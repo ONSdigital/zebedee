@@ -63,6 +63,70 @@ public class Builder {
 	}
 
 	/**
+	 * Creates a published file.
+	 * 
+	 * @param uri
+	 *            The URI to be created.
+	 * @throws IOException
+	 *             If a filesystem error occurs.
+	 */
+	void isPublished(String uri) throws IOException {
+
+		Path published = zebedee.resolve(Zebedee.PUBLISHED);
+		Path content = published.resolve(uri.substring(1));
+		Files.createDirectories(content.getParent());
+		Files.createFile(content);
+	}
+
+	/**
+	 * Creates an approved file.
+	 * 
+	 * @param uri
+	 *            The URI to be created.
+	 * @throws IOException
+	 *             If a filesystem error occurs.
+	 */
+	void isApproved(String uri) throws IOException {
+
+		Path approved = releases.get(1).resolve(Release.APPROVED);
+		Path content = approved.resolve(uri.substring(1));
+		Files.createDirectories(content.getParent());
+		Files.createFile(content);
+	}
+
+	/**
+	 * Creates an approved file in a different release.
+	 * 
+	 * @param uri
+	 *            The URI to be created.
+	 * @throws IOException
+	 *             If a filesystem error occurs.
+	 */
+	void isBeingEditedElsewhere(String uri, int release) throws IOException {
+
+		Path approved = releases.get(release).resolve(Release.APPROVED);
+		Path content = approved.resolve(uri.substring(1));
+		Files.createDirectories(content.getParent());
+		Files.createFile(content);
+	}
+
+	/**
+	 * Creates an in-progress file.
+	 * 
+	 * @param uri
+	 *            The URI to be created.
+	 * @throws IOException
+	 *             If a filesystem error occurs.
+	 */
+	void isInProgress(String uri) throws IOException {
+
+		Path inProgress = releases.get(1).resolve(Release.IN_PROGRESS);
+		Path content = inProgress.resolve(uri.substring(1));
+		Files.createDirectories(content.getParent());
+		Files.createFile(content);
+	}
+
+	/**
 	 * This method creates the expected set of folders for a Zebedee structure.
 	 * This code is intentionaly copied from {@link Zebedee#create(Path)}. This
 	 * ensures there's a fixed expectation, rather than relying on a method that

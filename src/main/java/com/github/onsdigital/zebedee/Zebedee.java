@@ -100,7 +100,7 @@ public class Zebedee {
 
 		for (String uri : release.approved.uris()) {
 			Path source = release.approved.get(uri);
-			Path destination = published.get(uri);
+			Path destination = published.toPath(uri);
 			PathUtils.move(source, destination);
 		}
 		return true;

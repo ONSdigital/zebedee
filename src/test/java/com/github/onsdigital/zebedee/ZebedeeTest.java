@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -114,6 +115,44 @@ public class ZebedeeTest {
 
 		// Then
 		assertEquals(1, actual);
+	}
+
+	@Test
+	public void shouldPublish() throws IOException {
+
+		// Given
+		// There is content ready to be published:
+		Zebedee zebedee = new Zebedee(expectedPath);
+		Release release = new Release(builder.releases.get(1), zebedee);
+		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
+		builder.isApproved(uri);
+
+		// When
+		boolean published = zebedee.publish(release);
+
+		// Then
+		assertTrue(published);
+		Path publishedPath = builder.zebedee.resolve(Zebedee.PUBLISHED);
+		assertTrue(Files.exists(publishedPath.resolve(uri.substring(1))));
+	}
+
+	@Test
+	public void shouldNotPublishIfAnythingInProgress() throws IOException {
+
+		// Given
+		// There is content ready to be published:
+		Zebedee zebedee = new Zebedee(expectedPath);
+		Release release = new Release(builder.releases.get(1), zebedee);
+		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
+		builder.isInProgress(uri);
+
+		// When
+		boolean published = zebedee.publish(release);
+
+		// Then
+		assertFalse(published);
+		Path publishedPath = builder.zebedee.resolve(Zebedee.PUBLISHED);
+		assertFalse(Files.exists(publishedPath.resolve(uri.substring(1))));
 	}
 
 }

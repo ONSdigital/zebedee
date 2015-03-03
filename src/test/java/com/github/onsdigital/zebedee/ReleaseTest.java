@@ -362,6 +362,24 @@ public class ReleaseTest {
 	}
 
 	@Test
+	public void shouldNotBeApprovedIfInProgress() throws IOException {
+
+		// Given
+		// The content has been approved:
+		String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+		builder.isApproved(uri);
+		builder.isInProgress(uri);
+
+		// When
+		boolean approved = release.isApproved(uri);
+		boolean inRelease = release.isInRelease(uri);
+
+		// Then
+		assertFalse(approved);
+		assertTrue(inRelease);
+	}
+
+	@Test
 	public void shouldGetPath() throws IOException {
 
 		// Given

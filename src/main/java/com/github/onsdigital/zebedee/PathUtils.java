@@ -38,13 +38,9 @@ public class PathUtils {
 	 *             If a filesystem error occurs.
 	 */
 	static void copy(Path source, Path destination) throws IOException {
-		if (!Files.exists(destination.getParent())) {
-			Files.createDirectories(destination.getParent());
-		}
-		try (InputStream input = Files.newInputStream(source);
-				OutputStream output = Files.newOutputStream(destination)) {
-			IOUtils.copy(input, output);
-		}
+
+		createParentFolders(destination);
+		doCopy(source, destination);
 	}
 
 	/**
@@ -61,20 +57,33 @@ public class PathUtils {
 	 */
 	static void move(Path source, Path destination) throws IOException {
 
-		// Create any necessary parent folders:
-		if (!Files.exists(destination.getParent())) {
-			Files.createDirectories(destination.getParent());
-		}
-
-		// Move if we can:
+		createParentFolders(destination);
 		if (!Files.exists(destination)) {
+
+			// Move
 			Files.move(source, destination);
+
 		} else {
-			try (InputStream input = Files.newInputStream(source);
-					OutputStream output = Files.newOutputStream(destination)) {
-				IOUtils.copy(input, output);
-			}
+
+			// Copy-then-delete
+			doCopy(source, destination);
 			Files.delete(source);
+		}
+	}
+
+	private static void doCopy(Path source, Path destination)
+			throws IOException {
+		try (InputStream input = Files.newInputStream(source);
+				OutputStream output = Files.newOutputStream(destination)) {
+			IOUtils.copy(input, output);
+		}
+	}
+
+	private static void createParentFolders(Path path) throws IOException {
+
+		// Create any necessary parent folders:
+		if (!Files.exists(path.getParent())) {
+			Files.createDirectories(path.getParent());
 		}
 	}
 }

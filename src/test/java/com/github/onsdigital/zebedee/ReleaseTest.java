@@ -90,7 +90,7 @@ public class ReleaseTest {
 		// Given
 		// The content already exists:
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-		isPublished(uri);
+		builder.isPublished(uri);
 
 		// When
 		boolean created = release.create(uri);
@@ -107,7 +107,7 @@ public class ReleaseTest {
 		// Given
 		// The content already exists:
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-		isApproved(uri);
+		builder.isApproved(uri);
 
 		// When
 		boolean created = release.create(uri);
@@ -124,7 +124,7 @@ public class ReleaseTest {
 		// Given
 		// The content already exists:
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-		isInProgress(uri);
+		builder.isInProgress(uri);
 
 		// When
 		boolean created = release.create(uri);
@@ -139,7 +139,7 @@ public class ReleaseTest {
 		// Given
 		// The content exists publicly:
 		String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-		isPublished(uri);
+		builder.isPublished(uri);
 
 		// When
 		boolean edited = release.edit(uri);
@@ -156,8 +156,8 @@ public class ReleaseTest {
 		// Given
 		// The content exists, has been edited and approved:
 		String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-		isPublished(uri);
-		isApproved(uri);
+		builder.isPublished(uri);
+		builder.isApproved(uri);
 
 		// When
 		boolean edited = release.edit(uri);
@@ -174,7 +174,7 @@ public class ReleaseTest {
 		// Given
 		// The content already exists:
 		String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-		isInProgress(uri);
+		builder.isInProgress(uri);
 
 		// When
 		boolean edited = release.edit(uri);
@@ -189,7 +189,7 @@ public class ReleaseTest {
 		// Given
 		// The content already exists in another release:
 		String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-		isBeingEditedElsewhere(uri);
+		builder.isBeingEditedElsewhere(uri, 0);
 
 		// When
 		boolean edited = release.edit(uri);
@@ -218,9 +218,9 @@ public class ReleaseTest {
 		// Given
 		// The content exists, has been edited and approved:
 		String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-		isPublished(uri);
-		isApproved(uri);
-		isInProgress(uri);
+		builder.isPublished(uri);
+		builder.isApproved(uri);
+		builder.isInProgress(uri);
 
 		// When
 		boolean approved = release.approve(uri);
@@ -237,7 +237,7 @@ public class ReleaseTest {
 		// Given
 		// The content already exists:
 		String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-		isApproved(uri);
+		builder.isApproved(uri);
 
 		// When
 		boolean approved = release.approve(uri);
@@ -253,7 +253,7 @@ public class ReleaseTest {
 		// The content exists, has been edited and approved:
 		String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
 		String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-		isPublished(sourceUri);
+		builder.isPublished(sourceUri);
 
 		// When
 		boolean copied = release.copy(sourceUri, targetUri);
@@ -283,10 +283,10 @@ public class ReleaseTest {
 	public void shouldNotCopyIfTargetApproved() throws IOException {
 
 		// Given
-		// The source URI does not exist:
+		// The target URI is already approved:
 		String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
 		String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-		isApproved(targetUri);
+		builder.isApproved(targetUri);
 
 		// When
 		boolean copied = release.copy(sourceUri, targetUri);
@@ -299,10 +299,10 @@ public class ReleaseTest {
 	public void shouldNotCopyIfTargetInProgress() throws IOException {
 
 		// Given
-		// The source URI does not exist:
+		// The target URI is currently being edited:
 		String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
 		String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-		isInProgress(targetUri);
+		builder.isInProgress(targetUri);
 
 		// When
 		boolean copied = release.copy(sourceUri, targetUri);
@@ -315,10 +315,10 @@ public class ReleaseTest {
 	public void shouldNotCopyIfTargetBeingEditedElsewhere() throws IOException {
 
 		// Given
-		// The source URI does not exist:
+		// The source URI is being edited in another release:
 		String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
 		String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-		isBeingEditedElsewhere(targetUri);
+		builder.isBeingEditedElsewhere(targetUri, 0);
 
 		// When
 		boolean copied = release.copy(sourceUri, targetUri);
@@ -331,9 +331,9 @@ public class ReleaseTest {
 	public void shouldBeInProgress() throws IOException {
 
 		// Given
-		// The content exists, has been edited and approved:
+		// The content is currently being edited:
 		String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-		isInProgress(uri);
+		builder.isInProgress(uri);
 
 		// When
 		boolean inProgress = release.isInProgress(uri);
@@ -348,9 +348,9 @@ public class ReleaseTest {
 	public void shouldBeApproved() throws IOException {
 
 		// Given
-		// The content exists, has been edited and approved:
+		// The content has been approved:
 		String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-		isApproved(uri);
+		builder.isApproved(uri);
 
 		// When
 		boolean approved = release.isApproved(uri);
@@ -367,9 +367,9 @@ public class ReleaseTest {
 		// Given
 		// We're editing some content:
 		String uri = "/economy/inflationandpriceindices/timeseries/beer.html";
-		isPublished(uri);
-		isApproved(uri);
-		isInProgress(uri);
+		builder.isPublished(uri);
+		builder.isApproved(uri);
+		builder.isInProgress(uri);
 
 		// When
 		// We write some output to the content:
@@ -381,75 +381,10 @@ public class ReleaseTest {
 
 		// Then
 		// The output should have gone to the expected copy of the file:
-		Path inProgressPath = builder.releases.get(1).resolve(Release.IN_PROGRESS);
+		Path inProgressPath = builder.releases.get(1).resolve(
+				Release.IN_PROGRESS);
 		Path expectedPath = inProgressPath.resolve(uri.substring(1));
 		assertTrue(Files.size(expectedPath) > 0);
-	}
-
-	// -----------------------------------------
-
-	/**
-	 * Creates a published file.
-	 * 
-	 * @param uri
-	 *            The URI to be created.
-	 * @throws IOException
-	 *             If a filesystem error occurs.
-	 */
-	private void isPublished(String uri) throws IOException {
-
-		Path published = builder.zebedee.resolve(Zebedee.PUBLISHED);
-		Path content = published.resolve(uri.substring(1));
-		Files.createDirectories(content.getParent());
-		Files.createFile(content);
-	}
-
-	/**
-	 * Creates an approved file.
-	 * 
-	 * @param uri
-	 *            The URI to be created.
-	 * @throws IOException
-	 *             If a filesystem error occurs.
-	 */
-	private void isApproved(String uri) throws IOException {
-
-		Path approved = builder.releases.get(1).resolve(Release.APPROVED);
-		Path content = approved.resolve(uri.substring(1));
-		Files.createDirectories(content.getParent());
-		Files.createFile(content);
-	}
-
-	/**
-	 * Creates an approved file in a different release.
-	 * 
-	 * @param uri
-	 *            The URI to be created.
-	 * @throws IOException
-	 *             If a filesystem error occurs.
-	 */
-	private void isBeingEditedElsewhere(String uri) throws IOException {
-
-		Path approved = builder.releases.get(0).resolve(Release.APPROVED);
-		Path content = approved.resolve(uri.substring(1));
-		Files.createDirectories(content.getParent());
-		Files.createFile(content);
-	}
-
-	/**
-	 * Creates an in-progress file.
-	 * 
-	 * @param uri
-	 *            The URI to be created.
-	 * @throws IOException
-	 *             If a filesystem error occurs.
-	 */
-	private void isInProgress(String uri) throws IOException {
-
-		Path inProgress = builder.releases.get(1).resolve(Release.IN_PROGRESS);
-		Path content = inProgress.resolve(uri.substring(1));
-		Files.createDirectories(content.getParent());
-		Files.createFile(content);
 	}
 
 }

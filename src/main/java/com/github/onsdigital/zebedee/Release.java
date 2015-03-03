@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
+
 public class Release {
 	static final String APPROVED = "approved";
 	static final String IN_PROGRESS = "inprogress";

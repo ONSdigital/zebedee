@@ -99,6 +99,8 @@ public class Builder {
 	 * 
 	 * @param uri
 	 *            The URI to be created.
+	 * @param release
+	 *            The release in which to create the content.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */

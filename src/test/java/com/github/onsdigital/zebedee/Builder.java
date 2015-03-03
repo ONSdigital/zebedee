@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
+
 /**
  * This is a utility class to build a known {@link Zebedee} structure for
  * testing.

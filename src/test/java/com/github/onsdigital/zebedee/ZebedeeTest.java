@@ -43,7 +43,7 @@ public class ZebedeeTest {
 		// Then
 		assertTrue(Files.exists(expectedPath));
 		assertTrue(Files.exists(expectedPath.resolve(Zebedee.PUBLISHED)));
-		assertTrue(Files.exists(expectedPath.resolve(Zebedee.RELEASES)));
+		assertTrue(Files.exists(expectedPath.resolve(Zebedee.CHANGE_SETS)));
 	}
 
 	@Test
@@ -80,10 +80,10 @@ public class ZebedeeTest {
 		Zebedee zebedee = new Zebedee(expectedPath);
 
 		// When
-		List<ChangeSet> releases = zebedee.getReleases();
+		List<ChangeSet> releases = zebedee.getChangeSets();
 
 		// Then
-		assertEquals(builder.releases.size(), releases.size());
+		assertEquals(builder.changeSets.size(), releases.size());
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class ZebedeeTest {
 		// Given
 		Zebedee zebedee = new Zebedee(expectedPath);
 		String path = builder.contentUris.get(0).substring(1);
-		Path approved = builder.releases.get(0).resolve(ChangeSet.APPROVED);
+		Path approved = builder.changeSets.get(0).resolve(ChangeSet.APPROVED);
 		Path beingEdited = approved.resolve(path);
 		Files.createDirectories(beingEdited.getParent());
 		Files.createFile(beingEdited);
@@ -123,7 +123,7 @@ public class ZebedeeTest {
 		// Given
 		// There is content ready to be published:
 		Zebedee zebedee = new Zebedee(expectedPath);
-		ChangeSet release = new ChangeSet(builder.releases.get(1), zebedee);
+		ChangeSet release = new ChangeSet(builder.changeSets.get(1), zebedee);
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 		builder.isApproved(uri);
 
@@ -142,7 +142,7 @@ public class ZebedeeTest {
 		// Given
 		// There is content ready to be published:
 		Zebedee zebedee = new Zebedee(expectedPath);
-		ChangeSet release = new ChangeSet(builder.releases.get(1), zebedee);
+		ChangeSet release = new ChangeSet(builder.changeSets.get(1), zebedee);
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 		builder.isInProgress(uri);
 

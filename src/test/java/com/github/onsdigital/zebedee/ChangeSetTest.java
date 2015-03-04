@@ -14,17 +14,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ReleaseTest {
+public class ChangeSetTest {
 
 	Zebedee zebedee;
-	ChangeSet release;
+	ChangeSet changeSet;
 	Builder builder;
 
 	@Before
 	public void setUp() throws Exception {
 		builder = new Builder(this.getClass());
 		zebedee = new Zebedee(builder.zebedee);
-		release = new ChangeSet(builder.releases.get(1), zebedee);
+		changeSet = new ChangeSet(builder.changeSets.get(1), zebedee);
 	}
 
 	@After
@@ -43,7 +43,7 @@ public class ReleaseTest {
 		ChangeSet.create(name, zebedee);
 
 		// Then
-		Path releasePath = builder.zebedee.resolve(Zebedee.RELEASES).resolve(
+		Path releasePath = builder.zebedee.resolve(Zebedee.CHANGE_SETS).resolve(
 				PathUtils.toFilename(name));
 		assertTrue(Files.exists(releasePath));
 		assertTrue(Files.exists(releasePath.resolve(ChangeSet.APPROVED)));
@@ -57,7 +57,7 @@ public class ReleaseTest {
 		// A folder that isn't a valid release:
 		String name = "Population Release";
 		ChangeSet.create(name, zebedee);
-		Path releasePath = builder.zebedee.resolve(Zebedee.RELEASES).resolve(
+		Path releasePath = builder.zebedee.resolve(Zebedee.CHANGE_SETS).resolve(
 				PathUtils.toFilename(name));
 		FileUtils.cleanDirectory(releasePath.toFile());
 
@@ -76,11 +76,11 @@ public class ReleaseTest {
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 
 		// When
-		boolean created = release.create(uri);
+		boolean created = changeSet.create(uri);
 
 		// Then
 		assertTrue(created);
-		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -93,11 +93,11 @@ public class ReleaseTest {
 		builder.isPublished(uri);
 
 		// When
-		boolean created = release.create(uri);
+		boolean created = changeSet.create(uri);
 
 		// Then
 		assertFalse(created);
-		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -110,11 +110,11 @@ public class ReleaseTest {
 		builder.isApproved(uri);
 
 		// When
-		boolean created = release.create(uri);
+		boolean created = changeSet.create(uri);
 
 		// Then
 		assertFalse(created);
-		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -127,7 +127,7 @@ public class ReleaseTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean created = release.create(uri);
+		boolean created = changeSet.create(uri);
 
 		// Then
 		assertFalse(created);
@@ -142,11 +142,11 @@ public class ReleaseTest {
 		builder.isPublished(uri);
 
 		// When
-		boolean edited = release.edit(uri);
+		boolean edited = changeSet.edit(uri);
 
 		// Then
 		assertTrue(edited);
-		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -160,11 +160,11 @@ public class ReleaseTest {
 		builder.isApproved(uri);
 
 		// When
-		boolean edited = release.edit(uri);
+		boolean edited = changeSet.edit(uri);
 
 		// Then
 		assertTrue(edited);
-		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -177,7 +177,7 @@ public class ReleaseTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean edited = release.edit(uri);
+		boolean edited = changeSet.edit(uri);
 
 		// Then
 		assertFalse(edited);
@@ -192,7 +192,7 @@ public class ReleaseTest {
 		builder.isBeingEditedElsewhere(uri, 0);
 
 		// When
-		boolean edited = release.edit(uri);
+		boolean edited = changeSet.edit(uri);
 
 		// Then
 		assertFalse(edited);
@@ -206,7 +206,7 @@ public class ReleaseTest {
 		String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
 
 		// When
-		boolean edited = release.edit(uri);
+		boolean edited = changeSet.edit(uri);
 
 		// Then
 		assertFalse(edited);
@@ -223,11 +223,11 @@ public class ReleaseTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean approved = release.approve(uri);
+		boolean approved = changeSet.approve(uri);
 
 		// Then
 		assertTrue(approved);
-		Path edited = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path edited = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertFalse(Files.exists(edited.resolve(uri.substring(1))));
 	}
 
@@ -240,7 +240,7 @@ public class ReleaseTest {
 		builder.isApproved(uri);
 
 		// When
-		boolean approved = release.approve(uri);
+		boolean approved = changeSet.approve(uri);
 
 		// Then
 		assertFalse(approved);
@@ -256,11 +256,11 @@ public class ReleaseTest {
 		builder.isPublished(sourceUri);
 
 		// When
-		boolean copied = release.copy(sourceUri, targetUri);
+		boolean copied = changeSet.copy(sourceUri, targetUri);
 
 		// Then
 		assertTrue(copied);
-		Path edited = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path edited = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertTrue(Files.exists(edited.resolve(targetUri.substring(1))));
 	}
 
@@ -273,7 +273,7 @@ public class ReleaseTest {
 		String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
 
 		// When
-		boolean copied = release.copy(sourceUri, targetUri);
+		boolean copied = changeSet.copy(sourceUri, targetUri);
 
 		// Then
 		assertFalse(copied);
@@ -289,7 +289,7 @@ public class ReleaseTest {
 		builder.isApproved(targetUri);
 
 		// When
-		boolean copied = release.copy(sourceUri, targetUri);
+		boolean copied = changeSet.copy(sourceUri, targetUri);
 
 		// Then
 		assertFalse(copied);
@@ -305,7 +305,7 @@ public class ReleaseTest {
 		builder.isInProgress(targetUri);
 
 		// When
-		boolean copied = release.copy(sourceUri, targetUri);
+		boolean copied = changeSet.copy(sourceUri, targetUri);
 
 		// Then
 		assertFalse(copied);
@@ -321,7 +321,7 @@ public class ReleaseTest {
 		builder.isBeingEditedElsewhere(targetUri, 0);
 
 		// When
-		boolean copied = release.copy(sourceUri, targetUri);
+		boolean copied = changeSet.copy(sourceUri, targetUri);
 
 		// Then
 		assertFalse(copied);
@@ -336,8 +336,8 @@ public class ReleaseTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean inProgress = release.isInProgress(uri);
-		boolean inRelease = release.isInRelease(uri);
+		boolean inProgress = changeSet.isInProgress(uri);
+		boolean inRelease = changeSet.isInChangeSet(uri);
 
 		// Then
 		assertTrue(inProgress);
@@ -353,8 +353,8 @@ public class ReleaseTest {
 		builder.isApproved(uri);
 
 		// When
-		boolean approved = release.isApproved(uri);
-		boolean inRelease = release.isInRelease(uri);
+		boolean approved = changeSet.isApproved(uri);
+		boolean inRelease = changeSet.isInChangeSet(uri);
 
 		// Then
 		assertTrue(approved);
@@ -371,8 +371,8 @@ public class ReleaseTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean approved = release.isApproved(uri);
-		boolean inRelease = release.isInRelease(uri);
+		boolean approved = changeSet.isApproved(uri);
+		boolean inRelease = changeSet.isInChangeSet(uri);
 
 		// Then
 		assertFalse(approved);
@@ -391,7 +391,7 @@ public class ReleaseTest {
 
 		// When
 		// We write some output to the content:
-		Path path = release.getPath(uri);
+		Path path = changeSet.getPath(uri);
 		try (Writer writer = Files.newBufferedWriter(path,
 				Charset.forName("utf8"));) {
 			writer.append("test");
@@ -399,7 +399,7 @@ public class ReleaseTest {
 
 		// Then
 		// The output should have gone to the expected copy of the file:
-		Path inProgressPath = builder.releases.get(1).resolve(
+		Path inProgressPath = builder.changeSets.get(1).resolve(
 				ChangeSet.IN_PROGRESS);
 		Path expectedPath = inProgressPath.resolve(uri.substring(1));
 		assertTrue(Files.size(expectedPath) > 0);

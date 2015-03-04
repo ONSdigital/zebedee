@@ -29,31 +29,40 @@ public class Root implements Startup {
 			// Create a Zebedee folder:
 			root = Files.createTempDirectory("zebedee");
 			zebedee = Zebedee.create(root);
-
-			// List the taxonomy files:
-			// ResourceUtils.classLoaderClass = Root.class;
-			// Path taxonomy = ResourceUtils.getPath("/taxonomy");
 			Path taxonomy = Paths.get(".").resolve("target/taxonomy");
-			List<Path> files = new ArrayList<>();
-			listFiles(taxonomy.toAbsolutePath(), taxonomy, files);
-
-			// Extract the content:
-			for (Path source : files) {
-				Path destination = zebedee.published.path.resolve(source
-						.toString());
-				Files.createDirectories(destination.getParent());
-				try (InputStream input = Files.newInputStream(source);
-						OutputStream output = Files
-								.newOutputStream(destination)) {
-					IOUtils.copy(input, output);
-				}
-			}
-
-			System.out.println("Zebedee root is at: " + root.toAbsolutePath());
+			List<Path> content = listContent(taxonomy);
+			copyContent(content, taxonomy);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private List<Path> listContent(Path taxonomy) throws IOException {
+		List<Path> content = new ArrayList<>();
+
+		// List the taxonomy files:
+		System.out.println(taxonomy.toAbsolutePath());
+		listFiles(taxonomy, taxonomy, content);
+
+		return content;
+	}
+
+	private void copyContent(List<Path> content, Path taxonomy)
+			throws IOException {
+
+		// Extract the content:
+		for (Path item : content) {
+			Path source = taxonomy.resolve(item);
+			Path destination = zebedee.published.path.resolve(item);
+			Files.createDirectories(destination.getParent());
+			try (InputStream input = Files.newInputStream(source);
+					OutputStream output = Files.newOutputStream(destination)) {
+				IOUtils.copy(input, output);
+			}
+		}
+
+		System.out.println("Zebedee root is at: " + root.toAbsolutePath());
 	}
 
 	/**
@@ -73,8 +82,7 @@ public class Root implements Startup {
 				if (Files.isDirectory(entry)) {
 					listFiles(base, entry, files);
 				} else {
-					// Path relative = base.relativize(entry.toAbsolutePath());
-					files.add(entry);
+					files.add(base.relativize(entry));
 				}
 			}
 		}

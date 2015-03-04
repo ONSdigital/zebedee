@@ -12,18 +12,18 @@ public class ChangeSet {
 	static final String APPROVED = "approved";
 	static final String IN_PROGRESS = "inprogress";
 
-	ReleaseDescription description;
+	public final ChangeSetDescription description;
 	Path path;
 	Content approved;
 	Content inProgress;
 	Zebedee zebedee;
 
 	/**
-	 * Constructs a new release in the given {@link Zebedee}, creating the
-	 * necessary folders {@value #APPROVED} and {@value #IN_PROGRESS}.
+	 * Constructs a new {@link ChangeSet} in the given {@link Zebedee}, creating
+	 * the necessary folders {@value #APPROVED} and {@value #IN_PROGRESS}.
 	 * 
 	 * @param name
-	 *            The readable name of the release.
+	 *            The readable name of the {@link ChangeSet}.
 	 * @param zebedee
 	 * @return
 	 * @throws IOException
@@ -34,16 +34,17 @@ public class ChangeSet {
 		String filename = PathUtils.toFilename(name);
 
 		// Create the folders:
-		Path release = zebedee.releases.resolve(filename);
-		Files.createDirectory(release);
-		Files.createDirectory(release.resolve(APPROVED));
-		Files.createDirectory(release.resolve(IN_PROGRESS));
+		Path changeSet = zebedee.changeSets.resolve(filename);
+		Files.createDirectory(changeSet);
+		Files.createDirectory(changeSet.resolve(APPROVED));
+		Files.createDirectory(changeSet.resolve(IN_PROGRESS));
 
-		// Create the release description:
-		Path releaseDescription = zebedee.releases.resolve(filename + ".json");
-		ReleaseDescription description = new ReleaseDescription();
+		// Create the description:
+		Path changeSetDescription = zebedee.changeSets.resolve(filename
+				+ ".json");
+		ChangeSetDescription description = new ChangeSetDescription();
 		description.name = name;
-		try (OutputStream output = Files.newOutputStream(releaseDescription)) {
+		try (OutputStream output = Files.newOutputStream(changeSetDescription)) {
 			Serialiser.serialise(output, description);
 		}
 
@@ -51,12 +52,12 @@ public class ChangeSet {
 	}
 
 	/**
-	 * Instantiates an existing release. This validates that the directory
-	 * contains folders named {@value #APPROVED} and {@value #IN_PROGRESS} and
-	 * throws an exception if not.
+	 * Instantiates an existing {@link ChangeSet}. This validates that the
+	 * directory contains folders named {@value #APPROVED} and
+	 * {@value #IN_PROGRESS} and throws an exception if not.
 	 * 
 	 * @param path
-	 *            The {@link Path} of the release.
+	 *            The {@link Path} of the {@link ChangeSet}.
 	 * @param zebedee
 	 *            The containing {@link Zebedee}.
 	 * @throws IOException
@@ -72,14 +73,14 @@ public class ChangeSet {
 		if (!Files.exists(approved) || !Files.exists(inProgress)
 				|| !Files.exists(description)) {
 			throw new IllegalArgumentException(
-					"This doesn't look like a release folder: "
+					"This doesn't look like a change set folder: "
 							+ path.toAbsolutePath());
 		}
 
-		// Deserialise the release description:
+		// Deserialise the description:
 		try (InputStream input = Files.newInputStream(description)) {
 			this.description = Serialiser.deserialise(input,
-					ReleaseDescription.class);
+					ChangeSetDescription.class);
 		}
 
 		// Set fields:
@@ -89,7 +90,7 @@ public class ChangeSet {
 	}
 
 	ChangeSet(String name, Zebedee zebedee) throws IOException {
-		this(zebedee.releases.resolve(PathUtils.toFilename(name)), zebedee);
+		this(zebedee.changeSets.resolve(PathUtils.toFilename(name)), zebedee);
 	}
 
 	/**
@@ -114,17 +115,18 @@ public class ChangeSet {
 	/**
 	 * @param uri
 	 *            The URI to check.
-	 * @return If the given URI is being edited as part of this release, true.
+	 * @return If the given URI is being edited as part of this
+	 *         {@link ChangeSet}, true.
 	 */
-	boolean isInRelease(String uri) {
+	boolean isInChangeSet(String uri) {
 		return isInProgress(uri) || isApproved(uri);
 	}
 
 	/**
 	 * @param uri
 	 *            uri The URI to check.
-	 * @return If the given URI is being edited as part of this release and has
-	 *         not yet been approved, true.
+	 * @return If the given URI is being edited as part of this
+	 *         {@link ChangeSet} and has not yet been approved, true.
 	 */
 	boolean isInProgress(String uri) {
 		return inProgress.exists(uri);
@@ -133,8 +135,8 @@ public class ChangeSet {
 	/**
 	 * @param uri
 	 *            uri The URI to check.
-	 * @return If the given URI is being edited as part of this release and has
-	 *         been approved, true.
+	 * @return If the given URI is being edited as part of this
+	 *         {@link ChangeSet} and has been approved, true.
 	 */
 	boolean isApproved(String uri) {
 		return !isInProgress(uri) && approved.exists(uri);
@@ -145,8 +147,9 @@ public class ChangeSet {
 	 * @param uri
 	 *            The new path you would like to create.
 	 * @return True if the new path was created. If the path is already present
-	 *         in the release, another release is editing this path or this path
-	 *         already exists in the published content, false.
+	 *         in the {@link ChangeSet}, another {@link ChangeSet} is editing
+	 *         this path or this path already exists in the published content,
+	 *         false.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
@@ -173,8 +176,9 @@ public class ChangeSet {
 	 * @param uri
 	 *            The new path you would like to create.
 	 * @return True if the new path was created. If the path is already present
-	 *         in the release, another release is editing this path or this path
-	 *         already exists in the published content, false.
+	 *         in the {@link ChangeSet}, another {@link ChangeSet} is editing
+	 *         this path or this path already exists in the published content,
+	 *         false.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
@@ -198,8 +202,9 @@ public class ChangeSet {
 	 * @param uri
 	 *            The path you would like to edit.
 	 * @return True if the path was added to {@link #inProgress}. If the path is
-	 *         already present in the release, another release is editing this
-	 *         path or this path already exists in the published content, false.
+	 *         already present in the {@link ChangeSet}, another
+	 *         {@link ChangeSet} is editing this path or this path already
+	 *         exists in the published content, false.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
@@ -207,7 +212,7 @@ public class ChangeSet {
 		boolean result = false;
 
 		Path source = find(uri);
-		boolean isBeingEditedElsewhere = !isInRelease(uri)
+		boolean isBeingEditedElsewhere = !isInChangeSet(uri)
 				&& zebedee.isBeingEdited(uri) > 0;
 		if (source != null && !isInProgress(uri) && !isBeingEditedElsewhere) {
 			// Copy to in progress:

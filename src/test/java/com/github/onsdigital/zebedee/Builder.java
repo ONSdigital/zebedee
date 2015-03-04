@@ -20,10 +20,10 @@ import com.github.davidcarboni.restolino.json.Serialiser;
  */
 public class Builder {
 
-	String[] releaseNames = { "Inflation Q2 2015", "Labour Market Q2 2015" };
+	String[] changeSetNames = { "Inflation Q2 2015", "Labour Market Q2 2015" };
 	Path parent;
 	Path zebedee;
-	List<Path> releases;
+	List<Path> changeSets;
 	List<String> contentUris;
 
 	Builder(Class<?> name) throws IOException {
@@ -32,11 +32,11 @@ public class Builder {
 		parent = Files.createTempDirectory(name.getSimpleName());
 		zebedee = createZebedee(parent);
 
-		// Create the releases:
-		releases = new ArrayList<>();
-		for (String releaseName : releaseNames) {
-			Path release = createRelease(releaseName, zebedee);
-			releases.add(release);
+		// Create the change sets:
+		changeSets = new ArrayList<>();
+		for (String changeSetName : changeSetNames) {
+			Path changeSet = createChangeSet(changeSetName, zebedee);
+			changeSets.add(changeSet);
 		}
 
 		// Create some published content:
@@ -90,25 +90,25 @@ public class Builder {
 	 */
 	void isApproved(String uri) throws IOException {
 
-		Path approved = releases.get(1).resolve(ChangeSet.APPROVED);
+		Path approved = changeSets.get(1).resolve(ChangeSet.APPROVED);
 		Path content = approved.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
 	}
 
 	/**
-	 * Creates an approved file in a different release.
+	 * Creates an approved file in a different {@link ChangeSet}.
 	 * 
 	 * @param uri
 	 *            The URI to be created.
-	 * @param release
-	 *            The release in which to create the content.
+	 * @param changeSet
+	 *            The {@link ChangeSet} in which to create the content.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	void isBeingEditedElsewhere(String uri, int release) throws IOException {
+	void isBeingEditedElsewhere(String uri, int changeSet) throws IOException {
 
-		Path approved = releases.get(release).resolve(ChangeSet.APPROVED);
+		Path approved = changeSets.get(changeSet).resolve(ChangeSet.APPROVED);
 		Path content = approved.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
@@ -124,7 +124,7 @@ public class Builder {
 	 */
 	void isInProgress(String uri) throws IOException {
 
-		Path inProgress = releases.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
 		Path content = inProgress.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
@@ -146,7 +146,7 @@ public class Builder {
 	private Path createZebedee(Path parent) throws IOException {
 		Path path = Files.createDirectory(parent.resolve(Zebedee.ZEBEDEE));
 		Files.createDirectory(path.resolve(Zebedee.PUBLISHED));
-		Files.createDirectory(path.resolve(Zebedee.RELEASES));
+		Files.createDirectory(path.resolve(Zebedee.CHANGE_SETS));
 		return path;
 	}
 
@@ -160,31 +160,31 @@ public class Builder {
 	 * @param root
 	 *            The root of the {@link Zebedee} structure
 	 * @param name
-	 *            The name of the release.
+	 *            The name of the {@link ChangeSet}.
 	 * @return The root {@link ChangeSet} path.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	private Path createRelease(String name, Path root) throws IOException {
+	private Path createChangeSet(String name, Path root) throws IOException {
 
 		String filename = PathUtils.toFilename(name);
-		Path releases = root.resolve(Zebedee.RELEASES);
+		Path changeSets = root.resolve(Zebedee.CHANGE_SETS);
 
 		// Create the folders:
-		Path release = releases.resolve(filename);
-		Files.createDirectory(release);
-		Files.createDirectory(release.resolve(ChangeSet.APPROVED));
-		Files.createDirectory(release.resolve(ChangeSet.IN_PROGRESS));
+		Path changeSet = changeSets.resolve(filename);
+		Files.createDirectory(changeSet);
+		Files.createDirectory(changeSet.resolve(ChangeSet.APPROVED));
+		Files.createDirectory(changeSet.resolve(ChangeSet.IN_PROGRESS));
 
-		// Create the release description:
-		Path releaseDescription = releases.resolve(filename + ".json");
-		ReleaseDescription description = new ReleaseDescription();
+		// Create the description:
+		Path changeSetDescription = changeSets.resolve(filename + ".json");
+		ChangeSetDescription description = new ChangeSetDescription();
 		description.name = name;
-		try (OutputStream output = Files.newOutputStream(releaseDescription)) {
+		try (OutputStream output = Files.newOutputStream(changeSetDescription)) {
 			Serialiser.serialise(output, description);
 		}
 
-		return release;
+		return changeSet;
 	}
 
 }

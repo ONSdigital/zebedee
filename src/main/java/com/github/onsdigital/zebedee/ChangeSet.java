@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 
-public class Release {
+public class ChangeSet {
 	static final String APPROVED = "approved";
 	static final String IN_PROGRESS = "inprogress";
 
@@ -28,7 +28,7 @@ public class Release {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Release create(String name, Zebedee zebedee)
+	public static ChangeSet create(String name, Zebedee zebedee)
 			throws IOException {
 
 		String filename = PathUtils.toFilename(name);
@@ -47,7 +47,7 @@ public class Release {
 			Serialiser.serialise(output, description);
 		}
 
-		return new Release(name, zebedee);
+		return new ChangeSet(name, zebedee);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class Release {
 	 *            The containing {@link Zebedee}.
 	 * @throws IOException
 	 */
-	Release(Path path, Zebedee zebedee) throws IOException {
+	ChangeSet(Path path, Zebedee zebedee) throws IOException {
 
 		// Validate the directory:
 		this.path = path;
@@ -88,7 +88,7 @@ public class Release {
 		this.inProgress = new Taxonomy(inProgress);
 	}
 
-	Release(String name, Zebedee zebedee) throws IOException {
+	ChangeSet(String name, Zebedee zebedee) throws IOException {
 		this(zebedee.releases.resolve(PathUtils.toFilename(name)), zebedee);
 	}
 

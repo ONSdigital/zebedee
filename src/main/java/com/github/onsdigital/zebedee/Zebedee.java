@@ -64,7 +64,7 @@ public class Zebedee {
 		int result = 0;
 
 		// Is this URI present in any of the releases?
-		for (Release release : getReleases()) {
+		for (ChangeSet release : getReleases()) {
 			if (release.isInRelease(uri)) {
 				result++;
 			}
@@ -79,19 +79,19 @@ public class Zebedee {
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	List<Release> getReleases() throws IOException {
-		List<Release> result = new ArrayList<>();
+	List<ChangeSet> getReleases() throws IOException {
+		List<ChangeSet> result = new ArrayList<>();
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(releases)) {
 			for (Path path : stream) {
 				if (Files.isDirectory(path)) {
-					result.add(new Release(path, this));
+					result.add(new ChangeSet(path, this));
 				}
 			}
 		}
 		return result;
 	}
 
-	boolean publish(Release release) throws IOException {
+	boolean publish(ChangeSet release) throws IOException {
 
 		// Check everything has been approved:
 		if (release.inProgress.uris().size() > 0) {

@@ -10,11 +10,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class Taxonomy {
+public class Content {
 
 	public final Path path;
 
-	Taxonomy(Path path) {
+	Content(Path path) {
 		this.path = path;
 		if (!Files.exists(path)) {
 			throw new IllegalArgumentException("Path does not exist: "
@@ -46,7 +46,7 @@ public class Taxonomy {
 
 	/**
 	 * Generates a {@link Path} that represents the given URI within this
-	 * {@link Taxonomy}. The {@link Path} is generated whether or not a file
+	 * {@link Content}. The {@link Path} is generated whether or not a file
 	 * actually exists, so this method is suitable for use when creating new
 	 * content.
 	 * 
@@ -83,7 +83,7 @@ public class Taxonomy {
 	}
 
 	/**
-	 * Recursively lists all files within this {@link Taxonomy}.
+	 * Recursively lists all files within this {@link Content}.
 	 * 
 	 * @param path
 	 *            The path to start from. This method calls itself recursively.

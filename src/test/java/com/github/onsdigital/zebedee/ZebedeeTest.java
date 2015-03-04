@@ -80,7 +80,7 @@ public class ZebedeeTest {
 		Zebedee zebedee = new Zebedee(expectedPath);
 
 		// When
-		List<Release> releases = zebedee.getReleases();
+		List<ChangeSet> releases = zebedee.getReleases();
 
 		// Then
 		assertEquals(builder.releases.size(), releases.size());
@@ -105,7 +105,7 @@ public class ZebedeeTest {
 		// Given
 		Zebedee zebedee = new Zebedee(expectedPath);
 		String path = builder.contentUris.get(0).substring(1);
-		Path approved = builder.releases.get(0).resolve(Release.APPROVED);
+		Path approved = builder.releases.get(0).resolve(ChangeSet.APPROVED);
 		Path beingEdited = approved.resolve(path);
 		Files.createDirectories(beingEdited.getParent());
 		Files.createFile(beingEdited);
@@ -123,7 +123,7 @@ public class ZebedeeTest {
 		// Given
 		// There is content ready to be published:
 		Zebedee zebedee = new Zebedee(expectedPath);
-		Release release = new Release(builder.releases.get(1), zebedee);
+		ChangeSet release = new ChangeSet(builder.releases.get(1), zebedee);
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 		builder.isApproved(uri);
 
@@ -142,7 +142,7 @@ public class ZebedeeTest {
 		// Given
 		// There is content ready to be published:
 		Zebedee zebedee = new Zebedee(expectedPath);
-		Release release = new Release(builder.releases.get(1), zebedee);
+		ChangeSet release = new ChangeSet(builder.releases.get(1), zebedee);
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 		builder.isInProgress(uri);
 

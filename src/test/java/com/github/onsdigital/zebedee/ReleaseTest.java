@@ -17,14 +17,14 @@ import org.junit.Test;
 public class ReleaseTest {
 
 	Zebedee zebedee;
-	Release release;
+	ChangeSet release;
 	Builder builder;
 
 	@Before
 	public void setUp() throws Exception {
 		builder = new Builder(this.getClass());
 		zebedee = new Zebedee(builder.zebedee);
-		release = new Release(builder.releases.get(1), zebedee);
+		release = new ChangeSet(builder.releases.get(1), zebedee);
 	}
 
 	@After
@@ -40,14 +40,14 @@ public class ReleaseTest {
 		String name = "Population Release";
 
 		// When
-		Release.create(name, zebedee);
+		ChangeSet.create(name, zebedee);
 
 		// Then
 		Path releasePath = builder.zebedee.resolve(Zebedee.RELEASES).resolve(
 				PathUtils.toFilename(name));
 		assertTrue(Files.exists(releasePath));
-		assertTrue(Files.exists(releasePath.resolve(Release.APPROVED)));
-		assertTrue(Files.exists(releasePath.resolve(Release.IN_PROGRESS)));
+		assertTrue(Files.exists(releasePath.resolve(ChangeSet.APPROVED)));
+		assertTrue(Files.exists(releasePath.resolve(ChangeSet.IN_PROGRESS)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -56,13 +56,13 @@ public class ReleaseTest {
 		// Given
 		// A folder that isn't a valid release:
 		String name = "Population Release";
-		Release.create(name, zebedee);
+		ChangeSet.create(name, zebedee);
 		Path releasePath = builder.zebedee.resolve(Zebedee.RELEASES).resolve(
 				PathUtils.toFilename(name));
 		FileUtils.cleanDirectory(releasePath.toFile());
 
 		// When
-		new Release(releasePath, zebedee);
+		new ChangeSet(releasePath, zebedee);
 
 		// Then
 		// We should get an exception.
@@ -80,7 +80,7 @@ public class ReleaseTest {
 
 		// Then
 		assertTrue(created);
-		Path inProgress = builder.releases.get(1).resolve(Release.IN_PROGRESS);
+		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -97,7 +97,7 @@ public class ReleaseTest {
 
 		// Then
 		assertFalse(created);
-		Path inProgress = builder.releases.get(1).resolve(Release.IN_PROGRESS);
+		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -114,7 +114,7 @@ public class ReleaseTest {
 
 		// Then
 		assertFalse(created);
-		Path inProgress = builder.releases.get(1).resolve(Release.IN_PROGRESS);
+		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -146,7 +146,7 @@ public class ReleaseTest {
 
 		// Then
 		assertTrue(edited);
-		Path inProgress = builder.releases.get(1).resolve(Release.IN_PROGRESS);
+		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -164,7 +164,7 @@ public class ReleaseTest {
 
 		// Then
 		assertTrue(edited);
-		Path inProgress = builder.releases.get(1).resolve(Release.IN_PROGRESS);
+		Path inProgress = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -227,7 +227,7 @@ public class ReleaseTest {
 
 		// Then
 		assertTrue(approved);
-		Path edited = builder.releases.get(1).resolve(Release.IN_PROGRESS);
+		Path edited = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertFalse(Files.exists(edited.resolve(uri.substring(1))));
 	}
 
@@ -260,7 +260,7 @@ public class ReleaseTest {
 
 		// Then
 		assertTrue(copied);
-		Path edited = builder.releases.get(1).resolve(Release.IN_PROGRESS);
+		Path edited = builder.releases.get(1).resolve(ChangeSet.IN_PROGRESS);
 		assertTrue(Files.exists(edited.resolve(targetUri.substring(1))));
 	}
 
@@ -400,7 +400,7 @@ public class ReleaseTest {
 		// Then
 		// The output should have gone to the expected copy of the file:
 		Path inProgressPath = builder.releases.get(1).resolve(
-				Release.IN_PROGRESS);
+				ChangeSet.IN_PROGRESS);
 		Path expectedPath = inProgressPath.resolve(uri.substring(1));
 		assertTrue(Files.size(expectedPath) > 0);
 	}

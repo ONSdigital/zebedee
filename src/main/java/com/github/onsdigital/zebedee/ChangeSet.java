@@ -14,8 +14,8 @@ public class ChangeSet {
 
 	ReleaseDescription description;
 	Path path;
-	Taxonomy approved;
-	Taxonomy inProgress;
+	Content approved;
+	Content inProgress;
 	Zebedee zebedee;
 
 	/**
@@ -84,8 +84,8 @@ public class ChangeSet {
 
 		// Set fields:
 		this.zebedee = zebedee;
-		this.approved = new Taxonomy(approved);
-		this.inProgress = new Taxonomy(inProgress);
+		this.approved = new Content(approved);
+		this.inProgress = new Content(inProgress);
 	}
 
 	ChangeSet(String name, Zebedee zebedee) throws IOException {

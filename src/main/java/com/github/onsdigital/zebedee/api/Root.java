@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.github.davidcarboni.restolino.framework.Startup;
-import com.github.onsdigital.zebedee.Taxonomy;
+import com.github.onsdigital.zebedee.Content;
 import com.github.onsdigital.zebedee.Zebedee;
 
 public class Root implements Startup {
@@ -57,7 +57,7 @@ public class Root implements Startup {
 	}
 
 	/**
-	 * Recursively lists all files within this {@link Taxonomy}.
+	 * Recursively lists all files within this {@link Content}.
 	 * 
 	 * @param path
 	 *            The path to start from. This method calls itself recursively.

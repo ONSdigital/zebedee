@@ -90,7 +90,7 @@ public class Builder {
 	 */
 	void isApproved(String uri) throws IOException {
 
-		Path approved = releases.get(1).resolve(Release.APPROVED);
+		Path approved = releases.get(1).resolve(ChangeSet.APPROVED);
 		Path content = approved.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
@@ -108,7 +108,7 @@ public class Builder {
 	 */
 	void isBeingEditedElsewhere(String uri, int release) throws IOException {
 
-		Path approved = releases.get(release).resolve(Release.APPROVED);
+		Path approved = releases.get(release).resolve(ChangeSet.APPROVED);
 		Path content = approved.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
@@ -124,7 +124,7 @@ public class Builder {
 	 */
 	void isInProgress(String uri) throws IOException {
 
-		Path inProgress = releases.get(1).resolve(Release.IN_PROGRESS);
+		Path inProgress = releases.get(1).resolve(ChangeSet.IN_PROGRESS);
 		Path content = inProgress.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
@@ -153,7 +153,7 @@ public class Builder {
 	/**
 	 * This method creates the expected set of folders for a Zebedee structure.
 	 * This code is intentionaly copied from
-	 * {@link Release#create(String, Zebedee)}. This ensures there's a fixed
+	 * {@link ChangeSet#create(String, Zebedee)}. This ensures there's a fixed
 	 * expectation, rather than relying on a method that will be tested as part
 	 * of the test suite.
 	 * 
@@ -161,7 +161,7 @@ public class Builder {
 	 *            The root of the {@link Zebedee} structure
 	 * @param name
 	 *            The name of the release.
-	 * @return The root {@link Release} path.
+	 * @return The root {@link ChangeSet} path.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
@@ -173,8 +173,8 @@ public class Builder {
 		// Create the folders:
 		Path release = releases.resolve(filename);
 		Files.createDirectory(release);
-		Files.createDirectory(release.resolve(Release.APPROVED));
-		Files.createDirectory(release.resolve(Release.IN_PROGRESS));
+		Files.createDirectory(release.resolve(ChangeSet.APPROVED));
+		Files.createDirectory(release.resolve(ChangeSet.IN_PROGRESS));
 
 		// Create the release description:
 		Path releaseDescription = releases.resolve(filename + ".json");

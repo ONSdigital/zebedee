@@ -20,12 +20,12 @@ import org.junit.Test;
 public class TaxonomyTest {
 
 	Path path;
-	Taxonomy taxonomy;
+	Content taxonomy;
 
 	@Before
 	public void setUp() throws Exception {
 		path = Files.createTempDirectory(this.getClass().getSimpleName());
-		taxonomy = new Taxonomy(path);
+		taxonomy = new Content(path);
 	}
 
 	@After
@@ -104,7 +104,7 @@ public class TaxonomyTest {
 		FileUtils.deleteDirectory(path.toFile());
 
 		// When
-		taxonomy = new Taxonomy(path);
+		taxonomy = new Content(path);
 
 		// Then
 		// We should get an exception because the directory is invalid.

@@ -13,7 +13,7 @@ public class Zebedee {
 	static final String RELEASES = "releases";
 
 	public final Path path;
-	public final Taxonomy published;
+	public final Content published;
 	public final Path releases;
 
 	/**
@@ -43,7 +43,7 @@ public class Zebedee {
 					"This folder doesn't look like a release folder: "
 							+ path.toAbsolutePath());
 		}
-		this.published = new Taxonomy(published);
+		this.published = new Content(published);
 		this.releases = releases;
 	}
 

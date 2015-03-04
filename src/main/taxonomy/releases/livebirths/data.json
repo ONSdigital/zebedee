@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Statistics on live births are a subset of numbers from the data that the ONS obtains from the births and deaths registrations. They are available by sex, month of the year and region of the UK. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Annual data of live births, fertility rates, percentage of births outside marriage, sex ratio, mean age of mother and country of birth of mother and father.",
+      "type": "bulletin",
+      "name": "Births in England and Wales, 2013",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/birthsinenglandandwales2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Births data collection",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/birthsdatacollection"
+    }
+  ],
+  "type": "release",
+  "name": "Live births",
+  "fileName": "livebirths"
+}

@@ -1,0 +1,51 @@
+{
+  "cdid": "RAID109",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "943",
+  "unit": "bn",
+  "preUnit": "£",
+  "date": "2008/10",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2008/10",
+      "value": "943",
+      "year": "2010"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid111",
+    "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid110"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Total household debt",
+  "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid109",
+  "fileName": "raid109",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Personal and household finances",
+      "fileName": "personalandhouseholdfinances"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Debt",
+      "fileName": "debt",
+      "breadcrumb": []
+    }
+  ]
+}

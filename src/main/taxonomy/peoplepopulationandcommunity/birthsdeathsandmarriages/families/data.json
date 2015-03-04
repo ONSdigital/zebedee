@@ -1,0 +1,75 @@
+{
+  "headline": {
+    "name": "Families",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid42"
+  },
+  "items": [
+    {
+      "name": "Families",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid42"
+    },
+    {
+      "name": "Married or civil partner couple families (with dependent children)",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid43"
+    },
+    {
+      "name": "Married or civil partner couple families (without dependent children)",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid44"
+    },
+    {
+      "name": "Cohabiting couple families (with dependent children)",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid45"
+    },
+    {
+      "name": "Cohabiting couple families (without dependent children)",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid46"
+    },
+    {
+      "name": "Lone parent families (with dependent children)",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid47"
+    },
+    {
+      "name": "Lone parent families (without dependent children)",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid48"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
+    "name": "Families and Households, 2013",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
+      "name": "Families and Households, 2013",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Families by family type",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesbyfamilytype"
+    }
+  ],
+  "level": "t3",
+  "index": 8,
+  "lede": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
+  "type": "home",
+  "name": "Families",
+  "fileName": "families",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

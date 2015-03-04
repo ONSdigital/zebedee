@@ -1,0 +1,255 @@
+{
+  "cdid": "RAID89",
+  "note1": "All malignant neoplasms excluding non melanoma skin cancer (ICD-10 C44)",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "282911",
+  "unit": "",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1971",
+      "value": "143602",
+      "year": "1971"
+    },
+    {
+      "date": "1972",
+      "value": "146114",
+      "year": "1972"
+    },
+    {
+      "date": "1973",
+      "value": "151873",
+      "year": "1973"
+    },
+    {
+      "date": "1974",
+      "value": "156723",
+      "year": "1974"
+    },
+    {
+      "date": "1975",
+      "value": "157383",
+      "year": "1975"
+    },
+    {
+      "date": "1976",
+      "value": "158302",
+      "year": "1976"
+    },
+    {
+      "date": "1977",
+      "value": "161457",
+      "year": "1977"
+    },
+    {
+      "date": "1978",
+      "value": "161313",
+      "year": "1978"
+    },
+    {
+      "date": "1979",
+      "value": "164994",
+      "year": "1979"
+    },
+    {
+      "date": "1980",
+      "value": "170283",
+      "year": "1980"
+    },
+    {
+      "date": "1981",
+      "value": "174946",
+      "year": "1981"
+    },
+    {
+      "date": "1982",
+      "value": "176112",
+      "year": "1982"
+    },
+    {
+      "date": "1983",
+      "value": "180213",
+      "year": "1983"
+    },
+    {
+      "date": "1984",
+      "value": "179988",
+      "year": "1984"
+    },
+    {
+      "date": "1985",
+      "value": "190325",
+      "year": "1985"
+    },
+    {
+      "date": "1986",
+      "value": "188071",
+      "year": "1986"
+    },
+    {
+      "date": "1987",
+      "value": "192856",
+      "year": "1987"
+    },
+    {
+      "date": "1988",
+      "value": "197716",
+      "year": "1988"
+    },
+    {
+      "date": "1989",
+      "value": "198247",
+      "year": "1989"
+    },
+    {
+      "date": "1990",
+      "value": "199303",
+      "year": "1990"
+    },
+    {
+      "date": "1991",
+      "value": "202729",
+      "year": "1991"
+    },
+    {
+      "date": "1992",
+      "value": "211198",
+      "year": "1992"
+    },
+    {
+      "date": "1993",
+      "value": "208110",
+      "year": "1993"
+    },
+    {
+      "date": "1994",
+      "value": "213745",
+      "year": "1994"
+    },
+    {
+      "date": "1995",
+      "value": "215194",
+      "year": "1995"
+    },
+    {
+      "date": "1996",
+      "value": "215735",
+      "year": "1996"
+    },
+    {
+      "date": "1997",
+      "value": "222577",
+      "year": "1997"
+    },
+    {
+      "date": "1998",
+      "value": "223667",
+      "year": "1998"
+    },
+    {
+      "date": "1999",
+      "value": "231089",
+      "year": "1999"
+    },
+    {
+      "date": "2000",
+      "value": "230985",
+      "year": "2000"
+    },
+    {
+      "date": "2001",
+      "value": "234815",
+      "year": "2001"
+    },
+    {
+      "date": "2002",
+      "value": "233011",
+      "year": "2002"
+    },
+    {
+      "date": "2003",
+      "value": "237338",
+      "year": "2003"
+    },
+    {
+      "date": "2004",
+      "value": "243234",
+      "year": "2004"
+    },
+    {
+      "date": "2005",
+      "value": "246890",
+      "year": "2005"
+    },
+    {
+      "date": "2006",
+      "value": "253699",
+      "year": "2006"
+    },
+    {
+      "date": "2007",
+      "value": "255556",
+      "year": "2007"
+    },
+    {
+      "date": "2008",
+      "value": "263506",
+      "year": "2008"
+    },
+    {
+      "date": "2009",
+      "value": "270148",
+      "year": "2009"
+    },
+    {
+      "date": "2010",
+      "value": "272971",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "277915",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "282911",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Number of newly diagnosed cancers",
+  "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid89",
+  "fileName": "raid89",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Health and social care",
+      "fileName": "healthandsocialcare"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Conditions and diseases",
+      "fileName": "conditionsanddiseases",
+      "breadcrumb": []
+    }
+  ]
+}

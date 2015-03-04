@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Economic output is the total value of goods and/or services produced in a process. Statistics on economic output include indices on manufacturing, production and services. Productivity is a measure of efficiency. It can be expressed as a ratio of output to input over a given period of time, for example output per person per hour. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Estimates of the key components of GDP from the output, income and expenditure approaches. Gross Domestic Product measures the chained volume index movements of the UK. The services sector accounts for more than three quarters of total gross domestic product. Figures are adjusted for seasonal variations unless otherwise stated and the reference year is 2010\u003d100.",
+      "type": "bulletin",
+      "name": "Quarterly National Accounts, Q1 2014",
+      "uri": "/economy/economicoutputandproductivity/bulletins/quarterlynationalaccountsq12014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "By category of output (reference year 2010) for production and service industries",
+      "type": "dataset",
+      "name": "Gross value added",
+      "uri": "/economy/economicoutputandproductivity/datasets/grossvalueadded"
+    }
+  ],
+  "type": "release",
+  "name": "Economic output and productivity",
+  "fileName": "economicoutputandproductivity"
+}

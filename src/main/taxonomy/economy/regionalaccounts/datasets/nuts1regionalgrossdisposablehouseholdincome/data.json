@@ -1,0 +1,47 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/regional-accounts/regional-household-income/spring-2014/rft-nuts1.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Brief description of dataset",
+  "nationalStatistic": true,
+  "description": "Comprehensive description of data contained within this dataset.",
+  "title": "NUTS1 Regional Gross Disposable Household Income",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "NUTS1 Regional Gross Disposable Household Income",
+  "uri": "/economy/regionalaccounts/datasets/nuts1regionalgrossdisposablehouseholdincome",
+  "fileName": "nuts1regionalgrossdisposablehouseholdincome",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Regional accounts",
+      "fileName": "regionalaccounts",
+      "breadcrumb": []
+    }
+  ]
+}

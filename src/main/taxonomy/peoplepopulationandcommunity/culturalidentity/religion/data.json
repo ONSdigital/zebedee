@@ -1,0 +1,75 @@
+{
+  "headline": {
+    "name": "Christian",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid74"
+  },
+  "items": [
+    {
+      "name": "Christian",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid74"
+    },
+    {
+      "name": "No religion",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid75"
+    },
+    {
+      "name": "Muslim",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid76"
+    },
+    {
+      "name": "Hindu",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid77"
+    },
+    {
+      "name": "Sikh",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid78"
+    },
+    {
+      "name": "Jewish",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid79"
+    },
+    {
+      "name": "Buddhist",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid80"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
+    "name": "2011 Census Key Statistics for England and Wales, March 2011",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
+      "name": "2011 Census Key Statistics for England and Wales, March 2011",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Religion",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/datasets/religion"
+    }
+  ],
+  "level": "t3",
+  "index": 2,
+  "lede": "Statistics on religion focus on what people state as their religion. The main source of data in this area is the 2011 Census. ",
+  "type": "home",
+  "name": "Religion",
+  "fileName": "religion",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Cultural identity",
+      "fileName": "culturalidentity"
+    }
+  ]
+}

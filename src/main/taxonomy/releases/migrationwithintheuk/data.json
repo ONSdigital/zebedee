@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Internal migration refers to residential moves between different geographic areas within the UK. These statistics are compiled from data from main three sources: The NHS Patient Register, The NHS Central Register (NHSCR) and the Higher Education Statistics Agency (HESA). ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Summarised statistics on residential moves between local authorities and regions in England and Wales and the UK.",
+      "type": "bulletin",
+      "name": "Internal Migration, England and Wales, Year Ending June 2013",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/bulletins/internalmigrationenglandandwalesyearendingjune2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Internal migration by English regions and Wales",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/datasets/internalmigrationbyenglishregionsandwales"
+    }
+  ],
+  "type": "release",
+  "name": "Migration within the UK",
+  "fileName": "migrationwithintheuk"
+}

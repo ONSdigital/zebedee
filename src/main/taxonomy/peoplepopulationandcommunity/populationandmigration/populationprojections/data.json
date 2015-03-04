@@ -1,0 +1,61 @@
+{
+  "headline": {
+    "name": "Mid-2037 UK population projected to reach",
+    "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/timeseries/raid130"
+  },
+  "items": [
+    {
+      "name": "Mid-2037 UK population projected to reach",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/timeseries/raid130"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "This statistical bulletin presents the key findings from the 2012-based national population projections.",
+    "name": "National Population Projections, 2012-based",
+    "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This statistical bulletin presents the key findings from the 2012-based national population projections.",
+      "name": "National Population Projections, 2012-based",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
+      "name": "Principal population projection - UK",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionuk"
+    },
+    {
+      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
+      "name": "Principal population projection - Great Britain",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectiongreatbritain"
+    },
+    {
+      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
+      "name": "Principal population projection - England and Wales",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionenglandandwales"
+    }
+  ],
+  "level": "t3",
+  "index": 2,
+  "lede": "National population projections are available by age and sex for the UK and its constituent countries. These population projections are based on mid-year population estimates and a set of underlying assumptions regarding future fertility, mortality and migration. They provide an indication of the impact that changes in demographic patterns might have on the size and age structure of the population in the future. These projections are widely used for resource allocation and planning. ",
+  "type": "home",
+  "name": "Population projections",
+  "fileName": "populationprojections",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    }
+  ]
+}

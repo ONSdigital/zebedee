@@ -1,0 +1,40 @@
+{
+  "cdid": "RAID88",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "47.69",
+  "unit": "m",
+  "preUnit": "",
+  "date": "2013",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/elections/bulletins/electoralstatisticsforuk2013"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/elections/timeseries/raid87"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "European/local government electors",
+  "uri": "/peoplepopulationandcommunity/elections/timeseries/raid88",
+  "fileName": "raid88",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Elections",
+      "fileName": "elections",
+      "breadcrumb": []
+    }
+  ]
+}

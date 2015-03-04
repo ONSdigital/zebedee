@@ -1,0 +1,929 @@
+{
+  "cdid": "RAID103",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "262062",
+  "unit": "",
+  "preUnit": "£",
+  "date": "May 2014",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [
+    {
+      "date": "2002 FEB",
+      "value": "122307",
+      "year": "2002",
+      "month": "February"
+    },
+    {
+      "date": "2002 MAR",
+      "value": "126610",
+      "year": "2002",
+      "month": "March"
+    },
+    {
+      "date": "2002 APR",
+      "value": "128290",
+      "year": "2002",
+      "month": "April"
+    },
+    {
+      "date": "2002 MAY",
+      "value": "131632",
+      "year": "2002",
+      "month": "May"
+    },
+    {
+      "date": "2002 JUN",
+      "value": "137035",
+      "year": "2002",
+      "month": "June"
+    },
+    {
+      "date": "2002 JUL",
+      "value": "138042",
+      "year": "2002",
+      "month": "July"
+    },
+    {
+      "date": "2002 AUG",
+      "value": "141129",
+      "year": "2002",
+      "month": "August"
+    },
+    {
+      "date": "2002 SEP",
+      "value": "144588",
+      "year": "2002",
+      "month": "September"
+    },
+    {
+      "date": "2002 OCT",
+      "value": "145696",
+      "year": "2002",
+      "month": "October"
+    },
+    {
+      "date": "2002 NOV",
+      "value": "147184",
+      "year": "2002",
+      "month": "November"
+    },
+    {
+      "date": "2002 DEC",
+      "value": "152025",
+      "year": "2002",
+      "month": "December"
+    },
+    {
+      "date": "2003 JAN",
+      "value": "149107",
+      "year": "2003",
+      "month": "January"
+    },
+    {
+      "date": "2003 FEB",
+      "value": "147563",
+      "year": "2003",
+      "month": "February"
+    },
+    {
+      "date": "2003 MAR",
+      "value": "150688",
+      "year": "2003",
+      "month": "March"
+    },
+    {
+      "date": "2003 APR",
+      "value": "154286",
+      "year": "2003",
+      "month": "April"
+    },
+    {
+      "date": "2003 MAY",
+      "value": "153217",
+      "year": "2003",
+      "month": "May"
+    },
+    {
+      "date": "2003 JUN",
+      "value": "153605",
+      "year": "2003",
+      "month": "June"
+    },
+    {
+      "date": "2003 JUL",
+      "value": "156273",
+      "year": "2003",
+      "month": "July"
+    },
+    {
+      "date": "2003 AUG",
+      "value": "159010",
+      "year": "2003",
+      "month": "August"
+    },
+    {
+      "date": "2003 SEP",
+      "value": "158576",
+      "year": "2003",
+      "month": "September"
+    },
+    {
+      "date": "2003 OCT",
+      "value": "161365",
+      "year": "2003",
+      "month": "October"
+    },
+    {
+      "date": "2003 NOV",
+      "value": "159480",
+      "year": "2003",
+      "month": "November"
+    },
+    {
+      "date": "2003 DEC",
+      "value": "162654",
+      "year": "2003",
+      "month": "December"
+    },
+    {
+      "date": "2004 JAN",
+      "value": "162559",
+      "year": "2004",
+      "month": "January"
+    },
+    {
+      "date": "2004 FEB",
+      "value": "160937",
+      "year": "2004",
+      "month": "February"
+    },
+    {
+      "date": "2004 MAR",
+      "value": "161306",
+      "year": "2004",
+      "month": "March"
+    },
+    {
+      "date": "2004 APR",
+      "value": "168600",
+      "year": "2004",
+      "month": "April"
+    },
+    {
+      "date": "2004 MAY",
+      "value": "170719",
+      "year": "2004",
+      "month": "May"
+    },
+    {
+      "date": "2004 JUN",
+      "value": "173756",
+      "year": "2004",
+      "month": "June"
+    },
+    {
+      "date": "2004 JUL",
+      "value": "177474",
+      "year": "2004",
+      "month": "July"
+    },
+    {
+      "date": "2004 AUG",
+      "value": "179486",
+      "year": "2004",
+      "month": "August"
+    },
+    {
+      "date": "2004 SEP",
+      "value": "179141",
+      "year": "2004",
+      "month": "September"
+    },
+    {
+      "date": "2004 OCT",
+      "value": "180444",
+      "year": "2004",
+      "month": "October"
+    },
+    {
+      "date": "2004 NOV",
+      "value": "180126",
+      "year": "2004",
+      "month": "November"
+    },
+    {
+      "date": "2004 DEC",
+      "value": "178906",
+      "year": "2004",
+      "month": "December"
+    },
+    {
+      "date": "2005 JAN",
+      "value": "180465",
+      "year": "2005",
+      "month": "January"
+    },
+    {
+      "date": "2005 FEB",
+      "value": "179491",
+      "year": "2005",
+      "month": "February"
+    },
+    {
+      "date": "2005 MAR",
+      "value": "183346",
+      "year": "2005",
+      "month": "March"
+    },
+    {
+      "date": "2005 APR",
+      "value": "181832",
+      "year": "2005",
+      "month": "April"
+    },
+    {
+      "date": "2005 MAY",
+      "value": "182651",
+      "year": "2005",
+      "month": "May"
+    },
+    {
+      "date": "2005 JUN",
+      "value": "184162",
+      "year": "2005",
+      "month": "June"
+    },
+    {
+      "date": "2005 JUL",
+      "value": "186207",
+      "year": "2005",
+      "month": "July"
+    },
+    {
+      "date": "2005 AUG",
+      "value": "186208",
+      "year": "2005",
+      "month": "August"
+    },
+    {
+      "date": "2005 SEP",
+      "value": "186638",
+      "year": "2005",
+      "month": "September"
+    },
+    {
+      "date": "2005 OCT",
+      "value": "184958",
+      "year": "2005",
+      "month": "October"
+    },
+    {
+      "date": "2005 NOV",
+      "value": "185848",
+      "year": "2005",
+      "month": "November"
+    },
+    {
+      "date": "2005 DEC",
+      "value": "185788",
+      "year": "2005",
+      "month": "December"
+    },
+    {
+      "date": "2006 JAN",
+      "value": "185112",
+      "year": "2006",
+      "month": "January"
+    },
+    {
+      "date": "2006 FEB",
+      "value": "182925",
+      "year": "2006",
+      "month": "February"
+    },
+    {
+      "date": "2006 MAR",
+      "value": "186519",
+      "year": "2006",
+      "month": "March"
+    },
+    {
+      "date": "2006 APR",
+      "value": "188095",
+      "year": "2006",
+      "month": "April"
+    },
+    {
+      "date": "2006 MAY",
+      "value": "190211",
+      "year": "2006",
+      "month": "May"
+    },
+    {
+      "date": "2006 JUN",
+      "value": "191016",
+      "year": "2006",
+      "month": "June"
+    },
+    {
+      "date": "2006 JUL",
+      "value": "194273",
+      "year": "2006",
+      "month": "July"
+    },
+    {
+      "date": "2006 AUG",
+      "value": "197009",
+      "year": "2006",
+      "month": "August"
+    },
+    {
+      "date": "2006 SEP",
+      "value": "198552",
+      "year": "2006",
+      "month": "September"
+    },
+    {
+      "date": "2006 OCT",
+      "value": "197740",
+      "year": "2006",
+      "month": "October"
+    },
+    {
+      "date": "2006 NOV",
+      "value": "199238",
+      "year": "2006",
+      "month": "November"
+    },
+    {
+      "date": "2006 DEC",
+      "value": "201090",
+      "year": "2006",
+      "month": "December"
+    },
+    {
+      "date": "2007 JAN",
+      "value": "205284",
+      "year": "2007",
+      "month": "January"
+    },
+    {
+      "date": "2007 FEB",
+      "value": "204556",
+      "year": "2007",
+      "month": "February"
+    },
+    {
+      "date": "2007 MAR",
+      "value": "206890",
+      "year": "2007",
+      "month": "March"
+    },
+    {
+      "date": "2007 APR",
+      "value": "209010",
+      "year": "2007",
+      "month": "April"
+    },
+    {
+      "date": "2007 MAY",
+      "value": "210793",
+      "year": "2007",
+      "month": "May"
+    },
+    {
+      "date": "2007 JUN",
+      "value": "214222",
+      "year": "2007",
+      "month": "June"
+    },
+    {
+      "date": "2007 JUL",
+      "value": "218288",
+      "year": "2007",
+      "month": "July"
+    },
+    {
+      "date": "2007 AUG",
+      "value": "219369",
+      "year": "2007",
+      "month": "August"
+    },
+    {
+      "date": "2007 SEP",
+      "value": "220111",
+      "year": "2007",
+      "month": "September"
+    },
+    {
+      "date": "2007 OCT",
+      "value": "220291",
+      "year": "2007",
+      "month": "October"
+    },
+    {
+      "date": "2007 NOV",
+      "value": "218865",
+      "year": "2007",
+      "month": "November"
+    },
+    {
+      "date": "2007 DEC",
+      "value": "218007",
+      "year": "2007",
+      "month": "December"
+    },
+    {
+      "date": "2008 JAN",
+      "value": "221130",
+      "year": "2008",
+      "month": "January"
+    },
+    {
+      "date": "2008 FEB",
+      "value": "217089",
+      "year": "2008",
+      "month": "February"
+    },
+    {
+      "date": "2008 MAR",
+      "value": "217344",
+      "year": "2008",
+      "month": "March"
+    },
+    {
+      "date": "2008 APR",
+      "value": "218264",
+      "year": "2008",
+      "month": "April"
+    },
+    {
+      "date": "2008 MAY",
+      "value": "216625",
+      "year": "2008",
+      "month": "May"
+    },
+    {
+      "date": "2008 JUN",
+      "value": "215029",
+      "year": "2008",
+      "month": "June"
+    },
+    {
+      "date": "2008 JUL",
+      "value": "214867",
+      "year": "2008",
+      "month": "July"
+    },
+    {
+      "date": "2008 AUG",
+      "value": "208892",
+      "year": "2008",
+      "month": "August"
+    },
+    {
+      "date": "2008 SEP",
+      "value": "208583",
+      "year": "2008",
+      "month": "September"
+    },
+    {
+      "date": "2008 OCT",
+      "value": "203580",
+      "year": "2008",
+      "month": "October"
+    },
+    {
+      "date": "2008 NOV",
+      "value": "199933",
+      "year": "2008",
+      "month": "November"
+    },
+    {
+      "date": "2008 DEC",
+      "value": "195317",
+      "year": "2008",
+      "month": "December"
+    },
+    {
+      "date": "2009 JAN",
+      "value": "195114",
+      "year": "2009",
+      "month": "January"
+    },
+    {
+      "date": "2009 FEB",
+      "value": "189747",
+      "year": "2009",
+      "month": "February"
+    },
+    {
+      "date": "2009 MAR",
+      "value": "187193",
+      "year": "2009",
+      "month": "March"
+    },
+    {
+      "date": "2009 APR",
+      "value": "188162",
+      "year": "2009",
+      "month": "April"
+    },
+    {
+      "date": "2009 MAY",
+      "value": "188466",
+      "year": "2009",
+      "month": "May"
+    },
+    {
+      "date": "2009 JUN",
+      "value": "191423",
+      "year": "2009",
+      "month": "June"
+    },
+    {
+      "date": "2009 JUL",
+      "value": "196084",
+      "year": "2009",
+      "month": "July"
+    },
+    {
+      "date": "2009 AUG",
+      "value": "196445",
+      "year": "2009",
+      "month": "August"
+    },
+    {
+      "date": "2009 SEP",
+      "value": "199303",
+      "year": "2009",
+      "month": "September"
+    },
+    {
+      "date": "2009 OCT",
+      "value": "198317",
+      "year": "2009",
+      "month": "October"
+    },
+    {
+      "date": "2009 NOV",
+      "value": "200255",
+      "year": "2009",
+      "month": "November"
+    },
+    {
+      "date": "2009 DEC",
+      "value": "200307",
+      "year": "2009",
+      "month": "December"
+    },
+    {
+      "date": "2010 JAN",
+      "value": "207483",
+      "year": "2010",
+      "month": "January"
+    },
+    {
+      "date": "2010 FEB",
+      "value": "203991",
+      "year": "2010",
+      "month": "February"
+    },
+    {
+      "date": "2010 MAR",
+      "value": "205598",
+      "year": "2010",
+      "month": "March"
+    },
+    {
+      "date": "2010 APR",
+      "value": "206957",
+      "year": "2010",
+      "month": "April"
+    },
+    {
+      "date": "2010 MAY",
+      "value": "208823",
+      "year": "2010",
+      "month": "May"
+    },
+    {
+      "date": "2010 JUN",
+      "value": "210775",
+      "year": "2010",
+      "month": "June"
+    },
+    {
+      "date": "2010 JUL",
+      "value": "212424",
+      "year": "2010",
+      "month": "July"
+    },
+    {
+      "date": "2010 AUG",
+      "value": "212710",
+      "year": "2010",
+      "month": "August"
+    },
+    {
+      "date": "2010 SEP",
+      "value": "211815",
+      "year": "2010",
+      "month": "September"
+    },
+    {
+      "date": "2010 OCT",
+      "value": "208287",
+      "year": "2010",
+      "month": "October"
+    },
+    {
+      "date": "2010 NOV",
+      "value": "208002",
+      "year": "2010",
+      "month": "November"
+    },
+    {
+      "date": "2010 DEC",
+      "value": "206677",
+      "year": "2010",
+      "month": "December"
+    },
+    {
+      "date": "2011 JAN",
+      "value": "216109",
+      "year": "2011",
+      "month": "January"
+    },
+    {
+      "date": "2011 FEB",
+      "value": "211960",
+      "year": "2011",
+      "month": "February"
+    },
+    {
+      "date": "2011 MAR",
+      "value": "214566",
+      "year": "2011",
+      "month": "March"
+    },
+    {
+      "date": "2011 APR",
+      "value": "213832",
+      "year": "2011",
+      "month": "April"
+    },
+    {
+      "date": "2011 MAY",
+      "value": "211975",
+      "year": "2011",
+      "month": "May"
+    },
+    {
+      "date": "2011 JUN",
+      "value": "214426",
+      "year": "2011",
+      "month": "June"
+    },
+    {
+      "date": "2011 JUL",
+      "value": "217473",
+      "year": "2011",
+      "month": "July"
+    },
+    {
+      "date": "2011 AUG",
+      "value": "218022",
+      "year": "2011",
+      "month": "August"
+    },
+    {
+      "date": "2011 SEP",
+      "value": "217044",
+      "year": "2011",
+      "month": "September"
+    },
+    {
+      "date": "2011 OCT",
+      "value": "215772",
+      "year": "2011",
+      "month": "October"
+    },
+    {
+      "date": "2011 NOV",
+      "value": "215333",
+      "year": "2011",
+      "month": "November"
+    },
+    {
+      "date": "2011 DEC",
+      "value": "214342",
+      "year": "2011",
+      "month": "December"
+    },
+    {
+      "date": "2012 JAN",
+      "value": "229121",
+      "year": "2012",
+      "month": "January"
+    },
+    {
+      "date": "2012 FEB",
+      "value": "225607",
+      "year": "2012",
+      "month": "February"
+    },
+    {
+      "date": "2012 MAR",
+      "value": "225283",
+      "year": "2012",
+      "month": "March"
+    },
+    {
+      "date": "2012 APR",
+      "value": "228532",
+      "year": "2012",
+      "month": "April"
+    },
+    {
+      "date": "2012 MAY",
+      "value": "228508",
+      "year": "2012",
+      "month": "May"
+    },
+    {
+      "date": "2012 JUN",
+      "value": "231104",
+      "year": "2012",
+      "month": "June"
+    },
+    {
+      "date": "2012 JUL",
+      "value": "233820",
+      "year": "2012",
+      "month": "July"
+    },
+    {
+      "date": "2012 AUG",
+      "value": "234025",
+      "year": "2012",
+      "month": "August"
+    },
+    {
+      "date": "2012 SEP",
+      "value": "232577",
+      "year": "2012",
+      "month": "September"
+    },
+    {
+      "date": "2012 OCT",
+      "value": "230616",
+      "year": "2012",
+      "month": "October"
+    },
+    {
+      "date": "2012 NOV",
+      "value": "231811",
+      "year": "2012",
+      "month": "November"
+    },
+    {
+      "date": "2012 DEC",
+      "value": "233295",
+      "year": "2012",
+      "month": "December"
+    },
+    {
+      "date": "2013 JAN",
+      "value": "237460",
+      "year": "2013",
+      "month": "January"
+    },
+    {
+      "date": "2013 FEB",
+      "value": "233339",
+      "year": "2013",
+      "month": "February"
+    },
+    {
+      "date": "2013 MAR",
+      "value": "234899",
+      "year": "2013",
+      "month": "March"
+    },
+    {
+      "date": "2013 APR",
+      "value": "238157",
+      "year": "2013",
+      "month": "April"
+    },
+    {
+      "date": "2013 MAY",
+      "value": "238756",
+      "year": "2013",
+      "month": "May"
+    },
+    {
+      "date": "2013 JUN",
+      "value": "241832",
+      "year": "2013",
+      "month": "June"
+    },
+    {
+      "date": "2013 JUL",
+      "value": "245190",
+      "year": "2013",
+      "month": "July"
+    },
+    {
+      "date": "2013 AUG",
+      "value": "246397",
+      "year": "2013",
+      "month": "August"
+    },
+    {
+      "date": "2013 SEP",
+      "value": "245130",
+      "year": "2013",
+      "month": "September"
+    },
+    {
+      "date": "2013 OCT",
+      "value": "246963",
+      "year": "2013",
+      "month": "October"
+    },
+    {
+      "date": "2013 NOV",
+      "value": "248083",
+      "year": "2013",
+      "month": "November"
+    },
+    {
+      "date": "2013 DEC",
+      "value": "249792",
+      "year": "2013",
+      "month": "December"
+    },
+    {
+      "date": "2014 JAN",
+      "value": "251935",
+      "year": "2014",
+      "month": "January"
+    },
+    {
+      "date": "2014 FEB",
+      "value": "253099",
+      "year": "2014",
+      "month": "February"
+    },
+    {
+      "date": "2014 MAR",
+      "value": "252019",
+      "year": "2014",
+      "month": "March"
+    },
+    {
+      "date": "2014 APR",
+      "value": "260059",
+      "year": "2014",
+      "month": "April"
+    },
+    {
+      "date": "2014 MAY",
+      "value": "262062",
+      "year": "2014",
+      "month": "May"
+    }
+  ],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/housing/timeseries/raid104"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "UK average house price",
+  "uri": "/peoplepopulationandcommunity/housing/timeseries/raid103",
+  "fileName": "raid103",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Housing",
+      "fileName": "housing",
+      "breadcrumb": []
+    }
+  ]
+}

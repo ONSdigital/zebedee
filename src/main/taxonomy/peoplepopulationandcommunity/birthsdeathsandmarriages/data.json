@@ -1,0 +1,267 @@
+{
+  "sections": [
+    {
+      "name": "Live births",
+      "link": "livebirths",
+      "index": 0,
+      "items": [
+        {
+          "name": "Live births in England and Wales",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid53"
+        },
+        {
+          "name": "Total fertility rate",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid54"
+        },
+        {
+          "name": "Live births outside marriage",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid55"
+        },
+        {
+          "name": "Live births to non-UK born mothers",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid56"
+        }
+      ]
+    },
+    {
+      "name": "Deaths",
+      "link": "deaths",
+      "index": 1,
+      "items": [
+        {
+          "name": "UK deaths",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid33"
+        },
+        {
+          "name": "England and Wales deaths",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid34"
+        },
+        {
+          "name": "England deaths",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid35"
+        },
+        {
+          "name": "Wales deaths",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid36"
+        },
+        {
+          "name": "Scotland deaths",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid37"
+        },
+        {
+          "name": "Northern Ireland deaths",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid38"
+        }
+      ]
+    },
+    {
+      "name": "Marriage, cohabitation and civil partnerships",
+      "link": "marriagecohabitationandcivilpartnerships",
+      "index": 2,
+      "items": [
+        {
+          "name": "Marriages",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid57"
+        },
+        {
+          "name": "Civil partnerships",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid58"
+        },
+        {
+          "name": "General Marriage Rate",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid59"
+        }
+      ]
+    },
+    {
+      "name": "Life expectancies",
+      "link": "lifeexpectancies",
+      "index": 3,
+      "items": [
+        {
+          "name": "Female life expectancy at birth",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49"
+        },
+        {
+          "name": "Male life expectancy at birth",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid50"
+        },
+        {
+          "name": "Female life expectancy at age 65",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid52"
+        },
+        {
+          "name": "Male life expectancy at age 65",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid51"
+        }
+      ]
+    },
+    {
+      "name": "Divorce",
+      "link": "divorce",
+      "index": 4,
+      "items": [
+        {
+          "name": "Number of divorces",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39"
+        },
+        {
+          "name": "Average age at divorce: Husband",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid40"
+        },
+        {
+          "name": "Average age at divorce: Wife",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid41"
+        }
+      ]
+    },
+    {
+      "name": "Adoption",
+      "link": "adoption",
+      "index": 5,
+      "items": [
+        {
+          "name": "Adoptions in England and Wales",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid19"
+        },
+        {
+          "name": "Adoptions in England and Wales: Males",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid20"
+        },
+        {
+          "name": "Adoptions in England and Wales: Females",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid21"
+        },
+        {
+          "name": "Adoptions of children born within marriage",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid22"
+        },
+        {
+          "name": "Adoptions of children born outside marriage",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid23"
+        }
+      ]
+    },
+    {
+      "name": "Ageing",
+      "link": "ageing",
+      "index": 6,
+      "items": [
+        {
+          "name": "Centenarians in the UK",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/timeseries/raid24"
+        },
+        {
+          "name": "People aged 90 and over",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/timeseries/raid25"
+        },
+        {
+          "name": "Men aged 90 and over",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/timeseries/raid26"
+        },
+        {
+          "name": "Women aged 90 and over",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/timeseries/raid27"
+        }
+      ]
+    },
+    {
+      "name": "Conception and fertility rates",
+      "link": "conceptionandfertilityrates",
+      "index": 7,
+      "items": [
+        {
+          "name": "Conceptions (all ages)",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid28"
+        },
+        {
+          "name": "Under 18 conceptions",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid29"
+        },
+        {
+          "name": "Under 18 conception rate",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid30"
+        },
+        {
+          "name": "Average completed family size",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid31"
+        },
+        {
+          "name": "Childlessness",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid32"
+        }
+      ]
+    },
+    {
+      "name": "Families",
+      "link": "families",
+      "index": 8,
+      "items": [
+        {
+          "name": "Families",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid42"
+        },
+        {
+          "name": "Married or civil partner couple families (with dependent children)",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid43"
+        },
+        {
+          "name": "Married or civil partner couple families (without dependent children)",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid44"
+        },
+        {
+          "name": "Cohabiting couple families (with dependent children)",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid45"
+        },
+        {
+          "name": "Cohabiting couple families (without dependent children)",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid46"
+        },
+        {
+          "name": "Lone parent families (with dependent children)",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid47"
+        },
+        {
+          "name": "Lone parent families (without dependent children)",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid48"
+        }
+      ]
+    },
+    {
+      "name": "Maternities",
+      "link": "maternities",
+      "index": 9,
+      "items": [
+        {
+          "name": "Number of maternities",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/maternities/timeseries/raid60"
+        }
+      ]
+    },
+    {
+      "name": "Stillbirths",
+      "link": "stillbirths",
+      "index": 10,
+      "items": [
+        {
+          "name": "Number of stillbirths",
+          "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/stillbirths/timeseries/raid61"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 0,
+  "lede": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+  "type": "home",
+  "name": "Births, deaths and marriages",
+  "fileName": "birthsdeathsandmarriages",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

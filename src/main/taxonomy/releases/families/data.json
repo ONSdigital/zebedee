@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
+      "type": "bulletin",
+      "name": "Families and Households, 2013",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Families by family type",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesbyfamilytype"
+    }
+  ],
+  "type": "release",
+  "name": "Families",
+  "fileName": "families"
+}

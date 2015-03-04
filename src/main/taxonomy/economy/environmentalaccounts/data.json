@@ -1,0 +1,57 @@
+{
+  "headline": {
+    "name": "Total energy consumption (oil equivalent)",
+    "uri": "/economy/environmentalaccounts/timeseries/raid138"
+  },
+  "items": [
+    {
+      "name": "Total energy consumption (oil equivalent)",
+      "uri": "/economy/environmentalaccounts/timeseries/raid138"
+    },
+    {
+      "name": "Greenhouse gas emissions (CO2 equivalent)",
+      "uri": "/economy/environmentalaccounts/timeseries/raid139"
+    },
+    {
+      "name": "Revenue from environmentally related taxes",
+      "uri": "/economy/environmentalaccounts/timeseries/raid140"
+    },
+    {
+      "name": "Spend on environmental protection activities",
+      "uri": "/economy/environmentalaccounts/timeseries/raid141"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Environmental accounts show how the environment contributes to the economy, the impacts that the economy has on the environment, and how society responds to environmental issues. They include natural capital accounts (oil and gas), physical accounts (fuel use, energy consumption, atmospheric emissions, material flows, and water), and monetary accounts (environmental taxes and environmental protection expenditure). For 2014, experimental natural capital accounts (land use and forestry) are also included. Environmental accounts are ‘satellite accounts’ to the main National Accounts and they are compiled in accordance with the System of Environmental Economic Accounting (SEEA), which closely follows the UN System of National Accounts (SNA). This means that they are comparable with economic indicators such as Gross Domestic Product (GDP).",
+    "name": "UK Environmental Accounts, 2014",
+    "uri": "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Environmental accounts show how the environment contributes to the economy, the impacts that the economy has on the environment, and how society responds to environmental issues. They include natural capital accounts (oil and gas), physical accounts (fuel use, energy consumption, atmospheric emissions, material flows, and water), and monetary accounts (environmental taxes and environmental protection expenditure). For 2014, experimental natural capital accounts (land use and forestry) are also included. Environmental accounts are ‘satellite accounts’ to the main National Accounts and they are compiled in accordance with the System of Environmental Economic Accounting (SEEA), which closely follows the UN System of National Accounts (SNA). This means that they are comparable with economic indicators such as Gross Domestic Product (GDP).",
+      "name": "UK Environmental Accounts, 2014",
+      "uri": "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "By Economic Sector and Gas, United Kingdom",
+      "name": "Atmospheric Emissions: Greenhouse Gas Emissions",
+      "uri": "/economy/environmentalaccounts/datasets/atmosphericemissionsgreenhousegasemissions"
+    }
+  ],
+  "level": "t3",
+  "index": 7,
+  "lede": "Environmental Accounts show the relationship between the environment and the economy. This is done by outlining how the environment contributes to the economy (e.g. through the extraction of raw materials), the impact the economy has on the environment (e.g. through energy consumption) and how society responds to environmental issues (e.g. through expenditure on environmental protection). These accounts are used to inform government policies and to evaluate the impact that different sectors have on the environment.",
+  "type": "home",
+  "name": "Environmental accounts",
+  "fileName": "environmentalaccounts",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    }
+  ]
+}

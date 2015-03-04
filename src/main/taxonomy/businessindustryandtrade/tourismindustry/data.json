@@ -1,0 +1,57 @@
+{
+  "headline": {
+    "name": "Overseas visits to the UK",
+    "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+  },
+  "items": [
+    {
+      "name": "Overseas visits to the UK",
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+    },
+    {
+      "name": "UK visits abroad",
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmax"
+    },
+    {
+      "name": "Overseas visits to UK earnings",
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmaz"
+    },
+    {
+      "name": "UK visits abroad expenditure",
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmbb"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
+    "name": "Overseas Travel and Tourism, Provisional Results for May 2014",
+    "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
+      "name": "Overseas Travel and Tourism, Provisional Results for May 2014",
+      "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Visits and Spending by UK residents abroad and overseas residents in the UK",
+      "name": "Overseas travel and tourism",
+      "uri": "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism"
+    }
+  ],
+  "level": "t3",
+  "index": 7,
+  "lede": "The tourism industries cover the following areas: accommodation services, food and beverage services, passenger transport services, vehicle hire, travel agencies and cultural, sports, recreational \u0026 conference services. Key figures here are employment levels and output of the tourism industries, the number of visitors to the UK and the amount visitors from different countries spend on average. ",
+  "type": "home",
+  "name": "Tourism industry",
+  "fileName": "tourismindustry",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    }
+  ]
+}

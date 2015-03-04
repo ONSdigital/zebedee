@@ -1,0 +1,239 @@
+{
+  "cdid": "GLBL",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "17107",
+  "unit": "bn",
+  "preUnit": "£",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1981",
+      "value": "3792",
+      "year": "1981",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1982",
+      "value": "0",
+      "year": "1982",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1983",
+      "value": "4163",
+      "year": "1983",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1984",
+      "value": "0",
+      "year": "1984",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1985",
+      "value": "5005",
+      "year": "1985",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1986",
+      "value": "5804",
+      "year": "1986",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1987",
+      "value": "6159",
+      "year": "1987",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1988",
+      "value": "6717",
+      "year": "1988",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1989",
+      "value": "7416",
+      "year": "1989",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1990",
+      "value": "8054",
+      "year": "1990",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1991",
+      "value": "7842",
+      "year": "1991",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1992",
+      "value": "8167",
+      "year": "1992",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1993",
+      "value": "8717",
+      "year": "1993",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1994",
+      "value": "8842",
+      "year": "1994",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1995",
+      "value": "9116",
+      "year": "1995",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1996",
+      "value": "9297",
+      "year": "1996",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1997",
+      "value": "9556",
+      "year": "1997",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1998",
+      "value": "10133",
+      "year": "1998",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1999",
+      "value": "11302",
+      "year": "1999",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2000",
+      "value": "11510",
+      "year": "2000",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2001",
+      "value": "12239",
+      "year": "2001",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2002",
+      "value": "12484",
+      "year": "2002",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2003",
+      "value": "12505",
+      "year": "2003",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2004",
+      "value": "12662",
+      "year": "2004",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2005",
+      "value": "13734",
+      "year": "2005",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2006",
+      "value": "14144",
+      "year": "2006",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2007",
+      "value": "15676",
+      "year": "2007",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2008",
+      "value": "15814",
+      "year": "2008",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2009",
+      "value": "15532",
+      "year": "2009",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2010",
+      "value": "16045",
+      "year": "2010",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2011",
+      "value": "17468",
+      "year": "2011",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2012",
+      "value": "17107",
+      "year": "2012",
+      "sourceDataset": "GERD"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/bulletins/ukgrossdomesticexpenditureonresearchanddevelopment2012"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [
+    "GERD"
+  ],
+  "type": "timeseries",
+  "name": "Business enterprise expenditure on research and development",
+  "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbl",
+  "fileName": "glbl",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Government, public sector and taxes",
+      "fileName": "governmentpublicsectorandtaxes"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Research and Development expenditure",
+      "fileName": "researchanddevelopmentexpenditure",
+      "breadcrumb": []
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "International trade is the exchange of goods and services across international borders. Here, you can find statistics on the types of goods traded internationally and the general trends in international trade. A key statistic is the balance on international trade, in recent times the UK has generally had a deficit on its trade in goods and a surplus on its trade in services which has led to an overall deficit in the UK\u0027s balance of international trade. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
+      "type": "bulletin",
+      "name": "UK Trade, June 2014",
+      "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Exports, imports and balance including total trade, trade in goods and oil",
+      "type": "dataset",
+      "name": "Value of UK trade in goods and services",
+      "uri": "/businessindustryandtrade/internationaltrade/datasets/valueofuktradeingoodsandservices"
+    },
+    {
+      "summary": "Exports, imports and balance for EMU, EU and non-EU",
+      "type": "dataset",
+      "name": "Trade in goods by area",
+      "uri": "/businessindustryandtrade/internationaltrade/datasets/tradeingoodsbyarea"
+    }
+  ],
+  "type": "release",
+  "name": "International trade",
+  "fileName": "internationaltrade"
+}

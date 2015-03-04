@@ -1,0 +1,99 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "GDP by category of expenditure",
+      "cdids": [
+        "ABJR",
+        "ABME",
+        "ABMG",
+        "ABMI",
+        "ABMQ",
+        "ABNU",
+        "ABPF",
+        "KG7F",
+        "KGW2",
+        "KGX6",
+        "KH23",
+        "KH2F",
+        "BKVT",
+        "CAFU",
+        "DMUM",
+        "GIXS",
+        "HAYO",
+        "IHYP",
+        "IHYQ",
+        "IHYR",
+        "IKBK",
+        "IKBL",
+        "KG7Q",
+        "KG7T",
+        "KGW6",
+        "KGW7",
+        "KGY2",
+        "KGY3",
+        "KGZ5",
+        "KGZ6",
+        "KGZ7",
+        "KH27",
+        "KH28",
+        "KH2J",
+        "KH2K",
+        "KH2R",
+        "KH2V",
+        "KH2W",
+        "KH3K",
+        "KH3O",
+        "KH3P",
+        "KTMZ",
+        "KTNB",
+        "NMRU",
+        "NMRY",
+        "NPJP",
+        "NPJR",
+        "NPQR",
+        "NPQT",
+        "YBIK",
+        "YBIM"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Brief description of dataset",
+  "nationalStatistic": true,
+  "description": "Comprehensive description of data contained within this dataset.",
+  "title": "GDP by category of expenditure",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "GDP by category of expenditure",
+  "uri": "/economy/grossdomesticproductgdp/datasets/gdpbycategoryofexpenditure",
+  "fileName": "gdpbycategoryofexpenditure",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Gross Domestic Product (GDP)",
+      "fileName": "grossdomesticproductgdp",
+      "breadcrumb": []
+    }
+  ]
+}

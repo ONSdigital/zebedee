@@ -1,0 +1,100 @@
+{
+  "cdid": "RAID24",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "13350",
+  "unit": "",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2002",
+      "value": "7740",
+      "year": "2002"
+    },
+    {
+      "date": "2003",
+      "value": "8050",
+      "year": "2003"
+    },
+    {
+      "date": "2004",
+      "value": "8400",
+      "year": "2004"
+    },
+    {
+      "date": "2005",
+      "value": "8800",
+      "year": "2005"
+    },
+    {
+      "date": "2006",
+      "value": "9250",
+      "year": "2006"
+    },
+    {
+      "date": "2007",
+      "value": "9880",
+      "year": "2007"
+    },
+    {
+      "date": "2008",
+      "value": "10310",
+      "year": "2008"
+    },
+    {
+      "date": "2009",
+      "value": "11100",
+      "year": "2009"
+    },
+    {
+      "date": "2010",
+      "value": "11830",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "12530",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "13350",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/bulletins/estimatesoftheveryoldincludingcentenariansfortheunitedkingdom20022012"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Centenarians in the UK",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/timeseries/raid24",
+  "fileName": "raid24",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Ageing",
+      "fileName": "ageing",
+      "breadcrumb": []
+    }
+  ]
+}

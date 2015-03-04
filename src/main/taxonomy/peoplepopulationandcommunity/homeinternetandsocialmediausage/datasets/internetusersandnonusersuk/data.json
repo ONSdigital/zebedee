@@ -1,0 +1,47 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/rdit2/internet-access-quarterly-update/q1-2014/rft-ia-q1-2014.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Brief description of dataset",
+  "nationalStatistic": true,
+  "description": "Comprehensive description of data contained within this dataset.",
+  "title": "Internet users and non-users, UK",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Internet users and non-users, UK",
+  "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/datasets/internetusersandnonusersuk",
+  "fileName": "internetusersandnonusersuk",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Home internet and social media usage",
+      "fileName": "homeinternetandsocialmediausage",
+      "breadcrumb": []
+    }
+  ]
+}

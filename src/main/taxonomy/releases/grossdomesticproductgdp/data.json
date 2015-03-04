@@ -1,0 +1,39 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Gross domestic product (GDP) is a measure of economic activity which captures the value of goods and services that a country produces during a given period.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK. Data is available split by industrial sector.",
+      "type": "bulletin",
+      "name": "GDP Preliminary Estimate Q3 2014",
+      "uri": "/economy/grossdomesticproductgdp/bulletins/gdppreliminaryestimateq32014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "GDP by category of expenditure",
+      "uri": "/economy/grossdomesticproductgdp/datasets/gdpbycategoryofexpenditure"
+    },
+    {
+      "summary": "High level overview of the economy",
+      "type": "dataset",
+      "name": "Gross Domestic Product data collection",
+      "uri": "/economy/grossdomesticproductgdp/datasets/grossdomesticproductdatacollection"
+    }
+  ],
+  "type": "release",
+  "name": "Gross Domestic Product (GDP)",
+  "fileName": "grossdomesticproductgdp"
+}

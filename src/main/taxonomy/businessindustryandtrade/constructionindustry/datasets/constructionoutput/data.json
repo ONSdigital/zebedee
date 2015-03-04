@@ -1,0 +1,47 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/construction/output-in-the-construction-industry/june-and-q2-2014/rft-output-tables-june-2014.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Range of construction figures by sector and region",
+  "nationalStatistic": true,
+  "description": "Range of construction data by sector and region.",
+  "title": "Construction output",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Construction output",
+  "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionoutput",
+  "fileName": "constructionoutput",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Construction industry",
+      "fileName": "constructionindustry",
+      "breadcrumb": []
+    }
+  ]
+}

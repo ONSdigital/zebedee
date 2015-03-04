@@ -1,0 +1,49 @@
+{
+  "headline": {
+    "name": "Median household income",
+    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115"
+  },
+  "items": [
+    {
+      "name": "Median household income",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115"
+    },
+    {
+      "name": "Median household wealth",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid116"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "A combined analysis of income and wealth based upon results from the third wave of the Wealth and Assets Survey and covering the period 2010-12.",
+    "name": "Wealth and Income, 2010-12",
+    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "A combined analysis of income and wealth based upon results from the third wave of the Wealth and Assets Survey and covering the period 2010-12.",
+      "name": "Wealth and Income, 2010-12",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012"
+    }
+  ],
+  "datasets": [],
+  "level": "t3",
+  "index": 2,
+  "lede": "Income and wealth are different because while income is a flow of money such as your monthly earnings, wealth is not a flow, it is a stock of assets such as shares in a company or property. Key statistics here are average household income and average household wealth. The average used is the median because this measure is not affected by outliers, i.e. those people who have levels of income or wealth that are very far away from the average. ",
+  "type": "home",
+  "name": "Income and wealth",
+  "fileName": "incomeandwealth",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Personal and household finances",
+      "fileName": "personalandhouseholdfinances"
+    }
+  ]
+}

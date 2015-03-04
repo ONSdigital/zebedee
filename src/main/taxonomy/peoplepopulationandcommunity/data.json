@@ -1,0 +1,272 @@
+{
+  "sections": [
+    {
+      "name": "Births, deaths and marriages",
+      "link": "birthsdeathsandmarriages",
+      "index": 0,
+      "items": [
+        {
+          "name": "Conception and fertility rates",
+          "uri": "conceptionandfertilityrates"
+        },
+        {
+          "name": "Adoption",
+          "uri": "adoption"
+        },
+        {
+          "name": "Marriage, cohabitation and civil partnerships",
+          "uri": "marriagecohabitationandcivilpartnerships"
+        },
+        {
+          "name": "Maternities",
+          "uri": "maternities"
+        },
+        {
+          "name": "Stillbirths",
+          "uri": "stillbirths"
+        },
+        {
+          "name": "Deaths",
+          "uri": "deaths"
+        },
+        {
+          "name": "Divorce",
+          "uri": "divorce"
+        },
+        {
+          "name": "Live births",
+          "uri": "livebirths"
+        },
+        {
+          "name": "Ageing",
+          "uri": "ageing"
+        },
+        {
+          "name": "Families",
+          "uri": "families"
+        },
+        {
+          "name": "Life expectancies",
+          "uri": "lifeexpectancies"
+        }
+      ]
+    },
+    {
+      "name": "Population and migration",
+      "link": "populationandmigration",
+      "index": 1,
+      "items": [
+        {
+          "name": "Population estimates",
+          "uri": "populationestimates"
+        },
+        {
+          "name": "Migration within the UK",
+          "uri": "migrationwithintheuk"
+        },
+        {
+          "name": "International migration",
+          "uri": "internationalmigration"
+        },
+        {
+          "name": "Population projections",
+          "uri": "populationprojections"
+        }
+      ]
+    },
+    {
+      "name": "Health and social care",
+      "link": "healthandsocialcare",
+      "index": 2,
+      "items": [
+        {
+          "name": "Conditions and diseases",
+          "uri": "conditionsanddiseases"
+        },
+        {
+          "name": "Disability",
+          "uri": "disability"
+        },
+        {
+          "name": "Drug use, alcohol and smoking",
+          "uri": "drugusealcoholandsmoking"
+        }
+      ]
+    },
+    {
+      "name": "Cultural identity",
+      "link": "culturalidentity",
+      "index": 3,
+      "items": [
+        {
+          "name": "Religion",
+          "uri": "religion"
+        },
+        {
+          "name": "Language",
+          "uri": "language"
+        },
+        {
+          "name": "Sexuality",
+          "uri": "sexuality"
+        },
+        {
+          "name": "Ethnicity",
+          "uri": "ethnicity"
+        }
+      ]
+    },
+    {
+      "name": "Crime and justice",
+      "link": "crimeandjustice",
+      "index": 4,
+      "items": [
+        {
+          "name": "Crimes recorded by police",
+          "uri": "/peoplepopulationandcommunity/crimeandjustice/timeseries/raid62"
+        },
+        {
+          "name": "Incidents of anti-social behaviour",
+          "uri": "/peoplepopulationandcommunity/crimeandjustice/timeseries/raid63"
+        },
+        {
+          "name": "Crimes against households",
+          "uri": "/peoplepopulationandcommunity/crimeandjustice/timeseries/raid64"
+        }
+      ]
+    },
+    {
+      "name": "Housing",
+      "link": "housing",
+      "index": 5,
+      "items": [
+        {
+          "name": "UK average house price",
+          "uri": "/peoplepopulationandcommunity/housing/timeseries/raid103"
+        },
+        {
+          "name": "UK house price change",
+          "uri": "/peoplepopulationandcommunity/housing/timeseries/raid104"
+        },
+        {
+          "name": "England average house price",
+          "uri": "/peoplepopulationandcommunity/housing/timeseries/raid105"
+        },
+        {
+          "name": "Wales average house price",
+          "uri": "/peoplepopulationandcommunity/housing/timeseries/raid106"
+        },
+        {
+          "name": "Scotland average house price",
+          "uri": "/peoplepopulationandcommunity/housing/timeseries/raid107"
+        },
+        {
+          "name": "Northern Ireland average house price",
+          "uri": "/peoplepopulationandcommunity/housing/timeseries/raid108"
+        }
+      ]
+    },
+    {
+      "name": "Personal and household finances",
+      "link": "personalandhouseholdfinances",
+      "index": 6,
+      "items": [
+        {
+          "name": "Expenditure",
+          "uri": "expenditure"
+        },
+        {
+          "name": "Debt",
+          "uri": "debt"
+        },
+        {
+          "name": "Income and wealth",
+          "uri": "incomeandwealth"
+        }
+      ]
+    },
+    {
+      "name": "Well-being",
+      "link": "wellbeing",
+      "index": 7,
+      "items": [
+        {
+          "name": "Life Satisfaction",
+          "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid131"
+        },
+        {
+          "name": "Worthwhile",
+          "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid132"
+        },
+        {
+          "name": "Happiness",
+          "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid133"
+        },
+        {
+          "name": "Anxiety",
+          "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid134"
+        }
+      ]
+    },
+    {
+      "name": "Leisure and tourism",
+      "link": "leisureandtourism",
+      "index": 8,
+      "items": [
+        {
+          "name": "Overseas visits to the UK",
+          "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+        },
+        {
+          "name": "UK visits abroad",
+          "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmax"
+        },
+        {
+          "name": "Overseas visits to UK earnings",
+          "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmaz"
+        },
+        {
+          "name": "UK visits abroad expenditure",
+          "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmbb"
+        }
+      ]
+    },
+    {
+      "name": "Home internet and social media usage",
+      "link": "homeinternetandsocialmediausage",
+      "index": 9,
+      "items": [
+        {
+          "name": "Adults in the UK that have used the Internet",
+          "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid101"
+        },
+        {
+          "name": "Adults that have never used the Internet",
+          "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid102"
+        }
+      ]
+    },
+    {
+      "name": "Elections",
+      "link": "elections",
+      "index": 10,
+      "items": [
+        {
+          "name": "Parliamentary electors",
+          "uri": "/peoplepopulationandcommunity/elections/timeseries/raid87"
+        },
+        {
+          "name": "European/local government electors",
+          "uri": "/peoplepopulationandcommunity/elections/timeseries/raid88"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 3,
+  "lede": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+  "type": "home",
+  "name": "People, population and community",
+  "fileName": "peoplepopulationandcommunity",
+  "breadcrumb": []
+}

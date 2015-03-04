@@ -1,0 +1,43 @@
+{
+  "cdid": "RAID14",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "106.1",
+  "unit": "index",
+  "preUnit": "",
+  "date": "June 2014",
+  "source": "Office for National Statistics",
+  "additionalText": "Index, 2010 \u003d 100",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/businessindustryandtrade/constructionindustry/bulletins/outputintheconstructionindustryjuneandq22014"
+  ],
+  "relatedTimeseries": [
+    "/businessindustryandtrade/constructionindustry/timeseries/raid11",
+    "/businessindustryandtrade/constructionindustry/timeseries/raid12",
+    "/businessindustryandtrade/constructionindustry/timeseries/raid13"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Construction output - repair and maintenance",
+  "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid14",
+  "fileName": "raid14",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Construction industry",
+      "fileName": "constructionindustry",
+      "breadcrumb": []
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "headline": {
+    "name": "Total e-commerce sales",
+    "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid15"
+  },
+  "items": [
+    {
+      "name": "Total e-commerce sales",
+      "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid15"
+    },
+    {
+      "name": "E-commerce sales (% turnover)",
+      "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid16"
+    },
+    {
+      "name": "Business with a website",
+      "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid17"
+    },
+    {
+      "name": "Business with a broadband",
+      "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid18"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "This release provides estimates of the values of e-commerce and the adoption and use of Information and Communication Technologies (ICTs) by UK businesses. The source of the information is the E-commerce Survey of UK Businesses.",
+    "name": "E-Commerce and ICT Activity, 2012",
+    "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This release provides estimates of the values of e-commerce and the adoption and use of Information and Communication Technologies (ICTs) by UK businesses. The source of the information is the E-commerce Survey of UK Businesses.",
+      "name": "E-Commerce and ICT Activity, 2012",
+      "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Data on e-commerce sales and how businesses are using the internet",
+      "name": "E-commerce and ICT Activity",
+      "uri": "/businessindustryandtrade/itandinternetindustry/datasets/ecommerceandictactivity"
+    }
+  ],
+  "level": "t3",
+  "index": 6,
+  "lede": "Key statistics here are on the value and percentage of business sales that take place over the internet. We also measure the percentage of businesses that have a website and a broadband connection. These figures allow us to monitor the growing importance of the internet to UK businesses. ",
+  "type": "home",
+  "name": "IT and internet industry",
+  "fileName": "itandinternetindustry",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    }
+  ]
+}

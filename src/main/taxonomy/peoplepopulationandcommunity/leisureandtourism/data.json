@@ -1,0 +1,57 @@
+{
+  "headline": {
+    "name": "Overseas visits to the UK",
+    "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+  },
+  "items": [
+    {
+      "name": "Overseas visits to the UK",
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+    },
+    {
+      "name": "UK visits abroad",
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmax"
+    },
+    {
+      "name": "Overseas visits to UK earnings",
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmaz"
+    },
+    {
+      "name": "UK visits abroad expenditure",
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmbb"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
+    "name": "Overseas Travel and Tourism, Provisional Results for May 2014",
+    "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
+      "name": "Overseas Travel and Tourism, Provisional Results for May 2014",
+      "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Visits and Spending by UK residents abroad and overseas residents in the UK",
+      "name": "Visits and spending to UK",
+      "uri": "/peoplepopulationandcommunity/leisureandtourism/datasets/visitsandspendingtouk"
+    }
+  ],
+  "level": "t3",
+  "index": 8,
+  "lede": "Statistics on leisure and tourism look at figures relating to the number of visits and visitors to the UK as well as the reason visitors give for visiting and the amount of money they spent when they were here. Also here are figures on the number of UK residents travelling abroad with the reason they gave for travelling and the amount of money they spent when away. These are useful for a variety of businesses involved in the tourism industry and statistics on UK residents travelling abroad are an informal indicator of living standards.",
+  "type": "home",
+  "name": "Leisure and tourism",
+  "fileName": "leisureandtourism",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Statistics here focus on the numbers of people whose daily activities are limited a little, a lot or not at all. Breakdowns of these figures include area of UK and gender. These statistics are important in determining the types of services that are needed across the UK. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "This statistical bulletin presents key results for the UK population from the individual censuses of England and Wales, Scotland and Northern Ireland. The bulletin focuses on the topics of population, ethnicity, country of birth, health, housing and accommodation.",
+      "type": "bulletin",
+      "name": "Key Statistics and Quick Statistics for local authorities in the United Kingdom",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Long-term health problem or disability",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/datasets/longtermhealthproblemordisability"
+    }
+  ],
+  "type": "release",
+  "name": "Disability",
+  "fileName": "disability"
+}

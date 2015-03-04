@@ -1,0 +1,56 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Overseas travel and tourism",
+      "cdids": [
+        "GMAA",
+        "GMAF",
+        "GMAK",
+        "GMAM",
+        "GMAT",
+        "GMAX",
+        "GMAZ",
+        "GMBB"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Visits and Spending by UK residents abroad and overseas residents in the UK",
+  "nationalStatistic": true,
+  "description": "Visits and Spending by UK residents abroad and overseas residents in the UK.",
+  "title": "Overseas travel and tourism",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Overseas travel and tourism",
+  "uri": "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism",
+  "fileName": "overseastravelandtourism",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Tourism industry",
+      "fileName": "tourismindustry",
+      "breadcrumb": []
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "headline": {
+    "name": "UK deaths",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid33"
+  },
+  "items": [
+    {
+      "name": "UK deaths",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid33"
+    },
+    {
+      "name": "England and Wales deaths",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid34"
+    },
+    {
+      "name": "England deaths",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid35"
+    },
+    {
+      "name": "Wales deaths",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid36"
+    },
+    {
+      "name": "Scotland deaths",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid37"
+    },
+    {
+      "name": "Northern Ireland deaths",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid38"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Annual data on death registrations. Contains death rates, cause of death data by sex and age and death registrations by area of residence and single year of age.",
+    "name": "Deaths Registered in England and Wales, 2013",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/deathsregisteredinenglandandwales2013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Annual data on death registrations. Contains death rates, cause of death data by sex and age and death registrations by area of residence and single year of age.",
+      "name": "Deaths Registered in England and Wales, 2013",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/deathsregisteredinenglandandwales2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Causes of death",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/datasets/causesofdeath"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Deaths data collection",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/datasets/deathsdatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "ONS receives data on deaths from the deaths register. This means only data on registered deaths is available. This data is available by age, sex, area of the UK and cause of death. Some of the datasets here are available as long run time series. ",
+  "type": "home",
+  "name": "Deaths",
+  "fileName": "deaths",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

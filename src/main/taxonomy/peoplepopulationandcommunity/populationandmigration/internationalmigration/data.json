@@ -1,0 +1,59 @@
+{
+  "headline": {
+    "name": "Net long-term migration to the UK",
+    "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117"
+  },
+  "items": [
+    {
+      "name": "Net long-term migration to the UK",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117"
+    },
+    {
+      "name": "Immigration to the UK",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid118"
+    },
+    {
+      "name": "Emigration from the UK",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid119"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
+    "name": "Migration Statistics Quarterly Report, May 2014",
+    "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
+      "name": "Migration Statistics Quarterly Report, May 2014",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Long-Term International Migration",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalmigration"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "International migration statistics provide estimates of the number of people moving in and out of the UK. Data on long term migration, short term migration, and visitor data provide a picture of those entering and leaving the UK, covering all lengths of stay. ",
+  "type": "home",
+  "name": "International migration",
+  "fileName": "internationalmigration",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    }
+  ]
+}

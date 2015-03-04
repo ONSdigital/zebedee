@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Regional Accounts are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts.  These accounts allow comparisons between regions and comparisons of a region against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "This bulletin presents the latest estimates of Gross Disposable Household Income (GDHI) for regions (see Table 1), sub-regions and local areas of the UK.",
+      "type": "bulletin",
+      "name": "Regional Gross Disposable Household Income (GDHI), 2012",
+      "uri": "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "NUTS1 Regional Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/datasets/nuts1regionalgrossdisposablehouseholdincome"
+    }
+  ],
+  "type": "release",
+  "name": "Regional accounts",
+  "fileName": "regionalaccounts"
+}

@@ -1,0 +1,40 @@
+{
+  "headline": {
+    "name": "Average total housing expenditure",
+    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure/timeseries/raid114"
+  },
+  "items": [
+    {
+      "name": "Average total housing expenditure",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure/timeseries/raid114"
+    }
+  ],
+  "statsBulletins": [],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Housing expenditure",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure/datasets/housingexpenditure"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "Household expenditure data can be broken down into twelve key headline areas, ranging from housing, fuel and power to clothing and footwear and alcoholic drinks, tobacco and narcotics. This data comes from the Living Costs and Food survey (LCF) which asks a sample of households to keep a diary of their costs over a period of time. This data gives us a headline figure of average weekly household spending.",
+  "type": "home",
+  "name": "Expenditure",
+  "fileName": "expenditure",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Personal and household finances",
+      "fileName": "personalandhouseholdfinances"
+    }
+  ]
+}

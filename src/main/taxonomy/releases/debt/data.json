@@ -1,0 +1,19 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Debt statistics found here focus on debt levels for people and households. These statistics come from the Wealth and Assets Survey (WAS). They tell us about financial debt, which includes credit and store cards that are not settled each month, overdrafts and all forms of fixed term loans. They also tell us about property debt, which is defined as the liabilities held against a household\u0027s main residence (mainly mortgages). Also available is data on how people feel about their level of debt.  ",
+  "articles": [],
+  "bulletins": [],
+  "datasets": [],
+  "type": "release",
+  "name": "Debt",
+  "fileName": "debt"
+}

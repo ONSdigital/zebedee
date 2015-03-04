@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Statistics on usage of the internet and social media are useful for the government, businesses and other groups to make decisions on how best to communicate with  different groups of people. Here you can find statistics on the number of people who have used the internet, who use the internet frequently and who have never used the internet. Most of these statistics can be broken down by age and gender.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Estimates of adult Internet users and non-users in the UK, by age, sex, disability, region, gross weekly pay, ethnicity and when adults last used the Internet.",
+      "type": "bulletin",
+      "name": "Internet Access Quarterly Update, Q1 2014",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Internet users and non-users, UK",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/datasets/internetusersandnonusersuk"
+    }
+  ],
+  "type": "release",
+  "name": "Home internet and social media usage",
+  "fileName": "homeinternetandsocialmediausage"
+}

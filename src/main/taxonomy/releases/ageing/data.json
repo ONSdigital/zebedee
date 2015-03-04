@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Ageing analysis builds on life expectancy and population estimates, summarising the latest analysis of official statistics on population ageing and the lives of older people. They also provide ageing indicators such as median age and sex ratios at older ages at the national and local level.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Annual mid-year population estimates by sex and single of age for people aged 90 to 104 and for the 105 and over age group, 2002-2012 for the United Kingdom.",
+      "type": "bulletin",
+      "name": "Estimates of the Very Old (including Centenarians) for the United Kingdom, 2002-2012",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/bulletins/estimatesoftheveryoldincludingcentenariansfortheunitedkingdom20022012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Estimates of the very old",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/datasets/estimatesoftheveryold"
+    }
+  ],
+  "type": "release",
+  "name": "Ageing",
+  "fileName": "ageing"
+}

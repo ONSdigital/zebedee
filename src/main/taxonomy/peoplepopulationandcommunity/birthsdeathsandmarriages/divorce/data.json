@@ -1,0 +1,59 @@
+{
+  "headline": {
+    "name": "Number of divorces",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39"
+  },
+  "items": [
+    {
+      "name": "Number of divorces",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39"
+    },
+    {
+      "name": "Average age at divorce: Husband",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid40"
+    },
+    {
+      "name": "Average age at divorce: Wife",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid41"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
+    "name": "Divorces in England and Wales, 2012",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
+      "name": "Divorces in England and Wales, 2012",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Number of couples divorcing",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/datasets/numberofcouplesdivorcing"
+    }
+  ],
+  "level": "t3",
+  "index": 4,
+  "lede": "Statistics on divorces allow us to map changing social attitudes to divorce and give an indication of the number of children growing up with divorced parents. They are available by the age and sex of the divorcees, who divorce was granted to and the areas of the UK divorces are more likely to happen in. ",
+  "type": "home",
+  "name": "Divorce",
+  "fileName": "divorce",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

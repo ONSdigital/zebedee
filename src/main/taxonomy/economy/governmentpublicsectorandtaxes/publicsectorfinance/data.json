@@ -1,0 +1,79 @@
+{
+  "headline": {
+    "name": "Public sector net borrowing excluding financial interventions",
+    "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annx"
+  },
+  "items": [
+    {
+      "name": "Public sector net borrowing excluding financial interventions",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annx"
+    },
+    {
+      "name": "Public sector net debt excluding banks",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/rutn"
+    },
+    {
+      "name": "Public sector net debt excluding banks as a percentage of GDP",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/ruto"
+    },
+    {
+      "name": "Public sector current budget excluding banks",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6w"
+    },
+    {
+      "name": "Public sector net lending excluding banks",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6x"
+    },
+    {
+      "name": "Public sector current budget",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/anmu"
+    },
+    {
+      "name": "Public sector net investment",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annw"
+    },
+    {
+      "name": "Public sector Net Cash Requirement (NCR)",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/rurq"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "A presentational framework for the headline measures of Public Sector Finance Statistics (net borrowing, net cash requirement and net debt) is explained in this release. This includes the reasons for changes in net borrowing (deficit) and debt.",
+    "name": "Public Sector Finances, June 2014",
+    "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinancesjune2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "A presentational framework for the headline measures of Public Sector Finance Statistics (net borrowing, net cash requirement and net debt) is explained in this release. This includes the reasons for changes in net borrowing (deficit) and debt.",
+      "name": "Public Sector Finances, June 2014",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinancesjune2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Public sector summary excluding financial interventions",
+      "name": "Public Sector data collection",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectordatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 0,
+  "lede": "These statistics are a compilation of figures on the main aspects of the UK’s public sector finances. These give an indication of the current state of the country’s financial position. They are published jointly by the Office for National Statistics (ONS) and HM Treasury. ",
+  "type": "home",
+  "name": "Public sector finance",
+  "fileName": "publicsectorfinance",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Government, public sector and taxes",
+      "fileName": "governmentpublicsectorandtaxes"
+    }
+  ]
+}

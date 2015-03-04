@@ -1,0 +1,134 @@
+{
+  "sections": [
+    {
+      "name": "Employment and employee types",
+      "link": "employmentandemployeetypes",
+      "index": 0,
+      "items": [
+        {
+          "name": "Employment rate (aged 16 to 64)",
+          "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf24"
+        },
+        {
+          "name": "Female employment rate (aged 16 to 64)",
+          "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf25"
+        },
+        {
+          "name": "Male employment rate (aged 16 to 64)",
+          "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsv"
+        },
+        {
+          "name": "Employment 16 and over",
+          "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgrz"
+        },
+        {
+          "name": "Female employment 16 and over",
+          "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsb"
+        },
+        {
+          "name": "Male employment 16 and over",
+          "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsa"
+        },
+        {
+          "name": "Vacancies",
+          "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/ap2y"
+        }
+      ]
+    },
+    {
+      "name": "Earnings and working hours",
+      "link": "earningsandworkinghours",
+      "index": 1,
+      "items": [
+        {
+          "name": "Average weekly earnings (total pay)",
+          "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kab9"
+        },
+        {
+          "name": "Average weekly earnings (regular pay)",
+          "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai7"
+        },
+        {
+          "name": "Average weekly earnings (bonus pay)",
+          "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf4"
+        },
+        {
+          "name": "Average weekly earnings growth rate (bonus pay)",
+          "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf6"
+        },
+        {
+          "name": "Average weekly earnings growth rate (regular pay)",
+          "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai9"
+        },
+        {
+          "name": "Average weekly earnings growth rate (bonus pay)",
+          "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf6"
+        },
+        {
+          "name": "Average weekly hours worked – full time",
+          "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/ybuy"
+        },
+        {
+          "name": "Average weekly hours worked – part time",
+          "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/ybvb"
+        }
+      ]
+    },
+    {
+      "name": "Labour productivity",
+      "link": "labourproductivity",
+      "index": 2,
+      "items": [
+        {
+          "name": "Output per worker",
+          "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/a4ym"
+        },
+        {
+          "name": "Output per job",
+          "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lnnn"
+        },
+        {
+          "name": "Output per hour",
+          "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lzvb"
+        }
+      ]
+    },
+    {
+      "name": "Workplace disputes and working conditions",
+      "link": "workplacedisputesandworkingconditions",
+      "index": 3,
+      "items": [
+        {
+          "name": "Working days lost",
+          "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bbfw"
+        },
+        {
+          "name": "Working days lost in the public sector",
+          "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/f8xz"
+        },
+        {
+          "name": "Working days lost in the private sector",
+          "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/f8y2"
+        },
+        {
+          "name": "Number of stoppages",
+          "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bluu"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 0,
+  "lede": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
+  "type": "home",
+  "name": "People in work",
+  "fileName": "peopleinwork",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    }
+  ]
+}

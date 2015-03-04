@@ -1,0 +1,65 @@
+{
+  "headline": {
+    "name": "Balance of Payments: Current balance",
+    "uri": "/economy/nationalaccounts/timeseries/hbop"
+  },
+  "items": [
+    {
+      "name": "Balance of Payments: Current balance",
+      "uri": "/economy/nationalaccounts/timeseries/hbop"
+    },
+    {
+      "name": "Trade in goods and services deficit (or surplus)",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+    },
+    {
+      "name": "Balance of Payments: Total income",
+      "uri": "/economy/nationalaccounts/timeseries/hboj"
+    },
+    {
+      "name": "Total exports of goods and services",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh"
+    },
+    {
+      "name": "Total imports of goods and services",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbi"
+    },
+    {
+      "name": "Current Transfers",
+      "uri": "/economy/nationalaccounts/timeseries/ikbp"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Contains summary of balance of payments accounts and detailed statistics for the current account including - trade in goods and services, income, current and capital transfers, transactions in UK external assets and liabilities, and levels of identified assets and liabilities.",
+    "name": "Balance of Payments, Q1 2014",
+    "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Contains summary of balance of payments accounts and detailed statistics for the current account including - trade in goods and services, income, current and capital transfers, transactions in UK external assets and liabilities, and levels of identified assets and liabilities.",
+      "name": "Balance of Payments, Q1 2014",
+      "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Balance of Payments data collection",
+      "uri": "/economy/nationalaccounts/datasets/balanceofpaymentsdatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 6,
+  "lede": "The National Accounts consistently estimate economic activity and the purpose of them has always been to provide data to inform policy. The ONS collects data from many sources such as businesses, manufacturers and service providers so that it can produce statistics on things such as GDP and indices of services, manufacturing and production.",
+  "type": "home",
+  "name": "National Accounts",
+  "fileName": "nationalaccounts",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    }
+  ]
+}

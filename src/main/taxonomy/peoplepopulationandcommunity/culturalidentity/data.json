@@ -1,0 +1,134 @@
+{
+  "sections": [
+    {
+      "name": "Ethnicity",
+      "link": "ethnicity",
+      "index": 0,
+      "items": [
+        {
+          "name": "White",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid65"
+        },
+        {
+          "name": "Asian/Asian British",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid67"
+        },
+        {
+          "name": "Black/African/Caribbean/Black British",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid68"
+        },
+        {
+          "name": "Mixed/Multiple Ethnic Groups",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid66"
+        },
+        {
+          "name": "Other Ethnic Group",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid69"
+        }
+      ]
+    },
+    {
+      "name": "Sexuality",
+      "link": "sexuality",
+      "index": 1,
+      "items": [
+        {
+          "name": "Adults identifying themselves as Gay, Lesbian or Bisexual",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid81"
+        },
+        {
+          "name": "Heterosexual/Straight",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid82"
+        },
+        {
+          "name": "Gay/Lesbian",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid83"
+        },
+        {
+          "name": "Bisexual",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid84"
+        },
+        {
+          "name": "Other",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid85"
+        },
+        {
+          "name": "Don\u0027t know/Refusal",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid86"
+        }
+      ]
+    },
+    {
+      "name": "Religion",
+      "link": "religion",
+      "index": 2,
+      "items": [
+        {
+          "name": "Christian",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid74"
+        },
+        {
+          "name": "No religion",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid75"
+        },
+        {
+          "name": "Muslim",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid76"
+        },
+        {
+          "name": "Hindu",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid77"
+        },
+        {
+          "name": "Sikh",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid78"
+        },
+        {
+          "name": "Jewish",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid79"
+        },
+        {
+          "name": "Buddhist",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid80"
+        }
+      ]
+    },
+    {
+      "name": "Language",
+      "link": "language",
+      "index": 3,
+      "items": [
+        {
+          "name": "English as main language",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70"
+        },
+        {
+          "name": "English as main language",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid71"
+        },
+        {
+          "name": "English not main language",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid72"
+        },
+        {
+          "name": "English not main language",
+          "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid73"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 3,
+  "lede": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
+  "type": "home",
+  "name": "Cultural identity",
+  "fileName": "culturalidentity",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

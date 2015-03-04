@@ -1,0 +1,53 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/subnational-health3/deaths-related-to-drug-poisoning/2012/drugs-reference-tables.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Brief description of dataset",
+  "nationalStatistic": true,
+  "description": "Comprehensive description of data contained within this dataset.",
+  "title": "Deaths from drug-related poisoning and drug misuse, by sex",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Deaths from drug-related poisoning and drug misuse, by sex",
+  "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/deathsfromdrugrelatedpoisoninganddrugmisusebysex",
+  "fileName": "deathsfromdrugrelatedpoisoninganddrugmisusebysex",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Health and social care",
+      "fileName": "healthandsocialcare"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Drug use, alcohol and smoking",
+      "fileName": "drugusealcoholandsmoking",
+      "breadcrumb": []
+    }
+  ]
+}

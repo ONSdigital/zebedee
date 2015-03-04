@@ -1,0 +1,108 @@
+{
+  "sections": [
+    {
+      "name": "People in work",
+      "link": "peopleinwork",
+      "index": 0,
+      "items": [
+        {
+          "name": "Labour productivity",
+          "uri": "labourproductivity"
+        },
+        {
+          "name": "Workplace disputes and working conditions",
+          "uri": "workplacedisputesandworkingconditions"
+        },
+        {
+          "name": "Earnings and working hours",
+          "uri": "earningsandworkinghours"
+        },
+        {
+          "name": "Employment and employee types",
+          "uri": "employmentandemployeetypes"
+        }
+      ]
+    },
+    {
+      "name": "Unemployment",
+      "link": "unemployment",
+      "index": 1,
+      "items": [
+        {
+          "name": "Unemployment rate (aged 16 to 64)",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx"
+        },
+        {
+          "name": "Female unemployment rate (aged 16 to 64)",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsz"
+        },
+        {
+          "name": "Male unemployment rate (aged 16 to 64)",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsy"
+        },
+        {
+          "name": "Unemployment 16 and over",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsc"
+        },
+        {
+          "name": "Female unemployment 16 and over",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/mgse"
+        },
+        {
+          "name": "Male unemployment 16 and over",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsd"
+        },
+        {
+          "name": "Total Claimant Count",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/bcjd"
+        },
+        {
+          "name": "Total Claimant Count Female",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/dpaf"
+        },
+        {
+          "name": "Total Claimant Count Male",
+          "uri": "/employmentandlabourmarket/unemployment/timeseries/dpae"
+        }
+      ]
+    },
+    {
+      "name": "Public sector personnel",
+      "link": "publicsectorpersonnel",
+      "index": 2,
+      "items": [
+        {
+          "name": "Total public sector employees: Head count",
+          "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g7au"
+        },
+        {
+          "name": "Total public sector employees: Full time equivalent",
+          "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g7g3"
+        },
+        {
+          "name": "Central government: Head count",
+          "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g6nq"
+        },
+        {
+          "name": "Central government: Full-time equivalent",
+          "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g7fp"
+        },
+        {
+          "name": "Local government: Head count",
+          "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g6nt"
+        },
+        {
+          "name": "Local government: Full-time equivalent",
+          "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g7fs"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 2,
+  "lede": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
+  "type": "home",
+  "name": "Employment and Labour market",
+  "fileName": "employmentandlabourmarket",
+  "breadcrumb": []
+}

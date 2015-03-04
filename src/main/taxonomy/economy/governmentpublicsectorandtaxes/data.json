@@ -1,0 +1,88 @@
+{
+  "sections": [
+    {
+      "name": "Public sector finance",
+      "link": "publicsectorfinance",
+      "index": 0,
+      "items": [
+        {
+          "name": "Public sector net borrowing excluding financial interventions",
+          "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annx"
+        },
+        {
+          "name": "Public sector net debt excluding banks",
+          "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/rutn"
+        },
+        {
+          "name": "Public sector net debt excluding banks as a percentage of GDP",
+          "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/ruto"
+        },
+        {
+          "name": "Public sector current budget excluding banks",
+          "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6w"
+        },
+        {
+          "name": "Public sector net lending excluding banks",
+          "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6x"
+        },
+        {
+          "name": "Public sector current budget",
+          "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/anmu"
+        },
+        {
+          "name": "Public sector net investment",
+          "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annw"
+        },
+        {
+          "name": "Public sector Net Cash Requirement (NCR)",
+          "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/rurq"
+        }
+      ]
+    },
+    {
+      "name": "Research and Development expenditure",
+      "link": "researchanddevelopmentexpenditure",
+      "index": 1,
+      "items": [
+        {
+          "name": "Gross domestic expenditure on research and development",
+          "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glba"
+        },
+        {
+          "name": "Government expenditure on research and development",
+          "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbk"
+        },
+        {
+          "name": "Research Councils expenditure on research and development",
+          "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/dmrs"
+        },
+        {
+          "name": "Business enterprise expenditure on research and development",
+          "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbl"
+        },
+        {
+          "name": "Higher education expenditure on research and development",
+          "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbm"
+        },
+        {
+          "name": "Private non-Profit expenditure on research and development",
+          "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbn"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 2,
+  "lede": "This section covers the latest figures on what the UK public sector has spent, raised in revenue and invested. The headline statistic here is Public Sector Net Borrowing, which is a measure of the amount of money the Government has had to borrow in order to bridge the gap between its revenue and expenditure. ",
+  "type": "home",
+  "name": "Government, public sector and taxes",
+  "fileName": "governmentpublicsectorandtaxes",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    }
+  ]
+}

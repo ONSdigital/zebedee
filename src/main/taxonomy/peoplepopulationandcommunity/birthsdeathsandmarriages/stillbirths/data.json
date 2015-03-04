@@ -1,0 +1,45 @@
+{
+  "headline": {
+    "name": "Number of stillbirths",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/stillbirths/timeseries/raid61"
+  },
+  "items": [
+    {
+      "name": "Number of stillbirths",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/stillbirths/timeseries/raid61"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Annual data of live births, fertility rates, percentage of births outside marriage, sex ratio, mean age of mother and country of birth of mother and father.",
+    "name": "Births in England and Wales, 2013",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/birthsinenglandandwales2013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Annual data of live births, fertility rates, percentage of births outside marriage, sex ratio, mean age of mother and country of birth of mother and father.",
+      "name": "Births in England and Wales, 2013",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/birthsinenglandandwales2013"
+    }
+  ],
+  "datasets": [],
+  "level": "t3",
+  "index": 10,
+  "lede": "Statistics on stillbirths are obtained from birth registrations. Stillbirth data is available by the age of the parents, the time of year, the area of usual residence for the mother and hospital of occurrence (where applicable). ",
+  "type": "home",
+  "name": "Stillbirths",
+  "fileName": "stillbirths",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

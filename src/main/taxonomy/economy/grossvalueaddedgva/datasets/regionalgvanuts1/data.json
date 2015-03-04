@@ -1,0 +1,94 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Regional GVA NUTS1",
+      "cdids": [
+        "ABML",
+        "TMPW",
+        "TMPX",
+        "TMPY",
+        "TMPZ",
+        "TMQA",
+        "DGPH",
+        "DGPI",
+        "DGPJ",
+        "TMQE",
+        "TMQF",
+        "TMQG",
+        "TMQH",
+        "TMQI",
+        "TMPV",
+        "DDQZ",
+        "RVFC",
+        "DDAB",
+        "TMQK",
+        "TMQL",
+        "TMQM",
+        "TMQN",
+        "TMQO",
+        "DGPL",
+        "DGPM",
+        "DGPN",
+        "TMQS",
+        "TMQT",
+        "TMQU",
+        "TMQV",
+        "TMQW",
+        "TMQJ",
+        "DDAF",
+        "DDBE",
+        "DDBF",
+        "DDBG",
+        "DDBH",
+        "DDBI",
+        "DGPO",
+        "DGPP",
+        "DGPQ",
+        "DDBM",
+        "DDBN",
+        "DDBO",
+        "DDBP",
+        "DDBQ"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Economic activity as measured by Gross Value Added (GVA)",
+  "nationalStatistic": true,
+  "description": "Economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland.",
+  "title": "Regional GVA NUTS1",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Regional GVA NUTS1",
+  "uri": "/economy/grossvalueaddedgva/datasets/regionalgvanuts1",
+  "fileName": "regionalgvanuts1",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Gross Value Added (GVA)",
+      "fileName": "grossvalueaddedgva",
+      "breadcrumb": []
+    }
+  ]
+}

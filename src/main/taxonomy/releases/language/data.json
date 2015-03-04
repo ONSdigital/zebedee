@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Statistics on language focus on the languages spoken across the UK. The key statistics here are the number and percentage of the population who speak English as their main language which can be viewed as a time series and for different areas across the UK. Statistics on welsh speakers can also be found here.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
+      "type": "bulletin",
+      "name": "2011 Census - Quick Statistics for England and Wales, March 2011",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Language",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/datasets/language"
+    }
+  ],
+  "type": "release",
+  "name": "Language",
+  "fileName": "language"
+}

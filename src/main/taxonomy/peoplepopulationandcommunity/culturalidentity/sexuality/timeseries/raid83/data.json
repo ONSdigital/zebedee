@@ -1,0 +1,47 @@
+{
+  "cdid": "RAID83",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "1.1",
+  "unit": "%",
+  "preUnit": "",
+  "date": "2011/12",
+  "source": "Office for National Statistics",
+  "additionalText": "Experimental statistics",
+  "nationalStatistic": false,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid81"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Gay/Lesbian",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid83",
+  "fileName": "raid83",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Cultural identity",
+      "fileName": "culturalidentity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Sexuality",
+      "fileName": "sexuality",
+      "breadcrumb": []
+    }
+  ]
+}

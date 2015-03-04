@@ -1,0 +1,53 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/bus-register/business-demography/2012/rft-business-demography-2012-tables.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Contains enterprise births, deaths and survivals",
+  "nationalStatistic": true,
+  "description": "Contains enterprise births, deaths and survivals",
+  "title": "Business births and deaths",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Business births and deaths",
+  "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/datasets/businessbirthsanddeaths",
+  "fileName": "businessbirthsanddeaths",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Changes to business",
+      "fileName": "changestobusiness"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business births, deaths and survival rates",
+      "fileName": "businessbirthsdeathsandsurvivalrates",
+      "breadcrumb": []
+    }
+  ]
+}

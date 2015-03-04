@@ -1,0 +1,2723 @@
+{
+  "cdid": "HF6X",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "79.9",
+  "unit": "m",
+  "preUnit": "£",
+  "date": "September 2014",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1993",
+      "value": "32.3",
+      "year": "1993",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994",
+      "value": "36.5",
+      "year": "1994",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995",
+      "value": "38.8",
+      "year": "1995",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996",
+      "value": "39.8",
+      "year": "1996",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997",
+      "value": "40.5",
+      "year": "1997",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998",
+      "value": "38.3",
+      "year": "1998",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999",
+      "value": "36.2",
+      "year": "1999",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000",
+      "value": "31.3",
+      "year": "2000",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001",
+      "value": "30.3",
+      "year": "2001",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002",
+      "value": "31",
+      "year": "2002",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003",
+      "value": "32.1",
+      "year": "2003",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004",
+      "value": "35",
+      "year": "2004",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005",
+      "value": "36.2",
+      "year": "2005",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006",
+      "value": "36.6",
+      "year": "2006",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007",
+      "value": "37.3",
+      "year": "2007",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008",
+      "value": "46.3",
+      "year": "2008",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009",
+      "value": "58",
+      "year": "2009",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010",
+      "value": "68.1",
+      "year": "2010",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011",
+      "value": "72.2",
+      "year": "2011",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012",
+      "value": "76.8",
+      "year": "2012",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013",
+      "value": "79",
+      "year": "2013",
+      "sourceDataset": "PUSF"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "1975 Q1",
+      "value": "55.8",
+      "year": "1975",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1976 Q1",
+      "value": "56.5",
+      "year": "1976",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1977 Q1",
+      "value": "54.8",
+      "year": "1977",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1978 Q1",
+      "value": "50.8",
+      "year": "1978",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1979 Q1",
+      "value": "49",
+      "year": "1979",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1980 Q1",
+      "value": "45",
+      "year": "1980",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1981 Q1",
+      "value": "45.6",
+      "year": "1981",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1982 Q1",
+      "value": "45.3",
+      "year": "1982",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1983 Q1",
+      "value": "43.9",
+      "year": "1983",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1984 Q1",
+      "value": "43.6",
+      "year": "1984",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1985 Q1",
+      "value": "44.3",
+      "year": "1985",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1986 Q1",
+      "value": "41.7",
+      "year": "1986",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1987 Q1",
+      "value": "40.1",
+      "year": "1987",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1988 Q1",
+      "value": "35.6",
+      "year": "1988",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1989 Q1",
+      "value": "29.3",
+      "year": "1989",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1990 Q1",
+      "value": "26.2",
+      "year": "1990",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1991 Q1",
+      "value": "24.2",
+      "year": "1991",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1992 Q1",
+      "value": "25.2",
+      "year": "1992",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 Q1",
+      "value": "29",
+      "year": "1993",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 Q2",
+      "value": "30.5",
+      "year": "1993",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 Q3",
+      "value": "32",
+      "year": "1993",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 Q4",
+      "value": "32.3",
+      "year": "1993",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 Q1",
+      "value": "33.9",
+      "year": "1994",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 Q2",
+      "value": "35.3",
+      "year": "1994",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 Q3",
+      "value": "36.3",
+      "year": "1994",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 Q4",
+      "value": "36.5",
+      "year": "1994",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 Q1",
+      "value": "37.5",
+      "year": "1995",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 Q2",
+      "value": "38.5",
+      "year": "1995",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 Q3",
+      "value": "39.1",
+      "year": "1995",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 Q4",
+      "value": "38.8",
+      "year": "1995",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 Q1",
+      "value": "39.2",
+      "year": "1996",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 Q2",
+      "value": "39.8",
+      "year": "1996",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 Q3",
+      "value": "40",
+      "year": "1996",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 Q4",
+      "value": "39.8",
+      "year": "1996",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 Q1",
+      "value": "39.9",
+      "year": "1997",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 Q2",
+      "value": "41.5",
+      "year": "1997",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 Q3",
+      "value": "41",
+      "year": "1997",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 Q4",
+      "value": "40.5",
+      "year": "1997",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 Q1",
+      "value": "39.3",
+      "year": "1998",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 Q2",
+      "value": "39.6",
+      "year": "1998",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 Q3",
+      "value": "38.9",
+      "year": "1998",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 Q4",
+      "value": "38.3",
+      "year": "1998",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 Q1",
+      "value": "37.5",
+      "year": "1999",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 Q2",
+      "value": "37.7",
+      "year": "1999",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 Q3",
+      "value": "36.5",
+      "year": "1999",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 Q4",
+      "value": "36.2",
+      "year": "1999",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 Q1",
+      "value": "34.6",
+      "year": "2000",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 Q2",
+      "value": "33",
+      "year": "2000",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 Q3",
+      "value": "31.1",
+      "year": "2000",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 Q4",
+      "value": "31.3",
+      "year": "2000",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 Q1",
+      "value": "30.1",
+      "year": "2001",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 Q2",
+      "value": "30.5",
+      "year": "2001",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 Q3",
+      "value": "29.6",
+      "year": "2001",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 Q4",
+      "value": "30.3",
+      "year": "2001",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 Q1",
+      "value": "29.3",
+      "year": "2002",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 Q2",
+      "value": "29.5",
+      "year": "2002",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 Q3",
+      "value": "29.4",
+      "year": "2002",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 Q4",
+      "value": "31",
+      "year": "2002",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 Q1",
+      "value": "30.3",
+      "year": "2003",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 Q2",
+      "value": "30.5",
+      "year": "2003",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 Q3",
+      "value": "30.9",
+      "year": "2003",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 Q4",
+      "value": "32.1",
+      "year": "2003",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 Q1",
+      "value": "31.7",
+      "year": "2004",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 Q2",
+      "value": "33.5",
+      "year": "2004",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 Q3",
+      "value": "33.7",
+      "year": "2004",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 Q4",
+      "value": "35",
+      "year": "2004",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 Q1",
+      "value": "34.3",
+      "year": "2005",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 Q2",
+      "value": "35",
+      "year": "2005",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 Q3",
+      "value": "35.1",
+      "year": "2005",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 Q4",
+      "value": "36.2",
+      "year": "2005",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 Q1",
+      "value": "35.4",
+      "year": "2006",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "36.4",
+      "year": "2006",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "36.1",
+      "year": "2006",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "36.6",
+      "year": "2006",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "36",
+      "year": "2007",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "36.5",
+      "year": "2007",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "36.2",
+      "year": "2007",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "37.3",
+      "year": "2007",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "36.7",
+      "year": "2008",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "38.6",
+      "year": "2008",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "41.5",
+      "year": "2008",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "46.3",
+      "year": "2008",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "49",
+      "year": "2009",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "52.4",
+      "year": "2009",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "53.5",
+      "year": "2009",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "58",
+      "year": "2009",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "62",
+      "year": "2010",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "64",
+      "year": "2010",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "65.7",
+      "year": "2010",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "68.1",
+      "year": "2010",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "68.7",
+      "year": "2011",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "70.1",
+      "year": "2011",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "70.7",
+      "year": "2011",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "72.2",
+      "year": "2011",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "72.3",
+      "year": "2012",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "73.7",
+      "year": "2012",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "74.7",
+      "year": "2012",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "76.8",
+      "year": "2012",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "76.8",
+      "year": "2013",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "77.7",
+      "year": "2013",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "77.9",
+      "year": "2013",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "79",
+      "year": "2013",
+      "quarter": "Q4",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "79",
+      "year": "2014",
+      "quarter": "Q1",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 Q2",
+      "value": "79.9",
+      "year": "2014",
+      "quarter": "Q2",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 Q3",
+      "value": "79.9",
+      "year": "2014",
+      "quarter": "Q3",
+      "sourceDataset": "PUSF"
+    }
+  ],
+  "months": [
+    {
+      "date": "1993 MAR",
+      "value": "29",
+      "year": "1993",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 APR",
+      "value": "30",
+      "year": "1993",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 MAY",
+      "value": "30.5",
+      "year": "1993",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 JUN",
+      "value": "30.5",
+      "year": "1993",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 JUL",
+      "value": "31",
+      "year": "1993",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 AUG",
+      "value": "31.4",
+      "year": "1993",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 SEP",
+      "value": "32",
+      "year": "1993",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 OCT",
+      "value": "31.9",
+      "year": "1993",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 NOV",
+      "value": "31.9",
+      "year": "1993",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1993 DEC",
+      "value": "32.3",
+      "year": "1993",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 JAN",
+      "value": "32.1",
+      "year": "1994",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 FEB",
+      "value": "32.5",
+      "year": "1994",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 MAR",
+      "value": "33.9",
+      "year": "1994",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 APR",
+      "value": "34.4",
+      "year": "1994",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 MAY",
+      "value": "34.9",
+      "year": "1994",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 JUN",
+      "value": "35.3",
+      "year": "1994",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 JUL",
+      "value": "35.4",
+      "year": "1994",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 AUG",
+      "value": "35.8",
+      "year": "1994",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 SEP",
+      "value": "36.3",
+      "year": "1994",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 OCT",
+      "value": "36.2",
+      "year": "1994",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 NOV",
+      "value": "36.5",
+      "year": "1994",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1994 DEC",
+      "value": "36.5",
+      "year": "1994",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 JAN",
+      "value": "35.9",
+      "year": "1995",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 FEB",
+      "value": "36.5",
+      "year": "1995",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 MAR",
+      "value": "37.5",
+      "year": "1995",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 APR",
+      "value": "37.9",
+      "year": "1995",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 MAY",
+      "value": "38.2",
+      "year": "1995",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 JUN",
+      "value": "38.5",
+      "year": "1995",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 JUL",
+      "value": "38.5",
+      "year": "1995",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 AUG",
+      "value": "38.7",
+      "year": "1995",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 SEP",
+      "value": "39.1",
+      "year": "1995",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 OCT",
+      "value": "38.8",
+      "year": "1995",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 NOV",
+      "value": "39",
+      "year": "1995",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1995 DEC",
+      "value": "38.8",
+      "year": "1995",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 JAN",
+      "value": "37.9",
+      "year": "1996",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 FEB",
+      "value": "38.1",
+      "year": "1996",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 MAR",
+      "value": "39.2",
+      "year": "1996",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 APR",
+      "value": "39.3",
+      "year": "1996",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 MAY",
+      "value": "39.6",
+      "year": "1996",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 JUN",
+      "value": "39.8",
+      "year": "1996",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 JUL",
+      "value": "39.4",
+      "year": "1996",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 AUG",
+      "value": "39.8",
+      "year": "1996",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 SEP",
+      "value": "40",
+      "year": "1996",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 OCT",
+      "value": "39.4",
+      "year": "1996",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 NOV",
+      "value": "39.6",
+      "year": "1996",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1996 DEC",
+      "value": "39.8",
+      "year": "1996",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 JAN",
+      "value": "38.8",
+      "year": "1997",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 FEB",
+      "value": "39.1",
+      "year": "1997",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 MAR",
+      "value": "39.9",
+      "year": "1997",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 APR",
+      "value": "40.5",
+      "year": "1997",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 MAY",
+      "value": "40.8",
+      "year": "1997",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 JUN",
+      "value": "41.5",
+      "year": "1997",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 JUL",
+      "value": "40.8",
+      "year": "1997",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 AUG",
+      "value": "40.8",
+      "year": "1997",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 SEP",
+      "value": "41",
+      "year": "1997",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 OCT",
+      "value": "40.2",
+      "year": "1997",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 NOV",
+      "value": "40.5",
+      "year": "1997",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1997 DEC",
+      "value": "40.5",
+      "year": "1997",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 JAN",
+      "value": "39",
+      "year": "1998",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 FEB",
+      "value": "38.7",
+      "year": "1998",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 MAR",
+      "value": "39.3",
+      "year": "1998",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 APR",
+      "value": "38.8",
+      "year": "1998",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 MAY",
+      "value": "39",
+      "year": "1998",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 JUN",
+      "value": "39.6",
+      "year": "1998",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 JUL",
+      "value": "38.9",
+      "year": "1998",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 AUG",
+      "value": "38.9",
+      "year": "1998",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 SEP",
+      "value": "38.9",
+      "year": "1998",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 OCT",
+      "value": "38",
+      "year": "1998",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 NOV",
+      "value": "38.2",
+      "year": "1998",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1998 DEC",
+      "value": "38.3",
+      "year": "1998",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 JAN",
+      "value": "36.9",
+      "year": "1999",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 FEB",
+      "value": "36.7",
+      "year": "1999",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 MAR",
+      "value": "37.5",
+      "year": "1999",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 APR",
+      "value": "37.1",
+      "year": "1999",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 MAY",
+      "value": "37.2",
+      "year": "1999",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 JUN",
+      "value": "37.7",
+      "year": "1999",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 JUL",
+      "value": "36.8",
+      "year": "1999",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 AUG",
+      "value": "36.6",
+      "year": "1999",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 SEP",
+      "value": "36.5",
+      "year": "1999",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 OCT",
+      "value": "35.5",
+      "year": "1999",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 NOV",
+      "value": "35.3",
+      "year": "1999",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "1999 DEC",
+      "value": "36.2",
+      "year": "1999",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 JAN",
+      "value": "34.4",
+      "year": "2000",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 FEB",
+      "value": "34",
+      "year": "2000",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 MAR",
+      "value": "34.6",
+      "year": "2000",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 APR",
+      "value": "33.8",
+      "year": "2000",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 MAY",
+      "value": "32.4",
+      "year": "2000",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 JUN",
+      "value": "33",
+      "year": "2000",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 JUL",
+      "value": "32.1",
+      "year": "2000",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 AUG",
+      "value": "32",
+      "year": "2000",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 SEP",
+      "value": "31.1",
+      "year": "2000",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 OCT",
+      "value": "30.5",
+      "year": "2000",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 NOV",
+      "value": "30.5",
+      "year": "2000",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2000 DEC",
+      "value": "31.3",
+      "year": "2000",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 JAN",
+      "value": "29.6",
+      "year": "2001",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 FEB",
+      "value": "29.5",
+      "year": "2001",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 MAR",
+      "value": "30.1",
+      "year": "2001",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 APR",
+      "value": "29.6",
+      "year": "2001",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 MAY",
+      "value": "29.8",
+      "year": "2001",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 JUN",
+      "value": "30.5",
+      "year": "2001",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 JUL",
+      "value": "29.7",
+      "year": "2001",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 AUG",
+      "value": "29.5",
+      "year": "2001",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 SEP",
+      "value": "29.6",
+      "year": "2001",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 OCT",
+      "value": "29",
+      "year": "2001",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 NOV",
+      "value": "29.4",
+      "year": "2001",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2001 DEC",
+      "value": "30.3",
+      "year": "2001",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 JAN",
+      "value": "29.2",
+      "year": "2002",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 FEB",
+      "value": "28.8",
+      "year": "2002",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 MAR",
+      "value": "29.3",
+      "year": "2002",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 APR",
+      "value": "29",
+      "year": "2002",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 MAY",
+      "value": "29.1",
+      "year": "2002",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 JUN",
+      "value": "29.5",
+      "year": "2002",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 JUL",
+      "value": "28.9",
+      "year": "2002",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 AUG",
+      "value": "28.9",
+      "year": "2002",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 SEP",
+      "value": "29.4",
+      "year": "2002",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 OCT",
+      "value": "29.8",
+      "year": "2002",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 NOV",
+      "value": "30.2",
+      "year": "2002",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2002 DEC",
+      "value": "31",
+      "year": "2002",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 JAN",
+      "value": "29.8",
+      "year": "2003",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 FEB",
+      "value": "29.5",
+      "year": "2003",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 MAR",
+      "value": "30.3",
+      "year": "2003",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 APR",
+      "value": "29.6",
+      "year": "2003",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 MAY",
+      "value": "29.8",
+      "year": "2003",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 JUN",
+      "value": "30.5",
+      "year": "2003",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 JUL",
+      "value": "30.3",
+      "year": "2003",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 AUG",
+      "value": "30.4",
+      "year": "2003",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 SEP",
+      "value": "30.9",
+      "year": "2003",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 OCT",
+      "value": "30.6",
+      "year": "2003",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 NOV",
+      "value": "31",
+      "year": "2003",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2003 DEC",
+      "value": "32.1",
+      "year": "2003",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 JAN",
+      "value": "30.8",
+      "year": "2004",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 FEB",
+      "value": "30.7",
+      "year": "2004",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 MAR",
+      "value": "31.7",
+      "year": "2004",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 APR",
+      "value": "31.7",
+      "year": "2004",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 MAY",
+      "value": "32.4",
+      "year": "2004",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 JUN",
+      "value": "33.5",
+      "year": "2004",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 JUL",
+      "value": "32.9",
+      "year": "2004",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 AUG",
+      "value": "33",
+      "year": "2004",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 SEP",
+      "value": "33.7",
+      "year": "2004",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 OCT",
+      "value": "33.4",
+      "year": "2004",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 NOV",
+      "value": "34",
+      "year": "2004",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2004 DEC",
+      "value": "35",
+      "year": "2004",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 JAN",
+      "value": "33.5",
+      "year": "2005",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 FEB",
+      "value": "33.4",
+      "year": "2005",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 MAR",
+      "value": "34.3",
+      "year": "2005",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 APR",
+      "value": "34.2",
+      "year": "2005",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 MAY",
+      "value": "34.3",
+      "year": "2005",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 JUN",
+      "value": "35",
+      "year": "2005",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 JUL",
+      "value": "34.3",
+      "year": "2005",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 AUG",
+      "value": "34.5",
+      "year": "2005",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 SEP",
+      "value": "35.1",
+      "year": "2005",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 OCT",
+      "value": "34.6",
+      "year": "2005",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 NOV",
+      "value": "35.1",
+      "year": "2005",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2005 DEC",
+      "value": "36.2",
+      "year": "2005",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 JAN",
+      "value": "34.3",
+      "year": "2006",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 FEB",
+      "value": "34.4",
+      "year": "2006",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 MAR",
+      "value": "35.4",
+      "year": "2006",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 APR",
+      "value": "35.1",
+      "year": "2006",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 MAY",
+      "value": "35.5",
+      "year": "2006",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 JUN",
+      "value": "36.4",
+      "year": "2006",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 JUL",
+      "value": "35.4",
+      "year": "2006",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 AUG",
+      "value": "35.5",
+      "year": "2006",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 SEP",
+      "value": "36.1",
+      "year": "2006",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 OCT",
+      "value": "35.4",
+      "year": "2006",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 NOV",
+      "value": "35.8",
+      "year": "2006",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2006 DEC",
+      "value": "36.6",
+      "year": "2006",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 JAN",
+      "value": "35",
+      "year": "2007",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 FEB",
+      "value": "35",
+      "year": "2007",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 MAR",
+      "value": "36",
+      "year": "2007",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 APR",
+      "value": "35.5",
+      "year": "2007",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 MAY",
+      "value": "35.9",
+      "year": "2007",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 JUN",
+      "value": "36.5",
+      "year": "2007",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 JUL",
+      "value": "35.4",
+      "year": "2007",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 AUG",
+      "value": "35.7",
+      "year": "2007",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 SEP",
+      "value": "36.2",
+      "year": "2007",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 OCT",
+      "value": "35.9",
+      "year": "2007",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 NOV",
+      "value": "36.4",
+      "year": "2007",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2007 DEC",
+      "value": "37.3",
+      "year": "2007",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 JAN",
+      "value": "35.7",
+      "year": "2008",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 FEB",
+      "value": "36",
+      "year": "2008",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 MAR",
+      "value": "36.7",
+      "year": "2008",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 APR",
+      "value": "36.6",
+      "year": "2008",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 MAY",
+      "value": "37.4",
+      "year": "2008",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 JUN",
+      "value": "38.6",
+      "year": "2008",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 JUL",
+      "value": "38",
+      "year": "2008",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 AUG",
+      "value": "38.8",
+      "year": "2008",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 SEP",
+      "value": "41.5",
+      "year": "2008",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 OCT",
+      "value": "42",
+      "year": "2008",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 NOV",
+      "value": "42.9",
+      "year": "2008",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2008 DEC",
+      "value": "46.3",
+      "year": "2008",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 JAN",
+      "value": "46.1",
+      "year": "2009",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 FEB",
+      "value": "46.7",
+      "year": "2009",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 MAR",
+      "value": "49",
+      "year": "2009",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 APR",
+      "value": "49.3",
+      "year": "2009",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 MAY",
+      "value": "50.7",
+      "year": "2009",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 JUN",
+      "value": "52.4",
+      "year": "2009",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 JUL",
+      "value": "52.4",
+      "year": "2009",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 AUG",
+      "value": "52.4",
+      "year": "2009",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 SEP",
+      "value": "53.5",
+      "year": "2009",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 OCT",
+      "value": "53.9",
+      "year": "2009",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 NOV",
+      "value": "54.6",
+      "year": "2009",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2009 DEC",
+      "value": "58",
+      "year": "2009",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 JAN",
+      "value": "60.2",
+      "year": "2010",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 FEB",
+      "value": "60.5",
+      "year": "2010",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 MAR",
+      "value": "62",
+      "year": "2010",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 APR",
+      "value": "62.2",
+      "year": "2010",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 MAY",
+      "value": "62.8",
+      "year": "2010",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 JUN",
+      "value": "64",
+      "year": "2010",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 JUL",
+      "value": "64.1",
+      "year": "2010",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 AUG",
+      "value": "64.4",
+      "year": "2010",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 SEP",
+      "value": "65.7",
+      "year": "2010",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 OCT",
+      "value": "65.7",
+      "year": "2010",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 NOV",
+      "value": "66.6",
+      "year": "2010",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2010 DEC",
+      "value": "68.1",
+      "year": "2010",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 JAN",
+      "value": "67.1",
+      "year": "2011",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 FEB",
+      "value": "67.3",
+      "year": "2011",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 MAR",
+      "value": "68.7",
+      "year": "2011",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 APR",
+      "value": "68.7",
+      "year": "2011",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 MAY",
+      "value": "69.1",
+      "year": "2011",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 JUN",
+      "value": "70.1",
+      "year": "2011",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 JUL",
+      "value": "69.6",
+      "year": "2011",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 AUG",
+      "value": "70.4",
+      "year": "2011",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 SEP",
+      "value": "70.7",
+      "year": "2011",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 OCT",
+      "value": "70.4",
+      "year": "2011",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 NOV",
+      "value": "70.9",
+      "year": "2011",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2011 DEC",
+      "value": "72.2",
+      "year": "2011",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 JAN",
+      "value": "70.9",
+      "year": "2012",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 FEB",
+      "value": "71.3",
+      "year": "2012",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 MAR",
+      "value": "72.3",
+      "year": "2012",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 APR",
+      "value": "72.1",
+      "year": "2012",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 MAY",
+      "value": "72.6",
+      "year": "2012",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 JUN",
+      "value": "73.7",
+      "year": "2012",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 JUL",
+      "value": "73.7",
+      "year": "2012",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 AUG",
+      "value": "73.7",
+      "year": "2012",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 SEP",
+      "value": "74.7",
+      "year": "2012",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 OCT",
+      "value": "75",
+      "year": "2012",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 NOV",
+      "value": "75.6",
+      "year": "2012",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2012 DEC",
+      "value": "76.8",
+      "year": "2012",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 JAN",
+      "value": "75.3",
+      "year": "2013",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 FEB",
+      "value": "75.5",
+      "year": "2013",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 MAR",
+      "value": "76.8",
+      "year": "2013",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 APR",
+      "value": "76.5",
+      "year": "2013",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 MAY",
+      "value": "77",
+      "year": "2013",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 JUN",
+      "value": "77.7",
+      "year": "2013",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 JUL",
+      "value": "77.4",
+      "year": "2013",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 AUG",
+      "value": "77.4",
+      "year": "2013",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 SEP",
+      "value": "77.9",
+      "year": "2013",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 OCT",
+      "value": "77.7",
+      "year": "2013",
+      "month": "October",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 NOV",
+      "value": "78.1",
+      "year": "2013",
+      "month": "November",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2013 DEC",
+      "value": "79",
+      "year": "2013",
+      "month": "December",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 JAN",
+      "value": "78.1",
+      "year": "2014",
+      "month": "January",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 FEB",
+      "value": "78.2",
+      "year": "2014",
+      "month": "February",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 MAR",
+      "value": "79",
+      "year": "2014",
+      "month": "March",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 APR",
+      "value": "78.8",
+      "year": "2014",
+      "month": "April",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 MAY",
+      "value": "79.2",
+      "year": "2014",
+      "month": "May",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 JUN",
+      "value": "79.9",
+      "year": "2014",
+      "month": "June",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 JUL",
+      "value": "79.3",
+      "year": "2014",
+      "month": "July",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 AUG",
+      "value": "79.2",
+      "year": "2014",
+      "month": "August",
+      "sourceDataset": "PUSF"
+    },
+    {
+      "date": "2014 SEP",
+      "value": "79.9",
+      "year": "2014",
+      "month": "September",
+      "sourceDataset": "PUSF"
+    }
+  ],
+  "relatedBulletins": [
+    "/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinancesjune2014"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [
+    "PUSF"
+  ],
+  "type": "timeseries",
+  "name": "Public sector net lending excluding banks",
+  "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6x",
+  "fileName": "hf6x",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Government, public sector and taxes",
+      "fileName": "governmentpublicsectorandtaxes"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Public sector finance",
+      "fileName": "publicsectorfinance",
+      "breadcrumb": []
+    }
+  ]
+}

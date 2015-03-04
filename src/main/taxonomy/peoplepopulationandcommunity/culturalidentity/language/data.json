@@ -1,0 +1,63 @@
+{
+  "headline": {
+    "name": "English as main language",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70"
+  },
+  "items": [
+    {
+      "name": "English as main language",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70"
+    },
+    {
+      "name": "English as main language",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid71"
+    },
+    {
+      "name": "English not main language",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid72"
+    },
+    {
+      "name": "English not main language",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid73"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
+    "name": "2011 Census - Quick Statistics for England and Wales, March 2011",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011"
+  },
+  "statsBulletins": [
+    {
+      "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
+      "name": "2011 Census - Quick Statistics for England and Wales, March 2011",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Language",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/datasets/language"
+    }
+  ],
+  "level": "t3",
+  "index": 3,
+  "lede": "Statistics on language focus on the languages spoken across the UK. The key statistics here are the number and percentage of the population who speak English as their main language which can be viewed as a time series and for different areas across the UK. Statistics on welsh speakers can also be found here.",
+  "type": "home",
+  "name": "Language",
+  "fileName": "language",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Cultural identity",
+      "fileName": "culturalidentity"
+    }
+  ]
+}

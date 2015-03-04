@@ -1,0 +1,675 @@
+{
+  "cdid": "RAID33",
+  "note1": "2012 figure provisional",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "569024",
+  "unit": "",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1887",
+      "value": "629287",
+      "year": "1887"
+    },
+    {
+      "date": "1888",
+      "value": "605899",
+      "year": "1888"
+    },
+    {
+      "date": "1889",
+      "value": "615033",
+      "year": "1889"
+    },
+    {
+      "date": "1890",
+      "value": "665758",
+      "year": "1890"
+    },
+    {
+      "date": "1891",
+      "value": "696490",
+      "year": "1891"
+    },
+    {
+      "date": "1892",
+      "value": "661273",
+      "year": "1892"
+    },
+    {
+      "date": "1893",
+      "value": "673722",
+      "year": "1893"
+    },
+    {
+      "date": "1894",
+      "value": "593808",
+      "year": "1894"
+    },
+    {
+      "date": "1895",
+      "value": "676110",
+      "year": "1895"
+    },
+    {
+      "date": "1896",
+      "value": "620108",
+      "year": "1896"
+    },
+    {
+      "date": "1897",
+      "value": "645630",
+      "year": "1897"
+    },
+    {
+      "date": "1898",
+      "value": "654812",
+      "year": "1898"
+    },
+    {
+      "date": "1899",
+      "value": "685510",
+      "year": "1899"
+    },
+    {
+      "date": "1900",
+      "value": "695867",
+      "year": "1900"
+    },
+    {
+      "date": "1901",
+      "value": "655646",
+      "year": "1901"
+    },
+    {
+      "date": "1902",
+      "value": "636650",
+      "year": "1902"
+    },
+    {
+      "date": "1903",
+      "value": "613726",
+      "year": "1903"
+    },
+    {
+      "date": "1904",
+      "value": "651301",
+      "year": "1904"
+    },
+    {
+      "date": "1905",
+      "value": "617516",
+      "year": "1905"
+    },
+    {
+      "date": "1906",
+      "value": "629955",
+      "year": "1906"
+    },
+    {
+      "date": "1907",
+      "value": "625271",
+      "year": "1907"
+    },
+    {
+      "date": "1908",
+      "value": "621427",
+      "year": "1908"
+    },
+    {
+      "date": "1909",
+      "value": "614910",
+      "year": "1909"
+    },
+    {
+      "date": "1910",
+      "value": "578091",
+      "year": "1910"
+    },
+    {
+      "date": "1911",
+      "value": "620868",
+      "year": "1911"
+    },
+    {
+      "date": "1912",
+      "value": "580977",
+      "year": "1912"
+    },
+    {
+      "date": "1913",
+      "value": "600554",
+      "year": "1913"
+    },
+    {
+      "date": "1914",
+      "value": "611970",
+      "year": "1914"
+    },
+    {
+      "date": "1915",
+      "value": "666322",
+      "year": "1915"
+    },
+    {
+      "date": "1916",
+      "value": "599621",
+      "year": "1916"
+    },
+    {
+      "date": "1917",
+      "value": "589416",
+      "year": "1917"
+    },
+    {
+      "date": "1918",
+      "value": "715246",
+      "year": "1918"
+    },
+    {
+      "date": "1919",
+      "value": "602188",
+      "year": "1919"
+    },
+    {
+      "date": "1920",
+      "value": "555326",
+      "year": "1920"
+    },
+    {
+      "date": "1921",
+      "value": "544140",
+      "year": "1921"
+    },
+    {
+      "date": "1922",
+      "value": "579480",
+      "year": "1922"
+    },
+    {
+      "date": "1923",
+      "value": "526858",
+      "year": "1923"
+    },
+    {
+      "date": "1924",
+      "value": "563891",
+      "year": "1924"
+    },
+    {
+      "date": "1925",
+      "value": "558132",
+      "year": "1925"
+    },
+    {
+      "date": "1926",
+      "value": "536411",
+      "year": "1926"
+    },
+    {
+      "date": "1927",
+      "value": "568655",
+      "year": "1927"
+    },
+    {
+      "date": "1928",
+      "value": "543664",
+      "year": "1928"
+    },
+    {
+      "date": "1929",
+      "value": "623231",
+      "year": "1929"
+    },
+    {
+      "date": "1930",
+      "value": "536860",
+      "year": "1930"
+    },
+    {
+      "date": "1931",
+      "value": "573908",
+      "year": "1931"
+    },
+    {
+      "date": "1932",
+      "value": "567986",
+      "year": "1932"
+    },
+    {
+      "date": "1933",
+      "value": "579467",
+      "year": "1933"
+    },
+    {
+      "date": "1934",
+      "value": "558072",
+      "year": "1934"
+    },
+    {
+      "date": "1935",
+      "value": "561324",
+      "year": "1935"
+    },
+    {
+      "date": "1936",
+      "value": "580942",
+      "year": "1936"
+    },
+    {
+      "date": "1937",
+      "value": "597798",
+      "year": "1937"
+    },
+    {
+      "date": "1938",
+      "value": "559598",
+      "year": "1938"
+    },
+    {
+      "date": "1939",
+      "value": "581857",
+      "year": "1939"
+    },
+    {
+      "date": "1940",
+      "value": "673253",
+      "year": "1940"
+    },
+    {
+      "date": "1941",
+      "value": "627378",
+      "year": "1941"
+    },
+    {
+      "date": "1942",
+      "value": "562356",
+      "year": "1942"
+    },
+    {
+      "date": "1943",
+      "value": "585582",
+      "year": "1943"
+    },
+    {
+      "date": "1944",
+      "value": "573570",
+      "year": "1944"
+    },
+    {
+      "date": "1945",
+      "value": "567027",
+      "year": "1945"
+    },
+    {
+      "date": "1946",
+      "value": "573361",
+      "year": "1946"
+    },
+    {
+      "date": "1947",
+      "value": "600728",
+      "year": "1947"
+    },
+    {
+      "date": "1948",
+      "value": "546002",
+      "year": "1948"
+    },
+    {
+      "date": "1949",
+      "value": "589876",
+      "year": "1949"
+    },
+    {
+      "date": "1950",
+      "value": "590136",
+      "year": "1950"
+    },
+    {
+      "date": "1951",
+      "value": "632786",
+      "year": "1951"
+    },
+    {
+      "date": "1952",
+      "value": "573806",
+      "year": "1952"
+    },
+    {
+      "date": "1953",
+      "value": "577220",
+      "year": "1953"
+    },
+    {
+      "date": "1954",
+      "value": "578400",
+      "year": "1954"
+    },
+    {
+      "date": "1955",
+      "value": "595916",
+      "year": "1955"
+    },
+    {
+      "date": "1956",
+      "value": "597981",
+      "year": "1956"
+    },
+    {
+      "date": "1957",
+      "value": "591200",
+      "year": "1957"
+    },
+    {
+      "date": "1958",
+      "value": "604040",
+      "year": "1958"
+    },
+    {
+      "date": "1959",
+      "value": "606115",
+      "year": "1959"
+    },
+    {
+      "date": "1960",
+      "value": "603328",
+      "year": "1960"
+    },
+    {
+      "date": "1961",
+      "value": "631788",
+      "year": "1961"
+    },
+    {
+      "date": "1962",
+      "value": "636051",
+      "year": "1962"
+    },
+    {
+      "date": "1963",
+      "value": "654288",
+      "year": "1963"
+    },
+    {
+      "date": "1964",
+      "value": "611130",
+      "year": "1964"
+    },
+    {
+      "date": "1965",
+      "value": "627798",
+      "year": "1965"
+    },
+    {
+      "date": "1966",
+      "value": "643754",
+      "year": "1966"
+    },
+    {
+      "date": "1967",
+      "value": "616710",
+      "year": "1967"
+    },
+    {
+      "date": "1968",
+      "value": "655998",
+      "year": "1968"
+    },
+    {
+      "date": "1969",
+      "value": "659537",
+      "year": "1969"
+    },
+    {
+      "date": "1970",
+      "value": "655385",
+      "year": "1970"
+    },
+    {
+      "date": "1971",
+      "value": "645078",
+      "year": "1971"
+    },
+    {
+      "date": "1972",
+      "value": "673938",
+      "year": "1972"
+    },
+    {
+      "date": "1973",
+      "value": "669692",
+      "year": "1973"
+    },
+    {
+      "date": "1974",
+      "value": "667359",
+      "year": "1974"
+    },
+    {
+      "date": "1975",
+      "value": "662477",
+      "year": "1975"
+    },
+    {
+      "date": "1976",
+      "value": "680799",
+      "year": "1976"
+    },
+    {
+      "date": "1977",
+      "value": "655143",
+      "year": "1977"
+    },
+    {
+      "date": "1978",
+      "value": "667177",
+      "year": "1978"
+    },
+    {
+      "date": "1979",
+      "value": "675576",
+      "year": "1979"
+    },
+    {
+      "date": "1980",
+      "value": "661519",
+      "year": "1980"
+    },
+    {
+      "date": "1981",
+      "value": "657974",
+      "year": "1981"
+    },
+    {
+      "date": "1982",
+      "value": "662801",
+      "year": "1982"
+    },
+    {
+      "date": "1983",
+      "value": "659101",
+      "year": "1983"
+    },
+    {
+      "date": "1984",
+      "value": "644918",
+      "year": "1984"
+    },
+    {
+      "date": "1985",
+      "value": "670656",
+      "year": "1985"
+    },
+    {
+      "date": "1986",
+      "value": "660735",
+      "year": "1986"
+    },
+    {
+      "date": "1987",
+      "value": "644342",
+      "year": "1987"
+    },
+    {
+      "date": "1988",
+      "value": "649178",
+      "year": "1988"
+    },
+    {
+      "date": "1989",
+      "value": "657733",
+      "year": "1989"
+    },
+    {
+      "date": "1990",
+      "value": "641799",
+      "year": "1990"
+    },
+    {
+      "date": "1991",
+      "value": "646181",
+      "year": "1991"
+    },
+    {
+      "date": "1992",
+      "value": "634238",
+      "year": "1992"
+    },
+    {
+      "date": "1993",
+      "value": "658194",
+      "year": "1993"
+    },
+    {
+      "date": "1994",
+      "value": "626222",
+      "year": "1994"
+    },
+    {
+      "date": "1995",
+      "value": "641712",
+      "year": "1995"
+    },
+    {
+      "date": "1996",
+      "value": "638879",
+      "year": "1996"
+    },
+    {
+      "date": "1997",
+      "value": "632517",
+      "year": "1997"
+    },
+    {
+      "date": "1998",
+      "value": "627592",
+      "year": "1998"
+    },
+    {
+      "date": "1999",
+      "value": "629476",
+      "year": "1999"
+    },
+    {
+      "date": "2000",
+      "value": "610579",
+      "year": "2000"
+    },
+    {
+      "date": "2001",
+      "value": "604393",
+      "year": "2001"
+    },
+    {
+      "date": "2002",
+      "value": "608045",
+      "year": "2002"
+    },
+    {
+      "date": "2003",
+      "value": "612085",
+      "year": "2003"
+    },
+    {
+      "date": "2004",
+      "value": "584791",
+      "year": "2004"
+    },
+    {
+      "date": "2005",
+      "value": "582964",
+      "year": "2005"
+    },
+    {
+      "date": "2006",
+      "value": "572224",
+      "year": "2006"
+    },
+    {
+      "date": "2007",
+      "value": "574687",
+      "year": "2007"
+    },
+    {
+      "date": "2008",
+      "value": "579697",
+      "year": "2008"
+    },
+    {
+      "date": "2009",
+      "value": "559617",
+      "year": "2009"
+    },
+    {
+      "date": "2010",
+      "value": "561666",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "552232",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "569024",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/deathsregisteredinenglandandwales2013"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "UK deaths",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid33",
+  "fileName": "raid33",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Deaths",
+      "fileName": "deaths",
+      "breadcrumb": []
+    }
+  ]
+}

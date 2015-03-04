@@ -1,0 +1,66 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Karen Watkins",
+    "email": "karen.watkins@ons.gsi.gov.uk"
+  },
+  "lede": "Producer Price Inflation (PPI) measures the price changes of goods bought and sold by UK manufacturers this month compared to the same month a year ago. PPI provides a key measure of inflation alongside other indicators such as the Consumer Prices Index (CPI) and Services Producer Price Index (SPPI).PPI is split into two components: output price inflation and input price inflation. The input price indices capture changes in the cost of the material and fuel inputs that producers face whereas the output price indices capture the changing prices of goods sold by producers.This article looks at the trends in both producer price indices since 2000 and which components contribute most towards changes in each price index in recent years.",
+  "more": "Annual output and input price changes follow similar trends, but with the latter tending to have higher price growth1. In Figure 1, trends in producer price inflation can be split into three distinct periods: 2000 to 2005, 2005 to 2012 and 2012 to June 2014.  Both indices experience greater variability within the second period of 2005 to 2012 than compared with the first and third period. From 2005 to 2012 the average growth rate was 2.9% for output price inflation and 8.1% for input price inflation.  The largest peaks and troughs experienced for both indices throughout the time series shown below occurred in the second period of 2005 to 2012. Output price inflation rose to 8.9% in July 2008 while input price inflation rose to 34.8% in June 2008 and both fell to their lowest rates in July 2009: output price inflation falling by 1.6% and input price inflation falling by 14.8%.",
+  "sections": [
+    {
+      "title": "Headline figures",
+      "markdown": "- The number of VAT and/or PAYE businesses is estimated to have risen by 18,000 (0.9%) between March 2012 and March 2013.\n- Companies and public corporations represent 64% of total businesses.\n- The largest industry group is professional, scientific and technical with 16.9% of all registered businesses.\n- London has the largest number of VAT and/or PAYE based businesses, with 17.2% of the UK total.\n- The number of businesses rose over the last couple of years, following a decline since 2008.\n"
+    },
+    {
+      "title": "Summary",
+      "markdown": "There were 2.17 million enterprises registered for VAT and/or PAYE in March 2013, compared with 2.15 million in March 2012, a rise of around 18,000 (0.9%).\n\n### Figure 1: Number of VAT and/or PAYE based enterprises, 2008-2013\n[![Figure 1](http://www.ons.gov.uk/ons/resources/2013chart1_tcm77-329127.png)](http://www.ons.gov.uk/ons/resources/2013chart1_tcm77-329127.png \"Figure 1: Number of VAT and/or PAYE based enterprises, 2008-2013\")\nSource: Office for National Statistics\n\n#### Notes:\n1. Approximately 31,000 of the change between 2011 and 2012 was caused by improvements to HMRC computer systems leading to previously excluded businesses being added to the IDBR.\n\n##### Download chart: \n![XLS](http://www.ons.gov.uk/ons/resources/iconxls_tcm77-30132.gif \"XLS\")  [XLS format](http://www.ons.gov.uk/ons/rel/bus-register/uk-business/2013/chd---chart-1.xls) (26 Kb)\n\n"
+    },
+    {
+      "title": "Business counts by legal form",
+      "markdown": "Between March 2012 and March 2013 there was a 5.2% reduction in the number of sole proprietors and partnerships, while corporate businesses increased by 4.4%.\n\nFigure 2 shows the gradual increase in incorporation and the decline in sole proprietors and partnerships over the last five years.\n\n### Figure 2: Percentage of VAT and/or PAYE based enterprises by year, 2008-2013\n\n[![Figure 2](http://www.ons.gov.uk/ons/resources/2013chart2b_tcm77-329128.png)](http://www.ons.gov.uk/ons/resources/2013chart2b_tcm77-329128.png \"Percentage of VAT and/or PAYE based enterprises, 2008-2013\")\nSource: Office for National Statistics \n\n##### Download chart: \n![XLS](http://www.ons.gov.uk/ons/resources/iconxls_tcm77-30132.gif \"XLS\") [XLS format](http://www.ons.gov.uk/ons/rel/bus-register/uk-business/2013/chd---chart-2.xls \"XLS format\") (30.5 Kb)\n\n- Corporate businesses (companies and public corporations) represented 64% of total enterprises, up 2.1 percentage points from the 61.9% seen in 2012\n- Sole proprietors represented 20.7% of total enterprises, down 1.4 percentage points from 22.1% in 2012\n- Partnerships represented 11.2% of total enterprises, down 0.7 percentage points from 11.9% in 2012\n- General government and non-profit making bodies represented 4% of total enterprises, compared with 4.1% in 2012\n"
+    },
+    {
+      "title": "Business counts by broad industry",
+      "markdown": "In 2013 the professional, scientific and technical sector accounted for the largest number of businesses, with 16.9% of all enterprises registered, overtaking wholesale, retail and repair of motor vehicles, with 16.5% of all enterprises registered. The third largest sector was construction; however, this fell from 12.3% in 2012 to 11.9% in 2013.\n\nThe professional, scientific and technical sector had the largest growth between 2012 and 2013, an increase of 14,000 businesses. This was followed by the information and communication sector which increased by 7,000 businesses in 2013. Construction had the largest fall in businesses with a fall of 6,000.\n"
+    },
+    {
+      "title": "Business counts by UK region",
+      "markdown": "London accounted for the largest number of businesses in March 2013, with 17.2% of the UK total. The region with the next largest share of businesses was the South East, at 15.7%.\n\nBetween 2012 and 2013 all regions except Northern Ireland and Wales saw an increase in the number of businesses with London and the South East experiencing the greatest increase of nearly 13,000 and 2,000 businesses respectively. London grew by 3.5% between 2012 and 2013 and this accounts for around two thirds of the growth in the UK. The number of businesses in Northern Ireland and Wales fell by 800 and 900 businesses respectively.\n"
+    },
+    {
+      "title": "Local unit site information",
+      "markdown": "Local units are sites that belong to an enterprise. In March 2013 there were 2.63 million local units belonging to VAT and/or PAYE based enterprises, compared with 2.61 million in March 2012 a rise of nearly 15,000 (0.6%). Out of the 2.17 million VAT and/or PAYE enterprises, only 58,000 (2.7%) operate from more than one site. These operated a total 516,000 local units.\n"
+    },
+    {
+      "title": "Background Notes",
+      "markdown": "1. UK Business: Activity, Size and Location is produced from an extract taken from the Inter-Departmental Business Register (IDBR) recording the position of units as at March of the reference year. Introduced in 1994, the IDBR provides the basis for the Office for National Statistics to conduct surveys of businesses.\n2. To support this release a set of reference tables in greater geographical and industrial detail have been produced and are available.\n3. Estimates presented in this release and the associated published tables are rounded to prevent disclosure. Differences may exist in totals across tables due to disclosure methods used.\n4. Although the statistics in this release are derived from the IDBR, the total count of live businesses is less than the Business Demography publication. This is mainly because the definition used in Business Demography of an active business is based on activity at any time in the year, whereas UK Business: Activity, Size and Location is based on an annual snapshot at a point in time.\n5. Approximately 31,000 of the change between 2011 and 2012 was caused by improvements to HMRC computer systems leading to previously excluded businesses being added to the IDBR. These businesses were registered before 2012, so distort the year on year change.\n6. Approximately 10,620 Composite and Managed Services Companies have been excluded where the address does not represent the location of the activities of these businesses to avoid giving a false impression of growth in these locations. Identification of Composite and Managed Services Companies may be incomplete, inflating business counts primarily in the Professional, Scientific and Technical sector. Further details on Composite and Managed Services Companies can be found on the HM Revenue and Customs website: [http://www.hmrc.gov.uk/employment-status/msc.htm]\n7. National Statistics are produced to high professional standards set out in the Code of Practice for Official Statistics. They undergo regular quality assurance reviews to ensure that they meet customer needs. They are produced free from any political interference.\n8. Follow ONS on [Twitter] ([@ONS]) and [Facebook] ([fb.ONS]). View the latest podcasts on [Youtube] ([ONSstats]) \n9. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html] or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\n[http://www.hmrc.gov.uk/employment-status/msc.htm]:(http://www.hmrc.gov.uk/employment-status/msc.htm) \"HM Revenue and Customs\"\n[www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html]:(http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) \"Statistics Autohority - Code of Practice\"\n[Twitter]:(http://www.ons.gov.uk/ons/external-links/social-media/twitter.html) \"Twitter\"\n[@ONS]:(http://twitter.com/ons) \"http://twitter.com/ons\"\n[Facebook]:(http://www.ons.gov.uk/ons/external-links/social-media/index.html) \"Facebook\"\n[fb.ONS]:(http://www.facebook.com/ONS) \"http://www.facebook.com/ONS\"\n[Youtube]:(http://www.ons.gov.uk/ons/external-links/social-media/youtube.html) \"YouTube\"\n[ONSstats]:(http://www.youtube.com/onsstats) \"http://www.youtube.com/onsstats\""
+    }
+  ],
+  "accordion": [],
+  "headline1": "The number of VAT and/or PAYE businesses is estimated to have risen by 18,000 (0.9%) between March 2012 and March 2013.",
+  "headline2": "Companies and public corporations represent 64% of total businesses.",
+  "headline3": "The largest industry group is professional, scientific and technical with 16.9% of all registered businesses.",
+  "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
+  "relatedBulletins": [],
+  "title": "UK Business: Activity, Size and Location - 2013",
+  "releaseDate": "19 August 2014",
+  "type": "bulletin",
+  "name": "UK Business: Activity, Size and Location - 2013",
+  "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013",
+  "fileName": "ukbusinessactivitysizeandlocation2013",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business activity, size and location",
+      "fileName": "businessactivitysizeandlocation",
+      "breadcrumb": []
+    }
+  ]
+}

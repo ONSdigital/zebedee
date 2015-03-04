@@ -1,0 +1,60 @@
+{
+  "sections": [
+    {
+      "name": "Business births, deaths and survival rates",
+      "link": "businessbirthsdeathsandsurvivalrates",
+      "index": 0,
+      "items": [
+        {
+          "name": "Business births",
+          "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid6"
+        },
+        {
+          "name": "Business deaths",
+          "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid7"
+        },
+        {
+          "name": "Survival rate for businesses born in 2007 and 2012",
+          "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid8"
+        }
+      ]
+    },
+    {
+      "name": "Mergers and acquisitions",
+      "link": "mergersandacquisitions",
+      "index": 1,
+      "items": [
+        {
+          "name": "Number of acquisitions",
+          "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbaq"
+        },
+        {
+          "name": "Number of disposals",
+          "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbas"
+        },
+        {
+          "name": "Value of acquisitions",
+          "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbbi"
+        },
+        {
+          "name": "Value of disposals",
+          "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbbt"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 5,
+  "lede": "Statistics here include a range of figures that provide a picture of how businesses in the UK are growing, surviving and changing over time. These figures are an informal indicator of the confidence in the UK economy. ",
+  "type": "home",
+  "name": "Changes to business",
+  "fileName": "changestobusiness",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    }
+  ]
+}

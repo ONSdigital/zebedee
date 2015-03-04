@@ -1,0 +1,47 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/rdit2/ict-activity-of-uk-businesses/2012/rft-ecom-2012.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Data on e-commerce sales and how businesses are using the internet",
+  "nationalStatistic": true,
+  "description": "Use of Information and Communication Technology (ICT) and e-commerce activity by UK businesses, containing data on e-commerce sales and how businesses are using the internet.",
+  "title": "E-commerce and ICT Activity",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "E-commerce and ICT Activity",
+  "uri": "/businessindustryandtrade/itandinternetindustry/datasets/ecommerceandictactivity",
+  "fileName": "ecommerceandictactivity",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "IT and internet industry",
+      "fileName": "itandinternetindustry",
+      "breadcrumb": []
+    }
+  ]
+}

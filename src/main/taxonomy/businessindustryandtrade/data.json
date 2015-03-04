@@ -1,0 +1,215 @@
+{
+  "sections": [
+    {
+      "name": "Retail industry",
+      "link": "retailindustry",
+      "index": 0,
+      "items": [
+        {
+          "name": "Retail Sales Value including automotive fuel ",
+          "uri": "/businessindustryandtrade/retailindustry/timeseries/j5c4"
+        },
+        {
+          "name": "Retail Sales Value excluding automotive fuel ",
+          "uri": "/businessindustryandtrade/retailindustry/timeseries/j468"
+        },
+        {
+          "name": "Retail Sales Volume including automotive fuel ",
+          "uri": "/businessindustryandtrade/retailindustry/timeseries/j5ek"
+        },
+        {
+          "name": "Retail Sales Volume excluding automotive fuel ",
+          "uri": "/businessindustryandtrade/retailindustry/timeseries/j467"
+        },
+        {
+          "name": "Retail Sales Value including automotive fuel (% change)",
+          "uri": "/businessindustryandtrade/retailindustry/timeseries/j5bs"
+        },
+        {
+          "name": "Retail Sales Volume including automotive fuel (% change)",
+          "uri": "/businessindustryandtrade/retailindustry/timeseries/j5eb"
+        }
+      ]
+    },
+    {
+      "name": "International trade",
+      "link": "internationaltrade",
+      "index": 1,
+      "items": [
+        {
+          "name": "Trade in goods and services deficit (or surplus)",
+          "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+        },
+        {
+          "name": "Total imports of goods and services",
+          "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbi"
+        },
+        {
+          "name": "Total exports of goods and services",
+          "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh"
+        },
+        {
+          "name": "Balance of trade in goods from EMU member",
+          "uri": "/businessindustryandtrade/internationaltrade/timeseries/mhn9"
+        },
+        {
+          "name": "Balance of trade in goods from all EU",
+          "uri": "/businessindustryandtrade/internationaltrade/timeseries/l87q"
+        },
+        {
+          "name": "Balance of trade in goods from all Non-EU",
+          "uri": "/businessindustryandtrade/internationaltrade/timeseries/l87k"
+        }
+      ]
+    },
+    {
+      "name": "Manufacturing and production industry",
+      "link": "manufacturingandproductionindustry",
+      "index": 2,
+      "items": [
+        {
+          "name": "Index of Production",
+          "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q"
+        },
+        {
+          "name": "Index of Production",
+          "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k222"
+        },
+        {
+          "name": "Manufacturing",
+          "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27y"
+        },
+        {
+          "name": "Manufacturing",
+          "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k22a"
+        }
+      ]
+    },
+    {
+      "name": "Construction industry",
+      "link": "constructionindustry",
+      "index": 3,
+      "items": [
+        {
+          "name": "Value of construction output  - all new work",
+          "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid9"
+        },
+        {
+          "name": "Value of construction output - all work",
+          "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid10"
+        },
+        {
+          "name": "Value of construction output - repair and maintenance",
+          "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid11"
+        },
+        {
+          "name": "Construction output - all new work",
+          "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid12"
+        },
+        {
+          "name": "Construction output - all work",
+          "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid13"
+        },
+        {
+          "name": "Construction output - repair and maintenance",
+          "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid14"
+        }
+      ]
+    },
+    {
+      "name": "Business activity, size and location",
+      "link": "businessactivitysizeandlocation",
+      "index": 4,
+      "items": [
+        {
+          "name": "UK businesses",
+          "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid1"
+        },
+        {
+          "name": "GB businesses",
+          "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid2"
+        },
+        {
+          "name": "England and Wales businesses",
+          "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid3"
+        },
+        {
+          "name": "England businesses",
+          "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid4"
+        },
+        {
+          "name": "Wales businesses",
+          "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid5"
+        }
+      ]
+    },
+    {
+      "name": "Changes to business",
+      "link": "changestobusiness",
+      "index": 5,
+      "items": [
+        {
+          "name": "Mergers and acquisitions",
+          "uri": "mergersandacquisitions"
+        },
+        {
+          "name": "Business births, deaths and survival rates",
+          "uri": "businessbirthsdeathsandsurvivalrates"
+        }
+      ]
+    },
+    {
+      "name": "IT and internet industry",
+      "link": "itandinternetindustry",
+      "index": 6,
+      "items": [
+        {
+          "name": "Total e-commerce sales",
+          "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid15"
+        },
+        {
+          "name": "E-commerce sales (% turnover)",
+          "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid16"
+        },
+        {
+          "name": "Business with a website",
+          "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid17"
+        },
+        {
+          "name": "Business with a broadband",
+          "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid18"
+        }
+      ]
+    },
+    {
+      "name": "Tourism industry",
+      "link": "tourismindustry",
+      "index": 7,
+      "items": [
+        {
+          "name": "Overseas visits to the UK",
+          "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+        },
+        {
+          "name": "UK visits abroad",
+          "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmax"
+        },
+        {
+          "name": "Overseas visits to UK earnings",
+          "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmaz"
+        },
+        {
+          "name": "UK visits abroad expenditure",
+          "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmbb"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 0,
+  "lede": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
+  "type": "home",
+  "name": "Business, industry and trade",
+  "fileName": "businessindustryandtrade",
+  "breadcrumb": []
+}

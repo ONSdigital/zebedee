@@ -1,0 +1,53 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/family-spending/family-spending/2013-edition/rft-2-2-final.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Brief description of dataset",
+  "nationalStatistic": true,
+  "description": "Comprehensive description of data contained within this dataset.",
+  "title": "Housing expenditure",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Housing expenditure",
+  "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure/datasets/housingexpenditure",
+  "fileName": "housingexpenditure",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Personal and household finances",
+      "fileName": "personalandhouseholdfinances"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Expenditure",
+      "fileName": "expenditure",
+      "breadcrumb": []
+    }
+  ]
+}

@@ -26,6 +26,11 @@
 			<version>0.1.6</version>
 		</dependency>
 		<dependency>
+			<groupId>com.github.davidcarboni</groupId>
+			<artifactId>resource-utils</artifactId>
+			<version>1.2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
@@ -44,6 +49,19 @@
 	</dependencies>
 
 	<build>
+	
+		<resources>
+			<!-- Standard resources -->
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<!-- Taxonomy structure -->
+			<resource>
+				<directory>src/main/taxonomy</directory>
+				<targetPath>${project.build.directory}/taxonomy</targetPath>
+			</resource>
+		</resources>
+		
 		<plugins>
 
 			<!-- Java 1.7 -->
@@ -142,6 +160,7 @@
 			</plugin>
 
 		</plugins>
+		
 	</build>
 
 </project>

@@ -1,0 +1,50 @@
+{
+  "cdid": "RAID65",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "86",
+  "unit": "%",
+  "preUnit": "",
+  "date": "2011",
+  "source": "Office for National Statistics",
+  "keyNote": "England and Wales",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2011",
+      "value": "80.5",
+      "year": "2011"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "White",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid65",
+  "fileName": "raid65",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Cultural identity",
+      "fileName": "culturalidentity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Ethnicity",
+      "fileName": "ethnicity",
+      "breadcrumb": []
+    }
+  ]
+}

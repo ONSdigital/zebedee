@@ -1,0 +1,59 @@
+{
+  "headline": {
+    "name": "Output per worker",
+    "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/a4ym"
+  },
+  "items": [
+    {
+      "name": "Output per worker",
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/a4ym"
+    },
+    {
+      "name": "Output per job",
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lnnn"
+    },
+    {
+      "name": "Output per hour",
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lzvb"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Output measures for the whole economy and a range of industries. Unit labour costs for the whole economy and unit wage costs for the whole economy and the manufacturing sector.",
+    "name": "Labour Productivity, Q1 2014",
+    "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivityq12014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Output measures for the whole economy and a range of industries. Unit labour costs for the whole economy and unit wage costs for the whole economy and the manufacturing sector.",
+      "name": "Labour Productivity, Q1 2014",
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivityq12014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Labour productivity",
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/datasets/labourproductivity"
+    }
+  ],
+  "level": "t3",
+  "index": 2,
+  "lede": "Labour productivity measures the efficiency of the workforce. It is calculated as output per worker, output per job and output per hour. Labour productivity is an important factor in determining the productive potential of the economy. Countries with strong labour productivity growth tend to benefit from high rates of growth and low inflation. ",
+  "type": "home",
+  "name": "Labour productivity",
+  "fileName": "labourproductivity",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    }
+  ]
+}

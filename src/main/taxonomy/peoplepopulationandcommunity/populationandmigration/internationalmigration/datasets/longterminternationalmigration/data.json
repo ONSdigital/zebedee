@@ -1,0 +1,53 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/migration1/migration-statistics-quarterly-report/may-2014/provisional-13q4.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Brief description of dataset",
+  "nationalStatistic": true,
+  "description": "Comprehensive description of data contained within this dataset.",
+  "title": "Long-Term International Migration",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Long-Term International Migration",
+  "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalmigration",
+  "fileName": "longterminternationalmigration",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "International migration",
+      "fileName": "internationalmigration",
+      "breadcrumb": []
+    }
+  ]
+}

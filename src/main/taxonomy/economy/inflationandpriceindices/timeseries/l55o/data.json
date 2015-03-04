@@ -1,0 +1,1065 @@
+{
+  "cdid": "L55O",
+  "seasonalAdjustment": "Not seasonally adjusted",
+  "mainMeasure": "Consumer Prices Index including owner occupiers\u0027 housing costs (CPIH)",
+  "description": "Consumer price indices are important indicators of how the UK economy is performing.\n\nThe indices are used in many ways by the government, businesses, and society in general. They can affect interest rates, tax allowances, wages, state benefits, pensions, maintenance, contracts and many other payments. They also show the impact of inflation on family budgets and affect the value of the pound in your pocket.",
+  "note1": "The National Statistics status of CPIH has been discontinued pending work by ONS to investigate and improve the method for measuring owner occupiers\u0027 housing costs in this index\n",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "1.2",
+  "unit": "%",
+  "preUnit": "",
+  "date": "September 2014",
+  "source": "Office for National Statistics",
+  "keyNote": "Percentage change over 12 months",
+  "additionalText": "Not a National Statistic",
+  "nationalStatistic": false,
+  "years": [
+    {
+      "date": "2006",
+      "value": "2.3",
+      "year": "2006",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007",
+      "value": "2.2",
+      "year": "2007",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008",
+      "value": "3.4",
+      "year": "2008",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009",
+      "value": "2",
+      "year": "2009",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010",
+      "value": "2.9",
+      "year": "2010",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011",
+      "value": "4.1",
+      "year": "2011",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012",
+      "value": "2.7",
+      "year": "2012",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013",
+      "value": "2.4",
+      "year": "2013",
+      "sourceDataset": "MM23"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "2006 Q1",
+      "value": "1.9",
+      "year": "2006",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "2.2",
+      "year": "2006",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "2.4",
+      "year": "2006",
+      "quarter": "Q3",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "2.6",
+      "year": "2006",
+      "quarter": "Q4",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "2.7",
+      "year": "2007",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "2.5",
+      "year": "2007",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "1.8",
+      "year": "2007",
+      "quarter": "Q3",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "2",
+      "year": "2007",
+      "quarter": "Q4",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "2.3",
+      "year": "2008",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "3.2",
+      "year": "2008",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "4.5",
+      "year": "2008",
+      "quarter": "Q3",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "3.6",
+      "year": "2008",
+      "quarter": "Q4",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "2.8",
+      "year": "2009",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "2",
+      "year": "2009",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "1.3",
+      "year": "2009",
+      "quarter": "Q3",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "1.8",
+      "year": "2009",
+      "quarter": "Q4",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "2.8",
+      "year": "2010",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "3",
+      "year": "2010",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "2.7",
+      "year": "2010",
+      "quarter": "Q3",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "3",
+      "year": "2010",
+      "quarter": "Q4",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "3.7",
+      "year": "2011",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "4",
+      "year": "2011",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "4.3",
+      "year": "2011",
+      "quarter": "Q3",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "4.3",
+      "year": "2011",
+      "quarter": "Q4",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "3.3",
+      "year": "2012",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "2.6",
+      "year": "2012",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "2.3",
+      "year": "2012",
+      "quarter": "Q3",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "2.5",
+      "year": "2012",
+      "quarter": "Q4",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "2.6",
+      "year": "2013",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "2.5",
+      "year": "2013",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "2.5",
+      "year": "2013",
+      "quarter": "Q3",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "2",
+      "year": "2013",
+      "quarter": "Q4",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "1.7",
+      "year": "2014",
+      "quarter": "Q1",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 Q2",
+      "value": "1.6",
+      "year": "2014",
+      "quarter": "Q2",
+      "sourceDataset": "MM23"
+    }
+  ],
+  "months": [
+    {
+      "date": "2006 JAN",
+      "value": "1.9",
+      "year": "2006",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 FEB",
+      "value": "2",
+      "year": "2006",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 MAR",
+      "value": "1.8",
+      "year": "2006",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 APR",
+      "value": "2",
+      "year": "2006",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 MAY",
+      "value": "2.2",
+      "year": "2006",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 JUN",
+      "value": "2.4",
+      "year": "2006",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 JUL",
+      "value": "2.3",
+      "year": "2006",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 AUG",
+      "value": "2.4",
+      "year": "2006",
+      "month": "August",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 SEP",
+      "value": "2.4",
+      "year": "2006",
+      "month": "September",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 OCT",
+      "value": "2.4",
+      "year": "2006",
+      "month": "October",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 NOV",
+      "value": "2.6",
+      "year": "2006",
+      "month": "November",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2006 DEC",
+      "value": "2.9",
+      "year": "2006",
+      "month": "December",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 JAN",
+      "value": "2.6",
+      "year": "2007",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 FEB",
+      "value": "2.7",
+      "year": "2007",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 MAR",
+      "value": "2.9",
+      "year": "2007",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 APR",
+      "value": "2.6",
+      "year": "2007",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 MAY",
+      "value": "2.4",
+      "year": "2007",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 JUN",
+      "value": "2.3",
+      "year": "2007",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 JUL",
+      "value": "1.8",
+      "year": "2007",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 AUG",
+      "value": "1.8",
+      "year": "2007",
+      "month": "August",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 SEP",
+      "value": "1.7",
+      "year": "2007",
+      "month": "September",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 OCT",
+      "value": "2",
+      "year": "2007",
+      "month": "October",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 NOV",
+      "value": "2",
+      "year": "2007",
+      "month": "November",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2007 DEC",
+      "value": "2",
+      "year": "2007",
+      "month": "December",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 JAN",
+      "value": "2.1",
+      "year": "2008",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 FEB",
+      "value": "2.4",
+      "year": "2008",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 MAR",
+      "value": "2.4",
+      "year": "2008",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 APR",
+      "value": "2.8",
+      "year": "2008",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 MAY",
+      "value": "3.2",
+      "year": "2008",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 JUN",
+      "value": "3.6",
+      "year": "2008",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 JUL",
+      "value": "4.1",
+      "year": "2008",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 AUG",
+      "value": "4.4",
+      "year": "2008",
+      "month": "August",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 SEP",
+      "value": "4.8",
+      "year": "2008",
+      "month": "September",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 OCT",
+      "value": "4.2",
+      "year": "2008",
+      "month": "October",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 NOV",
+      "value": "3.8",
+      "year": "2008",
+      "month": "November",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2008 DEC",
+      "value": "2.9",
+      "year": "2008",
+      "month": "December",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 JAN",
+      "value": "2.8",
+      "year": "2009",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 FEB",
+      "value": "3",
+      "year": "2009",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 MAR",
+      "value": "2.7",
+      "year": "2009",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 APR",
+      "value": "2.2",
+      "year": "2009",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 MAY",
+      "value": "2.1",
+      "year": "2009",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 JUN",
+      "value": "1.7",
+      "year": "2009",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 JUL",
+      "value": "1.6",
+      "year": "2009",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 AUG",
+      "value": "1.5",
+      "year": "2009",
+      "month": "August",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 SEP",
+      "value": "1",
+      "year": "2009",
+      "month": "September",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 OCT",
+      "value": "1.3",
+      "year": "2009",
+      "month": "October",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 NOV",
+      "value": "1.7",
+      "year": "2009",
+      "month": "November",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2009 DEC",
+      "value": "2.5",
+      "year": "2009",
+      "month": "December",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 JAN",
+      "value": "3",
+      "year": "2010",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 FEB",
+      "value": "2.5",
+      "year": "2010",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 MAR",
+      "value": "2.9",
+      "year": "2010",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 APR",
+      "value": "3.2",
+      "year": "2010",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 MAY",
+      "value": "2.9",
+      "year": "2010",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 JUN",
+      "value": "2.8",
+      "year": "2010",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 JUL",
+      "value": "2.6",
+      "year": "2010",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 AUG",
+      "value": "2.7",
+      "year": "2010",
+      "month": "August",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 SEP",
+      "value": "2.7",
+      "year": "2010",
+      "month": "September",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 OCT",
+      "value": "2.8",
+      "year": "2010",
+      "month": "October",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 NOV",
+      "value": "2.9",
+      "year": "2010",
+      "month": "November",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2010 DEC",
+      "value": "3.3",
+      "year": "2010",
+      "month": "December",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 JAN",
+      "value": "3.5",
+      "year": "2011",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 FEB",
+      "value": "3.9",
+      "year": "2011",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 MAR",
+      "value": "3.6",
+      "year": "2011",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 APR",
+      "value": "4",
+      "year": "2011",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 MAY",
+      "value": "4",
+      "year": "2011",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 JUN",
+      "value": "3.8",
+      "year": "2011",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 JUL",
+      "value": "4",
+      "year": "2011",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 AUG",
+      "value": "4.1",
+      "year": "2011",
+      "month": "August",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 SEP",
+      "value": "4.7",
+      "year": "2011",
+      "month": "September",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 OCT",
+      "value": "4.6",
+      "year": "2011",
+      "month": "October",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 NOV",
+      "value": "4.4",
+      "year": "2011",
+      "month": "November",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2011 DEC",
+      "value": "3.9",
+      "year": "2011",
+      "month": "December",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 JAN",
+      "value": "3.4",
+      "year": "2012",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 FEB",
+      "value": "3.2",
+      "year": "2012",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 MAR",
+      "value": "3.3",
+      "year": "2012",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 APR",
+      "value": "2.9",
+      "year": "2012",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 MAY",
+      "value": "2.6",
+      "year": "2012",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 JUN",
+      "value": "2.4",
+      "year": "2012",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 JUL",
+      "value": "2.5",
+      "year": "2012",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 AUG",
+      "value": "2.4",
+      "year": "2012",
+      "month": "August",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 SEP",
+      "value": "2.1",
+      "year": "2012",
+      "month": "September",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 OCT",
+      "value": "2.5",
+      "year": "2012",
+      "month": "October",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 NOV",
+      "value": "2.5",
+      "year": "2012",
+      "month": "November",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2012 DEC",
+      "value": "2.5",
+      "year": "2012",
+      "month": "December",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 JAN",
+      "value": "2.5",
+      "year": "2013",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 FEB",
+      "value": "2.6",
+      "year": "2013",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 MAR",
+      "value": "2.6",
+      "year": "2013",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 APR",
+      "value": "2.2",
+      "year": "2013",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 MAY",
+      "value": "2.5",
+      "year": "2013",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 JUN",
+      "value": "2.7",
+      "year": "2013",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 JUL",
+      "value": "2.5",
+      "year": "2013",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 AUG",
+      "value": "2.5",
+      "year": "2013",
+      "month": "August",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 SEP",
+      "value": "2.5",
+      "year": "2013",
+      "month": "September",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 OCT",
+      "value": "2",
+      "year": "2013",
+      "month": "October",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 NOV",
+      "value": "1.9",
+      "year": "2013",
+      "month": "November",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2013 DEC",
+      "value": "1.9",
+      "year": "2013",
+      "month": "December",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 JAN",
+      "value": "1.8",
+      "year": "2014",
+      "month": "January",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 FEB",
+      "value": "1.6",
+      "year": "2014",
+      "month": "February",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 MAR",
+      "value": "1.5",
+      "year": "2014",
+      "month": "March",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 APR",
+      "value": "1.6",
+      "year": "2014",
+      "month": "April",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 MAY",
+      "value": "1.4",
+      "year": "2014",
+      "month": "May",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 JUN",
+      "value": "1.8",
+      "year": "2014",
+      "month": "June",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 JUL",
+      "value": "1.5",
+      "year": "2014",
+      "month": "July",
+      "sourceDataset": "MM23"
+    },
+    {
+      "date": "2014 AUG",
+      "value": "1.5",
+      "year": "2014",
+      "month": "August",
+      "sourceDataset": "MM23"
+    }
+  ],
+  "relatedBulletins": [
+    "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
+  ],
+  "relatedTimeseries": [
+    "/economy/inflationandpriceindices/timeseries/l522",
+    "/economy/inflationandpriceindices/timeseries/d7g7"
+  ],
+  "sourceDatasets": [
+    "MM23"
+  ],
+  "type": "timeseries",
+  "name": "CPIH (% change)",
+  "uri": "/economy/inflationandpriceindices/timeseries/l55o",
+  "fileName": "l55o",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Inflation and price indices",
+      "fileName": "inflationandpriceindices",
+      "breadcrumb": []
+    }
+  ]
+}

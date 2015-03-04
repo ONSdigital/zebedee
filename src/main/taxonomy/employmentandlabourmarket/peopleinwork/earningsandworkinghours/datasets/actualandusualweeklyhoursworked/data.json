@@ -1,0 +1,69 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Actual and usual weekly hours worked",
+      "cdids": [
+        "YBUS",
+        "YBUV",
+        "YBUY",
+        "YBVB",
+        "YBVE",
+        "YBUT",
+        "YBUW",
+        "YBUZ",
+        "YBVC",
+        "YBVF",
+        "YBUU",
+        "YBUX",
+        "YBVA",
+        "YBVD",
+        "YBVG"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Brief description of dataset",
+  "nationalStatistic": true,
+  "description": "Comprehensive description of data contained within this dataset.",
+  "title": "Actual and usual weekly hours worked",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Actual and usual weekly hours worked",
+  "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/actualandusualweeklyhoursworked",
+  "fileName": "actualandusualweeklyhoursworked",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Earnings and working hours",
+      "fileName": "earningsandworkinghours",
+      "breadcrumb": []
+    }
+  ]
+}

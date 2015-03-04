@@ -1,0 +1,98 @@
+{
+  "sections": [
+    {
+      "name": "Population estimates",
+      "link": "populationestimates",
+      "index": 0,
+      "items": [
+        {
+          "name": "UK population",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid121"
+        },
+        {
+          "name": "England and Wales population",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid123"
+        },
+        {
+          "name": "England population",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid124"
+        },
+        {
+          "name": "Scotland population",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid125"
+        },
+        {
+          "name": "Wales population",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid126"
+        },
+        {
+          "name": "Northern Ireland population",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid127"
+        },
+        {
+          "name": "Males in the UK",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid128"
+        },
+        {
+          "name": "Females in the UK",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid129"
+        }
+      ]
+    },
+    {
+      "name": "International migration",
+      "link": "internationalmigration",
+      "index": 1,
+      "items": [
+        {
+          "name": "Net long-term migration to the UK",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117"
+        },
+        {
+          "name": "Immigration to the UK",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid118"
+        },
+        {
+          "name": "Emigration from the UK",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid119"
+        }
+      ]
+    },
+    {
+      "name": "Population projections",
+      "link": "populationprojections",
+      "index": 2,
+      "items": [
+        {
+          "name": "Mid-2037 UK population projected to reach",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/timeseries/raid130"
+        }
+      ]
+    },
+    {
+      "name": "Migration within the UK",
+      "link": "migrationwithintheuk",
+      "index": 3,
+      "items": [
+        {
+          "name": "Residents moving between local authorities",
+          "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/timeseries/raid120"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 1,
+  "lede": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
+  "type": "home",
+  "name": "Population and migration",
+  "fileName": "populationandmigration",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

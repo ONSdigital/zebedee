@@ -1,0 +1,882 @@
+{
+  "cdid": "L2N8",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "98.2",
+  "unit": "index",
+  "preUnit": "",
+  "date": "Q2 2014",
+  "source": "Office for National Statistics",
+  "additionalText": "Index, 2010 \u003d 100",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1990",
+      "value": "92.9",
+      "year": "1990",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1991",
+      "value": "86",
+      "year": "1991",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1992",
+      "value": "83.1",
+      "year": "1992",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1993",
+      "value": "82.1",
+      "year": "1993",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1994",
+      "value": "82.1",
+      "year": "1994",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1995",
+      "value": "83",
+      "year": "1995",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1996",
+      "value": "85.9",
+      "year": "1996",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1997",
+      "value": "88.3",
+      "year": "1997",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "1998",
+      "value": "89.6",
+      "year": "1998",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "1999",
+      "value": "90.8",
+      "year": "1999",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2000",
+      "value": "91.5",
+      "year": "2000",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2001",
+      "value": "93.2",
+      "year": "2001",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2002",
+      "value": "98.5",
+      "year": "2002",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2003",
+      "value": "103.4",
+      "year": "2003",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2004",
+      "value": "108.8",
+      "year": "2004",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2005",
+      "value": "106.2",
+      "year": "2005",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2006",
+      "value": "106.9",
+      "year": "2006",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2007",
+      "value": "109.2",
+      "year": "2007",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2008",
+      "value": "106.4",
+      "year": "2008",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2009",
+      "value": "92.3",
+      "year": "2009",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2010",
+      "value": "100",
+      "year": "2010",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2011",
+      "value": "102.3",
+      "year": "2011",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2012",
+      "value": "93.8",
+      "year": "2012",
+      "sourceDataset": "BB"
+    },
+    {
+      "date": "2013",
+      "value": "95.6",
+      "year": "2013",
+      "sourceDataset": "PGDP"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "1990 Q1",
+      "value": "94.4",
+      "year": "1990",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1990 Q2",
+      "value": "93.8",
+      "year": "1990",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1990 Q3",
+      "value": "92.1",
+      "year": "1990",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1990 Q4",
+      "value": "91.2",
+      "year": "1990",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1991 Q1",
+      "value": "86.8",
+      "year": "1991",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1991 Q2",
+      "value": "86.6",
+      "year": "1991",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1991 Q3",
+      "value": "85.8",
+      "year": "1991",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1991 Q4",
+      "value": "84.8",
+      "year": "1991",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1992 Q1",
+      "value": "83.5",
+      "year": "1992",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1992 Q2",
+      "value": "83.4",
+      "year": "1992",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1992 Q3",
+      "value": "83.2",
+      "year": "1992",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1992 Q4",
+      "value": "82.1",
+      "year": "1992",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1993 Q1",
+      "value": "82.7",
+      "year": "1993",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1993 Q2",
+      "value": "81.8",
+      "year": "1993",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1993 Q3",
+      "value": "81.8",
+      "year": "1993",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1993 Q4",
+      "value": "82",
+      "year": "1993",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1994 Q1",
+      "value": "81.4",
+      "year": "1994",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1994 Q2",
+      "value": "82",
+      "year": "1994",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1994 Q3",
+      "value": "82.3",
+      "year": "1994",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1994 Q4",
+      "value": "82.5",
+      "year": "1994",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1995 Q1",
+      "value": "81.8",
+      "year": "1995",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1995 Q2",
+      "value": "82.8",
+      "year": "1995",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1995 Q3",
+      "value": "83.3",
+      "year": "1995",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1995 Q4",
+      "value": "84.2",
+      "year": "1995",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1996 Q1",
+      "value": "84.6",
+      "year": "1996",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1996 Q2",
+      "value": "85.4",
+      "year": "1996",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1996 Q3",
+      "value": "86.8",
+      "year": "1996",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1996 Q4",
+      "value": "86.9",
+      "year": "1996",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1997 Q1",
+      "value": "86.6",
+      "year": "1997",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1997 Q2",
+      "value": "89",
+      "year": "1997",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1997 Q3",
+      "value": "88.3",
+      "year": "1997",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1997 Q4",
+      "value": "89.5",
+      "year": "1997",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1998 Q1",
+      "value": "90.7",
+      "year": "1998",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1998 Q2",
+      "value": "89",
+      "year": "1998",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1998 Q3",
+      "value": "89.3",
+      "year": "1998",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1998 Q4",
+      "value": "89.4",
+      "year": "1998",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1999 Q1",
+      "value": "89.5",
+      "year": "1999",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1999 Q2",
+      "value": "90.1",
+      "year": "1999",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1999 Q3",
+      "value": "92.1",
+      "year": "1999",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "1999 Q4",
+      "value": "91.3",
+      "year": "1999",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2000 Q1",
+      "value": "92.6",
+      "year": "2000",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2000 Q2",
+      "value": "91.9",
+      "year": "2000",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2000 Q3",
+      "value": "90.3",
+      "year": "2000",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2000 Q4",
+      "value": "91.2",
+      "year": "2000",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2001 Q1",
+      "value": "90.9",
+      "year": "2001",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2001 Q2",
+      "value": "93.5",
+      "year": "2001",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2001 Q3",
+      "value": "93.7",
+      "year": "2001",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2001 Q4",
+      "value": "94.7",
+      "year": "2001",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2002 Q1",
+      "value": "95.7",
+      "year": "2002",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2002 Q2",
+      "value": "96.8",
+      "year": "2002",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2002 Q3",
+      "value": "100.3",
+      "year": "2002",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2002 Q4",
+      "value": "101.4",
+      "year": "2002",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2003 Q1",
+      "value": "99.1",
+      "year": "2003",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2003 Q2",
+      "value": "102.1",
+      "year": "2003",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2003 Q3",
+      "value": "104.9",
+      "year": "2003",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2003 Q4",
+      "value": "107.5",
+      "year": "2003",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2004 Q1",
+      "value": "110.5",
+      "year": "2004",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2004 Q2",
+      "value": "109.1",
+      "year": "2004",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2004 Q3",
+      "value": "108.3",
+      "year": "2004",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2004 Q4",
+      "value": "107.2",
+      "year": "2004",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2005 Q1",
+      "value": "107.5",
+      "year": "2005",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2005 Q2",
+      "value": "107.1",
+      "year": "2005",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2005 Q3",
+      "value": "105.2",
+      "year": "2005",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2005 Q4",
+      "value": "104.8",
+      "year": "2005",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2006 Q1",
+      "value": "105.5",
+      "year": "2006",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "106.4",
+      "year": "2006",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "107",
+      "year": "2006",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "108.9",
+      "year": "2006",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "109.9",
+      "year": "2007",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "109.5",
+      "year": "2007",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "108",
+      "year": "2007",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "109.4",
+      "year": "2007",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "110.4",
+      "year": "2008",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "108.9",
+      "year": "2008",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "106",
+      "year": "2008",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "100.4",
+      "year": "2008",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "93.3",
+      "year": "2009",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "91.5",
+      "year": "2009",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "91.8",
+      "year": "2009",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "92.7",
+      "year": "2009",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "95.5",
+      "year": "2010",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "101.1",
+      "year": "2010",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "102.8",
+      "year": "2010",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "100.6",
+      "year": "2010",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "102.2",
+      "year": "2011",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "103.3",
+      "year": "2011",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "102.2",
+      "year": "2011",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "101.6",
+      "year": "2011",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "97.2",
+      "year": "2012",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "93.7",
+      "year": "2012",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "91.7",
+      "year": "2012",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "93.4",
+      "year": "2012",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "92.8",
+      "year": "2013",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "94.6",
+      "year": "2013",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "97.2",
+      "year": "2013",
+      "quarter": "Q3",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "97.6",
+      "year": "2013",
+      "quarter": "Q4",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "99.1",
+      "year": "2014",
+      "quarter": "Q1",
+      "sourceDataset": "PGDP"
+    },
+    {
+      "date": "2014 Q2",
+      "value": "99.1",
+      "year": "2014",
+      "quarter": "Q2",
+      "sourceDataset": "PGDP"
+    }
+  ],
+  "months": [],
+  "relatedBulletins": [
+    "/economy/grossdomesticproductgdp/bulletins/gdppreliminaryestimateq32014"
+  ],
+  "relatedTimeseries": [
+    "/economy/grossdomesticproductgdp/timeseries/l2kq",
+    "/economy/grossdomesticproductgdp/timeseries/l2kx",
+    "/economy/grossdomesticproductgdp/timeseries/l2kl",
+    "/economy/grossdomesticproductgdp/timeseries/l2nc"
+  ],
+  "sourceDatasets": [
+    "BB",
+    "PGDP",
+    "PN2",
+    "QNA",
+    "UKEA"
+  ],
+  "type": "timeseries",
+  "name": "Output measure: Construction",
+  "uri": "/economy/grossdomesticproductgdp/timeseries/l2n8",
+  "fileName": "l2n8",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Gross Domestic Product (GDP)",
+      "fileName": "grossdomesticproductgdp",
+      "breadcrumb": []
+    }
+  ]
+}

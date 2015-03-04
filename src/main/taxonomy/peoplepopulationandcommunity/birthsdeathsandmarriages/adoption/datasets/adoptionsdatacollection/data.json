@@ -1,0 +1,53 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/vsob1/adoptions-in-england-and-wales/2012/rtd-adoptions-tables--2012.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Adoptions in the Adopted Children Register: sex, and whether the adopted child born within/outside marriage",
+  "nationalStatistic": true,
+  "description": "Data on adoptions are derived from the Adopted Children Register and are based on adoption orders made in England and Wales. The data here relates to those cases notified by the courts to the Registrar General and entered onto the Adopted Children Register in a given year.",
+  "title": "Adoptions data collection",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Adoptions data collection",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/datasets/adoptionsdatacollection",
+  "fileName": "adoptionsdatacollection",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Adoption",
+      "fileName": "adoption",
+      "breadcrumb": []
+    }
+  ]
+}

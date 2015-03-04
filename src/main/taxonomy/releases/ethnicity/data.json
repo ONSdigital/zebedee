@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Ethnicity statistics found here focus on the number and proportion of people who state that they identify with a particular ethnic group. Time series data on these figures are also available and these allow us to get a picture of the changing population of the UK.  ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
+      "type": "bulletin",
+      "name": "2011 Census Key Statistics for England and Wales, March 2011",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Ethnicity",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/datasets/ethnicity"
+    }
+  ],
+  "type": "release",
+  "name": "Ethnicity",
+  "fileName": "ethnicity"
+}

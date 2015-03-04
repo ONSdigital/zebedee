@@ -1,0 +1,89 @@
+{
+  "headline": {
+    "name": "Average weekly earnings (total pay)",
+    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kab9"
+  },
+  "items": [
+    {
+      "name": "Average weekly earnings (total pay)",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kab9"
+    },
+    {
+      "name": "Average weekly earnings (regular pay)",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai7"
+    },
+    {
+      "name": "Average weekly earnings (bonus pay)",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf4"
+    },
+    {
+      "name": "Average weekly earnings growth rate (bonus pay)",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf6"
+    },
+    {
+      "name": "Average weekly earnings growth rate (regular pay)",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai9"
+    },
+    {
+      "name": "Average weekly earnings growth rate (bonus pay)",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf6"
+    },
+    {
+      "name": "Average weekly hours worked – full time",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/ybuy"
+    },
+    {
+      "name": "Average weekly hours worked – part time",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/ybvb"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+    "name": "UK Labour Market, July 2014",
+    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "The Annual Survey of Hours and Earnings (ASHE) is based on a 1% sample of employee jobs. This is drawn from HM Revenue and Customs Pay As You Earn (PAYE) records. This bulletin contains provisional results from the 2013 survey and revised results from the 2012 survey.",
+      "name": "Annual Survey of Hours and Earnings, 2013 Provisional Results",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings2013provisionalresults"
+    },
+    {
+      "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+      "name": "UK Labour Market, July 2014",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Actual and usual weekly hours worked",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/actualandusualweeklyhoursworked"
+    },
+    {
+      "summary": "Covering total pay, bonus pay and regular pay",
+      "name": "Average Weekly Earnings",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearnings"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "Earnings are the reward for work and they can be paid on a regular basis or as bonus pay. Total pay combines both regular and bonus pay. The Office for National Statistics reports the level and growth rate of average weekly total, regular and bonus pay. Working hours are given as the average weekly hours worked by full-time and part-time workers.",
+  "type": "home",
+  "name": "Earnings and working hours",
+  "fileName": "earningsandworkinghours",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Life expectancy statistics use population estimates with statistics on the number of deaths to derive an estimate of how long, on average, people of various ages can expect to live.  These statistics are used by central and local governments to make planning and resource allocation decisions and are of general interest to the public. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "2010-12 male and female period life expectancy at birth and at age 65 for the UK and local areas within the four constituent countries.",
+      "type": "bulletin",
+      "name": "Life Expectancy at Birth and at Age 65 by Local Areas in the United Kingdom, 2006-08 to 2010-12",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/lifeexpectancyatbirthandatage65bylocalareasintheunitedkingdom200608to201012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Life expectancy UK",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/lifeexpectancyuk"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Life expectancy England and Wales",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/lifeexpectancyenglandandwales"
+    }
+  ],
+  "type": "release",
+  "name": "Life expectancies",
+  "fileName": "lifeexpectancies"
+}

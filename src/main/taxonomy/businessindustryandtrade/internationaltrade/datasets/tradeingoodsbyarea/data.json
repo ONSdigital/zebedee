@@ -1,0 +1,60 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Trade in goods by area",
+      "cdids": [
+        "MHO3",
+        "MHO5",
+        "MHN9",
+        "L87S",
+        "L87U",
+        "L87Q",
+        "L87M",
+        "L8TO",
+        "L87K",
+        "BOKG",
+        "BOKH",
+        "BOKI"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Exports, imports and balance for EMU, EU and non-EU",
+  "nationalStatistic": true,
+  "description": "Trade in goods by area. Exports, imports and balance for European Monetary Union (EMU), European Union (EU) and non-EU.",
+  "title": "Trade in goods by area",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Trade in goods by area",
+  "uri": "/businessindustryandtrade/internationaltrade/datasets/tradeingoodsbyarea",
+  "fileName": "tradeingoodsbyarea",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "International trade",
+      "fileName": "internationaltrade",
+      "breadcrumb": []
+    }
+  ]
+}

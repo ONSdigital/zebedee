@@ -1,0 +1,67 @@
+{
+  "headline": {
+    "name": "Adoptions in England and Wales",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid19"
+  },
+  "items": [
+    {
+      "name": "Adoptions in England and Wales",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid19"
+    },
+    {
+      "name": "Adoptions in England and Wales: Males",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid20"
+    },
+    {
+      "name": "Adoptions in England and Wales: Females",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid21"
+    },
+    {
+      "name": "Adoptions of children born within marriage",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid22"
+    },
+    {
+      "name": "Adoptions of children born outside marriage",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid23"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Annual adoptions statistics following court orders. Analysed by sex, age and marital status of biological parents.",
+    "name": "Adoptions in England and Wales, 2012",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/bulletins/adoptionsinenglandandwales2012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Annual adoptions statistics following court orders. Analysed by sex, age and marital status of biological parents.",
+      "name": "Adoptions in England and Wales, 2012",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/bulletins/adoptionsinenglandandwales2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Adoptions in the Adopted Children Register: sex, and whether the adopted child born within/outside marriage",
+      "name": "Adoptions data collection",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/datasets/adoptionsdatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 5,
+  "lede": "Adoption statistics are available from adoption registrations. They are used to inform local and central governments about trends in adoptions and a long run time series is available to make comparisons and observations about the impact of various different government policies. These statistics are available by the age and gender of the children being adopted as well as by whether or not the adopted children were born inside marriage.",
+  "type": "home",
+  "name": "Adoption",
+  "fileName": "adoption",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

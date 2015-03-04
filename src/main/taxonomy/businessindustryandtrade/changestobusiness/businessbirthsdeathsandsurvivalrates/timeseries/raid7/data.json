@@ -1,0 +1,47 @@
+{
+  "cdid": "RAID7",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "254885",
+  "unit": "",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/bulletins/businessdemography2012"
+  ],
+  "relatedTimeseries": [
+    "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid6",
+    "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid8"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Business deaths",
+  "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid7",
+  "fileName": "raid7",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Changes to business",
+      "fileName": "changestobusiness"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business births, deaths and survival rates",
+      "fileName": "businessbirthsdeathsandsurvivalrates",
+      "breadcrumb": []
+    }
+  ]
+}

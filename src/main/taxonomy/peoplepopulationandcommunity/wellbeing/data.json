@@ -1,0 +1,57 @@
+{
+  "headline": {
+    "name": "Life Satisfaction",
+    "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid131"
+  },
+  "items": [
+    {
+      "name": "Life Satisfaction",
+      "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid131"
+    },
+    {
+      "name": "Worthwhile",
+      "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid132"
+    },
+    {
+      "name": "Happiness",
+      "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid133"
+    },
+    {
+      "name": "Anxiety",
+      "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid134"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "This bulletin presents experimental statistics from the second Personal Well-being Annual Population dataset, April 2012 to March 2013.  Overall estimates of personal well-being are provided for each country of the United Kingdom, as well as for lower level geographies in England, Scotland and Wales.",
+    "name": "Personal Well-being Across the UK, 2012-2013",
+    "uri": "/peoplepopulationandcommunity/wellbeing/bulletins/personalwellbeingacrosstheuk20122013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This bulletin presents experimental statistics from the second Personal Well-being Annual Population dataset, April 2012 to March 2013.  Overall estimates of personal well-being are provided for each country of the United Kingdom, as well as for lower level geographies in England, Scotland and Wales.",
+      "name": "Personal Well-being Across the UK, 2012-2013",
+      "uri": "/peoplepopulationandcommunity/wellbeing/bulletins/personalwellbeingacrosstheuk20122013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Comparison over time of estimates of personal well-being",
+      "name": "Personal well-being",
+      "uri": "/peoplepopulationandcommunity/wellbeing/datasets/personalwellbeing"
+    }
+  ],
+  "level": "t3",
+  "index": 7,
+  "lede": "Measuring National Well-being is about looking at measures of the UK as a whole that go beyond what we produce, which is measured by Gross Domestic Product (GDP). This section includes a wide range of headline indicators in areas such as health, relationships, education and skills, what we do, where we live, our finances, the economy, governance, the environment and measures of \u0027personal well-being\u0027 (individuals\u0027 assessment of their own well-being). This data comes from a variety of sources and much of the analysis is new.",
+  "type": "home",
+  "name": "Well-being",
+  "fileName": "wellbeing",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "cdid": "RAID114",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "677.8",
+  "unit": "per week",
+  "preUnit": "£",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2010",
+      "value": "664",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "677.3",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "677.8",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Average total housing expenditure",
+  "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure/timeseries/raid114",
+  "fileName": "raid114",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Personal and household finances",
+      "fileName": "personalandhouseholdfinances"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Expenditure",
+      "fileName": "expenditure",
+      "breadcrumb": []
+    }
+  ]
+}

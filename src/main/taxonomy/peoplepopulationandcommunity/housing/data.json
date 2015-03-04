@@ -1,0 +1,65 @@
+{
+  "headline": {
+    "name": "UK average house price",
+    "uri": "/peoplepopulationandcommunity/housing/timeseries/raid103"
+  },
+  "items": [
+    {
+      "name": "UK average house price",
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid103"
+    },
+    {
+      "name": "UK house price change",
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid104"
+    },
+    {
+      "name": "England average house price",
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid105"
+    },
+    {
+      "name": "Wales average house price",
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid106"
+    },
+    {
+      "name": "Scotland average house price",
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid107"
+    },
+    {
+      "name": "Northern Ireland average house price",
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid108"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Mix-adjusted average house prices and house price indices for the UK and its component countries and regions.",
+    "name": "House Price Index, May 2014",
+    "uri": "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Mix-adjusted average house prices and house price indices for the UK and its component countries and regions.",
+      "name": "House Price Index, May 2014",
+      "uri": "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Average house prices",
+      "uri": "/peoplepopulationandcommunity/housing/datasets/averagehouseprices"
+    }
+  ],
+  "level": "t3",
+  "index": 5,
+  "lede": "Housing statistics focus mainly on data about house prices. These are often used as an informal indicator of the confidence people feel in the UK economy as well as being useful and of interest to the general public. Here you can find the latest figures on the level and growth of house prices across the UK. The data here is collected from a sample of mortgage completions and therefore does not include houses sold to cash buyers. ",
+  "type": "home",
+  "name": "Housing",
+  "fileName": "housing",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

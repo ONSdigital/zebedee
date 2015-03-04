@@ -1,0 +1,70 @@
+{
+  "headline": {
+    "name": "Trade in goods and services deficit (or surplus)",
+    "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+  },
+  "items": [
+    {
+      "name": "Trade in goods and services deficit (or surplus)",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+    },
+    {
+      "name": "Total imports of goods and services",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbi"
+    },
+    {
+      "name": "Total exports of goods and services",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh"
+    },
+    {
+      "name": "Balance of trade in goods from EMU member",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/mhn9"
+    },
+    {
+      "name": "Balance of trade in goods from all EU",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/l87q"
+    },
+    {
+      "name": "Balance of trade in goods from all Non-EU",
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/l87k"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
+    "name": "UK Trade, June 2014",
+    "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
+      "name": "UK Trade, June 2014",
+      "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Exports, imports and balance including total trade, trade in goods and oil",
+      "name": "Value of UK trade in goods and services",
+      "uri": "/businessindustryandtrade/internationaltrade/datasets/valueofuktradeingoodsandservices"
+    },
+    {
+      "summary": "Exports, imports and balance for EMU, EU and non-EU",
+      "name": "Trade in goods by area",
+      "uri": "/businessindustryandtrade/internationaltrade/datasets/tradeingoodsbyarea"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "International trade is the exchange of goods and services across international borders. Here, you can find statistics on the types of goods traded internationally and the general trends in international trade. A key statistic is the balance on international trade, in recent times the UK has generally had a deficit on its trade in goods and a surplus on its trade in services which has led to an overall deficit in the UK\u0027s balance of international trade. ",
+  "type": "home",
+  "name": "International trade",
+  "fileName": "internationaltrade",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    }
+  ]
+}

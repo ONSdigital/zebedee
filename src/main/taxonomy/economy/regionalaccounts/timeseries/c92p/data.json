@@ -1,0 +1,140 @@
+{
+  "cdid": "C92P",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "166870",
+  "unit": "m",
+  "preUnit": "£",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1997",
+      "value": "89623",
+      "year": "1997",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "1998",
+      "value": "94979",
+      "year": "1998",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "1999",
+      "value": "99094",
+      "year": "1999",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2000",
+      "value": "105353",
+      "year": "2000",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2001",
+      "value": "111920",
+      "year": "2001",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2002",
+      "value": "114831",
+      "year": "2002",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2003",
+      "value": "118103",
+      "year": "2003",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2004",
+      "value": "121932",
+      "year": "2004",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2005",
+      "value": "126893",
+      "year": "2005",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2006",
+      "value": "134571",
+      "year": "2006",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2007",
+      "value": "140142",
+      "year": "2007",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2008",
+      "value": "142421",
+      "year": "2008",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2009",
+      "value": "146920",
+      "year": "2009",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2010",
+      "value": "155461",
+      "year": "2010",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2011",
+      "value": "160319",
+      "year": "2011",
+      "sourceDataset": "RGHI"
+    },
+    {
+      "date": "2012",
+      "value": "166870",
+      "year": "2012",
+      "sourceDataset": "RGHI"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012"
+  ],
+  "relatedTimeseries": [
+    "/economy/regionalaccounts/timeseries/qwnd",
+    "/economy/regionalaccounts/timeseries/c92r"
+  ],
+  "sourceDatasets": [
+    "RGHI"
+  ],
+  "type": "timeseries",
+  "name": "South East Gross Disposable Household Income",
+  "uri": "/economy/regionalaccounts/timeseries/c92p",
+  "fileName": "c92p",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Regional accounts",
+      "fileName": "regionalaccounts",
+      "breadcrumb": []
+    }
+  ]
+}

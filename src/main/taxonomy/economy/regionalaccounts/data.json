@@ -1,0 +1,97 @@
+{
+  "headline": {
+    "name": "UK Gross Disposable Household Income",
+    "uri": "/economy/regionalaccounts/timeseries/qwnd"
+  },
+  "items": [
+    {
+      "name": "UK Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/qwnd"
+    },
+    {
+      "name": "North East Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92i"
+    },
+    {
+      "name": "North West Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92j"
+    },
+    {
+      "name": "Yorkshire and The Humber Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92k"
+    },
+    {
+      "name": "East Midlands Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92l"
+    },
+    {
+      "name": "West Midlands Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92m"
+    },
+    {
+      "name": "East of England Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92n"
+    },
+    {
+      "name": "Income London Gross Disposable Household",
+      "uri": "/economy/regionalaccounts/timeseries/c92o"
+    },
+    {
+      "name": "South East Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92p"
+    },
+    {
+      "name": "South West Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92q"
+    },
+    {
+      "name": "England Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92r"
+    },
+    {
+      "name": "Wales Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92s"
+    },
+    {
+      "name": "Scotland Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92t"
+    },
+    {
+      "name": "Northern Ireland Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/timeseries/c92u"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "This bulletin presents the latest estimates of Gross Disposable Household Income (GDHI) for regions (see Table 1), sub-regions and local areas of the UK.",
+    "name": "Regional Gross Disposable Household Income (GDHI), 2012",
+    "uri": "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This bulletin presents the latest estimates of Gross Disposable Household Income (GDHI) for regions (see Table 1), sub-regions and local areas of the UK.",
+      "name": "Regional Gross Disposable Household Income (GDHI), 2012",
+      "uri": "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "NUTS1 Regional Gross Disposable Household Income",
+      "uri": "/economy/regionalaccounts/datasets/nuts1regionalgrossdisposablehouseholdincome"
+    }
+  ],
+  "level": "t3",
+  "index": 4,
+  "lede": "Regional Accounts are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts.  These accounts allow comparisons between regions and comparisons of a region against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income. ",
+  "type": "home",
+  "name": "Regional accounts",
+  "fileName": "regionalaccounts",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    }
+  ]
+}

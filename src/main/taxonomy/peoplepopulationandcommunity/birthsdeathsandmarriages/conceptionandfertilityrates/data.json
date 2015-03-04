@@ -1,0 +1,72 @@
+{
+  "headline": {
+    "name": "Conceptions (all ages)",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid28"
+  },
+  "items": [
+    {
+      "name": "Conceptions (all ages)",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid28"
+    },
+    {
+      "name": "Under 18 conceptions",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid29"
+    },
+    {
+      "name": "Under 18 conception rate",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid30"
+    },
+    {
+      "name": "Average completed family size",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid31"
+    },
+    {
+      "name": "Childlessness",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid32"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
+    "name": "Conceptions in England and Wales, 2012",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Fertility on year of birth of mother rather than the year of birth of child. Includes average number of live-born children and the proportion of women remaining childless by year of birth.",
+      "name": "Cohort Fertility, 2012",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/cohortfertility2012"
+    },
+    {
+      "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
+      "name": "Conceptions in England and Wales, 2012",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Teenage conceptions",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/datasets/teenageconceptions"
+    }
+  ],
+  "level": "t3",
+  "index": 7,
+  "lede": "Conception statistics bring together records of birth registrations and abortion notifications. Fertility analysis adds value to information published on births by reporting statistics on those with no children and fertility among women born inside and outside the UK. Fertility projections are also used in the population projections. ",
+  "type": "home",
+  "name": "Conception and fertility rates",
+  "fileName": "conceptionandfertilityrates",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

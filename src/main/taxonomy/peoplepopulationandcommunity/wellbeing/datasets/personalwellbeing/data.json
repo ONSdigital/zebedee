@@ -1,0 +1,47 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/wellbeing/measuring-national-well-being/personal-well-being-across-the-uk--2012-13/rft-table-3.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Comparison over time of estimates of personal well-being",
+  "nationalStatistic": true,
+  "description": "Comparison over time of estimates of personal well-being from the Annual Population Survey (APS) Personal Well-being dataset:  by UK, country and region.",
+  "title": "Personal well-being",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Personal well-being",
+  "uri": "/peoplepopulationandcommunity/wellbeing/datasets/personalwellbeing",
+  "fileName": "personalwellbeing",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Well-being",
+      "fileName": "wellbeing",
+      "breadcrumb": []
+    }
+  ]
+}

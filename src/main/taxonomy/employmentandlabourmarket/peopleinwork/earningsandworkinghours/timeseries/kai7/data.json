@@ -1,0 +1,1283 @@
+{
+  "cdid": "KAI7",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "451",
+  "unit": "",
+  "preUnit": "£",
+  "date": "May to July 2014",
+  "source": "Labour Force Survey",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [
+    {
+      "date": "2000 JAN",
+      "value": "298",
+      "year": "2000",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 FEB",
+      "value": "298",
+      "year": "2000",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 MAR",
+      "value": "298",
+      "year": "2000",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 APR",
+      "value": "297",
+      "year": "2000",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 MAY",
+      "value": "299",
+      "year": "2000",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 JUN",
+      "value": "300",
+      "year": "2000",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 JUL",
+      "value": "300",
+      "year": "2000",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 AUG",
+      "value": "302",
+      "year": "2000",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 SEP",
+      "value": "304",
+      "year": "2000",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 OCT",
+      "value": "305",
+      "year": "2000",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 NOV",
+      "value": "307",
+      "year": "2000",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2000 DEC",
+      "value": "308",
+      "year": "2000",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 JAN",
+      "value": "309",
+      "year": "2001",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 FEB",
+      "value": "309",
+      "year": "2001",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 MAR",
+      "value": "311",
+      "year": "2001",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 APR",
+      "value": "313",
+      "year": "2001",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 MAY",
+      "value": "314",
+      "year": "2001",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 JUN",
+      "value": "314",
+      "year": "2001",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 JUL",
+      "value": "316",
+      "year": "2001",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 AUG",
+      "value": "319",
+      "year": "2001",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 SEP",
+      "value": "319",
+      "year": "2001",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 OCT",
+      "value": "320",
+      "year": "2001",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 NOV",
+      "value": "321",
+      "year": "2001",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2001 DEC",
+      "value": "322",
+      "year": "2001",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 JAN",
+      "value": "323",
+      "year": "2002",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 FEB",
+      "value": "325",
+      "year": "2002",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 MAR",
+      "value": "326",
+      "year": "2002",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 APR",
+      "value": "327",
+      "year": "2002",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 MAY",
+      "value": "327",
+      "year": "2002",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 JUN",
+      "value": "329",
+      "year": "2002",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 JUL",
+      "value": "329",
+      "year": "2002",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 AUG",
+      "value": "328",
+      "year": "2002",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 SEP",
+      "value": "329",
+      "year": "2002",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 OCT",
+      "value": "330",
+      "year": "2002",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 NOV",
+      "value": "331",
+      "year": "2002",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2002 DEC",
+      "value": "331",
+      "year": "2002",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 JAN",
+      "value": "334",
+      "year": "2003",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 FEB",
+      "value": "335",
+      "year": "2003",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 MAR",
+      "value": "335",
+      "year": "2003",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 APR",
+      "value": "336",
+      "year": "2003",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 MAY",
+      "value": "337",
+      "year": "2003",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 JUN",
+      "value": "338",
+      "year": "2003",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 JUL",
+      "value": "339",
+      "year": "2003",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 AUG",
+      "value": "340",
+      "year": "2003",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 SEP",
+      "value": "341",
+      "year": "2003",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 OCT",
+      "value": "342",
+      "year": "2003",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 NOV",
+      "value": "344",
+      "year": "2003",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2003 DEC",
+      "value": "345",
+      "year": "2003",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 JAN",
+      "value": "345",
+      "year": "2004",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 FEB",
+      "value": "346",
+      "year": "2004",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 MAR",
+      "value": "347",
+      "year": "2004",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 APR",
+      "value": "348",
+      "year": "2004",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 MAY",
+      "value": "350",
+      "year": "2004",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 JUN",
+      "value": "351",
+      "year": "2004",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 JUL",
+      "value": "352",
+      "year": "2004",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 AUG",
+      "value": "353",
+      "year": "2004",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 SEP",
+      "value": "354",
+      "year": "2004",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 OCT",
+      "value": "356",
+      "year": "2004",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 NOV",
+      "value": "356",
+      "year": "2004",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2004 DEC",
+      "value": "359",
+      "year": "2004",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 JAN",
+      "value": "360",
+      "year": "2005",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 FEB",
+      "value": "360",
+      "year": "2005",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 MAR",
+      "value": "362",
+      "year": "2005",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 APR",
+      "value": "363",
+      "year": "2005",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 MAY",
+      "value": "364",
+      "year": "2005",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 JUN",
+      "value": "365",
+      "year": "2005",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 JUL",
+      "value": "367",
+      "year": "2005",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 AUG",
+      "value": "369",
+      "year": "2005",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 SEP",
+      "value": "370",
+      "year": "2005",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 OCT",
+      "value": "371",
+      "year": "2005",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 NOV",
+      "value": "371",
+      "year": "2005",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2005 DEC",
+      "value": "372",
+      "year": "2005",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 JAN",
+      "value": "374",
+      "year": "2006",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 FEB",
+      "value": "375",
+      "year": "2006",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 MAR",
+      "value": "376",
+      "year": "2006",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 APR",
+      "value": "377",
+      "year": "2006",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 MAY",
+      "value": "379",
+      "year": "2006",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 JUN",
+      "value": "381",
+      "year": "2006",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 JUL",
+      "value": "381",
+      "year": "2006",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 AUG",
+      "value": "381",
+      "year": "2006",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 SEP",
+      "value": "383",
+      "year": "2006",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 OCT",
+      "value": "386",
+      "year": "2006",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 NOV",
+      "value": "386",
+      "year": "2006",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2006 DEC",
+      "value": "388",
+      "year": "2006",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 JAN",
+      "value": "388",
+      "year": "2007",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 FEB",
+      "value": "390",
+      "year": "2007",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 MAR",
+      "value": "392",
+      "year": "2007",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 APR",
+      "value": "392",
+      "year": "2007",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 MAY",
+      "value": "395",
+      "year": "2007",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 JUN",
+      "value": "397",
+      "year": "2007",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 JUL",
+      "value": "398",
+      "year": "2007",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 AUG",
+      "value": "400",
+      "year": "2007",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 SEP",
+      "value": "400",
+      "year": "2007",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 OCT",
+      "value": "401",
+      "year": "2007",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 NOV",
+      "value": "403",
+      "year": "2007",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2007 DEC",
+      "value": "403",
+      "year": "2007",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 JAN",
+      "value": "404",
+      "year": "2008",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 FEB",
+      "value": "406",
+      "year": "2008",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 MAR",
+      "value": "408",
+      "year": "2008",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 APR",
+      "value": "411",
+      "year": "2008",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 MAY",
+      "value": "409",
+      "year": "2008",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 JUN",
+      "value": "411",
+      "year": "2008",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 JUL",
+      "value": "412",
+      "year": "2008",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 AUG",
+      "value": "413",
+      "year": "2008",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 SEP",
+      "value": "414",
+      "year": "2008",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 OCT",
+      "value": "415",
+      "year": "2008",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 NOV",
+      "value": "416",
+      "year": "2008",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2008 DEC",
+      "value": "416",
+      "year": "2008",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 JAN",
+      "value": "416",
+      "year": "2009",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 FEB",
+      "value": "417",
+      "year": "2009",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 MAR",
+      "value": "417",
+      "year": "2009",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 APR",
+      "value": "418",
+      "year": "2009",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 MAY",
+      "value": "419",
+      "year": "2009",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 JUN",
+      "value": "419",
+      "year": "2009",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 JUL",
+      "value": "418",
+      "year": "2009",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 AUG",
+      "value": "418",
+      "year": "2009",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 SEP",
+      "value": "419",
+      "year": "2009",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 OCT",
+      "value": "419",
+      "year": "2009",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 NOV",
+      "value": "420",
+      "year": "2009",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2009 DEC",
+      "value": "421",
+      "year": "2009",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 JAN",
+      "value": "423",
+      "year": "2010",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 FEB",
+      "value": "423",
+      "year": "2010",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 MAR",
+      "value": "425",
+      "year": "2010",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 APR",
+      "value": "424",
+      "year": "2010",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 MAY",
+      "value": "424",
+      "year": "2010",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 JUN",
+      "value": "425",
+      "year": "2010",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 JUL",
+      "value": "427",
+      "year": "2010",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 AUG",
+      "value": "428",
+      "year": "2010",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 SEP",
+      "value": "429",
+      "year": "2010",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 OCT",
+      "value": "429",
+      "year": "2010",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 NOV",
+      "value": "430",
+      "year": "2010",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2010 DEC",
+      "value": "430",
+      "year": "2010",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 JAN",
+      "value": "433",
+      "year": "2011",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 FEB",
+      "value": "432",
+      "year": "2011",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 MAR",
+      "value": "433",
+      "year": "2011",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 APR",
+      "value": "433",
+      "year": "2011",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 MAY",
+      "value": "434",
+      "year": "2011",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 JUN",
+      "value": "434",
+      "year": "2011",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 JUL",
+      "value": "434",
+      "year": "2011",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 AUG",
+      "value": "435",
+      "year": "2011",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 SEP",
+      "value": "436",
+      "year": "2011",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 OCT",
+      "value": "437",
+      "year": "2011",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 NOV",
+      "value": "438",
+      "year": "2011",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2011 DEC",
+      "value": "438",
+      "year": "2011",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 JAN",
+      "value": "438",
+      "year": "2012",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 FEB",
+      "value": "440",
+      "year": "2012",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 MAR",
+      "value": "441",
+      "year": "2012",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 APR",
+      "value": "441",
+      "year": "2012",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 MAY",
+      "value": "442",
+      "year": "2012",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 JUN",
+      "value": "442",
+      "year": "2012",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 JUL",
+      "value": "443",
+      "year": "2012",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 AUG",
+      "value": "444",
+      "year": "2012",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 SEP",
+      "value": "443",
+      "year": "2012",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 OCT",
+      "value": "443",
+      "year": "2012",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 NOV",
+      "value": "444",
+      "year": "2012",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2012 DEC",
+      "value": "444",
+      "year": "2012",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 JAN",
+      "value": "442",
+      "year": "2013",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 FEB",
+      "value": "443",
+      "year": "2013",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 MAR",
+      "value": "444",
+      "year": "2013",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 APR",
+      "value": "447",
+      "year": "2013",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 MAY",
+      "value": "446",
+      "year": "2013",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 JUN",
+      "value": "447",
+      "year": "2013",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 JUL",
+      "value": "447",
+      "year": "2013",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 AUG",
+      "value": "447",
+      "year": "2013",
+      "month": "August",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 SEP",
+      "value": "447",
+      "year": "2013",
+      "month": "September",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 OCT",
+      "value": "448",
+      "year": "2013",
+      "month": "October",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 NOV",
+      "value": "447",
+      "year": "2013",
+      "month": "November",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2013 DEC",
+      "value": "449",
+      "year": "2013",
+      "month": "December",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2014 JAN",
+      "value": "450",
+      "year": "2014",
+      "month": "January",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2014 FEB",
+      "value": "449",
+      "year": "2014",
+      "month": "February",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2014 MAR",
+      "value": "448",
+      "year": "2014",
+      "month": "March",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2014 APR",
+      "value": "449",
+      "year": "2014",
+      "month": "April",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2014 MAY",
+      "value": "449",
+      "year": "2014",
+      "month": "May",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2014 JUN",
+      "value": "450",
+      "year": "2014",
+      "month": "June",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2014 JUL",
+      "value": "451",
+      "year": "2014",
+      "month": "July",
+      "sourceDataset": "EMP"
+    },
+    {
+      "date": "2014 AUG",
+      "value": "452",
+      "year": "2014",
+      "month": "August",
+      "sourceDataset": "EMP"
+    }
+  ],
+  "relatedBulletins": [
+    "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings2013provisionalresults",
+    "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+  ],
+  "relatedTimeseries": [
+    "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai9"
+  ],
+  "sourceDatasets": [
+    "EMP",
+    "LMS"
+  ],
+  "type": "timeseries",
+  "name": "Average weekly earnings (regular pay)",
+  "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai7",
+  "fileName": "kai7",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Earnings and working hours",
+      "fileName": "earningsandworkinghours",
+      "breadcrumb": []
+    }
+  ]
+}

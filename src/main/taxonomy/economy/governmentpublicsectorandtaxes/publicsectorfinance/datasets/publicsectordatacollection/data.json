@@ -1,0 +1,65 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Public Sector data collection",
+      "cdids": [
+        "JW2T",
+        "JW2Z",
+        "J5II",
+        "L65P",
+        "HF6W",
+        "HF6X",
+        "ANMU",
+        "ANNW",
+        "ANNX",
+        "RUTN",
+        "RUTO"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Public sector summary excluding financial interventions",
+  "nationalStatistic": true,
+  "description": "Public sector summary excluding financial interventions.",
+  "title": "Public Sector data collection",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Public Sector data collection",
+  "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectordatacollection",
+  "fileName": "publicsectordatacollection",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Government, public sector and taxes",
+      "fileName": "governmentpublicsectorandtaxes"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Public sector finance",
+      "fileName": "publicsectorfinance",
+      "breadcrumb": []
+    }
+  ]
+}

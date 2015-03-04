@@ -1,0 +1,139 @@
+{
+  "cdid": "TMQE",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "101576",
+  "unit": "m",
+  "preUnit": "£",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1997",
+      "value": "56008",
+      "year": "1997",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "1998",
+      "value": "58476",
+      "year": "1998",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "1999",
+      "value": "61290",
+      "year": "1999",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2000",
+      "value": "63614",
+      "year": "2000",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2001",
+      "value": "68154",
+      "year": "2001",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2002",
+      "value": "71434",
+      "year": "2002",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2003",
+      "value": "76911",
+      "year": "2003",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2004",
+      "value": "81495",
+      "year": "2004",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2005",
+      "value": "84964",
+      "year": "2005",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2006",
+      "value": "88557",
+      "year": "2006",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2007",
+      "value": "95107",
+      "year": "2007",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2008",
+      "value": "96492",
+      "year": "2008",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2009",
+      "value": "96423",
+      "year": "2009",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2010",
+      "value": "100372",
+      "year": "2010",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2011",
+      "value": "100392",
+      "year": "2011",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2012",
+      "value": "101576",
+      "year": "2012",
+      "sourceDataset": "RAGV"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013"
+  ],
+  "relatedTimeseries": [
+    "/economy/grossvalueaddedgva/timeseries/abml"
+  ],
+  "sourceDatasets": [
+    "RAGV"
+  ],
+  "type": "timeseries",
+  "name": "South West Gross Value Added",
+  "uri": "/economy/grossvalueaddedgva/timeseries/tmqe",
+  "fileName": "tmqe",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Gross Value Added (GVA)",
+      "fileName": "grossvalueaddedgva",
+      "breadcrumb": []
+    }
+  ]
+}

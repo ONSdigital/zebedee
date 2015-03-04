@@ -1,0 +1,32 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "The level and rate of UK unemployment is measured by the Labour Force Survey using a definition of unemployment specified by the International Labour Organisation. This defines unemployed people as those without a job who have been actively seeking work in the past four weeks and are available to start work in the next two weeks, or those who are out of work but have found a job and are waiting to start it in the next two weeks. Another measure related to unemployment is the claimant count which measures the number of people claiming Jobseeker\u0027s Allowance.",
+  "articles": [],
+  "bulletins": [],
+  "datasets": [
+    {
+      "summary": "Data on the number of people claiming benefits principally for being unemployed",
+      "type": "dataset",
+      "name": "Claimant Count data collection",
+      "uri": "/employmentandlabourmarket/unemployment/datasets/claimantcountdatacollection"
+    },
+    {
+      "summary": "People without a job who have been actively seeking work in the UK",
+      "type": "dataset",
+      "name": "Unemployment data collection",
+      "uri": "/employmentandlabourmarket/unemployment/datasets/unemploymentdatacollection"
+    }
+  ],
+  "type": "release",
+  "name": "Unemployment",
+  "fileName": "unemployment"
+}

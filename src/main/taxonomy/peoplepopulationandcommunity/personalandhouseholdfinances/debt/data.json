@@ -1,0 +1,50 @@
+{
+  "headline": {
+    "name": "Total household debt",
+    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid109"
+  },
+  "items": [
+    {
+      "name": "Total household debt",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid109"
+    },
+    {
+      "name": "Financial debt",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid110"
+    },
+    {
+      "name": "Property debt",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid111"
+    },
+    {
+      "name": "Median household financial debt",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid112"
+    },
+    {
+      "name": "Median household property debt",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid113"
+    }
+  ],
+  "statsBulletins": [],
+  "datasets": [],
+  "level": "t3",
+  "index": 0,
+  "lede": "Debt statistics found here focus on debt levels for people and households. These statistics come from the Wealth and Assets Survey (WAS). They tell us about financial debt, which includes credit and store cards that are not settled each month, overdrafts and all forms of fixed term loans. They also tell us about property debt, which is defined as the liabilities held against a household\u0027s main residence (mainly mortgages). Also available is data on how people feel about their level of debt.  ",
+  "type": "home",
+  "name": "Debt",
+  "fileName": "debt",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Personal and household finances",
+      "fileName": "personalandhouseholdfinances"
+    }
+  ]
+}

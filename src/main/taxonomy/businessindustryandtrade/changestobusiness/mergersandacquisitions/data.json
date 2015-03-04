@@ -1,0 +1,73 @@
+{
+  "headline": {
+    "name": "Number of acquisitions",
+    "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbaq"
+  },
+  "items": [
+    {
+      "name": "Number of acquisitions",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbaq"
+    },
+    {
+      "name": "Number of disposals",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbas"
+    },
+    {
+      "name": "Value of acquisitions",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbbi"
+    },
+    {
+      "name": "Value of disposals",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbbt"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Estimates of the value and numbers of mergers, acquisitions and disposals involving UK companies with values of £1.0 million or more. The information provided reflects solely the change in majority ownership (ordinary shares) and therefore only transactions which result in a change of ultimate control of the target company are included.",
+    "name": "Mergers and Acquisitions Involving UK Companies, Q1 2014",
+    "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/bulletins/mergersandacquisitionsinvolvingukcompaniesq12014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Estimates of the value and numbers of mergers, acquisitions and disposals involving UK companies with values of £1.0 million or more. The information provided reflects solely the change in majority ownership (ordinary shares) and therefore only transactions which result in a change of ultimate control of the target company are included.",
+      "name": "Mergers and Acquisitions Involving UK Companies, Q1 2014",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/bulletins/mergersandacquisitionsinvolvingukcompaniesq12014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Cross-Border Mergers, Acquisitions and Disposals",
+      "name": "Mergers and Acquisitions",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/datasets/mergersandacquisitions"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Mergers and Acquisitions abroad by UK companies",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/datasets/mergersandacquisitionsabroadbyukcompanies"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Disposals abroad by UK companies",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/datasets/disposalsabroadbyukcompanies"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "These statistics tell us about the changing picture of businesses operating in the UK. A merger occurs when two companies or organisations of a similar size agree to join together in order to operate as one single company under a new name. An acquisition is a transaction which involves one company purchasing the shares of a second company which is usually of a smaller size. Other statistics here are on \u0027disposals\u0027, which refers to a company or organisation selling or liquidating an asset or subsidiary. ",
+  "type": "home",
+  "name": "Mergers and acquisitions",
+  "fileName": "mergersandacquisitions",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Changes to business",
+      "fileName": "changestobusiness"
+    }
+  ]
+}

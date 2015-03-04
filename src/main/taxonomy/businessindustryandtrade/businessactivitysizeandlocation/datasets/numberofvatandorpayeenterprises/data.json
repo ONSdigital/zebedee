@@ -1,0 +1,47 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/bus-register/uk-business/2013/rft---table-1.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Analysis of UK local units and UK VAT and/or PAYE based Enterprises",
+  "nationalStatistic": true,
+  "description": "Analysis of UK local units and UK VAT and/or PAYE based Enterprises",
+  "title": "Number of VAT and/or PAYE enterprises",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Number of VAT and/or PAYE enterprises",
+  "uri": "/businessindustryandtrade/businessactivitysizeandlocation/datasets/numberofvatandorpayeenterprises",
+  "fileName": "numberofvatandorpayeenterprises",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business activity, size and location",
+      "fileName": "businessactivitysizeandlocation",
+      "breadcrumb": []
+    }
+  ]
+}

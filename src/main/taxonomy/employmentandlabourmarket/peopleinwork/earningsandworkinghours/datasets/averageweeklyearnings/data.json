@@ -1,0 +1,108 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Average Weekly Earnings",
+      "cdids": [
+        "KAB9",
+        "KAC2",
+        "KAC3",
+        "KAC4",
+        "KAC5",
+        "KAC6",
+        "KAC7",
+        "KAC8",
+        "KAC9",
+        "K5BZ",
+        "K5C2",
+        "K5C3",
+        "K5C4",
+        "K5C5",
+        "K5C6",
+        "KAD8",
+        "KAD9",
+        "KAE2",
+        "KAF4",
+        "KAF5",
+        "KAF6",
+        "KAF7",
+        "KAF8",
+        "KAF9",
+        "KAG2",
+        "KAG3",
+        "KAG4",
+        "K5CS",
+        "K5CT",
+        "K5CU",
+        "K5CV",
+        "K5CW",
+        "K5CX",
+        "KAH3",
+        "KAH4",
+        "KAH5",
+        "K5DL",
+        "K5DM",
+        "K5DN",
+        "K5DO",
+        "K5DP",
+        "K5DQ",
+        "KAK6",
+        "KAK7",
+        "KAK8",
+        "KAI7",
+        "KAI8",
+        "KAI9",
+        "KAJ2",
+        "KAJ3",
+        "KAJ4",
+        "KAJ5",
+        "KAJ6",
+        "KAJ7"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Covering total pay, bonus pay and regular pay",
+  "nationalStatistic": true,
+  "description": "Average Weekly Earnings including total, bonus and regular pay.",
+  "title": "Average Weekly Earnings",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Average Weekly Earnings",
+  "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearnings",
+  "fileName": "averageweeklyearnings",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Earnings and working hours",
+      "fileName": "earningsandworkinghours",
+      "breadcrumb": []
+    }
+  ]
+}

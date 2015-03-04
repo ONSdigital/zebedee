@@ -1,0 +1,963 @@
+{
+  "cdid": "CBAS",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "9",
+  "unit": "",
+  "preUnit": "",
+  "date": "Q1 2014",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1987",
+      "value": "118",
+      "year": "1987",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1988",
+      "value": "112",
+      "year": "1988",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1989",
+      "value": "134",
+      "year": "1989",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1990",
+      "value": "134",
+      "year": "1990",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1991",
+      "value": "157",
+      "year": "1991",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1992",
+      "value": "219",
+      "year": "1992",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1993",
+      "value": "221",
+      "year": "1993",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1994",
+      "value": "149",
+      "year": "1994",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1995",
+      "value": "117",
+      "year": "1995",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1996",
+      "value": "178",
+      "year": "1996",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1997",
+      "value": "176",
+      "year": "1997",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1998",
+      "value": "218",
+      "year": "1998",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1999",
+      "value": "198",
+      "year": "1999",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2000",
+      "value": "168",
+      "year": "2000",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2001",
+      "value": "139",
+      "year": "2001",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2002",
+      "value": "128",
+      "year": "2002",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2003",
+      "value": "136",
+      "year": "2003",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2004",
+      "value": "118",
+      "year": "2004",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2005",
+      "value": "110",
+      "year": "2005",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2006",
+      "value": "89",
+      "year": "2006",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2007",
+      "value": "104",
+      "year": "2007",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2008",
+      "value": "71",
+      "year": "2008",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2009",
+      "value": "37",
+      "year": "2009",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2010",
+      "value": "73",
+      "year": "2010",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2011",
+      "value": "80",
+      "year": "2011",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2012",
+      "value": "40",
+      "year": "2012",
+      "sourceDataset": "AM"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "1987 Q1",
+      "value": "31",
+      "year": "1987",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1987 Q2",
+      "value": "26",
+      "year": "1987",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1987 Q3",
+      "value": "29",
+      "year": "1987",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1987 Q4",
+      "value": "32",
+      "year": "1987",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1988 Q1",
+      "value": "34",
+      "year": "1988",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1988 Q2",
+      "value": "28",
+      "year": "1988",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1988 Q3",
+      "value": "25",
+      "year": "1988",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1988 Q4",
+      "value": "25",
+      "year": "1988",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1989 Q1",
+      "value": "29",
+      "year": "1989",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1989 Q2",
+      "value": "36",
+      "year": "1989",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1989 Q3",
+      "value": "47",
+      "year": "1989",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1989 Q4",
+      "value": "22",
+      "year": "1989",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1990 Q1",
+      "value": "36",
+      "year": "1990",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1990 Q2",
+      "value": "21",
+      "year": "1990",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1990 Q3",
+      "value": "31",
+      "year": "1990",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1990 Q4",
+      "value": "46",
+      "year": "1990",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1991 Q1",
+      "value": "35",
+      "year": "1991",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1991 Q2",
+      "value": "43",
+      "year": "1991",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1991 Q3",
+      "value": "42",
+      "year": "1991",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1991 Q4",
+      "value": "37",
+      "year": "1991",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1992 Q1",
+      "value": "46",
+      "year": "1992",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1992 Q2",
+      "value": "52",
+      "year": "1992",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1992 Q3",
+      "value": "21",
+      "year": "1992",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1992 Q4",
+      "value": "100",
+      "year": "1992",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1993 Q1",
+      "value": "65",
+      "year": "1993",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1993 Q2",
+      "value": "51",
+      "year": "1993",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1993 Q3",
+      "value": "27",
+      "year": "1993",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1993 Q4",
+      "value": "78",
+      "year": "1993",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1994 Q1",
+      "value": "48",
+      "year": "1994",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1994 Q2",
+      "value": "25",
+      "year": "1994",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1994 Q3",
+      "value": "36",
+      "year": "1994",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1994 Q4",
+      "value": "40",
+      "year": "1994",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1995 Q1",
+      "value": "35",
+      "year": "1995",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1995 Q2",
+      "value": "22",
+      "year": "1995",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1995 Q3",
+      "value": "12",
+      "year": "1995",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1995 Q4",
+      "value": "48",
+      "year": "1995",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1996 Q1",
+      "value": "29",
+      "year": "1996",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1996 Q2",
+      "value": "38",
+      "year": "1996",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1996 Q3",
+      "value": "44",
+      "year": "1996",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1996 Q4",
+      "value": "67",
+      "year": "1996",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1997 Q1",
+      "value": "43",
+      "year": "1997",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1997 Q2",
+      "value": "36",
+      "year": "1997",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1997 Q3",
+      "value": "48",
+      "year": "1997",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1997 Q4",
+      "value": "49",
+      "year": "1997",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1998 Q1",
+      "value": "55",
+      "year": "1998",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1998 Q2",
+      "value": "63",
+      "year": "1998",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1998 Q3",
+      "value": "51",
+      "year": "1998",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1998 Q4",
+      "value": "49",
+      "year": "1998",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1999 Q1",
+      "value": "47",
+      "year": "1999",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1999 Q2",
+      "value": "75",
+      "year": "1999",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1999 Q3",
+      "value": "43",
+      "year": "1999",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "1999 Q4",
+      "value": "33",
+      "year": "1999",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2000 Q1",
+      "value": "48",
+      "year": "2000",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2000 Q2",
+      "value": "34",
+      "year": "2000",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2000 Q3",
+      "value": "50",
+      "year": "2000",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2000 Q4",
+      "value": "36",
+      "year": "2000",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2001 Q1",
+      "value": "30",
+      "year": "2001",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2001 Q2",
+      "value": "39",
+      "year": "2001",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2001 Q3",
+      "value": "26",
+      "year": "2001",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2001 Q4",
+      "value": "44",
+      "year": "2001",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2002 Q1",
+      "value": "24",
+      "year": "2002",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2002 Q2",
+      "value": "38",
+      "year": "2002",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2002 Q3",
+      "value": "35",
+      "year": "2002",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2002 Q4",
+      "value": "31",
+      "year": "2002",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2003 Q1",
+      "value": "26",
+      "year": "2003",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2003 Q2",
+      "value": "26",
+      "year": "2003",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2003 Q3",
+      "value": "40",
+      "year": "2003",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2003 Q4",
+      "value": "44",
+      "year": "2003",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2004 Q1",
+      "value": "42",
+      "year": "2004",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2004 Q2",
+      "value": "18",
+      "year": "2004",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2004 Q3",
+      "value": "35",
+      "year": "2004",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2004 Q4",
+      "value": "23",
+      "year": "2004",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2005 Q1",
+      "value": "20",
+      "year": "2005",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2005 Q2",
+      "value": "22",
+      "year": "2005",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2005 Q3",
+      "value": "42",
+      "year": "2005",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2005 Q4",
+      "value": "26",
+      "year": "2005",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2006 Q1",
+      "value": "18",
+      "year": "2006",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "18",
+      "year": "2006",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "24",
+      "year": "2006",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "29",
+      "year": "2006",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "23",
+      "year": "2007",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "39",
+      "year": "2007",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "23",
+      "year": "2007",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "19",
+      "year": "2007",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "15",
+      "year": "2008",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "19",
+      "year": "2008",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "19",
+      "year": "2008",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "18",
+      "year": "2008",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "13",
+      "year": "2009",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "7",
+      "year": "2009",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "7",
+      "year": "2009",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "10",
+      "year": "2009",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "13",
+      "year": "2010",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "18",
+      "year": "2010",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "18",
+      "year": "2010",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "24",
+      "year": "2010",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "18",
+      "year": "2011",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "19",
+      "year": "2011",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "22",
+      "year": "2011",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "21",
+      "year": "2011",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "8",
+      "year": "2012",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "14",
+      "year": "2012",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "7",
+      "year": "2012",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "11",
+      "year": "2012",
+      "quarter": "Q4",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "10",
+      "year": "2013",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "13",
+      "year": "2013",
+      "quarter": "Q2",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "5",
+      "year": "2013",
+      "quarter": "Q3",
+      "sourceDataset": "AM"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "9",
+      "year": "2014",
+      "quarter": "Q1",
+      "sourceDataset": "AM"
+    }
+  ],
+  "months": [],
+  "relatedBulletins": [
+    "/businessindustryandtrade/changestobusiness/mergersandacquisitions/bulletins/mergersandacquisitionsinvolvingukcompaniesq12014"
+  ],
+  "relatedTimeseries": [
+    "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbaq",
+    "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbbt"
+  ],
+  "sourceDatasets": [
+    "AM"
+  ],
+  "type": "timeseries",
+  "name": "Number of disposals",
+  "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbas",
+  "fileName": "cbas",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Changes to business",
+      "fileName": "changestobusiness"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Mergers and acquisitions",
+      "fileName": "mergersandacquisitions",
+      "breadcrumb": []
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "cdid": "RAID43",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "4.7",
+  "unit": "m",
+  "preUnit": "",
+  "date": "2013",
+  "source": "Labour Force Survey",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Married or civil partner couple families (with dependent children)",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid43",
+  "fileName": "raid43",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Families",
+      "fileName": "families",
+      "breadcrumb": []
+    }
+  ]
+}

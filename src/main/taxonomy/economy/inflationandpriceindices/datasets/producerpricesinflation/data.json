@@ -1,0 +1,55 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Producer Prices Inflation",
+      "cdids": [
+        "JVZ7",
+        "K3BI",
+        "K65A",
+        "K37Y",
+        "K646",
+        "K644",
+        "K647"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Comprehensive dataset covering input and output index series",
+  "nationalStatistic": true,
+  "description": "Comprehensive dataset covering input and output index series. Price movement data at all manufacturing, aggregated industry and product group level. Data supplied from individual UK manufacturers, importers and exporters.",
+  "title": "Producer Prices Inflation",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Producer Prices Inflation",
+  "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation",
+  "fileName": "producerpricesinflation",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Inflation and price indices",
+      "fileName": "inflationandpriceindices",
+      "breadcrumb": []
+    }
+  ]
+}

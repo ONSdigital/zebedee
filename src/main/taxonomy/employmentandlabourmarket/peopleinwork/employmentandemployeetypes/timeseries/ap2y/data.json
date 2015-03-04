@@ -1,0 +1,1618 @@
+{
+  "cdid": "AP2Y",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "677000",
+  "unit": "",
+  "preUnit": "",
+  "date": "May to July 2014",
+  "source": "Labour Force Survey",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2002",
+      "value": "606000",
+      "year": "2002",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003",
+      "value": "587000",
+      "year": "2003",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004",
+      "value": "634000",
+      "year": "2004",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005",
+      "value": "626000",
+      "year": "2005",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006",
+      "value": "603000",
+      "year": "2006",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007",
+      "value": "654000",
+      "year": "2007",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008",
+      "value": "633000",
+      "year": "2008",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009",
+      "value": "447000",
+      "year": "2009",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010",
+      "value": "464000",
+      "year": "2010",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011",
+      "value": "465000",
+      "year": "2011",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012",
+      "value": "476000",
+      "year": "2012",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013",
+      "value": "531000",
+      "year": "2013",
+      "sourceDataset": "LMS"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "2001 Q2",
+      "value": "673000",
+      "year": "2001",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 Q3",
+      "value": "654000",
+      "year": "2001",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 Q4",
+      "value": "596000",
+      "year": "2001",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 Q1",
+      "value": "613000",
+      "year": "2002",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 Q2",
+      "value": "610000",
+      "year": "2002",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 Q3",
+      "value": "603000",
+      "year": "2002",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 Q4",
+      "value": "597000",
+      "year": "2002",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 Q1",
+      "value": "586000",
+      "year": "2003",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 Q2",
+      "value": "573000",
+      "year": "2003",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 Q3",
+      "value": "586000",
+      "year": "2003",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 Q4",
+      "value": "608000",
+      "year": "2003",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 Q1",
+      "value": "617000",
+      "year": "2004",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 Q2",
+      "value": "634000",
+      "year": "2004",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 Q3",
+      "value": "645000",
+      "year": "2004",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 Q4",
+      "value": "654000",
+      "year": "2004",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 Q1",
+      "value": "638000",
+      "year": "2005",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 Q2",
+      "value": "635000",
+      "year": "2005",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 Q3",
+      "value": "614000",
+      "year": "2005",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 Q4",
+      "value": "602000",
+      "year": "2005",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 Q1",
+      "value": "592000",
+      "year": "2006",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "597000",
+      "year": "2006",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "603000",
+      "year": "2006",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "613000",
+      "year": "2006",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "637000",
+      "year": "2007",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "652000",
+      "year": "2007",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "673000",
+      "year": "2007",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "679000",
+      "year": "2007",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "696000",
+      "year": "2008",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "650000",
+      "year": "2008",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "607000",
+      "year": "2008",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "520000",
+      "year": "2008",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "457000",
+      "year": "2009",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "429000",
+      "year": "2009",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "436000",
+      "year": "2009",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "449000",
+      "year": "2009",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "457000",
+      "year": "2010",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "479000",
+      "year": "2010",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "451000",
+      "year": "2010",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "477000",
+      "year": "2010",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "475000",
+      "year": "2011",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "456000",
+      "year": "2011",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "460000",
+      "year": "2011",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "461000",
+      "year": "2011",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "462000",
+      "year": "2012",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "471000",
+      "year": "2012",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "483000",
+      "year": "2012",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "497000",
+      "year": "2012",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "503000",
+      "year": "2013",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "531000",
+      "year": "2013",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "544000",
+      "year": "2013",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "573000",
+      "year": "2013",
+      "quarter": "Q4",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "618000",
+      "year": "2014",
+      "quarter": "Q1",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 Q2",
+      "value": "656000",
+      "year": "2014",
+      "quarter": "Q2",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 Q3",
+      "value": "674000",
+      "year": "2014",
+      "quarter": "Q3",
+      "sourceDataset": "LMS"
+    }
+  ],
+  "months": [
+    {
+      "date": "2001 MAY",
+      "value": "673000",
+      "year": "2001",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 JUN",
+      "value": "666000",
+      "year": "2001",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 JUL",
+      "value": "654000",
+      "year": "2001",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 AUG",
+      "value": "654000",
+      "year": "2001",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 SEP",
+      "value": "631000",
+      "year": "2001",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 OCT",
+      "value": "619000",
+      "year": "2001",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 NOV",
+      "value": "596000",
+      "year": "2001",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2001 DEC",
+      "value": "601000",
+      "year": "2001",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 JAN",
+      "value": "610000",
+      "year": "2002",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 FEB",
+      "value": "613000",
+      "year": "2002",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 MAR",
+      "value": "613000",
+      "year": "2002",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 APR",
+      "value": "606000",
+      "year": "2002",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 MAY",
+      "value": "610000",
+      "year": "2002",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 JUN",
+      "value": "605000",
+      "year": "2002",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 JUL",
+      "value": "607000",
+      "year": "2002",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 AUG",
+      "value": "603000",
+      "year": "2002",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 SEP",
+      "value": "603000",
+      "year": "2002",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 OCT",
+      "value": "602000",
+      "year": "2002",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 NOV",
+      "value": "597000",
+      "year": "2002",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2002 DEC",
+      "value": "597000",
+      "year": "2002",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 JAN",
+      "value": "588000",
+      "year": "2003",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 FEB",
+      "value": "586000",
+      "year": "2003",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 MAR",
+      "value": "579000",
+      "year": "2003",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 APR",
+      "value": "582000",
+      "year": "2003",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 MAY",
+      "value": "573000",
+      "year": "2003",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 JUN",
+      "value": "569000",
+      "year": "2003",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 JUL",
+      "value": "572000",
+      "year": "2003",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 AUG",
+      "value": "586000",
+      "year": "2003",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 SEP",
+      "value": "598000",
+      "year": "2003",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 OCT",
+      "value": "604000",
+      "year": "2003",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 NOV",
+      "value": "608000",
+      "year": "2003",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2003 DEC",
+      "value": "610000",
+      "year": "2003",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 JAN",
+      "value": "611000",
+      "year": "2004",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 FEB",
+      "value": "617000",
+      "year": "2004",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 MAR",
+      "value": "624000",
+      "year": "2004",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 APR",
+      "value": "630000",
+      "year": "2004",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 MAY",
+      "value": "634000",
+      "year": "2004",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 JUN",
+      "value": "645000",
+      "year": "2004",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 JUL",
+      "value": "647000",
+      "year": "2004",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 AUG",
+      "value": "645000",
+      "year": "2004",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 SEP",
+      "value": "646000",
+      "year": "2004",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 OCT",
+      "value": "648000",
+      "year": "2004",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 NOV",
+      "value": "654000",
+      "year": "2004",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2004 DEC",
+      "value": "662000",
+      "year": "2004",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 JAN",
+      "value": "652000",
+      "year": "2005",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 FEB",
+      "value": "638000",
+      "year": "2005",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 MAR",
+      "value": "630000",
+      "year": "2005",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 APR",
+      "value": "635000",
+      "year": "2005",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 MAY",
+      "value": "635000",
+      "year": "2005",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 JUN",
+      "value": "627000",
+      "year": "2005",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 JUL",
+      "value": "617000",
+      "year": "2005",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 AUG",
+      "value": "614000",
+      "year": "2005",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 SEP",
+      "value": "602000",
+      "year": "2005",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 OCT",
+      "value": "599000",
+      "year": "2005",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 NOV",
+      "value": "602000",
+      "year": "2005",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2005 DEC",
+      "value": "613000",
+      "year": "2005",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 JAN",
+      "value": "606000",
+      "year": "2006",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 FEB",
+      "value": "592000",
+      "year": "2006",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 MAR",
+      "value": "592000",
+      "year": "2006",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 APR",
+      "value": "591000",
+      "year": "2006",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 MAY",
+      "value": "597000",
+      "year": "2006",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 JUN",
+      "value": "601000",
+      "year": "2006",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 JUL",
+      "value": "604000",
+      "year": "2006",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 AUG",
+      "value": "603000",
+      "year": "2006",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 SEP",
+      "value": "610000",
+      "year": "2006",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 OCT",
+      "value": "612000",
+      "year": "2006",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 NOV",
+      "value": "613000",
+      "year": "2006",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2006 DEC",
+      "value": "617000",
+      "year": "2006",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 JAN",
+      "value": "625000",
+      "year": "2007",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 FEB",
+      "value": "637000",
+      "year": "2007",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 MAR",
+      "value": "641000",
+      "year": "2007",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 APR",
+      "value": "644000",
+      "year": "2007",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 MAY",
+      "value": "652000",
+      "year": "2007",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 JUN",
+      "value": "661000",
+      "year": "2007",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 JUL",
+      "value": "671000",
+      "year": "2007",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 AUG",
+      "value": "673000",
+      "year": "2007",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 SEP",
+      "value": "673000",
+      "year": "2007",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 OCT",
+      "value": "678000",
+      "year": "2007",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 NOV",
+      "value": "679000",
+      "year": "2007",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2007 DEC",
+      "value": "682000",
+      "year": "2007",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 JAN",
+      "value": "688000",
+      "year": "2008",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 FEB",
+      "value": "696000",
+      "year": "2008",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 MAR",
+      "value": "687000",
+      "year": "2008",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 APR",
+      "value": "672000",
+      "year": "2008",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 MAY",
+      "value": "650000",
+      "year": "2008",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 JUN",
+      "value": "635000",
+      "year": "2008",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 JUL",
+      "value": "618000",
+      "year": "2008",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 AUG",
+      "value": "607000",
+      "year": "2008",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 SEP",
+      "value": "588000",
+      "year": "2008",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 OCT",
+      "value": "556000",
+      "year": "2008",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 NOV",
+      "value": "520000",
+      "year": "2008",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2008 DEC",
+      "value": "490000",
+      "year": "2008",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 JAN",
+      "value": "468000",
+      "year": "2009",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 FEB",
+      "value": "457000",
+      "year": "2009",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 MAR",
+      "value": "450000",
+      "year": "2009",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 APR",
+      "value": "441000",
+      "year": "2009",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 MAY",
+      "value": "429000",
+      "year": "2009",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 JUN",
+      "value": "429000",
+      "year": "2009",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 JUL",
+      "value": "438000",
+      "year": "2009",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 AUG",
+      "value": "436000",
+      "year": "2009",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 SEP",
+      "value": "434000",
+      "year": "2009",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 OCT",
+      "value": "438000",
+      "year": "2009",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 NOV",
+      "value": "449000",
+      "year": "2009",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2009 DEC",
+      "value": "454000",
+      "year": "2009",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 JAN",
+      "value": "458000",
+      "year": "2010",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 FEB",
+      "value": "457000",
+      "year": "2010",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 MAR",
+      "value": "462000",
+      "year": "2010",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 APR",
+      "value": "474000",
+      "year": "2010",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 MAY",
+      "value": "479000",
+      "year": "2010",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 JUN",
+      "value": "475000",
+      "year": "2010",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 JUL",
+      "value": "458000",
+      "year": "2010",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 AUG",
+      "value": "451000",
+      "year": "2010",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 SEP",
+      "value": "453000",
+      "year": "2010",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 OCT",
+      "value": "470000",
+      "year": "2010",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 NOV",
+      "value": "477000",
+      "year": "2010",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2010 DEC",
+      "value": "486000",
+      "year": "2010",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 JAN",
+      "value": "482000",
+      "year": "2011",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 FEB",
+      "value": "475000",
+      "year": "2011",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 MAR",
+      "value": "467000",
+      "year": "2011",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 APR",
+      "value": "456000",
+      "year": "2011",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 MAY",
+      "value": "456000",
+      "year": "2011",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 JUN",
+      "value": "453000",
+      "year": "2011",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 JUL",
+      "value": "459000",
+      "year": "2011",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 AUG",
+      "value": "460000",
+      "year": "2011",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 SEP",
+      "value": "464000",
+      "year": "2011",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 OCT",
+      "value": "460000",
+      "year": "2011",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 NOV",
+      "value": "461000",
+      "year": "2011",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2011 DEC",
+      "value": "466000",
+      "year": "2011",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 JAN",
+      "value": "466000",
+      "year": "2012",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 FEB",
+      "value": "462000",
+      "year": "2012",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 MAR",
+      "value": "462000",
+      "year": "2012",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 APR",
+      "value": "467000",
+      "year": "2012",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 MAY",
+      "value": "471000",
+      "year": "2012",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 JUN",
+      "value": "476000",
+      "year": "2012",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 JUL",
+      "value": "480000",
+      "year": "2012",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 AUG",
+      "value": "483000",
+      "year": "2012",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 SEP",
+      "value": "487000",
+      "year": "2012",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 OCT",
+      "value": "491000",
+      "year": "2012",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 NOV",
+      "value": "497000",
+      "year": "2012",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2012 DEC",
+      "value": "494000",
+      "year": "2012",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 JAN",
+      "value": "498000",
+      "year": "2013",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 FEB",
+      "value": "503000",
+      "year": "2013",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 MAR",
+      "value": "512000",
+      "year": "2013",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 APR",
+      "value": "521000",
+      "year": "2013",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 MAY",
+      "value": "531000",
+      "year": "2013",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 JUN",
+      "value": "537000",
+      "year": "2013",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 JUL",
+      "value": "537000",
+      "year": "2013",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 AUG",
+      "value": "544000",
+      "year": "2013",
+      "month": "August",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 SEP",
+      "value": "552000",
+      "year": "2013",
+      "month": "September",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 OCT",
+      "value": "566000",
+      "year": "2013",
+      "month": "October",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 NOV",
+      "value": "573000",
+      "year": "2013",
+      "month": "November",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2013 DEC",
+      "value": "583000",
+      "year": "2013",
+      "month": "December",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 JAN",
+      "value": "597000",
+      "year": "2014",
+      "month": "January",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 FEB",
+      "value": "618000",
+      "year": "2014",
+      "month": "February",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 MAR",
+      "value": "637000",
+      "year": "2014",
+      "month": "March",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 APR",
+      "value": "650000",
+      "year": "2014",
+      "month": "April",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 MAY",
+      "value": "656000",
+      "year": "2014",
+      "month": "May",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 JUN",
+      "value": "662000",
+      "year": "2014",
+      "month": "June",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 JUL",
+      "value": "677000",
+      "year": "2014",
+      "month": "July",
+      "sourceDataset": "LMS"
+    },
+    {
+      "date": "2014 AUG",
+      "value": "674000",
+      "year": "2014",
+      "month": "August",
+      "sourceDataset": "LMS"
+    }
+  ],
+  "relatedBulletins": [],
+  "relatedTimeseries": [],
+  "sourceDatasets": [
+    "LMS",
+    "UNEM"
+  ],
+  "type": "timeseries",
+  "name": "Vacancies",
+  "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/ap2y",
+  "fileName": "ap2y",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and employee types",
+      "fileName": "employmentandemployeetypes",
+      "breadcrumb": []
+    }
+  ]
+}

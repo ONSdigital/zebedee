@@ -1,0 +1,53 @@
+{
+  "headline": {
+    "name": "Net investment flows into the UK",
+    "uri": "/economy/investmentspensionsandtrusts/timeseries/raid135"
+  },
+  "items": [
+    {
+      "name": "Net investment flows into the UK",
+      "uri": "/economy/investmentspensionsandtrusts/timeseries/raid135"
+    },
+    {
+      "name": "Net flow of direct investment abroad by UK companies",
+      "uri": "/economy/investmentspensionsandtrusts/timeseries/raid136"
+    },
+    {
+      "name": "Net investment flows to Europe",
+      "uri": "/economy/investmentspensionsandtrusts/timeseries/raid137"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Provides a detailed breakdown of UK foreign direct investment flows, positions (stocks) and earnings (both inward and outward), by country, component and industry.",
+    "name": "Foreign Direct Investment Involving UK Companies, 2012 (MA4)",
+    "uri": "/economy/investmentspensionsandtrusts/bulletins/foreigndirectinvestmentinvolvingukcompanies2012ma4"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Provides a detailed breakdown of UK foreign direct investment flows, positions (stocks) and earnings (both inward and outward), by country, component and industry.",
+      "name": "Foreign Direct Investment Involving UK Companies, 2012 (MA4)",
+      "uri": "/economy/investmentspensionsandtrusts/bulletins/foreigndirectinvestmentinvolvingukcompanies2012ma4"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Comprehensive dataset covering Foreign Direct Investment (FDI) Involving UK Companies",
+      "name": "Data collection of FDI flows",
+      "uri": "/economy/investmentspensionsandtrusts/datasets/datacollectionoffdiflows"
+    }
+  ],
+  "level": "t3",
+  "index": 8,
+  "lede": "Investment refers to the flow of money around and across countries for the purpose of making profit. A pension is a fixed sum to be paid regularly to a person, typically following retirement and a trust is a legal arrangement where one or more \u0027trustees\u0027 are made legally responsible for holding assets. Statistics here include net flows of investment into the UK, figures on the number of people who hold pensions of different types and investments made by various types of trusts.",
+  "type": "home",
+  "name": "Investments, pensions and trusts",
+  "fileName": "investmentspensionsandtrusts",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    }
+  ]
+}

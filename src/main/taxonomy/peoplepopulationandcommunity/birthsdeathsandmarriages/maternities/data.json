@@ -1,0 +1,34 @@
+{
+  "headline": {
+    "name": "Number of maternities",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/maternities/timeseries/raid60"
+  },
+  "items": [
+    {
+      "name": "Number of maternities",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/maternities/timeseries/raid60"
+    }
+  ],
+  "statsBulletins": [],
+  "datasets": [],
+  "level": "t3",
+  "index": 9,
+  "lede": "A maternity is a pregnancy resulting in the birth of one or more children, including stillbirths. Multiple births arising from a single pregnancy are counted as one maternity, therefore the number of maternities indicates the number of women having babies rather than the number of babies born. Here you can find the latest figures on the number of maternities in England and Wales. ",
+  "type": "home",
+  "name": "Maternities",
+  "fileName": "maternities",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

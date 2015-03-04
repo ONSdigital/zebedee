@@ -1,0 +1,67 @@
+{
+  "headline": {
+    "name": "White",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid65"
+  },
+  "items": [
+    {
+      "name": "White",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid65"
+    },
+    {
+      "name": "Asian/Asian British",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid67"
+    },
+    {
+      "name": "Black/African/Caribbean/Black British",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid68"
+    },
+    {
+      "name": "Mixed/Multiple Ethnic Groups",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid66"
+    },
+    {
+      "name": "Other Ethnic Group",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid69"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
+    "name": "2011 Census Key Statistics for England and Wales, March 2011",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
+      "name": "2011 Census Key Statistics for England and Wales, March 2011",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Ethnicity",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/datasets/ethnicity"
+    }
+  ],
+  "level": "t3",
+  "index": 0,
+  "lede": "Ethnicity statistics found here focus on the number and proportion of people who state that they identify with a particular ethnic group. Time series data on these figures are also available and these allow us to get a picture of the changing population of the UK.  ",
+  "type": "home",
+  "name": "Ethnicity",
+  "fileName": "ethnicity",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Cultural identity",
+      "fileName": "culturalidentity"
+    }
+  ]
+}

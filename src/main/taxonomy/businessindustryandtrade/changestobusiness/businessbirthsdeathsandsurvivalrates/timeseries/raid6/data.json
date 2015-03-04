@@ -1,0 +1,93 @@
+{
+  "cdid": "RAID6",
+  "note1": "Information for 2009 onwards includes totals for the seven new Unitary Authorities introduced in April 2009.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "269565",
+  "unit": "",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2004",
+      "value": "280080",
+      "year": "2004"
+    },
+    {
+      "date": "2005",
+      "value": "274855",
+      "year": "2005"
+    },
+    {
+      "date": "2006",
+      "value": "255530",
+      "year": "2006"
+    },
+    {
+      "date": "2007",
+      "value": "280730",
+      "year": "2007"
+    },
+    {
+      "date": "2008",
+      "value": "267445",
+      "year": "2008"
+    },
+    {
+      "date": "2009",
+      "value": "236030",
+      "year": "2009"
+    },
+    {
+      "date": "2010",
+      "value": "235145",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "261370",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "269565",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/bulletins/businessdemography2012"
+  ],
+  "relatedTimeseries": [
+    "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid7",
+    "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid8"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Business births",
+  "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid6",
+  "fileName": "raid6",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Changes to business",
+      "fileName": "changestobusiness"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business births, deaths and survival rates",
+      "fileName": "businessbirthsdeathsandsurvivalrates",
+      "breadcrumb": []
+    }
+  ]
+}

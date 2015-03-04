@@ -1,0 +1,44 @@
+{
+  "cdid": "RAID119",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "316000",
+  "unit": "",
+  "preUnit": "",
+  "date": "March 2014",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Emigration from the UK",
+  "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid119",
+  "fileName": "raid119",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "International migration",
+      "fileName": "internationalmigration",
+      "breadcrumb": []
+    }
+  ]
+}

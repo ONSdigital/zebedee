@@ -1,0 +1,68 @@
+{
+  "headline": {
+    "name": "Female life expectancy at birth",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49"
+  },
+  "items": [
+    {
+      "name": "Female life expectancy at birth",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49"
+    },
+    {
+      "name": "Male life expectancy at birth",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid50"
+    },
+    {
+      "name": "Female life expectancy at age 65",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid52"
+    },
+    {
+      "name": "Male life expectancy at age 65",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid51"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "2010-12 male and female period life expectancy at birth and at age 65 for the UK and local areas within the four constituent countries.",
+    "name": "Life Expectancy at Birth and at Age 65 by Local Areas in the United Kingdom, 2006-08 to 2010-12",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/lifeexpectancyatbirthandatage65bylocalareasintheunitedkingdom200608to201012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "2010-12 male and female period life expectancy at birth and at age 65 for the UK and local areas within the four constituent countries.",
+      "name": "Life Expectancy at Birth and at Age 65 by Local Areas in the United Kingdom, 2006-08 to 2010-12",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/lifeexpectancyatbirthandatage65bylocalareasintheunitedkingdom200608to201012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Life expectancy UK",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/lifeexpectancyuk"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Life expectancy England and Wales",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/lifeexpectancyenglandandwales"
+    }
+  ],
+  "level": "t3",
+  "index": 3,
+  "lede": "Life expectancy statistics use population estimates with statistics on the number of deaths to derive an estimate of how long, on average, people of various ages can expect to live.  These statistics are used by central and local governments to make planning and resource allocation decisions and are of general interest to the public. ",
+  "type": "home",
+  "name": "Life expectancies",
+  "fileName": "lifeexpectancies",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

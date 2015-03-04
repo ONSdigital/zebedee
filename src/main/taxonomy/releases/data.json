@@ -1,0 +1,396 @@
+{
+  "releases": [
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Employment and employee types",
+      "uri": "/releases/employmentandemployeetypes",
+      "fileName": "employmentandemployeetypes"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Earnings and working hours",
+      "uri": "/releases/earningsandworkinghours",
+      "fileName": "earningsandworkinghours"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Workplace disputes and working conditions",
+      "uri": "/releases/workplacedisputesandworkingconditions",
+      "fileName": "workplacedisputesandworkingconditions"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Labour productivity",
+      "uri": "/releases/labourproductivity",
+      "fileName": "labourproductivity"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Public sector personnel",
+      "uri": "/releases/publicsectorpersonnel",
+      "fileName": "publicsectorpersonnel"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Unemployment",
+      "uri": "/releases/unemployment",
+      "fileName": "unemployment"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Population projections",
+      "uri": "/releases/populationprojections",
+      "fileName": "populationprojections"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "International migration",
+      "uri": "/releases/internationalmigration",
+      "fileName": "internationalmigration"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Leisure and tourism",
+      "uri": "/releases/leisureandtourism",
+      "fileName": "leisureandtourism"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Drug use, alcohol and smoking",
+      "uri": "/releases/drugusealcoholandsmoking",
+      "fileName": "drugusealcoholandsmoking"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Disability",
+      "uri": "/releases/disability",
+      "fileName": "disability"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Conditions and diseases",
+      "uri": "/releases/conditionsanddiseases",
+      "fileName": "conditionsanddiseases"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Crime and justice",
+      "uri": "/releases/crimeandjustice",
+      "fileName": "crimeandjustice"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Gross Value Added (GVA)",
+      "uri": "/releases/grossvalueaddedgva",
+      "fileName": "grossvalueaddedgva"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Gross Domestic Product (GDP)",
+      "uri": "/releases/grossdomesticproductgdp",
+      "fileName": "grossdomesticproductgdp"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Environmental accounts",
+      "uri": "/releases/environmentalaccounts",
+      "fileName": "environmentalaccounts"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Inflation and price indices",
+      "uri": "/releases/inflationandpriceindices",
+      "fileName": "inflationandpriceindices"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Investments, pensions and trusts",
+      "uri": "/releases/investmentspensionsandtrusts",
+      "fileName": "investmentspensionsandtrusts"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Regional accounts",
+      "uri": "/releases/regionalaccounts",
+      "fileName": "regionalaccounts"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Economic output and productivity",
+      "uri": "/releases/economicoutputandproductivity",
+      "fileName": "economicoutputandproductivity"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Manufacturing and production industry",
+      "uri": "/releases/manufacturingandproductionindustry",
+      "fileName": "manufacturingandproductionindustry"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Tourism industry",
+      "uri": "/releases/tourismindustry",
+      "fileName": "tourismindustry"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Business activity, size and location",
+      "uri": "/releases/businessactivitysizeandlocation",
+      "fileName": "businessactivitysizeandlocation"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "International trade",
+      "uri": "/releases/internationaltrade",
+      "fileName": "internationaltrade"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "IT and internet industry",
+      "uri": "/releases/itandinternetindustry",
+      "fileName": "itandinternetindustry"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Construction industry",
+      "uri": "/releases/constructionindustry",
+      "fileName": "constructionindustry"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Mergers and acquisitions",
+      "uri": "/releases/mergersandacquisitions",
+      "fileName": "mergersandacquisitions"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Business births, deaths and survival rates",
+      "uri": "/releases/businessbirthsdeathsandsurvivalrates",
+      "fileName": "businessbirthsdeathsandsurvivalrates"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Retail industry",
+      "uri": "/releases/retailindustry",
+      "fileName": "retailindustry"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "National Accounts",
+      "uri": "/releases/nationalaccounts",
+      "fileName": "nationalaccounts"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Public sector finance",
+      "uri": "/releases/publicsectorfinance",
+      "fileName": "publicsectorfinance"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Research and Development expenditure",
+      "uri": "/releases/researchanddevelopmentexpenditure",
+      "fileName": "researchanddevelopmentexpenditure"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Home internet and social media usage",
+      "uri": "/releases/homeinternetandsocialmediausage",
+      "fileName": "homeinternetandsocialmediausage"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Housing",
+      "uri": "/releases/housing",
+      "fileName": "housing"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Religion",
+      "uri": "/releases/religion",
+      "fileName": "religion"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Language",
+      "uri": "/releases/language",
+      "fileName": "language"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Sexuality",
+      "uri": "/releases/sexuality",
+      "fileName": "sexuality"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Ethnicity",
+      "uri": "/releases/ethnicity",
+      "fileName": "ethnicity"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Expenditure",
+      "uri": "/releases/expenditure",
+      "fileName": "expenditure"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Debt",
+      "uri": "/releases/debt",
+      "fileName": "debt"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Income and wealth",
+      "uri": "/releases/incomeandwealth",
+      "fileName": "incomeandwealth"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Elections",
+      "uri": "/releases/elections",
+      "fileName": "elections"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Well-being",
+      "uri": "/releases/wellbeing",
+      "fileName": "wellbeing"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Conception and fertility rates",
+      "uri": "/releases/conceptionandfertilityrates",
+      "fileName": "conceptionandfertilityrates"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Adoption",
+      "uri": "/releases/adoption",
+      "fileName": "adoption"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Marriage, cohabitation and civil partnerships",
+      "uri": "/releases/marriagecohabitationandcivilpartnerships",
+      "fileName": "marriagecohabitationandcivilpartnerships"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Maternities",
+      "uri": "/releases/maternities",
+      "fileName": "maternities"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Stillbirths",
+      "uri": "/releases/stillbirths",
+      "fileName": "stillbirths"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Deaths",
+      "uri": "/releases/deaths",
+      "fileName": "deaths"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Divorce",
+      "uri": "/releases/divorce",
+      "fileName": "divorce"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Live births",
+      "uri": "/releases/livebirths",
+      "fileName": "livebirths"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Ageing",
+      "uri": "/releases/ageing",
+      "fileName": "ageing"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Families",
+      "uri": "/releases/families",
+      "fileName": "families"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Life expectancies",
+      "uri": "/releases/lifeexpectancies",
+      "fileName": "lifeexpectancies"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Population estimates",
+      "uri": "/releases/populationestimates",
+      "fileName": "populationestimates"
+    },
+    {
+      "releaseDate": "21 October 2014",
+      "nextRelease": "21 January 2015",
+      "name": "Migration within the UK",
+      "uri": "/releases/migrationwithintheuk",
+      "fileName": "migrationwithintheuk"
+    }
+  ]
+}

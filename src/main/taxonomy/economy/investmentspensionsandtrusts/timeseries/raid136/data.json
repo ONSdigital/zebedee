@@ -1,0 +1,38 @@
+{
+  "cdid": "RAID136",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "26.5",
+  "unit": "bn",
+  "preUnit": "£",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/economy/investmentspensionsandtrusts/bulletins/foreigndirectinvestmentinvolvingukcompanies2012ma4"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Net flow of direct investment abroad by UK companies",
+  "uri": "/economy/investmentspensionsandtrusts/timeseries/raid136",
+  "fileName": "raid136",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Investments, pensions and trusts",
+      "fileName": "investmentspensionsandtrusts",
+      "breadcrumb": []
+    }
+  ]
+}

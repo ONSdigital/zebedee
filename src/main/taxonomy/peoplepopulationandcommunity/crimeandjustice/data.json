@@ -1,0 +1,58 @@
+{
+  "headline": {
+    "name": "Crimes recorded by police",
+    "uri": "/peoplepopulationandcommunity/crimeandjustice/timeseries/raid62"
+  },
+  "items": [
+    {
+      "name": "Crimes recorded by police",
+      "uri": "/peoplepopulationandcommunity/crimeandjustice/timeseries/raid62"
+    },
+    {
+      "name": "Incidents of anti-social behaviour",
+      "uri": "/peoplepopulationandcommunity/crimeandjustice/timeseries/raid63"
+    },
+    {
+      "name": "Crimes against households",
+      "uri": "/peoplepopulationandcommunity/crimeandjustice/timeseries/raid64"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Crime statistics from the Crime Survey for England and Wales and police recorded crime.",
+    "name": "Crime in England and Wales, Year Ending March 2014",
+    "uri": "/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwalesyearendingmarch2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Crime statistics from the Crime Survey for England and Wales and police recorded crime.",
+      "name": "Crime in England and Wales, Year Ending March 2014",
+      "uri": "/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwalesyearendingmarch2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Police recorded crime data collection",
+      "uri": "/peoplepopulationandcommunity/crimeandjustice/datasets/policerecordedcrimedatacollection"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Crime Survey for England and Wales data collection",
+      "uri": "/peoplepopulationandcommunity/crimeandjustice/datasets/crimesurveyforenglandandwalesdatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 4,
+  "lede": "Statistics on the number and types of crimes committed as well as the key characteristics of victims, are collected from crimes recorded by the police and the Crime Survey for England and Wales (CSEW). This survey is important as it covers crimes that may have not been reported or recorded by the police. Statistics on the outcomes of crime in terms of what happened to the criminal can also be found here. ",
+  "type": "home",
+  "name": "Crime and justice",
+  "fileName": "crimeandjustice",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

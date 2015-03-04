@@ -1,0 +1,38 @@
+{
+  "cdid": "RAID139",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "656.3",
+  "unit": "m tonnes",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts2014"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Greenhouse gas emissions (CO2 equivalent)",
+  "uri": "/economy/environmentalaccounts/timeseries/raid139",
+  "fileName": "raid139",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Environmental accounts",
+      "fileName": "environmentalaccounts",
+      "breadcrumb": []
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "headline": {
+    "name": "Parliamentary electors",
+    "uri": "/peoplepopulationandcommunity/elections/timeseries/raid87"
+  },
+  "items": [
+    {
+      "name": "Parliamentary electors",
+      "uri": "/peoplepopulationandcommunity/elections/timeseries/raid87"
+    },
+    {
+      "name": "European/local government electors",
+      "uri": "/peoplepopulationandcommunity/elections/timeseries/raid88"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Analysis of the annual counts of the number of people registered to vote in 2013, including comparisons over time and between the UK constituent countries.",
+    "name": "Electoral Statistics for UK, 2013",
+    "uri": "/peoplepopulationandcommunity/elections/bulletins/electoralstatisticsforuk2013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Analysis of the annual counts of the number of people registered to vote in 2013, including comparisons over time and between the UK constituent countries.",
+      "name": "Electoral Statistics for UK, 2013",
+      "uri": "/peoplepopulationandcommunity/elections/bulletins/electoralstatisticsforuk2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Electoral Statistics",
+      "uri": "/peoplepopulationandcommunity/elections/datasets/electoralstatistics"
+    }
+  ],
+  "level": "t3",
+  "index": 10,
+  "lede": "The key statistic in this section is the number of people who are listed on electoral registers. This differs from the number of people who are eligible to vote. These statistics are available for the constituent countries of the UK. ",
+  "type": "home",
+  "name": "Elections",
+  "fileName": "elections",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Annual estimates of the size of the UK “usually resident population” are calculated at the mid-year point (30 June). The ONS compile and publish the UK estimates using estimates for England and Wales (produced by ONS directly), estimates for Scotland (produced by National Records of Scotland) and estimates for Northern Ireland (produced by the Northern Ireland Statistics \u0026 Research Agency). ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Estimates of the usual resident population in the United Kingdom and its constituent countries as at 30 June 2013.",
+      "type": "bulletin",
+      "name": "Annual Mid-year Population Estimates, 2013",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Components of population change for countries; regions, counties and smaller geographic breakdowns",
+      "type": "dataset",
+      "name": "Population for Local Authorities",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationforlocalauthorities"
+    },
+    {
+      "summary": "Population estimates data by sex and single year of age for countries, regions and smaller geographic breakdowns",
+      "type": "dataset",
+      "name": "Population by age and sex",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationbyageandsex"
+    },
+    {
+      "summary": "Population estimates data overview by age group for the United Kingdom, England and Wales, and Great Britain",
+      "type": "dataset",
+      "name": "Population data collection",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationdatacollection"
+    }
+  ],
+  "type": "release",
+  "name": "Population estimates",
+  "fileName": "populationestimates"
+}

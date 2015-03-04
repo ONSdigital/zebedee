@@ -1,0 +1,26 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Statistics on religion focus on what people state as their religion. The main source of data in this area is the 2011 Census. ",
+  "articles": [],
+  "bulletins": [],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Religion",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/datasets/religion"
+    }
+  ],
+  "type": "release",
+  "name": "Religion",
+  "fileName": "religion"
+}

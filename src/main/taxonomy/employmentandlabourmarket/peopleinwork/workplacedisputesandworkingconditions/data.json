@@ -1,0 +1,63 @@
+{
+  "headline": {
+    "name": "Working days lost",
+    "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bbfw"
+  },
+  "items": [
+    {
+      "name": "Working days lost",
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bbfw"
+    },
+    {
+      "name": "Working days lost in the public sector",
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/f8xz"
+    },
+    {
+      "name": "Working days lost in the private sector",
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/f8y2"
+    },
+    {
+      "name": "Number of stoppages",
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bluu"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+    "name": "UK Labour Market, July 2014",
+    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+      "name": "UK Labour Market, July 2014",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Estimates measuring strikes connected with terms and conditions of employment",
+      "name": "Labour disputes",
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputes"
+    }
+  ],
+  "level": "t3",
+  "index": 3,
+  "lede": "Workplace disputes refer to stoppages of work related to a dispute between employer and employees. These include strikes (lawful and unlawful) and \u0027lock outs\u0027  (an employer barring employees from entering a place of work). Key figures here are the number of days lost to workplace disputes in the public and private sectors and the number of workers involved. ",
+  "type": "home",
+  "name": "Workplace disputes and working conditions",
+  "fileName": "workplacedisputesandworkingconditions",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    }
+  ]
+}

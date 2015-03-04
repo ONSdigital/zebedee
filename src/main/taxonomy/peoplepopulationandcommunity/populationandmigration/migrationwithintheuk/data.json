@@ -1,0 +1,51 @@
+{
+  "headline": {
+    "name": "Residents moving between local authorities",
+    "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/timeseries/raid120"
+  },
+  "items": [
+    {
+      "name": "Residents moving between local authorities",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/timeseries/raid120"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Summarised statistics on residential moves between local authorities and regions in England and Wales and the UK.",
+    "name": "Internal Migration, England and Wales, Year Ending June 2013",
+    "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/bulletins/internalmigrationenglandandwalesyearendingjune2013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Summarised statistics on residential moves between local authorities and regions in England and Wales and the UK.",
+      "name": "Internal Migration, England and Wales, Year Ending June 2013",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/bulletins/internalmigrationenglandandwalesyearendingjune2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Internal migration by English regions and Wales",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/datasets/internalmigrationbyenglishregionsandwales"
+    }
+  ],
+  "level": "t3",
+  "index": 3,
+  "lede": "Internal migration refers to residential moves between different geographic areas within the UK. These statistics are compiled from data from main three sources: The NHS Patient Register, The NHS Central Register (NHSCR) and the Higher Education Statistics Agency (HESA). ",
+  "type": "home",
+  "name": "Migration within the UK",
+  "fileName": "migrationwithintheuk",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    }
+  ]
+}

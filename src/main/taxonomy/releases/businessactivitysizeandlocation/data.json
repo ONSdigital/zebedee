@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Statistics here focus on business that are either registered for VAT or PAYE. This means some very small businesses are not be covered. Key figures are the number of businesses in the UK and the numbers across different areas of the UK. Business size is based on employment and turnover and business activity relates to the type of industry the business is related to. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
+      "type": "bulletin",
+      "name": "UK Business: Activity, Size and Location - 2013",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Analysis of UK local units and UK VAT and/or PAYE based Enterprises",
+      "type": "dataset",
+      "name": "Number of VAT and/or PAYE enterprises",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/datasets/numberofvatandorpayeenterprises"
+    }
+  ],
+  "type": "release",
+  "name": "Business activity, size and location",
+  "fileName": "businessactivitysizeandlocation"
+}

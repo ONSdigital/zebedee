@@ -1,0 +1,98 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Gross value added",
+      "cdids": [
+        "L2KL",
+        "L2KR",
+        "L2KX",
+        "L2MW",
+        "L2N2",
+        "L2KQ",
+        "L2N8",
+        "L2PZ",
+        "KI8M",
+        "KI8O",
+        "KI8Q",
+        "L2NC",
+        "CGCE",
+        "KLH7",
+        "L2NE",
+        "KI8M",
+        "L2NQ",
+        "L2O6",
+        "L2OC",
+        "L2OH",
+        "L2P8",
+        "L2PA",
+        "L2PC",
+        "L2Q5",
+        "L2NC",
+        "L3BB",
+        "L3BH",
+        "L3BN",
+        "L3DM",
+        "L3DQ",
+        "L3BG",
+        "L3DW",
+        "L3GP",
+        "KI8L",
+        "KI8N",
+        "KI8P",
+        "L3E2",
+        "KGM7",
+        "KLH8",
+        "L3E4",
+        "KI8L",
+        "L3EG",
+        "L3EU",
+        "L3F2",
+        "L3F7",
+        "L3FW",
+        "L3FY",
+        "L3G2",
+        "L3GT",
+        "L3E2"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "By category of output (reference year 2010) for production and service industries",
+  "nationalStatistic": true,
+  "description": "Gross value added at chained volume measures basic prices, by category of output (reference year 2010) for production and service industries.",
+  "title": "Gross value added",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Gross value added",
+  "uri": "/economy/economicoutputandproductivity/datasets/grossvalueadded",
+  "fileName": "grossvalueadded",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economic output and productivity",
+      "fileName": "economicoutputandproductivity",
+      "breadcrumb": []
+    }
+  ]
+}

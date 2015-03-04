@@ -1,0 +1,48 @@
+{
+  "cdid": "RAID72",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "8",
+  "unit": "%",
+  "preUnit": "",
+  "date": "2011",
+  "source": "Office for National Statistics",
+  "keyNote": "English or Welsh in Wales",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid73",
+    "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "English not main language",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid72",
+  "fileName": "raid72",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Cultural identity",
+      "fileName": "culturalidentity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Language",
+      "fileName": "language",
+      "breadcrumb": []
+    }
+  ]
+}

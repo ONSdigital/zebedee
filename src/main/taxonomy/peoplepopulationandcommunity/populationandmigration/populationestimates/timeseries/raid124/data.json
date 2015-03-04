@@ -1,0 +1,265 @@
+{
+  "cdid": "RAID124",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "53.9",
+  "unit": "m",
+  "preUnit": "",
+  "date": "Mid-2013",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1971",
+      "value": "46.411700",
+      "year": "1971"
+    },
+    {
+      "date": "1972",
+      "value": "46.571900",
+      "year": "1972"
+    },
+    {
+      "date": "1973",
+      "value": "46.686200",
+      "year": "1973"
+    },
+    {
+      "date": "1974",
+      "value": "46.682700",
+      "year": "1974"
+    },
+    {
+      "date": "1975",
+      "value": "46.674400",
+      "year": "1975"
+    },
+    {
+      "date": "1976",
+      "value": "46.659900",
+      "year": "1976"
+    },
+    {
+      "date": "1977",
+      "value": "46.639800",
+      "year": "1977"
+    },
+    {
+      "date": "1978",
+      "value": "46.638200",
+      "year": "1978"
+    },
+    {
+      "date": "1979",
+      "value": "46.698100",
+      "year": "1979"
+    },
+    {
+      "date": "1980",
+      "value": "46.787200",
+      "year": "1980"
+    },
+    {
+      "date": "1981",
+      "value": "46.820805",
+      "year": "1981"
+    },
+    {
+      "date": "1982",
+      "value": "46.777337",
+      "year": "1982"
+    },
+    {
+      "date": "1983",
+      "value": "46.813693",
+      "year": "1983"
+    },
+    {
+      "date": "1984",
+      "value": "46.912444",
+      "year": "1984"
+    },
+    {
+      "date": "1985",
+      "value": "47.057359",
+      "year": "1985"
+    },
+    {
+      "date": "1986",
+      "value": "47.187643",
+      "year": "1986"
+    },
+    {
+      "date": "1987",
+      "value": "47.300419",
+      "year": "1987"
+    },
+    {
+      "date": "1988",
+      "value": "47.412342",
+      "year": "1988"
+    },
+    {
+      "date": "1989",
+      "value": "47.552651",
+      "year": "1989"
+    },
+    {
+      "date": "1990",
+      "value": "47.699116",
+      "year": "1990"
+    },
+    {
+      "date": "1991",
+      "value": "47.875035",
+      "year": "1991"
+    },
+    {
+      "date": "1992",
+      "value": "47.997973",
+      "year": "1992"
+    },
+    {
+      "date": "1993",
+      "value": "48.102319",
+      "year": "1993"
+    },
+    {
+      "date": "1994",
+      "value": "48.228781",
+      "year": "1994"
+    },
+    {
+      "date": "1995",
+      "value": "48.383461",
+      "year": "1995"
+    },
+    {
+      "date": "1996",
+      "value": "48.519129",
+      "year": "1996"
+    },
+    {
+      "date": "1997",
+      "value": "48.664777",
+      "year": "1997"
+    },
+    {
+      "date": "1998",
+      "value": "48.820583",
+      "year": "1998"
+    },
+    {
+      "date": "1999",
+      "value": "49.032872",
+      "year": "1999"
+    },
+    {
+      "date": "2000",
+      "value": "49.233311",
+      "year": "2000"
+    },
+    {
+      "date": "2001",
+      "value": "49.449746",
+      "year": "2001"
+    },
+    {
+      "date": "2002",
+      "value": "49.679267",
+      "year": "2002"
+    },
+    {
+      "date": "2003",
+      "value": "49.925517",
+      "year": "2003"
+    },
+    {
+      "date": "2004",
+      "value": "50.194600",
+      "year": "2004"
+    },
+    {
+      "date": "2005",
+      "value": "50.606034",
+      "year": "2005"
+    },
+    {
+      "date": "2006",
+      "value": "50.965186",
+      "year": "2006"
+    },
+    {
+      "date": "2007",
+      "value": "51.381093",
+      "year": "2007"
+    },
+    {
+      "date": "2008",
+      "value": "51.815853",
+      "year": "2008"
+    },
+    {
+      "date": "2009",
+      "value": "52.196381",
+      "year": "2009"
+    },
+    {
+      "date": "2010",
+      "value": "52.642452",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "53.107169",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "53.493729",
+      "year": "2012"
+    },
+    {
+      "date": "2013",
+      "value": "53.865817",
+      "year": "2013"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates2013"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid123",
+    "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid125",
+    "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid126",
+    "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid127"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "England population",
+  "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid124",
+  "fileName": "raid124",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population estimates",
+      "fileName": "populationestimates",
+      "breadcrumb": []
+    }
+  ]
+}

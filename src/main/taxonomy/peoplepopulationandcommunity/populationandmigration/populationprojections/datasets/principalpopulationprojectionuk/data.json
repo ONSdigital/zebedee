@@ -1,0 +1,59 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "2012 based",
+      "xls": "http://www.ons.gov.uk/ons/rel/npp/national-population-projections/2012-based-projections/rft-table-a1-1-principal-projection---uk-summary.xls",
+      "csv": "#"
+    },
+    {
+      "title": "2010 based",
+      "xls": "http://www.ons.gov.uk/ons/rel/npp/national-population-projections/2010-based-projections/rft-table-a1-1-principal-projection---uk-summary.xls",
+      "csv": "#"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
+  "nationalStatistic": true,
+  "description": "Principal projection for the UK - This table provides summary information this includes: population totals in broad age groups, components of change, births, deaths and migration, children, working and pensionable age population, dependency ratios, average age of the population, expectation of life at birth, and total fertility rates. For mid-2012 to mid-2037 and selected years to 2112 \nCoverage: UK population, dependency ratios, average age of the population, expectation of life at birth, and total fertility rates. For mid-2012 to mid-2037 and selected years to 2112",
+  "title": "Principal population projection - UK",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Principal population projection - UK",
+  "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionuk",
+  "fileName": "principalpopulationprojectionuk",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population projections",
+      "fileName": "populationprojections",
+      "breadcrumb": []
+    }
+  ]
+}

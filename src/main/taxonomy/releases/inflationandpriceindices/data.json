@@ -1,0 +1,45 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Inflation measures the rate of increase in prices for goods and services using price indices. The rate of inflation used in the UK government’s inflation target is measured using the Consumer Prices Index (CPI). One way to understand the CPI is to think of a very large shopping basket containing a large selection of the goods and services bought by households, the CPI estimates changes to the total cost of this basket.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
+      "type": "bulletin",
+      "name": "Consumer Price Inflation, June 2014",
+      "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Measures of inflation data, including CPI, RPI, CPIH and RPIJ",
+      "type": "dataset",
+      "name": "Inflation data collection",
+      "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection"
+    },
+    {
+      "summary": "Complete dataset covering all RPI statistics. Not a National Statistic.",
+      "type": "dataset",
+      "name": "Retail Prices Index",
+      "uri": "/economy/inflationandpriceindices/datasets/retailpricesindex"
+    },
+    {
+      "summary": "Comprehensive dataset covering input and output index series",
+      "type": "dataset",
+      "name": "Producer Prices Inflation",
+      "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation"
+    }
+  ],
+  "type": "release",
+  "name": "Inflation and price indices",
+  "fileName": "inflationandpriceindices"
+}

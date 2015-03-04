@@ -1,0 +1,61 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Output by Manufacturing sub-sectors",
+      "cdids": [
+        "K22B",
+        "K22P",
+        "K22T",
+        "K22X",
+        "K22Z",
+        "K239",
+        "K23B",
+        "K23G",
+        "K23N",
+        "K23P",
+        "K23R",
+        "K23T",
+        "K23Z"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Brief description of dataset",
+  "nationalStatistic": true,
+  "description": "Comprehensive description of data contained within this dataset.",
+  "title": "Output by Manufacturing sub-sectors",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Output by Manufacturing sub-sectors",
+  "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputbymanufacturingsubsectors",
+  "fileName": "outputbymanufacturingsubsectors",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Manufacturing and production industry",
+      "fileName": "manufacturingandproductionindustry",
+      "breadcrumb": []
+    }
+  ]
+}

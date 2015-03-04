@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "The National Accounts consistently estimate economic activity and the purpose of them has always been to provide data to inform policy. The ONS collects data from many sources such as businesses, manufacturers and service providers so that it can produce statistics on things such as GDP and indices of services, manufacturing and production.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Contains summary of balance of payments accounts and detailed statistics for the current account including - trade in goods and services, income, current and capital transfers, transactions in UK external assets and liabilities, and levels of identified assets and liabilities.",
+      "type": "bulletin",
+      "name": "Balance of Payments, Q1 2014",
+      "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Balance of Payments data collection",
+      "uri": "/economy/nationalaccounts/datasets/balanceofpaymentsdatacollection"
+    }
+  ],
+  "type": "release",
+  "name": "National Accounts",
+  "fileName": "nationalaccounts"
+}

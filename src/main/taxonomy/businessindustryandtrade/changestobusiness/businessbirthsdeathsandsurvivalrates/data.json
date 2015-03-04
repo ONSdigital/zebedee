@@ -1,0 +1,59 @@
+{
+  "headline": {
+    "name": "Business births",
+    "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid6"
+  },
+  "items": [
+    {
+      "name": "Business births",
+      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid6"
+    },
+    {
+      "name": "Business deaths",
+      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid7"
+    },
+    {
+      "name": "Survival rate for businesses born in 2007 and 2012",
+      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid8"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "This statistical bulletin contains headline figures and commentary from the Business Demography 2012 publication.",
+    "name": "Business Demography - 2012",
+    "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/bulletins/businessdemography2012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This statistical bulletin contains headline figures and commentary from the Business Demography 2012 publication.",
+      "name": "Business Demography - 2012",
+      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/bulletins/businessdemography2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Contains enterprise births, deaths and survivals",
+      "name": "Business births and deaths",
+      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/datasets/businessbirthsanddeaths"
+    }
+  ],
+  "level": "t3",
+  "index": 0,
+  "lede": "Data on business births relates to businesses that register as VAT or PAYE businesses in a given time period. Data on business deaths relates to businesses that have ceased to trade in a given time period. Business survival rates are the percentage of businesses that are still registered a given number of years after they first registered. ",
+  "type": "home",
+  "name": "Business births, deaths and survival rates",
+  "fileName": "businessbirthsdeathsandsurvivalrates",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Changes to business",
+      "fileName": "changestobusiness"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "headline": {
+    "name": "Unemployment rate (aged 16 to 64)",
+    "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx"
+  },
+  "items": [
+    {
+      "name": "Unemployment rate (aged 16 to 64)",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx"
+    },
+    {
+      "name": "Female unemployment rate (aged 16 to 64)",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsz"
+    },
+    {
+      "name": "Male unemployment rate (aged 16 to 64)",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsy"
+    },
+    {
+      "name": "Unemployment 16 and over",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsc"
+    },
+    {
+      "name": "Female unemployment 16 and over",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgse"
+    },
+    {
+      "name": "Male unemployment 16 and over",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsd"
+    },
+    {
+      "name": "Total Claimant Count",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/bcjd"
+    },
+    {
+      "name": "Total Claimant Count Female",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/dpaf"
+    },
+    {
+      "name": "Total Claimant Count Male",
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/dpae"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+    "name": "UK Labour Market, July 2014",
+    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+      "name": "UK Labour Market, July 2014",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Data on the number of people claiming benefits principally for being unemployed",
+      "name": "Claimant Count data collection",
+      "uri": "/employmentandlabourmarket/unemployment/datasets/claimantcountdatacollection"
+    },
+    {
+      "summary": "People without a job who have been actively seeking work in the UK",
+      "name": "Unemployment data collection",
+      "uri": "/employmentandlabourmarket/unemployment/datasets/unemploymentdatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "The level and rate of UK unemployment is measured by the Labour Force Survey using a definition of unemployment specified by the International Labour Organisation. This defines unemployed people as those without a job who have been actively seeking work in the past four weeks and are available to start work in the next two weeks, or those who are out of work but have found a job and are waiting to start it in the next two weeks. Another measure related to unemployment is the claimant count which measures the number of people claiming Jobseeker\u0027s Allowance.",
+  "type": "home",
+  "name": "Unemployment",
+  "fileName": "unemployment",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    }
+  ]
+}

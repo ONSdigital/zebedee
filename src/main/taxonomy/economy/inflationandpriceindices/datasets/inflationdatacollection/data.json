@@ -1,0 +1,56 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Inflation data collection",
+      "cdids": [
+        "D7BT",
+        "D7G7",
+        "L522",
+        "L55O",
+        "CHAW",
+        "CZBH",
+        "KVR8",
+        "KVR9"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Measures of inflation data, including CPI, RPI, CPIH and RPIJ",
+  "nationalStatistic": true,
+  "description": "Overview of all high level consumer inflation data, including CPI, RPI, CPIH and RPIJ.",
+  "title": "Inflation data collection",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Inflation data collection",
+  "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection",
+  "fileName": "inflationdatacollection",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Inflation and price indices",
+      "fileName": "inflationandpriceindices",
+      "breadcrumb": []
+    }
+  ]
+}

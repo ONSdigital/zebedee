@@ -1,0 +1,47 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/fdi/foreign-direct-investment/2012-ma4/rft-fdi-ma4-2012.xls"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Comprehensive dataset covering Foreign Direct Investment (FDI) Involving UK Companies",
+  "nationalStatistic": true,
+  "description": "Comprehensive dataset covering Foreign Direct Investment (FDI) Involving UK Companies.",
+  "title": "Data collection of FDI flows",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Data collection of FDI flows",
+  "uri": "/economy/investmentspensionsandtrusts/datasets/datacollectionoffdiflows",
+  "fileName": "datacollectionoffdiflows",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Investments, pensions and trusts",
+      "fileName": "investmentspensionsandtrusts",
+      "breadcrumb": []
+    }
+  ]
+}

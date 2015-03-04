@@ -1,0 +1,195 @@
+{
+  "cdid": "RAID117",
+  "note1": "YE Mar 13 onwards provisional",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "243000",
+  "unit": "",
+  "preUnit": "",
+  "date": "March 2014",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [
+    {
+      "date": "YE Jun 04",
+      "value": "194000",
+      "year": "2004",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 04",
+      "value": "268000",
+      "year": "2004",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 05",
+      "value": "320000",
+      "year": "2005",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 05",
+      "value": "267000",
+      "year": "2005",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 06",
+      "value": "234000",
+      "year": "2006",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 06",
+      "value": "265000",
+      "year": "2006",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 07",
+      "value": "287000",
+      "year": "2007",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 07",
+      "value": "273000",
+      "year": "2007",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 08",
+      "value": "267000",
+      "year": "2008",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 08",
+      "value": "229000",
+      "year": "2008",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 09",
+      "value": "205000",
+      "year": "2009",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 09",
+      "value": "229000",
+      "year": "2009",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 10",
+      "value": "244000",
+      "year": "2010",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 10",
+      "value": "256000",
+      "year": "2010",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 11",
+      "value": "263000",
+      "year": "2011",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 11",
+      "value": "205000",
+      "year": "2011",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Mar 12",
+      "value": "184000",
+      "year": "2012",
+      "quarter": "Q1"
+    },
+    {
+      "date": "YE Jun 12",
+      "value": "167000",
+      "year": "2012",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Sep 12",
+      "value": "154000",
+      "year": "2012",
+      "quarter": "Q3"
+    },
+    {
+      "date": "YE Dec 12",
+      "value": "177000",
+      "year": "2012",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Mar 13",
+      "value": "175000",
+      "year": "2013",
+      "quarter": "Q1"
+    },
+    {
+      "date": "YE Jun 13",
+      "value": "183000",
+      "year": "2013",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Sep 13",
+      "value": "212000",
+      "year": "2013",
+      "quarter": "Q3"
+    },
+    {
+      "date": "YE Dec 13",
+      "value": "212000",
+      "year": "2013",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Mar 14",
+      "value": "243000",
+      "year": "2014",
+      "quarter": "Q1"
+    }
+  ],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Net long-term migration to the UK",
+  "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117",
+  "fileName": "raid117",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "International migration",
+      "fileName": "internationalmigration",
+      "breadcrumb": []
+    }
+  ]
+}

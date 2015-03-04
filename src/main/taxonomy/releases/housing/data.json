@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Housing statistics focus mainly on data about house prices. These are often used as an informal indicator of the confidence people feel in the UK economy as well as being useful and of interest to the general public. Here you can find the latest figures on the level and growth of house prices across the UK. The data here is collected from a sample of mortgage completions and therefore does not include houses sold to cash buyers. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Mix-adjusted average house prices and house price indices for the UK and its component countries and regions.",
+      "type": "bulletin",
+      "name": "House Price Index, May 2014",
+      "uri": "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Average house prices",
+      "uri": "/peoplepopulationandcommunity/housing/datasets/averagehouseprices"
+    }
+  ],
+  "type": "release",
+  "name": "Housing",
+  "fileName": "housing"
+}

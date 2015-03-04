@@ -1,0 +1,59 @@
+{
+  "headline": {
+    "name": "Day-to-day activities limited a lot (UK)",
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid95"
+  },
+  "items": [
+    {
+      "name": "Day-to-day activities limited a lot (UK)",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid95"
+    },
+    {
+      "name": "Day-to-day activities limited a little (UK)",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid96"
+    },
+    {
+      "name": "Day-to-day activities not limited (UK)",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid97"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "This statistical bulletin presents key results for the UK population from the individual censuses of England and Wales, Scotland and Northern Ireland. The bulletin focuses on the topics of population, ethnicity, country of birth, health, housing and accommodation.",
+    "name": "Key Statistics and Quick Statistics for local authorities in the United Kingdom",
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This statistical bulletin presents key results for the UK population from the individual censuses of England and Wales, Scotland and Northern Ireland. The bulletin focuses on the topics of population, ethnicity, country of birth, health, housing and accommodation.",
+      "name": "Key Statistics and Quick Statistics for local authorities in the United Kingdom",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Long-term health problem or disability",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/datasets/longtermhealthproblemordisability"
+    }
+  ],
+  "level": "t3",
+  "index": 0,
+  "lede": "Statistics here focus on the numbers of people whose daily activities are limited a little, a lot or not at all. Breakdowns of these figures include area of UK and gender. These statistics are important in determining the types of services that are needed across the UK. ",
+  "type": "home",
+  "name": "Disability",
+  "fileName": "disability",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Health and social care",
+      "fileName": "healthandsocialcare"
+    }
+  ]
+}

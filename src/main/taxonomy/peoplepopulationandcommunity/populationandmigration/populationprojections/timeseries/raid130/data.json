@@ -1,0 +1,170 @@
+{
+  "cdid": "RAID130",
+  "note1": "Mid year estimates for 2002-2010 are due to be revised to take account of the 2011 Census for Scotland. Revised population estimates for Scotland and the UK for 2002–2010 were not available at the time of projection.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "73.3",
+  "unit": "m",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2013",
+      "value": "64.1",
+      "year": "2013"
+    },
+    {
+      "date": "2014",
+      "value": "64.5",
+      "year": "2014"
+    },
+    {
+      "date": "2015",
+      "value": "64.9",
+      "year": "2015"
+    },
+    {
+      "date": "2016",
+      "value": "65.4",
+      "year": "2016"
+    },
+    {
+      "date": "2017",
+      "value": "65.8",
+      "year": "2017"
+    },
+    {
+      "date": "2018",
+      "value": "66.3",
+      "year": "2018"
+    },
+    {
+      "date": "2019",
+      "value": "66.7",
+      "year": "2019"
+    },
+    {
+      "date": "2020",
+      "value": "67.1",
+      "year": "2020"
+    },
+    {
+      "date": "2021",
+      "value": "67.5",
+      "year": "2021"
+    },
+    {
+      "date": "2022",
+      "value": "68.0",
+      "year": "2022"
+    },
+    {
+      "date": "2023",
+      "value": "68.4",
+      "year": "2023"
+    },
+    {
+      "date": "2024",
+      "value": "68.8",
+      "year": "2024"
+    },
+    {
+      "date": "2025",
+      "value": "69.2",
+      "year": "2025"
+    },
+    {
+      "date": "2026",
+      "value": "69.6",
+      "year": "2026"
+    },
+    {
+      "date": "2027",
+      "value": "70.0",
+      "year": "2027"
+    },
+    {
+      "date": "2028",
+      "value": "70.3",
+      "year": "2028"
+    },
+    {
+      "date": "2029",
+      "value": "70.7",
+      "year": "2029"
+    },
+    {
+      "date": "2030",
+      "value": "71.0",
+      "year": "2030"
+    },
+    {
+      "date": "2031",
+      "value": "71.4",
+      "year": "2031"
+    },
+    {
+      "date": "2032",
+      "value": "71.7",
+      "year": "2032"
+    },
+    {
+      "date": "2033",
+      "value": "72.0",
+      "year": "2033"
+    },
+    {
+      "date": "2034",
+      "value": "72.4",
+      "year": "2034"
+    },
+    {
+      "date": "2035",
+      "value": "72.7",
+      "year": "2035"
+    },
+    {
+      "date": "2036",
+      "value": "73.0",
+      "year": "2036"
+    },
+    {
+      "date": "2037",
+      "value": "73.3",
+      "year": "2037"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Mid-2037 UK population projected to reach",
+  "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/timeseries/raid130",
+  "fileName": "raid130",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population projections",
+      "fileName": "populationprojections",
+      "breadcrumb": []
+    }
+  ]
+}

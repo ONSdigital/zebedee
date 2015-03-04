@@ -1,0 +1,139 @@
+{
+  "cdid": "TMPY",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "93339",
+  "unit": "m",
+  "preUnit": "£",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1997",
+      "value": "53613",
+      "year": "1997",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "1998",
+      "value": "56379",
+      "year": "1998",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "1999",
+      "value": "57782",
+      "year": "1999",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2000",
+      "value": "59235",
+      "year": "2000",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2001",
+      "value": "61995",
+      "year": "2001",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2002",
+      "value": "67103",
+      "year": "2002",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2003",
+      "value": "72043",
+      "year": "2003",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2004",
+      "value": "77142",
+      "year": "2004",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2005",
+      "value": "80010",
+      "year": "2005",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2006",
+      "value": "84389",
+      "year": "2006",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2007",
+      "value": "90978",
+      "year": "2007",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2008",
+      "value": "90882",
+      "year": "2008",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2009",
+      "value": "89317",
+      "year": "2009",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2010",
+      "value": "91005",
+      "year": "2010",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2011",
+      "value": "92457",
+      "year": "2011",
+      "sourceDataset": "RAGV"
+    },
+    {
+      "date": "2012",
+      "value": "93339",
+      "year": "2012",
+      "sourceDataset": "RAGV"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013"
+  ],
+  "relatedTimeseries": [
+    "/economy/grossvalueaddedgva/timeseries/abml"
+  ],
+  "sourceDatasets": [
+    "RAGV"
+  ],
+  "type": "timeseries",
+  "name": "Yorkshire and The Humber Gross Value Added",
+  "uri": "/economy/grossvalueaddedgva/timeseries/tmpy",
+  "fileName": "tmpy",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Gross Value Added (GVA)",
+      "fileName": "grossvalueaddedgva",
+      "breadcrumb": []
+    }
+  ]
+}

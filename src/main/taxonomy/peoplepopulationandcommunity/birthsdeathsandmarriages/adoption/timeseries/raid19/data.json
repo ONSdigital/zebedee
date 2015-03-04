@@ -1,0 +1,240 @@
+{
+  "cdid": "RAID19",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "5053",
+  "unit": "children",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1974",
+      "value": "22502",
+      "year": "1974"
+    },
+    {
+      "date": "1975",
+      "value": "21299",
+      "year": "1975"
+    },
+    {
+      "date": "1976",
+      "value": "17621",
+      "year": "1976"
+    },
+    {
+      "date": "1977",
+      "value": "12748",
+      "year": "1977"
+    },
+    {
+      "date": "1978",
+      "value": "12121",
+      "year": "1978"
+    },
+    {
+      "date": "1979",
+      "value": "10870",
+      "year": "1979"
+    },
+    {
+      "date": "1980",
+      "value": "10609",
+      "year": "1980"
+    },
+    {
+      "date": "1981",
+      "value": "9284",
+      "year": "1981"
+    },
+    {
+      "date": "1982",
+      "value": "10240",
+      "year": "1982"
+    },
+    {
+      "date": "1983",
+      "value": "9029",
+      "year": "1983"
+    },
+    {
+      "date": "1984",
+      "value": "8648",
+      "year": "1984"
+    },
+    {
+      "date": "1985",
+      "value": "7615",
+      "year": "1985"
+    },
+    {
+      "date": "1986",
+      "value": "7892",
+      "year": "1986"
+    },
+    {
+      "date": "1987",
+      "value": "7201",
+      "year": "1987"
+    },
+    {
+      "date": "1988",
+      "value": "7390",
+      "year": "1988"
+    },
+    {
+      "date": "1989",
+      "value": "7044",
+      "year": "1989"
+    },
+    {
+      "date": "1990",
+      "value": "6533",
+      "year": "1990"
+    },
+    {
+      "date": "1991",
+      "value": "7170",
+      "year": "1991"
+    },
+    {
+      "date": "1992",
+      "value": "7341",
+      "year": "1992"
+    },
+    {
+      "date": "1993",
+      "value": "6854",
+      "year": "1993"
+    },
+    {
+      "date": "1994",
+      "value": "6240",
+      "year": "1994"
+    },
+    {
+      "date": "1995",
+      "value": "5797",
+      "year": "1995"
+    },
+    {
+      "date": "1996",
+      "value": "5962",
+      "year": "1996"
+    },
+    {
+      "date": "1997",
+      "value": "5300",
+      "year": "1997"
+    },
+    {
+      "date": "1998",
+      "value": "4382",
+      "year": "1998"
+    },
+    {
+      "date": "1999",
+      "value": "4323",
+      "year": "1999"
+    },
+    {
+      "date": "2000",
+      "value": "4943",
+      "year": "2000"
+    },
+    {
+      "date": "2001",
+      "value": "5977",
+      "year": "2001"
+    },
+    {
+      "date": "2002",
+      "value": "5671",
+      "year": "2002"
+    },
+    {
+      "date": "2003",
+      "value": "4809",
+      "year": "2003"
+    },
+    {
+      "date": "2004",
+      "value": "5555",
+      "year": "2004"
+    },
+    {
+      "date": "2005",
+      "value": "5556",
+      "year": "2005"
+    },
+    {
+      "date": "2006",
+      "value": "4978",
+      "year": "2006"
+    },
+    {
+      "date": "2007",
+      "value": "4637",
+      "year": "2007"
+    },
+    {
+      "date": "2008",
+      "value": "5065",
+      "year": "2008"
+    },
+    {
+      "date": "2009",
+      "value": "4725",
+      "year": "2009"
+    },
+    {
+      "date": "2010",
+      "value": "4550",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "4777",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "5053",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/bulletins/adoptionsinenglandandwales2012"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Adoptions in England and Wales",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid19",
+  "fileName": "raid19",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Adoption",
+      "fileName": "adoption",
+      "breadcrumb": []
+    }
+  ]
+}

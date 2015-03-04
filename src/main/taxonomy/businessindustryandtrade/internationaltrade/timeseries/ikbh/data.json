@@ -1,0 +1,3523 @@
+{
+  "cdid": "IKBH",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "121965",
+  "unit": "m",
+  "preUnit": "£",
+  "date": "Q2 2014",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1946",
+      "value": "1425",
+      "year": "1946",
+      "sourceDataset": "PNBP"
+    },
+    {
+      "date": "1947",
+      "value": "1647",
+      "year": "1947",
+      "sourceDataset": "PNBP"
+    },
+    {
+      "date": "1948",
+      "value": "2191",
+      "year": "1948",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1949",
+      "value": "2489",
+      "year": "1949",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1950",
+      "value": "2988",
+      "year": "1950",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1951",
+      "value": "3639",
+      "year": "1951",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1952",
+      "value": "3750",
+      "year": "1952",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1953",
+      "value": "3677",
+      "year": "1953",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1954",
+      "value": "3827",
+      "year": "1954",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1955",
+      "value": "4166",
+      "year": "1955",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1956",
+      "value": "4586",
+      "year": "1956",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1957",
+      "value": "4823",
+      "year": "1957",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1958",
+      "value": "4688",
+      "year": "1958",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1959",
+      "value": "4836",
+      "year": "1959",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1960",
+      "value": "5134",
+      "year": "1960",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1961",
+      "value": "5366",
+      "year": "1961",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1962",
+      "value": "5500",
+      "year": "1962",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1963",
+      "value": "5852",
+      "year": "1963",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1964",
+      "value": "6183",
+      "year": "1964",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1965",
+      "value": "6596",
+      "year": "1965",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1966",
+      "value": "7148",
+      "year": "1966",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1967",
+      "value": "7370",
+      "year": "1967",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1968",
+      "value": "8962",
+      "year": "1968",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1969",
+      "value": "10064",
+      "year": "1969",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1970",
+      "value": "11489",
+      "year": "1970",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1971",
+      "value": "12917",
+      "year": "1971",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1972",
+      "value": "13644",
+      "year": "1972",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1973",
+      "value": "17174",
+      "year": "1973",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1974",
+      "value": "23058",
+      "year": "1974",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1975",
+      "value": "27119",
+      "year": "1975",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1976",
+      "value": "35445",
+      "year": "1976",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1977",
+      "value": "43722",
+      "year": "1977",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1978",
+      "value": "47946",
+      "year": "1978",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1979",
+      "value": "55462",
+      "year": "1979",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1980",
+      "value": "63288",
+      "year": "1980",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1981",
+      "value": "68380",
+      "year": "1981",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1982",
+      "value": "73917",
+      "year": "1982",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1983",
+      "value": "81393",
+      "year": "1983",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1984",
+      "value": "93462",
+      "year": "1984",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1985",
+      "value": "104018",
+      "year": "1985",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1986",
+      "value": "99706",
+      "year": "1986",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1987",
+      "value": "109262",
+      "year": "1987",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1988",
+      "value": "111022",
+      "year": "1988",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1989",
+      "value": "125980",
+      "year": "1989",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1990",
+      "value": "139019",
+      "year": "1990",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1991",
+      "value": "141707",
+      "year": "1991",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1992",
+      "value": "149134",
+      "year": "1992",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1993",
+      "value": "170097",
+      "year": "1993",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1994",
+      "value": "188087",
+      "year": "1994",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1995",
+      "value": "212628",
+      "year": "1995",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1996",
+      "value": "232130",
+      "year": "1996",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1997",
+      "value": "239576",
+      "year": "1997",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1998",
+      "value": "234212",
+      "year": "1998",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999",
+      "value": "242314",
+      "year": "1999",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000",
+      "value": "269290",
+      "year": "2000",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001",
+      "value": "277813",
+      "year": "2001",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002",
+      "value": "280684",
+      "year": "2002",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003",
+      "value": "293760",
+      "year": "2003",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004",
+      "value": "305768",
+      "year": "2004",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005",
+      "value": "341690",
+      "year": "2005",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006",
+      "value": "390394",
+      "year": "2006",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007",
+      "value": "379768",
+      "year": "2007",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008",
+      "value": "420900",
+      "year": "2008",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009",
+      "value": "400260",
+      "year": "2009",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010",
+      "value": "447057",
+      "year": "2010",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011",
+      "value": "499452",
+      "year": "2011",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012",
+      "value": "500735",
+      "year": "2012",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013",
+      "value": "511275",
+      "year": "2013",
+      "sourceDataset": "MRET"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "1955 Q1",
+      "value": "1053",
+      "year": "1955",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1955 Q2",
+      "value": "962",
+      "year": "1955",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1955 Q3",
+      "value": "1068",
+      "year": "1955",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1955 Q4",
+      "value": "1083",
+      "year": "1955",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1956 Q1",
+      "value": "1126",
+      "year": "1956",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1956 Q2",
+      "value": "1158",
+      "year": "1956",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1956 Q3",
+      "value": "1140",
+      "year": "1956",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1956 Q4",
+      "value": "1162",
+      "year": "1956",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1957 Q1",
+      "value": "1221",
+      "year": "1957",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1957 Q2",
+      "value": "1206",
+      "year": "1957",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1957 Q3",
+      "value": "1204",
+      "year": "1957",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1957 Q4",
+      "value": "1192",
+      "year": "1957",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1958 Q1",
+      "value": "1189",
+      "year": "1958",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1958 Q2",
+      "value": "1121",
+      "year": "1958",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1958 Q3",
+      "value": "1203",
+      "year": "1958",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1958 Q4",
+      "value": "1175",
+      "year": "1958",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1959 Q1",
+      "value": "1159",
+      "year": "1959",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1959 Q2",
+      "value": "1194",
+      "year": "1959",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1959 Q3",
+      "value": "1217",
+      "year": "1959",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1959 Q4",
+      "value": "1266",
+      "year": "1959",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1960 Q1",
+      "value": "1296",
+      "year": "1960",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1960 Q2",
+      "value": "1261",
+      "year": "1960",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1960 Q3",
+      "value": "1279",
+      "year": "1960",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1960 Q4",
+      "value": "1298",
+      "year": "1960",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1961 Q1",
+      "value": "1355",
+      "year": "1961",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1961 Q2",
+      "value": "1328",
+      "year": "1961",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1961 Q3",
+      "value": "1344",
+      "year": "1961",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1961 Q4",
+      "value": "1339",
+      "year": "1961",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1962 Q1",
+      "value": "1348",
+      "year": "1962",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1962 Q2",
+      "value": "1386",
+      "year": "1962",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1962 Q3",
+      "value": "1378",
+      "year": "1962",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1962 Q4",
+      "value": "1388",
+      "year": "1962",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1963 Q1",
+      "value": "1426",
+      "year": "1963",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1963 Q2",
+      "value": "1447",
+      "year": "1963",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1963 Q3",
+      "value": "1476",
+      "year": "1963",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1963 Q4",
+      "value": "1503",
+      "year": "1963",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1964 Q1",
+      "value": "1522",
+      "year": "1964",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1964 Q2",
+      "value": "1549",
+      "year": "1964",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1964 Q3",
+      "value": "1535",
+      "year": "1964",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1964 Q4",
+      "value": "1577",
+      "year": "1964",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1965 Q1",
+      "value": "1596",
+      "year": "1965",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1965 Q2",
+      "value": "1629",
+      "year": "1965",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1965 Q3",
+      "value": "1660",
+      "year": "1965",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1965 Q4",
+      "value": "1711",
+      "year": "1965",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1966 Q1",
+      "value": "1737",
+      "year": "1966",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1966 Q2",
+      "value": "1722",
+      "year": "1966",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1966 Q3",
+      "value": "1803",
+      "year": "1966",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1966 Q4",
+      "value": "1886",
+      "year": "1966",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1967 Q1",
+      "value": "1891",
+      "year": "1967",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1967 Q2",
+      "value": "1839",
+      "year": "1967",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1967 Q3",
+      "value": "1863",
+      "year": "1967",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1967 Q4",
+      "value": "1777",
+      "year": "1967",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1968 Q1",
+      "value": "2159",
+      "year": "1968",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1968 Q2",
+      "value": "2146",
+      "year": "1968",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1968 Q3",
+      "value": "2311",
+      "year": "1968",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1968 Q4",
+      "value": "2346",
+      "year": "1968",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1969 Q1",
+      "value": "2369",
+      "year": "1969",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1969 Q2",
+      "value": "2482",
+      "year": "1969",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1969 Q3",
+      "value": "2591",
+      "year": "1969",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1969 Q4",
+      "value": "2622",
+      "year": "1969",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1970 Q1",
+      "value": "2806",
+      "year": "1970",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1970 Q2",
+      "value": "2786",
+      "year": "1970",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1970 Q3",
+      "value": "2800",
+      "year": "1970",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1970 Q4",
+      "value": "3097",
+      "year": "1970",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1971 Q1",
+      "value": "3010",
+      "year": "1971",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1971 Q2",
+      "value": "3248",
+      "year": "1971",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1971 Q3",
+      "value": "3325",
+      "year": "1971",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1971 Q4",
+      "value": "3334",
+      "year": "1971",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1972 Q1",
+      "value": "3298",
+      "year": "1972",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1972 Q2",
+      "value": "3345",
+      "year": "1972",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1972 Q3",
+      "value": "3153",
+      "year": "1972",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1972 Q4",
+      "value": "3848",
+      "year": "1972",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1973 Q1",
+      "value": "3911",
+      "year": "1973",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1973 Q2",
+      "value": "4124",
+      "year": "1973",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1973 Q3",
+      "value": "4412",
+      "year": "1973",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1973 Q4",
+      "value": "4727",
+      "year": "1973",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1974 Q1",
+      "value": "5182",
+      "year": "1974",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1974 Q2",
+      "value": "5751",
+      "year": "1974",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1974 Q3",
+      "value": "6027",
+      "year": "1974",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1974 Q4",
+      "value": "6098",
+      "year": "1974",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1975 Q1",
+      "value": "6511",
+      "year": "1975",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1975 Q2",
+      "value": "6482",
+      "year": "1975",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1975 Q3",
+      "value": "6761",
+      "year": "1975",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1975 Q4",
+      "value": "7365",
+      "year": "1975",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1976 Q1",
+      "value": "7865",
+      "year": "1976",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1976 Q2",
+      "value": "8614",
+      "year": "1976",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1976 Q3",
+      "value": "9069",
+      "year": "1976",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1976 Q4",
+      "value": "9897",
+      "year": "1976",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1977 Q1",
+      "value": "10299",
+      "year": "1977",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1977 Q2",
+      "value": "10874",
+      "year": "1977",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1977 Q3",
+      "value": "11435",
+      "year": "1977",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1977 Q4",
+      "value": "11114",
+      "year": "1977",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1978 Q1",
+      "value": "11429",
+      "year": "1978",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1978 Q2",
+      "value": "11919",
+      "year": "1978",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1978 Q3",
+      "value": "12167",
+      "year": "1978",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1978 Q4",
+      "value": "12431",
+      "year": "1978",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1979 Q1",
+      "value": "11817",
+      "year": "1979",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1979 Q2",
+      "value": "14318",
+      "year": "1979",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1979 Q3",
+      "value": "14263",
+      "year": "1979",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1979 Q4",
+      "value": "15064",
+      "year": "1979",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1980 Q1",
+      "value": "15912",
+      "year": "1980",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1980 Q2",
+      "value": "15858",
+      "year": "1980",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1980 Q3",
+      "value": "15721",
+      "year": "1980",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1980 Q4",
+      "value": "15797",
+      "year": "1980",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1981 Q1",
+      "value": "15928",
+      "year": "1981",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1981 Q2",
+      "value": "16524",
+      "year": "1981",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1981 Q3",
+      "value": "17759",
+      "year": "1981",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1981 Q4",
+      "value": "18169",
+      "year": "1981",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1982 Q1",
+      "value": "17910",
+      "year": "1982",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1982 Q2",
+      "value": "18442",
+      "year": "1982",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1982 Q3",
+      "value": "18443",
+      "year": "1982",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1982 Q4",
+      "value": "19122",
+      "year": "1982",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1983 Q1",
+      "value": "19589",
+      "year": "1983",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1983 Q2",
+      "value": "19876",
+      "year": "1983",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1983 Q3",
+      "value": "20714",
+      "year": "1983",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1983 Q4",
+      "value": "21214",
+      "year": "1983",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1984 Q1",
+      "value": "22095",
+      "year": "1984",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1984 Q2",
+      "value": "22674",
+      "year": "1984",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1984 Q3",
+      "value": "23700",
+      "year": "1984",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1984 Q4",
+      "value": "24993",
+      "year": "1984",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1985 Q1",
+      "value": "26254",
+      "year": "1985",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1985 Q2",
+      "value": "27037",
+      "year": "1985",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1985 Q3",
+      "value": "25391",
+      "year": "1985",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1985 Q4",
+      "value": "25336",
+      "year": "1985",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1986 Q1",
+      "value": "24951",
+      "year": "1986",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1986 Q2",
+      "value": "24505",
+      "year": "1986",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1986 Q3",
+      "value": "24328",
+      "year": "1986",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1986 Q4",
+      "value": "25922",
+      "year": "1986",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1987 Q1",
+      "value": "26961",
+      "year": "1987",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1987 Q2",
+      "value": "26814",
+      "year": "1987",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1987 Q3",
+      "value": "28100",
+      "year": "1987",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1987 Q4",
+      "value": "27387",
+      "year": "1987",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1988 Q1",
+      "value": "26734",
+      "year": "1988",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1988 Q2",
+      "value": "27664",
+      "year": "1988",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1988 Q3",
+      "value": "28501",
+      "year": "1988",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1988 Q4",
+      "value": "28123",
+      "year": "1988",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1989 Q1",
+      "value": "29821",
+      "year": "1989",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1989 Q2",
+      "value": "30717",
+      "year": "1989",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1989 Q3",
+      "value": "31955",
+      "year": "1989",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1989 Q4",
+      "value": "33487",
+      "year": "1989",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1990 Q1",
+      "value": "34535",
+      "year": "1990",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1990 Q2",
+      "value": "34990",
+      "year": "1990",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1990 Q3",
+      "value": "34550",
+      "year": "1990",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1990 Q4",
+      "value": "34944",
+      "year": "1990",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1991 Q1",
+      "value": "33793",
+      "year": "1991",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1991 Q2",
+      "value": "35443",
+      "year": "1991",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1991 Q3",
+      "value": "36334",
+      "year": "1991",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1991 Q4",
+      "value": "36137",
+      "year": "1991",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1992 Q1",
+      "value": "36657",
+      "year": "1992",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1992 Q2",
+      "value": "37331",
+      "year": "1992",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1992 Q3",
+      "value": "35963",
+      "year": "1992",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1992 Q4",
+      "value": "39183",
+      "year": "1992",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1993 Q1",
+      "value": "42115",
+      "year": "1993",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1993 Q2",
+      "value": "41276",
+      "year": "1993",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1993 Q3",
+      "value": "42661",
+      "year": "1993",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1993 Q4",
+      "value": "44045",
+      "year": "1993",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1994 Q1",
+      "value": "45311",
+      "year": "1994",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1994 Q2",
+      "value": "45711",
+      "year": "1994",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1994 Q3",
+      "value": "47522",
+      "year": "1994",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1994 Q4",
+      "value": "49543",
+      "year": "1994",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1995 Q1",
+      "value": "52563",
+      "year": "1995",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1995 Q2",
+      "value": "51602",
+      "year": "1995",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1995 Q3",
+      "value": "53250",
+      "year": "1995",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1995 Q4",
+      "value": "55213",
+      "year": "1995",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1996 Q1",
+      "value": "56524",
+      "year": "1996",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1996 Q2",
+      "value": "57900",
+      "year": "1996",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1996 Q3",
+      "value": "58323",
+      "year": "1996",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1996 Q4",
+      "value": "59383",
+      "year": "1996",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1997 Q1",
+      "value": "59018",
+      "year": "1997",
+      "quarter": "Q1",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1997 Q2",
+      "value": "59621",
+      "year": "1997",
+      "quarter": "Q2",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1997 Q3",
+      "value": "61069",
+      "year": "1997",
+      "quarter": "Q3",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1997 Q4",
+      "value": "59868",
+      "year": "1997",
+      "quarter": "Q4",
+      "sourceDataset": "PN2"
+    },
+    {
+      "date": "1998 Q1",
+      "value": "58915",
+      "year": "1998",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 Q2",
+      "value": "59163",
+      "year": "1998",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 Q3",
+      "value": "57964",
+      "year": "1998",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 Q4",
+      "value": "58170",
+      "year": "1998",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 Q1",
+      "value": "58338",
+      "year": "1999",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 Q2",
+      "value": "58753",
+      "year": "1999",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 Q3",
+      "value": "61281",
+      "year": "1999",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 Q4",
+      "value": "63942",
+      "year": "1999",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 Q1",
+      "value": "63266",
+      "year": "2000",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 Q2",
+      "value": "65879",
+      "year": "2000",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 Q3",
+      "value": "69151",
+      "year": "2000",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 Q4",
+      "value": "70994",
+      "year": "2000",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 Q1",
+      "value": "71641",
+      "year": "2001",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 Q2",
+      "value": "71346",
+      "year": "2001",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 Q3",
+      "value": "67921",
+      "year": "2001",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 Q4",
+      "value": "66905",
+      "year": "2001",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 Q1",
+      "value": "69442",
+      "year": "2002",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 Q2",
+      "value": "71000",
+      "year": "2002",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 Q3",
+      "value": "69307",
+      "year": "2002",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 Q4",
+      "value": "70935",
+      "year": "2002",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 Q1",
+      "value": "73937",
+      "year": "2003",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 Q2",
+      "value": "71609",
+      "year": "2003",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 Q3",
+      "value": "73313",
+      "year": "2003",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 Q4",
+      "value": "74901",
+      "year": "2003",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 Q1",
+      "value": "74828",
+      "year": "2004",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 Q2",
+      "value": "74300",
+      "year": "2004",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 Q3",
+      "value": "75963",
+      "year": "2004",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 Q4",
+      "value": "80677",
+      "year": "2004",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 Q1",
+      "value": "78666",
+      "year": "2005",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 Q2",
+      "value": "82305",
+      "year": "2005",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 Q3",
+      "value": "88272",
+      "year": "2005",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 Q4",
+      "value": "92447",
+      "year": "2005",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 Q1",
+      "value": "101449",
+      "year": "2006",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "107034",
+      "year": "2006",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "92037",
+      "year": "2006",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "89874",
+      "year": "2006",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "90908",
+      "year": "2007",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "93716",
+      "year": "2007",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "96024",
+      "year": "2007",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "99120",
+      "year": "2007",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "100649",
+      "year": "2008",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "108299",
+      "year": "2008",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "108113",
+      "year": "2008",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "103839",
+      "year": "2008",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "98838",
+      "year": "2009",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "98028",
+      "year": "2009",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "99756",
+      "year": "2009",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "103638",
+      "year": "2009",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "105821",
+      "year": "2010",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "112423",
+      "year": "2010",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "111224",
+      "year": "2010",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "117589",
+      "year": "2010",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "122357",
+      "year": "2011",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "125052",
+      "year": "2011",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "125197",
+      "year": "2011",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "126846",
+      "year": "2011",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "125880",
+      "year": "2012",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "124040",
+      "year": "2012",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "125986",
+      "year": "2012",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "124829",
+      "year": "2012",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "126242",
+      "year": "2013",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "132491",
+      "year": "2013",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "126922",
+      "year": "2013",
+      "quarter": "Q3",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "125620",
+      "year": "2013",
+      "quarter": "Q4",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "122959",
+      "year": "2014",
+      "quarter": "Q1",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 Q2",
+      "value": "121965",
+      "year": "2014",
+      "quarter": "Q2",
+      "sourceDataset": "MRET"
+    }
+  ],
+  "months": [
+    {
+      "date": "1998 JAN",
+      "value": "19409",
+      "year": "1998",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 FEB",
+      "value": "19458",
+      "year": "1998",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 MAR",
+      "value": "20048",
+      "year": "1998",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 APR",
+      "value": "19690",
+      "year": "1998",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 MAY",
+      "value": "19643",
+      "year": "1998",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 JUN",
+      "value": "19830",
+      "year": "1998",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 JUL",
+      "value": "19413",
+      "year": "1998",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 AUG",
+      "value": "19266",
+      "year": "1998",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 SEP",
+      "value": "19285",
+      "year": "1998",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 OCT",
+      "value": "19213",
+      "year": "1998",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 NOV",
+      "value": "19326",
+      "year": "1998",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1998 DEC",
+      "value": "19631",
+      "year": "1998",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 JAN",
+      "value": "19025",
+      "year": "1999",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 FEB",
+      "value": "19178",
+      "year": "1999",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 MAR",
+      "value": "20135",
+      "year": "1999",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 APR",
+      "value": "19490",
+      "year": "1999",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 MAY",
+      "value": "19729",
+      "year": "1999",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 JUN",
+      "value": "19534",
+      "year": "1999",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 JUL",
+      "value": "19725",
+      "year": "1999",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 AUG",
+      "value": "20654",
+      "year": "1999",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 SEP",
+      "value": "20902",
+      "year": "1999",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 OCT",
+      "value": "21294",
+      "year": "1999",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 NOV",
+      "value": "21547",
+      "year": "1999",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "1999 DEC",
+      "value": "21101",
+      "year": "1999",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 JAN",
+      "value": "20925",
+      "year": "2000",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 FEB",
+      "value": "20780",
+      "year": "2000",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 MAR",
+      "value": "21561",
+      "year": "2000",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 APR",
+      "value": "21263",
+      "year": "2000",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 MAY",
+      "value": "21656",
+      "year": "2000",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 JUN",
+      "value": "22960",
+      "year": "2000",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 JUL",
+      "value": "22321",
+      "year": "2000",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 AUG",
+      "value": "23455",
+      "year": "2000",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 SEP",
+      "value": "23375",
+      "year": "2000",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 OCT",
+      "value": "23668",
+      "year": "2000",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 NOV",
+      "value": "23786",
+      "year": "2000",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2000 DEC",
+      "value": "23540",
+      "year": "2000",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 JAN",
+      "value": "23612",
+      "year": "2001",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 FEB",
+      "value": "23947",
+      "year": "2001",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 MAR",
+      "value": "24082",
+      "year": "2001",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 APR",
+      "value": "23723",
+      "year": "2001",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 MAY",
+      "value": "23691",
+      "year": "2001",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 JUN",
+      "value": "23932",
+      "year": "2001",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 JUL",
+      "value": "23057",
+      "year": "2001",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 AUG",
+      "value": "22439",
+      "year": "2001",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 SEP",
+      "value": "22425",
+      "year": "2001",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 OCT",
+      "value": "22861",
+      "year": "2001",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 NOV",
+      "value": "22279",
+      "year": "2001",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2001 DEC",
+      "value": "21765",
+      "year": "2001",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 JAN",
+      "value": "22891",
+      "year": "2002",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 FEB",
+      "value": "22973",
+      "year": "2002",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 MAR",
+      "value": "23578",
+      "year": "2002",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 APR",
+      "value": "23410",
+      "year": "2002",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 MAY",
+      "value": "24528",
+      "year": "2002",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 JUN",
+      "value": "23062",
+      "year": "2002",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 JUL",
+      "value": "23532",
+      "year": "2002",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 AUG",
+      "value": "22188",
+      "year": "2002",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 SEP",
+      "value": "23587",
+      "year": "2002",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 OCT",
+      "value": "23742",
+      "year": "2002",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 NOV",
+      "value": "23544",
+      "year": "2002",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2002 DEC",
+      "value": "23649",
+      "year": "2002",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 JAN",
+      "value": "24746",
+      "year": "2003",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 FEB",
+      "value": "25005",
+      "year": "2003",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 MAR",
+      "value": "24186",
+      "year": "2003",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 APR",
+      "value": "24843",
+      "year": "2003",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 MAY",
+      "value": "23674",
+      "year": "2003",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 JUN",
+      "value": "23092",
+      "year": "2003",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 JUL",
+      "value": "24554",
+      "year": "2003",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 AUG",
+      "value": "24491",
+      "year": "2003",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 SEP",
+      "value": "24268",
+      "year": "2003",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 OCT",
+      "value": "25194",
+      "year": "2003",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 NOV",
+      "value": "24632",
+      "year": "2003",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2003 DEC",
+      "value": "25075",
+      "year": "2003",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 JAN",
+      "value": "24375",
+      "year": "2004",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 FEB",
+      "value": "25014",
+      "year": "2004",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 MAR",
+      "value": "25439",
+      "year": "2004",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 APR",
+      "value": "25203",
+      "year": "2004",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 MAY",
+      "value": "24652",
+      "year": "2004",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 JUN",
+      "value": "24445",
+      "year": "2004",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 JUL",
+      "value": "24757",
+      "year": "2004",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 AUG",
+      "value": "24995",
+      "year": "2004",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 SEP",
+      "value": "26211",
+      "year": "2004",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 OCT",
+      "value": "26411",
+      "year": "2004",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 NOV",
+      "value": "26996",
+      "year": "2004",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2004 DEC",
+      "value": "27270",
+      "year": "2004",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 JAN",
+      "value": "26207",
+      "year": "2005",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 FEB",
+      "value": "26224",
+      "year": "2005",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 MAR",
+      "value": "26235",
+      "year": "2005",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 APR",
+      "value": "26692",
+      "year": "2005",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 MAY",
+      "value": "27018",
+      "year": "2005",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 JUN",
+      "value": "28595",
+      "year": "2005",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 JUL",
+      "value": "28659",
+      "year": "2005",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 AUG",
+      "value": "29221",
+      "year": "2005",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 SEP",
+      "value": "30392",
+      "year": "2005",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 OCT",
+      "value": "30693",
+      "year": "2005",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 NOV",
+      "value": "30313",
+      "year": "2005",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2005 DEC",
+      "value": "31441",
+      "year": "2005",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 JAN",
+      "value": "31868",
+      "year": "2006",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 FEB",
+      "value": "33317",
+      "year": "2006",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 MAR",
+      "value": "36264",
+      "year": "2006",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 APR",
+      "value": "35652",
+      "year": "2006",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 MAY",
+      "value": "36768",
+      "year": "2006",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 JUN",
+      "value": "34614",
+      "year": "2006",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 JUL",
+      "value": "30838",
+      "year": "2006",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 AUG",
+      "value": "30853",
+      "year": "2006",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 SEP",
+      "value": "30346",
+      "year": "2006",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 OCT",
+      "value": "30006",
+      "year": "2006",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 NOV",
+      "value": "30030",
+      "year": "2006",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2006 DEC",
+      "value": "29838",
+      "year": "2006",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 JAN",
+      "value": "29667",
+      "year": "2007",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 FEB",
+      "value": "29724",
+      "year": "2007",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 MAR",
+      "value": "31517",
+      "year": "2007",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 APR",
+      "value": "31043",
+      "year": "2007",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 MAY",
+      "value": "31016",
+      "year": "2007",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 JUN",
+      "value": "31657",
+      "year": "2007",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 JUL",
+      "value": "31800",
+      "year": "2007",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 AUG",
+      "value": "31770",
+      "year": "2007",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 SEP",
+      "value": "32454",
+      "year": "2007",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 OCT",
+      "value": "32794",
+      "year": "2007",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 NOV",
+      "value": "33547",
+      "year": "2007",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2007 DEC",
+      "value": "32779",
+      "year": "2007",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 JAN",
+      "value": "33172",
+      "year": "2008",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 FEB",
+      "value": "34109",
+      "year": "2008",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 MAR",
+      "value": "33368",
+      "year": "2008",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 APR",
+      "value": "35028",
+      "year": "2008",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 MAY",
+      "value": "35862",
+      "year": "2008",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 JUN",
+      "value": "37409",
+      "year": "2008",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 JUL",
+      "value": "36996",
+      "year": "2008",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 AUG",
+      "value": "35384",
+      "year": "2008",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 SEP",
+      "value": "35733",
+      "year": "2008",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 OCT",
+      "value": "35138",
+      "year": "2008",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 NOV",
+      "value": "34745",
+      "year": "2008",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2008 DEC",
+      "value": "33956",
+      "year": "2008",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 JAN",
+      "value": "32444",
+      "year": "2009",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 FEB",
+      "value": "32856",
+      "year": "2009",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 MAR",
+      "value": "33538",
+      "year": "2009",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 APR",
+      "value": "33194",
+      "year": "2009",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 MAY",
+      "value": "32259",
+      "year": "2009",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 JUN",
+      "value": "32575",
+      "year": "2009",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 JUL",
+      "value": "33345",
+      "year": "2009",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 AUG",
+      "value": "32754",
+      "year": "2009",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 SEP",
+      "value": "33657",
+      "year": "2009",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 OCT",
+      "value": "34398",
+      "year": "2009",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 NOV",
+      "value": "34331",
+      "year": "2009",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2009 DEC",
+      "value": "34909",
+      "year": "2009",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 JAN",
+      "value": "33893",
+      "year": "2010",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 FEB",
+      "value": "35762",
+      "year": "2010",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 MAR",
+      "value": "36166",
+      "year": "2010",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 APR",
+      "value": "37210",
+      "year": "2010",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 MAY",
+      "value": "36810",
+      "year": "2010",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 JUN",
+      "value": "38403",
+      "year": "2010",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 JUL",
+      "value": "36917",
+      "year": "2010",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 AUG",
+      "value": "36913",
+      "year": "2010",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 SEP",
+      "value": "37394",
+      "year": "2010",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 OCT",
+      "value": "38654",
+      "year": "2010",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 NOV",
+      "value": "39474",
+      "year": "2010",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2010 DEC",
+      "value": "39461",
+      "year": "2010",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 JAN",
+      "value": "40848",
+      "year": "2011",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 FEB",
+      "value": "40954",
+      "year": "2011",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 MAR",
+      "value": "40555",
+      "year": "2011",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 APR",
+      "value": "40921",
+      "year": "2011",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 MAY",
+      "value": "42811",
+      "year": "2011",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 JUN",
+      "value": "41320",
+      "year": "2011",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 JUL",
+      "value": "41796",
+      "year": "2011",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 AUG",
+      "value": "41828",
+      "year": "2011",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 SEP",
+      "value": "41573",
+      "year": "2011",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 OCT",
+      "value": "42715",
+      "year": "2011",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 NOV",
+      "value": "41833",
+      "year": "2011",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2011 DEC",
+      "value": "42298",
+      "year": "2011",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 JAN",
+      "value": "41946",
+      "year": "2012",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 FEB",
+      "value": "41139",
+      "year": "2012",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 MAR",
+      "value": "42795",
+      "year": "2012",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 APR",
+      "value": "40492",
+      "year": "2012",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 MAY",
+      "value": "42913",
+      "year": "2012",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 JUN",
+      "value": "40635",
+      "year": "2012",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 JUL",
+      "value": "42596",
+      "year": "2012",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 AUG",
+      "value": "41572",
+      "year": "2012",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 SEP",
+      "value": "41818",
+      "year": "2012",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 OCT",
+      "value": "41722",
+      "year": "2012",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 NOV",
+      "value": "40948",
+      "year": "2012",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2012 DEC",
+      "value": "42159",
+      "year": "2012",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 JAN",
+      "value": "41493",
+      "year": "2013",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 FEB",
+      "value": "41764",
+      "year": "2013",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 MAR",
+      "value": "42985",
+      "year": "2013",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 APR",
+      "value": "43005",
+      "year": "2013",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 MAY",
+      "value": "43455",
+      "year": "2013",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 JUN",
+      "value": "46031",
+      "year": "2013",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 JUL",
+      "value": "42842",
+      "year": "2013",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 AUG",
+      "value": "42248",
+      "year": "2013",
+      "month": "August",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 SEP",
+      "value": "41832",
+      "year": "2013",
+      "month": "September",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 OCT",
+      "value": "41614",
+      "year": "2013",
+      "month": "October",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 NOV",
+      "value": "41552",
+      "year": "2013",
+      "month": "November",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2013 DEC",
+      "value": "42454",
+      "year": "2013",
+      "month": "December",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 JAN",
+      "value": "40746",
+      "year": "2014",
+      "month": "January",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 FEB",
+      "value": "40366",
+      "year": "2014",
+      "month": "February",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 MAR",
+      "value": "41847",
+      "year": "2014",
+      "month": "March",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 APR",
+      "value": "40817",
+      "year": "2014",
+      "month": "April",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 MAY",
+      "value": "40758",
+      "year": "2014",
+      "month": "May",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 JUN",
+      "value": "40390",
+      "year": "2014",
+      "month": "June",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 JUL",
+      "value": "40836",
+      "year": "2014",
+      "month": "July",
+      "sourceDataset": "MRET"
+    },
+    {
+      "date": "2014 AUG",
+      "value": "40134",
+      "year": "2014",
+      "month": "August",
+      "sourceDataset": "MRET"
+    }
+  ],
+  "relatedBulletins": [
+    "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014"
+  ],
+  "relatedTimeseries": [
+    "/businessindustryandtrade/internationaltrade/timeseries/ikbi"
+  ],
+  "sourceDatasets": [
+    "MRET",
+    "PN2",
+    "PNBP",
+    "QNA",
+    "UKEA"
+  ],
+  "type": "timeseries",
+  "name": "Total exports of goods and services",
+  "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh",
+  "fileName": "ikbh",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "International trade",
+      "fileName": "internationaltrade",
+      "breadcrumb": []
+    }
+  ]
+}

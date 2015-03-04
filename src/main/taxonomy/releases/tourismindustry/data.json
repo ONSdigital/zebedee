@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "The tourism industries cover the following areas: accommodation services, food and beverage services, passenger transport services, vehicle hire, travel agencies and cultural, sports, recreational \u0026 conference services. Key figures here are employment levels and output of the tourism industries, the number of visitors to the UK and the amount visitors from different countries spend on average. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
+      "type": "bulletin",
+      "name": "Overseas Travel and Tourism, Provisional Results for May 2014",
+      "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Visits and Spending by UK residents abroad and overseas residents in the UK",
+      "type": "dataset",
+      "name": "Overseas travel and tourism",
+      "uri": "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism"
+    }
+  ],
+  "type": "release",
+  "name": "Tourism industry",
+  "fileName": "tourismindustry"
+}

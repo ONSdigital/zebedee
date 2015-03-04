@@ -1,0 +1,59 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Output of the production industries",
+      "cdids": [
+        "K222",
+        "K224",
+        "K22A",
+        "K248",
+        "K24C",
+        "K226",
+        "K24Q",
+        "K24R",
+        "K24S",
+        "K24O",
+        "K24T"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Broad industry groups and main industrial groupings.",
+  "nationalStatistic": true,
+  "description": "Output of the Production Industries by, broad industry groups and main industrial groupings.",
+  "title": "Output of the production industries",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Output of the production industries",
+  "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputoftheproductionindustries",
+  "fileName": "outputoftheproductionindustries",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Manufacturing and production industry",
+      "fileName": "manufacturingandproductionindustry",
+      "breadcrumb": []
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "headline": {
+    "name": "Employment rate (aged 16 to 64)",
+    "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf24"
+  },
+  "items": [
+    {
+      "name": "Employment rate (aged 16 to 64)",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf24"
+    },
+    {
+      "name": "Female employment rate (aged 16 to 64)",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf25"
+    },
+    {
+      "name": "Male employment rate (aged 16 to 64)",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsv"
+    },
+    {
+      "name": "Employment 16 and over",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgrz"
+    },
+    {
+      "name": "Female employment 16 and over",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsb"
+    },
+    {
+      "name": "Male employment 16 and over",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsa"
+    },
+    {
+      "name": "Vacancies",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/ap2y"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+    "name": "UK Labour Market, July 2014",
+    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+      "name": "UK Labour Market, July 2014",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Full-time, part-time \u0026 temporary workers",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/fulltimeparttimetemporaryworkers"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Jobs by industry",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/jobsbyindustry"
+    }
+  ],
+  "level": "t3",
+  "index": 0,
+  "lede": "Those in employment are classed as those working for pay or those working for no pay in a family business. Employment rates for those aged 16 and over and those aged 16 to 64 are calculated from the Labour Force Survey (LFS). Other figures found here are for men and women in employment (also from the LFS) and vacancies (from the Vacancies survey).",
+  "type": "home",
+  "name": "Employment and employee types",
+  "fileName": "employmentandemployeetypes",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    }
+  ]
+}

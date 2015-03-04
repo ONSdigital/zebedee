@@ -1,0 +1,45 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "National population projections are available by age and sex for the UK and its constituent countries. These population projections are based on mid-year population estimates and a set of underlying assumptions regarding future fertility, mortality and migration. They provide an indication of the impact that changes in demographic patterns might have on the size and age structure of the population in the future. These projections are widely used for resource allocation and planning. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "This statistical bulletin presents the key findings from the 2012-based national population projections.",
+      "type": "bulletin",
+      "name": "National Population Projections, 2012-based",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
+      "type": "dataset",
+      "name": "Principal population projection - UK",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionuk"
+    },
+    {
+      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
+      "type": "dataset",
+      "name": "Principal population projection - Great Britain",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectiongreatbritain"
+    },
+    {
+      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
+      "type": "dataset",
+      "name": "Principal population projection - England and Wales",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionenglandandwales"
+    }
+  ],
+  "type": "release",
+  "name": "Population projections",
+  "fileName": "populationprojections"
+}

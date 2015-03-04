@@ -1,0 +1,61 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Labour disputes",
+      "cdids": [
+        "BBFW",
+        "F8XZ",
+        "F8Y2",
+        "BLUU",
+        "F8Y3",
+        "F8Y4",
+        "BLUT"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Estimates measuring strikes connected with terms and conditions of employment",
+  "nationalStatistic": true,
+  "description": "Estimates measuring strikes connected with terms and conditions of employment.",
+  "title": "Labour disputes",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Labour disputes",
+  "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputes",
+  "fileName": "labourdisputes",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Workplace disputes and working conditions",
+      "fileName": "workplacedisputesandworkingconditions",
+      "breadcrumb": []
+    }
+  ]
+}

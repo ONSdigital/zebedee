@@ -1,0 +1,44 @@
+{
+  "cdid": "RAID112",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "3200",
+  "unit": "",
+  "preUnit": "£",
+  "date": "2008/10",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid113"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Median household financial debt",
+  "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid112",
+  "fileName": "raid112",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Personal and household finances",
+      "fileName": "personalandhouseholdfinances"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Debt",
+      "fileName": "debt",
+      "breadcrumb": []
+    }
+  ]
+}

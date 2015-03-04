@@ -1,0 +1,69 @@
+{
+  "headline": {
+    "name": "Marriages",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid57"
+  },
+  "items": [
+    {
+      "name": "Marriages",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid57"
+    },
+    {
+      "name": "Civil partnerships",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid58"
+    },
+    {
+      "name": "General Marriage Rate",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid59"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Annual data on marriages in England and Wales. Marriages abroad not included. Non-residents are included. Derived as part of civil registration.",
+    "name": "Marriages in England and Wales (Provisional), 2012",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/marriagesinenglandandwalesprovisional2012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Annual statistics on civil partnerships that were formed in the United Kingdom (UK) in 2012, as well as those which were dissolved. Civil partnership statistics are analysed by sex, age, previous marital status and area of occurrence. Figures on formations for Northern Ireland and the UK are provisional and all dissolution data are provisional.",
+      "name": "Civil Partnerships in the UK, 2012",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/civilpartnershipsintheuk2012"
+    },
+    {
+      "summary": "Annual data on marriages in England and Wales. Marriages abroad not included. Non-residents are included. Derived as part of civil registration.",
+      "name": "Marriages in England and Wales (Provisional), 2012",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/marriagesinenglandandwalesprovisional2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Marriages data collection",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesdatacollection"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Civil partnerships data collection",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/civilpartnershipsdatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 2,
+  "lede": "Statistics on how people live together give us a fuller picture of the changing social landscape of the UK. Data on marriages and civil partnerships comes from registrations, but data on cohabitation comes from various different surveys.",
+  "type": "home",
+  "name": "Marriage, cohabitation and civil partnerships",
+  "fileName": "marriagecohabitationandcivilpartnerships",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    }
+  ]
+}

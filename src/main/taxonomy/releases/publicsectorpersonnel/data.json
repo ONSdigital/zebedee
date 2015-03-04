@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Public sector employment statistics relate to the number of people employed in central government, local government and public corporations. They are collected through returns from various organisations. Employees included in the headcount can be permanent, on a fixed-term contract, employed on a casual basis or working in a second job in the public sector. However, self-employed, contract workers and agency workers are excluded.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "This bulletin contains detailed estimates of public sector employment, updated with the latest estimates for the first quarter of 2014.",
+      "type": "bulletin",
+      "name": "Public Sector Employment, Q1 2014",
+      "uri": "/employmentandlabourmarket/publicsectorpersonnel/bulletins/publicsectoremploymentq12014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Public sector employment by sector classification",
+      "type": "dataset",
+      "name": "Public Sector Employment",
+      "uri": "/employmentandlabourmarket/publicsectorpersonnel/datasets/publicsectoremployment"
+    }
+  ],
+  "type": "release",
+  "name": "Public sector personnel",
+  "fileName": "publicsectorpersonnel"
+}

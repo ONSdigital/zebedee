@@ -1,0 +1,146 @@
+{
+  "cdid": "RAID98",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "2597",
+  "unit": "",
+  "preUnit": "",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1993",
+      "value": "2178",
+      "year": "1993"
+    },
+    {
+      "date": "1994",
+      "value": "2350",
+      "year": "1994"
+    },
+    {
+      "date": "1995",
+      "value": "2540",
+      "year": "1995"
+    },
+    {
+      "date": "1996",
+      "value": "2618",
+      "year": "1996"
+    },
+    {
+      "date": "1997",
+      "value": "2817",
+      "year": "1997"
+    },
+    {
+      "date": "1998",
+      "value": "2976",
+      "year": "1998"
+    },
+    {
+      "date": "1999",
+      "value": "3110",
+      "year": "1999"
+    },
+    {
+      "date": "2000",
+      "value": "2932",
+      "year": "2000"
+    },
+    {
+      "date": "2001",
+      "value": "3093",
+      "year": "2001"
+    },
+    {
+      "date": "2002",
+      "value": "2830",
+      "year": "2002"
+    },
+    {
+      "date": "2003",
+      "value": "2623",
+      "year": "2003"
+    },
+    {
+      "date": "2004",
+      "value": "2787",
+      "year": "2004"
+    },
+    {
+      "date": "2005",
+      "value": "2762",
+      "year": "2005"
+    },
+    {
+      "date": "2006",
+      "value": "2570",
+      "year": "2006"
+    },
+    {
+      "date": "2007",
+      "value": "2640",
+      "year": "2007"
+    },
+    {
+      "date": "2008",
+      "value": "2928",
+      "year": "2008"
+    },
+    {
+      "date": "2009",
+      "value": "2878",
+      "year": "2009"
+    },
+    {
+      "date": "2010",
+      "value": "2747",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "2652",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "2597",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/alcoholrelateddeathsintheunitedkingdomregisteredin2012",
+    "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/deathsrelatedtodrugpoisoninginenglandandwales2012"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Deaths from drug-related poisoning",
+  "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98",
+  "fileName": "raid98",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Health and social care",
+      "fileName": "healthandsocialcare"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Drug use, alcohol and smoking",
+      "fileName": "drugusealcoholandsmoking",
+      "breadcrumb": []
+    }
+  ]
+}

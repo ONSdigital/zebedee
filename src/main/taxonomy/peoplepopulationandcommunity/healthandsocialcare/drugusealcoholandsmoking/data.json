@@ -1,0 +1,69 @@
+{
+  "headline": {
+    "name": "Deaths from drug-related poisoning",
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98"
+  },
+  "items": [
+    {
+      "name": "Deaths from drug-related poisoning",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98"
+    },
+    {
+      "name": "Deaths from drug misuse",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid99"
+    },
+    {
+      "name": "Alcohol-related deaths",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid100"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Deaths related to drug poisoning in England and Wales for the last five years. Data from 1993 are available to download, and are discussed in the commentary to provide context to the latest (2012) data. Figures are presented by cause of death, sex, age, substance(s) involved in the death, country and region.",
+    "name": "Deaths Related to Drug Poisoning in England and Wales, 2012",
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/deathsrelatedtodrugpoisoninginenglandandwales2012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "This bulletin presents the latest figures for alcohol-related deaths in the UK, its four constituent countries and regions of England. Comparisons are made between 2012, the latest year, and previously published data from 2002 onwards.",
+      "name": "Alcohol-related deaths in the United Kingdom, registered in 2012",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/alcoholrelateddeathsintheunitedkingdomregisteredin2012"
+    },
+    {
+      "summary": "Deaths related to drug poisoning in England and Wales for the last five years. Data from 1993 are available to download, and are discussed in the commentary to provide context to the latest (2012) data. Figures are presented by cause of death, sex, age, substance(s) involved in the death, country and region.",
+      "name": "Deaths Related to Drug Poisoning in England and Wales, 2012",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/deathsrelatedtodrugpoisoninginenglandandwales2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Deaths from drug-related poisoning and drug misuse, by sex",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/deathsfromdrugrelatedpoisoninganddrugmisusebysex"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Alcohol-related deaths, UK",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/alcoholrelateddeathsuk"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "Statistics on drug use, alcohol and smoking focus on deaths and illnesses related to these areas. Deaths related to drugs can be through drug poisoning or drug misuse. It is important to know whether deaths related to these areas are rising or falling overall or rising for some groups and falling for others as this information is key when making decisions on allocating resources and creating policies aimed at reducing these illnesses and deaths.",
+  "type": "home",
+  "name": "Drug use, alcohol and smoking",
+  "fileName": "drugusealcoholandsmoking",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Health and social care",
+      "fileName": "healthandsocialcare"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "2013",
+      "xls": "http://www.ons.gov.uk/ons/rel/pop-estimate/population-estimates-for-uk--england-and-wales--scotland-and-northern-ireland/2013/rft---mid-2013-uk-population-estimates.zip",
+      "csv": "#"
+    },
+    {
+      "title": "2012",
+      "xls": "http://www.ons.gov.uk/ons/rel/pop-estimate/population-estimates-for-uk--england-and-wales--scotland-and-northern-ireland/mid-2011-and-mid-2012/rft---mid-2012-uk-population-estimates.zip",
+      "csv": "#"
+    },
+    {
+      "title": "2011",
+      "xls": "http://www.ons.gov.uk/ons/rel/pop-estimate/population-estimates-for-uk--england-and-wales--scotland-and-northern-ireland/mid-2011-and-mid-2012/rft---mid-2011-uk-population-estimates.zip",
+      "csv": "#"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Population estimates data overview by age group for the United Kingdom, England and Wales, and Great Britain",
+  "nationalStatistic": true,
+  "description": "Population estimates by age group for the United Kingdom, England and Wales, and Great Britain.",
+  "title": "Population data collection",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Population data collection",
+  "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationdatacollection",
+  "fileName": "populationdatacollection",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population estimates",
+      "fileName": "populationestimates",
+      "breadcrumb": []
+    }
+  ]
+}

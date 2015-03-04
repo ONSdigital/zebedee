@@ -1,0 +1,91 @@
+{
+  "headline": {
+    "name": "CPI: Consumer Prices Index (% change)",
+    "uri": "/economy/inflationandpriceindices/timeseries/d7g7"
+  },
+  "items": [
+    {
+      "name": "CPI: Consumer Prices Index (% change)",
+      "uri": "/economy/inflationandpriceindices/timeseries/d7g7"
+    },
+    {
+      "name": "RPI: Retail Price Index (% change)",
+      "uri": "/economy/inflationandpriceindices/timeseries/czbh"
+    },
+    {
+      "name": "CPIH (% change)",
+      "uri": "/economy/inflationandpriceindices/timeseries/l55o"
+    },
+    {
+      "name": "RPIJ (% change)",
+      "uri": "/economy/inflationandpriceindices/timeseries/kvr9"
+    },
+    {
+      "name": "CPI: Consumer Prices Index",
+      "uri": "/economy/inflationandpriceindices/timeseries/d7bt"
+    },
+    {
+      "name": "RPI: Retail Price Index",
+      "uri": "/economy/inflationandpriceindices/timeseries/chaw"
+    },
+    {
+      "name": "CPIH",
+      "uri": "/economy/inflationandpriceindices/timeseries/l522"
+    },
+    {
+      "name": "RPIJ",
+      "uri": "/economy/inflationandpriceindices/timeseries/kvr8"
+    },
+    {
+      "name": "Output of manufactured product",
+      "uri": "/economy/inflationandpriceindices/timeseries/jvz7"
+    },
+    {
+      "name": "Input of all manufacturing",
+      "uri": "/economy/inflationandpriceindices/timeseries/k646"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
+    "name": "Consumer Price Inflation, June 2014",
+    "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
+      "name": "Consumer Price Inflation, June 2014",
+      "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Measures of inflation data, including CPI, RPI, CPIH and RPIJ",
+      "name": "Inflation data collection",
+      "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection"
+    },
+    {
+      "summary": "Complete dataset covering all RPI statistics. Not a National Statistic.",
+      "name": "Retail Prices Index",
+      "uri": "/economy/inflationandpriceindices/datasets/retailpricesindex"
+    },
+    {
+      "summary": "Comprehensive dataset covering input and output index series",
+      "name": "Producer Prices Inflation",
+      "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation"
+    }
+  ],
+  "level": "t3",
+  "index": 0,
+  "lede": "Inflation measures the rate of increase in prices for goods and services using price indices. The rate of inflation used in the UK government’s inflation target is measured using the Consumer Prices Index (CPI). One way to understand the CPI is to think of a very large shopping basket containing a large selection of the goods and services bought by households, the CPI estimates changes to the total cost of this basket.",
+  "type": "home",
+  "name": "Inflation and price indices",
+  "fileName": "inflationandpriceindices",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    }
+  ]
+}

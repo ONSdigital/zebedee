@@ -1,0 +1,61 @@
+{
+  "headline": {
+    "name": "UK businesses",
+    "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid1"
+  },
+  "items": [
+    {
+      "name": "UK businesses",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid1"
+    },
+    {
+      "name": "GB businesses",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid2"
+    },
+    {
+      "name": "England and Wales businesses",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid3"
+    },
+    {
+      "name": "England businesses",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid4"
+    },
+    {
+      "name": "Wales businesses",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid5"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
+    "name": "UK Business: Activity, Size and Location - 2013",
+    "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
+      "name": "UK Business: Activity, Size and Location - 2013",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Analysis of UK local units and UK VAT and/or PAYE based Enterprises",
+      "name": "Number of VAT and/or PAYE enterprises",
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/datasets/numberofvatandorpayeenterprises"
+    }
+  ],
+  "level": "t3",
+  "index": 4,
+  "lede": "Statistics here focus on business that are either registered for VAT or PAYE. This means some very small businesses are not be covered. Key figures are the number of businesses in the UK and the numbers across different areas of the UK. Business size is based on employment and turnover and business activity relates to the type of industry the business is related to. ",
+  "type": "home",
+  "name": "Business activity, size and location",
+  "fileName": "businessactivitysizeandlocation",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    }
+  ]
+}

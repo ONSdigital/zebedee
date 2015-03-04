@@ -1,0 +1,32 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Those in employment are classed as those working for pay or those working for no pay in a family business. Employment rates for those aged 16 and over and those aged 16 to 64 are calculated from the Labour Force Survey (LFS). Other figures found here are for men and women in employment (also from the LFS) and vacancies (from the Vacancies survey).",
+  "articles": [],
+  "bulletins": [],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Full-time, part-time \u0026 temporary workers",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/fulltimeparttimetemporaryworkers"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Jobs by industry",
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/jobsbyindustry"
+    }
+  ],
+  "type": "release",
+  "name": "Employment and employee types",
+  "fileName": "employmentandemployeetypes"
+}

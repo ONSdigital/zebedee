@@ -1,0 +1,83 @@
+{
+  "cdid": "RAID101",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "87.2",
+  "unit": "%",
+  "preUnit": "",
+  "date": "2014 Q1",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [
+    {
+      "date": "2011 Q1",
+      "value": "82.2",
+      "year": "2011",
+      "quarter": "Q1"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "83.7",
+      "year": "2012",
+      "quarter": "Q1"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "85.8",
+      "year": "2013",
+      "quarter": "Q1"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "85.9",
+      "year": "2013",
+      "quarter": "Q2"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "86",
+      "year": "2013",
+      "quarter": "Q3"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "86.7",
+      "year": "2013",
+      "quarter": "Q4"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "87.2",
+      "year": "2014",
+      "quarter": "Q1"
+    }
+  ],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid102"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Adults in the UK that have used the Internet",
+  "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid101",
+  "fileName": "raid101",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Home internet and social media usage",
+      "fileName": "homeinternetandsocialmediausage",
+      "breadcrumb": []
+    }
+  ]
+}

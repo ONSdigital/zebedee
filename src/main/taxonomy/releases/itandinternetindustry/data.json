@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Key statistics here are on the value and percentage of business sales that take place over the internet. We also measure the percentage of businesses that have a website and a broadband connection. These figures allow us to monitor the growing importance of the internet to UK businesses. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "This release provides estimates of the values of e-commerce and the adoption and use of Information and Communication Technologies (ICTs) by UK businesses. The source of the information is the E-commerce Survey of UK Businesses.",
+      "type": "bulletin",
+      "name": "E-Commerce and ICT Activity, 2012",
+      "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Data on e-commerce sales and how businesses are using the internet",
+      "type": "dataset",
+      "name": "E-commerce and ICT Activity",
+      "uri": "/businessindustryandtrade/itandinternetindustry/datasets/ecommerceandictactivity"
+    }
+  ],
+  "type": "release",
+  "name": "IT and internet industry",
+  "fileName": "itandinternetindustry"
+}

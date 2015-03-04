@@ -1,0 +1,89 @@
+{
+  "headline": {
+    "name": "UK population",
+    "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid121"
+  },
+  "items": [
+    {
+      "name": "UK population",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid121"
+    },
+    {
+      "name": "England and Wales population",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid123"
+    },
+    {
+      "name": "England population",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid124"
+    },
+    {
+      "name": "Scotland population",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid125"
+    },
+    {
+      "name": "Wales population",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid126"
+    },
+    {
+      "name": "Northern Ireland population",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid127"
+    },
+    {
+      "name": "Males in the UK",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid128"
+    },
+    {
+      "name": "Females in the UK",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid129"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Estimates of the usual resident population in the United Kingdom and its constituent countries as at 30 June 2013.",
+    "name": "Annual Mid-year Population Estimates, 2013",
+    "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates2013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Estimates of the usual resident population in the United Kingdom and its constituent countries as at 30 June 2013.",
+      "name": "Annual Mid-year Population Estimates, 2013",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Components of population change for countries; regions, counties and smaller geographic breakdowns",
+      "name": "Population for Local Authorities",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationforlocalauthorities"
+    },
+    {
+      "summary": "Population estimates data by sex and single year of age for countries, regions and smaller geographic breakdowns",
+      "name": "Population by age and sex",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationbyageandsex"
+    },
+    {
+      "summary": "Population estimates data overview by age group for the United Kingdom, England and Wales, and Great Britain",
+      "name": "Population data collection",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationdatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 0,
+  "lede": "Annual estimates of the size of the UK “usually resident population” are calculated at the mid-year point (30 June). The ONS compile and publish the UK estimates using estimates for England and Wales (produced by ONS directly), estimates for Scotland (produced by National Records of Scotland) and estimates for Northern Ireland (produced by the Northern Ireland Statistics \u0026 Research Agency). ",
+  "type": "home",
+  "name": "Population estimates",
+  "fileName": "populationestimates",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Population and migration",
+      "fileName": "populationandmigration"
+    }
+  ]
+}

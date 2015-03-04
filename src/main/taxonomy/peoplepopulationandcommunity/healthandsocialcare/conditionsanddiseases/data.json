@@ -1,0 +1,69 @@
+{
+  "headline": {
+    "name": "Number of newly diagnosed cancers",
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid89"
+  },
+  "items": [
+    {
+      "name": "Number of newly diagnosed cancers",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid89"
+    },
+    {
+      "name": "Deaths from MRSA",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid92"
+    },
+    {
+      "name": "Deaths Involving Clostridium difficile",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid93"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "The number of diagnoses and incidence rates of all types of cancer by age and sex, and by region of residence in England.",
+    "name": "Cancer Statistics Registrations, England (Series MB1), No. 43, 2012",
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012"
+  },
+  "statsBulletins": [
+    {
+      "summary": "The number of diagnoses and incidence rates of all types of cancer by age and sex, and by region of residence in England.",
+      "name": "Cancer Statistics Registrations, England (Series MB1), No. 43, 2012",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Deaths involving Clostridium difficile",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/deathsinvolvingclostridiumdifficile"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Deaths involving  MRSA",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/deathsinvolvingmrsa"
+    },
+    {
+      "summary": "Brief description of dataset",
+      "name": "Cancer registration statistics",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/cancerregistrationstatistics"
+    }
+  ],
+  "level": "t3",
+  "index": 2,
+  "lede": "We publish statistics on many different health conditions and diseases collected from health bodies across the UK. However, key statistics in this area are on newly diagnosed cancers and deaths related to diseases mainly caught when a person is already in hospital, e.g. MRSA and Clostridium difficile.",
+  "type": "home",
+  "name": "Conditions and diseases",
+  "fileName": "conditionsanddiseases",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Health and social care",
+      "fileName": "healthandsocialcare"
+    }
+  ]
+}

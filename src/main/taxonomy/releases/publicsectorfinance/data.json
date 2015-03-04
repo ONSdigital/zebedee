@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "These statistics are a compilation of figures on the main aspects of the UK’s public sector finances. These give an indication of the current state of the country’s financial position. They are published jointly by the Office for National Statistics (ONS) and HM Treasury. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "A presentational framework for the headline measures of Public Sector Finance Statistics (net borrowing, net cash requirement and net debt) is explained in this release. This includes the reasons for changes in net borrowing (deficit) and debt.",
+      "type": "bulletin",
+      "name": "Public Sector Finances, June 2014",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinancesjune2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Public sector summary excluding financial interventions",
+      "type": "dataset",
+      "name": "Public Sector data collection",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectordatacollection"
+    }
+  ],
+  "type": "release",
+  "name": "Public sector finance",
+  "fileName": "publicsectorfinance"
+}

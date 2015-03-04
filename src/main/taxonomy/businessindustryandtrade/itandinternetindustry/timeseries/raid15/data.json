@@ -1,0 +1,64 @@
+{
+  "cdid": "RAID15",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "491.7",
+  "unit": "bn",
+  "preUnit": "£",
+  "date": "2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2008",
+      "value": "334.6",
+      "year": "2008"
+    },
+    {
+      "date": "2009",
+      "value": "374.1",
+      "year": "2009"
+    },
+    {
+      "date": "2010",
+      "value": "418.5",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "483.8",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "491.7",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012"
+  ],
+  "relatedTimeseries": [],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Total e-commerce sales",
+  "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid15",
+  "fileName": "raid15",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "IT and internet industry",
+      "fileName": "itandinternetindustry",
+      "breadcrumb": []
+    }
+  ]
+}

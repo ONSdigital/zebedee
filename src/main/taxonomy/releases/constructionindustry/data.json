@@ -1,0 +1,39 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "The construction industry includes businesses that are involved with the construction of entirely new buildings or the repair, alterations or additions to existing properties. Also included are businesses involved in civil engineering projects. Output of the construction industry is defined as the amount charged by construction companies to customers for the value of work produced in a given period. Users of data on the construction industry include central government departments, Eurostat and various industry analysts.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Construction output at current price and chained volume measures seasonally adjusted by public and private sector.",
+      "type": "bulletin",
+      "name": "Output in the Construction Industry, June and Q2 2014",
+      "uri": "/businessindustryandtrade/constructionindustry/bulletins/outputintheconstructionindustryjuneandq22014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Construction - All work summary",
+      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionallworksummary"
+    },
+    {
+      "summary": "Range of construction figures by sector and region",
+      "type": "dataset",
+      "name": "Construction output",
+      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionoutput"
+    }
+  ],
+  "type": "release",
+  "name": "Construction industry",
+  "fileName": "constructionindustry"
+}

@@ -1,0 +1,148 @@
+{
+  "cdid": "RAID49",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "82.72",
+  "unit": "years",
+  "preUnit": "",
+  "date": "2010-2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1991-1993",
+      "value": "78.86",
+      "year": "1993"
+    },
+    {
+      "date": "1992-1994",
+      "value": "79.09",
+      "year": "1994"
+    },
+    {
+      "date": "1993-1995",
+      "value": "79.17",
+      "year": "1995"
+    },
+    {
+      "date": "1994-1996",
+      "value": "79.38",
+      "year": "1996"
+    },
+    {
+      "date": "1995-1997",
+      "value": "79.44",
+      "year": "1997"
+    },
+    {
+      "date": "1996-1998",
+      "value": "79.6",
+      "year": "1998"
+    },
+    {
+      "date": "1997-1999",
+      "value": "79.72",
+      "year": "1999"
+    },
+    {
+      "date": "1998-2000",
+      "value": "79.94",
+      "year": "2000"
+    },
+    {
+      "date": "1999-2001",
+      "value": "80.16",
+      "year": "2001"
+    },
+    {
+      "date": "2000-2002",
+      "value": "80.41",
+      "year": "2002"
+    },
+    {
+      "date": "2001-2003",
+      "value": "80.47",
+      "year": "2003"
+    },
+    {
+      "date": "2002-2004",
+      "value": "80.65",
+      "year": "2004"
+    },
+    {
+      "date": "2003-2005",
+      "value": "80.88",
+      "year": "2005"
+    },
+    {
+      "date": "2004-2006",
+      "value": "81.27",
+      "year": "2006"
+    },
+    {
+      "date": "2005-2007",
+      "value": "81.51",
+      "year": "2007"
+    },
+    {
+      "date": "2006-2008",
+      "value": "81.71",
+      "year": "2008"
+    },
+    {
+      "date": "2007-2009",
+      "value": "81.97",
+      "year": "2009"
+    },
+    {
+      "date": "2008-2010",
+      "value": "82.22",
+      "year": "2010"
+    },
+    {
+      "date": "2009-2011",
+      "value": "82.6",
+      "year": "2011"
+    },
+    {
+      "date": "2010-2012",
+      "value": "82.72",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/lifeexpectancyatbirthandatage65bylocalareasintheunitedkingdom200608to201012"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid50",
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid52"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Female life expectancy at birth",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49",
+  "fileName": "raid49",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Life expectancies",
+      "fileName": "lifeexpectancies",
+      "breadcrumb": []
+    }
+  ]
+}

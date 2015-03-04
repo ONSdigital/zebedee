@@ -1,0 +1,65 @@
+{
+  "headline": {
+    "name": "Adults identifying themselves as Gay, Lesbian or Bisexual",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid81"
+  },
+  "items": [
+    {
+      "name": "Adults identifying themselves as Gay, Lesbian or Bisexual",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid81"
+    },
+    {
+      "name": "Heterosexual/Straight",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid82"
+    },
+    {
+      "name": "Gay/Lesbian",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid83"
+    },
+    {
+      "name": "Bisexual",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid84"
+    },
+    {
+      "name": "Other",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid85"
+    },
+    {
+      "name": "Don\u0027t know/Refusal",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid86"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Findings on health, smoking, sexual identity and other social topics compiled from the UK Integrated Household Survey (IHS) between April 2011 to March 2012.",
+    "name": "Integrated Household Survey April 2011 to March 2012- Experimental Statistics",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Findings on health, smoking, sexual identity and other social topics compiled from the UK Integrated Household Survey (IHS) between April 2011 to March 2012.",
+      "name": "Integrated Household Survey April 2011 to March 2012- Experimental Statistics",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics"
+    }
+  ],
+  "datasets": [],
+  "level": "t3",
+  "index": 1,
+  "lede": "Statistics on sexuality are obtained from large surveys which ask people to state their sexuality. Time series data on sexual identities is also available.",
+  "type": "home",
+  "name": "Sexuality",
+  "fileName": "sexuality",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Cultural identity",
+      "fileName": "culturalidentity"
+    }
+  ]
+}

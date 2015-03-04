@@ -1,0 +1,40 @@
+{
+  "cdid": "RAID106",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "166054",
+  "unit": "",
+  "preUnit": "£",
+  "date": "May 2014",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/housing/timeseries/raid104"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Wales average house price",
+  "uri": "/peoplepopulationandcommunity/housing/timeseries/raid106",
+  "fileName": "raid106",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Housing",
+      "fileName": "housing",
+      "breadcrumb": []
+    }
+  ]
+}

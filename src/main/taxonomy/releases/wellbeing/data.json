@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Measuring National Well-being is about looking at measures of the UK as a whole that go beyond what we produce, which is measured by Gross Domestic Product (GDP). This section includes a wide range of headline indicators in areas such as health, relationships, education and skills, what we do, where we live, our finances, the economy, governance, the environment and measures of \u0027personal well-being\u0027 (individuals\u0027 assessment of their own well-being). This data comes from a variety of sources and much of the analysis is new.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "This bulletin presents experimental statistics from the second Personal Well-being Annual Population dataset, April 2012 to March 2013.  Overall estimates of personal well-being are provided for each country of the United Kingdom, as well as for lower level geographies in England, Scotland and Wales.",
+      "type": "bulletin",
+      "name": "Personal Well-being Across the UK, 2012-2013",
+      "uri": "/peoplepopulationandcommunity/wellbeing/bulletins/personalwellbeingacrosstheuk20122013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Comparison over time of estimates of personal well-being",
+      "type": "dataset",
+      "name": "Personal well-being",
+      "uri": "/peoplepopulationandcommunity/wellbeing/datasets/personalwellbeing"
+    }
+  ],
+  "type": "release",
+  "name": "Well-being",
+  "fileName": "wellbeing"
+}

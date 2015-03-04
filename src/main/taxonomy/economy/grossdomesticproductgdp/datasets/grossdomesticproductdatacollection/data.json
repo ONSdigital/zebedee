@@ -1,0 +1,69 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Gross Domestic Product data collection",
+      "cdids": [
+        "ABMI",
+        "IHYQ",
+        "IHYR",
+        "YBHA",
+        "IHYN",
+        "IHYO",
+        "L2KQ",
+        "L2KX",
+        "L2KL",
+        "L2N8",
+        "L2NC",
+        "DTWM",
+        "CGBZ",
+        "CGBX",
+        "CMVL",
+        "ABPF",
+        "ABNU",
+        "NMRU",
+        "NPQR",
+        "IHXT",
+        "IHXW"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "High level overview of the economy",
+  "nationalStatistic": true,
+  "description": "High level overview of the economy covering income, output and expenditure measures.",
+  "title": "Gross Domestic Product data collection",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Gross Domestic Product data collection",
+  "uri": "/economy/grossdomesticproductgdp/datasets/grossdomesticproductdatacollection",
+  "fileName": "grossdomesticproductdatacollection",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Gross Domestic Product (GDP)",
+      "fileName": "grossdomesticproductgdp",
+      "breadcrumb": []
+    }
+  ]
+}

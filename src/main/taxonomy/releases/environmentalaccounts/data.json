@@ -1,0 +1,33 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Environmental Accounts show the relationship between the environment and the economy. This is done by outlining how the environment contributes to the economy (e.g. through the extraction of raw materials), the impact the economy has on the environment (e.g. through energy consumption) and how society responds to environmental issues (e.g. through expenditure on environmental protection). These accounts are used to inform government policies and to evaluate the impact that different sectors have on the environment.",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "Environmental accounts show how the environment contributes to the economy, the impacts that the economy has on the environment, and how society responds to environmental issues. They include natural capital accounts (oil and gas), physical accounts (fuel use, energy consumption, atmospheric emissions, material flows, and water), and monetary accounts (environmental taxes and environmental protection expenditure). For 2014, experimental natural capital accounts (land use and forestry) are also included. Environmental accounts are ‘satellite accounts’ to the main National Accounts and they are compiled in accordance with the System of Environmental Economic Accounting (SEEA), which closely follows the UN System of National Accounts (SNA). This means that they are comparable with economic indicators such as Gross Domestic Product (GDP).",
+      "type": "bulletin",
+      "name": "UK Environmental Accounts, 2014",
+      "uri": "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "By Economic Sector and Gas, United Kingdom",
+      "type": "dataset",
+      "name": "Atmospheric Emissions: Greenhouse Gas Emissions",
+      "uri": "/economy/environmentalaccounts/datasets/atmosphericemissionsgreenhousegasemissions"
+    }
+  ],
+  "type": "release",
+  "name": "Environmental accounts",
+  "fileName": "environmentalaccounts"
+}

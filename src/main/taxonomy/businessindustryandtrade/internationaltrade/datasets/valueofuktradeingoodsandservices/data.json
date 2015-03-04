@@ -1,0 +1,72 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Value of UK trade in goods and services",
+      "cdids": [
+        "IKBH",
+        "IKBI",
+        "IKBJ",
+        "BOKG",
+        "BOKH",
+        "BOKI",
+        "ELBL",
+        "ENXO",
+        "ENXQ",
+        "ELBM",
+        "ENXP",
+        "BQKH",
+        "BPAL",
+        "BQBB",
+        "BQKW",
+        "BPAO",
+        "BQBE",
+        "BPBM",
+        "BPBL",
+        "BQBG",
+        "BPAP",
+        "IKBB",
+        "IKBC",
+        "IKBD"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Exports, imports and balance including total trade, trade in goods and oil",
+  "nationalStatistic": true,
+  "description": "Value of UK Trade in Goods and Services, Balance of Payments basis. Exports, imports and balance including total trade, trade in goods and oil.",
+  "title": "Value of UK trade in goods and services",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Value of UK trade in goods and services",
+  "uri": "/businessindustryandtrade/internationaltrade/datasets/valueofuktradeingoodsandservices",
+  "fileName": "valueofuktradeingoodsandservices",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "International trade",
+      "fileName": "internationaltrade",
+      "breadcrumb": []
+    }
+  ]
+}

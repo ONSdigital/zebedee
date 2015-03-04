@@ -1,0 +1,130 @@
+{
+  "headline": {
+    "name": "Gross Domestic Product (GDP)  - CVM",
+    "uri": "/economy/grossdomesticproductgdp/timeseries/abmi"
+  },
+  "items": [
+    {
+      "name": "Gross Domestic Product (GDP)  - CVM",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/abmi"
+    },
+    {
+      "name": "GDP quarter on quarter growth - CVM",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyq"
+    },
+    {
+      "name": "GDP Change on same Quarter a year ago - CVM",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyr"
+    },
+    {
+      "name": "Gross Domestic Product (GDP) - CP",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ybha"
+    },
+    {
+      "name": "GDP quarter on quarter growth - CP",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyn"
+    },
+    {
+      "name": "GDP Change on same quarter a year ago - CP",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyo"
+    },
+    {
+      "name": "Output measure: Production",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kq"
+    },
+    {
+      "name": "Output measure: Manufacturing",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kx"
+    },
+    {
+      "name": "Output measure: Agriculture, forestry and fishing",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kl"
+    },
+    {
+      "name": "Output measure: Construction",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2n8"
+    },
+    {
+      "name": "Output measure: Services",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2nc"
+    },
+    {
+      "name": "Income measure: Compensation of Employees",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/dtwm"
+    },
+    {
+      "name": "Income measure: Gross Operating Surplus",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/cgbz"
+    },
+    {
+      "name": "Income measure: Other Income",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/cgbx"
+    },
+    {
+      "name": "Income measure: Taxes less Subsidies",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/cmvl"
+    },
+    {
+      "name": "Expenditure measure: Households",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/abpf"
+    },
+    {
+      "name": "Expenditure measure: Non-profit institutions serving households (NPISHs)",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/abnu"
+    },
+    {
+      "name": "Expenditure measure: General Government",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/nmru"
+    },
+    {
+      "name": "Expenditure measure: Gross Fixed Capital Formation",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/npqr"
+    },
+    {
+      "name": "GDP (average) per head, at current market prices",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihxt"
+    },
+    {
+      "name": "GDP (average) per head, Chained Volume Measures (CVM) market prices",
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihxw"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK. Data is available split by industrial sector.",
+    "name": "GDP Preliminary Estimate Q3 2014",
+    "uri": "/economy/grossdomesticproductgdp/bulletins/gdppreliminaryestimateq32014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK. Data is available split by industrial sector.",
+      "name": "GDP Preliminary Estimate Q3 2014",
+      "uri": "/economy/grossdomesticproductgdp/bulletins/gdppreliminaryestimateq32014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "GDP by category of expenditure",
+      "uri": "/economy/grossdomesticproductgdp/datasets/gdpbycategoryofexpenditure"
+    },
+    {
+      "summary": "High level overview of the economy",
+      "name": "Gross Domestic Product data collection",
+      "uri": "/economy/grossdomesticproductgdp/datasets/grossdomesticproductdatacollection"
+    }
+  ],
+  "level": "t3",
+  "index": 1,
+  "lede": "Gross domestic product (GDP) is a measure of economic activity which captures the value of goods and services that a country produces during a given period.",
+  "type": "home",
+  "name": "Gross Domestic Product (GDP)",
+  "fileName": "grossdomesticproductgdp",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    }
+  ]
+}

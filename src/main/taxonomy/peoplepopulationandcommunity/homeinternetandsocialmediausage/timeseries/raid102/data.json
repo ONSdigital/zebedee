@@ -1,0 +1,40 @@
+{
+  "cdid": "RAID102",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "12.6",
+  "unit": "%",
+  "preUnit": "",
+  "date": "2014 Q1",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid101"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Adults that have never used the Internet",
+  "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid102",
+  "fileName": "raid102",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Home internet and social media usage",
+      "fileName": "homeinternetandsocialmediausage",
+      "breadcrumb": []
+    }
+  ]
+}

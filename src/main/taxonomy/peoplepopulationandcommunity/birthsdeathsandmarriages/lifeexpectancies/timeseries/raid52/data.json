@@ -1,0 +1,47 @@
+{
+  "cdid": "RAID52",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "18.38",
+  "unit": "years",
+  "preUnit": "",
+  "date": "2010-2012",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/lifeexpectancyatbirthandatage65bylocalareasintheunitedkingdom200608to201012"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid51",
+    "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Female life expectancy at age 65",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid52",
+  "fileName": "raid52",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Births, deaths and marriages",
+      "fileName": "birthsdeathsandmarriages"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Life expectancies",
+      "fileName": "lifeexpectancies",
+      "breadcrumb": []
+    }
+  ]
+}

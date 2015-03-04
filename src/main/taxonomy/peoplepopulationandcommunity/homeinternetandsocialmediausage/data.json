@@ -1,0 +1,49 @@
+{
+  "headline": {
+    "name": "Adults in the UK that have used the Internet",
+    "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid101"
+  },
+  "items": [
+    {
+      "name": "Adults in the UK that have used the Internet",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid101"
+    },
+    {
+      "name": "Adults that have never used the Internet",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid102"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Estimates of adult Internet users and non-users in the UK, by age, sex, disability, region, gross weekly pay, ethnicity and when adults last used the Internet.",
+    "name": "Internet Access Quarterly Update, Q1 2014",
+    "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Estimates of adult Internet users and non-users in the UK, by age, sex, disability, region, gross weekly pay, ethnicity and when adults last used the Internet.",
+      "name": "Internet Access Quarterly Update, Q1 2014",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Internet users and non-users, UK",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/datasets/internetusersandnonusersuk"
+    }
+  ],
+  "level": "t3",
+  "index": 9,
+  "lede": "Statistics on usage of the internet and social media are useful for the government, businesses and other groups to make decisions on how best to communicate with  different groups of people. Here you can find statistics on the number of people who have used the internet, who use the internet frequently and who have never used the internet. Most of these statistics can be broken down by age and gender.",
+  "type": "home",
+  "name": "Home internet and social media usage",
+  "fileName": "homeinternetandsocialmediausage",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

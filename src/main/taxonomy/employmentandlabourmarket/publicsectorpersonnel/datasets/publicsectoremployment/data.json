@@ -1,0 +1,54 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Public Sector Employment",
+      "cdids": [
+        "G6NQ",
+        "G6NT",
+        "G6NW",
+        "G7AR",
+        "G7AU",
+        "G7D6"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Public sector employment by sector classification",
+  "nationalStatistic": true,
+  "description": "Public sector employment by sector classification.",
+  "title": "Public Sector Employment",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Public Sector Employment",
+  "uri": "/employmentandlabourmarket/publicsectorpersonnel/datasets/publicsectoremployment",
+  "fileName": "publicsectoremployment",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Public sector personnel",
+      "fileName": "publicsectorpersonnel",
+      "breadcrumb": []
+    }
+  ]
+}

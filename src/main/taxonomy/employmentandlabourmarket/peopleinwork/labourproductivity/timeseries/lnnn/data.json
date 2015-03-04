@@ -1,0 +1,644 @@
+{
+  "cdid": "LNNN",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "100.4",
+  "unit": "index",
+  "preUnit": "",
+  "date": "Q2 2014",
+  "source": "Labour Force Survey",
+  "additionalText": "Index, 2010 \u003d 100",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "1997",
+      "value": "82.1",
+      "year": "1997",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1998",
+      "value": "84.4",
+      "year": "1998",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1999",
+      "value": "85.9",
+      "year": "1999",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2000",
+      "value": "88.4",
+      "year": "2000",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2001",
+      "value": "89.9",
+      "year": "2001",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2002",
+      "value": "91.1",
+      "year": "2002",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2003",
+      "value": "94.3",
+      "year": "2003",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2004",
+      "value": "95.6",
+      "year": "2004",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2005",
+      "value": "97.5",
+      "year": "2005",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2006",
+      "value": "99.5",
+      "year": "2006",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2007",
+      "value": "101.1",
+      "year": "2007",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2008",
+      "value": "100.1",
+      "year": "2008",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2009",
+      "value": "97",
+      "year": "2009",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2010",
+      "value": "98.9",
+      "year": "2010",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2011",
+      "value": "100",
+      "year": "2011",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2012",
+      "value": "99.7",
+      "year": "2012",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2013",
+      "value": "100.2",
+      "year": "2013",
+      "sourceDataset": "PRDY"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "1997 Q1",
+      "value": "81.4",
+      "year": "1997",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1997 Q2",
+      "value": "81.7",
+      "year": "1997",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1997 Q3",
+      "value": "82",
+      "year": "1997",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1997 Q4",
+      "value": "83.1",
+      "year": "1997",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1998 Q1",
+      "value": "83.7",
+      "year": "1998",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1998 Q2",
+      "value": "84.3",
+      "year": "1998",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1998 Q3",
+      "value": "84.4",
+      "year": "1998",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1998 Q4",
+      "value": "85",
+      "year": "1998",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1999 Q1",
+      "value": "85.2",
+      "year": "1999",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1999 Q2",
+      "value": "85.1",
+      "year": "1999",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1999 Q3",
+      "value": "86.2",
+      "year": "1999",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "1999 Q4",
+      "value": "87.1",
+      "year": "1999",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2000 Q1",
+      "value": "87.8",
+      "year": "2000",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2000 Q2",
+      "value": "88.3",
+      "year": "2000",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2000 Q3",
+      "value": "88.5",
+      "year": "2000",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2000 Q4",
+      "value": "88.9",
+      "year": "2000",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2001 Q1",
+      "value": "89.7",
+      "year": "2001",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2001 Q2",
+      "value": "89.7",
+      "year": "2001",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2001 Q3",
+      "value": "90.1",
+      "year": "2001",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2001 Q4",
+      "value": "90",
+      "year": "2001",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2002 Q1",
+      "value": "90.5",
+      "year": "2002",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2002 Q2",
+      "value": "90.6",
+      "year": "2002",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2002 Q3",
+      "value": "91.3",
+      "year": "2002",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2002 Q4",
+      "value": "91.8",
+      "year": "2002",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2003 Q1",
+      "value": "92.7",
+      "year": "2003",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2003 Q2",
+      "value": "93.8",
+      "year": "2003",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2003 Q3",
+      "value": "94.9",
+      "year": "2003",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2003 Q4",
+      "value": "95.9",
+      "year": "2003",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2004 Q1",
+      "value": "95.5",
+      "year": "2004",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2004 Q2",
+      "value": "95.7",
+      "year": "2004",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2004 Q3",
+      "value": "95.5",
+      "year": "2004",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2004 Q4",
+      "value": "95.5",
+      "year": "2004",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2005 Q1",
+      "value": "96",
+      "year": "2005",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2005 Q2",
+      "value": "97",
+      "year": "2005",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2005 Q3",
+      "value": "97.6",
+      "year": "2005",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2005 Q4",
+      "value": "99.4",
+      "year": "2005",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2006 Q1",
+      "value": "99.4",
+      "year": "2006",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "99.4",
+      "year": "2006",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "99.3",
+      "year": "2006",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "100",
+      "year": "2006",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "100.7",
+      "year": "2007",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "100.8",
+      "year": "2007",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "101.3",
+      "year": "2007",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "101.4",
+      "year": "2007",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "101.4",
+      "year": "2008",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "100.9",
+      "year": "2008",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "99.9",
+      "year": "2008",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "98",
+      "year": "2008",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "96.4",
+      "year": "2009",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "97.1",
+      "year": "2009",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "97.1",
+      "year": "2009",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "97.4",
+      "year": "2009",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "98.6",
+      "year": "2010",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "98.8",
+      "year": "2010",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "99",
+      "year": "2010",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "99.2",
+      "year": "2010",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "99.2",
+      "year": "2011",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "99.5",
+      "year": "2011",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "100.7",
+      "year": "2011",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "100.7",
+      "year": "2011",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "100.3",
+      "year": "2012",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "99.5",
+      "year": "2012",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "100",
+      "year": "2012",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "99",
+      "year": "2012",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "99.9",
+      "year": "2013",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "100.1",
+      "year": "2013",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "100.3",
+      "year": "2013",
+      "quarter": "Q3",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "100.3",
+      "year": "2013",
+      "quarter": "Q4",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "100.2",
+      "year": "2014",
+      "quarter": "Q1",
+      "sourceDataset": "PRDY"
+    },
+    {
+      "date": "2014 Q2",
+      "value": "100.4",
+      "year": "2014",
+      "quarter": "Q2",
+      "sourceDataset": "PRDY"
+    }
+  ],
+  "months": [],
+  "relatedBulletins": [
+    "/employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivityq12014"
+  ],
+  "relatedTimeseries": [
+    "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/a4ym",
+    "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lzvb"
+  ],
+  "sourceDatasets": [
+    "PRDY"
+  ],
+  "type": "timeseries",
+  "name": "Output per job",
+  "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lnnn",
+  "fileName": "lnnn",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Employment and Labour market",
+      "fileName": "employmentandlabourmarket"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People in work",
+      "fileName": "peopleinwork"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Labour productivity",
+      "fileName": "labourproductivity",
+      "breadcrumb": []
+    }
+  ]
+}

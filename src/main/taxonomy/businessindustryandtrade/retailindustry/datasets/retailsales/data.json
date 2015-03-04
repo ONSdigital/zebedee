@@ -1,0 +1,88 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Retail sales",
+      "cdids": [
+        "J5C4",
+        "J468",
+        "EAQW",
+        "EAQY",
+        "EAQX",
+        "EARA",
+        "EARB",
+        "EAQZ",
+        "J5BI",
+        "JO2G",
+        "J5BS",
+        "J3MK",
+        "IDIF",
+        "IDIG",
+        "IDIE",
+        "IDIK",
+        "IDIL",
+        "IDIH",
+        "J5B2",
+        "JO3E",
+        "J5EK",
+        "J467",
+        "EAPT",
+        "EAPV",
+        "EAPU",
+        "EAPX",
+        "EAPY",
+        "EAPW",
+        "J5DZ",
+        "JO5A",
+        "J5EB",
+        "J45U",
+        "IDOB",
+        "IDOC",
+        "IDOA",
+        "IDOG",
+        "IDOH",
+        "IDOD",
+        "J5DK",
+        "JO4C"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "Value of retail sales index and percentage change",
+  "nationalStatistic": true,
+  "description": "Value of retail sales index and percentage change on same month a year earlier. Seasonally and not seasonally adjusted values.",
+  "title": "Retail sales",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Retail sales",
+  "uri": "/businessindustryandtrade/retailindustry/datasets/retailsales",
+  "fileName": "retailsales",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Retail industry",
+      "fileName": "retailindustry",
+      "breadcrumb": []
+    }
+  ]
+}

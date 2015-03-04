@@ -1,0 +1,26 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Household expenditure data can be broken down into twelve key headline areas, ranging from housing, fuel and power to clothing and footwear and alcoholic drinks, tobacco and narcotics. This data comes from the Living Costs and Food survey (LCF) which asks a sample of households to keep a diary of their costs over a period of time. This data gives us a headline figure of average weekly household spending.",
+  "articles": [],
+  "bulletins": [],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Housing expenditure",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure/datasets/housingexpenditure"
+    }
+  ],
+  "type": "release",
+  "name": "Expenditure",
+  "fileName": "expenditure"
+}

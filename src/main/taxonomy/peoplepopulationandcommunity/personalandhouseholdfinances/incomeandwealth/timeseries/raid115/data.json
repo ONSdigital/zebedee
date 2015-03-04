@@ -1,0 +1,52 @@
+{
+  "cdid": "RAID115",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "32100",
+  "unit": "",
+  "preUnit": "£",
+  "date": "2010-12",
+  "source": "Office for National Statistics",
+  "nationalStatistic": true,
+  "years": [
+    {
+      "date": "2010-12",
+      "value": "32100",
+      "year": "12"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012"
+  ],
+  "relatedTimeseries": [
+    "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid116"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "Median household income",
+  "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115",
+  "fileName": "raid115",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Personal and household finances",
+      "fileName": "personalandhouseholdfinances"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Income and wealth",
+      "fileName": "incomeandwealth",
+      "breadcrumb": []
+    }
+  ]
+}

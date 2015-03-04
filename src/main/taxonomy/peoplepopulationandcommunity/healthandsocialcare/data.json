@@ -1,0 +1,75 @@
+{
+  "sections": [
+    {
+      "name": "Disability",
+      "link": "disability",
+      "index": 0,
+      "items": [
+        {
+          "name": "Day-to-day activities limited a lot (UK)",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid95"
+        },
+        {
+          "name": "Day-to-day activities limited a little (UK)",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid96"
+        },
+        {
+          "name": "Day-to-day activities not limited (UK)",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid97"
+        }
+      ]
+    },
+    {
+      "name": "Drug use, alcohol and smoking",
+      "link": "drugusealcoholandsmoking",
+      "index": 1,
+      "items": [
+        {
+          "name": "Deaths from drug-related poisoning",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98"
+        },
+        {
+          "name": "Deaths from drug misuse",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid99"
+        },
+        {
+          "name": "Alcohol-related deaths",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid100"
+        }
+      ]
+    },
+    {
+      "name": "Conditions and diseases",
+      "link": "conditionsanddiseases",
+      "index": 2,
+      "items": [
+        {
+          "name": "Number of newly diagnosed cancers",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid89"
+        },
+        {
+          "name": "Deaths from MRSA",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid92"
+        },
+        {
+          "name": "Deaths Involving Clostridium difficile",
+          "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid93"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 2,
+  "lede": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
+  "type": "home",
+  "name": "Health and social care",
+  "fileName": "healthandsocialcare",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

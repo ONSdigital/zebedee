@@ -1,0 +1,41 @@
+{
+  "cdid": "RAID4",
+  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
+  "number": "1862095",
+  "unit": "",
+  "preUnit": "",
+  "date": "2013",
+  "source": "Office for National Statistics",
+  "keyNote": "Number of VAT and/or PAYE based enterprises",
+  "nationalStatistic": true,
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "relatedBulletins": [
+    "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013"
+  ],
+  "relatedTimeseries": [
+    "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid2"
+  ],
+  "sourceDatasets": [],
+  "type": "timeseries",
+  "name": "England businesses",
+  "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid4",
+  "fileName": "raid4",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business activity, size and location",
+      "fileName": "businessactivitysizeandlocation",
+      "breadcrumb": []
+    }
+  ]
+}

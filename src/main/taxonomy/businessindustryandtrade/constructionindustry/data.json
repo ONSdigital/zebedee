@@ -1,0 +1,70 @@
+{
+  "headline": {
+    "name": "Value of construction output  - all new work",
+    "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid9"
+  },
+  "items": [
+    {
+      "name": "Value of construction output  - all new work",
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid9"
+    },
+    {
+      "name": "Value of construction output - all work",
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid10"
+    },
+    {
+      "name": "Value of construction output - repair and maintenance",
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid11"
+    },
+    {
+      "name": "Construction output - all new work",
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid12"
+    },
+    {
+      "name": "Construction output - all work",
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid13"
+    },
+    {
+      "name": "Construction output - repair and maintenance",
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid14"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Construction output at current price and chained volume measures seasonally adjusted by public and private sector.",
+    "name": "Output in the Construction Industry, June and Q2 2014",
+    "uri": "/businessindustryandtrade/constructionindustry/bulletins/outputintheconstructionindustryjuneandq22014"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Construction output at current price and chained volume measures seasonally adjusted by public and private sector.",
+      "name": "Output in the Construction Industry, June and Q2 2014",
+      "uri": "/businessindustryandtrade/constructionindustry/bulletins/outputintheconstructionindustryjuneandq22014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "name": "Construction - All work summary",
+      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionallworksummary"
+    },
+    {
+      "summary": "Range of construction figures by sector and region",
+      "name": "Construction output",
+      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionoutput"
+    }
+  ],
+  "level": "t3",
+  "index": 3,
+  "lede": "The construction industry includes businesses that are involved with the construction of entirely new buildings or the repair, alterations or additions to existing properties. Also included are businesses involved in civil engineering projects. Output of the construction industry is defined as the amount charged by construction companies to customers for the value of work produced in a given period. Users of data on the construction industry include central government departments, Eurostat and various industry analysts.",
+  "type": "home",
+  "name": "Construction industry",
+  "fileName": "constructionindustry",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Business, industry and trade",
+      "fileName": "businessindustryandtrade"
+    }
+  ]
+}

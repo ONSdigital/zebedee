@@ -1,0 +1,48 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/environmental/uk-environmental-accounts/2014/rft-ghg-emissions.xls",
+      "csv": "#"
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "By Economic Sector and Gas, United Kingdom",
+  "nationalStatistic": true,
+  "description": "Emissions of carbon dioxide, methane, nitrous oxide, hydro-fluorocarbons, perfluorocarbons, sulphur hexaflouride, and total greenhouse gas emissions.",
+  "title": "Atmospheric Emissions: Greenhouse Gas Emissions",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Atmospheric Emissions: Greenhouse Gas Emissions",
+  "uri": "/economy/environmentalaccounts/datasets/atmosphericemissionsgreenhousegasemissions",
+  "fileName": "atmosphericemissionsgreenhousegasemissions",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Environmental accounts",
+      "fileName": "environmentalaccounts",
+      "breadcrumb": []
+    }
+  ]
+}

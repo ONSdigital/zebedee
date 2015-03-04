@@ -1,0 +1,71 @@
+{
+  "sections": [
+    {
+      "name": "Debt",
+      "link": "debt",
+      "index": 0,
+      "items": [
+        {
+          "name": "Total household debt",
+          "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid109"
+        },
+        {
+          "name": "Financial debt",
+          "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid110"
+        },
+        {
+          "name": "Property debt",
+          "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid111"
+        },
+        {
+          "name": "Median household financial debt",
+          "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid112"
+        },
+        {
+          "name": "Median household property debt",
+          "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid113"
+        }
+      ]
+    },
+    {
+      "name": "Expenditure",
+      "link": "expenditure",
+      "index": 1,
+      "items": [
+        {
+          "name": "Average total housing expenditure",
+          "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure/timeseries/raid114"
+        }
+      ]
+    },
+    {
+      "name": "Income and wealth",
+      "link": "incomeandwealth",
+      "index": 2,
+      "items": [
+        {
+          "name": "Median household income",
+          "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115"
+        },
+        {
+          "name": "Median household wealth",
+          "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid116"
+        }
+      ]
+    }
+  ],
+  "level": "t2",
+  "index": 6,
+  "lede": "Statistics on personal and household finances help us build a picture of how people in the UK are funding their lifestyles. Key statistics here are on household and personal debt, expenditure, income and wealth.",
+  "type": "home",
+  "name": "Personal and household finances",
+  "fileName": "personalandhouseholdfinances",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "People, population and community",
+      "fileName": "peoplepopulationandcommunity"
+    }
+  ]
+}

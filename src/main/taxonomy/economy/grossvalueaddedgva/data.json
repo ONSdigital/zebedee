@@ -1,0 +1,93 @@
+{
+  "headline": {
+    "name": "UK Gross Value Added (GVA)",
+    "uri": "/economy/grossvalueaddedgva/timeseries/abml"
+  },
+  "items": [
+    {
+      "name": "UK Gross Value Added (GVA)",
+      "uri": "/economy/grossvalueaddedgva/timeseries/abml"
+    },
+    {
+      "name": "North East Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmpw"
+    },
+    {
+      "name": "North West Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmpx"
+    },
+    {
+      "name": "Yorkshire and The Humber Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmpy"
+    },
+    {
+      "name": "East Midlands Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmpz"
+    },
+    {
+      "name": "West Midlands Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqa"
+    },
+    {
+      "name": "East of England Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/dgph"
+    },
+    {
+      "name": "London Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/dgpi"
+    },
+    {
+      "name": "South East Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/dgpj"
+    },
+    {
+      "name": "South West Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqe"
+    },
+    {
+      "name": "Wales Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqg"
+    },
+    {
+      "name": "Scotland Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqh"
+    },
+    {
+      "name": "Northern Ireland Gross Value Added",
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqi"
+    }
+  ],
+  "statsBulletinHeadline": {
+    "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
+    "name": "Regional Gross Value Added (Income Approach), December 2013",
+    "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013"
+  },
+  "statsBulletins": [
+    {
+      "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
+      "name": "Regional Gross Value Added (Income Approach), December 2013",
+      "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Economic activity as measured by Gross Value Added (GVA)",
+      "name": "Regional GVA NUTS1",
+      "uri": "/economy/grossvalueaddedgva/datasets/regionalgvanuts1"
+    }
+  ],
+  "level": "t3",
+  "index": 5,
+  "lede": "Gross Value Added (GVA) measures the contribution to the economy of each individual producer, industry or sector. In the UK it is used in the estimation of Gross Domestic Product (GDP).",
+  "type": "home",
+  "name": "Gross Value Added (GVA)",
+  "fileName": "grossvalueaddedgva",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    }
+  ]
+}

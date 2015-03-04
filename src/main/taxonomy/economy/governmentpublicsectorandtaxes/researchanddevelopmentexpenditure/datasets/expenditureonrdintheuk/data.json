@@ -1,0 +1,128 @@
+{
+  "nextRelease": "21 November 2014",
+  "contact": {
+    "name": "Jukesie",
+    "email": "jukesie@hotmail.com"
+  },
+  "lede": "This content is not available in the prototype but in future will describe this dataset.",
+  "more": "Real descriptive content will be available in the live version of this website",
+  "download": [
+    {
+      "title": "Expenditure on R\u0026D in the UK",
+      "cdids": [
+        "DMRJ",
+        "DMRK",
+        "DMRL",
+        "DMRM",
+        "DMRN",
+        "DMRO",
+        "DMRP",
+        "DMRQ",
+        "DMRR",
+        "DMRS",
+        "DMSC",
+        "DMSM",
+        "DMSN",
+        "DMSO",
+        "DMSP",
+        "DMSQ",
+        "DMSR",
+        "DMSS",
+        "DMST",
+        "DMSX",
+        "DMSY",
+        "DMSZ",
+        "GLBA",
+        "GLBB",
+        "GLBC",
+        "GLBK",
+        "GLBL",
+        "GLBM",
+        "GLBN",
+        "GLBO",
+        "GLBP",
+        "GLBQ",
+        "GLBR",
+        "GLBS",
+        "GLBT",
+        "GLBU",
+        "GLBV",
+        "GLCA",
+        "GLCB",
+        "GLCC",
+        "GLCD",
+        "GLCE",
+        "GLCF",
+        "GLCG",
+        "GLCH",
+        "GLCI",
+        "GLCJ",
+        "GLCK",
+        "GLCL",
+        "GLCM",
+        "GLCN",
+        "GLCO",
+        "GLCU",
+        "GLCV",
+        "GLCW",
+        "GLCX",
+        "GLCY",
+        "GLCZ",
+        "GLDA",
+        "GLDB",
+        "GLDC",
+        "GLDD",
+        "GLDE",
+        "GLDF",
+        "GLDG",
+        "GLDH",
+        "GLDI",
+        "GLDJ",
+        "GLDK",
+        "GLDL",
+        "GLDM",
+        "GLDN",
+        "GLDO",
+        "LLAA"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    },
+    {
+      "data": "This content is not available in the prototype but in future will provide a note about this dataset."
+    }
+  ],
+  "summary": "By performing and funding sectors",
+  "nationalStatistic": true,
+  "description": "Expenditure on R\u0026D in the UK by performing and funding sectors.",
+  "title": "Expenditure on R\u0026D in the UK",
+  "releaseDate": "19 February 2014",
+  "type": "dataset",
+  "name": "Expenditure on R\u0026D in the UK",
+  "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/datasets/expenditureonrdintheuk",
+  "fileName": "expenditureonrdintheuk",
+  "breadcrumb": [
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Economy",
+      "fileName": "economy"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Government, public sector and taxes",
+      "fileName": "governmentpublicsectorandtaxes"
+    },
+    {
+      "index": 0,
+      "type": "home",
+      "name": "Research and Development expenditure",
+      "fileName": "researchanddevelopmentexpenditure",
+      "breadcrumb": []
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "releaseDate": "21 October 2014",
+  "nextRelease": "21 January 2015",
+  "contact": {
+    "email": {
+      "name": "Jukesie",
+      "email": "jukesie@hotmail.com"
+    },
+    "organisation": "Business Prices",
+    "telephone": "+44 (0)1633 456468"
+  },
+  "lede": "Businesses in the retail industry are those which sell directly to the customer. The key statistic for the retail industry is the retail sales index (RSI). This is published on a monthly basis and the data comes from a survey sent out to retail business in Great Britain. The data in the RSI only covers spending on goods, data on spending on services can be found in the Index of Services. ",
+  "articles": [],
+  "bulletins": [
+    {
+      "summary": "A first estimate of retail sales in value and volume terms, seasonally and non-seasonally adjusted.",
+      "type": "bulletin",
+      "name": "Retail Sales, June 2014",
+      "uri": "/businessindustryandtrade/retailindustry/bulletins/retailsalesjune2014"
+    }
+  ],
+  "datasets": [
+    {
+      "summary": "Brief description of dataset",
+      "type": "dataset",
+      "name": "Value of retail sales by commodity",
+      "uri": "/businessindustryandtrade/retailindustry/datasets/valueofretailsalesbycommodity"
+    },
+    {
+      "summary": "Value of retail sales index and percentage change",
+      "type": "dataset",
+      "name": "Retail sales",
+      "uri": "/businessindustryandtrade/retailindustry/datasets/retailsales"
+    }
+  ],
+  "type": "release",
+  "name": "Retail industry",
+  "fileName": "retailindustry"
+}

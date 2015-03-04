@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
+export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"
 
 # Restolino configuration
 export RESTOLINO_STATIC="src/main/resources/files"

@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-class Taxonomy {
+public class Taxonomy {
 
-	Path path;
+	public final Path path;
 
 	Taxonomy(Path path) {
 		this.path = path;

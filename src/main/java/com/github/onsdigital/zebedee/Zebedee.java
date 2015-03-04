@@ -12,9 +12,9 @@ public class Zebedee {
 	static final String PUBLISHED = "published";
 	static final String RELEASES = "releases";
 
-	Path path;
-	Taxonomy published;
-	Path releases;
+	public final Path path;
+	public final Taxonomy published;
+	public final Path releases;
 
 	/**
 	 * Creates a new Zebedee folder in the specified parent Path.
@@ -25,7 +25,7 @@ public class Zebedee {
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	static Zebedee create(Path parent) throws IOException {
+	public static Zebedee create(Path parent) throws IOException {
 		Path path = Files.createDirectory(parent.resolve(ZEBEDEE));
 		Files.createDirectory(path.resolve(PUBLISHED));
 		Files.createDirectory(path.resolve(RELEASES));

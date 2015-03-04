@@ -29,7 +29,7 @@ public class ChangeSets {
 		if (index < 0) {
 			return list();
 		} else {
-			ChangeSet result = get(index);
+			ChangeSet result = getChangeSet(request);
 			if (result == null) {
 				response.setStatus(HttpStatus.NOT_FOUND_404);
 			}
@@ -39,8 +39,8 @@ public class ChangeSets {
 
 	@POST
 	public void create(HttpServletRequest request,
-			HttpServletResponse response, ChangeSetDescription changeSetDescription)
-			throws IOException {
+			HttpServletResponse response,
+			ChangeSetDescription changeSetDescription) throws IOException {
 		changeSetDescription.name = StringUtils.trim(changeSetDescription.name);
 		for (ChangeSet changeSet : Root.zebedee.getChangeSets()) {
 			if (StringUtils.equals(changeSet.description.name,
@@ -52,7 +52,7 @@ public class ChangeSets {
 		ChangeSet.create(changeSetDescription.name, Root.zebedee);
 	}
 
-	public List<ChangeSetDescription> list() throws IOException {
+	List<ChangeSetDescription> list() throws IOException {
 		List<ChangeSetDescription> result = new ArrayList<>();
 
 		List<ChangeSet> changeSets = Root.zebedee.getChangeSets();
@@ -63,12 +63,17 @@ public class ChangeSets {
 		return result;
 	}
 
-	public ChangeSet get(int index) throws IOException {
+	static ChangeSet getChangeSet(HttpServletRequest request)
+			throws IOException {
 		ChangeSet result = null;
 
-		List<ChangeSet> changeSets = Root.zebedee.getChangeSets();
-		if (index < changeSets.size()) {
-			result = changeSets.get(index);
+		Path path = Path.newInstance(request);
+		int index = Parameter.getId(path);
+		if (index >= 0) {
+			List<ChangeSet> changeSets = Root.zebedee.getChangeSets();
+			if (index < changeSets.size()) {
+				result = changeSets.get(index);
+			}
 		}
 
 		return result;

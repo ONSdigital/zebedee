@@ -10,9 +10,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.github.davidcarboni.restolino.framework.Startup;
+import com.github.onsdigital.zebedee.Taxonomy;
 import com.github.onsdigital.zebedee.Zebedee;
 
 public class Root implements Startup {
@@ -26,6 +28,7 @@ public class Root implements Startup {
 
 			// Create a Zebedee folder:
 			root = Files.createTempDirectory("zebedee");
+			zebedee = Zebedee.create(root);
 
 			// List the taxonomy files:
 			// ResourceUtils.classLoaderClass = Root.class;
@@ -36,7 +39,8 @@ public class Root implements Startup {
 
 			// Extract the content:
 			for (Path source : files) {
-				Path destination = root.resolve(source.toString());
+				Path destination = zebedee.published.path.resolve(source
+						.toString());
 				Files.createDirectories(destination.getParent());
 				try (InputStream input = Files.newInputStream(source);
 						OutputStream output = Files
@@ -51,52 +55,6 @@ public class Root implements Startup {
 			e.printStackTrace();
 		}
 	}
-
-	// public static void main(String[] args) throws IOException,
-	// URISyntaxException {
-	//
-	// CodeSource src = Root.class.getProtectionDomain().getCodeSource();
-	// if (src != null) {
-	// URL url = src.getLocation();
-	// URI uri = url.toURI();
-	// Path path = Paths.get(uri);
-	// if (StringUtils.endsWithIgnoreCase(uri.getPath(), ".jar")) {
-	// uri = URI.create("jar:file:" + path);
-	// FileSystem fileSystem = FileSystems.newFileSystem(uri,
-	// new HashMap<String, Object>());
-	// path = fileSystem.getPath("/");
-	// }
-	// List<Path> files = new ArrayList<>();
-	// listFiles(path, path, files);
-	// for (Path file : files) {
-	// System.out.println(file);
-	// }
-	//
-	// path = ResourceUtils.getPath("/com");
-	// files.clear();
-	// listFiles(path, path, files);
-	// for (Path file : files) {
-	// System.out.println(file);
-	// }
-	//
-	// // ZipInputStream zip = new ZipInputStream(jar.openStream());
-	// // while (true) {
-	// // ZipEntry e = zip.getNextEntry();
-	// // if (e == null) {
-	// // break;
-	// // }
-	// // String name = e.getName();
-	// // System.out.println(name);
-	// // if (name.startsWith("path/to/your/dir/")) {
-	// // /* Do something with this entry. */
-	// // // ...
-	// // }
-	// // }
-	//
-	// } else {
-	// /* Fail... */
-	// }
-	// }
 
 	/**
 	 * Recursively lists all files within this {@link Taxonomy}.
@@ -121,4 +79,20 @@ public class Root implements Startup {
 			}
 		}
 	}
+
+	/**
+	 * Cleans up
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		System.out.println(" - Deleting Zebeddee at: " + root);
+		try {
+			FileUtils.deleteDirectory(root.toFile());
+			System.out.println(" - Deleting Zebeddee complete: " + root);
+		} catch (Throwable t) {
+			System.out.println(" - Error deleting Zebedee: ");
+			System.out.println(t.getStackTrace());
+		}
+	}
+
 }

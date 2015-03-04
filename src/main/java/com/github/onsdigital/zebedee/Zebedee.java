@@ -99,12 +99,40 @@ public class Zebedee {
 			return false;
 		}
 
+		// Move each item of content:
 		for (String uri : changeSet.approved.uris()) {
 			Path source = changeSet.approved.get(uri);
 			Path destination = published.toPath(uri);
 			PathUtils.move(source, destination);
 		}
+
+		// Delete the folders:
+		delete(changeSet.path);
+
 		return true;
+	}
+
+	/**
+	 * Deletes a change set folder structure. This method only deletes folders
+	 * and will throw an exception if any of the folders aren't empty. This
+	 * ensures that only a release that has been published can be deleted.
+	 * 
+	 * @param path
+	 *            The {@link Path} to the change set folder.
+	 * @throws IOException
+	 *             If any of the subfolders is not empty or if a filesystem
+	 *             error occurs.
+	 */
+	private void delete(Path path) throws IOException {
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+			for (Path directory : stream) {
+				// Recursively delete directories only:
+				if (Files.isDirectory(directory)) {
+					delete(directory);
+				}
+			}
+		}
+		Files.delete(path);
 	}
 
 }

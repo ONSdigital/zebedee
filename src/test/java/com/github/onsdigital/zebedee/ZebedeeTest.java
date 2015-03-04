@@ -155,4 +155,23 @@ public class ZebedeeTest {
 		assertFalse(Files.exists(publishedPath.resolve(uri.substring(1))));
 	}
 
+	@Test
+	public void shouldDeleteChangeSetAfterPublish() throws IOException {
+
+		// Given
+		// There is content ready to be published:
+		Zebedee zebedee = new Zebedee(expectedPath);
+		ChangeSet release = new ChangeSet(builder.changeSets.get(1), zebedee);
+		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
+		builder.isApproved(uri);
+
+		// When
+		zebedee.publish(release);
+
+		// Then
+		// The release folder should have been deleted:
+		Path releaseFolder = builder.changeSets.get(1);
+		assertFalse(Files.exists(releaseFolder));
+	}
+
 }

@@ -15,7 +15,8 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Parameter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.onsdigital.zebedee.ChangeSet;
-import com.github.onsdigital.zebedee.ChangeSetDescription;
+import com.github.onsdigital.zebedee.json.ChangeSetDescription;
+import com.github.onsdigital.zebedee.json.Item;
 
 @Api
 public class Edit {

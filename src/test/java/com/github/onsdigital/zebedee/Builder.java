@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.json.ChangeSetDescription;
 
 /**
  * This is a utility class to build a known {@link Zebedee} structure for

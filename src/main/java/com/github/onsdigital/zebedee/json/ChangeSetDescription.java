@@ -1,4 +1,6 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.json;
+
+import com.github.onsdigital.zebedee.ChangeSet;
 
 /**
  * This cd ..

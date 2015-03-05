@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.json.ChangeSetDescription;
 
 public class ChangeSet {
 	static final String APPROVED = "approved";

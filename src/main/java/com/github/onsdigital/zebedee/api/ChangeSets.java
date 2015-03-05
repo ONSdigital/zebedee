@@ -68,7 +68,15 @@ public class ChangeSets {
 		ChangeSet result = null;
 
 		Path path = Path.newInstance(request);
-		int index = Parameter.getId(path);
+		List<String> segments = path.segments();
+		int index = -1;
+		if (segments.size() > 1) {
+			Parameter.toInt(segments.get(1));
+		}
+		for (String segment : path.segments()) {
+			System.out.println(" - " + segment);
+		}
+
 		if (index >= 0) {
 			List<ChangeSet> changeSets = Root.zebedee.getChangeSets();
 			if (index < changeSets.size()) {

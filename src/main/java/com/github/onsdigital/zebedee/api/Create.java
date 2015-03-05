@@ -13,20 +13,20 @@ import com.github.onsdigital.zebedee.ChangeSet;
 import com.github.onsdigital.zebedee.json.Item;
 
 @Api
-public class Edit {
+public class Create {
 
 	/**
-	 * Opens an existing item for editing.
+	 * Creates a new item.
 	 * 
 	 * @param request
 	 * @param response
 	 * @param item
-	 *            The URI of the item to be edited.
-	 * @return If the item was successfully opened for editing, true.
+	 *            The URI of the item to create.
+	 * @return If the item was successfully created, true.
 	 * @throws IOException
 	 */
 	@POST
-	public boolean edit(HttpServletRequest request,
+	public boolean create(HttpServletRequest request,
 			HttpServletResponse response, Item item) throws IOException {
 		boolean result;
 

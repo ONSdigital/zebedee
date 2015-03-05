@@ -209,7 +209,7 @@ public class ChangeSet {
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	boolean edit(String uri) throws IOException {
+	public boolean edit(String uri) throws IOException {
 		boolean result = false;
 
 		Path source = find(uri);

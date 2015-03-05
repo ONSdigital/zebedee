@@ -92,6 +92,13 @@ public class Zebedee {
 		return result;
 	}
 
+	public Path find(String uri) throws IOException {
+
+		// There's currently only one place to look for content.
+		// We may add one or more staging layers later.
+		return published.get(uri);
+	}
+
 	public boolean publish(ChangeSet changeSet) throws IOException {
 
 		// Check everything has been approved:

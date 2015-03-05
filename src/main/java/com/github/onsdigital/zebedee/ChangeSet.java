@@ -102,7 +102,7 @@ public class ChangeSet {
 	 * @return The {@link #inProgress} path, otherwise the {@link #approved}
 	 *         path, otherwise the existing published path, otherwise null.
 	 */
-	Path find(String uri) {
+	public Path find(String uri) {
 		Path result = inProgress.get(uri);
 		if (result == null) {
 			result = approved.get(uri);

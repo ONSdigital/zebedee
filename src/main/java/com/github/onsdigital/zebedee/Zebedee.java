@@ -10,11 +10,11 @@ import java.util.List;
 public class Zebedee {
 	static final String ZEBEDEE = "zebedee";
 	static final String PUBLISHED = "published";
-	static final String CHANGE_SETS = "changeSets";
+	static final String COLLECTIONS = "collections";
 
 	public final Path path;
 	public final Content published;
-	public final Path changeSets;
+	public final Path collections;
 
 	/**
 	 * Creates a new Zebedee folder in the specified parent Path.
@@ -28,7 +28,7 @@ public class Zebedee {
 	public static Zebedee create(Path parent) throws IOException {
 		Path path = Files.createDirectory(parent.resolve(ZEBEDEE));
 		Files.createDirectory(path.resolve(PUBLISHED));
-		Files.createDirectory(path.resolve(CHANGE_SETS));
+		Files.createDirectory(path.resolve(COLLECTIONS));
 		return new Zebedee(path);
 	}
 
@@ -37,18 +37,18 @@ public class Zebedee {
 		// Validate the directory:
 		this.path = path;
 		Path published = path.resolve(PUBLISHED);
-		Path changeSetst = path.resolve(CHANGE_SETS);
-		if (!Files.exists(published) || !Files.exists(changeSetst)) {
+		Path collections = path.resolve(COLLECTIONS);
+		if (!Files.exists(published) || !Files.exists(collections)) {
 			throw new IllegalArgumentException(
-					"This folder doesn't look like a change set folder: "
+					"This folder doesn't look like a collection folder: "
 							+ path.toAbsolutePath());
 		}
 		this.published = new Content(published);
-		this.changeSets = changeSetst;
+		this.collections = collections;
 	}
 
 	/**
-	 * This method works out how many {@link ChangeSet}s contain the given URI.
+	 * This method works out how many {@link Collection}s contain the given URI.
 	 * The intention is to allow double-checking in case of concurrent editing.
 	 * This should be 0 in order for someone to be allowed to edit a URI and
 	 * should be 1 after editing is initiated. If this returns more than 1 after
@@ -57,15 +57,15 @@ public class Zebedee {
 	 * 
 	 * @param uri
 	 *            The URI to check.
-	 * @return The number of {@link ChangeSet}s containing the given URI.
+	 * @return The number of {@link Collection}s containing the given URI.
 	 * @throws IOException
 	 */
 	public int isBeingEdited(String uri) throws IOException {
 		int result = 0;
 
 		// Is this URI present anywhere else?
-		for (ChangeSet changeSet : getChangeSets()) {
-			if (changeSet.isInChangeSet(uri)) {
+		for (Collection collection : getCollections()) {
+			if (collection.isInCollection(uri)) {
 				result++;
 			}
 		}
@@ -75,17 +75,17 @@ public class Zebedee {
 
 	/**
 	 * 
-	 * @return A list of all {@link ChangeSet}s.
+	 * @return A list of all {@link Collection}s.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	public List<ChangeSet> getChangeSets() throws IOException {
-		List<ChangeSet> result = new ArrayList<>();
+	public List<Collection> getCollections() throws IOException {
+		List<Collection> result = new ArrayList<>();
 		try (DirectoryStream<Path> stream = Files
-				.newDirectoryStream(changeSets)) {
+				.newDirectoryStream(collections)) {
 			for (Path path : stream) {
 				if (Files.isDirectory(path)) {
-					result.add(new ChangeSet(path, this));
+					result.add(new Collection(path, this));
 				}
 			}
 		}
@@ -99,33 +99,33 @@ public class Zebedee {
 		return published.get(uri);
 	}
 
-	public boolean publish(ChangeSet changeSet) throws IOException {
+	public boolean publish(Collection collection) throws IOException {
 
 		// Check everything has been approved:
-		if (changeSet.inProgress.uris().size() > 0) {
+		if (collection.inProgress.uris().size() > 0) {
 			return false;
 		}
 
 		// Move each item of content:
-		for (String uri : changeSet.approved.uris()) {
-			Path source = changeSet.approved.get(uri);
+		for (String uri : collection.approved.uris()) {
+			Path source = collection.approved.get(uri);
 			Path destination = published.toPath(uri);
 			PathUtils.move(source, destination);
 		}
 
 		// Delete the folders:
-		delete(changeSet.path);
+		delete(collection.path);
 
 		return true;
 	}
 
 	/**
-	 * Deletes a change set folder structure. This method only deletes folders
+	 * Deletes a collection folder structure. This method only deletes folders
 	 * and will throw an exception if any of the folders aren't empty. This
 	 * ensures that only a release that has been published can be deleted.
 	 * 
 	 * @param path
-	 *            The {@link Path} to the change set folder.
+	 *            The {@link Path} to the collection folder.
 	 * @throws IOException
 	 *             If any of the subfolders is not empty or if a filesystem
 	 *             error occurs.

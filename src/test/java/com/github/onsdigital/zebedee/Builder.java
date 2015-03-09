@@ -10,7 +10,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.json.ChangeSetDescription;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 /**
  * This is a utility class to build a known {@link Zebedee} structure for
@@ -21,10 +21,10 @@ import com.github.onsdigital.zebedee.json.ChangeSetDescription;
  */
 public class Builder {
 
-	String[] changeSetNames = { "Inflation Q2 2015", "Labour Market Q2 2015" };
+	String[] collectionNames = { "Inflation Q2 2015", "Labour Market Q2 2015" };
 	Path parent;
 	Path zebedee;
-	List<Path> changeSets;
+	List<Path> collections;
 	List<String> contentUris;
 
 	Builder(Class<?> name) throws IOException {
@@ -33,11 +33,11 @@ public class Builder {
 		parent = Files.createTempDirectory(name.getSimpleName());
 		zebedee = createZebedee(parent);
 
-		// Create the change sets:
-		changeSets = new ArrayList<>();
-		for (String changeSetName : changeSetNames) {
-			Path changeSet = createChangeSet(changeSetName, zebedee);
-			changeSets.add(changeSet);
+		// Create the collections:
+		collections = new ArrayList<>();
+		for (String collectionName : collectionNames) {
+			Path collection = createCollection(collectionName, zebedee);
+			collections.add(collection);
 		}
 
 		// Create some published content:
@@ -91,25 +91,26 @@ public class Builder {
 	 */
 	void isApproved(String uri) throws IOException {
 
-		Path approved = changeSets.get(1).resolve(ChangeSet.APPROVED);
+		Path approved = collections.get(1).resolve(Collection.APPROVED);
 		Path content = approved.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
 	}
 
 	/**
-	 * Creates an approved file in a different {@link ChangeSet}.
+	 * Creates an approved file in a different {@link Collection}.
 	 * 
 	 * @param uri
 	 *            The URI to be created.
-	 * @param changeSet
-	 *            The {@link ChangeSet} in which to create the content.
+	 * @param collection
+	 *            The {@link Collection} in which to create the content.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	void isBeingEditedElsewhere(String uri, int changeSet) throws IOException {
+	void isBeingEditedElsewhere(String uri, int collection) throws IOException {
 
-		Path approved = changeSets.get(changeSet).resolve(ChangeSet.APPROVED);
+		Path approved = collections.get(collection)
+				.resolve(Collection.APPROVED);
 		Path content = approved.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
@@ -125,7 +126,7 @@ public class Builder {
 	 */
 	void isInProgress(String uri) throws IOException {
 
-		Path inProgress = changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = collections.get(1).resolve(Collection.IN_PROGRESS);
 		Path content = inProgress.resolve(uri.substring(1));
 		Files.createDirectories(content.getParent());
 		Files.createFile(content);
@@ -147,45 +148,45 @@ public class Builder {
 	private Path createZebedee(Path parent) throws IOException {
 		Path path = Files.createDirectory(parent.resolve(Zebedee.ZEBEDEE));
 		Files.createDirectory(path.resolve(Zebedee.PUBLISHED));
-		Files.createDirectory(path.resolve(Zebedee.CHANGE_SETS));
+		Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
 		return path;
 	}
 
 	/**
 	 * This method creates the expected set of folders for a Zebedee structure.
 	 * This code is intentionaly copied from
-	 * {@link ChangeSet#create(String, Zebedee)}. This ensures there's a fixed
+	 * {@link Collection#create(String, Zebedee)}. This ensures there's a fixed
 	 * expectation, rather than relying on a method that will be tested as part
 	 * of the test suite.
 	 * 
 	 * @param root
 	 *            The root of the {@link Zebedee} structure
 	 * @param name
-	 *            The name of the {@link ChangeSet}.
-	 * @return The root {@link ChangeSet} path.
+	 *            The name of the {@link Collection}.
+	 * @return The root {@link Collection} path.
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	private Path createChangeSet(String name, Path root) throws IOException {
+	private Path createCollection(String name, Path root) throws IOException {
 
 		String filename = PathUtils.toFilename(name);
-		Path changeSets = root.resolve(Zebedee.CHANGE_SETS);
+		Path collections = root.resolve(Zebedee.COLLECTIONS);
 
 		// Create the folders:
-		Path changeSet = changeSets.resolve(filename);
-		Files.createDirectory(changeSet);
-		Files.createDirectory(changeSet.resolve(ChangeSet.APPROVED));
-		Files.createDirectory(changeSet.resolve(ChangeSet.IN_PROGRESS));
+		Path collection = collections.resolve(filename);
+		Files.createDirectory(collection);
+		Files.createDirectory(collection.resolve(Collection.APPROVED));
+		Files.createDirectory(collection.resolve(Collection.IN_PROGRESS));
 
 		// Create the description:
-		Path changeSetDescription = changeSets.resolve(filename + ".json");
-		ChangeSetDescription description = new ChangeSetDescription();
+		Path collectionDescription = collections.resolve(filename + ".json");
+		CollectionDescription description = new CollectionDescription();
 		description.name = name;
-		try (OutputStream output = Files.newOutputStream(changeSetDescription)) {
+		try (OutputStream output = Files.newOutputStream(collectionDescription)) {
 			Serialiser.serialise(output, description);
 		}
 
-		return changeSet;
+		return collection;
 	}
 
 }

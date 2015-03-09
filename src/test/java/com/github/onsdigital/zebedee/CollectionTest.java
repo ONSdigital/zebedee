@@ -14,17 +14,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ChangeSetTest {
+public class CollectionTest {
 
 	Zebedee zebedee;
-	ChangeSet changeSet;
+	Collection collection;
 	Builder builder;
 
 	@Before
 	public void setUp() throws Exception {
 		builder = new Builder(this.getClass());
 		zebedee = new Zebedee(builder.zebedee);
-		changeSet = new ChangeSet(builder.changeSets.get(1), zebedee);
+		collection = new Collection(builder.collections.get(1), zebedee);
 	}
 
 	@After
@@ -40,14 +40,14 @@ public class ChangeSetTest {
 		String name = "Population Release";
 
 		// When
-		ChangeSet.create(name, zebedee);
+		Collection.create(name, zebedee);
 
 		// Then
-		Path releasePath = builder.zebedee.resolve(Zebedee.CHANGE_SETS).resolve(
+		Path releasePath = builder.zebedee.resolve(Zebedee.COLLECTIONS).resolve(
 				PathUtils.toFilename(name));
 		assertTrue(Files.exists(releasePath));
-		assertTrue(Files.exists(releasePath.resolve(ChangeSet.APPROVED)));
-		assertTrue(Files.exists(releasePath.resolve(ChangeSet.IN_PROGRESS)));
+		assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+		assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -56,13 +56,13 @@ public class ChangeSetTest {
 		// Given
 		// A folder that isn't a valid release:
 		String name = "Population Release";
-		ChangeSet.create(name, zebedee);
-		Path releasePath = builder.zebedee.resolve(Zebedee.CHANGE_SETS).resolve(
+		Collection.create(name, zebedee);
+		Path releasePath = builder.zebedee.resolve(Zebedee.COLLECTIONS).resolve(
 				PathUtils.toFilename(name));
 		FileUtils.cleanDirectory(releasePath.toFile());
 
 		// When
-		new ChangeSet(releasePath, zebedee);
+		new Collection(releasePath, zebedee);
 
 		// Then
 		// We should get an exception.
@@ -76,11 +76,11 @@ public class ChangeSetTest {
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 
 		// When
-		boolean created = changeSet.create(uri);
+		boolean created = collection.create(uri);
 
 		// Then
 		assertTrue(created);
-		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -93,11 +93,11 @@ public class ChangeSetTest {
 		builder.isPublished(uri);
 
 		// When
-		boolean created = changeSet.create(uri);
+		boolean created = collection.create(uri);
 
 		// Then
 		assertFalse(created);
-		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 		assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -110,11 +110,11 @@ public class ChangeSetTest {
 		builder.isApproved(uri);
 
 		// When
-		boolean created = changeSet.create(uri);
+		boolean created = collection.create(uri);
 
 		// Then
 		assertFalse(created);
-		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 		assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -127,7 +127,7 @@ public class ChangeSetTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean created = changeSet.create(uri);
+		boolean created = collection.create(uri);
 
 		// Then
 		assertFalse(created);
@@ -142,11 +142,11 @@ public class ChangeSetTest {
 		builder.isPublished(uri);
 
 		// When
-		boolean edited = changeSet.edit(uri);
+		boolean edited = collection.edit(uri);
 
 		// Then
 		assertTrue(edited);
-		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -160,11 +160,11 @@ public class ChangeSetTest {
 		builder.isApproved(uri);
 
 		// When
-		boolean edited = changeSet.edit(uri);
+		boolean edited = collection.edit(uri);
 
 		// Then
 		assertTrue(edited);
-		Path inProgress = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 		assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 	}
 
@@ -177,7 +177,7 @@ public class ChangeSetTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean edited = changeSet.edit(uri);
+		boolean edited = collection.edit(uri);
 
 		// Then
 		assertFalse(edited);
@@ -192,7 +192,7 @@ public class ChangeSetTest {
 		builder.isBeingEditedElsewhere(uri, 0);
 
 		// When
-		boolean edited = changeSet.edit(uri);
+		boolean edited = collection.edit(uri);
 
 		// Then
 		assertFalse(edited);
@@ -206,7 +206,7 @@ public class ChangeSetTest {
 		String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
 
 		// When
-		boolean edited = changeSet.edit(uri);
+		boolean edited = collection.edit(uri);
 
 		// Then
 		assertFalse(edited);
@@ -223,11 +223,11 @@ public class ChangeSetTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean approved = changeSet.approve(uri);
+		boolean approved = collection.approve(uri);
 
 		// Then
 		assertTrue(approved);
-		Path edited = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 		assertFalse(Files.exists(edited.resolve(uri.substring(1))));
 	}
 
@@ -240,7 +240,7 @@ public class ChangeSetTest {
 		builder.isApproved(uri);
 
 		// When
-		boolean approved = changeSet.approve(uri);
+		boolean approved = collection.approve(uri);
 
 		// Then
 		assertFalse(approved);
@@ -256,11 +256,11 @@ public class ChangeSetTest {
 		builder.isPublished(sourceUri);
 
 		// When
-		boolean copied = changeSet.copy(sourceUri, targetUri);
+		boolean copied = collection.copy(sourceUri, targetUri);
 
 		// Then
 		assertTrue(copied);
-		Path edited = builder.changeSets.get(1).resolve(ChangeSet.IN_PROGRESS);
+		Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 		assertTrue(Files.exists(edited.resolve(targetUri.substring(1))));
 	}
 
@@ -273,7 +273,7 @@ public class ChangeSetTest {
 		String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
 
 		// When
-		boolean copied = changeSet.copy(sourceUri, targetUri);
+		boolean copied = collection.copy(sourceUri, targetUri);
 
 		// Then
 		assertFalse(copied);
@@ -289,7 +289,7 @@ public class ChangeSetTest {
 		builder.isApproved(targetUri);
 
 		// When
-		boolean copied = changeSet.copy(sourceUri, targetUri);
+		boolean copied = collection.copy(sourceUri, targetUri);
 
 		// Then
 		assertFalse(copied);
@@ -305,7 +305,7 @@ public class ChangeSetTest {
 		builder.isInProgress(targetUri);
 
 		// When
-		boolean copied = changeSet.copy(sourceUri, targetUri);
+		boolean copied = collection.copy(sourceUri, targetUri);
 
 		// Then
 		assertFalse(copied);
@@ -321,7 +321,7 @@ public class ChangeSetTest {
 		builder.isBeingEditedElsewhere(targetUri, 0);
 
 		// When
-		boolean copied = changeSet.copy(sourceUri, targetUri);
+		boolean copied = collection.copy(sourceUri, targetUri);
 
 		// Then
 		assertFalse(copied);
@@ -336,8 +336,8 @@ public class ChangeSetTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean inProgress = changeSet.isInProgress(uri);
-		boolean inRelease = changeSet.isInChangeSet(uri);
+		boolean inProgress = collection.isInProgress(uri);
+		boolean inRelease = collection.isInCollection(uri);
 
 		// Then
 		assertTrue(inProgress);
@@ -353,8 +353,8 @@ public class ChangeSetTest {
 		builder.isApproved(uri);
 
 		// When
-		boolean approved = changeSet.isApproved(uri);
-		boolean inRelease = changeSet.isInChangeSet(uri);
+		boolean approved = collection.isApproved(uri);
+		boolean inRelease = collection.isInCollection(uri);
 
 		// Then
 		assertTrue(approved);
@@ -371,8 +371,8 @@ public class ChangeSetTest {
 		builder.isInProgress(uri);
 
 		// When
-		boolean approved = changeSet.isApproved(uri);
-		boolean inRelease = changeSet.isInChangeSet(uri);
+		boolean approved = collection.isApproved(uri);
+		boolean inRelease = collection.isInCollection(uri);
 
 		// Then
 		assertFalse(approved);
@@ -391,7 +391,7 @@ public class ChangeSetTest {
 
 		// When
 		// We write some output to the content:
-		Path path = changeSet.getPath(uri);
+		Path path = collection.getPath(uri);
 		try (Writer writer = Files.newBufferedWriter(path,
 				Charset.forName("utf8"));) {
 			writer.append("test");
@@ -399,8 +399,8 @@ public class ChangeSetTest {
 
 		// Then
 		// The output should have gone to the expected copy of the file:
-		Path inProgressPath = builder.changeSets.get(1).resolve(
-				ChangeSet.IN_PROGRESS);
+		Path inProgressPath = builder.collections.get(1).resolve(
+				Collection.IN_PROGRESS);
 		Path expectedPath = inProgressPath.resolve(uri.substring(1));
 		assertTrue(Files.size(expectedPath) > 0);
 	}

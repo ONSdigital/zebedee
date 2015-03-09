@@ -9,7 +9,7 @@ import javax.ws.rs.POST;
 import org.eclipse.jetty.http.HttpStatus;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.ChangeSet;
+import com.github.onsdigital.zebedee.Collection;
 import com.github.onsdigital.zebedee.json.Item;
 
 @Api
@@ -30,15 +30,15 @@ public class Create {
 			HttpServletResponse response, Item item) throws IOException {
 		boolean result;
 
-		// Locate the change set:
-		ChangeSet changeSet = ChangeSets.getChangeSet(request);
-		if (changeSet == null) {
+		// Locate the collection:
+		Collection collection = Collections.getCollection(request);
+		if (collection == null) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			result = false;
 		}
 
 		// Open the item for editing:
-		result = changeSet.edit(item.uri);
+		result = collection.edit(item.uri);
 		if (!result) {
 			response.setStatus(HttpStatus.BAD_REQUEST_400);
 		}

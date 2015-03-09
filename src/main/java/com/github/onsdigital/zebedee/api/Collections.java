@@ -15,11 +15,11 @@ import org.eclipse.jetty.http.HttpStatus;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Parameter;
 import com.github.davidcarboni.restolino.helpers.Path;
-import com.github.onsdigital.zebedee.ChangeSet;
-import com.github.onsdigital.zebedee.json.ChangeSetDescription;
+import com.github.onsdigital.zebedee.Collection;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 @Api
-public class ChangeSets {
+public class Collections {
 
 	@GET
 	public Object get(HttpServletRequest request, HttpServletResponse response)
@@ -29,7 +29,7 @@ public class ChangeSets {
 		if (index < 0) {
 			return list();
 		} else {
-			ChangeSet result = getChangeSet(request);
+			Collection result = getCollection(request);
 			if (result == null) {
 				response.setStatus(HttpStatus.NOT_FOUND_404);
 			}
@@ -40,32 +40,32 @@ public class ChangeSets {
 	@POST
 	public void create(HttpServletRequest request,
 			HttpServletResponse response,
-			ChangeSetDescription changeSetDescription) throws IOException {
-		changeSetDescription.name = StringUtils.trim(changeSetDescription.name);
-		for (ChangeSet changeSet : Root.zebedee.getChangeSets()) {
-			if (StringUtils.equals(changeSet.description.name,
-					changeSetDescription.name)) {
+			CollectionDescription collectionDescription) throws IOException {
+		collectionDescription.name = StringUtils.trim(collectionDescription.name);
+		for (Collection collection : Root.zebedee.getCollections()) {
+			if (StringUtils.equals(collection.description.name,
+					collectionDescription.name)) {
 				response.setStatus(HttpStatus.CONFLICT_409);
 				return;
 			}
 		}
-		ChangeSet.create(changeSetDescription.name, Root.zebedee);
+		Collection.create(collectionDescription.name, Root.zebedee);
 	}
 
-	List<ChangeSetDescription> list() throws IOException {
-		List<ChangeSetDescription> result = new ArrayList<>();
+	List<CollectionDescription> list() throws IOException {
+		List<CollectionDescription> result = new ArrayList<>();
 
-		List<ChangeSet> changeSets = Root.zebedee.getChangeSets();
-		for (ChangeSet changeSet : changeSets) {
-			result.add(changeSet.description);
+		List<Collection> collections = Root.zebedee.getCollections();
+		for (Collection collection : collections) {
+			result.add(collection.description);
 		}
 
 		return result;
 	}
 
-	static ChangeSet getChangeSet(HttpServletRequest request)
+	static Collection getCollection(HttpServletRequest request)
 			throws IOException {
-		ChangeSet result = null;
+		Collection result = null;
 
 		Path path = Path.newInstance(request);
 		List<String> segments = path.segments();
@@ -78,9 +78,9 @@ public class ChangeSets {
 		}
 
 		if (index >= 0) {
-			List<ChangeSet> changeSets = Root.zebedee.getChangeSets();
-			if (index < changeSets.size()) {
-				result = changeSets.get(index);
+			List<Collection> collections = Root.zebedee.getCollections();
+			if (index < collections.size()) {
+				result = collections.get(index);
 			}
 		}
 

@@ -6,6 +6,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.ChangeSet;
 import com.github.onsdigital.zebedee.json.DirectoryListing;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,29 +34,34 @@ public class Browse {
     public DirectoryListing browse(HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
 
-        Path requestPath = Path.newInstance(request);
-        List<String> segments = new ArrayList<>(requestPath.segments());
+        String uri = request.getParameter("path");
 
-        // Remove the API name:
-        if (segments.size() > 0) {
-            segments.remove(0);
-        }
+        if (StringUtils.isBlank(uri)) {
 
-        // Remove the changeset ID, if present:
-        if (segments.size() > 0 && segments.get(0).matches("[0-9]+")) {
-            segments.remove(0);
-        }
+            Path requestPath = Path.newInstance(request);
+            List<String> segments = new ArrayList<>(requestPath.segments());
 
-        // Build the URI:
-        StringBuilder uriBuilder = new StringBuilder();
-        for (String segment : segments) {
-            uriBuilder.append("/");
-            uriBuilder.append(segment);
+            // Remove the API name:
+            if (segments.size() > 0) {
+                segments.remove(0);
+            }
+
+            // Remove the changeset ID, if present:
+            if (segments.size() > 0 && segments.get(0).matches("[0-9]+")) {
+                segments.remove(0);
+            }
+
+            // Build the URI:
+            StringBuilder uriBuilder = new StringBuilder();
+            for (String segment : segments) {
+                uriBuilder.append("/");
+                uriBuilder.append(segment);
+            }
+            if (uriBuilder.length() == 0) {
+                uriBuilder.append("/");
+            }
+            uri = uriBuilder.toString();
         }
-        if (uriBuilder.length() == 0) {
-            uriBuilder.append("/");
-        }
-        String uri = uriBuilder.toString();
 
         // Locate the path:
         java.nio.file.Path path;

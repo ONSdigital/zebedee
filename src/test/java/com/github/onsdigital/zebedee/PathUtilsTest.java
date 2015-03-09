@@ -43,6 +43,19 @@ public class PathUtilsTest {
 		assertEquals("name.é$_", result);
 	}
 
+    @Test
+    public void shouldLowerCaseString() {
+
+        // Given
+        String string = "NaMe";
+
+        // When
+        String result = PathUtils.toFilename(string);
+
+        // Then
+        assertEquals("name", result);
+    }
+
 	@Test
 	public void shouldAbbreviateString() {
 

@@ -23,8 +23,8 @@ public class PathUtils {
 		}
 
 		// Ensure the String is a sensible length:
-		return StringUtils.abbreviateMiddle(filename.toString(), "_",
-				MAX_LENGTH);
+		return StringUtils.lowerCase(StringUtils.abbreviateMiddle(filename.toString(), "_",
+				MAX_LENGTH));
 	}
 
 	/**

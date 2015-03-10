@@ -7,28 +7,20 @@ import com.google.gson.reflect.TypeToken;
 import com.jayway.restassured.response.Response;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import static com.jayway.restassured.RestAssured.get;
-import static com.jayway.restassured.RestAssured.given;
 import static org.junit.Assert.fail;
 
 public class CollectionsIT {
 
     @Test
     public void shouldGetCollections() {
-        CollectionDescription desc = new CollectionDescription();
-        desc.name = UUID.randomUUID().toString();
-        desc.publishDate = new SimpleDateFormat().format(new Date());
 
-        Response postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection");
-        postResponse.then().assertThat().statusCode(200);
+        CollectionDescription description = CollectionIT.CreateCollection();
 
         Response getResponse = get(Configuration.getBaseUrl() + "/collections");
-        postResponse.then().assertThat().statusCode(200);
+        getResponse.then().assertThat().statusCode(200);
 
         List<CollectionDescription> collections = new
                 Gson().fromJson(getResponse.asString(),
@@ -37,7 +29,7 @@ public class CollectionsIT {
 
 
         for (CollectionDescription collection : collections) {
-            if (collection.name.equals(desc.name))
+            if (collection.name.equals(description.name))
                 return;
         }
 

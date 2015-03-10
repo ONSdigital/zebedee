@@ -15,84 +15,63 @@ import static com.jayway.restassured.RestAssured.given;
 
 public class CollectionIT {
 
+    public static CollectionDescription CreateCollection() {
+        CollectionDescription description = new CollectionDescription();
+        description.name = UUID.randomUUID().toString();
+        description.publishDate = new SimpleDateFormat().format(new Date());
+
+        Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection");
+        postResponse.then().assertThat().statusCode(200);
+
+        return description;
+    }
+
     @Test
     public void shouldCreateCollection() {
 
-        CollectionDescription desc = new CollectionDescription();
-        desc.name = UUID.randomUUID().toString();
-        desc.publishDate = new SimpleDateFormat().format(new Date());
+        CollectionDescription description = CreateCollection();
 
-        Response postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection");
-        postResponse.then().assertThat().statusCode(200);
-
-        postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection");
+        Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection");
         postResponse.then().assertThat().statusCode(409);
     }
 
     @Test
     public void shouldUpdateCollection() {
 
-        CollectionDescription desc = new CollectionDescription();
-        desc.name = UUID.randomUUID().toString();
-        desc.publishDate = new SimpleDateFormat().format(new Date());
+        CollectionDescription description = CreateCollection();
 
-        // Create a new collection
-        Response postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection");
-        postResponse.then().assertThat().statusCode(200);
+        String oldName = description.name;
+        String oldPublishDate = description.publishDate;
 
-
-        String oldName = desc.name;
-        String oldPublishDate = desc.publishDate;
-
-        desc.name = UUID.randomUUID().toString();
-        desc.publishDate = new SimpleDateFormat().format(new Date());
+        description.name = UUID.randomUUID().toString();
+        description.publishDate = new SimpleDateFormat().format(new Date());
 
         // Update the collection with the new
-        postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection/" + oldName);
+        Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection/" + oldName);
         postResponse.then().assertThat().statusCode(200);
 
-        Response response = get(Configuration.getBaseUrl() + "/collection/" + desc.name);
+        Response response = get(Configuration.getBaseUrl() + "/collection/" + description.name);
         response.then().assertThat().statusCode(200);
-
-        postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection/" + oldName);
-        postResponse.then().assertThat().statusCode(200);
     }
 
     @Test
     public void shouldReturn409IfUpdateNameAlreadyExists() {
 
-        CollectionDescription desc = new CollectionDescription();
-        desc.name = UUID.randomUUID().toString();
-        desc.publishDate = new SimpleDateFormat().format(new Date());
+        CollectionDescription description = CreateCollection();
+        String existingName = description.name;
 
-        // Create a new collection
-        Response postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection");
-        postResponse.then().assertThat().statusCode(200);
+        description = CreateCollection();
 
-        String existingName = desc.name;
-
-        desc.name = UUID.randomUUID().toString();
-        desc.publishDate = new SimpleDateFormat().format(new Date());
-
-        postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection/");
-        postResponse.then().assertThat().statusCode(200);
-
-        postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection/" + existingName);
+        Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection/" + existingName);
         postResponse.then().assertThat().statusCode(409);
     }
-
 
     @Test
     public void shouldGetCollection() {
 
-        CollectionDescription desc = new CollectionDescription();
-        desc.name = UUID.randomUUID().toString();
-        desc.publishDate = new SimpleDateFormat().format(new Date());
+        CollectionDescription description = CreateCollection();
 
-        Response postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection");
-        postResponse.then().assertThat().statusCode(200);
-
-        Response response = get(Configuration.getBaseUrl() + "/collection/" + desc.name);
+        Response response = get(Configuration.getBaseUrl() + "/collection/" + description.name);
         response.then().assertThat().statusCode(200);
     }
 }

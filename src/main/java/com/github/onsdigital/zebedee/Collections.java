@@ -25,6 +25,6 @@ public class Collections extends ArrayList<Collection> {
     }
 
     public boolean hasCollection(String name) {
-        return getCollection(name) == null;
+        return getCollection(name) != null;
     }
 }

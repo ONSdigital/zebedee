@@ -12,6 +12,7 @@ public class Collections extends ArrayList<Collection> {
             for (Collection collection : this) {
                 if (collection.description.name.equals(name)) {
                     result = collection;
+                    break;
                 }
             }
         }

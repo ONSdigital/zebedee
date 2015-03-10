@@ -28,7 +28,7 @@ public class Create {
 		boolean result;
 
 		// Locate the collection:
-        com.github.onsdigital.zebedee.Collection collection = Root.zebedee.getCollections().getCollection(request);
+        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
         if (collection == null) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			result = false;

@@ -20,7 +20,7 @@ public class Collection {
     public Object get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        com.github.onsdigital.zebedee.Collection collection = Root.zebedee.getCollections().getCollection(request);
+        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
         if (collection == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
         }

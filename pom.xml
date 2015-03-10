@@ -169,6 +169,9 @@
                 <configuration>
                     <parallel>methods</parallel>
                     <threadCount>10</threadCount>
+                    <systemPropertyVariables>
+                        <baseUrl>http://localhost:8082</baseUrl>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 

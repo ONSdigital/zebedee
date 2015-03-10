@@ -1,15 +1,12 @@
 package com.github.onsdigital.zebedee.api;
 
-import java.io.IOException;
+import com.github.davidcarboni.restolino.framework.Api;
+import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
-
-import org.eclipse.jetty.http.HttpStatus;
-
-import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.Collection;
+import java.io.IOException;
 
 @Api
 public class Publish {
@@ -20,8 +17,8 @@ public class Publish {
 		boolean result = false;
 
 		// Locate and publish the collection:
-		Collection collection = Collections.getCollection(request);
-		if (collection != null) {
+        com.github.onsdigital.zebedee.Collection collection = Root.zebedee.getCollections().getCollection(request);
+        if (collection != null) {
 			result = Root.zebedee.publish(collection);
 		}
 

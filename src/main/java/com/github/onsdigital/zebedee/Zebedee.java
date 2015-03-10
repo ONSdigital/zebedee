@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Zebedee {
 	static final String ZEBEDEE = "zebedee";
@@ -16,10 +14,25 @@ public class Zebedee {
 	public final Content published;
 	public final Path collections;
 
+    Zebedee(Path path) {
+
+        // Validate the directory:
+        this.path = path;
+        Path published = path.resolve(PUBLISHED);
+        Path collections = path.resolve(COLLECTIONS);
+        if (!Files.exists(published) || !Files.exists(collections)) {
+            throw new IllegalArgumentException(
+                    "This folder doesn't look like a collection folder: "
+                            + path.toAbsolutePath());
+        }
+        this.published = new Content(published);
+        this.collections = collections;
+    }
+
 	/**
 	 * Creates a new Zebedee folder in the specified parent Path.
-	 * 
-	 * @param parent
+     *
+     * @param parent
 	 *            The directory in which the folder will be created.
 	 * @return A {@link Zebedee} instance representing the newly created folder.
 	 * @throws IOException
@@ -30,21 +43,6 @@ public class Zebedee {
 		Files.createDirectory(path.resolve(PUBLISHED));
 		Files.createDirectory(path.resolve(COLLECTIONS));
 		return new Zebedee(path);
-	}
-
-	Zebedee(Path path) {
-
-		// Validate the directory:
-		this.path = path;
-		Path published = path.resolve(PUBLISHED);
-		Path collections = path.resolve(COLLECTIONS);
-		if (!Files.exists(published) || !Files.exists(collections)) {
-			throw new IllegalArgumentException(
-					"This folder doesn't look like a collection folder: "
-							+ path.toAbsolutePath());
-		}
-		this.published = new Content(published);
-		this.collections = collections;
 	}
 
 	/**
@@ -79,9 +77,9 @@ public class Zebedee {
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	public List<Collection> getCollections() throws IOException {
-		List<Collection> result = new ArrayList<>();
-		try (DirectoryStream<Path> stream = Files
+    public Collections getCollections() throws IOException {
+        Collections result = new Collections();
+        try (DirectoryStream<Path> stream = Files
 				.newDirectoryStream(collections)) {
 			for (Path path : stream) {
 				if (Files.isDirectory(path)) {

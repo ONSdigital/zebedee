@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 
+import com.github.onsdigital.zebedee.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.jayway.restassured.response.Response;
 import org.junit.Test;
@@ -14,8 +15,6 @@ import static com.jayway.restassured.RestAssured.given;
 
 public class CollectionIT {
 
-    private static final String baseUrl = "http://localhost:8082";
-
     @Test
     public void shouldCreateCollection() {
 
@@ -23,7 +22,7 @@ public class CollectionIT {
         desc.name = UUID.randomUUID().toString(); // "Inflation Q2 2015";
         desc.publishDate = new SimpleDateFormat().format(new Date());
 
-        Response postResponse = given().body(desc).post(baseUrl + "/collection");
+        Response postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection");
         postResponse.then().assertThat().statusCode(200);
     }
 
@@ -35,10 +34,10 @@ public class CollectionIT {
         desc.name = UUID.randomUUID().toString(); // "Inflation Q2 2015";
         desc.publishDate = new SimpleDateFormat().format(new Date());
 
-        Response postResponse = given().body(desc).post(baseUrl + "/collection");
+        Response postResponse = given().body(desc).post(Configuration.getBaseUrl() + "/collection");
         postResponse.then().assertThat().statusCode(200);
 
-        Response response = get(baseUrl + "/collection/" + desc.name);
+        Response response = get(Configuration.getBaseUrl() + "/collection/" + desc.name);
         response.then().assertThat().statusCode(200);
     }
 }

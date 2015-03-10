@@ -1,13 +1,13 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 public class Collection {
 	static final String APPROVED = "approved";
@@ -20,80 +20,80 @@ public class Collection {
 	Zebedee zebedee;
 
 	/**
-	 * Constructs a new {@link Collection} in the given {@link Zebedee},
-	 * creating the necessary folders {@value #APPROVED} and
-	 * {@value #IN_PROGRESS}.
-	 * 
-	 * @param name
-	 *            The readable name of the {@link Collection}.
-	 * @param zebedee
-	 * @return
-	 * @throws IOException
+     * Instantiates an existing {@link Collection}. This validates that the
+     * directory contains folders named {@value #APPROVED} and
+     * {@value #IN_PROGRESS} and throws an exception if not.
+     *
+     * @param path
+     *            The {@link Path} of the {@link Collection}.
+     * @param zebedee
+     *            The containing {@link Zebedee}.
+     * @throws IOException
 	 */
-	public static Collection create(String name, Zebedee zebedee)
-			throws IOException {
+    Collection(Path path, Zebedee zebedee) throws IOException {
 
-		String filename = PathUtils.toFilename(name);
+        // Validate the directory:
+        this.path = path;
+        Path approved = path.resolve(APPROVED);
+        Path inProgress = path.resolve(IN_PROGRESS);
+        Path description = path.getParent().resolve(
+                path.getFileName() + ".json");
+        if (!Files.exists(approved) || !Files.exists(inProgress)
+                || !Files.exists(description)) {
+            throw new IllegalArgumentException(
+                    "This doesn't look like a collection folder: "
+                            + path.toAbsolutePath());
+        }
 
-		// Create the folders:
-		Path collection = zebedee.collections.resolve(filename);
-		Files.createDirectory(collection);
-		Files.createDirectory(collection.resolve(APPROVED));
-		Files.createDirectory(collection.resolve(IN_PROGRESS));
+        // Deserialise the description:
+        try (InputStream input = Files.newInputStream(description)) {
+            this.description = Serialiser.deserialise(input,
+                    CollectionDescription.class);
+        }
 
-		// Create the description:
-		Path collectionDescription = zebedee.collections.resolve(filename
-				+ ".json");
-		CollectionDescription description = new CollectionDescription();
-		description.name = name;
-		try (OutputStream output = Files.newOutputStream(collectionDescription)) {
-			Serialiser.serialise(output, description);
-		}
+        // Set fields:
+        this.zebedee = zebedee;
+        this.approved = new Content(approved);
+        this.inProgress = new Content(inProgress);
+    }
 
-		return new Collection(name, zebedee);
-	}
+    Collection(String name, Zebedee zebedee) throws IOException {
+        this(zebedee.collections.resolve(PathUtils.toFilename(name)), zebedee);
+    }
 
 	/**
-	 * Instantiates an existing {@link Collection}. This validates that the
-	 * directory contains folders named {@value #APPROVED} and
-	 * {@value #IN_PROGRESS} and throws an exception if not.
-	 * 
-	 * @param path
-	 *            The {@link Path} of the {@link Collection}.
-	 * @param zebedee
-	 *            The containing {@link Zebedee}.
-	 * @throws IOException
+     * Constructs a new {@link Collection} in the given {@link Zebedee},
+     * creating the necessary folders {@value #APPROVED} and
+     * {@value #IN_PROGRESS}.
+     *
+     * @param name
+     *            The readable name of the {@link Collection}.
+     * @param zebedee
+     * @return
+     * @throws IOException
 	 */
-	Collection(Path path, Zebedee zebedee) throws IOException {
+    public static Collection create(String name, Zebedee zebedee)
+            throws IOException {
 
-		// Validate the directory:
-		this.path = path;
-		Path approved = path.resolve(APPROVED);
-		Path inProgress = path.resolve(IN_PROGRESS);
-		Path description = path.getParent().resolve(
-				path.getFileName() + ".json");
-		if (!Files.exists(approved) || !Files.exists(inProgress)
-				|| !Files.exists(description)) {
-			throw new IllegalArgumentException(
-					"This doesn't look like a collection folder: "
-							+ path.toAbsolutePath());
-		}
+        String filename = PathUtils.toFilename(name);
 
-		// Deserialise the description:
-		try (InputStream input = Files.newInputStream(description)) {
-			this.description = Serialiser.deserialise(input,
-					CollectionDescription.class);
-		}
+        // Create the folders:
+        Path collection = zebedee.collections.resolve(filename);
+        Files.createDirectory(collection);
+        Files.createDirectory(collection.resolve(APPROVED));
+        Files.createDirectory(collection.resolve(IN_PROGRESS));
 
-		// Set fields:
-		this.zebedee = zebedee;
-		this.approved = new Content(approved);
-		this.inProgress = new Content(inProgress);
-	}
+        // Create the description:
+        Path collectionDescription = zebedee.collections.resolve(filename
+                + ".json");
+        CollectionDescription description = new CollectionDescription();
+        description.name = name;
+        try (OutputStream output = Files.newOutputStream(collectionDescription)) {
+            Serialiser.serialise(output, description);
+        }
 
-	Collection(String name, Zebedee zebedee) throws IOException {
-		this(zebedee.collections.resolve(PathUtils.toFilename(name)), zebedee);
-	}
+        return new Collection(name, zebedee);
+    }
 
 	/**
 	 * Finds the given URI in the resolved overlay.
@@ -268,5 +268,4 @@ public class Collection {
 	Path getPath(String uri) {
 		return inProgress.get(uri);
 	}
-
 }

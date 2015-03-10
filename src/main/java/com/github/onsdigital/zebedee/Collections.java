@@ -14,7 +14,7 @@ public class Collections extends ArrayList<Collection> {
             String filename = PathUtils.toFilename(name);
             for (Collection collection : this) {
                 String collectionFilename = collection.path.getFileName().toString();
-                if (StringUtils.equalsIgnoreCase(collectionFilename,filename)) {
+                if (StringUtils.equalsIgnoreCase(collectionFilename, filename)) {
                     result = collection;
                     break;
                 }
@@ -24,5 +24,7 @@ public class Collections extends ArrayList<Collection> {
         return result;
     }
 
-
+    public boolean hasCollection(String name) {
+        return getCollection(name) == null;
+    }
 }

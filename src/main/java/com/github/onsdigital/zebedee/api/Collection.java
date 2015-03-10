@@ -28,18 +28,32 @@ public class Collection {
     }
 
     @POST
-    public void create(HttpServletRequest request,
+    public void update(HttpServletRequest request,
                        HttpServletResponse response,
                        CollectionDescription collectionDescription) throws IOException {
 
+        com.github.onsdigital.zebedee.Collection existingCollection = Collections.getCollection(request);
+
         collectionDescription.name = StringUtils.trim(collectionDescription.name);
-        for (com.github.onsdigital.zebedee.Collection collection : Root.zebedee.getCollections()) {
-            if (StringUtils.equals(collection.description.name,
-                    collectionDescription.name)) {
+
+        if (existingCollection == null) {
+
+            if (Root.zebedee.getCollections().hasCollection(collectionDescription.name)) {
                 response.setStatus(HttpStatus.CONFLICT_409);
                 return;
             }
+
+            com.github.onsdigital.zebedee.Collection.create(collectionDescription.name, Root.zebedee);
+        } else {
+            if (!StringUtils.equals(existingCollection.description.name, collectionDescription.name)) {
+                if (Root.zebedee.getCollections().hasCollection(collectionDescription.name)) {
+                    response.setStatus(HttpStatus.CONFLICT_409);
+                    return;
+                }
+
+                com.github.onsdigital.zebedee.Collection.rename(existingCollection.description.name,
+                        collectionDescription.name, Root.zebedee);
+            }
         }
-        com.github.onsdigital.zebedee.Collection.create(collectionDescription.name, Root.zebedee);
     }
 }

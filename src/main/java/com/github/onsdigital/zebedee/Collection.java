@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -90,6 +91,31 @@ public class Collection {
         }
 
         return new Collection(name, zebedee);
+    }
+
+    public static Collection rename(String name, String newName, Zebedee zebedee)
+            throws IOException {
+
+        String filename = PathUtils.toFilename(name);
+        String newFilename = PathUtils.toFilename(newName);
+
+        Path collection = zebedee.collections.resolve(filename);
+        Path newCollection = zebedee.collections.resolve(newFilename);
+
+        new File(collection.toUri()).renameTo(new File(newCollection.toUri()));
+
+        // Create the description:
+        Path collectionDescription = zebedee.collections.resolve(newFilename
+                + ".json");
+        CollectionDescription description = new CollectionDescription();
+        description.name = newName;
+        try (OutputStream output = Files.newOutputStream(collectionDescription)) {
+            Serialiser.serialise(output, description);
+        }
+
+        Files.delete(zebedee.collections.resolve(filename + ".json"));
+
+        return new Collection(newName, zebedee);
     }
 
     /**

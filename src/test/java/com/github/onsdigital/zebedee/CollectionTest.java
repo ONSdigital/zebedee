@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -9,10 +11,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class CollectionTest {
 
@@ -33,22 +33,53 @@ public class CollectionTest {
 	}
 
 	@Test
-	public void shouldCreateRelease() throws IOException {
+    public void shouldCreateCollection() throws IOException {
 
 		// Given
 		// The content doesn't exist at any level:
 		String name = "Population Release";
+        String filename = PathUtils.toFilename(name);
 
 		// When
 		Collection.create(name, zebedee);
 
 		// Then
-		Path releasePath = builder.zebedee.resolve(Zebedee.COLLECTIONS).resolve(
-				PathUtils.toFilename(name));
+        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path releasePath = rootPath.resolve(filename);
+        Path jsonPath = rootPath.resolve(filename + ".json");
+
 		assertTrue(Files.exists(releasePath));
-		assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+        assertTrue(Files.exists(jsonPath));
+        assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
 		assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
 	}
+
+    @Test
+    public void shouldRenameCollection() throws IOException {
+
+        // Given
+        String name = "Population Release";
+        String newName = "Economy Release";
+
+        String filename = PathUtils.toFilename(newName);
+
+        // When
+        Collection.create(name, zebedee);
+        Collection.rename(name, newName, zebedee);
+
+        // Then
+        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path releasePath = rootPath.resolve(filename);
+        Path jsonPath = rootPath.resolve(filename + ".json");
+
+        Path oldJsonPath = rootPath.resolve(PathUtils.toFilename(name) + ".json");
+
+        assertTrue(Files.exists(releasePath));
+        assertTrue(Files.exists(jsonPath));
+        assertTrue(!Files.exists(oldJsonPath));
+        assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
+    }
 
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldNotInstantiateInInvalidFolder() throws IOException {

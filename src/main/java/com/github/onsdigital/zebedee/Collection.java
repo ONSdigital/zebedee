@@ -241,7 +241,9 @@ public class Collection {
      * to {@link #approved}.
      * @throws IOException If a filesystem error occurs.
      */
-    boolean approve(String uri) throws IOException {
+
+
+    public boolean approve(String uri) throws IOException {
         boolean result = false;
 
         if (isInProgress(uri)) {

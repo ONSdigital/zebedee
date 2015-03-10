@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.json;
 
+import java.util.List;
+
 import com.github.onsdigital.zebedee.Collection;
 
 /**
@@ -16,4 +18,7 @@ public class CollectionDescription {
 	 * a publish date).
 	 */
 	public String publishDate;
+
+	public List<String> inProgressUris;
+	public List<String> approvedUris;
 }

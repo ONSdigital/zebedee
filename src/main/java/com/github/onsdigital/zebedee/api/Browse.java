@@ -24,8 +24,7 @@ public class Browse {
     public DirectoryListing browse(HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
 
-        String uri = request.getParameter("path");
-
+        String uri = request.getParameter("uri");
         if (StringUtils.isBlank(uri))
             uri = "/";
 

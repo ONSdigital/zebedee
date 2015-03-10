@@ -391,7 +391,7 @@ public class CollectionTest {
 
 		// When
 		// We write some output to the content:
-		Path path = collection.getPath(uri);
+		Path path = collection.getInProgressPath(uri);
 		try (Writer writer = Files.newBufferedWriter(path,
 				Charset.forName("utf8"));) {
 			writer.append("test");

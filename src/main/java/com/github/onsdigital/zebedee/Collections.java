@@ -16,6 +16,7 @@ public class Collections extends ArrayList<Collection> {
                 String collectionFilename = collection.path.getFileName().toString();
                 if (StringUtils.equalsIgnoreCase(collectionFilename,filename)) {
                     result = collection;
+                    break;
                 }
             }
         }

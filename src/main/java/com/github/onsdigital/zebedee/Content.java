@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
@@ -7,8 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class Content {
 
@@ -99,8 +99,9 @@ public class Content {
 					listFiles(entry, files);
 				} else {
 					Path relative = this.path.relativize(entry);
-					files.add(relative);
-				}
+                    if (!relative.endsWith(".DS_Store"))
+                        files.add(relative);
+                }
 			}
 		}
 	}

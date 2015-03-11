@@ -45,7 +45,7 @@ public class Content {
     }
 
     @POST
-    public void write(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public boolean write(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
@@ -60,25 +60,27 @@ public class Content {
         java.nio.file.Path path = getPath(uri, request, response);
         if (path == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
-            return;
+            return false;
         }
 
         // Check we're requesting a file:
         if (java.nio.file.Files.isDirectory(path)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return;
+            return false;
         }
 
         try (OutputStream output = java.nio.file.Files.newOutputStream(path)) {
             org.apache.commons.io.IOUtils.copy(requestBody, output);
         }
+
+        return true;
     }
 
     private Path getPath(String uri, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Path path = null;
         com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
         if (collection != null) {
-            path = collection.getInProgressPath(uri);
+            path = collection.find(uri);
         }
         return path;
     }

@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.jayway.restassured.response.Response;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,7 +17,7 @@ public class CollectionIT {
     public static CollectionDescription CreateCollection() {
         CollectionDescription description = new CollectionDescription();
         description.name = UUID.randomUUID().toString();
-        description.publishDate = new SimpleDateFormat().format(new Date());
+        description.publishDate = new Date();
 
         Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection");
         postResponse.then().assertThat().statusCode(200);
@@ -41,10 +40,10 @@ public class CollectionIT {
         CollectionDescription description = CreateCollection();
 
         String oldName = description.name;
-        String oldPublishDate = description.publishDate;
+        Date oldPublishDate = description.publishDate;
 
         description.name = UUID.randomUUID().toString();
-        description.publishDate = new SimpleDateFormat().format(new Date());
+        description.publishDate = new Date();
 
         // Update the collection with the new
         Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection/" + oldName);

@@ -38,8 +38,8 @@ public class Root implements Startup {
             e.printStackTrace();
         }
 
-        // Set ISO date formatting in Gson:
-        Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mmZ");
+        // Set ISO date formatting in Gson to match Javascript Date.toISODate()
+        Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSXXX");
 
         // Set the class that will be used to determine a ClassLoader when loading resources:
         ResourceUtils.classLoaderClass = Root.class;

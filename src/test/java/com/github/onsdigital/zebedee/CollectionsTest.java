@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,8 +30,8 @@ public class CollectionsTest {
     public void shouldFindCollection() throws IOException {
         Collections collections = new Collections();
 
-        Collection firstCollection = Collection.create("FirstCollection", zebedee);
-        Collection secondCollection = Collection.create("SecondCollection", zebedee);
+        Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
+        Collection secondCollection = Collection.create(new CollectionDescription("SecondCollection"), zebedee);
 
         collections.add(firstCollection);
         collections.add(secondCollection);
@@ -44,7 +45,7 @@ public class CollectionsTest {
 
         Collections collections = new Collections();
 
-        Collection firstCollection = Collection.create("FirstCollection", zebedee);
+        Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
 
         collections.add(firstCollection);
 

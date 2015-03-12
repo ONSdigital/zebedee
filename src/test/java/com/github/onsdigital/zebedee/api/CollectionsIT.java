@@ -17,7 +17,7 @@ public class CollectionsIT {
     @Test
     public void shouldGetCollections() {
 
-        CollectionDescription description = CollectionIT.CreateCollection();
+        CollectionDescription description = CollectionIT.createCollection();
 
         Response getResponse = get(Configuration.getBaseUrl() + "/collections");
         getResponse.then().assertThat().statusCode(200);

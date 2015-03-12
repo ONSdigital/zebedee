@@ -18,7 +18,7 @@ public class BrowseIT {
     @Test
     public void shouldReturn200WithValidCollectionName() {
 
-        CollectionDescription description = CollectionIT.CreateCollection();
+        CollectionDescription description = CollectionIT.createCollection();
 
         Response response = given()
                 .get(Configuration.getBaseUrl() + "/browse/" + description.name);

@@ -18,7 +18,7 @@ public class CollectionIT {
 
     private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").create();
 
-    public static CollectionDescription CreateCollection() {
+    public static CollectionDescription createCollection() {
         CollectionDescription description = new CollectionDescription();
         description.name = UUID.randomUUID().toString();
         description.publishDate = new Date();
@@ -32,7 +32,7 @@ public class CollectionIT {
     @Test
     public void shouldCreateCollection() {
 
-        CollectionDescription description = CreateCollection();
+        CollectionDescription description = createCollection();
 
         Response postResponse = given().body(gson.toJson(description)).post(Configuration.getBaseUrl() + "/collection");
         postResponse.then().assertThat().statusCode(409);
@@ -41,7 +41,7 @@ public class CollectionIT {
     @Test
     public void shouldUpdateCollection() {
 
-        CollectionDescription description = CreateCollection();
+        CollectionDescription description = createCollection();
 
         String oldName = description.name;
         Date oldPublishDate = description.publishDate;
@@ -60,10 +60,10 @@ public class CollectionIT {
     @Test
     public void shouldReturn409IfUpdateNameAlreadyExists() {
 
-        CollectionDescription description = CreateCollection();
+        CollectionDescription description = createCollection();
         String existingName = description.name;
 
-        description = CreateCollection();
+        description = createCollection();
 
         Response postResponse = given().body(gson.toJson(description)).post(Configuration.getBaseUrl() + "/collection/" + existingName);
         postResponse.then().assertThat().statusCode(409);
@@ -72,7 +72,7 @@ public class CollectionIT {
     @Test
     public void shouldGetCollection() {
 
-        CollectionDescription description = CreateCollection();
+        CollectionDescription description = createCollection();
 
         Response response = get(Configuration.getBaseUrl() + "/collection/" + description.name);
         response.then().assertThat().statusCode(200);

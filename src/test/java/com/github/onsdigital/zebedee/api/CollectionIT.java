@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.onsdigital.zebedee.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jayway.restassured.response.Response;
 import org.junit.Test;
 
@@ -14,12 +16,14 @@ import static com.jayway.restassured.RestAssured.given;
 
 public class CollectionIT {
 
+    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").create();
+
     public static CollectionDescription CreateCollection() {
         CollectionDescription description = new CollectionDescription();
         description.name = UUID.randomUUID().toString();
         description.publishDate = new Date();
 
-        Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection");
+        Response postResponse = given().body(gson.toJson(description)).post(Configuration.getBaseUrl() + "/collection");
         postResponse.then().assertThat().statusCode(200);
 
         return description;
@@ -30,7 +34,7 @@ public class CollectionIT {
 
         CollectionDescription description = CreateCollection();
 
-        Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection");
+        Response postResponse = given().body(gson.toJson(description)).post(Configuration.getBaseUrl() + "/collection");
         postResponse.then().assertThat().statusCode(409);
     }
 
@@ -46,7 +50,7 @@ public class CollectionIT {
         description.publishDate = new Date();
 
         // Update the collection with the new
-        Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection/" + oldName);
+        Response postResponse = given().body(gson.toJson(description)).post(Configuration.getBaseUrl() + "/collection/" + oldName);
         postResponse.then().assertThat().statusCode(200);
 
         Response response = get(Configuration.getBaseUrl() + "/collection/" + description.name);
@@ -61,7 +65,7 @@ public class CollectionIT {
 
         description = CreateCollection();
 
-        Response postResponse = given().body(description).post(Configuration.getBaseUrl() + "/collection/" + existingName);
+        Response postResponse = given().body(gson.toJson(description)).post(Configuration.getBaseUrl() + "/collection/" + existingName);
         postResponse.then().assertThat().statusCode(409);
     }
 

@@ -35,10 +35,10 @@ public class Collection {
         return result;
     }
 
-    @POST
-    public void update(HttpServletRequest request,
-                       HttpServletResponse response,
-                       CollectionDescription collectionDescription) throws IOException {
+	@POST
+    public void createOrUpdate(HttpServletRequest request,
+                               HttpServletResponse response,
+			CollectionDescription collectionDescription) throws IOException {
 
         com.github.onsdigital.zebedee.Collection existingCollection = Collections
                 .getCollection(request);

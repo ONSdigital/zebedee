@@ -1,16 +1,15 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import org.apache.commons.io.FileUtils;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-
-import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 /**
  * This is a utility class to build a known {@link Zebedee} structure for
@@ -73,7 +72,7 @@ public class Builder {
 	 * @throws IOException
 	 *             If a filesystem error occurs.
 	 */
-	void isPublished(String uri) throws IOException {
+    void createPublishedFile(String uri) throws IOException {
 
 		Path published = zebedee.resolve(Zebedee.PUBLISHED);
 		Path content = published.resolve(uri.substring(1));

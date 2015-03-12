@@ -172,7 +172,7 @@ public class Collection {
      * false.
      * @throws IOException If a filesystem error occurs.
      */
-    boolean create(String uri) throws IOException {
+    public boolean create(String uri) throws IOException {
         boolean result = false;
 
         boolean exists = find(uri) != null;
@@ -223,13 +223,21 @@ public class Collection {
     public boolean edit(String uri) throws IOException {
         boolean result = false;
 
+        if (isInProgress(uri))
+            return true;
+
         Path source = find(uri);
         boolean isBeingEditedElsewhere = !isInCollection(uri)
                 && zebedee.isBeingEdited(uri) > 0;
         if (source != null && !isInProgress(uri) && !isBeingEditedElsewhere) {
             // Copy to in progress:
             Path destination = inProgress.toPath(uri);
-            PathUtils.copy(source, destination);
+
+            if (approved.get(uri) != null) {
+                PathUtils.move(source, destination);
+            } else {
+                PathUtils.copy(source, destination);
+            }
             result = true;
         }
 

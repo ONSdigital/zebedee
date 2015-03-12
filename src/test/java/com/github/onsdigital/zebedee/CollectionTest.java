@@ -125,7 +125,7 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.isPublished(uri);
+        builder.createPublishedFile(uri);
 
         // When
         boolean created = collection.create(uri);
@@ -174,7 +174,7 @@ public class CollectionTest {
         // Given
         // The content exists publicly:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.isPublished(uri);
+        builder.createPublishedFile(uri);
 
         // When
         boolean edited = collection.edit(uri);
@@ -183,6 +183,10 @@ public class CollectionTest {
         assertTrue(edited);
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
+
+        Path published = builder.zebedee.resolve(Zebedee.PUBLISHED);
+        Path content = published.resolve(uri.substring(1));
+        assertTrue(Files.exists(content));
     }
 
     @Test
@@ -191,7 +195,7 @@ public class CollectionTest {
         // Given
         // The content exists, has been edited and approved:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.isPublished(uri);
+        builder.createPublishedFile(uri);
         builder.isApproved(uri);
 
         // When
@@ -201,10 +205,13 @@ public class CollectionTest {
         assertTrue(edited);
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
+
+        Path approved = builder.collections.get(1).resolve(Collection.APPROVED);
+        assertFalse(Files.exists(approved.resolve(uri.substring(1))));
     }
 
     @Test
-    public void shouldNotEditIfEditingAlready() throws IOException {
+    public void shouldEditIfEditingAlready() throws IOException {
 
         // Given
         // The content already exists:
@@ -215,7 +222,7 @@ public class CollectionTest {
         boolean edited = collection.edit(uri);
 
         // Then
-        assertFalse(edited);
+        assertTrue(edited);
     }
 
     @Test
@@ -253,7 +260,7 @@ public class CollectionTest {
         // Given
         // The content exists, has been edited and approved:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.isPublished(uri);
+        builder.createPublishedFile(uri);
         builder.isApproved(uri);
         builder.isInProgress(uri);
 
@@ -288,7 +295,7 @@ public class CollectionTest {
         // The content exists, has been edited and approved:
         String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
         String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-        builder.isPublished(sourceUri);
+        builder.createPublishedFile(sourceUri);
 
         // When
         boolean copied = collection.copy(sourceUri, targetUri);
@@ -420,7 +427,7 @@ public class CollectionTest {
         // Given
         // We're editing some content:
         String uri = "/economy/inflationandpriceindices/timeseries/beer.html";
-        builder.isPublished(uri);
+        builder.createPublishedFile(uri);
         builder.isApproved(uri);
         builder.isInProgress(uri);
 

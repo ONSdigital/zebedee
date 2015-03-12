@@ -23,6 +23,26 @@ public class Root implements Startup {
     static Path root;
     static Zebedee zebedee;
 
+    /**
+     * Recursively lists all files within this {@link Content}.
+     *
+     * @param path  The path to start from. This method calls itself recursively.
+     * @param files The list to which results will be added.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private static void listFiles(Path base, Path path, List<Path> files)
+            throws IOException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry)) {
+                    listFiles(base, entry, files);
+                } else {
+                    files.add(base.relativize(entry));
+                }
+            }
+        }
+    }
+
     @Override
     public void init() {
         try {
@@ -39,7 +59,7 @@ public class Root implements Startup {
         }
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
-        Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSXXX");
+        Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
         // Set the class that will be used to determine a ClassLoader when loading resources:
         ResourceUtils.classLoaderClass = Root.class;
@@ -70,26 +90,6 @@ public class Root implements Startup {
         }
 
         System.out.println("Zebedee root is at: " + root.toAbsolutePath());
-    }
-
-    /**
-     * Recursively lists all files within this {@link Content}.
-     *
-     * @param path  The path to start from. This method calls itself recursively.
-     * @param files The list to which results will be added.
-     * @throws IOException If a filesystem error occurs.
-     */
-    private static void listFiles(Path base, Path path, List<Path> files)
-            throws IOException {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-            for (Path entry : stream) {
-                if (Files.isDirectory(entry)) {
-                    listFiles(base, entry, files);
-                } else {
-                    files.add(base.relativize(entry));
-                }
-            }
-        }
     }
 
     /**

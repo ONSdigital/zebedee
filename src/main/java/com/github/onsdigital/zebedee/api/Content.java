@@ -11,7 +11,6 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
 
 /**
  * Created by david on 10/03/2015.
@@ -21,13 +20,17 @@ import java.nio.file.Path;
 public class Content {
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+        // This API only reads the in progress changes.
         String uri = request.getParameter("uri");
         if (StringUtils.isBlank(uri))
             uri = "/";
 
-        // Locate the path:
-        java.nio.file.Path path = getPath(uri, request, response);
+        java.nio.file.Path path = null;
+        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
+        if (collection != null) {
+            path = collection.find(uri);
+        }
+
         if (path == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return;
@@ -56,9 +59,32 @@ public class Content {
         if (StringUtils.isBlank(uri))
             uri = "/";
 
-        // Locate the path:
-        java.nio.file.Path path = getPath(uri, request, response);
+
+        java.nio.file.Path path = null;
+        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
+        if (collection != null) {
+            path = collection.find(uri); // see if the file exists anywhere.
+        }
+
         if (path == null) {
+            // create the file
+            boolean result = collection.create(uri);
+            if (!result) {
+                response.setStatus(HttpStatus.BAD_REQUEST_400);
+            }
+        } else {
+            // edit the file
+            boolean result = collection.edit(uri);
+            if (!result) {
+                response.setStatus(HttpStatus.BAD_REQUEST_400);
+            }
+        }
+
+        if (collection != null) {
+            path = collection.getInProgressPath(uri);
+        }
+
+        if (!java.nio.file.Files.exists(path)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return false;
         }
@@ -74,14 +100,5 @@ public class Content {
         }
 
         return true;
-    }
-
-    private Path getPath(String uri, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Path path = null;
-        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
-        if (collection != null) {
-            path = collection.find(uri);
-        }
-        return path;
     }
 }

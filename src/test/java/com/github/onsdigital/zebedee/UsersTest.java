@@ -273,4 +273,55 @@ public class UsersTest {
         // Nothing should have been created with the new email:
         assertNull(readNew);
     }
+
+    @Test
+    public void shouldAuthenticateUser() throws Exception {
+
+        // Given
+        // An existing user:
+        String email = "patricia@example.com";
+        String password = "password";
+
+        // When
+        // We attempt to authenticate
+        String token = zebedee.users.authenticate(email, password);
+
+        // Then
+        // Authentication should succeed
+        assertTrue(StringUtils.isNotBlank(token));
+    }
+
+    @Test
+    public void shouldNotAuthenticateBlankEmail() throws Exception {
+
+        // Given
+        // A null email address
+        String email = null;
+        String password = "password";
+
+        // When
+        // We attempt to authenticate
+        String token = zebedee.users.authenticate(email, password);
+
+        // Then
+        // We shouldn't get an error
+        assertTrue(StringUtils.isBlank(token));
+    }
+
+    @Test
+    public void shouldNotAuthenticateBlankPassword() throws Exception {
+
+        // Given
+        // A null email address
+        String email = "patricia@example.com";
+        String password = null;
+
+        // When
+        // We attempt to authenticate
+        String token = zebedee.users.authenticate(email, password);
+
+        // Then
+        // We shouldn't get an error
+        assertTrue(StringUtils.isBlank(token));
+    }
 }

@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.cryptolite.Password;
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
@@ -96,8 +98,15 @@ public class Users {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
-    public boolean authenticate(String email, String password) {
-        return false;
+    public String authenticate(String email, String password) throws IOException {
+        String result = null;
+
+        User user = get(email);
+        if (user != null && Password.verify(password, user.passwordHash)) {
+            result = Random.id();
+        }
+
+        return result;
     }
 
     private Path userPath(String email) {

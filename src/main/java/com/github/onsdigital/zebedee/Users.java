@@ -27,7 +27,7 @@ public class Users {
      * @return The requested user, unless the email is blank or no record exists for this email.
      * @throws IOException If a filesystem error occurs.
      */
-    public User getUser(String email) throws IOException {
+    public User get(String email) throws IOException {
 
         // Check the user record exists:
         if (!exists(email)) {
@@ -75,7 +75,7 @@ public class Users {
 
         if (valid(user) && exists(user.email)) {
 
-            result = getUser(user.email);
+            result = get(user.email);
             result.name = user.name;
             result.inactive = user.inactive;
 
@@ -88,16 +88,16 @@ public class Users {
         return result;
     }
 
-    public boolean authenticate(String email, String password) {
-        return false;
-    }
-
     public boolean exists(User user) throws IOException {
         return user != null && exists(user.email);
     }
 
     public boolean exists(String email) throws IOException {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
+    }
+
+    public boolean authenticate(String email, String password) {
+        return false;
     }
 
     private Path userPath(String email) {

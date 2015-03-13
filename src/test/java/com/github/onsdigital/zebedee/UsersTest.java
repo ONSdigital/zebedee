@@ -35,7 +35,7 @@ public class UsersTest {
         String password = "password";
 
         // When
-        User user = zebedee.users.getUser(email);
+        User user = zebedee.users.get(email);
 
         // Then
         assertNotNull(user);
@@ -52,7 +52,7 @@ public class UsersTest {
         // No preconditions
 
         // When
-        User user = zebedee.users.getUser(null);
+        User user = zebedee.users.get(null);
 
         // Then
         // We should not have an error
@@ -67,7 +67,7 @@ public class UsersTest {
         String email = null;
 
         // When
-        User user = zebedee.users.getUser(email);
+        User user = zebedee.users.get(email);
 
         // Then
         // We should not have an error
@@ -82,7 +82,7 @@ public class UsersTest {
         String email = "";
 
         // When
-        User user = zebedee.users.getUser(email);
+        User user = zebedee.users.get(email);
 
         // Then
         // We should not have an error
@@ -102,7 +102,7 @@ public class UsersTest {
 
         // When
         User created = zebedee.users.create(user);
-        User read = zebedee.users.getUser(email);
+        User read = zebedee.users.get(email);
 
         // Then
 
@@ -189,7 +189,7 @@ public class UsersTest {
         String email = "";
 
         // When
-        User user = zebedee.users.getUser(null);
+        User user = zebedee.users.get(null);
 
         // Then
         // We should not have an error
@@ -204,13 +204,13 @@ public class UsersTest {
         String email = "patricia@example.com";
         String name = "Sunnink ewse";
         boolean inactive = true;
-        User existing = zebedee.users.getUser(email);
+        User existing = zebedee.users.get(email);
 
         // When
         existing.name = name;
         existing.inactive = inactive;
         User updated = zebedee.users.update(existing);
-        User read = zebedee.users.getUser(email);
+        User read = zebedee.users.get(email);
 
         // Then
 
@@ -230,12 +230,12 @@ public class UsersTest {
         // An existing user:
         String email = "patricia@example.com";
         String password = "new password";
-        User existing = zebedee.users.getUser(email);
+        User existing = zebedee.users.get(email);
 
         // When
         existing.passwordHash = Password.hash(password);
         User updated = zebedee.users.update(existing);
-        User read = zebedee.users.getUser(email);
+        User read = zebedee.users.get(email);
 
         // Then
 
@@ -253,13 +253,13 @@ public class UsersTest {
         // An existing user:
         String email = "patricia@example.com";
         String newEmail = "patricia@google.com";
-        User existing = zebedee.users.getUser(email);
+        User existing = zebedee.users.get(email);
 
         // When
         existing.email = newEmail;
         User updated = zebedee.users.update(existing);
-        User read = zebedee.users.getUser(email);
-        User readNew = zebedee.users.getUser(newEmail);
+        User read = zebedee.users.get(email);
+        User readNew = zebedee.users.get(newEmail);
 
         // Then
 

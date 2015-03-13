@@ -28,7 +28,7 @@ public class Users {
             return null;
         }
 
-        User result = Root.zebedee.users.getUser(email);
+        User result = Root.zebedee.users.get(email);
 
         if (result == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
@@ -63,7 +63,7 @@ public class Users {
         User result = null;
 
         if (Root.zebedee.users.exists(user)) {
-            User existing = Root.zebedee.users.getUser(user.email);
+            User existing = Root.zebedee.users.get(user.email);
             existing.name = user.name;
             existing.inactive = user.inactive;
             result = Root.zebedee.users.update(user);

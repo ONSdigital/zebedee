@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Captures requests with a file extension as they do not get routed to the API.

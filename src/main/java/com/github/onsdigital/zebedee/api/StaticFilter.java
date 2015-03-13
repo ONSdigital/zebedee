@@ -12,7 +12,7 @@ import java.net.URL;
 /**
  * Captures requests with a file extension as they do not get routed to the API.
  */
-public class Files implements Filter
+public class StaticFilter implements Filter
 {
 
     @Override

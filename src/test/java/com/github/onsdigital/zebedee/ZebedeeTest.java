@@ -1,18 +1,16 @@
 package com.github.onsdigital.zebedee;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class ZebedeeTest {
 
@@ -43,7 +41,8 @@ public class ZebedeeTest {
 		// Then
 		assertTrue(Files.exists(expectedPath));
 		assertTrue(Files.exists(expectedPath.resolve(Zebedee.PUBLISHED)));
-		assertTrue(Files.exists(expectedPath.resolve(Zebedee.COLLECTIONS)));
+        assertTrue(Files.exists(expectedPath.resolve(Zebedee.COLLECTIONS)));
+        assertTrue(Files.exists(expectedPath.resolve(Zebedee.USERS)));
 	}
 
 	@Test
@@ -155,23 +154,23 @@ public class ZebedeeTest {
 		assertFalse(Files.exists(publishedPath.resolve(uri.substring(1))));
 	}
 
-	@Test
-	public void shouldDeleteCollectionAfterPublish() throws IOException {
+    @Test
+    public void shouldDeleteCollectionAfterPublish() throws IOException {
 
-		// Given
-		// There is content ready to be published:
-		Zebedee zebedee = new Zebedee(expectedPath);
-		Collection release = new Collection(builder.collections.get(1), zebedee);
-		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-		builder.isApproved(uri);
+        // Given
+        // There is content ready to be published:
+        Zebedee zebedee = new Zebedee(expectedPath);
+        Collection release = new Collection(builder.collections.get(1), zebedee);
+        String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
+        builder.isApproved(uri);
 
-		// When
-		zebedee.publish(release);
+        // When
+        zebedee.publish(release);
 
-		// Then
-		// The release folder should have been deleted:
-		Path releaseFolder = builder.collections.get(1);
-		assertFalse(Files.exists(releaseFolder));
-	}
+        // Then
+        // The release folder should have been deleted:
+        Path releaseFolder = builder.collections.get(1);
+        assertFalse(Files.exists(releaseFolder));
+    }
 
 }

@@ -10,11 +10,13 @@ public class Zebedee {
     static final String PUBLISHED = "published";
     static final String COLLECTIONS = "collections";
     static final String USERS = "users";
+    static final String SESSIONS = "sessions";
 
     public final Path path;
     public final Content published;
     public final Path collections;
     public final Users users;
+    public final Sessions sessions;
 
     Zebedee(Path path) {
 
@@ -23,7 +25,8 @@ public class Zebedee {
         Path published = path.resolve(PUBLISHED);
         Path collections = path.resolve(COLLECTIONS);
         Path users = path.resolve(USERS);
-        if (!Files.exists(published) || !Files.exists(collections)) {
+        Path sessions = path.resolve(SESSIONS);
+        if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a collection folder: "
                             + path.toAbsolutePath());
@@ -31,6 +34,7 @@ public class Zebedee {
         this.published = new Content(published);
         this.collections = collections;
         this.users = new Users(users);
+        this.sessions = new Sessions(sessions);
     }
 
     /**
@@ -45,6 +49,7 @@ public class Zebedee {
         Files.createDirectory(path.resolve(PUBLISHED));
         Files.createDirectory(path.resolve(COLLECTIONS));
         Files.createDirectory(path.resolve(USERS));
+        Files.createDirectory(path.resolve(SESSIONS));
         return new Zebedee(path);
     }
 

@@ -1,0 +1,31 @@
+package com.github.onsdigital.zebedee.json;
+
+import java.util.Date;
+
+/**
+ * Represents a user login session.
+ * Created by david on 16/03/2015.
+ */
+public class Session {
+
+    /**
+     * The ID of this session.
+     */
+    public String id;
+
+    /**
+     * The user this session represents.
+     */
+    public String email;
+
+    /**
+     * The date-time at which the session started. This is useful for general information. Defaults to the current date.
+     */
+    public Date start = new Date();
+
+    /**
+     * The date-time at which the session was last accessed. This is useful for timeouts. Defaults to the current date.
+     */
+    public Date lastAccess = new Date();
+
+}

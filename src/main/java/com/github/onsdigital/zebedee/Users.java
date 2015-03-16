@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
@@ -81,10 +80,7 @@ public class Users {
             result.name = user.name;
             result.inactive = user.inactive;
 
-            Path userPath = userPath(result.email);
-            try (OutputStream output = Files.newOutputStream(userPath)) {
-                Serialiser.serialise(output, result);
-            }
+            write(result);
         }
 
         return result;
@@ -98,12 +94,24 @@ public class Users {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
-    public String authenticate(String email, String password) throws IOException {
-        String result = null;
+    public boolean authenticate(String email, String password) throws IOException {
+        boolean result = false;
 
         User user = get(email);
         if (user != null && Password.verify(password, user.passwordHash)) {
-            result = Random.id();
+            result = true;
+        }
+
+        return result;
+    }
+
+    public boolean setPassword(String email, String password) throws IOException {
+        boolean result = false;
+
+        User user = get(email);
+        if (user != null) {
+            user.passwordHash = Password.hash(password);
+            write(user);
         }
 
         return result;
@@ -123,5 +131,18 @@ public class Users {
 
     private boolean valid(User user) {
         return user != null && StringUtils.isNoneBlank(user.email, user.name);
+    }
+
+    /**
+     * Writes a user record to disk.
+     *
+     * @param user The record to be written.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void write(User user) throws IOException {
+        Path userPath = userPath(user.email);
+        try (OutputStream output = Files.newOutputStream(userPath)) {
+            Serialiser.serialise(output, user);
+        }
     }
 }

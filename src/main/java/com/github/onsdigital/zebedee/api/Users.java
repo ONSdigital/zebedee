@@ -62,12 +62,7 @@ public class Users {
     public User update(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
         User result = null;
 
-        if (Root.zebedee.users.exists(user)) {
-            User existing = Root.zebedee.users.get(user.email);
-            existing.name = user.name;
-            existing.inactive = user.inactive;
-            result = Root.zebedee.users.update(user);
-        }
+        result = Root.zebedee.users.update(user);
 
         // We'll allow changing the email at some point.
         // It entails renaming the json file and checking

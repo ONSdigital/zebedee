@@ -74,10 +74,12 @@ public class Users {
     public User update(User user) throws IOException {
         User result = null;
 
-        if (valid(user) && exists(user.email)) {
+        if (exists(user.email)) {
 
             result = get(user.email);
+            if (StringUtils.isNotBlank(user.name))
             result.name = user.name;
+            if (user.inactive != null)
             result.inactive = user.inactive;
 
             write(result);

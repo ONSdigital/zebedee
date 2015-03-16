@@ -79,6 +79,10 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(ronny.email)+".json"))) {
             Serialiser.serialise(outputStream, ronny);
         }
+
+        Path sessions = zebedee.resolve(Zebedee.SESSIONS);
+        Files.createDirectories(sessions);
+
     }
 
     void delete() throws IOException {
@@ -164,7 +168,7 @@ public class Builder {
     /**
      * This method creates the expected set of folders for a Zebedee structure.
      * This code is intentionaly copied from
-     * {@link Collection#create(String, Zebedee)}. This ensures there's a fixed
+     * {@link Collection#create(com.github.onsdigital.zebedee.json.CollectionDescription, Zebedee)}. This ensures there's a fixed
      * expectation, rather than relying on a method that will be tested as part
      * of the test suite.
      *

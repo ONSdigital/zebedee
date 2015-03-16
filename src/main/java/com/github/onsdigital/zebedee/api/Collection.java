@@ -66,7 +66,7 @@ public class Collection {
                 }
 
                 com.github.onsdigital.zebedee.Collection.rename(
-                        existingCollection.description.name,
+                        existingCollection.description,
                         collectionDescription.name, Root.zebedee);
             }
         }

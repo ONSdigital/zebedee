@@ -12,6 +12,15 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 
 public class ContentIT {
+
+    @Test
+    public void shouldReturn400WhenNoUriIsSpecified() {
+        CollectionDescription description = CollectionIT.createCollection();
+
+        Response getResponse = get(Configuration.getBaseUrl() + "/content/" + description.name);
+        getResponse.then().assertThat().statusCode(400);
+    }
+
     @Test
     public void shouldAddContent() {
         CollectionDescription description = CollectionIT.createCollection();

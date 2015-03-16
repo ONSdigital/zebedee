@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -284,11 +285,11 @@ public class UsersTest {
 
         // When
         // We attempt to authenticate
-        String token = zebedee.users.authenticate(email, password);
+        boolean result = zebedee.users.authenticate(email, password);
 
         // Then
         // Authentication should succeed
-        assertTrue(StringUtils.isNotBlank(token));
+        assertTrue(result);
     }
 
     @Test
@@ -301,11 +302,11 @@ public class UsersTest {
 
         // When
         // We attempt to authenticate
-        String token = zebedee.users.authenticate(email, password);
+        boolean result = zebedee.users.authenticate(email, password);
 
         // Then
-        // We shouldn't get an error
-        assertTrue(StringUtils.isBlank(token));
+        // We should get an authentication failure, but no error
+        assertFalse(result);
     }
 
     @Test
@@ -318,10 +319,29 @@ public class UsersTest {
 
         // When
         // We attempt to authenticate
-        String token = zebedee.users.authenticate(email, password);
+        boolean result = zebedee.users.authenticate(email, password);
 
         // Then
-        // We shouldn't get an error
-        assertTrue(StringUtils.isBlank(token));
+        // We should get an authentication failure, but no error
+        assertFalse(result);
+    }
+
+    @Test
+    public void shouldSetPassword() throws Exception {
+
+        // Given
+        // An existing user
+        String email = "patricia@example.com";
+        User existing = zebedee.users.get(email);
+        String password = Random.password(8);
+        String oldHosh = existing.passwordHash;
+
+        // When
+        // We set the new password
+        boolean result = zebedee.users.setPassword(email, password);
+
+        // Then
+        // Authentication should succeed
+        assertTrue(zebedee.users.authenticate(email, password));
     }
 }

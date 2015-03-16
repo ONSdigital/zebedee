@@ -94,10 +94,19 @@ public class Collection {
         return new Collection(collectionDescription, zebedee);
     }
 
-    public static Collection rename(String name, String newName, Zebedee zebedee)
+    /**
+     * Renames an existing {@link Collection} in the given {@link Zebedee}.
+     *
+     * @param collectionDescription The {@link CollectionDescription} for the {@link Collection} to rename.
+     * @param newName               The new name to apply to the {@link Collection}.
+     * @param zebedee
+     * @return
+     * @throws IOException
+     */
+    public static Collection rename(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
             throws IOException {
 
-        String filename = PathUtils.toFilename(name);
+        String filename = PathUtils.toFilename(collectionDescription.name);
         String newFilename = PathUtils.toFilename(newName);
 
         Path collection = zebedee.collections.resolve(filename);
@@ -106,11 +115,11 @@ public class Collection {
         new File(collection.toUri()).renameTo(new File(newCollection.toUri()));
 
         // Create the description:
-        Path collectionDescription = zebedee.collections.resolve(newFilename
+        Path newPath = zebedee.collections.resolve(newFilename
                 + ".json");
         CollectionDescription description = new CollectionDescription();
         description.name = newName;
-        try (OutputStream output = Files.newOutputStream(collectionDescription)) {
+        try (OutputStream output = Files.newOutputStream(newPath)) {
             Serialiser.serialise(output, description);
         }
 

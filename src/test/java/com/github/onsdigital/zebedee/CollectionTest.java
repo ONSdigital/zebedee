@@ -68,7 +68,7 @@ public class CollectionTest {
 
         // When
         Collection.create(collectionDescription, zebedee);
-        Collection.rename(name, newName, zebedee);
+        Collection.rename(collectionDescription, newName, zebedee);
 
         // Then
         Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);

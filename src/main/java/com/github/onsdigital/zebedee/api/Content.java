@@ -20,10 +20,12 @@ import java.io.OutputStream;
 public class Content {
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // This API only reads the in progress changes.
+
         String uri = request.getParameter("uri");
-        if (StringUtils.isBlank(uri))
-            uri = "/";
+        if (StringUtils.isBlank(uri)) {
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return;
+        }
 
         java.nio.file.Path path = null;
         com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);

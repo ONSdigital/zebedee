@@ -11,17 +11,36 @@ import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by david on 12/03/2015.
  */
-public class Sessions {
+public class Sessions extends TimerTask {
     private Path sessions;
+    Timer timer;
 
     public Sessions(Path sessions) {
         this.sessions = sessions;
+
+        // Run every minute after the first minute:
+        timer = new Timer();
+        timer.schedule(this, 60 * 1000, 60 * 1000);
+    }
+
+    /**
+     * This is the entrypoint for {@link java.util.TimerTask}.
+     */
+    @Override
+    public void run() {
+        try {
+            deleteExpiredSessions();
+        } catch (IOException e) {
+            // Not much we can do.
+            // This could periodically spam the logs
+            // so need to review at some point.
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -34,23 +53,23 @@ public class Sessions {
      * @throws java.io.IOException If a filesystem error occurs.
      */
     public Session create(String email) throws IOException {
-        Session result = null;
+        Session session = null;
 
         if (StringUtils.isNotBlank(email)) {
 
             // Check for an existing session:
-            result = find(email);
+            session = find(email);
 
             // Otherwise go ahead and create
-            if (result == null) {
-                result = new Session();
-                result.id = Random.id();
-                result.email = email;
-                write(result, result.id);
+            if (session == null) {
+                session = new Session();
+                session.id = Random.id();
+                session.email = email;
+                write(session);
             }
         }
 
-        return result;
+        return session;
     }
 
     /**
@@ -66,12 +85,13 @@ public class Sessions {
 
         // Check the session record exists:
         if (exists(id)) {
-            // Deserialise the json to a session:
-            Path sessionPath = sessionPath(id);
-            result = read(id);
-            updateLastAccessed(result);
+            // Deserialise the json:
+            Session session = read(id);
+            if (!expired(session)) {
+                updateLastAccess(session);
+                result = session;
+            }
         }
-
         return result;
     }
 
@@ -84,73 +104,118 @@ public class Sessions {
      */
     public Session find(String email) throws IOException {
         Session result = null;
+        Session session = null;
 
+        // Find the session we're looking for:
         iterate:
-        try (DirectoryStream<Path> stream = Files
-                .newDirectoryStream(sessions)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessions)) {
             for (Path entry : stream) {
                 if (!Files.isDirectory(entry)) {
 
                     // Examine each session for a match to the email address:
-                    Session session = read(entry);
-                    if (StringUtils.equalsIgnoreCase(session.email, email)
-                            && valid(session)) {
-                        result = session;
-                    }
-
-                    // Break out if we've found the session:
-                    if (result != null) {
-                        updateLastAccessed(session);
+                    Session candidate = read(entry);
+                    if (StringUtils.equalsIgnoreCase(candidate.email, email)
+                            && !expired(candidate)) {
+                        session = candidate;
                         break iterate;
                     }
                 }
             }
         }
 
+        // Update the last accessed date if we've found the session.
+        // NB this is outside of the DirectoryStream block to
+        // avoid any potential clash between input and output streams
+        // (When updating the Last accessed date)
+        if (!expired(session)) {
+            updateLastAccess(session);
+            result = session;
+        }
+
         return result;
     }
 
+    /**
+     * Determines whether a session exists for the given ID.
+     *
+     * @param id The ID to check.
+     * @return If the ID is not blank and a corresponding session exists, true.
+     * @throws IOException If a filesystem error occurs.
+     */
     private boolean exists(String id) throws IOException {
         return StringUtils.isNotBlank(id) && Files.exists(sessionPath(id));
     }
 
-    private Session updateLastAccessed(Session session) throws IOException {
-        Session result = null;
 
-        if (valid(session) && exists(session.id)) {
+    /**
+     * Iterates all sessions and deletes expired ones.
+     *
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void deleteExpiredSessions() throws IOException {
 
-            result = read(session.id);
-            result.lastAccess = new Date();
-            write(session, result.id);
+        List<Session> expired = new ArrayList<>();
+
+        // Find the session we're looking for:
+        iterate:
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessions)) {
+            for (Path entry : stream) {
+                if (!Files.isDirectory(entry)) {
+
+                    // Examine each session to see if it has expired:
+                    Session session = read(entry);
+                    if (expired(session)) {
+                        expired.add(session);
+                    }
+                }
+            }
+        }
+
+        // Delete expired sessions:
+        for (Session session : expired) {
+            System.out.println("Deleting expired session " + session.id);
+            Files.delete(sessionPath(session.id));
+        }
+    }
+
+    /**
+     * Determines whether the given session has expired.
+     *
+     * @param session The session to check.
+     * @return If the session is not null and the last access time is
+     * more than 60 minutes in the past, true.
+     */
+    private boolean expired(Session session) {
+        boolean result = false;
+
+        if (session != null) {
+            Calendar expiry = Calendar.getInstance();
+            expiry.add(Calendar.MINUTE, -60);
+            result = session.lastAccess.before(expiry.getTime());
         }
 
         return result;
     }
 
-    private boolean valid(Session session) {
-        Calendar expiry = Calendar.getInstance();
-        expiry.add(Calendar.MINUTE, -60);
-        return session != null && StringUtils.isNotBlank(session.email)
-                && !session.lastAccess.before(expiry.getTime());
-    }
-
-    private void write(Session session, String id) throws IOException {
-        Path path = sessionPath(session.id);
-        try (OutputStream output = Files.newOutputStream(path)) {
-            Serialiser.serialise(output, session);
+    /**
+     * Updates the last access time and saves the session to disk.
+     *
+     * @param session The session to update.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void updateLastAccess(Session session) throws IOException {
+        if (session != null) {
+            session.lastAccess = new Date();
+            write(session);
         }
     }
 
-    private Session read(String id) throws IOException {
-        return read(sessionPath(id));
-    }
-
-    private Session read(Path path) throws IOException {
-        try (InputStream input = Files.newInputStream(path)) {
-            return Serialiser.deserialise(input, Session.class);
-        }
-    }
-
+    /**
+     * Determines the filesystem path for the given session ID.
+     *
+     * @param id The ID to get a path for.
+     * @return The path, or null if the ID is blank.
+     */
     private Path sessionPath(String id) {
         Path result = null;
 
@@ -161,6 +226,50 @@ public class Sessions {
         }
 
         return result;
+    }
+
+    /**
+     * Reads the session with the given ID from disk.
+     *
+     * @param id The ID to be read.
+     * @return The session, or
+     * @throws IOException
+     */
+    private Session read(String id) throws IOException {
+        return read(sessionPath(id));
+    }
+
+    /**
+     * Reads a {@link com.github.onsdigital.zebedee.json.Session} object
+     * from the given {@link java.nio.file.Path}
+     *
+     * @param path The path to read from.
+     * @return The read session.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private Session read(Path path) throws IOException {
+        Session session = null;
+
+        if (Files.exists(path)) {
+            try (InputStream input = Files.newInputStream(path)) {
+                session = Serialiser.deserialise(input, Session.class);
+            }
+        }
+
+        return session;
+    }
+
+    /**
+     * Writes a session object to disk.
+     *
+     * @param session The {@link com.github.onsdigital.zebedee.json.Session} to be written.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private void write(Session session) throws IOException {
+        Path path = sessionPath(session.id);
+        try (OutputStream output = Files.newOutputStream(path)) {
+            Serialiser.serialise(output, session);
+        }
     }
 
     // TODO: Add an expiry method to delete old sessions.

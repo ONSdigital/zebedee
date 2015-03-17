@@ -10,4 +10,4 @@ deploy:
   on:
     repo: davidcarboni/zebedee
 after_deploy:
-  - mvn -DbaseUrl=https://zebedee.herokuapp.com clean test-compile failsafe:integration-test
+  - mvn -DbaseUrl=$BASE_URL clean test-compile failsafe:integration-test

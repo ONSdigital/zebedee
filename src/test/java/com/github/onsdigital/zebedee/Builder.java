@@ -68,7 +68,8 @@ public class Builder {
         patricia.name = "Patricia Pumpkin";
         patricia.email = "patricia@example.com";
         patricia.passwordHash = Password.hash("password");
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(patricia.email)+".json"))) {
+        patricia.inactive = false;
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(patricia.email) + ".json"))) {
             Serialiser.serialise(outputStream, patricia);
         }
 
@@ -76,7 +77,8 @@ public class Builder {
         ronny.name = "Ronny Roller";
         ronny.email = "ronny@example.com";
         ronny.passwordHash = Password.hash("secret");
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(ronny.email)+".json"))) {
+        ronny.inactive = false;
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(ronny.email) + ".json"))) {
             Serialiser.serialise(outputStream, ronny);
         }
 
@@ -167,7 +169,7 @@ public class Builder {
 
     /**
      * This method creates the expected set of folders for a Zebedee structure.
-     * This code is intentionaly copied from
+     * This code is intentionally copied from
      * {@link Collection#create(com.github.onsdigital.zebedee.json.CollectionDescription, Zebedee)}. This ensures there's a fixed
      * expectation, rather than relying on a method that will be tested as part
      * of the test suite.

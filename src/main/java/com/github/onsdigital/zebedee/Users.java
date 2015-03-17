@@ -71,10 +71,19 @@ public class Users {
         return result;
     }
 
+    /**
+     * Updates the specified {@link com.github.onsdigital.zebedee.json.User}.
+     * NB this does not allow you to update the email address, because
+     * that would entail renaming the Json file that contains the user record.
+     *
+     * @param user The user record to be updated
+     * @return The updated record.
+     * @throws IOException If a filesystem error occurs.
+     */
     public User update(User user) throws IOException {
         User result = null;
 
-        if (exists(user.email)) {
+        if (exists(user)) {
 
             result = get(user.email);
             if (StringUtils.isNotBlank(user.name))
@@ -88,14 +97,37 @@ public class Users {
         return result;
     }
 
+    /**
+     * Determines whether the given {@link com.github.onsdigital.zebedee.json.User} exists.
+     *
+     * @param user Can be null.
+     * @return If the given user can be mapped to a user record, true.
+     * @throws IOException If a filesystem error occurs.
+     */
     public boolean exists(User user) throws IOException {
         return user != null && exists(user.email);
     }
 
+    /**
+     * Determines whether a {@link com.github.onsdigital.zebedee.json.User} record exists for the given email.
+     *
+     * @param email Can be null.
+     * @return If the given email can be mapped to a user record, true.
+     * @throws IOException If a filesystem error occurs.
+     */
     public boolean exists(String email) throws IOException {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
+    /**
+     * Authenticates using the given email address and password.
+     *
+     * @param email    The user ID.
+     * @param password The user's password.
+     * @return If given email maps to a {@link com.github.onsdigital.zebedee.json.User} record
+     * and the password validates against the stored hash, true.
+     * @throws IOException
+     */
     public boolean authenticate(String email, String password) throws IOException {
         boolean result = false;
 
@@ -128,18 +160,12 @@ public class Users {
         return result;
     }
 
-    private Path userPath(String email) {
-        Path result = null;
-
-        if (StringUtils.isNotBlank(email)) {
-            String userFileName = PathUtils.toFilename(email);
-            userFileName += ".json";
-            result = users.resolve(userFileName);
-        }
-
-        return result;
-    }
-
+    /**
+     * Determines whether the given {@link com.github.onsdigital.zebedee.json.User} is valid.
+     *
+     * @param user The object to check.
+     * @return If the user is not null and neither email nor name ar blank, true.
+     */
     private boolean valid(User user) {
         return user != null && StringUtils.isNoneBlank(user.email, user.name);
     }
@@ -151,9 +177,36 @@ public class Users {
      * @throws IOException If a filesystem error occurs.
      */
     private void write(User user) throws IOException {
+        user.email = normalise(user.email);
         Path userPath = userPath(user.email);
         try (OutputStream output = Files.newOutputStream(userPath)) {
             Serialiser.serialise(output, user);
         }
+    }
+
+    /**
+     * Generates a {@link java.nio.file.Path} for the given email address.
+     *
+     * @param email The email address to generate a {@link java.nio.file.Path} for.
+     * @return A {@link java.nio.file.Path} to the specified user record.
+     */
+    private Path userPath(String email) {
+        Path result = null;
+
+        if (StringUtils.isNotBlank(email)) {
+            String userFileName = PathUtils.toFilename(normalise(email));
+            userFileName += ".json";
+            result = users.resolve(userFileName);
+        }
+
+        return result;
+    }
+
+    /**
+     * @param email An email address to be standardised.
+     * @return The given email, trimmed and lowercased.
+     */
+    private String normalise(String email) {
+        return StringUtils.lowerCase(StringUtils.trim(email));
     }
 }

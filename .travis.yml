@@ -1,3 +1,8 @@
 language: java
 jdk:
-- openjdk7
+- oraclejdk7
+deploy:
+  api_key:
+    secure: R89ay/6L8wsuwkiuVAph1nFRhD07UEKcYGUGB09hQ6Ol89nLd0+yqflVs4tiYCv/4Rqd25uu+Qk64BvM5z3/Z3jqpy9R79q0R5JxUa1QUzCkzm23hTHEi0D6cgoQyOWT0ZClX0yW9pQum2tOxo9q0hHVJDjzDFpUnEJ0Z/SFjic=
+after_deploy:
+  - mvn -DbaseUrl=https://zebedee.herokuapp.com clean test-compile failsafe:integration-test

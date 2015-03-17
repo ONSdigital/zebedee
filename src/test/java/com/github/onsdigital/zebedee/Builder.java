@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.io.FileUtils;
@@ -10,8 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * This is a utility class to build a known {@link Zebedee} structure for
@@ -85,6 +85,23 @@ public class Builder {
         Path sessions = zebedee.resolve(Zebedee.SESSIONS);
         Files.createDirectories(sessions);
 
+        // Set up some permissions:
+        Path permissions = zebedee.resolve(Zebedee.PERMISSIONS);
+        Files.createDirectories(permissions);
+
+        AccessMapping accessMapping = new AccessMapping();
+        accessMapping.digitalPublishingTeam = new HashSet<>();
+        accessMapping.digitalPublishingTeam.add(patricia.email);
+        accessMapping.paths = new HashMap<>();
+
+        Set contentOwners = new HashSet<>();
+        contentOwners.add(ronny.email);
+        accessMapping.paths.put("/economy", contentOwners);
+
+        Path path = permissions.resolve("accessMapping.json");
+        try (OutputStream output = Files.newOutputStream(path)) {
+            Serialiser.serialise(output, accessMapping);
+        }
     }
 
     void delete() throws IOException {

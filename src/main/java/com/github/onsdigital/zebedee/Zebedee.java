@@ -6,17 +6,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Zebedee {
+
+
     static final String ZEBEDEE = "zebedee";
     static final String PUBLISHED = "published";
     static final String COLLECTIONS = "collections";
     static final String USERS = "users";
     static final String SESSIONS = "sessions";
+    static final String PERMISSIONS = "permissions";
 
     public final Path path;
     public final Content published;
     public final Path collections;
     public final Users users;
     public final Sessions sessions;
+    public final Permissions permissions;
 
     Zebedee(Path path) {
 
@@ -26,6 +30,7 @@ public class Zebedee {
         Path collections = path.resolve(COLLECTIONS);
         Path users = path.resolve(USERS);
         Path sessions = path.resolve(SESSIONS);
+        Path permissions = path.resolve(PERMISSIONS);
         if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a collection folder: "
@@ -35,6 +40,7 @@ public class Zebedee {
         this.collections = collections;
         this.users = new Users(users);
         this.sessions = new Sessions(sessions);
+        this.permissions = new Permissions(permissions);
     }
 
     /**
@@ -50,6 +56,7 @@ public class Zebedee {
         Files.createDirectory(path.resolve(COLLECTIONS));
         Files.createDirectory(path.resolve(USERS));
         Files.createDirectory(path.resolve(SESSIONS));
+        Files.createDirectory(path.resolve(PERMISSIONS));
         return new Zebedee(path);
     }
 

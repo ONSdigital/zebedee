@@ -78,9 +78,9 @@ public class Users {
 
             result = get(user.email);
             if (StringUtils.isNotBlank(user.name))
-            result.name = user.name;
+                result.name = user.name;
             if (user.inactive != null)
-            result.inactive = user.inactive;
+                result.inactive = user.inactive;
 
             write(result);
         }
@@ -107,12 +107,21 @@ public class Users {
         return result;
     }
 
+    /**
+     * Setst the specified user's password and sets the account to active.
+     *
+     * @param email    The user ID.
+     * @param password The password to set.
+     * @return True if the password was set. If no user exists for the given email address, false.
+     * @throws IOException If a filesystem error occurs.
+     */
     public boolean setPassword(String email, String password) throws IOException {
         boolean result = false;
 
         User user = get(email);
         if (user != null) {
             user.passwordHash = Password.hash(password);
+            user.inactive = false;
             write(user);
         }
 

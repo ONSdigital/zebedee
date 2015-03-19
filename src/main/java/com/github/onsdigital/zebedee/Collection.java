@@ -85,10 +85,9 @@ public class Collection {
         // Create the description:
         Path collectionDescriptionPath = zebedee.collections.resolve(filename
                 + ".json");
-        CollectionDescription description = new CollectionDescription();
-        description.name = collectionDescription.name;
+
         try (OutputStream output = Files.newOutputStream(collectionDescriptionPath)) {
-            Serialiser.serialise(output, description);
+            Serialiser.serialise(output, collectionDescription);
         }
 
         return new Collection(collectionDescription, zebedee);

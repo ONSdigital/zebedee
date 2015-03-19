@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.api;
+package com.github.onsdigital.zebedee.filters;
 
 import com.github.davidcarboni.restolino.framework.Filter;
 import com.github.onsdigital.zebedee.configuration.Configuration;

@@ -155,6 +155,7 @@ public class Users {
             user.passwordHash = Password.hash(password);
             user.inactive = false;
             write(user);
+            result = true;
         }
 
         return result;

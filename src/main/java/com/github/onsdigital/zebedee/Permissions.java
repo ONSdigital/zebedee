@@ -9,7 +9,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
@@ -17,37 +20,72 @@ import java.util.*;
  */
 public class Permissions {
     private Path permissions;
-    Timer timer;
 
     public Permissions(Path permissions) {
         this.permissions = permissions;
     }
 
+    /**
+     * Determines whether the specified user has editing rights.
+     *
+     * @param email The user's email.
+     * @return True if the user is a member of the Digital Publishing team.
+     * @throws IOException If a filesystem error occurs.
+     */
     public boolean canEdit(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         return canEdit(email, accessMapping);
     }
 
+    /**
+     * Determines whether the specified user has viewing rights.
+     *
+     * @param email The user's email.
+     * @param path  The path to be viewed.
+     * @return True if the user is a member of the Digital Publishing team or
+     * the user is a content owner with access to the given path or any parent path.
+     * @throws IOException If a filesystem error occurs.
+     */
     public boolean canView(String email, String path) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         return canEdit(email, accessMapping) || canView(email, path, accessMapping);
     }
 
+    /**
+     * Adds the specified user to the Digital Publishing team, giving them access to read and write all content.
+     *
+     * @param email The user's email.
+     * @throws IOException If a filesystem error occurs.
+     */
     public void addEditor(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         accessMapping.digitalPublishingTeam.add(email);
         writeAccessMapping(accessMapping);
     }
 
+
+    /**
+     * Removes the specified user to the Digital Publishing team, revoking access to read and write all content.
+     *
+     * @param email The user's email.
+     * @throws IOException If a filesystem error occurs.
+     */
     public void removeEditor(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         accessMapping.digitalPublishingTeam.remove(email);
         writeAccessMapping(accessMapping);
     }
 
+    /**
+     * Adds the specified user to the content owners, giving them access to read content at the given path and all sub-paths.
+     *
+     * @param email The user's email.
+     * @param path  The path under which the user will get read access.
+     * @throws IOException If a filesystem error occurs.
+     */
     public void addViewer(String email, String path) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
-        Set viewers = accessMapping.paths.get(path);
+        Set<String> viewers = accessMapping.paths.get(path);
         if (viewers == null) {
             viewers = new HashSet<>();
         }
@@ -56,10 +94,17 @@ public class Permissions {
         writeAccessMapping(accessMapping);
     }
 
+    /**
+     * removes the specified user to the content owners, giving them access to read content at the given path and all sub-paths.
+     *
+     * @param email The user's email.
+     * @param path  The path under which the user will get read access.
+     * @throws IOException If a filesystem error occurs.
+     */
     public void removeViewer(String email, String path) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
 
-        // Check to see if the requested path matches (or is a sub-path of) any mapping:
+// Check to see if the requested path matches (or is a sub-path of) any mapping:
         for (Map.Entry<String, Set<String>> mapping : accessMapping.paths.entrySet()) {
             boolean isSubPath = StringUtils.startsWithIgnoreCase(mapping.getKey(), path);
             boolean emailMatches = mapping.getValue().contains(email);

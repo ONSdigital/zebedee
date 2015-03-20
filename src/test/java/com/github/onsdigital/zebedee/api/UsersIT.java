@@ -5,6 +5,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Configuration;
 import com.github.onsdigital.zebedee.json.User;
 import com.jayway.restassured.response.Response;
+import com.jayway.restassured.response.ValidatableResponse;
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
@@ -54,13 +55,15 @@ public class UsersIT {
         Response getResponse = given().param("email", email).get(Configuration.getBaseUrl() + "/users");
 
         // Then
+        ValidatableResponse post = postResponse.then();
+        ValidatableResponse get = getResponse.then();
 
         // The user should be created
-        postResponse.then().assertThat().statusCode(200);
+        post.assertThat().statusCode(200);
+        get.assertThat().statusCode(200);
 
         // We should get the expected user details
-        getResponse.then().assertThat().statusCode(200);
-        getResponse.then().body("email", is(email));
-        getResponse.then().body("name", is(name));
+        get.body("email", is(email));
+        get.body("name", is(name));
     }
 }

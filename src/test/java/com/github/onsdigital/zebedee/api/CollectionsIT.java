@@ -27,6 +27,9 @@ public class CollectionsIT {
                 new TypeToken<List<CollectionDescription>>() {
                 }.getType());
 
+        if (collections == null) {
+            fail("No collections returned.");
+        }
 
         for (CollectionDescription collection : collections) {
             if (collection.name.equals(description.name))

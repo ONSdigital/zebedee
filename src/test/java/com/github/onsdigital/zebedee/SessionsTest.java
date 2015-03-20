@@ -61,7 +61,6 @@ public class SessionsTest {
         Assert.assertEquals(session.id, newSession.id);
     }
 
-
     @Test
     public void shouldGetSession() throws Exception {
 
@@ -80,7 +79,6 @@ public class SessionsTest {
         Assert.assertEquals(existingSession.id, session.id);
     }
 
-
     @Test
     public void shouldNotGetNonexistentSession() throws Exception {
 
@@ -95,6 +93,22 @@ public class SessionsTest {
 
         // Then
         // No session should be returned
+        Assert.assertNull(session);
+    }
+
+    @Test
+    public void shouldNotThrowErrorForNullSessionToken() throws Exception {
+
+        // Given
+        // An empty session token
+        String token = null;
+
+        // When
+        // We try to get a session
+        Session session = zebedee.sessions.get(token);
+
+        // Then
+        // No error should be thrown
         Assert.assertNull(session);
     }
 }

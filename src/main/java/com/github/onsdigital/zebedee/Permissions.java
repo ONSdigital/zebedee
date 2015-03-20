@@ -26,6 +26,17 @@ public class Permissions {
     }
 
     /**
+     * Determines whether the specified user has administator permissions.
+     *
+     * @param email  The user's emal.
+     * @return True if the user is an administrator.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private boolean isAdministrator(String email, AccessMapping accessMapping) throws IOException {
+        return accessMapping.owners.contains(email);
+    }
+
+    /**
      * Determines whether the specified user has editing rights.
      *
      * @param email The user's email.
@@ -49,6 +60,31 @@ public class Permissions {
     public boolean canView(String email, String path) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         return canEdit(email, accessMapping) || canView(email, path, accessMapping);
+    }
+
+    /**
+     * Adds the specified user to the owners, giving them administrator permissions (but not content permissions).
+     *
+     * @param email The user's email.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void addOwner(String email) throws IOException {
+        AccessMapping accessMapping = readAccessMapping();
+        accessMapping.owners.add(email);
+        writeAccessMapping(accessMapping);
+    }
+
+
+    /**
+     * Removes the specified user from the owners, revoking administrative permissions (but not content permissions).
+     *
+     * @param email The user's email.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void removeOwner(String email) throws IOException {
+        AccessMapping accessMapping = readAccessMapping();
+        accessMapping.owners.remove(email);
+        writeAccessMapping(accessMapping);
     }
 
     /**

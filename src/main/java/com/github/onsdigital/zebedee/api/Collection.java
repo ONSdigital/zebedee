@@ -36,7 +36,7 @@ public class Collection {
     }
 
     @POST
-    public void createOrUpdate(HttpServletRequest request,
+    public boolean createOrUpdate(HttpServletRequest request,
                                HttpServletResponse response,
                                CollectionDescription collectionDescription) throws IOException {
 
@@ -51,7 +51,7 @@ public class Collection {
             if (Root.zebedee.getCollections().hasCollection(
                     collectionDescription.name)) {
                 response.setStatus(HttpStatus.CONFLICT_409);
-                return;
+                return false;
             }
 
             com.github.onsdigital.zebedee.Collection.create(
@@ -62,7 +62,7 @@ public class Collection {
                 if (Root.zebedee.getCollections().hasCollection(
                         collectionDescription.name)) {
                     response.setStatus(HttpStatus.CONFLICT_409);
-                    return;
+                    return false;
                 }
 
                 com.github.onsdigital.zebedee.Collection.rename(
@@ -70,5 +70,6 @@ public class Collection {
                         collectionDescription.name, Root.zebedee);
             }
         }
+        return true;
     }
 }

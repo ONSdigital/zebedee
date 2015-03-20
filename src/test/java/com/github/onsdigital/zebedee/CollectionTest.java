@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -7,13 +8,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CollectionTest {
 
@@ -54,6 +55,15 @@ public class CollectionTest {
         assertTrue(Files.exists(jsonPath));
         assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
+
+        CollectionDescription createdCollectionDescription;
+        try (InputStream inputStream = Files.newInputStream(jsonPath)) {
+            createdCollectionDescription = Serialiser.deserialise(inputStream, CollectionDescription.class);
+        }
+
+        assertNotNull(createdCollectionDescription);
+        assertEquals(collectionDescription.name, createdCollectionDescription.name);
+        assertEquals(collectionDescription.publishDate, createdCollectionDescription.publishDate);
     }
 
     @Test

@@ -39,4 +39,16 @@ public class CollectionDescription {
     public CollectionDescription(String name) {
         this.name = name;
     }
+
+    /**
+     * Convenience constructor for instantiating with a name
+     * and publish date.
+     *
+     * @param name
+     * @param publishDate
+     */
+    public CollectionDescription(String name, Date publishDate) {
+        this.publishDate = publishDate;
+        this.name = name;
+    }
 }

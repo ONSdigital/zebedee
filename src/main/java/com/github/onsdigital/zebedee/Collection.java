@@ -75,6 +75,7 @@ public class Collection {
             throws IOException {
 
         String filename = PathUtils.toFilename(collectionDescription.name);
+        collectionDescription.id = filename;
 
         // Create the folders:
         Path collection = zebedee.collections.resolve(filename);
@@ -116,15 +117,19 @@ public class Collection {
         // Create the description:
         Path newPath = zebedee.collections.resolve(newFilename
                 + ".json");
-        CollectionDescription description = new CollectionDescription();
-        description.name = newName;
+
+        CollectionDescription renamedCollectionDescription = new CollectionDescription(
+                newName,
+                collectionDescription.publishDate);
+        renamedCollectionDescription.id = newFilename;
+
         try (OutputStream output = Files.newOutputStream(newPath)) {
-            Serialiser.serialise(output, description);
+            Serialiser.serialise(output, renamedCollectionDescription);
         }
 
         Files.delete(zebedee.collections.resolve(filename + ".json"));
 
-        return new Collection(description, zebedee);
+        return new Collection(renamedCollectionDescription, zebedee);
     }
 
     /**

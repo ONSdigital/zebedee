@@ -29,6 +29,7 @@ public class Collection {
 
         // Collate the result:
         CollectionDescription result = new CollectionDescription();
+        result.id = collection.description.id;
         result.name = collection.description.name;
         result.inProgressUris = collection.inProgressUris();
         result.approvedUris = collection.approvedUris();

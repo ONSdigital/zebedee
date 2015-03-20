@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +52,8 @@ public class CollectionTest {
         Path releasePath = rootPath.resolve(filename);
         Path jsonPath = rootPath.resolve(filename + ".json");
 
+        assertTrue(StringUtils.isNotEmpty(collectionDescription.id));
+
         assertTrue(Files.exists(releasePath));
         assertTrue(Files.exists(jsonPath));
         assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
@@ -92,6 +95,17 @@ public class CollectionTest {
         assertTrue(!Files.exists(oldJsonPath));
         assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
+
+        CollectionDescription renamedCollectionDescription;
+        try (InputStream inputStream = Files.newInputStream(jsonPath)) {
+            renamedCollectionDescription = Serialiser.deserialise(inputStream, CollectionDescription.class);
+        }
+
+        assertNotNull(renamedCollectionDescription);
+        assertNotEquals(collectionDescription.id, renamedCollectionDescription.id);
+        assertEquals(filename, renamedCollectionDescription.id);
+        assertEquals(newName, renamedCollectionDescription.name);
+        assertEquals(collectionDescription.publishDate, renamedCollectionDescription.publishDate);
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -11,6 +11,11 @@ import java.util.List;
  * @author david
  */
 public class CollectionDescription {
+
+    /**
+     * The unique identifier of this {@link Collection}.
+     */
+    public String id;
     /**
      * The readable name of this {@link Collection}.
      */

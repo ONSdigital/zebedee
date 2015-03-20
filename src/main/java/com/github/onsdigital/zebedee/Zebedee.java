@@ -1,5 +1,8 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.cryptolite.Password;
+import com.github.onsdigital.zebedee.json.User;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -57,6 +60,16 @@ public class Zebedee {
         Files.createDirectory(path.resolve(USERS));
         Files.createDirectory(path.resolve(SESSIONS));
         Files.createDirectory(path.resolve(PERMISSIONS));
+
+        // Create the initial user:
+        Zebedee zebedee = new Zebedee(path);
+        User user = new User();
+        user.email = "florence@magicroundabout.ons.gov.uk";
+        user.name = "Florence";
+        user.passwordHash = Password.hash("Doug4l");
+        user.inactive = false;
+        zebedee.users.create(user);
+        zebedee.permissions.addOwner(user.email);
         return new Zebedee(path);
     }
 

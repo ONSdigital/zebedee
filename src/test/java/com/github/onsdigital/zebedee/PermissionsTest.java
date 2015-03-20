@@ -238,4 +238,22 @@ public class PermissionsTest {
         assertFalse(zebedee.permissions.canView(email, "/economy/subpath"));
         assertFalse(zebedee.permissions.canEdit(email));
     }
+
+    @Test
+    public void shouldAddAdministrator() throws IOException {
+
+        // Given
+        // A new Administrator user
+        String email = "blue@cat.com";
+
+        // When
+        // We add the user as an administrator
+        zebedee.permissions.addOwner(email);
+
+        // Then
+        // The new user should get only admin permission:
+        assertTrue(zebedee.permissions.);
+        assertFalse(zebedee.permissions.canView(email, "/economy"));
+        assertFalse(zebedee.permissions.canEdit(email));
+    }
 }

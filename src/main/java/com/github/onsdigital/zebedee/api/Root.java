@@ -21,7 +21,7 @@ import java.util.List;
 public class Root implements Startup {
 
     static Path root;
-    static Zebedee zebedee;
+    public static Zebedee zebedee;
 
     /**
      * Recursively lists all files within this {@link Content}.

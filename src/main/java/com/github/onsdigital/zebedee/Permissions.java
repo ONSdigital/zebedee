@@ -69,7 +69,7 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addOwner(String email) throws IOException {
+    public void addAdministrator(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         if (accessMapping.owners == null) {
             accessMapping.owners = new HashSet<>();
@@ -202,10 +202,13 @@ public class Permissions {
         }
 
         // Or generate a new one:
-        System.out.println("Generating new access mapping configuration.");
         AccessMapping accessMapping = new AccessMapping();
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.paths = new HashMap<>();
+        System.out.println("\t*****");
+        System.out.println(path + " : " + Files.exists(path));
+        System.out.println(path.getParent().getParent() + " : " + Files.exists(path.getParent().getParent()));
+        System.out.println(path.getParent().getParent() + " : " + Files.exists(path.getParent().getParent()));
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
@@ -214,7 +217,6 @@ public class Permissions {
 
     private void writeAccessMapping(AccessMapping accessMapping) throws IOException {
         Path path = permissions.resolve("accessMapping.json");
-        System.out.println(path);
 
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);

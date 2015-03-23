@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,7 @@ public class UsersTest {
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
+        Root.zebedee = zebedee;
     }
 
     @After

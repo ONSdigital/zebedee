@@ -248,7 +248,7 @@ public class PermissionsTest {
 
         // When
         // We add the user as an administrator
-        zebedee.permissions.addOwner(email);
+        zebedee.permissions.addAdministrator(email);
 
         // Then
         // The new user should get only admin permission:

@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
@@ -117,8 +116,6 @@ public class Builder {
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
-
-        Root.zebedee = new Zebedee(zebedee);
     }
 
     void delete() throws IOException {

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,7 @@ public class CollectionTest {
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
+        Root.zebedee = zebedee;
         collection = new Collection(builder.collections.get(1), zebedee);
     }
 

@@ -69,7 +69,7 @@ public class Zebedee {
         user.passwordHash = Password.hash("Doug4l");
         user.inactive = false;
         zebedee.users.create(user);
-        zebedee.permissions.addOwner(user.email);
+        zebedee.permissions.addAdministrator(user.email);
         return new Zebedee(path);
     }
 

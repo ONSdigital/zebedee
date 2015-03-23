@@ -293,9 +293,6 @@ public class Collection {
     /**
      * This only enables you to access the content of items that are currently
      * in progress.
-     * <p/>
-     * To open an item for editing, use {@link #create(String, String)},
-     * {@link #edit(String, String)} or {@link #copy(String, String, String)}
      *
      * @param uri The URI of the item.
      * @return The {@link Path} to the item, so that you can call e.g.

@@ -18,6 +18,7 @@ import java.nio.file.Path;
 
 import static org.junit.Assert.*;
 
+
 public class CollectionTest {
 
     Zebedee zebedee;

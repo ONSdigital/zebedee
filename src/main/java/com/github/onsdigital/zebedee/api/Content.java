@@ -65,8 +65,12 @@ public class Content {
         if (StringUtils.isBlank(uri))
             uri = "/";
 
+        // Check the user has edit permission
         String id = request.getHeader(AuthenticationFilter.tokenHeader);
         Session session = Root.zebedee.sessions.get(id);
+        if (!Root.zebedee.permissions.canEdit(session.email)) {
+            return false;
+        }
 
         java.nio.file.Path path = null;
         com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);

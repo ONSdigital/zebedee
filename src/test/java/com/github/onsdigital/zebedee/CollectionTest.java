@@ -231,12 +231,17 @@ public class CollectionTest {
         boolean edited = collection.edit(email, uri);
 
         // Then
+
+        // It should be edited
         assertTrue(edited);
+
+        // It should be in in progress
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
+        // The approved copy should still be there in case we need to roll back
         Path approved = builder.collections.get(1).resolve(Collection.APPROVED);
-        assertFalse(Files.exists(approved.resolve(uri.substring(1))));
+        assertTrue(Files.exists(approved.resolve(uri.substring(1))));
     }
 
     @Test

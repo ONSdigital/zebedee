@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,7 +14,7 @@ public class Content {
 
 	public final Path path;
 
-	Content(Path path) {
+	public Content(Path path) {
 		this.path = path;
 		if (!Files.exists(path)) {
 			throw new IllegalArgumentException("Path does not exist: "
@@ -35,7 +35,7 @@ public class Content {
 		return get(uri.getPath());
 	}
 
-	Path get(String uri) {
+    public Path get(String uri) {
 		Path path = toPath(uri);
 		Path result = null;
 		if (Files.exists(path)) {
@@ -54,7 +54,7 @@ public class Content {
 	 *            The URI of the item.
 	 * @return A {@link Path} to the [potential] location of the specified item.
 	 */
-	Path toPath(String uri) {
+    public Path toPath(String uri) {
 		String relative = uri;
 		if (StringUtils.startsWith(uri, "/")) {
 			relative = StringUtils.substring(uri, 1);

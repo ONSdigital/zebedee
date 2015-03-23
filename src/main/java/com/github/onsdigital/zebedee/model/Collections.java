@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
 import org.apache.commons.lang3.StringUtils;
 

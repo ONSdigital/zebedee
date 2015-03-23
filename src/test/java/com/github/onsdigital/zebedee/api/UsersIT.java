@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Configuration;
+import com.github.onsdigital.zebedee.model.Configuration;
 import com.github.onsdigital.zebedee.json.User;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ValidatableResponse;

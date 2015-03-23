@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.model.*;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -11,8 +12,8 @@ public class Zebedee {
 
 
     static final String ZEBEDEE = "zebedee";
-    static final String PUBLISHED = "published";
-    static final String COLLECTIONS = "collections";
+    public static final String PUBLISHED = "published";
+    public static final String COLLECTIONS = "collections";
     static final String USERS = "users";
     static final String SESSIONS = "sessions";
     static final String PERMISSIONS = "permissions";
@@ -24,7 +25,7 @@ public class Zebedee {
     public final Sessions sessions;
     public final Permissions permissions;
 
-    Zebedee(Path path) {
+    public Zebedee(Path path) {
 
         // Validate the directory:
         this.path = path;
@@ -53,6 +54,8 @@ public class Zebedee {
      * @throws IOException If a filesystem error occurs.
      */
     public static Zebedee create(Path parent) throws IOException {
+
+        // Create the folder structure
         Path path = Files.createDirectory(parent.resolve(ZEBEDEE));
         Files.createDirectory(path.resolve(PUBLISHED));
         Files.createDirectory(path.resolve(COLLECTIONS));
@@ -60,28 +63,19 @@ public class Zebedee {
         Files.createDirectory(path.resolve(SESSIONS));
         Files.createDirectory(path.resolve(PERMISSIONS));
 
-        // Create the initial user:
-        Zebedee zebedee = new Zebedee(path);
-
-        // Create the user
+        // Create the initial user
         User user = new User();
         user.email = "florence@magicroundabout.ons.gov.uk";
         user.name = "Florence";
-        User created = zebedee.users.create(user);
+        user.passwordHash = "";
+        Zebedee zebedee = new Zebedee(path);
+        Users.createAdmin(zebedee, user);
 
-        // Update the user
-        created.inactive = false;
-        zebedee.users.update(created);
-        zebedee.users.setPassword(user.email,"Doug4l");
-
-        // Grant admin permissions
-        zebedee.permissions.addAdministrator(user.email);
-
-        return new Zebedee(path);
+        return zebedee;
     }
 
     /**
-     * This method works out how many {@link Collection}s contain the given URI.
+     * This method works out how many {@link com.github.onsdigital.zebedee.model.Collection}s contain the given URI.
      * The intention is to allow double-checking in case of concurrent editing.
      * This should be 0 in order for someone to be allowed to edit a URI and
      * should be 1 after editing is initiated. If this returns more than 1 after
@@ -89,7 +83,7 @@ public class Zebedee {
      * presumably a race condition.
      *
      * @param uri The URI to check.
-     * @return The number of {@link Collection}s containing the given URI.
+     * @return The number of {@link com.github.onsdigital.zebedee.model.Collection}s containing the given URI.
      * @throws IOException
      */
     public int isBeingEdited(String uri) throws IOException {

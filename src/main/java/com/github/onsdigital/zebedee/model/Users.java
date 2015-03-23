@@ -1,7 +1,8 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
@@ -21,6 +22,23 @@ public class Users {
 
     public Users(Path users) {
         this.users = users;
+    }
+
+    /**
+     * Creates a user. This is used to create the initial administrator user when the system is set up.
+     *
+     * @param zebedee A {@link Zebedee} instance.
+     * @param user    The details of the {@link User} to be created.
+     * @return The created user.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public static void createAdmin(Zebedee zebedee, User user) throws IOException {
+        zebedee.users.write(user);
+        zebedee.permissions.addAdministrator(user.email);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Password.hash("Doug4l"));
     }
 
     /**
@@ -172,7 +190,7 @@ public class Users {
      * @return True if the password was set. If no user exists for the given email address, false.
      * @throws IOException If a filesystem error occurs.
      */
-    boolean setPassword(String email, String password) throws IOException {
+    private boolean setPassword(String email, String password) throws IOException {
         boolean result = false;
 
         User user = get(email);

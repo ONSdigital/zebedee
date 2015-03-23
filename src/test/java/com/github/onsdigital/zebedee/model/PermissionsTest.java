@@ -1,5 +1,7 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
+import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.Zebedee;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

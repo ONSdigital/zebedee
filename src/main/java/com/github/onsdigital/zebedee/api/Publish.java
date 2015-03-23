@@ -17,7 +17,7 @@ public class Publish {
 		boolean result = false;
 
 		// Locate and publish the collection:
-        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         if (collection != null) {
 			result = Root.zebedee.publish(collection);
 		}

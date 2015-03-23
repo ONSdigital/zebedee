@@ -18,7 +18,7 @@ public class Collection {
     public Object get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        com.github.onsdigital.zebedee.Collection collection = Collections
+        com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
 
         // Check whether we found the collection:
@@ -41,7 +41,7 @@ public class Collection {
                                HttpServletResponse response,
                                CollectionDescription collectionDescription) throws IOException {
 
-        com.github.onsdigital.zebedee.Collection existingCollection = Collections
+        com.github.onsdigital.zebedee.model.Collection existingCollection = Collections
                 .getCollection(request);
 
         collectionDescription.name = StringUtils
@@ -55,7 +55,7 @@ public class Collection {
                 return false;
             }
 
-            com.github.onsdigital.zebedee.Collection.create(
+            com.github.onsdigital.zebedee.model.Collection.create(
                     collectionDescription, Root.zebedee);
         } else {
             if (!StringUtils.equals(existingCollection.description.name,
@@ -66,7 +66,7 @@ public class Collection {
                     return false;
                 }
 
-                com.github.onsdigital.zebedee.Collection.rename(
+                com.github.onsdigital.zebedee.model.Collection.rename(
                         existingCollection.description,
                         collectionDescription.name, Root.zebedee);
             }

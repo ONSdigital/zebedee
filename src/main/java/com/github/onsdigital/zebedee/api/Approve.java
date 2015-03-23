@@ -18,7 +18,7 @@ public class Approve {
     public ResultMessage approve(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // Locate the collection:
-        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         if (collection == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return new ResultMessage("Collection not found.");

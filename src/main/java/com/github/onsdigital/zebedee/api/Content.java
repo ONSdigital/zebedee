@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -29,7 +30,7 @@ public class Content {
         }
 
         java.nio.file.Path path = null;
-        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         if (collection != null) {
             Session session = Root.zebedee.sessions.get(request);
             path = collection.find(session.email, uri);
@@ -70,7 +71,7 @@ public class Content {
         }
 
         java.nio.file.Path path = null;
-        com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
+        Collection collection = Collections.getCollection(request);
         if (collection != null) {
             path = collection.find(session.email, uri); // see if the file exists anywhere.
         }

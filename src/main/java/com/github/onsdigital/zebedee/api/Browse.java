@@ -2,9 +2,9 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Collection;
 import com.github.onsdigital.zebedee.json.DirectoryListing;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 

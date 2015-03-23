@@ -1,6 +1,10 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
+import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

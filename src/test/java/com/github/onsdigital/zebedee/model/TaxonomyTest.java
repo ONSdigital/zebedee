@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.github.onsdigital.zebedee.model.Content;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;

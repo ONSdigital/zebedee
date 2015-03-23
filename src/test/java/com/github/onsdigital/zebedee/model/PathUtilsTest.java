@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
+import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;

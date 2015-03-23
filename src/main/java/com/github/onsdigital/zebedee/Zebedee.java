@@ -34,9 +34,9 @@ public class Zebedee {
         Path users = path.resolve(USERS);
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
-        if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions)) {
+        if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions)) {
             throw new IllegalArgumentException(
-                    "This folder doesn't look like a collection folder: "
+                    "This folder doesn't look like a zebedee folder: "
                             + path.toAbsolutePath());
         }
         this.published = new Content(published);

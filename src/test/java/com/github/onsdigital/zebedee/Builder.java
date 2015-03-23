@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.User;
@@ -64,6 +65,15 @@ public class Builder {
         Path users = zebedee.resolve(Zebedee.USERS);
         Files.createDirectories(users);
 
+        User jukesie = new User();
+        jukesie.name = "Matt Jukes";
+        jukesie.email = "jukesie@example.com";
+        jukesie.passwordHash = Password.hash("twitter");
+        jukesie.inactive = false;
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(jukesie.email) + ".json"))) {
+            Serialiser.serialise(outputStream, jukesie);
+        }
+
         User patricia = new User();
         patricia.name = "Patricia Pumpkin";
         patricia.email = "patricia@example.com";
@@ -90,10 +100,14 @@ public class Builder {
         Files.createDirectories(permissions);
 
         AccessMapping accessMapping = new AccessMapping();
+
+        accessMapping.owners = new HashSet<>();
+        accessMapping.owners.add(jukesie.email);
+
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.digitalPublishingTeam.add(patricia.email);
-        accessMapping.paths = new HashMap<>();
 
+        accessMapping.paths = new HashMap<>();
         Set contentOwners = new HashSet<>();
         contentOwners.add(ronny.email);
         accessMapping.paths.put("/economy", contentOwners);
@@ -102,6 +116,8 @@ public class Builder {
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
+
+        Root.zebedee = new Zebedee(zebedee);
     }
 
     void delete() throws IOException {
@@ -114,12 +130,13 @@ public class Builder {
      * @param uri The URI to be created.
      * @throws IOException If a filesystem error occurs.
      */
-    void createPublishedFile(String uri) throws IOException {
+    Path createPublishedFile(String uri) throws IOException {
 
         Path published = zebedee.resolve(Zebedee.PUBLISHED);
         Path content = published.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
+        return content;
     }
 
     /**
@@ -128,12 +145,13 @@ public class Builder {
      * @param uri The URI to be created.
      * @throws IOException If a filesystem error occurs.
      */
-    void isApproved(String uri) throws IOException {
+    Path isApproved(String uri) throws IOException {
 
         Path approved = collections.get(1).resolve(Collection.APPROVED);
         Path content = approved.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
+        return content;
     }
 
     /**
@@ -158,12 +176,13 @@ public class Builder {
      * @param uri The URI to be created.
      * @throws IOException If a filesystem error occurs.
      */
-    void isInProgress(String uri) throws IOException {
+    Path isInProgress(String uri) throws IOException {
 
         Path inProgress = collections.get(1).resolve(Collection.IN_PROGRESS);
         Path content = inProgress.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
+        return content;
     }
 
     /**
@@ -181,6 +200,8 @@ public class Builder {
         Path path = Files.createDirectory(parent.resolve(Zebedee.ZEBEDEE));
         Files.createDirectory(path.resolve(Zebedee.PUBLISHED));
         Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
+        Files.createDirectory(path.resolve(Zebedee.SESSIONS));
+        Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
         return path;
     }
 

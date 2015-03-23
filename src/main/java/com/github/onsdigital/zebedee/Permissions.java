@@ -28,11 +28,12 @@ public class Permissions {
     /**
      * Determines whether the specified user has administator permissions.
      *
-     * @param email  The user's emal.
+     * @param email The user's emal.
      * @return True if the user is an administrator.
      * @throws IOException If a filesystem error occurs.
      */
-    private boolean isAdministrator(String email, AccessMapping accessMapping) throws IOException {
+    public boolean isAdministrator(String email) throws IOException {
+        AccessMapping accessMapping = readAccessMapping();
         return accessMapping.owners.contains(email);
     }
 
@@ -70,6 +71,9 @@ public class Permissions {
      */
     public void addOwner(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.owners == null) {
+            accessMapping.owners = new HashSet<>();
+        }
         accessMapping.owners.add(email);
         writeAccessMapping(accessMapping);
     }
@@ -83,6 +87,9 @@ public class Permissions {
      */
     public void removeOwner(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.owners == null) {
+            accessMapping.owners = new HashSet<>();
+        }
         accessMapping.owners.remove(email);
         writeAccessMapping(accessMapping);
     }
@@ -95,6 +102,9 @@ public class Permissions {
      */
     public void addEditor(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.digitalPublishingTeam == null) {
+            accessMapping.digitalPublishingTeam = new HashSet<>();
+        }
         accessMapping.digitalPublishingTeam.add(email);
         writeAccessMapping(accessMapping);
     }
@@ -108,6 +118,9 @@ public class Permissions {
      */
     public void removeEditor(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.digitalPublishingTeam == null) {
+            accessMapping.digitalPublishingTeam = new HashSet<>();
+        }
         accessMapping.digitalPublishingTeam.remove(email);
         writeAccessMapping(accessMapping);
     }
@@ -121,6 +134,9 @@ public class Permissions {
      */
     public void addViewer(String email, String path) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.paths == null) {
+            accessMapping.paths = new HashMap<>();
+        }
         Set<String> viewers = accessMapping.paths.get(path);
         if (viewers == null) {
             viewers = new HashSet<>();
@@ -139,8 +155,11 @@ public class Permissions {
      */
     public void removeViewer(String email, String path) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.paths == null) {
+            accessMapping.paths = new HashMap<>();
+        }
 
-// Check to see if the requested path matches (or is a sub-path of) any mapping:
+        // Check to see if the requested path matches (or is a sub-path of) any mapping:
         for (Map.Entry<String, Set<String>> mapping : accessMapping.paths.entrySet()) {
             boolean isSubPath = StringUtils.startsWithIgnoreCase(mapping.getKey(), path);
             boolean emailMatches = mapping.getValue().contains(email);

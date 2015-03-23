@@ -252,7 +252,7 @@ public class PermissionsTest {
 
         // Then
         // The new user should get only admin permission:
-        assertTrue(zebedee.permissions.);
+        assertTrue(zebedee.permissions.isAdministrator(email));
         assertFalse(zebedee.permissions.canView(email, "/economy"));
         assertFalse(zebedee.permissions.canEdit(email));
     }

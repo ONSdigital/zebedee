@@ -3,7 +3,9 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Collection;
+import com.github.onsdigital.zebedee.filters.AuthenticationFilter;
 import com.github.onsdigital.zebedee.json.DirectoryListing;
+import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -46,9 +48,13 @@ public class Browse {
 
     private Path getPath(String uri, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Path path = null;
+
+        String id = request.getHeader(AuthenticationFilter.tokenHeader);
+        Session session = Root.zebedee.sessions.get(id);
+
         Collection collection = Collections.getCollection(request);
         if (collection != null) {
-            path = collection.find(uri);
+            path = collection.find(session.email, uri);
         }
         return path;
     }

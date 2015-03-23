@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -32,26 +31,7 @@ public class Login {
             return "Authentication failed.";
         }
 
-        return getSession(credentials.email);
-    }
-
-    /**
-     * Creates a new session, or returns an existing one if one exists.
-     *
-     * @param email The user's email address.
-     * @return A session for this user, whether new or existing.
-     * @throws IOException If a filesystem error occurs.
-     */
-    private String getSession(String email) throws IOException {
-
-        // Get the session ID
-        Session session = Root.zebedee.sessions.create(email);
-        String sessionId = null;
-        if (session != null) {
-            sessionId = session.id;
-        }
-
-        return sessionId;
+        return Root.zebedee.sessions.create(credentials.email).id;
     }
 
 }

@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.filters.AuthenticationFilter;
+import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -30,8 +32,9 @@ public class Content {
         java.nio.file.Path path = null;
         com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
         if (collection != null) {
-            Root.zebedee.sessions.get(request);
-            path = collection.find(uri);
+            String id = request.getHeader(AuthenticationFilter.tokenHeader);
+            Session session = Root.zebedee.sessions.get(id);
+            path = collection.find(session.email, uri);
         }
 
         if (path == null) {
@@ -62,22 +65,24 @@ public class Content {
         if (StringUtils.isBlank(uri))
             uri = "/";
 
+        String id = request.getHeader(AuthenticationFilter.tokenHeader);
+        Session session = Root.zebedee.sessions.get(id);
 
         java.nio.file.Path path = null;
         com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
         if (collection != null) {
-            path = collection.find(uri); // see if the file exists anywhere.
+            path = collection.find(session.email, uri); // see if the file exists anywhere.
         }
 
         if (path == null) {
             // create the file
-            boolean result = collection.create(uri);
+            boolean result = collection.create(session.email, uri);
             if (!result) {
                 response.setStatus(HttpStatus.BAD_REQUEST_400);
             }
         } else {
             // edit the file
-            boolean result = collection.edit(uri);
+            boolean result = collection.edit(session.email, uri);
             if (!result) {
                 response.setStatus(HttpStatus.BAD_REQUEST_400);
             }

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.io.FileUtils;
@@ -22,6 +23,7 @@ public class CollectionTest {
     Zebedee zebedee;
     Collection collection;
     Builder builder;
+    String email = "patricia@example.com";
 
     @Before
     public void setUp() throws Exception {
@@ -135,7 +137,7 @@ public class CollectionTest {
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 
         // When
-        boolean created = collection.create(uri);
+        boolean created = collection.create(email, uri);
 
         // Then
         assertTrue(created);
@@ -152,7 +154,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean created = collection.create(uri);
+        boolean created = collection.create(email, uri);
 
         // Then
         assertFalse(created);
@@ -169,7 +171,7 @@ public class CollectionTest {
         builder.isApproved(uri);
 
         // When
-        boolean created = collection.create(uri);
+        boolean created = collection.create(email, uri);
 
         // Then
         assertFalse(created);
@@ -186,7 +188,7 @@ public class CollectionTest {
         builder.isInProgress(uri);
 
         // When
-        boolean created = collection.create(uri);
+        boolean created = collection.create(email, uri);
 
         // Then
         assertFalse(created);
@@ -201,7 +203,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean edited = collection.edit(uri);
+        boolean edited = collection.edit(email, uri);
 
         // Then
         assertTrue(edited);
@@ -223,7 +225,7 @@ public class CollectionTest {
         builder.isApproved(uri);
 
         // When
-        boolean edited = collection.edit(uri);
+        boolean edited = collection.edit(email, uri);
 
         // Then
         assertTrue(edited);
@@ -243,7 +245,7 @@ public class CollectionTest {
         builder.isInProgress(uri);
 
         // When
-        boolean edited = collection.edit(uri);
+        boolean edited = collection.edit(email, uri);
 
         // Then
         assertTrue(edited);
@@ -258,7 +260,7 @@ public class CollectionTest {
         builder.isBeingEditedElsewhere(uri, 0);
 
         // When
-        boolean edited = collection.edit(uri);
+        boolean edited = collection.edit(email, uri);
 
         // Then
         assertFalse(edited);
@@ -272,7 +274,7 @@ public class CollectionTest {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
 
         // When
-        boolean edited = collection.edit(uri);
+        boolean edited = collection.edit(email, uri);
 
         // Then
         assertFalse(edited);
@@ -322,7 +324,7 @@ public class CollectionTest {
         builder.createPublishedFile(sourceUri);
 
         // When
-        boolean copied = collection.copy(sourceUri, targetUri);
+        boolean copied = collection.copy(email, sourceUri, targetUri);
 
         // Then
         assertTrue(copied);
@@ -339,7 +341,7 @@ public class CollectionTest {
         String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
 
         // When
-        boolean copied = collection.copy(sourceUri, targetUri);
+        boolean copied = collection.copy(email, sourceUri, targetUri);
 
         // Then
         assertFalse(copied);
@@ -355,7 +357,7 @@ public class CollectionTest {
         builder.isApproved(targetUri);
 
         // When
-        boolean copied = collection.copy(sourceUri, targetUri);
+        boolean copied = collection.copy(email, sourceUri, targetUri);
 
         // Then
         assertFalse(copied);
@@ -371,7 +373,7 @@ public class CollectionTest {
         builder.isInProgress(targetUri);
 
         // When
-        boolean copied = collection.copy(sourceUri, targetUri);
+        boolean copied = collection.copy(email, sourceUri, targetUri);
 
         // Then
         assertFalse(copied);
@@ -387,7 +389,7 @@ public class CollectionTest {
         builder.isBeingEditedElsewhere(targetUri, 0);
 
         // When
-        boolean copied = collection.copy(sourceUri, targetUri);
+        boolean copied = collection.copy(email, sourceUri, targetUri);
 
         // Then
         assertFalse(copied);
@@ -469,6 +471,32 @@ public class CollectionTest {
                 Collection.IN_PROGRESS);
         Path expectedPath = inProgressPath.resolve(uri.substring(1));
         assertTrue(Files.size(expectedPath) > 0);
+    }
+
+    @Test
+    public void shouldFilterOnPermissions() throws IOException {
+
+        // Given
+        // We have different content in each of published, approved and in progress
+        String uri = "/economy/inflationandpriceindices/timeseries/permissions.html";
+        Path published = builder.createPublishedFile(uri);
+        Path approved = builder.isApproved(uri);
+        Path inProgress = builder.isInProgress(uri);
+        String publishedContent = Random.id();
+        String approvedContent = Random.id();
+        String inProgressContent = Random.id();
+        FileUtils.writeStringToFile(published.toFile(), publishedContent);
+        FileUtils.writeStringToFile(approved.toFile(), approvedContent);
+        FileUtils.writeStringToFile(inProgress.toFile(), inProgressContent);
+
+        // When
+        // A user without permissions attempts to locate the content
+        Path found = collection.find("user.without.permissions@example.com", uri);
+        String foundContent = FileUtils.readFileToString(found.toFile());
+
+        // Then
+        // The published content should be returned, not approved or in progress
+        assertEquals(publishedContent, foundContent);
     }
 
 }

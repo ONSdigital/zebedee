@@ -69,7 +69,6 @@ public class Root implements Startup {
         List<Path> content = new ArrayList<>();
 
         // List the taxonomy files:
-        System.out.println(taxonomy.toAbsolutePath());
         listFiles(taxonomy, taxonomy, content);
 
         return content;

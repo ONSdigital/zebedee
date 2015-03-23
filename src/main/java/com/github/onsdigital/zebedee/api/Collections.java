@@ -26,10 +26,6 @@ public class Collections {
             collectionName = segments.get(1);
         }
 
-        for (String segment : path.segments()) {
-            System.out.println(" - " + segment);
-        }
-
         return Root.zebedee.getCollections().getCollection(collectionName);
     }
 

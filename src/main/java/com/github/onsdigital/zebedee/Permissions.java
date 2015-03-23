@@ -192,7 +192,6 @@ public class Permissions {
 
     private AccessMapping readAccessMapping() throws IOException {
         Path path = permissions.resolve("accessMapping.json");
-        System.out.println(path);
 
         // Read the configuration
         if (Files.exists(path)) {

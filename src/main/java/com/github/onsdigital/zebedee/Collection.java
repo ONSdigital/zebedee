@@ -197,7 +197,7 @@ public class Collection {
     public boolean create(String email, String uri) throws IOException {
         boolean result = false;
 
-        boolean exists = find(email,uri) != null;
+        boolean exists = find(email, uri) != null;
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
         boolean permission = Root.zebedee.permissions.canEdit(email);
         if (!isBeingEdited && !exists && permission) {
@@ -223,7 +223,7 @@ public class Collection {
     boolean copy(String email, String sourceUri, String targetUri) throws IOException {
         boolean result = false;
 
-        Path source = find(email,sourceUri);
+        Path source = find(email, sourceUri);
         boolean isBeingEdited = zebedee.isBeingEdited(targetUri) > 0;
         boolean permission = Root.zebedee.permissions.canEdit(email);
         if (source != null && !isBeingEdited && permission) {
@@ -254,15 +254,10 @@ public class Collection {
         boolean isBeingEditedElsewhere = !isInCollection(uri)
                 && zebedee.isBeingEdited(uri) > 0;
         boolean permission = Root.zebedee.permissions.canEdit(email);
-        if (source != null && !isInProgress(uri) && !isBeingEditedElsewhere && permission) {
+        if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
             Path destination = inProgress.toPath(uri);
-
-            if (approved.get(uri) != null) {
-                PathUtils.move(source, destination);
-            } else {
-                PathUtils.copy(source, destination);
-            }
+            PathUtils.copy(source, destination);
             result = true;
         }
 

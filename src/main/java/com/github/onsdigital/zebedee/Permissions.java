@@ -205,10 +205,7 @@ public class Permissions {
         AccessMapping accessMapping = new AccessMapping();
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.paths = new HashMap<>();
-        System.out.println("\t*****");
-        System.out.println(path + " : " + Files.exists(path));
-        System.out.println(path.getParent().getParent() + " : " + Files.exists(path.getParent().getParent()));
-        System.out.println(path.getParent().getParent() + " : " + Files.exists(path.getParent().getParent()));
+
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }

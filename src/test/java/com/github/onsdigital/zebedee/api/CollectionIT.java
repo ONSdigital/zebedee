@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 
-import com.github.onsdigital.zebedee.Configuration;
+import com.github.onsdigital.zebedee.model.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

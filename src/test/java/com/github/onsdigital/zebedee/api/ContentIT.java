@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.onsdigital.zebedee.Configuration;
+import com.github.onsdigital.zebedee.model.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.jayway.restassured.response.Response;
 import org.junit.Test;

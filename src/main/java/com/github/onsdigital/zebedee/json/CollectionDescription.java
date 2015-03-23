@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.json;
 
-import com.github.onsdigital.zebedee.Collection;
+import com.github.onsdigital.zebedee.model.Collection;
 
 import java.util.Date;
 import java.util.List;

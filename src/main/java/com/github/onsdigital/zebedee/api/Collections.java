@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
-import com.github.onsdigital.zebedee.Collection;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 import javax.servlet.http.HttpServletRequest;

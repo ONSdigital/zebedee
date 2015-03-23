@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Content;
+import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.Zebedee;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

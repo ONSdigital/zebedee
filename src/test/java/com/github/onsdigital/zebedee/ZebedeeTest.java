@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;

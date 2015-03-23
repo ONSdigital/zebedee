@@ -1,6 +1,7 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 
@@ -13,13 +14,13 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class Collection {
-    static final String APPROVED = "approved";
-    static final String IN_PROGRESS = "inprogress";
+    public static final String APPROVED = "approved";
+    public static final String IN_PROGRESS = "inprogress";
 
     public final CollectionDescription description;
-    Path path;
-    Content approved;
-    Content inProgress;
+    public Path path;
+    public Content approved;
+    public Content inProgress;
     Zebedee zebedee;
 
     /**
@@ -31,7 +32,7 @@ public class Collection {
      * @param zebedee The containing {@link Zebedee}.
      * @throws IOException
      */
-    Collection(Path path, Zebedee zebedee) throws IOException {
+    public Collection(Path path, Zebedee zebedee) throws IOException {
 
         // Validate the directory:
         this.path = path;
@@ -164,7 +165,7 @@ public class Collection {
      * @return If the given URI is being edited as part of this
      * {@link Collection}, true.
      */
-    boolean isInCollection(String uri) {
+    public boolean isInCollection(String uri) {
         return isInProgress(uri) || isApproved(uri);
     }
 

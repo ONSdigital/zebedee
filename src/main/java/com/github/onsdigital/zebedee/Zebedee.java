@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.davidcarboni.cryptolite.Password;
 import com.github.onsdigital.zebedee.json.User;
 
 import java.io.IOException;
@@ -71,9 +70,9 @@ public class Zebedee {
         User created = zebedee.users.create(user);
 
         // Update the user
-        created.passwordHash = Password.hash("Doug4l");
         created.inactive = false;
         zebedee.users.update(created);
+        zebedee.users.setPassword(user.email,"Doug4l");
 
         // Grant admin permissions
         zebedee.permissions.addAdministrator(user.email);

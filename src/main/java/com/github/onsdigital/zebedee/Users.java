@@ -160,6 +160,20 @@ public class Users {
             return false;
         }
 
+        return setPassword(email, password);
+    }
+
+    /**
+     * Sets the specified user's password and sets the account to active.
+     *
+     * @param email     The user ID.
+     * @param password  The password to set.
+     * @return True if the password was set. If no user exists for the given email address, false.
+     * @throws IOException If a filesystem error occurs.
+     */
+    boolean setPassword(String email, String password) throws IOException {
+        boolean result = false;
+
         User user = get(email);
         if (user != null) {
             user.passwordHash = Password.hash(password);

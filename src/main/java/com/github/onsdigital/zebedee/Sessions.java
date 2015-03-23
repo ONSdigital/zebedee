@@ -5,6 +5,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,6 +18,9 @@ import java.util.*;
  * Created by david on 12/03/2015.
  */
 public class Sessions extends TimerTask {
+
+    private static final String tokenHeader = "x-florence-token";
+
     private Path sessions;
     Timer timer;
 
@@ -70,6 +74,19 @@ public class Sessions extends TimerTask {
         }
 
         return session;
+    }
+
+    /**
+     * Gets the record for an existing session.
+     *
+     * @param request The {@link HttpServletRequest}. The session ID will be retrieved from the {@value #tokenHeader} header.
+     * @return The requested session, unless the ID is blank or no record exists
+     * for this ID.
+     * @throws java.io.IOException If a filesystem error occurs.
+     */
+    public Session get(HttpServletRequest request) throws IOException {
+        String token = request.getHeader(tokenHeader);
+        return get(token);
     }
 
     /**

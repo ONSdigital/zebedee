@@ -144,20 +144,21 @@ public class Users {
     /**
      * Sets the specified user's password and sets the account to active.
      *
-     * @param email     The user ID.
-     * @param password  The password to set.
-     * @param sessionId The ID of the logged in session.
+     * @param email    The user ID.
+     * @param password The password to set.
+     * @param session  The logged in session.
      * @return True if the password was set. If no user exists for the given email address, false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean setPassword(String email, String password, String sessionId) throws IOException {
+    public boolean setPassword(String email, String password, Session session) throws IOException {
         boolean result = false;
 
-        // Check permissions - must be an administrator to set a password:
-        Session session = Root.zebedee.sessions.get(sessionId);
-        boolean isAdministrator = Root.zebedee.permissions.isAdministrator(session.email);
-        if (!isAdministrator) {
-            return false;
+        if (session != null) {
+            // Check permissions - must be an administrator to set a password:
+            boolean isAdministrator = Root.zebedee.permissions.isAdministrator(session.email);
+            if (!isAdministrator) {
+                return false;
+            }
         }
 
         return setPassword(email, password);
@@ -166,8 +167,8 @@ public class Users {
     /**
      * Sets the specified user's password and sets the account to active.
      *
-     * @param email     The user ID.
-     * @param password  The password to set.
+     * @param email    The user ID.
+     * @param password The password to set.
      * @return True if the password was set. If no user exists for the given email address, false.
      * @throws IOException If a filesystem error occurs.
      */

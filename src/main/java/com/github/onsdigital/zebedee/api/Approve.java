@@ -26,6 +26,7 @@ public class Approve {
 
         // Locate the path:
         String uri = request.getParameter("uri");
+
         java.nio.file.Path path = collection.getInProgressPath(uri);
         if (path == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);

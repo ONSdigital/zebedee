@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.filters.AuthenticationFilter;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -25,8 +25,8 @@ public class Password {
             return "Please provide credentials (email, password).";
         }
 
-        String sessionId = request.getHeader(AuthenticationFilter.tokenHeader);
-        if (!Root.zebedee.users.setPassword(credentials.email, credentials.password, sessionId)) {
+        Session session = Root.zebedee.sessions.get(request);
+        if (!Root.zebedee.users.setPassword(credentials.email, credentials.password, session)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return "Failed to update password for " + credentials.email;
         }

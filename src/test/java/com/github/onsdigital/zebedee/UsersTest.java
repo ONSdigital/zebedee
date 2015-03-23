@@ -340,7 +340,7 @@ public class UsersTest {
 
         // When
         // We set the password
-        boolean result = zebedee.users.setPassword(email, newPassword, adminSession.id);
+        boolean result = zebedee.users.setPassword(email, newPassword, adminSession);
 
         // Then
         // Authentication should succeed with the new password
@@ -359,7 +359,7 @@ public class UsersTest {
 
         // When
         // We attempt to set the password
-        boolean result = zebedee.users.setPassword(email, newPassword, nonAdminSession.id);
+        boolean result = zebedee.users.setPassword(email, newPassword, nonAdminSession);
 
         // Then
         // Authentication should not succeed with the new password because it hasn't been changed

@@ -14,8 +14,6 @@ import java.io.IOException;
 
 public class AuthenticationFilter implements Filter {
 
-    public static final String
-            tokenHeader = "x-florence-token";
 
     /**
      * This filter protects all resources except {@link com.github.onsdigital.zebedee.api.Login}.
@@ -24,7 +22,7 @@ public class AuthenticationFilter implements Filter {
      * @param response
      * @return <ul>
      * <li>If the first path segment is login, true.</li>
-     * <li>Otherwise, if an {@value #tokenHeader} header is present and matches a {@link com.github.onsdigital.zebedee.json.Session}, true.</li>
+     * <li>Otherwise, if a {@link com.github.onsdigital.zebedee.json.Session} can be found for the login token, true.</li>
      * <li>Otherwise false.</li>
      * </ul>
      */
@@ -37,26 +35,29 @@ public class AuthenticationFilter implements Filter {
             return true;
         }
 
-        String token = request.getHeader(tokenHeader);
+        // Check all other requests:
+        boolean result = false;
         try {
-            boolean result = false;
-            Session session = Root.zebedee.sessions.get(token);
+            Session session = Root.zebedee.sessions.get(request);
             if (session == null) {
-                response.setStatus(HttpStatus.FORBIDDEN_403);
-                try {
-                    Serialiser.serialise(response, "Please log in");
-                } catch (IOException e1) {
-                    System.out.println("Error sending error response.");
-                    e1.printStackTrace();
-                }
+                forbidden(response);
             } else {
                 result = true;
             }
-            return result;
         } catch (IOException e) {
-            response.setContentType("application/json");
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
-            return false;
+            error(response);
         }
+        return result;
+    }
+
+    private void forbidden(HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(HttpStatus.FORBIDDEN_403);
+        Serialiser.serialise(response, "Please log in");
+    }
+
+    private void error(HttpServletResponse response) {
+        response.setContentType("application/json");
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
     }
 }

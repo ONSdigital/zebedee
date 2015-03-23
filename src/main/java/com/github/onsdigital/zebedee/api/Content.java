@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.filters.AuthenticationFilter;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -32,8 +31,7 @@ public class Content {
         java.nio.file.Path path = null;
         com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
         if (collection != null) {
-            String id = request.getHeader(AuthenticationFilter.tokenHeader);
-            Session session = Root.zebedee.sessions.get(id);
+            Session session = Root.zebedee.sessions.get(request);
             path = collection.find(session.email, uri);
         }
 
@@ -66,8 +64,7 @@ public class Content {
             uri = "/";
 
         // Check the user has edit permission
-        String id = request.getHeader(AuthenticationFilter.tokenHeader);
-        Session session = Root.zebedee.sessions.get(id);
+        Session session = Root.zebedee.sessions.get(request);
         if (!Root.zebedee.permissions.canEdit(session.email)) {
             return false;
         }

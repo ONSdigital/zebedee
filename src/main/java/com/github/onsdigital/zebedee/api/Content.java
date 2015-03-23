@@ -30,6 +30,7 @@ public class Content {
         java.nio.file.Path path = null;
         com.github.onsdigital.zebedee.Collection collection = Collections.getCollection(request);
         if (collection != null) {
+            Root.zebedee.sessions.get(request);
             path = collection.find(uri);
         }
 

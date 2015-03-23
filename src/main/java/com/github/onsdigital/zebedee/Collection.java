@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 import java.io.File;
@@ -135,14 +136,22 @@ public class Collection {
      * @return The {@link #inProgress} path, otherwise the {@link #approved}
      * path, otherwise the existing published path, otherwise null.
      */
-    public Path find(String uri) {
-        Path result = inProgress.get(uri);
-        if (result == null) {
-            result = approved.get(uri);
+    public Path find(String email, String uri) throws IOException {
+        Path result = null;
+
+        // Only show edited material if the user has permission:
+        if (Root.zebedee.permissions.canView(email, uri)) {
+            result = inProgress.get(uri);
+            if (result == null) {
+                result = approved.get(uri);
+            }
         }
+
+        // Default is the published version:
         if (result == null) {
             result = zebedee.published.get(uri);
         }
+
         return result;
     }
 
@@ -181,12 +190,13 @@ public class Collection {
      * false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean create(String uri) throws IOException {
+    public boolean create(String email, String uri) throws IOException {
         boolean result = false;
 
-        boolean exists = find(uri) != null;
+        boolean exists = find(email,uri) != null;
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
-        if (!isBeingEdited && !exists) {
+        boolean permission = Root.zebedee.permissions.canEdit(email);
+        if (!isBeingEdited && !exists && permission) {
             // Copy from Published to in progress:
             Path destination = inProgress.toPath(uri);
             Files.createDirectories(destination.getParent());
@@ -206,12 +216,13 @@ public class Collection {
      * false.
      * @throws IOException If a filesystem error occurs.
      */
-    boolean copy(String sourceUri, String targetUri) throws IOException {
+    boolean copy(String email, String sourceUri, String targetUri) throws IOException {
         boolean result = false;
 
-        Path source = find(sourceUri);
+        Path source = find(email,sourceUri);
         boolean isBeingEdited = zebedee.isBeingEdited(targetUri) > 0;
-        if (source != null && !isBeingEdited) {
+        boolean permission = Root.zebedee.permissions.canEdit(email);
+        if (source != null && !isBeingEdited && permission) {
             // Copy from source to in progress:
             Path destination = inProgress.toPath(targetUri);
             PathUtils.copy(source, destination);
@@ -229,16 +240,17 @@ public class Collection {
      * exists in the published content, false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean edit(String uri) throws IOException {
+    public boolean edit(String email, String uri) throws IOException {
         boolean result = false;
 
         if (isInProgress(uri))
             return true;
 
-        Path source = find(uri);
+        Path source = find(email, uri);
         boolean isBeingEditedElsewhere = !isInCollection(uri)
                 && zebedee.isBeingEdited(uri) > 0;
-        if (source != null && !isInProgress(uri) && !isBeingEditedElsewhere) {
+        boolean permission = Root.zebedee.permissions.canEdit(email);
+        if (source != null && !isInProgress(uri) && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
             Path destination = inProgress.toPath(uri);
 
@@ -278,8 +290,8 @@ public class Collection {
      * This only enables you to access the content of items that are currently
      * in progress.
      * <p/>
-     * To open an item for editing, use {@link #create(String)},
-     * {@link #edit(String)} or {@link #copy(String, String)}
+     * To open an item for editing, use {@link #create(String, String)},
+     * {@link #edit(String, String)} or {@link #copy(String, String, String)}
      *
      * @param uri The URI of the item.
      * @return The {@link Path} to the item, so that you can call e.g.

@@ -14,7 +14,8 @@ import java.io.IOException;
 
 public class AuthenticationFilter implements Filter {
 
-    public static final String tokenHeader = "x-florence-token";
+    public static final String
+            tokenHeader = "x-florence-token";
 
     /**
      * This filter protects all resources except {@link com.github.onsdigital.zebedee.api.Login}.

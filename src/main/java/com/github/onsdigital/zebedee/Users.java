@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
 
@@ -140,15 +142,23 @@ public class Users {
     }
 
     /**
-     * Setst the specified user's password and sets the account to active.
+     * Sets the specified user's password and sets the account to active.
      *
-     * @param email    The user ID.
-     * @param password The password to set.
+     * @param email     The user ID.
+     * @param password  The password to set.
+     * @param sessionId The ID of the logged in session.
      * @return True if the password was set. If no user exists for the given email address, false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean setPassword(String email, String password) throws IOException {
+    public boolean setPassword(String email, String password, String sessionId) throws IOException {
         boolean result = false;
+
+        // Check permissions - must be an administrator to set a password:
+        Session session = Root.zebedee.sessions.get(sessionId);
+        boolean isAdministrator = Root.zebedee.permissions.isAdministrator(session.email);
+        if (!isAdministrator) {
+            return false;
+        }
 
         User user = get(email);
         if (user != null) {

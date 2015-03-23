@@ -5,6 +5,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.io.FileUtils;
 
@@ -183,6 +184,27 @@ public class Builder {
         Files.createDirectories(content.getParent());
         Files.createFile(content);
         return content;
+    }
+
+    Session createSession(String email) throws IOException {
+
+        // Build the session object
+        Session session = new Session();
+        session.id = com.github.davidcarboni.cryptolite.Random.id();
+        session.email = email;
+
+        // Determine the path in which to create the session Json
+        Path sessionPath = null;
+        String sessionFileName = PathUtils.toFilename(session.id);
+        sessionFileName += ".json";
+        sessionPath = zebedee.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
+
+        // Serialise
+        try (OutputStream output = Files.newOutputStream(sessionPath)) {
+            Serialiser.serialise(output, session);
+        }
+
+        return session;
     }
 
     /**

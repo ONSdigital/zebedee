@@ -32,7 +32,7 @@ public class Login {
             return "Authentication failed.";
         }
 
-        return getSessionId(credentials.email);
+        return getSession(credentials.email);
     }
 
     /**
@@ -42,7 +42,7 @@ public class Login {
      * @return A session for this user, whether new or existing.
      * @throws IOException If a filesystem error occurs.
      */
-    private String getSessionId(String email) throws IOException {
+    private String getSession(String email) throws IOException {
 
         // Get the session ID
         Session session = Root.zebedee.sessions.create(email);

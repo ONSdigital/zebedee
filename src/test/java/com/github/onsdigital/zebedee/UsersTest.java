@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -330,18 +331,56 @@ public class UsersTest {
     public void shouldSetPassword() throws Exception {
 
         // Given
-        // An existing user
+        // An existing user and an administrator session
         String email = "patricia@example.com";
-        User existing = zebedee.users.get(email);
-        String password = Random.password(8);
-        String oldHosh = existing.passwordHash;
+        String newPassword = Random.password(8);
+        Session adminSession = builder.createSession("jukesie@example.com");
 
         // When
-        // We set the new password
-        boolean result = zebedee.users.setPassword(email, password);
+        // We set the password
+        boolean result = zebedee.users.setPassword(email, newPassword, adminSession.id);
 
         // Then
-        // Authentication should succeed
-        assertTrue(zebedee.users.authenticate(email, password));
+        // Authentication should succeed with the new password
+        assertTrue(result);
+        assertTrue(zebedee.users.authenticate(email, newPassword));
     }
+
+    @Test
+    public void shouldNotSetPasswordIfNotAdmin() throws Exception {
+
+        // Given
+        // An existing user and a non-administrator session
+        String email = "patricia@example.com";
+        String newPassword = Random.password(8);
+        Session nonAdminSession = builder.createSession("patricia@example.com");
+
+        // When
+        // We attempt to set the password
+        boolean result = zebedee.users.setPassword(email, newPassword, nonAdminSession.id);
+
+        // Then
+        // Authentication should not succeed with the new password because it hasn't been changed
+        assertFalse(result);
+        assertFalse(zebedee.users.authenticate(email, newPassword));
+    }
+
+//    @Test
+//    public void shouldChangePassword() throws Exception {
+//
+//        // Given
+//        // An existing user
+//        String email = "patricia@example.com";
+//        User existing = zebedee.users.get(email);
+//        String password = Random.password(8);
+//        String oldHosh = existing.passwordHash;
+//
+//        // When
+//        // We set the new password
+//        boolean result = zebedee.users.changePassword(email, oldPassword, password);
+//
+//        // Then
+//        // Authentication should succeed
+//        assertTrue(zebedee.users.authenticate(email, password));
+//    }
 }

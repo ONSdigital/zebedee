@@ -63,13 +63,21 @@ public class Zebedee {
 
         // Create the initial user:
         Zebedee zebedee = new Zebedee(path);
+
+        // Create the user
         User user = new User();
         user.email = "florence@magicroundabout.ons.gov.uk";
         user.name = "Florence";
-        user.passwordHash = Password.hash("Doug4l");
-        user.inactive = false;
-        zebedee.users.create(user);
+        User created = zebedee.users.create(user);
+
+        // Update the user
+        created.passwordHash = Password.hash("Doug4l");
+        created.inactive = false;
+        zebedee.users.update(created);
+
+        // Grant admin permissions
         zebedee.permissions.addAdministrator(user.email);
+
         return new Zebedee(path);
     }
 

@@ -120,6 +120,7 @@ public class Builder {
     }
 
     public void delete() throws IOException {
+        System.out.println("Deleting zebedee at "+parent);
         FileUtils.deleteDirectory(parent.toFile());
     }
 
@@ -222,6 +223,7 @@ public class Builder {
         Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
         Files.createDirectory(path.resolve(Zebedee.SESSIONS));
         Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
+        System.out.println("Created zebedee at "+path);
         return path;
     }
 

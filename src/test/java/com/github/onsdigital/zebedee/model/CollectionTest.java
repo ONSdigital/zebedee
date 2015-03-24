@@ -6,8 +6,6 @@ import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -324,87 +322,6 @@ public class CollectionTest {
 
         // Then
         assertFalse(approved);
-    }
-
-    @Test
-    public void shouldCopy() throws IOException {
-
-        // Given
-        // The content exists, has been edited and approved:
-        String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
-        String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-        builder.createPublishedFile(sourceUri);
-
-        // When
-        boolean copied = collection.copy(email, sourceUri, targetUri);
-
-        // Then
-        assertTrue(copied);
-        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
-        assertTrue(Files.exists(edited.resolve(targetUri.substring(1))));
-    }
-
-    @Test
-    public void shouldNotCopyIfSourceDoesNotExist() throws IOException {
-
-        // Given
-        // The source URI does not exist:
-        String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
-        String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-
-        // When
-        boolean copied = collection.copy(email, sourceUri, targetUri);
-
-        // Then
-        assertFalse(copied);
-    }
-
-    @Test
-    public void shouldNotCopyIfTargetApproved() throws IOException {
-
-        // Given
-        // The target URI is already approved:
-        String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
-        String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-        builder.isApproved(targetUri);
-
-        // When
-        boolean copied = collection.copy(email, sourceUri, targetUri);
-
-        // Then
-        assertFalse(copied);
-    }
-
-    @Test
-    public void shouldNotCopyIfTargetInProgress() throws IOException {
-
-        // Given
-        // The target URI is currently being edited:
-        String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
-        String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-        builder.isInProgress(targetUri);
-
-        // When
-        boolean copied = collection.copy(email, sourceUri, targetUri);
-
-        // Then
-        assertFalse(copied);
-    }
-
-    @Test
-    public void shouldNotCopyIfTargetBeingEditedElsewhere() throws IOException {
-
-        // Given
-        // The source URI is being edited in another release:
-        String sourceUri = "/economy/inflationandpriceindices/timeseries/raid1.html";
-        String targetUri = "/economy/inflationandpriceindices/timeseries/raid2.html";
-        builder.isBeingEditedElsewhere(targetUri, 0);
-
-        // When
-        boolean copied = collection.copy(email, sourceUri, targetUri);
-
-        // Then
-        assertFalse(copied);
     }
 
     @Test

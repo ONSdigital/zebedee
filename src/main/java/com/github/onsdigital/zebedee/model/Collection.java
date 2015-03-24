@@ -213,31 +213,6 @@ public class Collection {
     }
 
     /**
-     * @param sourceUri The existing path you would like to duplicate.
-     * @param targetUri The new path you would like to create.
-     * @return True if the new path was created. If the path is already present
-     * in the {@link Collection}, another {@link Collection} is editing
-     * this path or this path already exists in the published content,
-     * false.
-     * @throws IOException If a filesystem error occurs.
-     */
-    boolean copy(String email, String sourceUri, String targetUri) throws IOException {
-        boolean result = false;
-
-        Path source = find(email, sourceUri);
-        boolean isBeingEdited = zebedee.isBeingEdited(targetUri) > 0;
-        boolean permission = Root.zebedee.permissions.canEdit(email);
-        if (source != null && !isBeingEdited && permission) {
-            // Copy from source to in progress:
-            Path destination = inProgress.toPath(targetUri);
-            PathUtils.copy(source, destination);
-            result = true;
-        }
-
-        return result;
-    }
-
-    /**
      * @param uri The path you would like to edit.
      * @return True if the path was added to {@link #inProgress}. If the path is
      * already present in the {@link Collection}, another

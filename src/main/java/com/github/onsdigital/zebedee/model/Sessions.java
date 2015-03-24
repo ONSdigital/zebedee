@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class Sessions extends TimerTask {
 
-    private static final String tokenHeader = "x-florence-token";
+    private static final String tokenHeader = "X-Florence-Token";
 
     private Path sessions;
     Timer timer;

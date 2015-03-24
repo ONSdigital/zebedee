@@ -37,6 +37,7 @@ public class Users {
         user.passwordHash = Password.hash(password);
         zebedee.users.write(user);
         zebedee.permissions.addAdministrator(user.email);
+        zebedee.permissions.addEditor(user.email);
     }
 
     /**

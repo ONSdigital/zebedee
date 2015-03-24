@@ -50,7 +50,6 @@ public class Root implements Startup {
             // Create a Zebedee folder:
             root = Files.createTempDirectory("zebedee");
             zebedee = Zebedee.create(root);
-            zebedee.permissions.addEditor("florence@magicroundabout.ons.gov.uk");
             Path taxonomy = Paths.get(".").resolve("target/taxonomy");
             List<Path> content = listContent(taxonomy);
             copyContent(content, taxonomy);

@@ -198,14 +198,19 @@ public class Collection {
     public boolean create(String email, String uri) throws IOException {
         boolean result = false;
 
+        // Does this path already exist in the published area?
         boolean exists = find(email, uri) != null;
+
+        // Is someone creating the same file in another collection?
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
+
+        // Does the current user have permission to edit?
         boolean permission = Root.zebedee.permissions.canEdit(email);
+
         if (!isBeingEdited && !exists && permission) {
             // Copy from Published to in progress:
-            Path destination = inProgress.toPath(uri);
-            Files.createDirectories(destination.getParent());
-            Files.createFile(destination);
+            Path path = inProgress.toPath(uri);
+            PathUtils.create(path);
             result = true;
         }
 
@@ -227,9 +232,14 @@ public class Collection {
             return true;
 
         Path source = find(email, uri);
+
+        // Is the path being edited anywhere but here?
         boolean isBeingEditedElsewhere = !isInCollection(uri)
                 && zebedee.isBeingEdited(uri) > 0;
+
+        // Does the user have permission to edit?
         boolean permission = Root.zebedee.permissions.canEdit(email);
+
         if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
             Path destination = inProgress.toPath(uri);
@@ -251,7 +261,7 @@ public class Collection {
         boolean result = false;
 
         if (isInProgress(uri)) {
-            // Copy to in approved and then delete the in-progress copy:
+            // Move the in-progress copy to approved:
             Path source = inProgress.get(uri);
             Path destination = approved.toPath(uri);
             PathUtils.move(source, destination);
@@ -262,8 +272,8 @@ public class Collection {
     }
 
     /**
-     * This only enables you to access the content of items that are currently
-     * in progress.
+     * This enables you to access the content of items that are currently
+     * in progress. This is used to update content when editing.
      *
      * @param uri The URI of the item.
      * @return The {@link Path} to the item, so that you can call e.g.

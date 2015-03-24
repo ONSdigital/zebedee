@@ -28,6 +28,18 @@ public class PathUtils {
     }
 
     /**
+     * Creates a new file at the given path, including any required parent directories.
+     *
+     * @param path The path of the file to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    static void create(Path path) throws IOException {
+
+        Files.createDirectories(path.getParent());
+        Files.createFile(path);
+    }
+
+    /**
      * Convenience method for copying content between two paths.
      *
      * @param source      The source {@link Path}.

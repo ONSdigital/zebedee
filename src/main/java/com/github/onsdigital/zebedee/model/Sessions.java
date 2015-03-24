@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class Sessions extends TimerTask {
 
-    private static final String tokenHeader = "X-Florence-Token";
+    public static final String TOKEN_HEADER = "X-Florence-Token";
 
     private Path sessions;
     Timer timer;
@@ -79,13 +79,13 @@ public class Sessions extends TimerTask {
     /**
      * Gets the record for an existing session.
      *
-     * @param request The {@link HttpServletRequest}. The session ID will be retrieved from the {@value #tokenHeader} header.
+     * @param request The {@link HttpServletRequest}. The session ID will be retrieved from the {@value #TOKEN_HEADER} header.
      * @return The requested session, unless the ID is blank or no record exists
      * for this ID.
      * @throws java.io.IOException If a filesystem error occurs.
      */
     public Session get(HttpServletRequest request) throws IOException {
-        String token = request.getHeader(tokenHeader);
+        String token = request.getHeader(TOKEN_HEADER);
         return get(token);
     }
 

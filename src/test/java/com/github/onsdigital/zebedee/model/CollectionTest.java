@@ -301,7 +301,7 @@ public class CollectionTest {
         builder.isInProgress(uri);
 
         // When
-        boolean approved = collection.approve(uri);
+        boolean approved = collection.approve(email, uri);
 
         // Then
         assertTrue(approved);
@@ -318,7 +318,7 @@ public class CollectionTest {
         builder.isApproved(uri);
 
         // When
-        boolean approved = collection.approve(uri);
+        boolean approved = collection.approve(email, uri);
 
         // Then
         assertFalse(approved);

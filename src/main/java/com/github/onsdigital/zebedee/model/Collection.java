@@ -144,8 +144,11 @@ public class Collection {
     public Path find(String email, String uri) throws IOException {
         Path result = null;
 
+        // Does the user have permission tno see this content?
+        boolean permission = Root.zebedee.permissions.canView(email, uri);
+
         // Only show edited material if the user has permission:
-        if (Root.zebedee.permissions.canView(email, uri)) {
+        if (permission) {
             result = inProgress.get(uri);
             if (result == null) {
                 result = approved.get(uri);
@@ -251,16 +254,20 @@ public class Collection {
     }
 
     /**
-     * @param uri The path you would like to approve.
+     * @param email The approving user's email.
+     * @param uri   The path you would like to approve.
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #approved}.
      * @throws IOException If a filesystem error occurs.
      */
 
-    public boolean approve(String uri) throws IOException {
+    public boolean approve(String email, String uri) throws IOException {
         boolean result = false;
 
-        if (isInProgress(uri)) {
+        // Doees the user have permission to approve? (or at least see this content)
+        boolean permission = Root.zebedee.permissions.canView(email, uri);
+
+        if (isInProgress(uri) && permission) {
             // Move the in-progress copy to approved:
             Path source = inProgress.get(uri);
             Path destination = approved.toPath(uri);

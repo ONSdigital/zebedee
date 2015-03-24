@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.ResultMessage;
+import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import java.io.IOException;
  */
 @Api
 public class Approve {
+
     @POST
     public ResultMessage approve(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -40,7 +42,8 @@ public class Approve {
         }
 
         // Attempt to approve:
-        if (!collection.approve(uri)) {
+        Session session = Root.zebedee.sessions.get(request);
+        if (!collection.approve(session.email, uri)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return new ResultMessage("URI was not approved.");
         }

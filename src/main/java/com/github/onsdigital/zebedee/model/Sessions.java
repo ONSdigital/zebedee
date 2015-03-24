@@ -17,6 +17,9 @@ import java.util.*;
  * Created by david on 12/03/2015.
  */
 public class Sessions extends TimerTask {
+
+    private static final String tokenHeader = "X-Florence-Token";
+
     private Path sessions;
     Timer timer;
 

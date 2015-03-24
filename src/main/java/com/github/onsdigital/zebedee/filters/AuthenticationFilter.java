@@ -29,14 +29,14 @@ public class AuthenticationFilter implements Filter {
     @Override
     public boolean filter(HttpServletRequest request, HttpServletResponse response) {
 
-        // Pass through without authentication for login requests:
-        Path path = Path.newInstance(request);
-        if (StringUtils.equalsIgnoreCase("login", path.firstSegment())) {
+        // Pass through OPTIONS request without authentication for cross-origin preflight requests:
+        if (StringUtils.equalsIgnoreCase("OPTIONS", request.getMethod())) {
             return true;
         }
 
-        // Pass through OPTIONS request without authentication for cross-origin preflight requests:
-        if (StringUtils.equalsIgnoreCase("OPTIONS", request.getMethod())) {
+        // Pass through without authentication for login requests:
+        Path path = Path.newInstance(request);
+        if (StringUtils.equalsIgnoreCase("login", path.firstSegment())) {
             return true;
         }
 

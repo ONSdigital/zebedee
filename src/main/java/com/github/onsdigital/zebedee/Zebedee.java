@@ -67,9 +67,9 @@ public class Zebedee {
         User user = new User();
         user.email = "florence@magicroundabout.ons.gov.uk";
         user.name = "Florence";
-        user.passwordHash = "";
+        String password = "Doug4l";
         Zebedee zebedee = new Zebedee(path);
-        Users.createAdmin(zebedee, user);
+        Users.createAdmin(zebedee, user, password);
 
         return zebedee;
     }

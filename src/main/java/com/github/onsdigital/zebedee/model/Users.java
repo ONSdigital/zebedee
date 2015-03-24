@@ -27,18 +27,16 @@ public class Users {
     /**
      * Creates a user. This is used to create the initial administrator user when the system is set up.
      *
-     * @param zebedee A {@link Zebedee} instance.
-     * @param user    The details of the {@link User} to be created.
+     * @param zebedee  A {@link Zebedee} instance.
+     * @param user     The details of the {@link User} to be created.
+     * @param password The plaintext password for this admin user.
      * @return The created user.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createAdmin(Zebedee zebedee, User user) throws IOException {
+    public static void createAdmin(Zebedee zebedee, User user, String password) throws IOException {
+        user.passwordHash = Password.hash(password);
         zebedee.users.write(user);
         zebedee.permissions.addAdministrator(user.email);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(Password.hash("Doug4l"));
     }
 
     /**

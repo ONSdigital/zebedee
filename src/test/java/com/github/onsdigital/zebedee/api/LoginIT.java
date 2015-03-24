@@ -2,10 +2,10 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.model.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.model.Configuration;
 import com.jayway.restassured.response.Response;
 import org.junit.Test;
 
@@ -13,6 +13,7 @@ import static com.jayway.restassured.RestAssured.given;
 
 public class LoginIT {
 
+    public static final String tokenHeader = "x-florence-token";
 
     public static User createUser() {
         User user = new User();
@@ -32,10 +33,25 @@ public class LoginIT {
         credentials.email = user.email;
         credentials.password = password;
 
+        return password;
+    }
+
+    public static void setPassword(Credentials credentials) {
         Response postResponse = given().body(Serialiser.serialise(credentials)).post(Configuration.getBaseUrl() + "/password");
         postResponse.then().assertThat().statusCode(200);
+    }
 
-        return password;
+    public static String login(Credentials credentials) {
+        Response postResponse = given().body(Serialiser.serialise(credentials)).post(Configuration.getBaseUrl() + "/login");
+        postResponse.then().assertThat().statusCode(200);
+        return postResponse.asString();
+    }
+
+    public static Credentials defaultCredentials() {
+        Credentials credentials = new Credentials();
+        credentials.email = "florence@magicroundabout.ons.gov.uk";
+        credentials.password = "Doug4l";
+        return credentials;
     }
 
     @Test
@@ -43,7 +59,7 @@ public class LoginIT {
 
         // Given
         Credentials credentials = new Credentials();
-        credentials.email=null;
+        credentials.email = null;
         String json = Serialiser.serialise(credentials);
         CollectionDescription description = CollectionIT.createCollection();
 
@@ -56,7 +72,7 @@ public class LoginIT {
 
         // Given
         Credentials credentials = new Credentials();
-        credentials.email=null;
+        credentials.email = null;
         String json = Serialiser.serialise(credentials);
         CollectionDescription description = CollectionIT.createCollection();
 

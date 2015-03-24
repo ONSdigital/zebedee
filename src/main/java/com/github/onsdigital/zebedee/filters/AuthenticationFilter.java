@@ -35,6 +35,11 @@ public class AuthenticationFilter implements Filter {
             return true;
         }
 
+        // Pass through OPTIONS request without authentication for cross-origin preflight requests:
+        if (StringUtils.equalsIgnoreCase("OPTIONS", request.getMethod())) {
+            return true;
+        }
+
         // Check all other requests:
         boolean result = false;
         try {

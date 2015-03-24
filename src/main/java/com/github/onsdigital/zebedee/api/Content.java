@@ -20,7 +20,7 @@ import java.io.OutputStream;
 
 @Api
 public class Content {
-    
+
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException {
 

@@ -3,8 +3,8 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.model.Content;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -20,8 +20,8 @@ import java.util.List;
 
 public class Root implements Startup {
 
-    static Path root;
     public static Zebedee zebedee;
+    static Path root;
 
     /**
      * Recursively lists all files within this {@link Content}.
@@ -50,6 +50,7 @@ public class Root implements Startup {
             // Create a Zebedee folder:
             root = Files.createTempDirectory("zebedee");
             zebedee = Zebedee.create(root);
+            zebedee.permissions.addEditor("florence@magicroundabout.ons.gov.uk");
             Path taxonomy = Paths.get(".").resolve("target/taxonomy");
             List<Path> content = listContent(taxonomy);
             copyContent(content, taxonomy);

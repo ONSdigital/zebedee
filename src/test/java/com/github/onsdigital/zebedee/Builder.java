@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
 
@@ -145,10 +146,44 @@ public class Builder {
      * @param uri The URI to be created.
      * @throws IOException If a filesystem error occurs.
      */
-    public Path isApproved(String uri) throws IOException {
+    public Path createApprovedFile(String uri) throws IOException {
 
-        Path approved = collections.get(1).resolve(com.github.onsdigital.zebedee.model.Collection.APPROVED);
-        Path content = approved.resolve(uri.substring(1));
+        return createFile(Collection.APPROVED, uri);
+    }
+
+    /**
+     * Creates a complete file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public Path createCompleteFile(String uri) throws IOException {
+
+        return createFile(Collection.COMPLETE, uri);
+    }
+
+    /**
+     * Creates a complete file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public Path createInProgressFile(String uri) throws IOException {
+
+        return createFile(Collection.IN_PROGRESS, uri);
+    }
+
+    /**
+     * Creates a file in the given directory.
+     *
+     * @param directory The directory to be created.
+     * @param uri       The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private Path createFile(String directory, String uri) throws IOException {
+
+        Path inProgress = collections.get(1).resolve(directory);
+        Path content = inProgress.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
         return content;
@@ -168,21 +203,6 @@ public class Builder {
         Path content = approved.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
-    }
-
-    /**
-     * Creates an in-progress file.
-     *
-     * @param uri The URI to be created.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public Path isInProgress(String uri) throws IOException {
-
-        Path inProgress = collections.get(1).resolve(com.github.onsdigital.zebedee.model.Collection.IN_PROGRESS);
-        Path content = inProgress.resolve(uri.substring(1));
-        Files.createDirectories(content.getParent());
-        Files.createFile(content);
-        return content;
     }
 
     public Session createSession(String email) throws IOException {
@@ -248,6 +268,7 @@ public class Builder {
         Path collection = collections.resolve(filename);
         Files.createDirectory(collection);
         Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.APPROVED));
+        Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.COMPLETE));
         Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.IN_PROGRESS));
 
         // Create the description:

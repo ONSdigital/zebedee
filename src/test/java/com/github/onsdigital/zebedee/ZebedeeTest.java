@@ -125,7 +125,7 @@ public class ZebedeeTest {
 		Zebedee zebedee = new Zebedee(expectedPath);
 		Collection release = new Collection(builder.collections.get(1), zebedee);
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-		builder.isApproved(uri);
+        builder.createApprovedFile(uri);
 
 		// When
 		boolean published = zebedee.publish(release);
@@ -144,7 +144,7 @@ public class ZebedeeTest {
 		Zebedee zebedee = new Zebedee(expectedPath);
 		Collection release = new Collection(builder.collections.get(1), zebedee);
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-		builder.isInProgress(uri);
+        builder.createInProgressFile(uri);
 
 		// When
 		boolean published = zebedee.publish(release);
@@ -163,7 +163,7 @@ public class ZebedeeTest {
         Zebedee zebedee = new Zebedee(expectedPath);
         Collection release = new Collection(builder.collections.get(1), zebedee);
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.isApproved(uri);
+        builder.createApprovedFile(uri);
 
         // When
         zebedee.publish(release);

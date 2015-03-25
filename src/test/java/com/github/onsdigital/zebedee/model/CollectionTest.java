@@ -64,6 +64,7 @@ public class CollectionTest {
         assertTrue(Files.exists(releasePath));
         assertTrue(Files.exists(jsonPath));
         assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
 
         CollectionDescription createdCollectionDescription;
@@ -101,6 +102,7 @@ public class CollectionTest {
         assertTrue(Files.exists(jsonPath));
         assertTrue(!Files.exists(oldJsonPath));
         assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
 
         CollectionDescription renamedCollectionDescription;
@@ -173,7 +175,24 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.isApproved(uri);
+        builder.createApprovedFile(uri);
+
+        // When
+        boolean created = collection.create(email, uri);
+
+        // Then
+        assertFalse(created);
+        Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
+    }
+
+    @Test
+    public void shouldNotCreateIfComplete() throws IOException {
+
+        // Given
+        // The content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
+        builder.createApprovedFile(uri);
 
         // When
         boolean created = collection.create(email, uri);
@@ -190,7 +209,7 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.isInProgress(uri);
+        builder.createInProgressFile(uri);
 
         // When
         boolean created = collection.create(email, uri);
@@ -227,7 +246,7 @@ public class CollectionTest {
         // The content exists, has been edited and approved:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        builder.isApproved(uri);
+        builder.createApprovedFile(uri);
 
         // When
         boolean edited = collection.edit(email, uri);
@@ -252,7 +271,7 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.isInProgress(uri);
+        builder.createInProgressFile(uri);
 
         // When
         boolean edited = collection.edit(email, uri);
@@ -297,8 +316,8 @@ public class CollectionTest {
         // The content exists, has been edited and approved:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        builder.isApproved(uri);
-        builder.isInProgress(uri);
+        builder.createApprovedFile(uri);
+        builder.createInProgressFile(uri);
 
         // When
         boolean approved = collection.approve(email, uri);
@@ -315,7 +334,7 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.isApproved(uri);
+        builder.createApprovedFile(uri);
 
         // When
         boolean approved = collection.approve(email, uri);
@@ -330,7 +349,7 @@ public class CollectionTest {
         // Given
         // The content is currently being edited:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.isInProgress(uri);
+        builder.createInProgressFile(uri);
 
         // When
         boolean inProgress = collection.isInProgress(uri);
@@ -347,7 +366,7 @@ public class CollectionTest {
         // Given
         // The content has been approved:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.isApproved(uri);
+        builder.createApprovedFile(uri);
 
         // When
         boolean approved = collection.isApproved(uri);
@@ -364,8 +383,8 @@ public class CollectionTest {
         // Given
         // The content has been approved:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.isApproved(uri);
-        builder.isInProgress(uri);
+        builder.createApprovedFile(uri);
+        builder.createInProgressFile(uri);
 
         // When
         boolean approved = collection.isApproved(uri);
@@ -383,8 +402,8 @@ public class CollectionTest {
         // We're editing some content:
         String uri = "/economy/inflationandpriceindices/timeseries/beer.html";
         builder.createPublishedFile(uri);
-        builder.isApproved(uri);
-        builder.isInProgress(uri);
+        builder.createApprovedFile(uri);
+        builder.createInProgressFile(uri);
 
         // When
         // We write some output to the content:
@@ -409,8 +428,8 @@ public class CollectionTest {
         // We have different content in each of published, approved and in progress
         String uri = "/economy/inflationandpriceindices/timeseries/permissions.html";
         Path published = builder.createPublishedFile(uri);
-        Path approved = builder.isApproved(uri);
-        Path inProgress = builder.isInProgress(uri);
+        Path approved = builder.createApprovedFile(uri);
+        Path inProgress = builder.createInProgressFile(uri);
         String publishedContent = Random.id();
         String approvedContent = Random.id();
         String inProgressContent = Random.id();

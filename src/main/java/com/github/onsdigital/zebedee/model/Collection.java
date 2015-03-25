@@ -15,18 +15,21 @@ import java.util.List;
 
 public class Collection {
     public static final String APPROVED = "approved";
+    public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
 
     public final CollectionDescription description;
     public Path path;
     public Content approved;
+    public Content complete;
     public Content inProgress;
     Zebedee zebedee;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
-     * directory contains folders named {@value #APPROVED} and
-     * {@value #IN_PROGRESS} and throws an exception if not.
+     * directory contains folders named {@value #APPROVED},
+     * {@value #IN_PROGRESS}, and {@value #COMPLETE}
+     * and throws an exception if not.
      *
      * @param path    The {@link Path} of the {@link Collection}.
      * @param zebedee The containing {@link Zebedee}.
@@ -37,10 +40,12 @@ public class Collection {
         // Validate the directory:
         this.path = path;
         Path approved = path.resolve(APPROVED);
+        Path complete = path.resolve(COMPLETE);
         Path inProgress = path.resolve(IN_PROGRESS);
+
         Path description = path.getParent().resolve(
                 path.getFileName() + ".json");
-        if (!Files.exists(approved) || !Files.exists(inProgress)
+        if (!Files.exists(approved) || !Files.exists(inProgress) || !Files.exists(complete)
                 || !Files.exists(description)) {
             throw new IllegalArgumentException(
                     "This doesn't look like a collection folder: "
@@ -56,6 +61,7 @@ public class Collection {
         // Set fields:
         this.zebedee = zebedee;
         this.approved = new Content(approved);
+        this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
     }
 
@@ -83,6 +89,7 @@ public class Collection {
         Path collection = zebedee.collections.resolve(filename);
         Files.createDirectory(collection);
         Files.createDirectory(collection.resolve(APPROVED));
+        Files.createDirectory(collection.resolve(COMPLETE));
         Files.createDirectory(collection.resolve(IN_PROGRESS));
 
         // Create the description:

@@ -176,7 +176,7 @@ public class Collection {
      * {@link Collection}, true.
      */
     public boolean isInCollection(String uri) {
-        return isInProgress(uri) || isReviewed(uri);
+        return isInProgress(uri) || isComplete(uri) || isReviewed(uri);
     }
 
     /**
@@ -191,10 +191,19 @@ public class Collection {
     /**
      * @param uri uri The URI to check.
      * @return If the given URI is being edited as part of this
+     * {@link Collection} and has not yet been reviewed, true.
+     */
+    boolean isComplete(String uri) {
+        return !isInProgress(uri) && complete.exists(uri);
+    }
+
+    /**
+     * @param uri uri The URI to check.
+     * @return If the given URI is being edited as part of this
      * {@link Collection} and has been reviewed, true.
      */
     boolean isReviewed(String uri) {
-        return !isInProgress(uri) && reviewed.exists(uri);
+        return !isInProgress(uri) && !isComplete(uri) && reviewed.exists(uri);
     }
 
     /**
@@ -268,15 +277,41 @@ public class Collection {
      * @throws IOException If a filesystem error occurs.
      */
 
-    public boolean review(String email, String uri) throws IOException {
+    public boolean complete(String email, String uri) throws IOException {
         boolean result = false;
 
-        // Doees the user have permission to review? (or at least see this content)
+        // Does the user have permission to complete? (or at least see this content)
         boolean permission = Root.zebedee.permissions.canView(email, uri);
 
         if (isInProgress(uri) && permission) {
-            // Move the in-progress copy to reviewed:
+            // Move the in-progress copy to completed:
             Path source = inProgress.get(uri);
+            Path destination = complete.toPath(uri);
+            PathUtils.move(source, destination);
+            result = true;
+        }
+
+        return result;
+    }
+
+    /**
+     * Set the given uri to reviewed in this collection.
+     *
+     * @param email The reviewing user's email.
+     * @param uri   The path you would like to review.
+     * @return True if the path is found in {@link #inProgress} and was copied
+     * to {@link #reviewed}.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean review(String email, String uri) throws IOException {
+        boolean result = false;
+
+        // Does the user have permission to review? (or at least see this content)
+        boolean permission = Root.zebedee.permissions.canView(email, uri);
+
+        if (isComplete(uri) && permission) {
+            // Move the complete copy to reviewed:
+            Path source = complete.get(uri);
             Path destination = reviewed.toPath(uri);
             PathUtils.move(source, destination);
             result = true;

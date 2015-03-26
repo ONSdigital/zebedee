@@ -11,18 +11,17 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 @Api
-public class Review {
-
+public class Complete {
     /**
-     * Set a page to the reviewed state.
+     * Set a page to the complete state.
      *
      * @param request
      * @param response
      * @return
-     * @throws IOException
+     * @throws java.io.IOException
      */
     @POST
-    public ResultMessage review(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResultMessage complete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // Locate the collection:
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
@@ -48,12 +47,12 @@ public class Review {
 
         // Attempt to review:
         Session session = Root.zebedee.sessions.get(request);
-        if (!collection.review(session.email, uri)) {
+        if (!collection.complete(session.email, uri)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return new ResultMessage("URI was not reviewed.");
         }
 
         return new ResultMessage("URI reviewed.");
     }
-
 }
+

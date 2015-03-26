@@ -316,8 +316,7 @@ public class CollectionTest {
         // The content exists, has been edited and reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        builder.createReviewedFile(uri);
-        builder.createInProgressFile(uri);
+        builder.createCompleteFile(uri);
 
         // When
         boolean reviewed = collection.review(email, uri);
@@ -353,11 +352,28 @@ public class CollectionTest {
 
         // When
         boolean inProgress = collection.isInProgress(uri);
-        boolean inRelease = collection.isInCollection(uri);
+        boolean isInCollection = collection.isInCollection(uri);
 
         // Then
         assertTrue(inProgress);
-        assertTrue(inRelease);
+        assertTrue(isInCollection);
+    }
+
+    @Test
+    public void shouldBeComplete() throws IOException {
+
+        // Given
+        // The content has been completed:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createCompleteFile(uri);
+
+        // When
+        boolean complete = collection.isComplete(uri);
+        boolean isInCollection = collection.isInCollection(uri);
+
+        // Then
+        assertTrue(complete);
+        assertTrue(isInCollection);
     }
 
     @Test
@@ -370,11 +386,47 @@ public class CollectionTest {
 
         // When
         boolean reviewed = collection.isReviewed(uri);
-        boolean inRelease = collection.isInCollection(uri);
+        boolean isInCollection = collection.isInCollection(uri);
 
         // Then
         assertTrue(reviewed);
-        assertTrue(inRelease);
+        assertTrue(isInCollection);
+    }
+
+    @Test
+    public void shouldNotBeCompleteIfInProgress() throws IOException {
+
+        // Given
+        // The content has been reviewed:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createCompleteFile(uri);
+        builder.createInProgressFile(uri);
+
+        // When
+        boolean isComplete = collection.isComplete(uri);
+        boolean isInCollection = collection.isInCollection(uri);
+
+        // Then
+        assertFalse(isComplete);
+        assertTrue(isInCollection);
+    }
+
+    @Test
+    public void shouldNotBeReviewedIfComplete() throws IOException {
+
+        // Given
+        // The content has been complete:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createReviewedFile(uri);
+        builder.createCompleteFile(uri);
+
+        // When
+        boolean reviewed = collection.isReviewed(uri);
+        boolean isInCollection = collection.isInCollection(uri);
+
+        // Then
+        assertFalse(reviewed);
+        assertTrue(isInCollection);
     }
 
     @Test

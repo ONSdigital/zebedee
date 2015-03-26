@@ -141,14 +141,14 @@ public class Builder {
     }
 
     /**
-     * Creates an approved file.
+     * Creates an reviewed file.
      *
      * @param uri The URI to be created.
      * @throws IOException If a filesystem error occurs.
      */
-    public Path createApprovedFile(String uri) throws IOException {
+    public Path createReviewedFile(String uri) throws IOException {
 
-        return createFile(Collection.APPROVED, uri);
+        return createFile(Collection.REVIEWED, uri);
     }
 
     /**
@@ -190,7 +190,7 @@ public class Builder {
     }
 
     /**
-     * Creates an approved file in a different {@link com.github.onsdigital.zebedee.model.Collection}.
+     * Creates an reviewed file in a different {@link com.github.onsdigital.zebedee.model.Collection}.
      *
      * @param uri        The URI to be created.
      * @param collection The {@link com.github.onsdigital.zebedee.model.Collection} in which to create the content.
@@ -198,9 +198,9 @@ public class Builder {
      */
     public void isBeingEditedElsewhere(String uri, int collection) throws IOException {
 
-        Path approved = collections.get(collection)
-                .resolve(com.github.onsdigital.zebedee.model.Collection.APPROVED);
-        Path content = approved.resolve(uri.substring(1));
+        Path reviewed = collections.get(collection)
+                .resolve(com.github.onsdigital.zebedee.model.Collection.REVIEWED);
+        Path content = reviewed.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
     }
@@ -267,7 +267,7 @@ public class Builder {
         // Create the folders:
         Path collection = collections.resolve(filename);
         Files.createDirectory(collection);
-        Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.APPROVED));
+        Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.REVIEWED));
         Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.COMPLETE));
         Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.IN_PROGRESS));
 

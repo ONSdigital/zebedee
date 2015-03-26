@@ -63,7 +63,7 @@ public class CollectionTest {
 
         assertTrue(Files.exists(releasePath));
         assertTrue(Files.exists(jsonPath));
-        assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.REVIEWED)));
         assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
 
@@ -101,7 +101,7 @@ public class CollectionTest {
         assertTrue(Files.exists(releasePath));
         assertTrue(Files.exists(jsonPath));
         assertTrue(!Files.exists(oldJsonPath));
-        assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.REVIEWED)));
         assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
 
@@ -170,12 +170,12 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldNotCreateIfApproved() throws IOException {
+    public void shouldNotCreateIfReviewed() throws IOException {
 
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
 
         // When
         boolean created = collection.create(email, uri);
@@ -192,7 +192,7 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
 
         // When
         boolean created = collection.create(email, uri);
@@ -240,13 +240,13 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditApproved() throws IOException {
+    public void shouldEditReviewed() throws IOException {
 
         // Given
-        // The content exists, has been edited and approved:
+        // The content exists, has been edited and reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
 
         // When
         boolean edited = collection.edit(email, uri);
@@ -260,9 +260,9 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
-        // The approved copy should still be there in case we need to roll back
-        Path approved = builder.collections.get(1).resolve(Collection.APPROVED);
-        assertTrue(Files.exists(approved.resolve(uri.substring(1))));
+        // The reviewed copy should still be there in case we need to roll back
+        Path reviewed = builder.collections.get(1).resolve(Collection.REVIEWED);
+        assertTrue(Files.exists(reviewed.resolve(uri.substring(1))));
     }
 
     @Test
@@ -310,37 +310,37 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldApprove() throws IOException {
+    public void shouldReview() throws IOException {
 
         // Given
-        // The content exists, has been edited and approved:
+        // The content exists, has been edited and reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
         builder.createInProgressFile(uri);
 
         // When
-        boolean approved = collection.approve(email, uri);
+        boolean reviewed = collection.review(email, uri);
 
         // Then
-        assertTrue(approved);
+        assertTrue(reviewed);
         Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
     }
 
     @Test
-    public void shouldNotApproveIfNotEditing() throws IOException {
+    public void shouldNotReviewIfNotEditing() throws IOException {
 
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
 
         // When
-        boolean approved = collection.approve(email, uri);
+        boolean reviewed = collection.review(email, uri);
 
         // Then
-        assertFalse(approved);
+        assertFalse(reviewed);
     }
 
     @Test
@@ -361,37 +361,37 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldBeApproved() throws IOException {
+    public void shouldBeReviewed() throws IOException {
 
         // Given
-        // The content has been approved:
+        // The content has been reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
 
         // When
-        boolean approved = collection.isApproved(uri);
+        boolean reviewed = collection.isReviewed(uri);
         boolean inRelease = collection.isInCollection(uri);
 
         // Then
-        assertTrue(approved);
+        assertTrue(reviewed);
         assertTrue(inRelease);
     }
 
     @Test
-    public void shouldNotBeApprovedIfInProgress() throws IOException {
+    public void shouldNotBeReviewedIfInProgress() throws IOException {
 
         // Given
-        // The content has been approved:
+        // The content has been reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
         builder.createInProgressFile(uri);
 
         // When
-        boolean approved = collection.isApproved(uri);
+        boolean reviewed = collection.isReviewed(uri);
         boolean inRelease = collection.isInCollection(uri);
 
         // Then
-        assertFalse(approved);
+        assertFalse(reviewed);
         assertTrue(inRelease);
     }
 
@@ -402,7 +402,7 @@ public class CollectionTest {
         // We're editing some content:
         String uri = "/economy/inflationandpriceindices/timeseries/beer.html";
         builder.createPublishedFile(uri);
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
         builder.createInProgressFile(uri);
 
         // When
@@ -425,16 +425,16 @@ public class CollectionTest {
     public void shouldFilterOnPermissions() throws IOException {
 
         // Given
-        // We have different content in each of published, approved and in progress
+        // We have different content in each of published, reviewed and in progress
         String uri = "/economy/inflationandpriceindices/timeseries/permissions.html";
         Path published = builder.createPublishedFile(uri);
-        Path approved = builder.createApprovedFile(uri);
+        Path reviewed = builder.createReviewedFile(uri);
         Path inProgress = builder.createInProgressFile(uri);
         String publishedContent = Random.id();
-        String approvedContent = Random.id();
+        String reviewedContent = Random.id();
         String inProgressContent = Random.id();
         FileUtils.writeStringToFile(published.toFile(), publishedContent);
-        FileUtils.writeStringToFile(approved.toFile(), approvedContent);
+        FileUtils.writeStringToFile(reviewed.toFile(), reviewedContent);
         FileUtils.writeStringToFile(inProgress.toFile(), inProgressContent);
 
         // When
@@ -443,7 +443,7 @@ public class CollectionTest {
         String foundContent = FileUtils.readFileToString(found.toFile());
 
         // Then
-        // The published content should be returned, not approved or in progress
+        // The published content should be returned, not reviewed or in progress
         assertEquals(publishedContent, foundContent);
     }
 

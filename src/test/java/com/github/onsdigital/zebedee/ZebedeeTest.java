@@ -105,9 +105,9 @@ public class ZebedeeTest {
 		// Given
 		Zebedee zebedee = new Zebedee(expectedPath);
 		String path = builder.contentUris.get(0).substring(1);
-		Path approved = builder.collections.get(0).resolve(Collection.APPROVED);
-		Path beingEdited = approved.resolve(path);
-		Files.createDirectories(beingEdited.getParent());
+        Path reviewed = builder.collections.get(0).resolve(Collection.REVIEWED);
+        Path beingEdited = reviewed.resolve(path);
+        Files.createDirectories(beingEdited.getParent());
 		Files.createFile(beingEdited);
 
 		// When
@@ -125,7 +125,7 @@ public class ZebedeeTest {
 		Zebedee zebedee = new Zebedee(expectedPath);
 		Collection release = new Collection(builder.collections.get(1), zebedee);
 		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
 
 		// When
 		boolean published = zebedee.publish(release);
@@ -163,7 +163,7 @@ public class ZebedeeTest {
         Zebedee zebedee = new Zebedee(expectedPath);
         Collection release = new Collection(builder.collections.get(1), zebedee);
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createApprovedFile(uri);
+        builder.createReviewedFile(uri);
 
         // When
         zebedee.publish(release);

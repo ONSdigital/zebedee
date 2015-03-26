@@ -11,9 +11,9 @@ import java.nio.file.Path;
 public class Zebedee {
 
 
-    static final String ZEBEDEE = "zebedee";
     public static final String PUBLISHED = "published";
     public static final String COLLECTIONS = "collections";
+    static final String ZEBEDEE = "zebedee";
     static final String USERS = "users";
     static final String SESSIONS = "sessions";
     static final String PERMISSIONS = "permissions";
@@ -125,14 +125,14 @@ public class Zebedee {
 
     public boolean publish(Collection collection) throws IOException {
 
-        // Check everything has been approved:
+        // Check everything has been reviewed:
         if (collection.inProgress.uris().size() > 0) {
             return false;
         }
 
         // Move each item of content:
-        for (String uri : collection.approved.uris()) {
-            Path source = collection.approved.get(uri);
+        for (String uri : collection.reviewed.uris()) {
+            Path source = collection.reviewed.get(uri);
             Path destination = published.toPath(uri);
             PathUtils.move(source, destination);
         }

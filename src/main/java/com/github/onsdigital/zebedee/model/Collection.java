@@ -14,20 +14,20 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class Collection {
-    public static final String APPROVED = "approved";
+    public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
 
     public final CollectionDescription description;
     public Path path;
-    public Content approved;
+    public Content reviewed;
     public Content complete;
     public Content inProgress;
     Zebedee zebedee;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
-     * directory contains folders named {@value #APPROVED},
+     * directory contains folders named {@value #REVIEWED},
      * {@value #IN_PROGRESS}, and {@value #COMPLETE}
      * and throws an exception if not.
      *
@@ -39,13 +39,13 @@ public class Collection {
 
         // Validate the directory:
         this.path = path;
-        Path approved = path.resolve(APPROVED);
+        Path reviewed = path.resolve(REVIEWED);
         Path complete = path.resolve(COMPLETE);
         Path inProgress = path.resolve(IN_PROGRESS);
 
         Path description = path.getParent().resolve(
                 path.getFileName() + ".json");
-        if (!Files.exists(approved) || !Files.exists(inProgress) || !Files.exists(complete)
+        if (!Files.exists(reviewed) || !Files.exists(inProgress) || !Files.exists(complete)
                 || !Files.exists(description)) {
             throw new IllegalArgumentException(
                     "This doesn't look like a collection folder: "
@@ -60,7 +60,7 @@ public class Collection {
 
         // Set fields:
         this.zebedee = zebedee;
-        this.approved = new Content(approved);
+        this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
     }
@@ -71,7 +71,7 @@ public class Collection {
 
     /**
      * Constructs a new {@link Collection} in the given {@link Zebedee},
-     * creating the necessary folders {@value #APPROVED} and
+     * creating the necessary folders {@value #REVIEWED} and
      * {@value #IN_PROGRESS}.
      *
      * @param collectionDescription The {@link CollectionDescription} for the {@link Collection}.
@@ -88,7 +88,7 @@ public class Collection {
         // Create the folders:
         Path collection = zebedee.collections.resolve(filename);
         Files.createDirectory(collection);
-        Files.createDirectory(collection.resolve(APPROVED));
+        Files.createDirectory(collection.resolve(REVIEWED));
         Files.createDirectory(collection.resolve(COMPLETE));
         Files.createDirectory(collection.resolve(IN_PROGRESS));
 
@@ -145,7 +145,7 @@ public class Collection {
      * Finds the given URI in the resolved overlay.
      *
      * @param uri The URI to find.
-     * @return The {@link #inProgress} path, otherwise the {@link #approved}
+     * @return The {@link #inProgress} path, otherwise the {@link #reviewed}
      * path, otherwise the existing published path, otherwise null.
      */
     public Path find(String email, String uri) throws IOException {
@@ -158,7 +158,7 @@ public class Collection {
         if (permission) {
             result = inProgress.get(uri);
             if (result == null) {
-                result = approved.get(uri);
+                result = reviewed.get(uri);
             }
         }
 
@@ -176,13 +176,13 @@ public class Collection {
      * {@link Collection}, true.
      */
     public boolean isInCollection(String uri) {
-        return isInProgress(uri) || isApproved(uri);
+        return isInProgress(uri) || isReviewed(uri);
     }
 
     /**
      * @param uri uri The URI to check.
      * @return If the given URI is being edited as part of this
-     * {@link Collection} and has not yet been approved, true.
+     * {@link Collection} and has not yet been reviewed, true.
      */
     boolean isInProgress(String uri) {
         return inProgress.exists(uri);
@@ -191,10 +191,10 @@ public class Collection {
     /**
      * @param uri uri The URI to check.
      * @return If the given URI is being edited as part of this
-     * {@link Collection} and has been approved, true.
+     * {@link Collection} and has been reviewed, true.
      */
-    boolean isApproved(String uri) {
-        return !isInProgress(uri) && approved.exists(uri);
+    boolean isReviewed(String uri) {
+        return !isInProgress(uri) && reviewed.exists(uri);
     }
 
     /**
@@ -261,23 +261,23 @@ public class Collection {
     }
 
     /**
-     * @param email The approving user's email.
-     * @param uri   The path you would like to approve.
+     * @param email The reviewing user's email.
+     * @param uri   The path you would like to review.
      * @return True if the path is found in {@link #inProgress} and was copied
-     * to {@link #approved}.
+     * to {@link #reviewed}.
      * @throws IOException If a filesystem error occurs.
      */
 
-    public boolean approve(String email, String uri) throws IOException {
+    public boolean review(String email, String uri) throws IOException {
         boolean result = false;
 
-        // Doees the user have permission to approve? (or at least see this content)
+        // Doees the user have permission to review? (or at least see this content)
         boolean permission = Root.zebedee.permissions.canView(email, uri);
 
         if (isInProgress(uri) && permission) {
-            // Move the in-progress copy to approved:
+            // Move the in-progress copy to reviewed:
             Path source = inProgress.get(uri);
-            Path destination = approved.toPath(uri);
+            Path destination = reviewed.toPath(uri);
             PathUtils.move(source, destination);
             result = true;
         }
@@ -305,7 +305,7 @@ public class Collection {
         return inProgress.uris();
     }
 
-    public List<String> approvedUris() throws IOException {
-        return approved.uris();
+    public List<String> reviewedUris() throws IOException {
+        return reviewed.uris();
     }
 }

@@ -32,7 +32,7 @@ public class Collection {
         result.id = collection.description.id;
         result.name = collection.description.name;
         result.inProgressUris = collection.inProgressUris();
-        result.approvedUris = collection.approvedUris();
+        result.reviewedUris = collection.reviewedUris();
         return result;
     }
 

@@ -158,6 +158,9 @@ public class Collection {
         if (permission) {
             result = inProgress.get(uri);
             if (result == null) {
+                result = complete.get(uri);
+            }
+            if (result == null) {
                 result = reviewed.get(uri);
             }
         }
@@ -259,10 +262,15 @@ public class Collection {
         // Does the user have permission to edit?
         boolean permission = Root.zebedee.permissions.canEdit(email);
 
-        if (source != null && !isBeingEditedElsewhere && permission) {
+        if (source != null && !isInProgress(uri) && !isBeingEditedElsewhere) {
             // Copy to in progress:
             Path destination = inProgress.toPath(uri);
-            PathUtils.copy(source, destination);
+
+            if (this.isInCollection(uri))
+                PathUtils.move(source, destination);
+            else {
+                PathUtils.copy(source, destination);
+            }
             result = true;
         }
 
@@ -338,6 +346,10 @@ public class Collection {
 
     public List<String> inProgressUris() throws IOException {
         return inProgress.uris();
+    }
+
+    public List<String> completeUris() throws IOException {
+        return complete.uris();
     }
 
     public List<String> reviewedUris() throws IOException {

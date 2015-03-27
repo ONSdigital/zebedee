@@ -18,6 +18,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -240,6 +241,31 @@ public class CollectionTest {
     }
 
     @Test
+    public void shouldEditComplete() throws IOException {
+
+        // Given
+        // The content exists, has been edited and completed:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        builder.createCompleteFile(uri);
+
+        // When
+        boolean edited = collection.edit(email, uri);
+
+        // Then
+        // It should be edited
+        assertTrue(edited);
+
+        // It should be in in progress
+        Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
+
+        // check the file no longer exists in complete, the previous version is no longer wanted.
+        Path complete = builder.collections.get(1).resolve(Collection.COMPLETE);
+        assertFalse(Files.exists(complete.resolve(uri.substring(1))));
+    }
+
+    @Test
     public void shouldEditReviewed() throws IOException {
 
         // Given
@@ -252,7 +278,6 @@ public class CollectionTest {
         boolean edited = collection.edit(email, uri);
 
         // Then
-
         // It should be edited
         assertTrue(edited);
 
@@ -260,9 +285,9 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
-        // The reviewed copy should still be there in case we need to roll back
+        // check the file no longer exists in reviewed, the previous version is no longer wanted.
         Path reviewed = builder.collections.get(1).resolve(Collection.REVIEWED);
-        assertTrue(Files.exists(reviewed.resolve(uri.substring(1))));
+        assertFalse(Files.exists(reviewed.resolve(uri.substring(1))));
     }
 
     @Test
@@ -562,4 +587,120 @@ public class CollectionTest {
         assertEquals(publishedContent, foundContent);
     }
 
+    @Test
+    public void shouldReturnInProgressUris() throws IOException {
+        // Given
+        // There are these files in progress:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
+        builder.createInProgressFile(uri);
+        builder.createInProgressFile(uri2);
+
+        // When
+        // We attempt to get the in progress files.
+        List<String> uris = collection.inProgressUris();
+
+        // Then
+        // We get out the expected in progress files.
+        assertTrue(uris.contains(uri));
+        assertTrue(uris.contains(uri2));
+
+        // and the uri lists for other states are empty.
+        assertTrue(collection.completeUris().isEmpty());
+        assertTrue(collection.reviewedUris().isEmpty());
+    }
+
+    @Test
+    public void shouldReturnCompleteUris() throws IOException {
+        // Given
+        // There are these files complete:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
+        builder.createCompleteFile(uri);
+        builder.createCompleteFile(uri2);
+
+        // When
+        // We attempt to get the complete files.
+        List<String> uris = collection.completeUris();
+
+        // Then
+        // We get out the expected complete files.
+        assertTrue(uris.contains(uri));
+        assertTrue(uris.contains(uri2));
+
+        // and the uri lists for other states are empty.
+        assertTrue(collection.inProgressUris().isEmpty());
+        assertTrue(collection.reviewedUris().isEmpty());
+    }
+
+    @Test
+    public void shouldReturnReviewedUris() throws IOException {
+        // Given
+        // There are these files reviewed:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
+        builder.createReviewedFile(uri);
+        builder.createReviewedFile(uri2);
+
+        // When
+        // We attempt to get the reviewed files.
+        List<String> uris = collection.reviewedUris();
+
+        // Then
+        // We get out the expected reviewed files.
+        assertTrue(uris.contains(uri));
+        assertTrue(uris.contains(uri2));
+
+        // and the uri lists for other states are empty.
+        assertTrue(collection.inProgressUris().isEmpty());
+        assertTrue(collection.completeUris().isEmpty());
+    }
+
+    @Test
+    public void shouldFindInProgressUri() throws IOException {
+        // Given
+        // There is a file in progress
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createInProgressFile(uri);
+
+        // When
+        // We attempt to find the file.
+        Path path = collection.find(builder.publisher.email, uri);
+
+        // Then
+        // We get the path to the in progress file.
+        assertTrue(path.toString().contains("/" + Collection.IN_PROGRESS + "/"));
+    }
+
+    @Test
+    public void shouldFindCompleteUri() throws IOException {
+        // Given
+        // There is a file in progress
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createCompleteFile(uri);
+
+        // When
+        // We attempt to find the file.
+        Path path = collection.find(builder.publisher.email, uri);
+
+        // Then
+        // We get the path to the in progress file.
+        assertTrue(path.toString().contains("/" + Collection.COMPLETE + "/"));
+    }
+
+    @Test
+    public void shouldFindReviewedUri() throws IOException {
+        // Given
+        // There is a file in progress
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createReviewedFile(uri);
+
+        // When
+        // We attempt to find the file.
+        Path path = collection.find(builder.publisher.email, uri);
+
+        // Then
+        // We get the path to the in progress file.
+        assertTrue(path.toString().contains("/" + Collection.REVIEWED + "/"));
+    }
 }

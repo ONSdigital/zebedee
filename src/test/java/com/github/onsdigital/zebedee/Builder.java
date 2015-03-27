@@ -30,6 +30,8 @@ public class Builder {
     public List<Path> collections;
     public List<String> contentUris;
 
+    public User publisher; // accessible publishing team user
+
     public Builder(Class<?> name) throws IOException {
 
         // Create the structure:
@@ -84,6 +86,7 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(patricia.email) + ".json"))) {
             Serialiser.serialise(outputStream, patricia);
         }
+        publisher = patricia;
 
         User ronny = new User();
         ronny.name = "Ronny Roller";

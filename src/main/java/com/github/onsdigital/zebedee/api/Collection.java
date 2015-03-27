@@ -32,6 +32,7 @@ public class Collection {
         result.id = collection.description.id;
         result.name = collection.description.name;
         result.inProgressUris = collection.inProgressUris();
+        result.completeUris = collection.completeUris();
         result.reviewedUris = collection.reviewedUris();
         return result;
     }

@@ -262,7 +262,7 @@ public class Collection {
         // Does the user have permission to edit?
         boolean permission = Root.zebedee.permissions.canEdit(email);
 
-        if (source != null && !isInProgress(uri) && !isBeingEditedElsewhere) {
+        if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
             Path destination = inProgress.toPath(uri);
 

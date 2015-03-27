@@ -328,6 +328,69 @@ public class CollectionTest {
     }
 
     @Test
+    public void shouldComplete() throws IOException {
+
+        // Given
+        // The content exists, has been edited and complete:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        builder.createInProgressFile(uri);
+
+        // When
+        boolean complete = collection.complete(email, uri);
+
+        // Then
+        assertTrue(complete);
+        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
+    }
+
+    @Test
+    public void shouldNotCompleteIfReviewed() throws IOException {
+
+        // Given
+        // The content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createReviewedFile(uri);
+
+        // When
+        boolean isComplete = collection.complete(email, uri);
+
+        // Then
+        assertFalse(isComplete);
+    }
+
+    @Test
+    public void shouldNotCompleteIfAlreadyComplete() throws IOException {
+
+        // Given
+        // The content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createCompleteFile(uri);
+
+        // When
+        boolean isComplete = collection.complete(email, uri);
+
+        // Then
+        assertFalse(isComplete);
+    }
+
+    @Test
+    public void shouldNotCompleteIfNotEditing() throws IOException {
+
+        // Given
+        // The content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createCompleteFile(uri);
+
+        // When
+        boolean isComplete = collection.complete(email, uri);
+
+        // Then
+        assertFalse(isComplete);
+    }
+
+    @Test
     public void shouldNotReviewIfNotEditing() throws IOException {
 
         // Given

@@ -152,7 +152,7 @@ public class Collection {
         Path result = null;
 
         // Does the user have permission tno see this content?
-        boolean permission = Root.zebedee.permissions.canView(email, uri);
+        boolean permission = zebedee.permissions.canView(email, uri);
 
         // Only show edited material if the user has permission:
         if (permission) {
@@ -227,7 +227,7 @@ public class Collection {
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
 
         // Does the current user have permission to edit?
-        boolean permission = Root.zebedee.permissions.canEdit(email);
+        boolean permission = zebedee.permissions.canEdit(email);
 
         if (!isBeingEdited && !exists && permission) {
             // Copy from Published to in progress:
@@ -260,7 +260,7 @@ public class Collection {
                 && zebedee.isBeingEdited(uri) > 0;
 
         // Does the user have permission to edit?
-        boolean permission = Root.zebedee.permissions.canEdit(email);
+        boolean permission = zebedee.permissions.canEdit(email);
 
         if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
@@ -289,7 +289,7 @@ public class Collection {
         boolean result = false;
 
         // Does the user have permission to complete? (or at least see this content)
-        boolean permission = Root.zebedee.permissions.canView(email, uri);
+        boolean permission = zebedee.permissions.canView(email, uri);
 
         if (isInProgress(uri) && permission) {
             // Move the in-progress copy to completed:
@@ -315,7 +315,7 @@ public class Collection {
         boolean result = false;
 
         // Does the user have permission to review? (or at least see this content)
-        boolean permission = Root.zebedee.permissions.canView(email, uri);
+        boolean permission = zebedee.permissions.canView(email, uri);
 
         if (isComplete(uri) && permission) {
             // Move the complete copy to reviewed:

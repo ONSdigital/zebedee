@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.onsdigital.zebedee.model.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.model.Configuration;
 import com.jayway.restassured.response.Response;
 import org.junit.Test;
 
@@ -64,7 +64,7 @@ public class ContentIT {
     }
 
     @Test
-    public void shouldUpdateApprovedContent() {
+    public void shouldUpdateReviewedContent() {
         CollectionDescription description = CollectionIT.createCollection();
 
         String content = "this is content";
@@ -75,7 +75,7 @@ public class ContentIT {
                 Configuration.getBaseUrl() + "/content/" + description.name + "?uri=" + path);
         createResponse.then().assertThat().statusCode(200);
 
-        ApproveIT.approve(description.name, path);
+        ReviewIT.review(description.name, path);
 
         String updateContent = "This content has been updated";
         Response updateResponse = given().body(updateContent).post(

@@ -20,9 +20,8 @@ import java.util.*;
 public class Sessions extends TimerTask {
 
     public static final String TOKEN_HEADER = "X-Florence-Token";
-
-    private Path sessions;
     Timer timer;
+    private Path sessions;
 
     public Sessions(Path sessions) {
         this.sessions = sessions;
@@ -264,7 +263,7 @@ public class Sessions extends TimerTask {
      * @return The read session.
      * @throws IOException If a filesystem error occurs.
      */
-    private Session read(Path path) throws IOException {
+    private synchronized Session read(Path path) throws IOException {
         Session session = null;
 
         if (Files.exists(path)) {
@@ -282,7 +281,7 @@ public class Sessions extends TimerTask {
      * @param session The {@link com.github.onsdigital.zebedee.json.Session} to be written.
      * @throws IOException If a filesystem error occurs.
      */
-    private void write(Session session) throws IOException {
+    private synchronized void write(Session session) throws IOException {
         Path path = sessionPath(session.id);
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, session);

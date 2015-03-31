@@ -10,14 +10,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-/**
- * Created by david on 10/03/2015.
- */
 @Api
-public class Approve {
+public class Review {
 
+    /**
+     * Set a page to the reviewed state.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     */
     @POST
-    public ResultMessage approve(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResultMessage review(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // Locate the collection:
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
@@ -41,14 +46,14 @@ public class Approve {
             return new ResultMessage("URI does not represent a file.");
         }
 
-        // Attempt to approve:
+        // Attempt to review:
         Session session = Root.zebedee.sessions.get(request);
-        if (!collection.approve(session.email, uri)) {
+        if (!collection.review(session.email, uri)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return new ResultMessage("URI was not approved.");
+            return new ResultMessage("URI was not reviewed.");
         }
 
-        return new ResultMessage("URI approved.");
+        return new ResultMessage("URI reviewed.");
     }
 
 }

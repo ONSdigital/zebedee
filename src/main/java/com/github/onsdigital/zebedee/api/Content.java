@@ -82,12 +82,14 @@ public class Content {
             boolean result = collection.create(session.email, uri);
             if (!result) {
                 response.setStatus(HttpStatus.BAD_REQUEST_400);
+                return false;
             }
         } else {
             // edit the file
             boolean result = collection.edit(session.email, uri);
             if (!result) {
                 response.setStatus(HttpStatus.BAD_REQUEST_400);
+                return false;
             }
         }
 

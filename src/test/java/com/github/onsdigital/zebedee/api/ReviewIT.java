@@ -5,9 +5,9 @@ import com.jayway.restassured.response.Response;
 
 import static com.jayway.restassured.RestAssured.post;
 
-public class ApproveIT {
-    public static void approve(String collectionName, String path) {
-        Response postResponse = post(Configuration.getBaseUrl() + "/approve/" + collectionName + "?uri=" + path);
+public class ReviewIT {
+    public static void review(String collectionName, String path) {
+        Response postResponse = post(Configuration.getBaseUrl() + "/review/" + collectionName + "?uri=" + path);
         postResponse.then().assertThat().statusCode(200);
     }
 }

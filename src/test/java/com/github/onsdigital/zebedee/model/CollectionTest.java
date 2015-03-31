@@ -18,6 +18,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -63,7 +64,8 @@ public class CollectionTest {
 
         assertTrue(Files.exists(releasePath));
         assertTrue(Files.exists(jsonPath));
-        assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.REVIEWED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
 
         CollectionDescription createdCollectionDescription;
@@ -100,7 +102,8 @@ public class CollectionTest {
         assertTrue(Files.exists(releasePath));
         assertTrue(Files.exists(jsonPath));
         assertTrue(!Files.exists(oldJsonPath));
-        assertTrue(Files.exists(releasePath.resolve(Collection.APPROVED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.REVIEWED)));
+        assertTrue(Files.exists(releasePath.resolve(Collection.COMPLETE)));
         assertTrue(Files.exists(releasePath.resolve(Collection.IN_PROGRESS)));
 
         CollectionDescription renamedCollectionDescription;
@@ -168,12 +171,29 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldNotCreateIfApproved() throws IOException {
+    public void shouldNotCreateIfReviewed() throws IOException {
 
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.isApproved(uri);
+        builder.createReviewedFile(uri);
+
+        // When
+        boolean created = collection.create(email, uri);
+
+        // Then
+        assertFalse(created);
+        Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
+    }
+
+    @Test
+    public void shouldNotCreateIfComplete() throws IOException {
+
+        // Given
+        // The content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
+        builder.createReviewedFile(uri);
 
         // When
         boolean created = collection.create(email, uri);
@@ -190,7 +210,7 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.isInProgress(uri);
+        builder.createInProgressFile(uri);
 
         // When
         boolean created = collection.create(email, uri);
@@ -221,19 +241,18 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditApproved() throws IOException {
+    public void shouldEditComplete() throws IOException {
 
         // Given
-        // The content exists, has been edited and approved:
+        // The content exists, has been edited and completed:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        builder.isApproved(uri);
+        builder.createCompleteFile(uri);
 
         // When
         boolean edited = collection.edit(email, uri);
 
         // Then
-
         // It should be edited
         assertTrue(edited);
 
@@ -241,9 +260,34 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
-        // The approved copy should still be there in case we need to roll back
-        Path approved = builder.collections.get(1).resolve(Collection.APPROVED);
-        assertTrue(Files.exists(approved.resolve(uri.substring(1))));
+        // check the file no longer exists in complete, the previous version is no longer wanted.
+        Path complete = builder.collections.get(1).resolve(Collection.COMPLETE);
+        assertFalse(Files.exists(complete.resolve(uri.substring(1))));
+    }
+
+    @Test
+    public void shouldEditReviewed() throws IOException {
+
+        // Given
+        // The content exists, has been edited and reviewed:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        builder.createReviewedFile(uri);
+
+        // When
+        boolean edited = collection.edit(email, uri);
+
+        // Then
+        // It should be edited
+        assertTrue(edited);
+
+        // It should be in in progress
+        Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
+
+        // check the file no longer exists in reviewed, the previous version is no longer wanted.
+        Path reviewed = builder.collections.get(1).resolve(Collection.REVIEWED);
+        assertFalse(Files.exists(reviewed.resolve(uri.substring(1))));
     }
 
     @Test
@@ -252,7 +296,7 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.isInProgress(uri);
+        builder.createInProgressFile(uri);
 
         // When
         boolean edited = collection.edit(email, uri);
@@ -291,37 +335,99 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldApprove() throws IOException {
+    public void shouldReview() throws IOException {
 
         // Given
-        // The content exists, has been edited and approved:
+        // The content exists, has been edited and reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        builder.isApproved(uri);
-        builder.isInProgress(uri);
+        builder.createCompleteFile(uri);
 
         // When
-        boolean approved = collection.approve(email, uri);
+        boolean reviewed = collection.review(email, uri);
 
         // Then
-        assertTrue(approved);
+        assertTrue(reviewed);
         Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
     }
 
     @Test
-    public void shouldNotApproveIfNotEditing() throws IOException {
+    public void shouldComplete() throws IOException {
+
+        // Given
+        // The content exists, has been edited and complete:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        builder.createInProgressFile(uri);
+
+        // When
+        boolean complete = collection.complete(email, uri);
+
+        // Then
+        assertTrue(complete);
+        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
+    }
+
+    @Test
+    public void shouldNotCompleteIfReviewed() throws IOException {
 
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.isApproved(uri);
+        builder.createReviewedFile(uri);
 
         // When
-        boolean approved = collection.approve(email, uri);
+        boolean isComplete = collection.complete(email, uri);
 
         // Then
-        assertFalse(approved);
+        assertFalse(isComplete);
+    }
+
+    @Test
+    public void shouldNotCompleteIfAlreadyComplete() throws IOException {
+
+        // Given
+        // The content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createCompleteFile(uri);
+
+        // When
+        boolean isComplete = collection.complete(email, uri);
+
+        // Then
+        assertFalse(isComplete);
+    }
+
+    @Test
+    public void shouldNotCompleteIfNotEditing() throws IOException {
+
+        // Given
+        // The content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createCompleteFile(uri);
+
+        // When
+        boolean isComplete = collection.complete(email, uri);
+
+        // Then
+        assertFalse(isComplete);
+    }
+
+    @Test
+    public void shouldNotReviewIfNotEditing() throws IOException {
+
+        // Given
+        // The content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createReviewedFile(uri);
+
+        // When
+        boolean reviewed = collection.review(email, uri);
+
+        // Then
+        assertFalse(reviewed);
     }
 
     @Test
@@ -330,49 +436,102 @@ public class CollectionTest {
         // Given
         // The content is currently being edited:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.isInProgress(uri);
+        builder.createInProgressFile(uri);
 
         // When
         boolean inProgress = collection.isInProgress(uri);
-        boolean inRelease = collection.isInCollection(uri);
+        boolean isInCollection = collection.isInCollection(uri);
 
         // Then
         assertTrue(inProgress);
-        assertTrue(inRelease);
+        assertTrue(isInCollection);
     }
 
     @Test
-    public void shouldBeApproved() throws IOException {
+    public void shouldBeComplete() throws IOException {
 
         // Given
-        // The content has been approved:
+        // The content has been completed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.isApproved(uri);
+        builder.createCompleteFile(uri);
 
         // When
-        boolean approved = collection.isApproved(uri);
-        boolean inRelease = collection.isInCollection(uri);
+        boolean complete = collection.isComplete(uri);
+        boolean isInCollection = collection.isInCollection(uri);
 
         // Then
-        assertTrue(approved);
-        assertTrue(inRelease);
+        assertTrue(complete);
+        assertTrue(isInCollection);
     }
 
     @Test
-    public void shouldNotBeApprovedIfInProgress() throws IOException {
+    public void shouldBeReviewed() throws IOException {
 
         // Given
-        // The content has been approved:
+        // The content has been reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
-        builder.isApproved(uri);
-        builder.isInProgress(uri);
+        builder.createReviewedFile(uri);
 
         // When
-        boolean approved = collection.isApproved(uri);
+        boolean reviewed = collection.isReviewed(uri);
+        boolean isInCollection = collection.isInCollection(uri);
+
+        // Then
+        assertTrue(reviewed);
+        assertTrue(isInCollection);
+    }
+
+    @Test
+    public void shouldNotBeCompleteIfInProgress() throws IOException {
+
+        // Given
+        // The content has been reviewed:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createCompleteFile(uri);
+        builder.createInProgressFile(uri);
+
+        // When
+        boolean isComplete = collection.isComplete(uri);
+        boolean isInCollection = collection.isInCollection(uri);
+
+        // Then
+        assertFalse(isComplete);
+        assertTrue(isInCollection);
+    }
+
+    @Test
+    public void shouldNotBeReviewedIfComplete() throws IOException {
+
+        // Given
+        // The content has been complete:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createReviewedFile(uri);
+        builder.createCompleteFile(uri);
+
+        // When
+        boolean reviewed = collection.isReviewed(uri);
+        boolean isInCollection = collection.isInCollection(uri);
+
+        // Then
+        assertFalse(reviewed);
+        assertTrue(isInCollection);
+    }
+
+    @Test
+    public void shouldNotBeReviewedIfInProgress() throws IOException {
+
+        // Given
+        // The content has been reviewed:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createReviewedFile(uri);
+        builder.createInProgressFile(uri);
+
+        // When
+        boolean reviewed = collection.isReviewed(uri);
         boolean inRelease = collection.isInCollection(uri);
 
         // Then
-        assertFalse(approved);
+        assertFalse(reviewed);
         assertTrue(inRelease);
     }
 
@@ -383,8 +542,8 @@ public class CollectionTest {
         // We're editing some content:
         String uri = "/economy/inflationandpriceindices/timeseries/beer.html";
         builder.createPublishedFile(uri);
-        builder.isApproved(uri);
-        builder.isInProgress(uri);
+        builder.createReviewedFile(uri);
+        builder.createInProgressFile(uri);
 
         // When
         // We write some output to the content:
@@ -406,16 +565,16 @@ public class CollectionTest {
     public void shouldFilterOnPermissions() throws IOException {
 
         // Given
-        // We have different content in each of published, approved and in progress
+        // We have different content in each of published, reviewed and in progress
         String uri = "/economy/inflationandpriceindices/timeseries/permissions.html";
         Path published = builder.createPublishedFile(uri);
-        Path approved = builder.isApproved(uri);
-        Path inProgress = builder.isInProgress(uri);
+        Path reviewed = builder.createReviewedFile(uri);
+        Path inProgress = builder.createInProgressFile(uri);
         String publishedContent = Random.id();
-        String approvedContent = Random.id();
+        String reviewedContent = Random.id();
         String inProgressContent = Random.id();
         FileUtils.writeStringToFile(published.toFile(), publishedContent);
-        FileUtils.writeStringToFile(approved.toFile(), approvedContent);
+        FileUtils.writeStringToFile(reviewed.toFile(), reviewedContent);
         FileUtils.writeStringToFile(inProgress.toFile(), inProgressContent);
 
         // When
@@ -424,8 +583,124 @@ public class CollectionTest {
         String foundContent = FileUtils.readFileToString(found.toFile());
 
         // Then
-        // The published content should be returned, not approved or in progress
+        // The published content should be returned, not reviewed or in progress
         assertEquals(publishedContent, foundContent);
     }
 
+    @Test
+    public void shouldReturnInProgressUris() throws IOException {
+        // Given
+        // There are these files in progress:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
+        builder.createInProgressFile(uri);
+        builder.createInProgressFile(uri2);
+
+        // When
+        // We attempt to get the in progress files.
+        List<String> uris = collection.inProgressUris();
+
+        // Then
+        // We get out the expected in progress files.
+        assertTrue(uris.contains(uri));
+        assertTrue(uris.contains(uri2));
+
+        // and the uri lists for other states are empty.
+        assertTrue(collection.completeUris().isEmpty());
+        assertTrue(collection.reviewedUris().isEmpty());
+    }
+
+    @Test
+    public void shouldReturnCompleteUris() throws IOException {
+        // Given
+        // There are these files complete:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
+        builder.createCompleteFile(uri);
+        builder.createCompleteFile(uri2);
+
+        // When
+        // We attempt to get the complete files.
+        List<String> uris = collection.completeUris();
+
+        // Then
+        // We get out the expected complete files.
+        assertTrue(uris.contains(uri));
+        assertTrue(uris.contains(uri2));
+
+        // and the uri lists for other states are empty.
+        assertTrue(collection.inProgressUris().isEmpty());
+        assertTrue(collection.reviewedUris().isEmpty());
+    }
+
+    @Test
+    public void shouldReturnReviewedUris() throws IOException {
+        // Given
+        // There are these files reviewed:
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        String uri2 = "/economy/someotherthing/timeseries/e4c4.html";
+        builder.createReviewedFile(uri);
+        builder.createReviewedFile(uri2);
+
+        // When
+        // We attempt to get the reviewed files.
+        List<String> uris = collection.reviewedUris();
+
+        // Then
+        // We get out the expected reviewed files.
+        assertTrue(uris.contains(uri));
+        assertTrue(uris.contains(uri2));
+
+        // and the uri lists for other states are empty.
+        assertTrue(collection.inProgressUris().isEmpty());
+        assertTrue(collection.completeUris().isEmpty());
+    }
+
+    @Test
+    public void shouldFindInProgressUri() throws IOException {
+        // Given
+        // There is a file in progress
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createInProgressFile(uri);
+
+        // When
+        // We attempt to find the file.
+        Path path = collection.find(builder.publisher.email, uri);
+
+        // Then
+        // We get the path to the in progress file.
+        assertTrue(path.toString().contains("/" + Collection.IN_PROGRESS + "/"));
+    }
+
+    @Test
+    public void shouldFindCompleteUri() throws IOException {
+        // Given
+        // There is a file in progress
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createCompleteFile(uri);
+
+        // When
+        // We attempt to find the file.
+        Path path = collection.find(builder.publisher.email, uri);
+
+        // Then
+        // We get the path to the in progress file.
+        assertTrue(path.toString().contains("/" + Collection.COMPLETE + "/"));
+    }
+
+    @Test
+    public void shouldFindReviewedUri() throws IOException {
+        // Given
+        // There is a file in progress
+        String uri = "/economy/inflationandpriceindices/timeseries/d7g7.html";
+        builder.createReviewedFile(uri);
+
+        // When
+        // We attempt to find the file.
+        Path path = collection.find(builder.publisher.email, uri);
+
+        // Then
+        // We get the path to the in progress file.
+        assertTrue(path.toString().contains("/" + Collection.REVIEWED + "/"));
+    }
 }

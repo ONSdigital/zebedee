@@ -27,7 +27,8 @@ public class CollectionDescription {
     public Date publishDate;
 
     public List<String> inProgressUris;
-    public List<String> approvedUris;
+    public List<String> completeUris;
+    public List<String> reviewedUris;
 
     /**
      * Default constuructor for serialisation.

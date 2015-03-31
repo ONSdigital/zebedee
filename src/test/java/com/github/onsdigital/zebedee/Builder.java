@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
 
@@ -28,6 +29,8 @@ public class Builder {
     public Path zebedee;
     public List<Path> collections;
     public List<String> contentUris;
+
+    public User publisher; // accessible publishing team user
 
     public Builder(Class<?> name) throws IOException {
 
@@ -83,6 +86,7 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(patricia.email) + ".json"))) {
             Serialiser.serialise(outputStream, patricia);
         }
+        publisher = patricia;
 
         User ronny = new User();
         ronny.name = "Ronny Roller";
@@ -140,22 +144,56 @@ public class Builder {
     }
 
     /**
-     * Creates an approved file.
+     * Creates an reviewed file.
      *
      * @param uri The URI to be created.
      * @throws IOException If a filesystem error occurs.
      */
-    public Path isApproved(String uri) throws IOException {
+    public Path createReviewedFile(String uri) throws IOException {
 
-        Path approved = collections.get(1).resolve(com.github.onsdigital.zebedee.model.Collection.APPROVED);
-        Path content = approved.resolve(uri.substring(1));
+        return createFile(Collection.REVIEWED, uri);
+    }
+
+    /**
+     * Creates a complete file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public Path createCompleteFile(String uri) throws IOException {
+
+        return createFile(Collection.COMPLETE, uri);
+    }
+
+    /**
+     * Creates a complete file.
+     *
+     * @param uri The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public Path createInProgressFile(String uri) throws IOException {
+
+        return createFile(Collection.IN_PROGRESS, uri);
+    }
+
+    /**
+     * Creates a file in the given directory.
+     *
+     * @param directory The directory to be created.
+     * @param uri       The URI to be created.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private Path createFile(String directory, String uri) throws IOException {
+
+        Path inProgress = collections.get(1).resolve(directory);
+        Path content = inProgress.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
         return content;
     }
 
     /**
-     * Creates an approved file in a different {@link com.github.onsdigital.zebedee.model.Collection}.
+     * Creates an reviewed file in a different {@link com.github.onsdigital.zebedee.model.Collection}.
      *
      * @param uri        The URI to be created.
      * @param collection The {@link com.github.onsdigital.zebedee.model.Collection} in which to create the content.
@@ -163,26 +201,11 @@ public class Builder {
      */
     public void isBeingEditedElsewhere(String uri, int collection) throws IOException {
 
-        Path approved = collections.get(collection)
-                .resolve(com.github.onsdigital.zebedee.model.Collection.APPROVED);
-        Path content = approved.resolve(uri.substring(1));
+        Path reviewed = collections.get(collection)
+                .resolve(com.github.onsdigital.zebedee.model.Collection.REVIEWED);
+        Path content = reviewed.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
-    }
-
-    /**
-     * Creates an in-progress file.
-     *
-     * @param uri The URI to be created.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public Path isInProgress(String uri) throws IOException {
-
-        Path inProgress = collections.get(1).resolve(com.github.onsdigital.zebedee.model.Collection.IN_PROGRESS);
-        Path content = inProgress.resolve(uri.substring(1));
-        Files.createDirectories(content.getParent());
-        Files.createFile(content);
-        return content;
     }
 
     public Session createSession(String email) throws IOException {
@@ -247,7 +270,8 @@ public class Builder {
         // Create the folders:
         Path collection = collections.resolve(filename);
         Files.createDirectory(collection);
-        Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.APPROVED));
+        Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.REVIEWED));
+        Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.COMPLETE));
         Files.createDirectory(collection.resolve(com.github.onsdigital.zebedee.model.Collection.IN_PROGRESS));
 
         // Create the description:

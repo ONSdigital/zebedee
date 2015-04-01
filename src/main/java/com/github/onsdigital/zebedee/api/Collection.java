@@ -41,37 +41,22 @@ public class Collection {
     public boolean createOrUpdate(HttpServletRequest request,
                                HttpServletResponse response,
                                CollectionDescription collectionDescription) throws IOException {
+        if(collectionDescription.name == null){
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return false;
+        }
 
-        com.github.onsdigital.zebedee.model.Collection existingCollection = Collections
-                .getCollection(request);
+        collectionDescription.name = StringUtils.trim(collectionDescription.name);
 
-        collectionDescription.name = StringUtils
-                .trim(collectionDescription.name);
-
-        if (existingCollection == null) {
-
-            if (Root.zebedee.getCollections().hasCollection(
-                    collectionDescription.name)) {
+        if (Root.zebedee.getCollections().hasCollection(
+                collectionDescription.name)) {
                 response.setStatus(HttpStatus.CONFLICT_409);
                 return false;
             }
 
-            com.github.onsdigital.zebedee.model.Collection.create(
-                    collectionDescription, Root.zebedee);
-        } else {
-            if (!StringUtils.equals(existingCollection.description.name,
-                    collectionDescription.name)) {
-                if (Root.zebedee.getCollections().hasCollection(
-                        collectionDescription.name)) {
-                    response.setStatus(HttpStatus.CONFLICT_409);
-                    return false;
-                }
+        com.github.onsdigital.zebedee.model.Collection.create(
+                collectionDescription, Root.zebedee);
 
-                com.github.onsdigital.zebedee.model.Collection.rename(
-                        existingCollection.description,
-                        collectionDescription.name, Root.zebedee);
-            }
-        }
         return true;
     }
 }

@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.Configuration;
 import com.jayway.restassured.response.Response;
+import org.junit.Before;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
@@ -14,6 +15,7 @@ import static com.jayway.restassured.RestAssured.given;
 public class LoginIT {
 
     public static final String tokenHeader = "x-florence-token";
+    private String authenticationToken = "";
 
     public static User createUser() {
         User user = new User();
@@ -47,11 +49,20 @@ public class LoginIT {
         return postResponse.asString();
     }
 
+    public static String login() {
+        return login(defaultCredentials());
+    }
+
     public static Credentials defaultCredentials() {
         Credentials credentials = new Credentials();
         credentials.email = "florence@magicroundabout.ons.gov.uk";
         credentials.password = "Doug4l";
         return credentials;
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        authenticationToken = LoginIT.login();
     }
 
     @Test
@@ -61,7 +72,7 @@ public class LoginIT {
         Credentials credentials = new Credentials();
         credentials.email = null;
         String json = Serialiser.serialise(credentials);
-        CollectionDescription description = CollectionIT.createCollection();
+        CollectionDescription description = CollectionIT.createCollection(authenticationToken);
 
         Response postResponse = given().body(json).post(Configuration.getBaseUrl() + "/login");
         postResponse.then().assertThat().statusCode(400);
@@ -74,7 +85,7 @@ public class LoginIT {
         Credentials credentials = new Credentials();
         credentials.email = null;
         String json = Serialiser.serialise(credentials);
-        CollectionDescription description = CollectionIT.createCollection();
+        CollectionDescription description = CollectionIT.createCollection(authenticationToken);
 
         Response postResponse = given().body(json).post(Configuration.getBaseUrl() + "/login");
         postResponse.then().assertThat().statusCode(400);
@@ -83,7 +94,7 @@ public class LoginIT {
     @Test
     public void shouldReturn200WithValidCollectionName() {
 
-        CollectionDescription description = CollectionIT.createCollection();
+        CollectionDescription description = CollectionIT.createCollection(authenticationToken);
 
         Response response = given()
                 .get(Configuration.getBaseUrl() + "/browse/" + description.name);

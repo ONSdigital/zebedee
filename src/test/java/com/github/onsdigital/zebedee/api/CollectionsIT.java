@@ -1,10 +1,11 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.onsdigital.zebedee.model.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.model.Configuration;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jayway.restassured.response.Response;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -14,10 +15,17 @@ import static org.junit.Assert.fail;
 
 public class CollectionsIT {
 
+    private String authenticationToken = "";
+
+    @Before
+    public void setUp() throws Exception {
+        authenticationToken = LoginIT.login();
+    }
+
     @Test
     public void shouldGetCollections() {
 
-        CollectionDescription description = CollectionIT.createCollection();
+        CollectionDescription description = CollectionIT.createCollection(authenticationToken);
 
         Response getResponse = get(Configuration.getBaseUrl() + "/collections");
         getResponse.then().assertThat().statusCode(200);

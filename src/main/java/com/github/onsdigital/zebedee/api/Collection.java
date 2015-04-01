@@ -31,6 +31,7 @@ public class Collection {
         CollectionDescription result = new CollectionDescription();
         result.id = collection.description.id;
         result.name = collection.description.name;
+        result.publishDate = collection.description.publishDate;
         result.inProgressUris = collection.inProgressUris();
         result.completeUris = collection.completeUris();
         result.reviewedUris = collection.reviewedUris();

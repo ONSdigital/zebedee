@@ -81,7 +81,8 @@ public class Content {
             // create the file
             boolean result = collection.create(session.email, uri);
             if (!result) {
-                response.setStatus(HttpStatus.BAD_REQUEST_400);
+                // file is being edited in a different collection
+                response.setStatus(HttpStatus.CONFLICT_409);
                 return false;
             }
         } else {

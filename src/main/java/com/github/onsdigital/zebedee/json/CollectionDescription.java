@@ -29,6 +29,7 @@ public class CollectionDescription {
     public List<String> inProgressUris;
     public List<String> completeUris;
     public List<String> reviewedUris;
+    public boolean approvedStatus;
 
     /**
      * Default constuructor for serialisation.
@@ -57,4 +58,6 @@ public class CollectionDescription {
         this.publishDate = publishDate;
         this.name = name;
     }
+
+
 }

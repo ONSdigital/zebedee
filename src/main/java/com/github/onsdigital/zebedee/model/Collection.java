@@ -103,6 +103,19 @@ public class Collection {
         return new Collection(collectionDescription, zebedee);
     }
 
+    public  boolean save() throws IOException {
+        CollectionDescription description = this.description;
+
+        try (OutputStream output = Files.newOutputStream(this.descriptionPath())) {
+            Serialiser.serialise(output, this.description);
+            return true;
+        }
+    }
+
+    private Path descriptionPath(){
+        return zebedee.collections.resolve(this.description.id+".json");
+    }
+
     /**
      * Renames an existing {@link Collection} in the given {@link Zebedee}.
      *

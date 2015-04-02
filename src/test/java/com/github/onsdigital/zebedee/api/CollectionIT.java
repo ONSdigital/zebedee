@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Configuration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,14 +18,17 @@ import static com.jayway.restassured.RestAssured.given;
 
 public class CollectionIT {
 
-    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").create();
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer()).create();
 
     private String authenticationToken = "";
+
 
     public static CollectionDescription createCollection(String authenticationToken) {
         CollectionDescription description = new CollectionDescription();
         description.name = UUID.randomUUID().toString();
         description.publishDate = new Date();
+
+        System.out.println(gson.toJson(description));
 
         Response postResponse = given()
                 .header(LoginIT.tokenHeader, authenticationToken)

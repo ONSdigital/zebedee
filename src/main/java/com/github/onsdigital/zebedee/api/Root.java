@@ -4,6 +4,7 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Content;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Root implements Startup {
@@ -59,7 +61,7 @@ public class Root implements Startup {
         }
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
-        Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+        Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
         // Set the class that will be used to determine a ClassLoader when loading resources:
         ResourceUtils.classLoaderClass = Root.class;

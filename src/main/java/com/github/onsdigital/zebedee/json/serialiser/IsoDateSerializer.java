@@ -1,12 +1,11 @@
 package com.github.onsdigital.zebedee.json.serialiser;
 
 import com.google.gson.*;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -17,11 +16,10 @@ import java.util.TimeZone;
  */
 public class IsoDateSerializer implements JsonSerializer<Date>, JsonDeserializer<Date> {
 
-    private final DateFormat iso8601Format;
+    private final FastDateFormat iso8601Format;
 
     public IsoDateSerializer() {
-        this.iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-        this.iso8601Format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        this.iso8601Format = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", TimeZone.getTimeZone("BST"), Locale.UK);
     }
 
     public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {

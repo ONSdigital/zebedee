@@ -53,6 +53,7 @@ public class Review {
             return new ResultMessage("URI was not reviewed.");
         }
 
+        collection.save();
         return new ResultMessage("URI reviewed.");
     }
 

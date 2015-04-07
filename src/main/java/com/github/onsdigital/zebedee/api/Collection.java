@@ -35,6 +35,7 @@ public class Collection {
         result.inProgressUris = collection.inProgressUris();
         result.completeUris = collection.completeUris();
         result.reviewedUris = collection.reviewedUris();
+        result.eventsByUri = collection.description.eventsByUri;
         return result;
     }
 

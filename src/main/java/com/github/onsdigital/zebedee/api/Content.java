@@ -95,6 +95,7 @@ public class Content {
         }
 
         if (collection != null) {
+            collection.save();
             path = collection.getInProgressPath(uri);
         }
 

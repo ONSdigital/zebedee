@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.ContentEventType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -151,6 +152,9 @@ public class CollectionTest {
         assertTrue(created);
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
+
+        // check an event has been created for the content being created.
+        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.CREATED);
     }
 
     @Test
@@ -238,6 +242,9 @@ public class CollectionTest {
         Path published = builder.zebedee.resolve(Zebedee.PUBLISHED);
         Path content = published.resolve(uri.substring(1));
         assertTrue(Files.exists(content));
+
+        // check an event has been created for the content being created.
+        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.EDITED);
     }
 
     @Test
@@ -350,6 +357,9 @@ public class CollectionTest {
         assertTrue(reviewed);
         Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
+
+        // check an event has been created for the content being created.
+        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
     }
 
     @Test
@@ -368,6 +378,9 @@ public class CollectionTest {
         assertTrue(complete);
         Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
+
+        // check an event has been created for the content being created.
+        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.COMPLETED);
     }
 
     @Test

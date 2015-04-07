@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This cd ..
@@ -30,6 +31,11 @@ public class CollectionDescription {
     public List<String> completeUris;
     public List<String> reviewedUris;
     public boolean approvedStatus;
+
+    /**
+     * A List of {@link ContentEvent} for each uri in the collection.
+     */
+    public Map<String, ContentEvents> eventsByUri;
 
     /**
      * Default constuructor for serialisation.

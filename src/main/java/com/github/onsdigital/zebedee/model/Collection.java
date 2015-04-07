@@ -3,6 +3,9 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.ContentEvent;
+import com.github.onsdigital.zebedee.json.ContentEventType;
+import com.github.onsdigital.zebedee.json.ContentEvents;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +13,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class Collection {
@@ -147,8 +152,8 @@ public class Collection {
         }
     }
 
-    private Path descriptionPath(){
-        return zebedee.collections.resolve(this.description.id+".json");
+    private Path descriptionPath() {
+        return zebedee.collections.resolve(this.description.id + ".json");
     }
 
     /**
@@ -243,6 +248,9 @@ public class Collection {
             // Copy from Published to in progress:
             Path path = inProgress.toPath(uri);
             PathUtils.create(path);
+
+            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.CREATED, email));
+
             result = true;
         }
 
@@ -281,6 +289,8 @@ public class Collection {
             else {
                 PathUtils.copy(source, destination);
             }
+
+            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.EDITED, email));
             result = true;
         }
 
@@ -306,6 +316,8 @@ public class Collection {
             Path source = inProgress.get(uri);
             Path destination = complete.toPath(uri);
             PathUtils.move(source, destination);
+
+            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.COMPLETED, email));
             result = true;
         }
 
@@ -332,6 +344,8 @@ public class Collection {
             Path source = complete.get(uri);
             Path destination = reviewed.toPath(uri);
             PathUtils.move(source, destination);
+
+            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.REVIEWED, email));
             result = true;
         }
 
@@ -365,4 +379,22 @@ public class Collection {
     public List<String> reviewedUris() throws IOException {
         return reviewed.uris();
     }
+
+    /**
+     * Add a {@link ContentEvent} for the given uri.
+     *
+     * @param uri   The uri the event belongs to.
+     * @param event The event to add.
+     */
+    void AddEvent(String uri, ContentEvent event) {
+
+        if (this.description.eventsByUri == null)
+            this.description.eventsByUri = new HashMap<>();
+
+        if (!this.description.eventsByUri.containsKey(uri))
+            this.description.eventsByUri.put(uri, new ContentEvents());
+
+        this.description.eventsByUri.get(uri).add(event);
+    }
 }
+

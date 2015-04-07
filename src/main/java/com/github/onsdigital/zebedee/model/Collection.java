@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 import java.io.File;
@@ -103,19 +102,6 @@ public class Collection {
         return new Collection(collectionDescription, zebedee);
     }
 
-    public  boolean save() throws IOException {
-        CollectionDescription description = this.description;
-
-        try (OutputStream output = Files.newOutputStream(this.descriptionPath())) {
-            Serialiser.serialise(output, this.description);
-            return true;
-        }
-    }
-
-    private Path descriptionPath(){
-        return zebedee.collections.resolve(this.description.id+".json");
-    }
-
     /**
      * Renames an existing {@link Collection} in the given {@link Zebedee}.
      *
@@ -152,6 +138,17 @@ public class Collection {
         Files.delete(zebedee.collections.resolve(filename + ".json"));
 
         return new Collection(renamedCollectionDescription, zebedee);
+    }
+
+    public boolean save() throws IOException {
+        try (OutputStream output = Files.newOutputStream(this.descriptionPath())) {
+            Serialiser.serialise(output, this.description);
+            return true;
+        }
+    }
+
+    private Path descriptionPath(){
+        return zebedee.collections.resolve(this.description.id+".json");
     }
 
     /**

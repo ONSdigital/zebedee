@@ -6,11 +6,17 @@ import com.jayway.restassured.response.Response;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class ContentIT {
 
@@ -98,5 +104,71 @@ public class ContentIT {
         getResponse.then().assertThat().statusCode(200);
 
         assertEquals(updateContent, getResponse.asString());
+    }
+
+    @Test
+    public void shouldGetContentConcurrently() throws IOException, InterruptedException {
+        CollectionDescription description = CollectionIT.createCollection(authenticationToken);
+
+        String content = "this is content";
+        String directory = UUID.randomUUID().toString();
+        String path = directory + "/data.json";
+
+        Response postResponse = given()
+                .header(LoginIT.tokenHeader, authenticationToken)
+                .body(content)
+                .post(Configuration.getBaseUrl() + "/content/" + description.name + "?uri=" + path);
+        postResponse.then().assertThat().statusCode(200);
+
+
+        ExecutorService executor = Executors.newCachedThreadPool();
+
+        List<GetContent> runnables = new ArrayList<>();
+
+        for (int i = 0; i < 20; ++i) {
+            runnables.add(new GetContent(description, path));
+        }
+
+        for (GetContent runnable : runnables) {
+            executor.execute(runnable);
+        }
+
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+        }
+
+        for (GetContent runnable : runnables) {
+            assertFalse(runnable.failed);
+        }
+    }
+
+    public class GetContent implements Runnable {
+        public boolean failed = false;
+        String content = "this is content";
+        CollectionDescription description;
+        String path;
+
+        public GetContent(CollectionDescription description, String path) {
+            this.description = description;
+            this.path = path;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Response getResponse = given()
+                        .header(LoginIT.tokenHeader, authenticationToken)
+                        .get(Configuration.getBaseUrl() + "/content/" + description.name + "?uri=" + path);
+
+                if (getResponse.statusCode() != 200)
+                    failed = true;
+
+                System.out.println(getResponse.asString());
+                assertEquals(content, getResponse.asString());
+
+            } catch (Exception e) {
+                failed = true;
+            }
+        }
     }
 }

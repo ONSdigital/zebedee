@@ -11,6 +11,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.*;
@@ -42,6 +43,12 @@ public class Content {
         }
 
         if (path == null) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            return;
+        }
+
+        // Check we're requesting a file:
+        if (!java.nio.file.Files.exists(path)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return;
         }
@@ -171,7 +178,35 @@ public class Content {
         }
     }
 
-    void getDataFile(HttpServletRequest request, HttpServletResponse response, Path path) {
+    @DELETE
+    public void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        String uri = request.getParameter("uri");
+        if (StringUtils.isBlank(uri)) {
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return;
+        }
+
+        java.nio.file.Path path = null;
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        if (collection != null) {
+            Session session = Root.zebedee.sessions.get(request);
+            path = collection.find(session.email, uri);
+        }
+
+        if (path == null) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            return;
+        }
+
+        // Check we're requesting a file:
+        if (java.nio.file.Files.exists(path) == false) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            return;
+        }
+
+        Files.delete(path);
+        response.setStatus(HttpStatus.OK_200);
+        return;
     }
 }

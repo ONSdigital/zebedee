@@ -152,7 +152,7 @@ public class Zebedee {
      * @throws IOException If any of the subfolders is not empty or if a filesystem
      *                     error occurs.
      */
-    private void delete(Path path) throws IOException {
+    public void delete(Path path) throws IOException {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path directory : stream) {
                 // Recursively delete directories only:

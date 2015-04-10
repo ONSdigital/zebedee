@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -44,6 +45,7 @@ public class Collection {
     public boolean createOrUpdate(HttpServletRequest request,
                                HttpServletResponse response,
                                CollectionDescription collectionDescription) throws IOException {
+
         if(collectionDescription.name == null){
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return false;
@@ -64,28 +66,22 @@ public class Collection {
     }
 
     @DELETE
-    public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response, CollectionDescription collectionDescription) throws IOException {
-        if(collectionDescription.name == null){
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
+    public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        com.github.onsdigital.zebedee.model.Collection collection = Collections
+                .getCollection(request);
+
+        // Check whether we found the collection:
+        if (collection == null) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
             return false;
         }
-
-        collectionDescription.name = StringUtils.trim(collectionDescription.name);
-
-        if (!Root.zebedee.getCollections().hasCollection(
-                collectionDescription.name)) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return false;
-        }
-
-        // Get the collection object
-        com.github.onsdigital.zebedee.model.Collection collection = Root.zebedee.getCollections().getCollection(collectionDescription.name);
 
         // Remove from collections in memory
         Root.zebedee.getCollections().remove(collection);
 
         // Remove from file system
-        collection.delete();
+        Root.zebedee.delete(collection.path);
 
         response.setStatus(HttpStatus.OK_200);
         return true;

@@ -396,5 +396,16 @@ public class Collection {
 
         this.description.eventsByUri.get(uri).add(event);
     }
+
+    /**
+     * Deletes this collection from the file system
+     *
+     * @return True if the file system has been amended
+     */
+    public boolean delete() {
+        //TODO Make the delete deconstruct the path
+
+        return false;
+    }
 }
 

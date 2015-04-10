@@ -16,6 +16,14 @@ import java.io.IOException;
 @Api
 public class Login {
 
+    /**
+     * Jah mon.
+     * @param request
+     * @param response
+     * @param credentials
+     * @return
+     * @throws IOException
+     */
     @POST
     public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException {
 

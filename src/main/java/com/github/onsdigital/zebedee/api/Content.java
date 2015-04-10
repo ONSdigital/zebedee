@@ -3,6 +3,9 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -10,9 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Created by david on 10/03/2015.
@@ -48,6 +52,11 @@ public class Content {
             return;
         }
 
+        // Guess the MIME type
+        String contentType = Files.probeContentType(path);
+        if(contentType!=null) { response.setContentType(contentType); }
+
+        // Write the file to the response
         try (InputStream input = java.nio.file.Files.newInputStream(path)) {
             org.apache.commons.io.IOUtils.copy(input, response.getOutputStream());
         }
@@ -71,11 +80,17 @@ public class Content {
             return false;
         }
 
+        // Find the collection if it exists
         java.nio.file.Path path = null;
         Collection collection = Collections.getCollection(request);
         if (collection != null) {
             path = collection.find(session.email, uri); // see if the file exists anywhere.
+        } else {
+            // attempting to access non-existent collection
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return false;
         }
+
 
         if (path == null) {
             // create the file
@@ -110,10 +125,53 @@ public class Content {
             return false;
         }
 
-        try (OutputStream output = java.nio.file.Files.newOutputStream(path)) {
-            org.apache.commons.io.IOUtils.copy(requestBody, output);
-        }
 
+        // Detect whether this is a multipart request
+        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        if(isMultipart) { // If it is we are going to do an xls/csv file upload
+            try {
+                postDataFile(request, response, path);
+            } catch (Exception e) {
+
+            }
+        } else { // If it isn't we are going to be doing a straightforward content update
+            try (OutputStream output = java.nio.file.Files.newOutputStream(path)) {
+                org.apache.commons.io.IOUtils.copy(requestBody, output);
+            }
+        }
         return true;
+    }
+
+    void postDataFile(HttpServletRequest request, HttpServletResponse response, Path path) throws Exception {
+
+        // Set up the objects that do all the heavy lifting
+        //PrintWriter out = response.getWriter();
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        ServletFileUpload upload = new ServletFileUpload(factory);
+
+        // Set up a progress listener that we can use to power a progress bar
+        ProgressListener progressListener = new ProgressListener(){
+            private long megaBytes = -1;
+            public void update(long pBytesRead, long pContentLength, int pItems) {
+                long mBytes = pBytesRead / 1000000;
+                if (megaBytes == mBytes) {
+                    return;
+                }
+                megaBytes = mBytes;
+            }
+        };
+        upload.setProgressListener(progressListener);
+
+        // Read the items - this will save the values to temp files
+        List<FileItem> items = upload.parseRequest(request);
+
+        // Process the items
+        for(FileItem item: items) {
+            item.write(path.toFile());
+        }
+    }
+
+    void getDataFile(HttpServletRequest request, HttpServletResponse response, Path path) {
+
     }
 }

@@ -7,6 +7,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
@@ -59,6 +60,34 @@ public class Collection {
         com.github.onsdigital.zebedee.model.Collection.create(
                 collectionDescription, Root.zebedee);
 
+        return true;
+    }
+
+    @DELETE
+    public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response, CollectionDescription collectionDescription) throws IOException {
+        if(collectionDescription.name == null){
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return false;
+        }
+
+        collectionDescription.name = StringUtils.trim(collectionDescription.name);
+
+        if (!Root.zebedee.getCollections().hasCollection(
+                collectionDescription.name)) {
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return false;
+        }
+
+        // Get the collection object
+        com.github.onsdigital.zebedee.model.Collection collection = Root.zebedee.getCollections().getCollection(collectionDescription.name);
+
+        // Remove from collections in memory
+        Root.zebedee.getCollections().remove(collection);
+
+        // Remove from file system
+        collection.delete();
+
+        response.setStatus(HttpStatus.OK_200);
         return true;
     }
 }

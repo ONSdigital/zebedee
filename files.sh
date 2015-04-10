@@ -10,7 +10,7 @@ export PACKAGE_PREFIX=com.github.onsdigital.zebedee.api
 
 # Development: reloadable
 mvn test dependency:copy-dependencies  && \
-java $JAVA_OPTS \p
+java $JAVA_OPTS \
  -Drestolino.files=$RESTOLINO_STATIC \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \

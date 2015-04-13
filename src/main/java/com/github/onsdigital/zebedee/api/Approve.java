@@ -20,11 +20,12 @@ public class Approve {
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         // check everything is completed
-        if(!collection.inProgressUris().isEmpty() &&  !collection.reviewedUris().isEmpty()){
+        if(!collection.inProgressUris().isEmpty() ||  !collection.reviewedUris().isEmpty()){
             response.setStatus(HttpStatus.CONFLICT_409);
             return false;
         }
 
+        response.setStatus(HttpStatus.OK_200);
         collection.description.approvedStatus = true;
 
         return collection.save();

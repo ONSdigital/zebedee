@@ -38,7 +38,6 @@ public class UsersTest {
         // The users created by Builder
         String email = "patricia@example.com";
         String name = "Patricia Pumpkin";
-        String password = "password";
 
         // When
         User user = zebedee.users.get(email);

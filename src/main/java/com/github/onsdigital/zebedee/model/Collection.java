@@ -338,8 +338,9 @@ public class Collection {
 
         // Does the user have permission to review? (or at least see this content)
         boolean permission = zebedee.permissions.canView(email, uri);
+        boolean userCompletedContent = didUserCompleteContent(email, uri);
 
-        if (isComplete(uri) && permission) {
+        if (isComplete(uri) && permission && !userCompletedContent) {
             // Move the complete copy to reviewed:
             Path source = complete.get(uri);
             Path destination = reviewed.toPath(uri);
@@ -350,6 +351,20 @@ public class Collection {
         }
 
         return result;
+    }
+
+    private boolean didUserCompleteContent(String email, String uri) {
+
+        if (this.description.eventsByUri == null)
+            throw new IllegalStateException("This content has not been completed. No events found.");
+        ContentEvents contentEvents = this.description.eventsByUri.get(uri);
+        if (contentEvents == null)
+            throw new IllegalStateException("This content has not been completed. No events found.");
+
+        boolean userCompletedContent = true;
+        ContentEvent mostRecentCompletedEvent = this.description.eventsByUri.get(uri).mostRecentEventForType(ContentEventType.COMPLETED);
+        if (mostRecentCompletedEvent != null) userCompletedContent = mostRecentCompletedEvent.email == email;
+        return userCompletedContent;
     }
 
     /**

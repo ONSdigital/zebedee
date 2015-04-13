@@ -31,6 +31,7 @@ public class Builder {
     public List<String> contentUris;
 
     public User publisher; // accessible publishing team user
+    public User reviewer;
 
     public Builder(Class<?> name) throws IOException {
 
@@ -88,6 +89,16 @@ public class Builder {
         }
         publisher = patricia;
 
+        User freddy = new User();
+        freddy.name = "freddy Pumpkin";
+        freddy.email = "freddy@example.com";
+        freddy.passwordHash = Password.hash("password");
+        freddy.inactive = false;
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(freddy.email) + ".json"))) {
+            Serialiser.serialise(outputStream, freddy);
+        }
+        reviewer = freddy;
+
         User ronny = new User();
         ronny.name = "Ronny Roller";
         ronny.email = "ronny@example.com";
@@ -111,6 +122,7 @@ public class Builder {
 
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.digitalPublishingTeam.add(patricia.email);
+        accessMapping.digitalPublishingTeam.add(freddy.email);
 
         accessMapping.paths = new HashMap<>();
         Set contentOwners = new HashSet<>();

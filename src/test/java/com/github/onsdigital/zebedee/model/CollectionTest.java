@@ -23,13 +23,12 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-
 public class CollectionTest {
 
     Zebedee zebedee;
     Collection collection;
     Builder builder;
-    String email = "patricia@example.com";
+    String email;
 
     @Before
     public void setUp() throws Exception {
@@ -37,6 +36,7 @@ public class CollectionTest {
         zebedee = new Zebedee(builder.zebedee);
         Root.zebedee = zebedee;
         collection = new Collection(builder.collections.get(1), zebedee);
+        email = builder.publisher.email;
     }
 
     @After
@@ -348,10 +348,11 @@ public class CollectionTest {
         // The content exists, has been edited and reviewed:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        builder.createCompleteFile(uri);
+        collection.edit(email, uri);
+        collection.complete(email, uri);
 
         // When
-        boolean reviewed = collection.review(email, uri);
+        boolean reviewed = collection.review(builder.reviewer.email, uri);
 
         // Then
         assertTrue(reviewed);
@@ -360,6 +361,25 @@ public class CollectionTest {
 
         // check an event has been created for the content being created.
         collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
+    }
+
+    @Test
+    public void shouldNotReviewIfTheSameUserCompletedContent() throws IOException {
+
+        // Given
+        // The content exists, has been edited and reviewed:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        collection.edit(email, uri);
+        collection.complete(email, uri);
+
+        // When
+        boolean reviewed = collection.review(email, uri);
+
+        // Then
+        assertFalse(reviewed);
+        Path complete = builder.collections.get(1).resolve(Collection.COMPLETE);
+        assertTrue(Files.exists(complete.resolve(uri.substring(1))));
     }
 
     @Test
@@ -434,6 +454,9 @@ public class CollectionTest {
         // Given
         // The content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        collection.edit(email, uri);
+        collection.complete(email, uri);
         builder.createReviewedFile(uri);
 
         // When
@@ -441,6 +464,19 @@ public class CollectionTest {
 
         // Then
         assertFalse(reviewed);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotReviewIfNotPreviouslyCompleted() throws IOException {
+
+        // Given
+        // Some content:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+
+        // When content is trying to be reviewed before being completed
+        boolean reviewed = collection.review(email, uri);
+
+        // Then the expected exception is thrown.
     }
 
     @Test

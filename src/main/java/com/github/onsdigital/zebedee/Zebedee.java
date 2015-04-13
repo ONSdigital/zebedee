@@ -63,12 +63,32 @@ public class Zebedee {
         Files.createDirectory(path.resolve(SESSIONS));
         Files.createDirectory(path.resolve(PERMISSIONS));
 
+        Zebedee zebedee = new Zebedee(path);
+
         // Create the initial user
         User user = new User();
         user.email = "florence@magicroundabout.ons.gov.uk";
         user.name = "Florence";
         String password = "Doug4l";
-        Zebedee zebedee = new Zebedee(path);
+        Users.createAdmin(zebedee, user, password);
+
+        // todo - remove these once access functionality is available.
+        user = new User();
+        user.email = "p1@t.com";
+        user.name = "p1";
+        password = "Doug4l";
+        Users.createAdmin(zebedee, user, password);
+
+        user = new User();
+        user.email = "p2@t.com";
+        user.name = "p2";
+        password = "Doug4l";
+        Users.createAdmin(zebedee, user, password);
+
+        user = new User();
+        user.email = "p3@t.com";
+        user.name = "p3";
+        password = "Doug4l";
         Users.createAdmin(zebedee, user, password);
 
         return zebedee;

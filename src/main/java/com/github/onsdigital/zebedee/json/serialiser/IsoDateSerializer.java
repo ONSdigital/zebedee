@@ -19,7 +19,7 @@ public class IsoDateSerializer implements JsonSerializer<Date>, JsonDeserializer
     private final FastDateFormat iso8601Format;
 
     public IsoDateSerializer() {
-        this.iso8601Format = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", TimeZone.getTimeZone("BST"), Locale.UK);
+        this.iso8601Format = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", TimeZone.getTimeZone("UTC"), Locale.UK);
     }
 
     public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {

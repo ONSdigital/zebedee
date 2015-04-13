@@ -1,8 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.model.*;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +18,7 @@ public class Approve {
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         // check everything is completed
-        if(!collection.inProgressUris().isEmpty() ||  !collection.reviewedUris().isEmpty()){
+        if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
             response.setStatus(HttpStatus.CONFLICT_409);
             return false;
         }

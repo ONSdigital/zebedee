@@ -3,7 +3,8 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -84,6 +87,7 @@ public class Content {
         // Check the user has edit permission
         Session session = Root.zebedee.sessions.get(request);
         if (!Root.zebedee.permissions.canEdit(session.email)) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return false;
         }
 
@@ -97,7 +101,6 @@ public class Content {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return false;
         }
-
 
         if (path == null) {
             // create the file

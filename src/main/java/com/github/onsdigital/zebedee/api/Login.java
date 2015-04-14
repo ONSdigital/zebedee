@@ -17,11 +17,15 @@ import java.io.IOException;
 public class Login {
 
     /**
-     * Jah mon.
-     * @param request
-     * @param response
-     * @param credentials
-     * @return
+     * Authenticates with Zebedee.
+     * @param request This should contain a {@link Credentials} Json object.
+     * @param response <ul>
+     *                      <li>If authentication succeeds: a new or existing session ID.</li>
+     *                      <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                      <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                      </ul>
+     * @param credentials The user email and password.
+     * @return A session ID to be passed in the {@value com.github.onsdigital.zebedee.model.Sessions#TOKEN_HEADER} header.
      * @throws IOException
      */
     @POST

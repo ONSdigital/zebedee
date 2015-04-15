@@ -417,9 +417,15 @@ public class Collection {
      *
      * @return True if the file system has been amended
      */
-    public boolean delete() {
-        //TODO Make the delete deconstruct the path
-
+    public boolean delete(String uri) throws IOException {
+        // Find the relevant collection for the uri and delete
+        if(isInProgress(uri)) {
+            return inProgress.delete(uri);
+        } else if (isComplete(uri)) {
+            return complete.delete(uri);
+        } else if (isReviewed(uri)) {
+            return inProgress.delete(uri);
+        }
         return false;
     }
 }

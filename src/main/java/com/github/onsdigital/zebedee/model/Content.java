@@ -105,4 +105,32 @@ public class Content {
 			}
 		}
 	}
+
+	public boolean delete(String uri) throws IOException {
+		Path path = toPath(uri);
+
+		if(Files.exists(path)) { // If there is a file to be deleted
+
+			Files.delete(path); // Delete it
+
+			// Delete the folder tree by walking up the folder structure
+			Path delPath = path.getParent();
+			while (path.equals(delPath) == false) { // Go no further than the Content root
+				if (isDirEmpty(delPath)) { // If the folder is empty
+					Files.delete(delPath); // delete
+					delPath = delPath.getParent();
+				} else {
+					break;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean isDirEmpty(final Path directory) throws IOException {
+		try(DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
+			return !dirStream.iterator().hasNext();
+		}
+	}
 }

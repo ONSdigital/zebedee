@@ -190,6 +190,7 @@ public class Content {
             return;
         }
 
+        // Get the collection
         java.nio.file.Path path = null;
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         if (collection != null) {
@@ -197,19 +198,24 @@ public class Content {
             path = collection.find(session.email, uri);
         }
 
+        // Check the user has access to the given file
         if (path == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return;
         }
 
-        // Check we're requesting a file:
-        if (java.nio.file.Files.exists(path) == false) {
+        // Check the file we are requesting exists:
+        if (collection.isInCollection(uri)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return;
         }
 
-        Files.delete(path);
-        response.setStatus(HttpStatus.OK_200);
+        // Delete the file
+        if( collection.delete(uri) ) {
+            response.setStatus(HttpStatus.OK_200);
+        } else {
+            response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
+        }
         return;
     }
 }

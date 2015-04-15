@@ -205,7 +205,7 @@ public class Content {
         }
 
         // Check the file we are requesting exists:
-        if (collection.isInCollection(uri)) {
+        if (!collection.isInCollection(uri)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return;
         }

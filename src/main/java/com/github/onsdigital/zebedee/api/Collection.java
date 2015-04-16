@@ -12,6 +12,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 
 @Api
 public class Collection {
@@ -68,8 +69,8 @@ public class Collection {
     @DELETE
     public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        com.github.onsdigital.zebedee.model.Collection collection = Collections
-                .getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection collection;
+        collection = Collections.getCollection(request);
 
         // Check whether we found the collection:
         if (collection == null) {
@@ -77,12 +78,17 @@ public class Collection {
             return false;
         }
 
-        // Remove from collections in memory
-        Root.zebedee.getCollections().remove(collection);
+        //TODO Check whether user has permission to delete this collection!
 
-        // Remove from file system
-        Root.zebedee.delete(collection.path);
+        // Check whether the collection can be deleted
+        if (!collection.isEmpty()) {
+            response.setStatus(HttpStatus.FORBIDDEN_403);
+            return false;
+        }
 
+        // Delete
+        collection.delete();
+        
         response.setStatus(HttpStatus.OK_200);
         return true;
     }

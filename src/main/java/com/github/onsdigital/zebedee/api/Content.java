@@ -211,7 +211,7 @@ public class Content {
         }
 
         // Delete the file
-        if( collection.delete(uri) ) {
+        if( collection.deleteContent(uri) ) {
             response.setStatus(HttpStatus.OK_200);
         } else {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);

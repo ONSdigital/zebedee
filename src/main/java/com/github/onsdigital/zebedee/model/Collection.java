@@ -74,7 +74,26 @@ public class Collection {
     }
 
     /**
-     * Constructs a new {@link Collection} in the given {@link Zebedee},
+     * Deconstructs a {@link Collection} in the given {@link Zebedee} and deletes it's description
+     *
+     * @return
+     * @throws IOException
+     */
+    public void delete()
+            throws IOException {
+
+
+        // Delete folders:
+        this.zebedee.delete(path);
+
+        // Delete the description file
+        String filename = PathUtils.toFilename(this.description.name);
+        Path collectionDescriptionPath = zebedee.collections.resolve(filename + ".json");
+        Files.delete(collectionDescriptionPath);
+    }
+
+    /**
+     * Deconstructs a {@link Collection} in the given {@link Zebedee},
      * creating the necessary folders {@value #REVIEWED} and
      * {@value #IN_PROGRESS}.
      *
@@ -144,6 +163,8 @@ public class Collection {
 
         return new Collection(renamedCollectionDescription, zebedee);
     }
+
+
 
     public boolean save() throws IOException {
         try (OutputStream output = Files.newOutputStream(this.descriptionPath())) {
@@ -395,6 +416,24 @@ public class Collection {
         return reviewed.uris();
     }
 
+    public boolean isEmpty() {
+        return uriCount() == 0;
+    }
+
+    /**
+     *
+     * @return the total uri's in all edit folders
+     */
+    public int uriCount() {
+        try {
+            return inProgress.uris().size() + completeUris().size() + reviewedUris().size();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
     /**
      * Add a {@link ContentEvent} for the given uri.
      *
@@ -417,7 +456,7 @@ public class Collection {
      *
      * @return True if the file system has been amended
      */
-    public boolean delete(String uri) throws IOException {
+    public boolean deleteContent(String uri) throws IOException {
         // Find the relevant collection for the uri and delete
         if(isInProgress(uri)) {
             return inProgress.delete(uri);

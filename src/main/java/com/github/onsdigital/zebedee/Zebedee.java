@@ -175,8 +175,8 @@ public class Zebedee {
     public void delete(Path path) throws IOException {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path directory : stream) {
-                // Recursively delete directories only:
-                if (Files.isDirectory(directory)) {
+                // Recursively delete directories only - added .DS_Store files:
+                if (Files.isDirectory(directory) || directory.endsWith(".DS_Store")) {
                     delete(directory);
                 }
             }

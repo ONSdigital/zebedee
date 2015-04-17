@@ -9,7 +9,7 @@ export RESTOLINO_CLASSES="target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee.api
 
 # Development: reloadable
-mvn test dependency:copy-dependencies  && \
+mvn clean package dependency:copy-dependencies && \
 java $JAVA_OPTS \
  -Drestolino.files=$RESTOLINO_STATIC \
  -Drestolino.classes=$RESTOLINO_CLASSES \

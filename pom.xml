@@ -165,30 +165,6 @@
                     <threadCount>10</threadCount>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.18.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <parallel>methods</parallel>
-                    <threadCount>10</threadCount>
-                    <systemPropertyVariables>
-                        <baseUrl>http://localhost:8082</baseUrl>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-
         </plugins>
-
     </build>
-
 </project>

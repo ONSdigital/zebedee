@@ -14,11 +14,16 @@ import java.io.IOException;
 public class Review {
 
     /**
-     * Set a page to the reviewed state.
+     * Moves files between collections using the endpoint <code>/Review/[CollectionName]?uri=[uri]</code>
      *
-     * @param request
-     * @param response
-     * @return
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                 <li>If the collection does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If the content item does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If the uri specified a folder not a file:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 <li>If user not authorised to review:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>The review fails for some other reason:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     * @return a success status wrapped in a {@link ResultMessage} object
      * @throws IOException
      */
     @POST
@@ -30,6 +35,8 @@ public class Review {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return new ResultMessage("Collection not found.");
         }
+
+        // TODO Check user permissions HttpStatus.UNAUTHORISED_401
 
         // Locate the path:
         String uri = request.getParameter("uri");

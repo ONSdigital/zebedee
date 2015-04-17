@@ -5,6 +5,9 @@ import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
 import com.github.onsdigital.zebedee.model.Collection;
 
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import org.eclipse.jetty.http.HttpStatus;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -28,6 +31,14 @@ public class Collections {
         return Root.zebedee.getCollections().getCollection(collectionName);
     }
 
+    /**
+     * Retrieves current {@link CollectionDescription} objects
+     *
+     * @param request
+     * @param response
+     * @return a List of {@link Collection#description}.
+     * @throws IOException
+     */
     @GET
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {

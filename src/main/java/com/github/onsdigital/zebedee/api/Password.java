@@ -17,8 +17,20 @@ import java.io.IOException;
 @Api
 public class Password {
 
+    /**
+     * Updates a user password.
+     *
+     * @param request This should contain a {@link Credentials} Json object.
+     * @param response <ul>
+     *                      <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                      <li>If update fails: {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                      </ul>
+     * @param credentials A {@link Credentials} Json object
+     * @return A session ID to be passed in the {@value com.github.onsdigital.zebedee.model.Sessions#TOKEN_HEADER} header.
+     * @throws IOException
+     */
     @POST
-    public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException {
+    public String updatePassword(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException {
 
         if (credentials == null || StringUtils.isBlank(credentials.email)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);

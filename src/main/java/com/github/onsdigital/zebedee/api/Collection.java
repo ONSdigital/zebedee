@@ -17,6 +17,16 @@ import java.nio.file.DirectoryNotEmptyException;
 @Api
 public class Collection {
 
+    /**
+     * Retrieves a CollectionDescription object at the endpoint /Collection/[CollectionName]
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                      <li>If no collection exists:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 </ul>
+     * @return the CollectionDescription.
+     * @throws IOException
+     */
     @GET
     public Object get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -42,18 +52,34 @@ public class Collection {
         return result;
     }
 
+    /**
+     * Creates or updates collection details the endpoint /Collection/
+     *
+     * Checks if a collection exists using {@link CollectionDescription#name}
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                 <li>If no name has been passed:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 <li>If user cannot create collections:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>If collection with name already exists:  {@link HttpStatus#CONFLICT_409}</li>
+     *                 </ul>
+     * @param collectionDescription
+     * @return
+     * @throws IOException
+     */
     @POST
-    public boolean createOrUpdate(HttpServletRequest request,
-                               HttpServletResponse response,
-                               CollectionDescription collectionDescription) throws IOException {
+    public boolean create(HttpServletRequest request,
+                          HttpServletResponse response,
+                          CollectionDescription collectionDescription) throws IOException {
 
         if(collectionDescription.name == null){
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return false;
         }
 
-        collectionDescription.name = StringUtils.trim(collectionDescription.name);
+        //TODO Check whether user has permission to delete this collection HttpStatus.UNAUTHORIZED_401
 
+        collectionDescription.name = StringUtils.trim(collectionDescription.name);
         if (Root.zebedee.getCollections().hasCollection(
                 collectionDescription.name)) {
                 response.setStatus(HttpStatus.CONFLICT_409);
@@ -66,6 +92,18 @@ public class Collection {
         return true;
     }
 
+    /**
+     * Deletes the collection details at the endpoint /Collection/[CollectionName]
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                 <li>If the collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 <li>If user is not authorised to delete this collection:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>If the collection has contents preventing deletion:  {@link HttpStatus#CONFLICT_409}</li>
+     *                 </ul>
+     * @return
+     * @throws IOException
+     */
     @DELETE
     public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -78,11 +116,11 @@ public class Collection {
             return false;
         }
 
-        //TODO Check whether user has permission to delete this collection!
+        //TODO Check whether user has permission to delete this collection HttpStatus.UNAUTHORIZED_401
 
         // Check whether the collection can be deleted
         if (!collection.isEmpty()) {
-            response.setStatus(HttpStatus.FORBIDDEN_403);
+            response.setStatus(HttpStatus.CONFLICT_409);
             return false;
         }
 

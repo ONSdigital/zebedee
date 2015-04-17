@@ -21,6 +21,18 @@ import java.nio.file.Path;
  */
 @Api
 public class Browse {
+
+    /**
+     * Retrieves a list of content at the endpoint /Browse/[CollectionName]?uri=[uri]
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                      <li>If no authorized folder exists:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                      <li>If the uri supplied is not to a folder:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 </ul>
+     * @return DirectoryListing object for the requested uri.
+     * @throws IOException
+     */
     @GET
     public DirectoryListing browse(HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {

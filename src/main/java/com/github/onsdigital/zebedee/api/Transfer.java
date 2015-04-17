@@ -19,6 +19,19 @@ import java.nio.file.Path;
  */
 @Api
 public class Transfer {
+
+    /**
+     * Moves files between collections using the endpoint <code>/Transfer/[CollectionName]</code>
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                 <li>If the file does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If user not authorised to transfer:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>A file already exists in the second collection:  {@link HttpStatus#CONFLICT_409}</li>
+     * @param params A {@link TransferRequest} object
+     * @return success true/false
+     * @throws IOException
+     */
     @POST
     public boolean move(HttpServletRequest request, HttpServletResponse response, TransferRequest params) throws IOException {
         boolean result = true;
@@ -44,7 +57,7 @@ public class Transfer {
 
         // user has permission
         if (!Root.zebedee.permissions.canEdit(session.email)){
-            response.setStatus(HttpStatus.FORBIDDEN_403);
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
             result = false;
         }
 

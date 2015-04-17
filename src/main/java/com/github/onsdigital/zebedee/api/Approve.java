@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.json.Credentials;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,11 +14,32 @@ import java.io.IOException;
  */
 @Api
 public class Approve {
+
+    /**
+     * Approves the content of a collection at the endpoint /Approve/[CollectionName].
+     *
+     * @param request
+     * @param response <ul>
+     *                      <li>If approval succeeds: {@link HttpStatus#OK_200}</li>
+     *                      <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                      <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                      <li>If the collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                      <li>If the collection has incomplete items:  {@link HttpStatus#CONFLICT_409}</li>
+     *                 </ul>
+     * @return Save successful status of the description.
+     * @throws IOException
+     */
     @POST
-    public  boolean approveCollection(HttpServletRequest request,HttpServletResponse response) throws IOException {
+    public boolean approveCollection(HttpServletRequest request,HttpServletResponse response) throws IOException {
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
-        // check everything is completed
+        // TODO Check user permissions are provided BAD_REQUEST_400
+
+        // TODO Check user permissions UNAUTHORISED_401
+
+        // TODO Check collection exists BAD_REQUEST_400
+
+        // Check everything is completed
         if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
             response.setStatus(HttpStatus.CONFLICT_409);
             return false;
@@ -27,6 +49,7 @@ public class Approve {
         collection.description.approvedStatus = true;
 
         return collection.save();
-
     }
+
+
 }

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.fileupload.FileItem;
@@ -29,6 +30,21 @@ import java.util.List;
 @Api
 public class Content {
 
+
+    /**
+     * Retrieves file content for the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
+     *
+     * <p>This may be working content from the collection. Defaults to current website content</p>
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                 <li>If success: the contents of the object at the uri</li>
+     *                 <li>If no uri supplied:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 <li>If uri doesn't exist:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If uri supplied is for a folder:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     * @return
+     * @throws IOException
+     */
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -50,7 +66,7 @@ public class Content {
             return;
         }
 
-        // Check we're requesting a file:
+        // Check the path exists:
         if (!java.nio.file.Files.exists(path)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return;
@@ -72,6 +88,24 @@ public class Content {
         }
     }
 
+    /**
+     * Posts file content to the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
+     *
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     *                <ul>Body should contain
+     *                <li>Page content - JSON Serialized content</li>
+     *                <li>File Upload - A multipart content object with part "file" as binary data </li>
+     *                </ul>
+     * @param response <ul>
+     *                 <li>If success: the contents of the object at the uri</li>
+     *                 <li>If no authorisation:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>If collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 <li>If uri is being edited in a different collection:  {@link HttpStatus#CONFLICT_409}</li>
+     *                 <li>If uri supplied is for a folder:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     * @return true/false
+     * @throws IOException
+     */
     @POST
     public boolean write(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -181,6 +215,21 @@ public class Content {
         }
     }
 
+
+    /**
+     * Deletes file content from the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
+     *
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                 <li>If success: {@link HttpStatus#OK_200}</li>
+     *                 <li>If no uri parameter:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 <li>If no authorisation:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>If file doesn't exist in collection:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If delete fails:  {@link HttpStatus#EXPECTATION_FAILED_417}</li>
+     * @return
+     * @throws IOException
+     */
     @DELETE
     public void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -189,6 +238,8 @@ public class Content {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return;
         }
+
+        // TODO User has delete access to the file HttpStatus#UNAUTHORIZED_401
 
         // Get the collection
         java.nio.file.Path path = null;

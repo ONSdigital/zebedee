@@ -12,13 +12,20 @@ import java.io.IOException;
 
 @Api
 public class Complete {
+
     /**
-     * Set a page to the complete state.
+     * Creates or updates collection details the endpoint <code>/Complete/[CollectionName]/?uri=[uri]</code>
+     * <p>Marks a content item complete</p>
      *
-     * @param request
-     * @param response
-     * @return
-     * @throws java.io.IOException
+     *
+     * @param request This should contain a X-Florence-Token header for the current session
+     * @param response <ul>
+     *                 <li>If collection does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If uri is not currently inProgress:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If user cannot delete the file:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>Complete fails for another reason:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     * @return a success status wrapped in a {@link ResultMessage} object
+     * @throws IOException
      */
     @POST
     public ResultMessage complete(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -30,9 +37,10 @@ public class Complete {
             return new ResultMessage("Collection not found.");
         }
 
+        //TODO Check user authorisation  HttpStatus.UNAUTHORIZED_401
+
         // Locate the path:
         String uri = request.getParameter("uri");
-
         java.nio.file.Path path = collection.getInProgressPath(uri);
         if (path == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);

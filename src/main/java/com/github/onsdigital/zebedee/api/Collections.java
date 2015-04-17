@@ -2,14 +2,13 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
+import com.github.onsdigital.zebedee.json.CollectionDescriptions;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Api
@@ -30,10 +29,10 @@ public class Collections {
     }
 
     @GET
-    public Object get(HttpServletRequest request, HttpServletResponse response)
+    public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        List<CollectionDescription> result = new ArrayList<>();
+        CollectionDescriptions result = new CollectionDescriptions();
 
         List<Collection> collections = Root.zebedee.getCollections();
         for (Collection collection : collections) {
@@ -42,6 +41,4 @@ public class Collections {
 
         return result;
     }
-
-
 }

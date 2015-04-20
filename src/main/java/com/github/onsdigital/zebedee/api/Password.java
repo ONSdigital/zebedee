@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,24 +19,34 @@ public class Password {
     /**
      * Updates a user password.
      *
-     * @param request This should contain a {@link Credentials} Json object.
-     * @param response <ul>
-     *                      <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      <li>If update fails: {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      </ul>
+     * @param request     This should contain a {@link Credentials} Json object.
+     * @param response    <ul>
+     *                    <li>If setting the password succeeds: a 200 OK message.</li>
+     *                    <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                    <li>If the logged in user is not an administrator:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                    <li>If the password is not updated for any other reason:  {@link HttpStatus#BAD_REQUEST_400}.</li>
+     *                    </ul>
      * @param credentials A {@link Credentials} Json object
      * @return A session ID to be passed in the {@value com.github.onsdigital.zebedee.model.Sessions#TOKEN_HEADER} header.
      * @throws IOException
      */
     @POST
-    public String updatePassword(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException {
+    public String setPassword(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException {
 
-        if (credentials == null || StringUtils.isBlank(credentials.email)) {
+        // Check the user session
+        Session session = Root.zebedee.sessions.get(request);
+        if (!Root.zebedee.permissions.isAdministrator(session.email)) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return "Unauthorised.";
+        }
+
+        // Check the request
+        if (credentials == null || !Root.zebedee.users.exists(credentials.email)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return "Please provide credentials (email, password).";
         }
 
-        Session session = Root.zebedee.sessions.get(request);
+        // Attempt to change the password
         if (!Root.zebedee.users.setPassword(credentials.email, credentials.password, session)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return "Failed to update password for " + credentials.email;

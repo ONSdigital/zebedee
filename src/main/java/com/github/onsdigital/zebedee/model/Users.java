@@ -33,11 +33,11 @@ public class Users {
      * @return The created user.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createAdmin(Zebedee zebedee, User user, String password) throws IOException {
+    public static void createAdmin(Zebedee zebedee, User user, String password, Session session) throws IOException {
         user.passwordHash = Password.hash(password);
         zebedee.users.write(user);
-        zebedee.permissions.addAdministrator(user.email);
-        zebedee.permissions.addEditor(user.email);
+        zebedee.permissions.addAdministrator(user.email, session);
+        zebedee.permissions.addEditor(user.email, session);
     }
 
     /**

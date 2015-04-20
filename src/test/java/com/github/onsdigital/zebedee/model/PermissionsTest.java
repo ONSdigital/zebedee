@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.json.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -161,10 +162,11 @@ public class PermissionsTest {
         // Given
         // A new Digital Publishing user
         String email = "blue@cat.com";
+        Session session = zebedee.sessions.create("jukesie@example.com");
 
         // When
         // We check view access
-        zebedee.permissions.addEditor(email);
+        zebedee.permissions.addEditor(email, session);
 
         // Then
         // The new user should get both View and Edit permissions:
@@ -178,10 +180,11 @@ public class PermissionsTest {
         // Given
         // A new Content owner user
         String email = "blue@cat.com";
+        Session session = zebedee.sessions.create("jukesie@example.com");
 
         // When
         // We check view access
-        zebedee.permissions.addViewer(email, "/economy");
+        zebedee.permissions.addViewer(email, "/economy", session);
 
         // Then
         // The new user should get only View permission:
@@ -195,10 +198,11 @@ public class PermissionsTest {
         // Given
         // A Digital Publishing user
         String email = "patricia@example.com";
+        Session session = zebedee.sessions.create("jukesie@example.com");
 
         // When
         // We remove edit access
-        zebedee.permissions.removeEditor(email);
+        zebedee.permissions.removeEditor(email, session);
 
         // Then
         // The new user should no longer have permission
@@ -212,10 +216,11 @@ public class PermissionsTest {
         // Given
         // A Content owner user
         String email = "ronny@example.com";
+        Session session = zebedee.sessions.create("jukesie@example.com");
 
         // When
         // We remove view access
-        zebedee.permissions.removeViewer(email, "/economy");
+        zebedee.permissions.removeViewer(email, "/economy", session);
 
         // Then
         // The new user should no longer have permission
@@ -229,11 +234,12 @@ public class PermissionsTest {
         // Given
         // A Content owner user is added to a sub-path
         String email = "ronny@example.com";
-        zebedee.permissions.addViewer(email, "/economy/subpath");
+        Session session = zebedee.sessions.create("jukesie@example.com");
+        zebedee.permissions.addViewer(email, "/economy/subpath", session);
 
         // When
         // We remove access from the parent path
-        zebedee.permissions.removeViewer(email, "/economy");
+        zebedee.permissions.removeViewer(email, "/economy", session);
 
         // Then
         // The content owner's permissions should be removed from the sub-path
@@ -247,10 +253,11 @@ public class PermissionsTest {
         // Given
         // A new Administrator user
         String email = "blue@cat.com";
+        Session session = zebedee.sessions.create("jukesie@example.com");
 
         // When
         // We add the user as an administrator
-        zebedee.permissions.addAdministrator(email);
+        zebedee.permissions.addAdministrator(email, session);
 
         // Then
         // The new user should get only admin permission:

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
 
@@ -64,32 +65,33 @@ public class Zebedee {
         Files.createDirectory(path.resolve(PERMISSIONS));
 
         Zebedee zebedee = new Zebedee(path);
+        Session session = zebedee.sessions.create("florence@magicroundabout.ons.gov.uk");
 
         // Create the initial user
         User user = new User();
         user.email = "florence@magicroundabout.ons.gov.uk";
         user.name = "Florence";
         String password = "Doug4l";
-        Users.createAdmin(zebedee, user, password);
+        Users.createAdmin(zebedee, user, password, session);
 
         // todo - remove these once access functionality is available.
         user = new User();
         user.email = "p1@t.com";
         user.name = "p1";
         password = "Doug4l";
-        Users.createAdmin(zebedee, user, password);
+        Users.createAdmin(zebedee, user, password, session);
 
         user = new User();
         user.email = "p2@t.com";
         user.name = "p2";
         password = "Doug4l";
-        Users.createAdmin(zebedee, user, password);
+        Users.createAdmin(zebedee, user, password, session);
 
         user = new User();
         user.email = "p3@t.com";
         user.name = "p3";
         password = "Doug4l";
-        Users.createAdmin(zebedee, user, password);
+        Users.createAdmin(zebedee, user, password, session);
 
         return zebedee;
     }

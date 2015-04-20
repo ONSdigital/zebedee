@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
@@ -117,8 +118,8 @@ public class Builder {
 
         AccessMapping accessMapping = new AccessMapping();
 
-        accessMapping.owners = new HashSet<>();
-        accessMapping.owners.add(jukesie.email);
+        accessMapping.administrators = new HashSet<>();
+        accessMapping.administrators.add(jukesie.email);
 
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.digitalPublishingTeam.add(patricia.email);
@@ -133,10 +134,12 @@ public class Builder {
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
+
+        Root.zebedee = new Zebedee(zebedee);
     }
 
     public void delete() throws IOException {
-        System.out.println("Deleting zebedee at "+parent);
+        System.out.println("Deleting zebedee at " + parent);
         FileUtils.deleteDirectory(parent.toFile());
     }
 
@@ -258,7 +261,7 @@ public class Builder {
         Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
         Files.createDirectory(path.resolve(Zebedee.SESSIONS));
         Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
-        System.out.println("Created zebedee at "+path);
+        System.out.println("Created zebedee at " + path);
         return path;
     }
 

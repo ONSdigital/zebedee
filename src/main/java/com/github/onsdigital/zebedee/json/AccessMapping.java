@@ -9,9 +9,9 @@ import java.util.Set;
 public class AccessMapping {
 
     /**
-     * System owners - this is for administrative permission only.
+     * System administrators - this is for administrative permission only.
      */
-    public Set<String> owners;
+    public Set<String> administrators;
 
     /**
      * Members of the Digital Publishing Team can view and edit everything.

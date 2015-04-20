@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
+import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
@@ -20,6 +24,7 @@ import java.util.Set;
  */
 public class Permissions {
     private Path permissions;
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public Permissions(Path permissions) {
         this.permissions = permissions;
@@ -34,7 +39,7 @@ public class Permissions {
      */
     public boolean isAdministrator(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
-        return accessMapping.owners.contains(email);
+        return accessMapping.administrators != null && accessMapping.administrators.contains(email);
     }
 
     /**
@@ -64,33 +69,41 @@ public class Permissions {
     }
 
     /**
-     * Adds the specified user to the owners, giving them administrator permissions (but not content permissions).
+     * Adds the specified user to the administrators, giving them administrator permissions (but not content permissions).
      *
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addAdministrator(String email) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.owners == null) {
-            accessMapping.owners = new HashSet<>();
+    public void addAdministrator(String email, Session session) throws IOException {
+        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+            return;
         }
-        accessMapping.owners.add(email);
+
+        AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.administrators == null) {
+            accessMapping.administrators = new HashSet<>();
+        }
+        accessMapping.administrators.add(email);
         writeAccessMapping(accessMapping);
     }
 
 
     /**
-     * Removes the specified user from the owners, revoking administrative permissions (but not content permissions).
+     * Removes the specified user from the administrators, revoking administrative permissions (but not content permissions).
      *
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeOwner(String email) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.owners == null) {
-            accessMapping.owners = new HashSet<>();
+    public void removeAdministrator(String email, Session session) throws IOException {
+        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+            return;
         }
-        accessMapping.owners.remove(email);
+
+        AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.administrators == null) {
+            accessMapping.administrators = new HashSet<>();
+        }
+        accessMapping.administrators.remove(email);
         writeAccessMapping(accessMapping);
     }
 
@@ -100,7 +113,11 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addEditor(String email) throws IOException {
+    public void addEditor(String email, Session session) throws IOException {
+        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+            return;
+        }
+
         AccessMapping accessMapping = readAccessMapping();
         if (accessMapping.digitalPublishingTeam == null) {
             accessMapping.digitalPublishingTeam = new HashSet<>();
@@ -116,7 +133,11 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeEditor(String email) throws IOException {
+    public void removeEditor(String email, Session session) throws IOException {
+        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+            return;
+        }
+
         AccessMapping accessMapping = readAccessMapping();
         if (accessMapping.digitalPublishingTeam == null) {
             accessMapping.digitalPublishingTeam = new HashSet<>();
@@ -126,13 +147,17 @@ public class Permissions {
     }
 
     /**
-     * Adds the specified user to the content owners, giving them access to read content at the given path and all sub-paths.
+     * Adds the specified user to the content administrators, giving them access to read content at the given path and all sub-paths.
      *
      * @param email The user's email.
      * @param path  The path under which the user will get read access.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addViewer(String email, String path) throws IOException {
+    public void addViewer(String email, String path, Session session) throws IOException {
+        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+            return;
+        }
+
         AccessMapping accessMapping = readAccessMapping();
         if (accessMapping.paths == null) {
             accessMapping.paths = new HashMap<>();
@@ -147,13 +172,46 @@ public class Permissions {
     }
 
     /**
-     * removes the specified user to the content owners, giving them access to read content at the given path and all sub-paths.
+     * Adds the specified user to the content administrators, giving them access to read content at the given paths and all sub-paths.
      *
      * @param email The user's email.
-     * @param path  The path under which the user will get read access.
+     * @param paths The paths under which the user will get read access.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeViewer(String email, String path) throws IOException {
+    public void addViewer(String email, Set<String> paths, Session session) throws IOException {
+        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+            return;
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.paths == null) {
+            accessMapping.paths = new HashMap<>();
+        }
+
+        for (String path : paths) {
+            Set<String> viewers = accessMapping.paths.get(path);
+            if (viewers == null) {
+                viewers = new HashSet<>();
+            }
+            viewers.add(email);
+            accessMapping.paths.put(path, viewers);
+        }
+
+        writeAccessMapping(accessMapping);
+    }
+
+    /**
+     * removes the specified user from the content owners, revoking access to read content at the given path and all sub-paths.
+     *
+     * @param email The user's email.
+     * @param path  The path under which the user will no longer have read access.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void removeViewer(String email, String path, Session session) throws IOException {
+        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+            return;
+        }
+
         AccessMapping accessMapping = readAccessMapping();
         if (accessMapping.paths == null) {
             accessMapping.paths = new HashMap<>();
@@ -170,9 +228,32 @@ public class Permissions {
         writeAccessMapping(accessMapping);
     }
 
+    /**
+     * removes the specified user from the content owners, revoking access to read content from any path.
+     *
+     * @param email The user's email.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void removeViewer(String email, Session session) throws IOException {
+        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+            return;
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.paths == null) {
+            accessMapping.paths = new HashMap<>();
+        }
+
+        // Ensure the email address is not present for any path:
+        for (Map.Entry<String, Set<String>> mapping : accessMapping.paths.entrySet()) {
+            mapping.getValue().remove(email);
+        }
+        writeAccessMapping(accessMapping);
+    }
+
     private boolean canEdit(String email, AccessMapping accessMapping) throws IOException {
         Set<String> digitalPublishingTeam = accessMapping.digitalPublishingTeam;
-        return digitalPublishingTeam.contains(email);
+        return digitalPublishingTeam!=null && digitalPublishingTeam.contains(email);
     }
 
     private boolean canView(String email, String path, AccessMapping accessMapping) {
@@ -205,17 +286,24 @@ public class Permissions {
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.paths = new HashMap<>();
 
+        lock.readLock().lock();
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
+        } finally {
+            lock.readLock().unlock();
         }
+
         return accessMapping;
     }
 
     private void writeAccessMapping(AccessMapping accessMapping) throws IOException {
         Path path = permissions.resolve("accessMapping.json");
 
+        lock.writeLock().lock();
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 

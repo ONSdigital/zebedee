@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -12,7 +11,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
 
 @Api
 public class Collection {
@@ -49,6 +47,7 @@ public class Collection {
         result.completeUris = collection.completeUris();
         result.reviewedUris = collection.reviewedUris();
         result.eventsByUri = collection.description.eventsByUri;
+        result.approvedStatus = collection.description.approvedStatus;
         return result;
     }
 

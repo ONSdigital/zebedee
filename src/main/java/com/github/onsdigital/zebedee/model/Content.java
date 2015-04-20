@@ -1,9 +1,13 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -20,6 +24,12 @@ public class Content {
         if (!Files.exists(path)) {
             throw new IllegalArgumentException("Path does not exist: "
                     + path.toAbsolutePath());
+        }
+    }
+
+    private static boolean isDirEmpty(final Path directory) throws IOException {
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
+            return !dirStream.iterator().hasNext();
         }
     }
 
@@ -83,6 +93,37 @@ public class Content {
     }
 
     /**
+     * Returns a list of {@link ContentDetail} objects for each file within this {@link Content}
+     *
+     * @return
+     * @throws IOException
+     */
+    public List<ContentDetail> details() throws IOException {
+        List<ContentDetail> details = new ArrayList<>();
+        for (String uri : this.uris()) {
+            details.add(details(uri));
+        }
+        return details;
+    }
+
+    /**
+     * Returns an individual {@link ContentDetail} object for the given uri.
+     *
+     * @return
+     * @throws IOException
+     */
+    public ContentDetail details(String uri) throws IOException {
+        ContentDetail result = null;
+        if (Files.exists(path)) {
+            try (InputStream input = Files.newInputStream(new File(path.toFile(), uri).toPath())) {
+                result = Serialiser.deserialise(input, ContentDetail.class);
+                result.uri = uri;
+            }
+        }
+        return result;
+    }
+
+    /**
      * Recursively lists all files within this {@link Content}.
      *
      * @param path  The path to start from. This method calls itself recursively.
@@ -125,11 +166,5 @@ public class Content {
             return true;
         }
         return false;
-    }
-
-    private static boolean isDirEmpty(final Path directory) throws IOException {
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
-            return !dirStream.iterator().hasNext();
-        }
     }
 }

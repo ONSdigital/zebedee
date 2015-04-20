@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -43,6 +44,17 @@ public class Permissions {
     }
 
     /**
+     * Determines whether an administator exists.
+     *
+     * @return True if at least one administrator exists.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean hasAdministrator() throws IOException {
+        AccessMapping accessMapping = readAccessMapping();
+        return accessMapping.administrators != null && (accessMapping.administrators.size() > 0);
+    }
+
+    /**
      * Determines whether the specified user has editing rights.
      *
      * @param email The user's email.
@@ -71,10 +83,13 @@ public class Permissions {
     /**
      * Adds the specified user to the administrators, giving them administrator permissions (but not content permissions).
      *
+     * <p>If no administrator exists the first call will succeed otherwise </p>
+     *
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
     public void addAdministrator(String email, Session session) throws IOException {
+
         if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
@@ -86,8 +101,6 @@ public class Permissions {
         accessMapping.administrators.add(email);
         writeAccessMapping(accessMapping);
     }
-
-
     /**
      * Removes the specified user from the administrators, revoking administrative permissions (but not content permissions).
      *

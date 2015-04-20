@@ -16,6 +16,8 @@ import java.nio.file.Path;
 
 /**
  * Created by david on 12/03/2015.
+ *
+ * Class to handle user management functions
  */
 public class Users {
     private Path users;
@@ -30,7 +32,7 @@ public class Users {
      * @param zebedee  A {@link Zebedee} instance.
      * @param user     The details of the {@link User} to be created.
      * @param password The plaintext password for this admin user.
-     * @return The created user.
+     * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
     public static void createAdmin(Zebedee zebedee, User user, String password, Session session) throws IOException {
@@ -38,6 +40,24 @@ public class Users {
         zebedee.users.write(user);
         zebedee.permissions.addAdministrator(user.email, session);
         zebedee.permissions.addEditor(user.email, session);
+    }
+
+    /**
+     * Creates the initial system user.
+     *
+     * @param zebedee  A {@link Zebedee} instance.
+     * @param user     The details of the system {@link User}.
+     * @param password The plaintext password for the user.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException {
+
+        if (zebedee.permissions.hasAdministrator()) {
+            return;
+        }
+
+        zebedee.users.create(user);
+        zebedee.users.setPassword(user.email, password, null);
     }
 
     /**
@@ -170,7 +190,10 @@ public class Users {
     public boolean setPassword(String email, String password, Session session) throws IOException {
         boolean result = false;
 
-        if (session != null) {
+        // Allow the password to be set for the first administrator with a null session.
+        // After the first administrator is created, always check for an admin session.
+        if (Root.zebedee.permissions.hasAdministrator()) {
+
             // Check permissions - must be an administrator to set a password:
             boolean isAdministrator = Root.zebedee.permissions.isAdministrator(session.email);
             if (!isAdministrator) {

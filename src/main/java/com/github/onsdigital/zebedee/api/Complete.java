@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
+import java.nio.file.Path;
 
 @Api
 public class Complete {
@@ -41,7 +42,7 @@ public class Complete {
 
         // Locate the path:
         String uri = request.getParameter("uri");
-        java.nio.file.Path path = collection.getInProgressPath(uri);
+        Path path = collection.inProgress.get(uri);
         if (path == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return new ResultMessage("URI not in progress.");

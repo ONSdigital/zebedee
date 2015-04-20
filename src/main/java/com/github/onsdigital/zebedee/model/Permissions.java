@@ -2,10 +2,8 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -93,7 +91,8 @@ public class Permissions {
      */
     public void addAdministrator(String email, Session session) throws IOException {
 
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
+        // Allow the initial user to be set as an administrator:
+        if (zebedee.permissions.hasAdministrator() && !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 
@@ -130,7 +129,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addEditor(String email, Session session) throws IOException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
+        if (zebedee.permissions.hasAdministrator() && !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 

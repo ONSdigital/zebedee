@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +15,7 @@ import java.nio.file.Path;
 
 /**
  * Created by david on 12/03/2015.
- *
+ * <p/>
  * Class to handle user management functions
  */
 public class Users {
@@ -60,6 +59,8 @@ public class Users {
 
         zebedee.users.create(user);
         zebedee.users.setPassword(user.email, password, null);
+        zebedee.permissions.addEditor(user.email, null);
+        zebedee.permissions.addAdministrator(user.email, null);
     }
 
     /**

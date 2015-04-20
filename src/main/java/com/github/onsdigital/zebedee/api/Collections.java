@@ -2,11 +2,9 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
 import com.github.onsdigital.zebedee.model.Collection;
-
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +45,12 @@ public class Collections {
 
         List<Collection> collections = Root.zebedee.getCollections();
         for (Collection collection : collections) {
-            result.add(collection.description);
+
+            CollectionDescription description = new CollectionDescription();
+            description.id = collection.description.id;
+            description.name = collection.description.name;
+            description.publishDate = collection.description.publishDate;
+            result.add(description);
         }
 
         return result;

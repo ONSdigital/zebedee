@@ -74,25 +74,6 @@ public class Collection {
     }
 
     /**
-     * Deconstructs a {@link Collection} in the given {@link Zebedee} and deletes it's description
-     *
-     * @return
-     * @throws IOException
-     */
-    public void delete()
-            throws IOException {
-
-
-        // Delete folders:
-        this.zebedee.delete(path);
-
-        // Delete the description file
-        String filename = PathUtils.toFilename(this.description.name);
-        Path collectionDescriptionPath = zebedee.collections.resolve(filename + ".json");
-        Files.delete(collectionDescriptionPath);
-    }
-
-    /**
      * Deconstructs a {@link Collection} in the given {@link Zebedee},
      * creating the necessary folders {@value #REVIEWED} and
      * {@value #IN_PROGRESS}.
@@ -164,7 +145,24 @@ public class Collection {
         return new Collection(renamedCollectionDescription, zebedee);
     }
 
+    /**
+     * Deconstructs a {@link Collection} in the given {@link Zebedee} and deletes it's description
+     *
+     * @return
+     * @throws IOException
+     */
+    public void delete()
+            throws IOException {
 
+
+        // Delete folders:
+        this.zebedee.delete(path);
+
+        // Delete the description file
+        String filename = PathUtils.toFilename(this.description.name);
+        Path collectionDescriptionPath = zebedee.collections.resolve(filename + ".json");
+        Files.delete(collectionDescriptionPath);
+    }
 
     public boolean save() throws IOException {
         try (OutputStream output = Files.newOutputStream(this.descriptionPath())) {
@@ -328,9 +326,7 @@ public class Collection {
 
     public boolean complete(String email, String uri) throws IOException {
         boolean result = false;
-
-        // Does the user have permission to complete? (or at least see this content)
-        boolean permission = zebedee.permissions.canView(email, uri);
+        boolean permission = zebedee.permissions.canEdit(email);
 
         if (isInProgress(uri) && permission) {
             // Move the in-progress copy to completed:
@@ -356,9 +352,7 @@ public class Collection {
      */
     public boolean review(String email, String uri) throws IOException {
         boolean result = false;
-
-        // Does the user have permission to review? (or at least see this content)
-        boolean permission = zebedee.permissions.canView(email, uri);
+        boolean permission = zebedee.permissions.canEdit(email);
         boolean userCompletedContent = didUserCompleteContent(email, uri);
 
         if (isComplete(uri) && permission && !userCompletedContent) {

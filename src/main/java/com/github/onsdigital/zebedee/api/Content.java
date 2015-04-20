@@ -86,6 +86,8 @@ public class Content {
         try (InputStream input = java.nio.file.Files.newInputStream(path)) {
             org.apache.commons.io.IOUtils.copy(input, response.getOutputStream());
         }
+
+        response.setStatus(HttpStatus.OK_200);
     }
 
     /**
@@ -183,6 +185,8 @@ public class Content {
                 org.apache.commons.io.IOUtils.copy(requestBody, output);
             }
         }
+        response.setStatus(HttpStatus.OK_200);
+
         return true;
     }
 

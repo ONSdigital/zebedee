@@ -43,6 +43,8 @@ public class Login {
             return "Authentication failed.";
         }
 
+        response.setStatus(HttpStatus.OK_200);
+
         return Root.zebedee.sessions.create(credentials.email).id;
     }
 

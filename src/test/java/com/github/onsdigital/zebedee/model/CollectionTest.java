@@ -34,7 +34,6 @@ public class CollectionTest {
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
-        Root.zebedee = zebedee;
         collection = new Collection(builder.collections.get(1), zebedee);
         email = builder.publisher.email;
     }

@@ -23,7 +23,6 @@ public class UsersTest {
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
-        Root.zebedee = zebedee;
     }
 
     @After

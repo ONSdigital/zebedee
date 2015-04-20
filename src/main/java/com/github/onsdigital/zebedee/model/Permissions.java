@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.Session;
@@ -25,10 +26,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class Permissions {
     private Path permissions;
+    private Zebedee zebedee;
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public Permissions(Path permissions) {
+    public Permissions(Path permissions, Zebedee zebedee) {
         this.permissions = permissions;
+        this.zebedee = zebedee;
     }
 
     /**
@@ -90,7 +93,7 @@ public class Permissions {
      */
     public void addAdministrator(String email, Session session) throws IOException {
 
-        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 
@@ -108,7 +111,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeAdministrator(String email, Session session) throws IOException {
-        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 
@@ -127,7 +130,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addEditor(String email, Session session) throws IOException {
-        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 
@@ -147,7 +150,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeEditor(String email, Session session) throws IOException {
-        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 
@@ -167,7 +170,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addViewer(String email, String path, Session session) throws IOException {
-        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 
@@ -192,7 +195,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addViewer(String email, Set<String> paths, Session session) throws IOException {
-        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 
@@ -221,7 +224,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeViewer(String email, String path, Session session) throws IOException {
-        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 
@@ -248,7 +251,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeViewer(String email, Session session) throws IOException {
-        if (session == null || !Root.zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             return;
         }
 

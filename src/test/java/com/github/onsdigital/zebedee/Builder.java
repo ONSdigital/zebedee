@@ -134,8 +134,6 @@ public class Builder {
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
-
-        Root.zebedee = new Zebedee(zebedee);
     }
 
     public void delete() throws IOException {

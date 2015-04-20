@@ -21,9 +21,11 @@ import java.nio.file.Path;
  */
 public class Users {
     private Path users;
+    private Zebedee zebedee;
 
-    public Users(Path users) {
+    public Users(Path users, Zebedee zebedee) {
         this.users = users;
+        this.zebedee = zebedee;
     }
 
     /**
@@ -192,10 +194,10 @@ public class Users {
 
         // Allow the password to be set for the first administrator with a null session.
         // After the first administrator is created, always check for an admin session.
-        if (Root.zebedee.permissions.hasAdministrator()) {
+        if (zebedee.permissions.hasAdministrator()) {
 
             // Check permissions - must be an administrator to set a password:
-            boolean isAdministrator = Root.zebedee.permissions.isAdministrator(session.email);
+            boolean isAdministrator = zebedee.permissions.isAdministrator(session.email);
             if (!isAdministrator) {
                 return false;
             }

@@ -43,9 +43,9 @@ public class Zebedee {
         }
         this.published = new Content(published);
         this.collections = collections;
-        this.users = new Users(users);
+        this.users = new Users(users, this);
         this.sessions = new Sessions(sessions);
-        this.permissions = new Permissions(permissions);
+        this.permissions = new Permissions(permissions, this);
     }
 
     /**
@@ -66,7 +66,6 @@ public class Zebedee {
         Files.createDirectory(path.resolve(PERMISSIONS));
 
         Zebedee zebedee = new Zebedee(path);
-        Root.zebedee = zebedee;
 
         // Create the initial user
         User user = new User();

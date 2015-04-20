@@ -47,6 +47,10 @@ public class Root implements Startup {
 
     @Override
     public void init() {
+
+        // Set ISO date formatting in Gson to match Javascript Date.toISODate()
+        Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
+
         try {
 
             // Create a Zebedee folder:
@@ -59,9 +63,6 @@ public class Root implements Startup {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Set ISO date formatting in Gson to match Javascript Date.toISODate()
-        Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
         // Set the class that will be used to determine a ClassLoader when loading resources:
         ResourceUtils.classLoaderClass = Root.class;

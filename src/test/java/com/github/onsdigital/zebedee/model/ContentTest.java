@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ContentTest {
 
@@ -67,5 +68,44 @@ public class ContentTest {
         // The result has the expected values
         assertEquals(1, results.size());
         assertEquals(contentDetail.name, results.get(0).name);
+    }
+
+    @Test
+    public void shouldGetAllUris() throws IOException {
+
+        // Given a content instance with a json file and csv file in it.
+        Path basePath = Files.createTempDirectory(this.getClass().getSimpleName());
+        String jsonFile = Random.id() + ".json";
+        String csvFile = Random.id() + ".csv";
+        Files.createFile(basePath.resolve(jsonFile));
+        Files.createFile(basePath.resolve(csvFile));
+        Content content = new Content(basePath);
+
+        // When the uris method is called
+        List<String> results = content.uris();
+
+        // The result has the expected values
+        assertEquals(2, results.size());
+        assertTrue(results.contains("/" + jsonFile));
+        assertTrue(results.contains("/" + csvFile));
+    }
+
+    @Test
+    public void shouldApplyGlobToUris() throws IOException {
+
+        // Given a content instance with a json file and csv file in it.
+        Path basePath = Files.createTempDirectory(this.getClass().getSimpleName());
+        String jsonFile = Random.id() + ".json";
+        String csvFile = Random.id() + ".csv";
+        Files.createFile(basePath.resolve(jsonFile));
+        Files.createFile(basePath.resolve(csvFile));
+        Content content = new Content(basePath);
+
+        // When the details method is called with a uri
+        List<String> results = content.uris("*.json");
+
+        // The result has the expected values
+        assertEquals(1, results.size());
+        assertTrue(results.contains("/" + jsonFile));
     }
 }

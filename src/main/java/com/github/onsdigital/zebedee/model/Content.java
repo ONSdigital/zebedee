@@ -72,11 +72,28 @@ public class Content {
         return path.resolve(relative);
     }
 
+    /**
+     * Returns a list of uri's for each file within this {@link Content}
+     *
+     * @return
+     * @throws IOException
+     */
     public List<String> uris() throws IOException {
+        return uris("*");
+    }
+
+    /**
+     * Returns a list of uri's for each file within this {@link Content}
+     *
+     * @param glob The filter glob to apply to the list.
+     * @return
+     * @throws IOException
+     */
+    public List<String> uris(String glob) throws IOException {
 
         // Get a list of files:
         List<Path> files = new ArrayList<>();
-        listFiles(path, files);
+        listFiles(path, files, glob);
 
         // Convert to URIs:
         List<String> uris = new ArrayList<>();
@@ -128,16 +145,17 @@ public class Content {
      *
      * @param path  The path to start from. This method calls itself recursively.
      * @param files The list to which results will be added.
-     * @throws IOException If a filesystem error occurs.
+     * @param glob  The filter glob to apply to the list.
+     * @throws IOException
      */
-    private void listFiles(Path path, List<Path> files) throws IOException {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+    private void listFiles(Path path, List<Path> files, String glob) throws IOException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, glob)) {
             for (Path entry : stream) {
                 if (Files.isDirectory(entry)) {
-                    listFiles(entry, files);
+                    listFiles(entry, files, glob);
                 } else {
                     Path relative = this.path.relativize(entry);
-                    if (!relative.endsWith(".DS_Store"))
+                    if (!relative.endsWith(".DS_Store")) // issue when in development on Mac's
                         files.add(relative);
                 }
             }
@@ -155,7 +173,7 @@ public class Content {
             Path folder = path.getParent();
             while (!Files.isSameFile(this.path, folder)) { // Go no further than the Content root
                 List<Path> files = new ArrayList<>();
-                listFiles(folder, files);
+                listFiles(folder, files, "*");
                 if (files.size() == 0) { // If the folder is empty
                     FileUtils.deleteDirectory(folder.toFile());
                     folder = folder.getParent();

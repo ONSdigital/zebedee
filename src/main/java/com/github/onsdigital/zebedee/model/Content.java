@@ -149,17 +149,16 @@ public class Content {
      * @throws IOException
      */
     private void listFiles(Path path, List<Path> files, String glob) throws IOException {
-
-        // find the files matching the given glob.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, glob)) {
             for (Path entry : stream) {
-                Path relative = this.path.relativize(entry);
-                if (!relative.endsWith(".DS_Store")) // issue when in development on Mac's
-                    files.add(relative);
+                if (!Files.isDirectory(entry)) {
+                    Path relative = this.path.relativize(entry);
+                    if (!relative.endsWith(".DS_Store")) // issue when in development on Mac's
+                        files.add(relative);
+                }
             }
         }
 
-        // recurse on any directories found.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path entry : stream) {
                 if (Files.isDirectory(entry)) {

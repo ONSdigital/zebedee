@@ -31,13 +31,17 @@ public class Approve {
      */
     @POST
     public boolean approveCollection(HttpServletRequest request,HttpServletResponse response) throws IOException {
+
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
-        // TODO Check user permissions are provided BAD_REQUEST_400
+        // Check collection exists
+        if(collection == null) {
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return false;
+        }
 
         // TODO Check user permissions UNAUTHORISED_401
 
-        // TODO Check collection exists BAD_REQUEST_400
 
         // Check everything is completed
         if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {

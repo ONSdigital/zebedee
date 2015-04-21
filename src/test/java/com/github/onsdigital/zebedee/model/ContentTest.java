@@ -95,10 +95,11 @@ public class ContentTest {
 
         // Given a content instance with a json file and csv file in it.
         Path basePath = Files.createTempDirectory(this.getClass().getSimpleName());
+        Path directoryPath = Files.createDirectory(basePath.resolve("somedirectory"));
         String jsonFile = Random.id() + ".json";
         String csvFile = Random.id() + ".csv";
-        Files.createFile(basePath.resolve(jsonFile));
-        Files.createFile(basePath.resolve(csvFile));
+        Files.createFile(directoryPath.resolve(jsonFile));
+        Files.createFile(directoryPath.resolve(csvFile));
         Content content = new Content(basePath);
 
         // When the details method is called with a uri
@@ -106,6 +107,6 @@ public class ContentTest {
 
         // The result has the expected values
         assertEquals(1, results.size());
-        assertTrue(results.contains("/" + jsonFile));
+        assertTrue(results.contains("/somedirectory/" + jsonFile));
     }
 }

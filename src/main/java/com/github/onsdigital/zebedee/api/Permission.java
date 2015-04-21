@@ -32,7 +32,7 @@ public class Permission {
      * @throws IOException
      */
     @POST
-    public String setPassword(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException {
+    public String setPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException {
 
         // Check the user session
         Session session = Root.zebedee.sessions.get(request);
@@ -71,7 +71,7 @@ public class Permission {
         if (permissionDefinition.contentOwnerPaths != null && permissionDefinition.contentOwnerPaths.size()>0) {
             Root.zebedee.permissions.addViewer(permissionDefinition.email, new HashSet<String>(permissionDefinition.contentOwnerPaths), session);
         } else {
-            Root.zebedee.permissions.removeEditor(permissionDefinition.email, session);
+            Root.zebedee.permissions.removeViewer(permissionDefinition.email, session);
         }
 
         return "Permissions updated for " + permissionDefinition.email;

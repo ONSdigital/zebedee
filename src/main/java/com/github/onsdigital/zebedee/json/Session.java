@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.json;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 
 /**
@@ -28,4 +30,8 @@ public class Session {
      */
     public Date lastAccess = new Date();
 
+    @Override
+    public String toString() {
+        return email + " (" + StringUtils.abbreviate(id, 8) + ")";
+    }
 }

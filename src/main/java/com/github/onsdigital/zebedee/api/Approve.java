@@ -1,11 +1,12 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
@@ -41,7 +42,17 @@ public class Approve {
         }
 
         // TODO Check user permissions UNAUTHORISED_401
+        Session session = Root.zebedee.sessions.get(request);
+        if (session==null || !Root.zebedee.permissions.canEdit(session.email)) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return false;
+        }
 
+        // TODO Check collection exists BAD_REQUEST_400
+        if (collection == null) {
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return false;
+        }
 
         // Check everything is completed
         if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {

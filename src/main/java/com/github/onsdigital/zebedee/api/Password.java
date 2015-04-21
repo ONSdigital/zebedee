@@ -37,18 +37,21 @@ public class Password {
         Session session = Root.zebedee.sessions.get(request);
         if (!Root.zebedee.permissions.isAdministrator(session.email)) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            System.out.println(session + " is not an administrator.");
             return "Unauthorised.";
         }
 
         // Check the request
         if (credentials == null || !Root.zebedee.users.exists(credentials.email)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
+            System.out.println(credentials + " is not a valid user.");
             return "Please provide credentials (email, password).";
         }
 
         // Attempt to change the password
         if (!Root.zebedee.users.setPassword(credentials.email, credentials.password, session)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
+            System.out.println(session + " failed to update password for " + credentials);
             return "Failed to update password for " + credentials.email;
         }
 

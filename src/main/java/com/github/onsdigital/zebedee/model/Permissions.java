@@ -24,12 +24,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class Permissions {
     private Path permissions;
+    private Path accessMappingPath;
     private Zebedee zebedee;
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public Permissions(Path permissions, Zebedee zebedee) {
-        this.permissions = permissions;
         this.zebedee = zebedee;
+        this.permissions = permissions;
+        accessMappingPath = permissions.resolve("accessMapping.json");
+        System.out.println("Access mapping path: " + accessMappingPath);
     }
 
     /**
@@ -83,7 +86,7 @@ public class Permissions {
 
     /**
      * Adds the specified user to the administrators, giving them administrator permissions (but not content permissions).
-     *
+     * <p/>
      * <p>If no administrator exists the first call will succeed otherwise </p>
      *
      * @param email The user's email.
@@ -103,6 +106,7 @@ public class Permissions {
         accessMapping.administrators.add(email);
         writeAccessMapping(accessMapping);
     }
+
     /**
      * Removes the specified user from the administrators, revoking administrative permissions (but not content permissions).
      *
@@ -268,7 +272,7 @@ public class Permissions {
 
     private boolean canEdit(String email, AccessMapping accessMapping) throws IOException {
         Set<String> digitalPublishingTeam = accessMapping.digitalPublishingTeam;
-        return digitalPublishingTeam!=null && digitalPublishingTeam.contains(email);
+        return digitalPublishingTeam != null && digitalPublishingTeam.contains(email);
     }
 
     private boolean canView(String email, String path, AccessMapping accessMapping) {
@@ -312,10 +316,9 @@ public class Permissions {
     }
 
     private void writeAccessMapping(AccessMapping accessMapping) throws IOException {
-        Path path = permissions.resolve("accessMapping.json");
 
         lock.writeLock().lock();
-        try (OutputStream output = Files.newOutputStream(path)) {
+        try (OutputStream output = Files.newOutputStream(accessMappingPath)) {
             Serialiser.serialise(output, accessMapping);
         } finally {
             lock.writeLock().unlock();

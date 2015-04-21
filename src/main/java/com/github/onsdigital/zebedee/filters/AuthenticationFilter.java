@@ -57,7 +57,7 @@ public class AuthenticationFilter implements Filter {
 
     private void forbidden(HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
-        response.setStatus(HttpStatus.FORBIDDEN_403);
+        response.setStatus(HttpStatus.UNAUTHORIZED_401);
         Serialiser.serialise(response, "Please log in");
     }
 

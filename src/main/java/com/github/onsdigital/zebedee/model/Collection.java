@@ -304,9 +304,9 @@ public class Collection {
             Path destination = inProgress.toPath(uri);
 
             if (this.isInCollection(uri))
-                PathUtils.move(source, destination);
+                PathUtils.moveFilesInDirectory(source, destination);
             else {
-                PathUtils.copy(source, destination);
+                PathUtils.copyFilesInDirectory(source, destination);
             }
 
             AddEvent(uri, new ContentEvent(new Date(), ContentEventType.EDITED, email));
@@ -332,7 +332,7 @@ public class Collection {
             // Move the in-progress copy to completed:
             Path source = inProgress.get(uri);
             Path destination = complete.toPath(uri);
-            PathUtils.move(source, destination);
+            PathUtils.moveFilesInDirectory(source, destination);
 
             AddEvent(uri, new ContentEvent(new Date(), ContentEventType.COMPLETED, email));
             result = true;
@@ -359,7 +359,7 @@ public class Collection {
             // Move the complete copy to reviewed:
             Path source = complete.get(uri);
             Path destination = reviewed.toPath(uri);
-            PathUtils.move(source, destination);
+            PathUtils.moveFilesInDirectory(source, destination);
 
             AddEvent(uri, new ContentEvent(new Date(), ContentEventType.REVIEWED, email));
             result = true;

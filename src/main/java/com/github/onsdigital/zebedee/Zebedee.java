@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
@@ -157,7 +156,7 @@ public class Zebedee {
         for (String uri : collection.reviewed.uris()) {
             Path source = collection.reviewed.get(uri);
             Path destination = published.toPath(uri);
-            PathUtils.move(source, destination);
+            PathUtils.moveFilesInDirectory(source, destination);
         }
 
         // Delete the folders:

@@ -3,8 +3,8 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.TransferRequest;
-import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.PathUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,7 +61,7 @@ public class Transfer {
             result = false;
         }
 
-        PathUtils.move(sourcePath, destinationPath);
+        PathUtils.moveFilesInDirectory(sourcePath, destinationPath);
 
         return result;
     }

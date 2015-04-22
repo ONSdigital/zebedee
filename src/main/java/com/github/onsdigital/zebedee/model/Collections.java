@@ -1,10 +1,8 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.zebedee.api.Root;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -43,7 +41,7 @@ public class Collections extends ArrayList<Collection> {
             Path sourcePath = source.find(email, uri);
             Path destinationPath = destination.getInProgressPath(uri);
 
-            PathUtils.move(sourcePath,destinationPath);
+        PathUtils.moveFilesInDirectory(sourcePath, destinationPath);
             result = true;
 
 

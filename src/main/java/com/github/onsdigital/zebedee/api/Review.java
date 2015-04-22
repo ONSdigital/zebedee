@@ -40,11 +40,10 @@ public class Review {
 
         // Locate the path:
         String uri = request.getParameter("uri");
-
-        java.nio.file.Path path = collection.getInProgressPath(uri);
+        java.nio.file.Path path = collection.complete.get(uri);
         if (path == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
-            return new ResultMessage("URI not in progress.");
+            return new ResultMessage("URI is not complete.");
         }
 
         // Check we're requesting a file:

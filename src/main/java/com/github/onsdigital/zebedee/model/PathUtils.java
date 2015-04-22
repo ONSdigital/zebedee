@@ -123,6 +123,25 @@ public class PathUtils {
         }
     }
 
+    /**
+     * Given a path to a file or directory, delete all the files in the directory.
+     * If a file is given, The parent directory of the file is used.
+     *
+     * @param target
+     */
+    public static void deleteFilesInDirectory(Path target) throws IOException {
+
+        Path sourceDirectory = Files.isDirectory(target) ? target : target.getParent();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(sourceDirectory)) {
+            for (Path entry : stream) {
+                if (!Files.isDirectory(entry)) {
+                    Files.delete(entry);
+                }
+            }
+        }
+    }
+
     private static void doCopy(Path source, Path destination)
             throws IOException {
         try (InputStream input = Files.newInputStream(source);

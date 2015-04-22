@@ -269,4 +269,43 @@ public class PathUtilsTest {
         assertFalse(Files.exists(destinationSubDirectory.resolve("some.csv")));
         assertFalse(Files.exists(destinationSubDirectory));
     }
+
+    @Test
+    public void shouldDeleteAllFilesInDirectory() throws IOException {
+
+        // Given - a directory with two files.
+        Path target = Files.createDirectory(folder.resolve("target"));
+        Path targetJsonFile = target.resolve("data.json");
+        Files.createFile(targetJsonFile);
+        Path targetCsvFile = target.resolve("uploaded.csv");
+        Files.createFile(targetCsvFile);
+
+        // When - we call deleteFilesInDirectory() method with the path to
+        // one of the files.
+        PathUtils.deleteFilesInDirectory(targetJsonFile);
+
+        // Then - all files in the directory are deleted
+        assertFalse(Files.exists(targetCsvFile));
+        assertFalse(Files.exists(targetJsonFile));
+    }
+
+    @Test
+    public void shouldNotDeleteSubDirectories() throws IOException {
+
+        // Given - a directory with a sub directory containing a file
+        Path target = Files.createDirectory(folder.resolve("target"));
+        Path targetFile = target.resolve("data.json");
+        Files.createFile(targetFile);
+        Path subDirectory = Files.createDirectory(target.resolve("subdirectory"));
+        Path subDirectoryFile = subDirectory.resolve("some.csv");
+        Files.createFile(subDirectoryFile);
+
+        // When - we call deleteFilesInDirectory()
+        PathUtils.deleteFilesInDirectory(targetFile);
+
+        // Then - the file is deleted but the sub directory is not copied.
+        assertFalse(Files.exists(targetFile.resolve("some.csv")));
+        assertTrue(Files.exists(subDirectory));
+        assertTrue(Files.exists(subDirectoryFile));
+    }
 }

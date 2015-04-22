@@ -93,6 +93,18 @@ public class Zebedee {
         password = "Doug4l";
         Users.createAdmin(zebedee, user, password, session);
 
+        user = new User();
+        user.email = "p4@t.com";
+        user.name = "p4";
+        password = "Doug4l";
+        Users.createAdmin(zebedee, user, password, session);
+
+        user = new User();
+        user.email = "p5@t.com";
+        user.name = "p5";
+        password = "Doug4l";
+        Users.createAdmin(zebedee, user, password, session);
+
         return zebedee;
     }
 

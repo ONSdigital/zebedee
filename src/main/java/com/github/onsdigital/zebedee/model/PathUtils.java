@@ -1,11 +1,13 @@
 package com.github.onsdigital.zebedee.model;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -74,6 +76,50 @@ public class PathUtils {
             // Copy-then-delete
             doCopy(source, destination);
             Files.delete(source);
+        }
+    }
+
+    /**
+     * Given a path to a file or directory, move all the files in the directory
+     * to the destination directory. If a file is given, The parent directory
+     * of the file is used.
+     *
+     * @param source
+     * @param destination
+     */
+    public static void moveFilesInDirectory(Path source, Path destination) throws IOException {
+
+        Path sourceDirectory = Files.isDirectory(source) ? source : source.getParent();
+        Path destinationDirectory = Files.isDirectory(destination) ? destination : destination.getParent();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(sourceDirectory)) {
+            for (Path entry : stream) {
+                if (!Files.isDirectory(entry)) {
+                    FileUtils.moveFileToDirectory(entry.toFile(), destinationDirectory.toFile(), true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Given a path to a file or directory, copy all the files in the directory
+     * to the destination directory. If a file is given, The parent directory
+     * of the file is used.
+     *
+     * @param source
+     * @param destination
+     */
+    public static void copyFilesInDirectory(Path source, Path destination) throws IOException {
+
+        Path sourceDirectory = Files.isDirectory(source) ? source : source.getParent();
+        Path destinationDirectory = Files.isDirectory(destination) ? destination : destination.getParent();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(sourceDirectory)) {
+            for (Path entry : stream) {
+                if (!Files.isDirectory(entry)) {
+                    FileUtils.copyFileToDirectory(entry.toFile(), destinationDirectory.toFile(), true);
+                }
+            }
         }
     }
 

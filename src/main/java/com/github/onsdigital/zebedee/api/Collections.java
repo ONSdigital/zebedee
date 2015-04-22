@@ -50,6 +50,7 @@ public class Collections {
             description.id = collection.description.id;
             description.name = collection.description.name;
             description.publishDate = collection.description.publishDate;
+            description.approvedStatus = collection.description.approvedStatus;
             result.add(description);
         }
 

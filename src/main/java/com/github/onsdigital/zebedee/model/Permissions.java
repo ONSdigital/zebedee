@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.AccessMapping;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,6 +34,10 @@ public class Permissions {
         this.permissions = permissions;
         accessMappingPath = permissions.resolve("accessMapping.json");
         System.out.println("Access mapping path: " + accessMappingPath);
+    }
+
+    public boolean canView(String email, CollectionDescription collectionDescription) {
+        return true;
     }
 
     /**

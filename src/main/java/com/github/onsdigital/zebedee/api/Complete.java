@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
@@ -38,7 +39,12 @@ public class Complete {
             return new ResultMessage("Collection not found.");
         }
 
-        //TODO Check user authorisation  HttpStatus.UNAUTHORIZED_401
+        // Check authorisation
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.canEdit(session.email) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return new ResultMessage("Unauthorized");
+        }
 
         // Locate the path:
         String uri = request.getParameter("uri");
@@ -55,7 +61,6 @@ public class Complete {
         }
 
         // Attempt to review:
-        Session session = Root.zebedee.sessions.get(request);
         if (!collection.complete(session.email, uri)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return new ResultMessage("URI was not reviewed.");

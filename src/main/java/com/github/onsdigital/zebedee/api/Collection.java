@@ -1,7 +1,10 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.Sessions;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -37,6 +40,14 @@ public class Collection {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return null;
         }
+
+        // Check whether we have access
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return null;
+        };
+
 
         // Collate the result:
         CollectionDescription result = new CollectionDescription();
@@ -76,7 +87,11 @@ public class Collection {
             return false;
         }
 
-        //TODO Check whether user has permission to delete this collection HttpStatus.UNAUTHORIZED_401
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.canEdit(session.email) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return false;
+        }
 
         collectionDescription.name = StringUtils.trim(collectionDescription.name);
         if (Root.zebedee.getCollections().hasCollection(
@@ -115,7 +130,12 @@ public class Collection {
             return false;
         }
 
-        //TODO Check whether user has permission to delete this collection HttpStatus.UNAUTHORIZED_401
+        // Check whether user has permission to delete this collection
+        Session session = Root.zebedee.sessions.get(request);
+        if(Root.zebedee.permissions.canEdit(session.email) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return false;
+        }
 
         // Check whether the collection can be deleted
         if (!collection.isEmpty()) {

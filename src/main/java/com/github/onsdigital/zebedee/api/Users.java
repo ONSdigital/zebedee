@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -62,10 +63,17 @@ public class Users {
     @POST
     public User create(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
 
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.isAdministrator(session.email) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return null;
+        }
+
         if (Root.zebedee.users.exists(user)) {
             response.setStatus(HttpStatus.CONFLICT_409);
             return null;
         }
+
 
         User created = Root.zebedee.users.create(user);
 

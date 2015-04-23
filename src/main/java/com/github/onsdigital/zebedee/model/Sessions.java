@@ -130,7 +130,7 @@ public class Sessions extends TimerTask {
 
                     // Examine each session for a match to the email address:
                     Session candidate = read(entry);
-                    if (StringUtils.equalsIgnoreCase(candidate.email, email)
+                    if (StringUtils.equalsIgnoreCase(candidate.email, PathUtils.standardise(email))
                             && !expired(candidate)) {
                         session = candidate;
                         break iterate;

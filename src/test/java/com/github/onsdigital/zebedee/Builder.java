@@ -1,11 +1,9 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.json.AccessMapping;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
@@ -25,9 +23,11 @@ import java.util.*;
 public class Builder {
 
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
+    public String[] teamNames = {"Economy Team", "Labour Market Team"};
     public Path parent;
     public Path zebedee;
     public List<Path> collections;
+    public List<String> teams;
     public List<String> contentUris;
 
     public User publisher; // accessible publishing team user
@@ -45,6 +45,9 @@ public class Builder {
             Path collection = createCollection(collectionName, zebedee);
             collections.add(collection);
         }
+
+        // Create the teams
+        teams = new ArrayList<>();
 
         // Create some published content:
         Path folder = zebedee.resolve(Zebedee.PUBLISHED);
@@ -114,6 +117,8 @@ public class Builder {
         // Set up some permissions:
         Path permissions = zebedee.resolve(Zebedee.PERMISSIONS);
         Files.createDirectories(permissions);
+        Path teams = permissions.resolve(Zebedee.TEAMS);
+        Files.createDirectories(teams);
 
         AccessMapping accessMapping = new AccessMapping();
 
@@ -124,15 +129,42 @@ public class Builder {
         accessMapping.digitalPublishingTeam.add(patricia.email);
         accessMapping.digitalPublishingTeam.add(freddy.email);
 
-        //accessMapping.paths = new HashMap<>();
-        //Set contentOwners = new HashSet<>();
-        //contentOwners.add(ronny.email);
-        //accessMapping.paths.put("/economy", contentOwners);
+        CollectionDescription collectionDescription = new CollectionDescription();
+        collectionDescription.id = Random.id();
+        accessMapping.collections = new HashMap<>();
+
+        Zebedee z = new Zebedee(zebedee);
+        Team labourMarketTeam = createTeam(freddy, "Labour Market Team", teams);
+        Team inflationTeam = createTeam(ronny, "Inflation and Price Indices Team", teams);
+        accessMapping.collections.put(new Collection(collections.get(0), z).description.id, set(labourMarketTeam));
+        accessMapping.collections.put(new Collection(collections.get(1), z).description.id, set(inflationTeam));
 
         Path path = permissions.resolve("accessMapping.json");
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
+    }
+
+    private Set<Integer> set(Team team) {
+        Set<Integer> ids = new HashSet<>();
+        ids.add(team.id);
+        return ids;
+    }
+
+    static int teamId;
+    private Team createTeam(User user, String name, Path teams) throws IOException {
+        Team team = new Team();
+
+        team.id = ++teamId;
+        team.name = name;
+        team.members = new HashSet<>();
+        team.members.add(user.email);
+        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.name));
+        try (OutputStream output = Files.newOutputStream(labourMarketTeamPath)) {
+            Serialiser.serialise(output, team);
+        }
+
+        return team;
     }
 
     public void delete() throws IOException {
@@ -224,7 +256,7 @@ public class Builder {
 
         // Build the session object
         Session session = new Session();
-        session.id = com.github.davidcarboni.cryptolite.Random.id();
+        session.id = Random.id();
         session.email = email;
 
         // Determine the path in which to create the session Json
@@ -290,6 +322,7 @@ public class Builder {
         // Create the description:
         Path collectionDescription = collections.resolve(filename + ".json");
         CollectionDescription description = new CollectionDescription();
+        description.id = Random.id();
         description.name = name;
         try (OutputStream output = Files.newOutputStream(collectionDescription)) {
             Serialiser.serialise(output, description);

@@ -1,21 +1,24 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.Team;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.http.HttpStatus;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -24,14 +27,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Created by david on 12/03/2015.
  */
 public class Permissions {
-    private Path permissions;
+    private Path teamsPath;
     private Path accessMappingPath;
-    private Zebedee zebedee;
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
+    private ReadWriteLock teamLock = new ReentrantReadWriteLock();
 
-    public Permissions(Path permissions, Zebedee zebedee) {
-        this.zebedee = zebedee;
-        this.permissions = permissions;
+    public Permissions(Path permissions, Path teams) {
+        this.teamsPath = teams;
         accessMappingPath = permissions.resolve("accessMapping.json");
         System.out.println("Access mapping path: " + accessMappingPath);
     }
@@ -49,7 +51,7 @@ public class Permissions {
      */
     public boolean isAdministrator(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
-        return accessMapping.administrators != null && accessMapping.administrators.contains(email);
+        return accessMapping.administrators != null && accessMapping.administrators.contains(standardise(email));
     }
 
     /**
@@ -78,15 +80,15 @@ public class Permissions {
     /**
      * Determines whether the specified user has viewing rights.
      *
-     * @param email The user's email.
-     * @param path  The path to be viewed.
+     * @param email                 The user's email.
+     * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
      * the user is a content owner with access to the given path or any parent path.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean canView(String email, String path) throws IOException {
+    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
-        return canEdit(email, accessMapping) || canView(email, path, accessMapping);
+        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
     }
 
     /**
@@ -100,8 +102,8 @@ public class Permissions {
     public void addAdministrator(String email, Session session) throws IOException {
 
         // Allow the initial user to be set as an administrator:
-        if (zebedee.permissions.hasAdministrator() && !zebedee.permissions.isAdministrator(session.email)) {
-            return;
+        if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -119,8 +121,8 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeAdministrator(String email, Session session) throws IOException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            return;
+        if (session == null || !isAdministrator(session.email)) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -138,8 +140,8 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addEditor(String email, Session session) throws IOException {
-        if (zebedee.permissions.hasAdministrator() && !zebedee.permissions.isAdministrator(session.email)) {
-            return;
+        if (hasAdministrator() && !isAdministrator(session.email)) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -158,8 +160,8 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeEditor(String email, Session session) throws IOException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            return;
+        if (session == null || !isAdministrator(session.email)) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -171,164 +173,369 @@ public class Permissions {
     }
 
     /**
-     * Adds the specified user to the content administrators, giving them access to read content at the given path and all sub-paths.
+     * Grants the given team access to the given collection.
      *
-     * @param email The user's email.
-     * @param path  The path under which the user will get read access.
+     * @param collectionDescription The collection to give the team access to.
+     * @param team                  The team to be granted access.
+     * @param session               Only editors can grant a team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addViewer(String email, String path, Session session) throws IOException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
+    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException {
+        if (session == null || !canEdit(session.email)) {
             return;
         }
 
         AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.paths == null) {
-            accessMapping.paths = new HashMap<>();
+        Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.id);
+        if (collectionTeams == null) {
+            collectionTeams = new HashSet<>();
+            accessMapping.collections.put(collectionDescription.id, collectionTeams);
         }
-        Set<String> viewers = accessMapping.paths.get(path);
-        if (viewers == null) {
-            viewers = new HashSet<>();
-        }
-        viewers.add(email);
-        accessMapping.paths.put(path, viewers);
+        collectionTeams.add(team.id);
         writeAccessMapping(accessMapping);
+    }
+
+    /**
+     * Revokes access for given team to the given collection.
+     *
+     * @param collectionDescription The collection to revoke team access to.
+     * @param team                  The team to be revoked access.
+     * @param session               Only editors can revoke team access to a collection.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException {
+        if (session == null || !canEdit(session.email)) {
+            return;
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.id);
+        if (collectionTeams == null) {
+            collectionTeams = new HashSet<>();
+            accessMapping.collections.put(collectionDescription.id, collectionTeams);
+        }
+        collectionTeams.remove(team.id);
+        writeAccessMapping(accessMapping);
+    }
+
+    public List<Team> listTeams() throws IOException {
+        List<Team> result = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(teamsPath)) {
+            for (Path path : stream) {
+                teamLock.readLock().lock();
+                try (InputStream input = Files.newInputStream(path)) {
+                    result.add(Serialiser.deserialise(input, Team.class));
+                } finally {
+                    teamLock.readLock().unlock();
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Team findTeam(String teamName) throws IOException {
+        Team result = null;
+
+        for (Team team : listTeams()) {
+            if (StringUtils.equals(team.name, teamName)) result = team;
+        }
+
+        return result;
+    }
+
+    /**
+     * Create a new content owner (viewer) team.
+     *
+     * @param teamName The name for the team.
+     * @param session  Only administrators can create a team.
+     * @return The created team.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public Team createTeam(String teamName, Session session) throws IOException {
+        if (session == null || !isAdministrator(session.email)) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
+        }
+
+        String filename = PathUtils.toFilename(teamName);
+        int id = 0;
+
+        // Check for a name conflict:
+        List<Team> teams = listTeams();
+        for (Team team : teams) {
+            id = Math.max(id, team.id);
+            String teamFilename = PathUtils.toFilename(team.name);
+            if (StringUtils.equalsIgnoreCase(filename, teamFilename)) {
+                throw new ClientErrorException("There is already a team matching this name.", HttpStatus.CONFLICT_409);
+            }
+        }
+
+        // Create the team object:
+        Team team = new Team();
+        team.name = teamName;
+        team.id = ++id;
+        team.members = new HashSet<>();
+        writeTeam(team);
+
+        return team;
+    }
+
+    /**
+     * Renames a team.
+     *
+     * @param update  The team with the updated name. The ID will be used to find the existing team.
+     * @param session Only administrators can rename a team.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void renameTeam(Team update, Session session) throws IOException {
+        if (session == null || !isAdministrator(session.email)) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
+        }
+
+        if (update != null && StringUtils.isNotBlank(update.name)) {
+
+            // Find the team to update:
+            Team existing = null;
+            List<Team> teams = listTeams();
+            for (Team team : teams) {
+                if (update.id == team.id) {
+                    existing = update;
+                }
+            }
+            if (existing == null) {
+                throw new NotFoundException("Team ID not found: " + update);
+            }
+
+            // Create a file with the new name and then delete the old one:
+            if (!StringUtils.equals(PathUtils.toFilename(existing.name), PathUtils.toFilename(update.name))) {
+                writeTeam(update);
+                Files.delete(teamPath(existing));
+            }
+
+        } else {
+            throw new BadRequestException("Invalid team: " + update);
+        }
+    }
+
+    /**
+     * Delete a team.
+     *
+     * @param delete  The team to be deleted. The ID will be used to find the existing team.
+     * @param session Only an administrator can delete a team.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void deleteTeam(Team delete, Session session) throws IOException {
+        if (session == null || !isAdministrator(session.email)) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
+        }
+
+        if (delete != null && StringUtils.isNotBlank(delete.name)) {
+
+            // Find the team to update:
+            Team existing = null;
+            List<Team> teams = listTeams();
+            for (Team team : teams) {
+                if (delete.id == team.id) {
+                    existing = delete;
+                }
+            }
+            if (existing == null) {
+                throw new NotFoundException("Team ID not found: " + delete);
+            }
+
+            // Delete the team:
+            Files.delete(teamPath(existing));
+
+        } else {
+            throw new BadRequestException("Invalid team: " + delete);
+        }
     }
 
     /**
      * Adds the specified user to the content administrators, giving them access to read content at the given paths and all sub-paths.
      *
      * @param email The user's email.
-     * @param paths The paths under which the user will get read access.
+     * @param team  The team to add the given email to.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addViewer(String email, Set<String> paths, Session session) throws IOException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            return;
+    public void addTeamMember(String email, Team team, Session session) throws IOException {
+        if (session == null || !isAdministrator(session.email)) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
         }
 
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.paths == null) {
-            accessMapping.paths = new HashMap<>();
+        if (!StringUtils.isBlank(email) && team != null) {
+            team.members.add(standardise(email));
+            writeTeam(team);
         }
 
-        for (String path : paths) {
-            Set<String> viewers = accessMapping.paths.get(path);
-            if (viewers == null) {
-                viewers = new HashSet<>();
-            }
-            viewers.add(email);
-            accessMapping.paths.put(path, viewers);
-        }
-
-        writeAccessMapping(accessMapping);
     }
 
     /**
-     * removes the specified user from the content owners, revoking access to read content at the given path and all sub-paths.
+     * Adds the specified user to the content administrators, giving them access to read content at the given paths and all sub-paths.
      *
      * @param email The user's email.
-     * @param path  The path under which the user will no longer have read access.
+     * @param team  The team to remove the given email from.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeViewer(String email, String path, Session session) throws IOException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            return;
+    public void removeTeamMember(String email, Team team, Session session) throws IOException {
+        if (session == null || !isAdministrator(session.email)) {
+            throw new NotAuthorizedException("Session is not an administrator: " + session);
         }
 
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.paths == null) {
-            accessMapping.paths = new HashMap<>();
+        if (!StringUtils.isBlank(email) && team != null) {
+            team.members.remove(standardise(email));
+            writeTeam(team);
         }
 
-        // Check to see if the requested path matches (or is a sub-path of) any mapping:
-        for (Map.Entry<String, Set<String>> mapping : accessMapping.paths.entrySet()) {
-            boolean isSubPath = StringUtils.startsWithIgnoreCase(mapping.getKey(), path);
-            boolean emailMatches = mapping.getValue().contains(email);
-            if (isSubPath && emailMatches) {
-                mapping.getValue().remove(email);
-            }
-        }
-        writeAccessMapping(accessMapping);
-    }
-
-    /**
-     * removes the specified user from the content owners, revoking access to read content from any path.
-     *
-     * @param email The user's email.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public void removeViewer(String email, Session session) throws IOException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            return;
-        }
-
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.paths == null) {
-            accessMapping.paths = new HashMap<>();
-        }
-
-        // Ensure the email address is not present for any path:
-        for (Map.Entry<String, Set<String>> mapping : accessMapping.paths.entrySet()) {
-            mapping.getValue().remove(email);
-        }
-        writeAccessMapping(accessMapping);
     }
 
     private boolean canEdit(String email, AccessMapping accessMapping) throws IOException {
         Set<String> digitalPublishingTeam = accessMapping.digitalPublishingTeam;
-        return digitalPublishingTeam != null && digitalPublishingTeam.contains(email);
+        return digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email));
     }
 
-    private boolean canView(String email, String path, AccessMapping accessMapping) {
+    private boolean canView(String email, CollectionDescription collectionDescription, AccessMapping accessMapping) throws IOException {
+        boolean result = false;
 
-        // Check to see if the requested path matches (or is a sub-path of) any mapping:
-        for (Map.Entry<String, Set<String>> mapping : accessMapping.paths.entrySet()) {
-            boolean isSubPath = StringUtils.startsWithIgnoreCase(path, mapping.getKey());
-            boolean emailMatches = mapping.getValue().contains(email);
-            if (isSubPath && emailMatches) {
-                return true;
+        // Check to see if the email is a member of a team associated with the given collection:
+        Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
+        if (teams != null) {
+            for (Team team : listTeams()) {
+                if (teams.contains(team.id)) {
+                    result = true;
+                }
             }
         }
 
-        // No match found:
-        return false;
+        return result;
     }
 
     private AccessMapping readAccessMapping() throws IOException {
-        Path path = permissions.resolve("accessMapping.json");
+        AccessMapping result = null;
 
-        // Read the configuration
-        if (Files.exists(path)) {
-            try (InputStream input = Files.newInputStream(path)) {
-                return Serialiser.deserialise(input, AccessMapping.class);
+        if (Files.exists(accessMappingPath)) {
+
+            // Read the configuration
+            accessMappingLock.readLock().lock();
+            try (InputStream input = Files.newInputStream(accessMappingPath)) {
+                result = Serialiser.deserialise(input, AccessMapping.class);
+            } finally {
+                accessMappingLock.readLock().unlock();
             }
+
+            // Initialise any missing objects:
+            if (result.administrators == null) {
+                result.administrators = new HashSet<>();
+            }
+            if (result.digitalPublishingTeam == null) {
+                result.digitalPublishingTeam = new HashSet<>();
+            }
+            if (result.collections == null) {
+                result.collections = new HashMap<>();
+            }
+
+        } else {
+
+            // Or generate a new one:
+            result = new AccessMapping();
+            result.administrators = new HashSet<>();
+            result.digitalPublishingTeam = new HashSet<>();
+            result.collections = new HashMap<>();
+            writeAccessMapping(result);
         }
 
-        // Or generate a new one:
-        AccessMapping accessMapping = new AccessMapping();
-        accessMapping.digitalPublishingTeam = new HashSet<>();
-        accessMapping.paths = new HashMap<>();
-
-        lock.readLock().lock();
-        try (OutputStream output = Files.newOutputStream(path)) {
-            Serialiser.serialise(output, accessMapping);
-        } finally {
-            lock.readLock().unlock();
-        }
-
-        return accessMapping;
+        return result;
     }
 
     private void writeAccessMapping(AccessMapping accessMapping) throws IOException {
 
-        lock.writeLock().lock();
+        accessMappingLock.writeLock().lock();
         try (OutputStream output = Files.newOutputStream(accessMappingPath)) {
             Serialiser.serialise(output, accessMapping);
         } finally {
-            lock.writeLock().unlock();
+            accessMappingLock.writeLock().unlock();
         }
     }
 
+    /**
+     * Retrieves the given {@link Team}, creating it if necessary.
+     *
+     * @param teamName The name of the team to retrieve.
+     * @return A {@link Team} with the given name.
+     * @throws IOException If a filesystem error occurs.
+     */
+    private Team readTeam(String teamName) throws IOException {
+        Team result = null;
+
+        Path path = teamPath(teamName);
+        if (path != null) {
+            if (Files.exists(path)) {
+
+                // Read the team
+                teamLock.readLock().lock();
+                try (InputStream input = Files.newInputStream(path)) {
+                    result = Serialiser.deserialise(input, Team.class);
+                } finally {
+                    teamLock.readLock().unlock();
+                }
+
+                // Initialise the memers set if it's missing:
+                if (result.members == null) {
+                    result.members = new HashSet<>();
+                }
+
+            } else {
+
+                // Generate a new team:
+                Team team = new Team();
+                team.name = teamName;
+                team.members = new HashSet<>();
+                writeTeam(team);
+            }
+
+        } else {
+            throw new BadRequestException("Invalid team name: " + teamName);
+        }
+
+        return result;
+    }
+
+    private void writeTeam(Team team) throws IOException {
+
+        Path path = teamPath(team);
+
+        if (path != null) {
+            teamLock.writeLock().lock();
+            try (OutputStream output = Files.newOutputStream(path)) {
+                Serialiser.serialise(output, team);
+            } finally {
+                teamLock.writeLock().unlock();
+            }
+        } else {
+            throw new BadRequestException("Invalid team: " + team);
+        }
+    }
+
+    private Path teamPath(Team team) {
+        Path result = null;
+        if (team != null) {
+            result = teamPath(team.name);
+        }
+        return result;
+    }
+
+    private Path teamPath(String teamName) {
+        Path result = null;
+        if (StringUtils.isNotBlank(teamName)) {
+            result = teamsPath.resolve(PathUtils.toFilename(teamName) + ".json");
+        }
+        return result;
+    }
+
+
+    private String standardise(String email) {
+        return PathUtils.standardise(email);
+    }
 
 }

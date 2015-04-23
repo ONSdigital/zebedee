@@ -29,6 +29,44 @@ public class PermissionsTest {
     }
 
     @Test
+    public void shouldAddAdministrator() throws IOException {
+
+        // Given
+        // A new Administrator user
+        String email = "blue@cat.com";
+        Session session = zebedee.sessions.create("jukesie@example.com");
+
+        // When
+        // We add the user as an administrator
+        zebedee.permissions.addAdministrator(email, session);
+
+        // Then
+        // The new user should get only admin permission:
+        assertTrue(zebedee.permissions.isAdministrator(email));
+        assertFalse(zebedee.permissions.canView(email, "/economy"));
+        assertFalse(zebedee.permissions.canEdit(email));
+    }
+
+    @Test
+    public void shouldAddAdministrator() throws IOException {
+
+        // Given
+        // A new Administrator user
+        String email = "blue@cat.com";
+        Session session = zebedee.sessions.create("jukesie@example.com");
+
+        // When
+        // We add the user as an administrator
+        zebedee.permissions.addAdministrator(email, session);
+
+        // Then
+        // The new user should get only admin permission:
+        assertTrue(zebedee.permissions.isAdministrator(email));
+        assertFalse(zebedee.permissions.canView(email, "/economy"));
+        assertFalse(zebedee.permissions.canEdit(email));
+    }
+
+    @Test
     public void shouldForbidEditToUnknownUser() throws IOException {
 
         // Given
@@ -184,7 +222,7 @@ public class PermissionsTest {
 
         // When
         // We check view access
-        zebedee.permissions.addViewer(email, "/economy", session);
+        ////zebedee.permissions.addViewer(email, "/economy", session);
 
         // Then
         // The new user should get only View permission:
@@ -235,7 +273,7 @@ public class PermissionsTest {
         // A Content owner user is added to a sub-path
         String email = "ronny@example.com";
         Session session = zebedee.sessions.create("jukesie@example.com");
-        zebedee.permissions.addViewer(email, "/economy/subpath", session);
+        ////zebedee.permissions.addViewer(email, "/economy/subpath", session);
 
         // When
         // We remove access from the parent path
@@ -244,25 +282,6 @@ public class PermissionsTest {
         // Then
         // The content owner's permissions should be removed from the sub-path
         assertFalse(zebedee.permissions.canView(email, "/economy/subpath"));
-        assertFalse(zebedee.permissions.canEdit(email));
-    }
-
-    @Test
-    public void shouldAddAdministrator() throws IOException {
-
-        // Given
-        // A new Administrator user
-        String email = "blue@cat.com";
-        Session session = zebedee.sessions.create("jukesie@example.com");
-
-        // When
-        // We add the user as an administrator
-        zebedee.permissions.addAdministrator(email, session);
-
-        // Then
-        // The new user should get only admin permission:
-        assertTrue(zebedee.permissions.isAdministrator(email));
-        assertFalse(zebedee.permissions.canView(email, "/economy"));
         assertFalse(zebedee.permissions.canEdit(email));
     }
 }

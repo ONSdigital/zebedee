@@ -119,7 +119,7 @@ public class Builder {
         // Set up some permissions:
         Path permissions = zebedee.resolve(Zebedee.PERMISSIONS);
         Files.createDirectories(permissions);
-        Path teams = permissions.resolve(Zebedee.TEAMS);
+        Path teams = zebedee.resolve(Zebedee.TEAMS);
         Files.createDirectories(teams);
 
         AccessMapping accessMapping = new AccessMapping();
@@ -154,6 +154,7 @@ public class Builder {
     }
 
     static int teamId;
+
     private Team createTeam(User user, String name, Path teams) throws IOException {
         Team team = new Team();
 
@@ -292,7 +293,7 @@ public class Builder {
         Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
         Files.createDirectory(path.resolve(Zebedee.SESSIONS));
         Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
-        Files.createDirectory(path.resolve(Zebedee.PERMISSIONS).resolve(Zebedee.TEAMS));
+        Files.createDirectory(path.resolve(Zebedee.TEAMS));
         System.out.println("Created zebedee at " + path);
         return path;
     }

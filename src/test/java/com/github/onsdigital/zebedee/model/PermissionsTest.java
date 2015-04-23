@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -16,20 +18,30 @@ public class PermissionsTest {
 
     Zebedee zebedee;
     Builder builder;
+    Collection inflationCollection;
+    Collection labourMarketCollection;
+
+    List<Builder> cleanup = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
+        inflationCollection = new Collection(builder.collections.get(0), zebedee);
+        labourMarketCollection = new Collection(builder.collections.get(1), zebedee);
     }
 
     @After
     public void tearDown() throws Exception {
         builder.delete();
+        for (Builder additional : cleanup) {
+            additional.delete();
+        }
+        cleanup.clear();
     }
 
     @Test
-    public void shouldAddAdministrator() throws IOException {
+    public void shouldBeAdministrator() throws IOException {
 
         // Given
         // A new Administrator user
@@ -43,7 +55,8 @@ public class PermissionsTest {
         // Then
         // The new user should get only admin permission:
         assertTrue(zebedee.permissions.isAdministrator(email));
-        assertFalse(zebedee.permissions.canView(email, "/economy"));
+        assertFalse(zebedee.permissions.canView(email, inflationCollection.description));
+        assertFalse(zebedee.permissions.canView(email, labourMarketCollection.description));
         assertFalse(zebedee.permissions.canEdit(email));
     }
 
@@ -62,8 +75,48 @@ public class PermissionsTest {
         // Then
         // The new user should get only admin permission:
         assertTrue(zebedee.permissions.isAdministrator(email));
-        assertFalse(zebedee.permissions.canView(email, "/economy"));
+        assertFalse(zebedee.permissions.canView(email, inflationCollection.description));
+        assertFalse(zebedee.permissions.canView(email, labourMarketCollection.description));
         assertFalse(zebedee.permissions.canEdit(email));
+    }
+
+    @Test
+    public void shouldRemoveAdministrator() throws IOException {
+
+        // Given
+        // An Administrator user
+        String email = "William.Henry.Harrison@whitehouse.gov";
+        Session session = zebedee.sessions.create("jukesie@example.com");
+        zebedee.permissions.addAdministrator(email, session);
+
+        // When
+        // We remove the user as an administrator
+        zebedee.permissions.removeAdministrator(email, session);
+
+        // Then
+        // The new user should get only admin permission:
+        assertFalse(zebedee.permissions.isAdministrator(email));
+        assertFalse(zebedee.permissions.canView(email, inflationCollection.description));
+        assertFalse(zebedee.permissions.canView(email, labourMarketCollection.description));
+        assertFalse(zebedee.permissions.canEdit(email));
+    }
+
+    @Test
+    public void shouldAddEditor() throws IOException {
+
+        // Given
+        // A new Digital Publishing user
+        String email = "blue@cat.com";
+        Session session = zebedee.sessions.create("jukesie@example.com");
+
+        // When
+        // We check view access
+        zebedee.permissions.addEditor(email, session);
+
+        // Then
+        // The new user should get both View and Edit permissions:
+        assertTrue(zebedee.permissions.canView(email, "/economy"));
+        assertTrue(zebedee.permissions.canEdit(email));
     }
 
     @Test
@@ -192,24 +245,6 @@ public class PermissionsTest {
         // Then
         // Computer should say no
         assertFalse(permission);
-    }
-
-    @Test
-    public void shouldAddDigitalPublisher() throws IOException {
-
-        // Given
-        // A new Digital Publishing user
-        String email = "blue@cat.com";
-        Session session = zebedee.sessions.create("jukesie@example.com");
-
-        // When
-        // We check view access
-        zebedee.permissions.addEditor(email, session);
-
-        // Then
-        // The new user should get both View and Edit permissions:
-        assertTrue(zebedee.permissions.canView(email, "/economy"));
-        assertTrue(zebedee.permissions.canEdit(email));
     }
 
     @Test

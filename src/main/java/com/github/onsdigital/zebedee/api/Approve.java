@@ -6,7 +6,6 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import java.io.IOException;
 

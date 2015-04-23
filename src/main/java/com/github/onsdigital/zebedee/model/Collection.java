@@ -186,7 +186,7 @@ public class Collection {
         Path result = null;
 
         // Does the user have permission tno see this content?
-        boolean permission = zebedee.permissions.canView(email, uri);
+        boolean permission = zebedee.permissions.canView(email, description);
 
         // Only show edited material if the user has permission:
         if (permission) {

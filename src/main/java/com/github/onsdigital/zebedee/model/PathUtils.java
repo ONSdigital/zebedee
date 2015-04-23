@@ -29,6 +29,17 @@ public class PathUtils {
                 MAX_LENGTH));
     }
 
+
+    /**
+     * Trims and lowercases the given string. Typically this is useful for email addresses rather than paths but
+     * it seemed wrong to create a generic utility class or a class specifically for this one method.
+     * @param string The string to be standardised. Can be null.
+     * @return A trimmed, lowercased copy of the string.
+     */
+    public static String standardise(String string) {
+        return StringUtils.trim(StringUtils.lowerCase(string));
+    }
+
     /**
      * Creates a new file at the given path, including any required parent directories.
      *

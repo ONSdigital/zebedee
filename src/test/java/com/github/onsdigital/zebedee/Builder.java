@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
@@ -125,10 +124,10 @@ public class Builder {
         accessMapping.digitalPublishingTeam.add(patricia.email);
         accessMapping.digitalPublishingTeam.add(freddy.email);
 
-        accessMapping.paths = new HashMap<>();
-        Set contentOwners = new HashSet<>();
-        contentOwners.add(ronny.email);
-        accessMapping.paths.put("/economy", contentOwners);
+        //accessMapping.paths = new HashMap<>();
+        //Set contentOwners = new HashSet<>();
+        //contentOwners.add(ronny.email);
+        //accessMapping.paths.put("/economy", contentOwners);
 
         Path path = permissions.resolve("accessMapping.json");
         try (OutputStream output = Files.newOutputStream(path)) {
@@ -259,6 +258,7 @@ public class Builder {
         Files.createDirectory(path.resolve(Zebedee.COLLECTIONS));
         Files.createDirectory(path.resolve(Zebedee.SESSIONS));
         Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
+        Files.createDirectory(path.resolve(Zebedee.PERMISSIONS).resolve(Zebedee.TEAMS));
         System.out.println("Created zebedee at " + path);
         return path;
     }

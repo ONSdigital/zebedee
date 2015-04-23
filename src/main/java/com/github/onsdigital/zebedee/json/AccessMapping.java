@@ -19,7 +19,7 @@ public class AccessMapping {
     public Set<String> digitalPublishingTeam;
 
     /**
-     * Content owners can be assigned access to specific paths in the taxonomy (and everything under those paths).
+     * Content owners can be assigned access to collections via one or more teams.
      */
-    public Map<String, Set<String>> paths;
+    public Map<String, Set<Integer>> collections;
 }

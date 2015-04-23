@@ -1,6 +1,10 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
@@ -8,10 +12,6 @@ import com.github.onsdigital.zebedee.json.Team;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,6 +62,48 @@ public class Permissions {
     }
 
     /**
+     * Adds the specified user to the administrators, giving them administrator permissions (but not content permissions).
+     * <p/>
+     * <p>If no administrator exists the first call will succeed otherwise </p>
+     *
+     * @param email The user's email.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void addAdministrator(String email, Session session) throws IOException {
+
+        // Allow the initial user to be set as an administrator:
+        if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
+            throw new UnauthorizedException("Session is not an administrator: " + session);
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.administrators == null) {
+            accessMapping.administrators = new HashSet<>();
+        }
+        accessMapping.administrators.add(standardise(email));
+        writeAccessMapping(accessMapping);
+    }
+
+    /**
+     * Removes the specified user from the administrators, revoking administrative permissions (but not content permissions).
+     *
+     * @param email The user's email.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public void removeAdministrator(String email, Session session) throws IOException {
+        if (session == null || !isAdministrator(session.email)) {
+            throw new UnauthorizedException("Session is not an administrator: " + session);
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        if (accessMapping.administrators == null) {
+            accessMapping.administrators = new HashSet<>();
+        }
+        accessMapping.administrators.remove(standardise(email));
+        writeAccessMapping(accessMapping);
+    }
+
+    /**
      * Determines whether the specified user has editing rights.
      *
      * @param email The user's email.
@@ -74,62 +116,6 @@ public class Permissions {
     }
 
     /**
-     * Determines whether the specified user has viewing rights.
-     *
-     * @param email                 The user's email.
-     * @param collectionDescription The collection to check access for.
-     * @return True if the user is a member of the Digital Publishing team or
-     * the user is a content owner with access to the given path or any parent path.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
-        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
-    }
-
-    /**
-     * Adds the specified user to the administrators, giving them administrator permissions (but not content permissions).
-     * <p/>
-     * <p>If no administrator exists the first call will succeed otherwise </p>
-     *
-     * @param email The user's email.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public void addAdministrator(String email, Session session) throws IOException {
-
-        // Allow the initial user to be set as an administrator:
-        if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
-        }
-
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.administrators == null) {
-            accessMapping.administrators = new HashSet<>();
-        }
-        accessMapping.administrators.add(email);
-        writeAccessMapping(accessMapping);
-    }
-
-    /**
-     * Removes the specified user from the administrators, revoking administrative permissions (but not content permissions).
-     *
-     * @param email The user's email.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public void removeAdministrator(String email, Session session) throws IOException {
-        if (session == null || !isAdministrator(session.email)) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
-        }
-
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.administrators == null) {
-            accessMapping.administrators = new HashSet<>();
-        }
-        accessMapping.administrators.remove(email);
-        writeAccessMapping(accessMapping);
-    }
-
-    /**
      * Adds the specified user to the Digital Publishing team, giving them access to read and write all content.
      *
      * @param email The user's email.
@@ -137,7 +123,7 @@ public class Permissions {
      */
     public void addEditor(String email, Session session) throws IOException {
         if (hasAdministrator() && !isAdministrator(session.email)) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -157,7 +143,7 @@ public class Permissions {
      */
     public void removeEditor(String email, Session session) throws IOException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -166,6 +152,20 @@ public class Permissions {
         }
         accessMapping.digitalPublishingTeam.remove(email);
         writeAccessMapping(accessMapping);
+    }
+
+    /**
+     * Determines whether the specified user has viewing rights.
+     *
+     * @param email                 The user's email.
+     * @param collectionDescription The collection to check access for.
+     * @return True if the user is a member of the Digital Publishing team or
+     * the user is a content owner with access to the given path or any parent path.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
+        AccessMapping accessMapping = readAccessMapping();
+        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
     }
 
     /**
@@ -251,7 +251,7 @@ public class Permissions {
      */
     public Team createTeam(String teamName, Session session) throws IOException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
         String filename = PathUtils.toFilename(teamName);
@@ -263,7 +263,7 @@ public class Permissions {
             id = Math.max(id, team.id);
             String teamFilename = PathUtils.toFilename(team.name);
             if (StringUtils.equalsIgnoreCase(filename, teamFilename)) {
-                throw new ClientErrorException("There is already a team matching this name.", HttpStatus.CONFLICT_409);
+                throw new ConflictException("There is already a team matching this name.");
             }
         }
 
@@ -286,7 +286,7 @@ public class Permissions {
      */
     public void renameTeam(Team update, Session session) throws IOException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
         if (update != null && StringUtils.isNotBlank(update.name)) {
@@ -323,7 +323,7 @@ public class Permissions {
      */
     public void deleteTeam(Team delete, Session session) throws IOException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
         if (delete != null && StringUtils.isNotBlank(delete.name)) {
@@ -357,7 +357,7 @@ public class Permissions {
      */
     public void addTeamMember(String email, Team team, Session session) throws IOException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
         if (!StringUtils.isBlank(email) && team != null) {
@@ -376,7 +376,7 @@ public class Permissions {
      */
     public void removeTeamMember(String email, Team team, Session session) throws IOException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new NotAuthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
         if (!StringUtils.isBlank(email) && team != null) {
@@ -399,7 +399,7 @@ public class Permissions {
         if (teams != null) {
             for (Team team : listTeams()) {
                 if (teams.contains(team.id)) {
-                    result = true;
+                    return team.members.contains(standardise(email));
                 }
             }
         }

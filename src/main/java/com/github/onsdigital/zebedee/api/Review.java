@@ -36,13 +36,23 @@ public class Review {
             return new ResultMessage("Collection not found.");
         }
 
-        // TODO Check user permissions HttpStatus.UNAUTHORISED_401
+        Session session = Root.zebedee.sessions.get(request);
+        if(Root.zebedee.permissions.canEdit(session.email) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return new ResultMessage("Review unauthorized.");
+        }
 
-        // Locate the path:
+        // Check the uri exists in this collection
         String uri = request.getParameter("uri");
+        if(collection.isInCollection(uri) == false) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            return new ResultMessage("URI is not complete.");
+        }
+
+        // Locate the path in the complete section
         java.nio.file.Path path = collection.complete.get(uri);
         if (path == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
             return new ResultMessage("URI is not complete.");
         }
 
@@ -53,7 +63,6 @@ public class Review {
         }
 
         // Attempt to review:
-        Session session = Root.zebedee.sessions.get(request);
         if (!collection.review(session.email, uri)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return new ResultMessage("URI was not reviewed.");

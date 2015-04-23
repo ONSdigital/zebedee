@@ -25,9 +25,10 @@ public class Transfer {
      *
      * @param request This should contain a X-Florence-Token header for the current session
      * @param response <ul>
+     *                 <li>If the either collection does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
      *                 <li>If the file does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
      *                 <li>If user not authorised to transfer:  {@link HttpStatus#UNAUTHORIZED_401}</li>
-     *                 <li>A file already exists in the second collection:  {@link HttpStatus#CONFLICT_409}</li>
+     *                 <li>A file with that name already exists in the second collection:  {@link HttpStatus#CONFLICT_409}</li>
      * @param params A {@link TransferRequest} object
      * @return success true/false
      * @throws IOException
@@ -35,35 +36,41 @@ public class Transfer {
     @POST
     public boolean move(HttpServletRequest request, HttpServletResponse response, TransferRequest params) throws IOException {
         boolean result = true;
+
+        // user has permission
         Session session = Root.zebedee.sessions.get(request);
+        if (!Root.zebedee.permissions.canEdit(session.email)){
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return false;
+        }
 
         // get the source collection
         Collection source = getSource(params,request);
 
         Path sourcePath = source.find(session.email,params.uri);
-        if (Files.notExists(sourcePath)){
+        if (Files.notExists(sourcePath)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
-            result = false;
+            return false;
         }
 
         // get the destination file
         Collection destination = Root.zebedee.getCollections().getCollection(params.destination);
+        if (destination == null) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            return false;
+        }
+
         Path destinationPath = destination.getInProgressPath(params.uri);
 
         if (Files.exists(destinationPath)){
             response.setStatus(HttpStatus.CONFLICT_409);
-            result = false;
+            return false;
         }
 
-        // user has permission
-        if (!Root.zebedee.permissions.canEdit(session.email)){
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            result = false;
-        }
+
 
         PathUtils.moveFilesInDirectory(sourcePath, destinationPath);
-
-        return result;
+        return true;
     }
 
     private Collection getSource(TransferRequest params, HttpServletRequest request) throws  IOException{

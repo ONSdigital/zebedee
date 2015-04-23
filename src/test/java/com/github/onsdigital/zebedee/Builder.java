@@ -30,7 +30,8 @@ public class Builder {
     public List<String> teams;
     public List<String> contentUris;
 
-    public User publisher; // accessible publishing team user
+    public User administrator;
+    public User publisher;
     public User reviewer;
 
     public Builder(Class<?> name) throws IOException {
@@ -81,6 +82,7 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(jukesie.email) + ".json"))) {
             Serialiser.serialise(outputStream, jukesie);
         }
+        administrator = jukesie;
 
         User patricia = new User();
         patricia.name = "Patricia Pumpkin";

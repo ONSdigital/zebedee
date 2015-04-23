@@ -37,7 +37,11 @@ public class Zebedee {
         Path users = path.resolve(USERS);
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
+<<<<<<< HEAD
         Path teams = path.resolve(TEAMS);
+=======
+        Path teams = path.resolve(PERMISSIONS).resolve(TEAMS);
+>>>>>>> Initial commit of permissions. Not compiling yet as need to fix tests.o
         if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
@@ -47,8 +51,12 @@ public class Zebedee {
         this.collections = collections;
         this.users = new Users(users, this);
         this.sessions = new Sessions(sessions);
+<<<<<<< HEAD
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
+=======
+        this.permissions = new Permissions(permissions, teams);
+>>>>>>> Initial commit of permissions. Not compiling yet as need to fix tests.o
     }
 
     /**
@@ -67,7 +75,11 @@ public class Zebedee {
         Files.createDirectory(path.resolve(USERS));
         Files.createDirectory(path.resolve(SESSIONS));
         Files.createDirectory(path.resolve(PERMISSIONS));
+<<<<<<< HEAD
         Files.createDirectory(path.resolve(TEAMS));
+=======
+        Files.createDirectory(path.resolve(PERMISSIONS).resolve(TEAMS));
+>>>>>>> Initial commit of permissions. Not compiling yet as need to fix tests.o
 
         Zebedee zebedee = new Zebedee(path);
 

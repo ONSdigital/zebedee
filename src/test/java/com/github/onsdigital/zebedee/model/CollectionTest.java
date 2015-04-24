@@ -4,7 +4,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentEventType;
 import org.apache.commons.io.FileUtils;
@@ -341,14 +340,11 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldReview() throws IOException {
+    public void shouldReviewWithReviewer() throws IOException {
 
         // Given
-        // The content exists, has been edited and reviewed:
-        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
-        collection.edit(email, uri);
-        collection.complete(email, uri);
+        // The content exists, has been edited and complete:
+        String uri = CreateCompleteContent();
 
         // When
         boolean reviewed = collection.review(builder.reviewer.email, uri);
@@ -363,22 +359,92 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldNotReviewIfTheSameUserCompletedContent() throws IOException {
+    public void shouldNotReviewAsPublisher() throws IOException {
 
         // Given
-        // The content exists, has been edited and reviewed:
-        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
-        collection.edit(email, uri);
-        collection.complete(email, uri);
+        // The content exists, has been edited and complete:
+        String uri = CreateCompleteContent();
 
-        // When
+        // When the original content creator attempts to review the content
         boolean reviewed = collection.review(email, uri);
 
         // Then
         assertFalse(reviewed);
         Path complete = builder.collections.get(1).resolve(Collection.COMPLETE);
         assertTrue(Files.exists(complete.resolve(uri.substring(1))));
+    }
+
+    @Test
+    public void shouldReviewIfInProgressAsReviewer() throws IOException {
+
+        // Given some content that has been edited and completed by a publisher:
+        String uri = CreateCompleteContent();
+
+        // When - the reviewer edits and reviews content
+        collection.edit(email, uri);
+        boolean reviewed = collection.review(builder.reviewer.email, uri);
+
+        // Then - the content is set to reviewed without going through completion.
+        assertTrue(reviewed);
+        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
+
+        // check an event has been created for the content being created.
+        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
+    }
+
+    private String CreatePublishedContent() throws IOException {
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        return uri;
+    }
+
+    private String CreateEditedContent() throws IOException {
+        String uri = CreatePublishedContent();
+        collection.edit(email, uri);
+        return uri;
+    }
+
+    private String CreateCompleteContent() throws IOException {
+        String uri = CreateEditedContent();
+        collection.complete(email, uri);
+        return uri;
+    }
+
+    @Test
+    public void shouldNotReviewIfInProgressAsPublisher() throws IOException {
+
+        // Given some content that has been edited and completed by a publisher:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        collection.edit(email, uri);
+        collection.complete(email, uri);
+        collection.edit(email, uri);
+
+        // When - A second publisher edits and reviews content
+        boolean reviewed = collection.review(email, uri);
+
+        // Then - the content is set to reviewed without going through completion.
+        assertFalse(reviewed);
+        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertTrue(Files.exists(edited.resolve(uri.substring(1))));
+    }
+
+    @Test
+    public void shouldNotReviewIfContentHasNotBeenCompleted() throws IOException {
+
+        // Given some content that has been edited by a publisher:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        builder.createPublishedFile(uri);
+        collection.edit(email, uri);
+
+        // When - A reviewer edits reviews content
+        boolean reviewed = collection.review(builder.reviewer.email, uri);
+
+        // Then - the content is not set to reviewed.
+        assertFalse(reviewed);
+        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertTrue(Files.exists(edited.resolve(uri.substring(1))));
     }
 
     @Test
@@ -452,10 +518,7 @@ public class CollectionTest {
 
         // Given
         // The content already exists:
-        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
-        collection.edit(email, uri);
-        collection.complete(email, uri);
+        String uri = CreateCompleteContent();
         builder.createReviewedFile(uri);
 
         // When

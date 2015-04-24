@@ -89,6 +89,9 @@ public class PermissionsTest {
         assertFalse(nullIsAdministrator);
     }
 
+    Split out
+    teams
+
     @Test
 
     public void shouldAddAdministrator() throws IOException {

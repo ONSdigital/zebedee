@@ -222,6 +222,132 @@ public class CollectionTest {
     }
 
     @Test
+    public void shouldDeleteAllFilesFromInProgressDirectory() throws IOException {
+
+        // Given a content instance with a json file and csv file in it.
+        String jsonFile = Random.id() + ".json";
+        String csvFile = Random.id() + ".csv";
+
+        builder.createInProgressFile("/" + jsonFile);
+        builder.createInProgressFile("/" + csvFile);
+
+        Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+
+        // When the delete method is called on the json file
+        boolean result = collection.deleteContent(jsonFile);
+
+        // Then both the json file and csv file are deleted.
+        assertTrue(result);
+        assertFalse(Files.exists(inProgress.resolve(jsonFile)));
+        assertFalse(Files.exists(inProgress.resolve(csvFile)));
+    }
+
+    @Test
+    public void shouldDeleteAllFilesFromCompleteDirectory() throws IOException {
+
+        // Given a content instance with a json file and csv file in it.
+        String jsonFile = Random.id() + ".json";
+        String csvFile = Random.id() + ".csv";
+
+        builder.createCompleteFile("/" + jsonFile);
+        builder.createCompleteFile("/" + csvFile);
+
+        Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
+
+        // When the delete method is called on the json file
+        boolean result = collection.deleteContent(jsonFile);
+
+        // Then both the json file and csv file are deleted.
+        assertTrue(result);
+        assertFalse(Files.exists(root.resolve(jsonFile)));
+        assertFalse(Files.exists(root.resolve(csvFile)));
+    }
+
+    @Test
+    public void shouldDeleteAllFilesFromReviewedDirectory() throws IOException {
+
+        // Given a content instance with a json file and csv file in it.
+        String jsonFile = Random.id() + ".json";
+        String csvFile = Random.id() + ".csv";
+
+        builder.createReviewedFile("/" + jsonFile);
+        builder.createReviewedFile("/" + csvFile);
+
+        Path root = builder.collections.get(1).resolve(Collection.REVIEWED);
+
+        // When the delete method is called on the json file
+        boolean result = collection.deleteContent(jsonFile);
+
+        // Then both the json file and csv file are deleted.
+        assertTrue(result);
+        assertFalse(Files.exists(root.resolve(jsonFile)));
+        assertFalse(Files.exists(root.resolve(csvFile)));
+    }
+
+    @Test
+    public void shouldDeleteOnlyGivenFileFromReviewedDirectory() throws IOException {
+
+        // Given a content instance with a json file and csv file in it.
+        String jsonFile = Random.id() + ".json";
+        String csvFile = Random.id() + ".csv";
+
+        builder.createReviewedFile("/" + jsonFile);
+        builder.createReviewedFile("/" + csvFile);
+
+        Path root = builder.collections.get(1).resolve(Collection.REVIEWED);
+
+        // When the delete method is called on the json file
+        boolean result = collection.deleteFile(jsonFile);
+
+        // Then both the json file and csv file are deleted.
+        assertTrue(result);
+        assertFalse(Files.exists(root.resolve(jsonFile)));
+        assertTrue(Files.exists(root.resolve(csvFile)));
+    }
+
+    @Test
+    public void shouldDeleteOnlyGivenFileFromCompleteDirectory() throws IOException {
+
+        // Given a content instance with a json file and csv file in it.
+        String jsonFile = Random.id() + ".json";
+        String csvFile = Random.id() + ".csv";
+
+        builder.createCompleteFile("/" + jsonFile);
+        builder.createCompleteFile("/" + csvFile);
+
+        Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
+
+        // When the delete method is called on the json file
+        boolean result = collection.deleteFile(jsonFile);
+
+        // Then both the json file and csv file are deleted.
+        assertTrue(result);
+        assertFalse(Files.exists(root.resolve(jsonFile)));
+        assertTrue(Files.exists(root.resolve(csvFile)));
+    }
+
+    @Test
+    public void shouldDeleteOnlyGivenFileFromInProgressDirectory() throws IOException {
+
+        // Given a content instance with a json file and csv file in it.
+        String jsonFile = Random.id() + ".json";
+        String csvFile = Random.id() + ".csv";
+
+        builder.createInProgressFile("/" + jsonFile);
+        builder.createInProgressFile("/" + csvFile);
+
+        Path root = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+
+        // When the delete method is called on the json file
+        boolean result = collection.deleteFile(jsonFile);
+
+        // Then both the json file and csv file are deleted.
+        assertTrue(result);
+        assertFalse(Files.exists(root.resolve(jsonFile)));
+        assertTrue(Files.exists(root.resolve(csvFile)));
+    }
+
+    @Test
     public void shouldEditPublished() throws IOException {
 
         // Given

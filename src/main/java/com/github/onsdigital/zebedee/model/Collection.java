@@ -354,10 +354,16 @@ public class Collection {
         boolean result = false;
         boolean permission = zebedee.permissions.canEdit(email);
         boolean userCompletedContent = didUserCompleteContent(email, uri);
+        boolean contentWasCompleted = contentWasCompleted(uri);
 
-        if (isComplete(uri) && permission && !userCompletedContent) {
+        if (permission && contentWasCompleted && !userCompletedContent) {
             // Move the complete copy to reviewed:
             Path source = complete.get(uri);
+
+            if (source == null) {
+                source = inProgress.get(uri);
+            }
+
             Path destination = reviewed.toPath(uri);
             PathUtils.moveFilesInDirectory(source, destination);
 
@@ -368,6 +374,17 @@ public class Collection {
         return result;
     }
 
+    private boolean contentWasCompleted(String uri) {
+
+        if (this.description.eventsByUri == null)
+            throw new IllegalStateException("This content has not been completed. No events found.");
+        ContentEvents contentEvents = this.description.eventsByUri.get(uri);
+        if (contentEvents == null)
+            throw new IllegalStateException("This content has not been completed. No events found.");
+
+        return this.description.eventsByUri.get(uri).hasEventForType(ContentEventType.COMPLETED);
+    }
+
     private boolean didUserCompleteContent(String email, String uri) {
 
         if (this.description.eventsByUri == null)
@@ -376,7 +393,7 @@ public class Collection {
         if (contentEvents == null)
             throw new IllegalStateException("This content has not been completed. No events found.");
 
-        boolean userCompletedContent = true;
+        boolean userCompletedContent = false;
         ContentEvent mostRecentCompletedEvent = this.description.eventsByUri.get(uri).mostRecentEventForType(ContentEventType.COMPLETED);
         if (mostRecentCompletedEvent != null) userCompletedContent = mostRecentCompletedEvent.email == email;
         return userCompletedContent;
@@ -415,7 +432,6 @@ public class Collection {
     }
 
     /**
-     *
      * @return the total uri's in all edit folders
      */
     public int uriCount() {

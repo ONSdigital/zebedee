@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.fileupload.FileItem;
@@ -23,20 +22,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-/**
- * Created by david on 10/03/2015.
- */
-
 @Api
 public class Content {
 
 
     /**
      * Retrieves file content for the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
-     *
+     * <p/>
      * <p>This may be working content from the collection. Defaults to current website content</p>
      *
-     * @param request This should contain a X-Florence-Token header for the current session
+     * @param request  This should contain a X-Florence-Token header for the current session
      * @param response <ul>
      *                 <li>If success: the contents of the object at the uri</li>
      *                 <li>If no uri supplied:  {@link HttpStatus#BAD_REQUEST_400}</li>
@@ -54,7 +49,7 @@ public class Content {
             return;
         }
 
-        java.nio.file.Path path = null;
+        Path path = null;
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         if (collection != null) {
             Session session = Root.zebedee.sessions.get(request);
@@ -67,23 +62,25 @@ public class Content {
         }
 
         // Check the path exists:
-        if (!java.nio.file.Files.exists(path)) {
+        if (!Files.exists(path)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return;
         }
 
         // Check we're requesting a file:
-        if (java.nio.file.Files.isDirectory(path)) {
+        if (Files.isDirectory(path)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return;
         }
 
         // Guess the MIME type
         String contentType = Files.probeContentType(path);
-        if(contentType!=null) { response.setContentType(contentType); }
+        if (contentType != null) {
+            response.setContentType(contentType);
+        }
 
         // Write the file to the response
-        try (InputStream input = java.nio.file.Files.newInputStream(path)) {
+        try (InputStream input = Files.newInputStream(path)) {
             org.apache.commons.io.IOUtils.copy(input, response.getOutputStream());
         }
 
@@ -93,12 +90,11 @@ public class Content {
     /**
      * Posts file content to the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
      *
-     *
-     * @param request This should contain a X-Florence-Token header for the current session
-     *                <ul>Body should contain
-     *                <li>Page content - JSON Serialized content</li>
-     *                <li>File Upload - A multipart content object with part "file" as binary data </li>
-     *                </ul>
+     * @param request  This should contain a X-Florence-Token header for the current session
+     *                 <ul>Body should contain
+     *                 <li>Page content - JSON Serialized content</li>
+     *                 <li>File Upload - A multipart content object with part "file" as binary data </li>
+     *                 </ul>
      * @param response <ul>
      *                 <li>If success: the contents of the object at the uri</li>
      *                 <li>If no authorisation:  {@link HttpStatus#UNAUTHORIZED_401}</li>
@@ -128,7 +124,7 @@ public class Content {
         }
 
         // Find the collection if it exists
-        java.nio.file.Path path = null;
+        Path path = null;
         Collection collection = Collections.getCollection(request);
         if (collection != null) {
             path = collection.find(session.email, uri); // see if the file exists anywhere.
@@ -160,13 +156,13 @@ public class Content {
             path = collection.getInProgressPath(uri);
         }
 
-        if (!java.nio.file.Files.exists(path)) {
+        if (!Files.exists(path)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return false;
         }
 
         // Check we're requesting a file:
-        if (java.nio.file.Files.isDirectory(path)) {
+        if (Files.isDirectory(path)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return false;
         }
@@ -174,14 +170,14 @@ public class Content {
 
         // Detect whether this is a multipart request
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-        if(isMultipart) { // If it is we are going to do an xls/csv file upload
+        if (isMultipart) { // If it is we are going to do an xls/csv file upload
             try {
                 postDataFile(request, response, path);
             } catch (Exception e) {
 
             }
         } else { // If it isn't we are going to be doing a straightforward content update
-            try (OutputStream output = java.nio.file.Files.newOutputStream(path)) {
+            try (OutputStream output = Files.newOutputStream(path)) {
                 org.apache.commons.io.IOUtils.copy(requestBody, output);
             }
         }
@@ -198,8 +194,9 @@ public class Content {
         ServletFileUpload upload = new ServletFileUpload(factory);
 
         // Set up a progress listener that we can use to power a progress bar
-        ProgressListener progressListener = new ProgressListener(){
+        ProgressListener progressListener = new ProgressListener() {
             private long megaBytes = -1;
+
             public void update(long pBytesRead, long pContentLength, int pItems) {
                 long mBytes = pBytesRead / 1000000;
                 if (megaBytes == mBytes) {
@@ -214,7 +211,7 @@ public class Content {
         List<FileItem> items = upload.parseRequest(request);
 
         // Process the items
-        for(FileItem item: items) {
+        for (FileItem item : items) {
             item.write(path.toFile());
         }
     }
@@ -223,8 +220,7 @@ public class Content {
     /**
      * Deletes file content from the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
      *
-     *
-     * @param request This should contain a X-Florence-Token header for the current session
+     * @param request  This should contain a X-Florence-Token header for the current session
      * @param response <ul>
      *                 <li>If success: {@link HttpStatus#OK_200}</li>
      *                 <li>If no uri parameter:  {@link HttpStatus#BAD_REQUEST_400}</li>
@@ -246,7 +242,7 @@ public class Content {
         // TODO User has delete access to the file HttpStatus#UNAUTHORIZED_401
 
         // Get the collection and the session
-        java.nio.file.Path path = null;
+        Path path = null;
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         Session session = Root.zebedee.sessions.get(request);
@@ -267,12 +263,21 @@ public class Content {
             return;
         }
 
-        // Delete the file
-        if( collection.deleteContent(session.email, uri) ) {
+        boolean deleted = false;
+
+        if (Files.isDirectory(path)) {
+            deleted = collection.deleteContent(session.email, uri);
+            ;
+        } else {
+            deleted = collection.deleteFile(uri);
+        }
+
+        if (deleted) {
             response.setStatus(HttpStatus.OK_200);
         } else {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
         }
+
         return;
     }
 }

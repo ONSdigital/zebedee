@@ -489,11 +489,11 @@ public class Collection {
         boolean hasDeleted = true;
 
         if (isInProgress(uri)) {
-            PathUtils.deleteFilesInDirectory(inProgress.path.resolve(uri));
+            PathUtils.deleteFilesInDirectory(inProgress.toPath(uri));
         } else if (isComplete(uri)) {
-            PathUtils.deleteFilesInDirectory(complete.path.resolve(uri));
+            PathUtils.deleteFilesInDirectory(complete.toPath(uri));
         } else if (isReviewed(uri)) {
-            PathUtils.deleteFilesInDirectory(reviewed.path.resolve(uri));
+            PathUtils.deleteFilesInDirectory(reviewed.toPath(uri));
         } else {
             hasDeleted = false;
         }

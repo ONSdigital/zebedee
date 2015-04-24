@@ -38,10 +38,14 @@ public class Zebedee {
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
 <<<<<<< HEAD
+<<<<<<< HEAD
         Path teams = path.resolve(TEAMS);
 =======
         Path teams = path.resolve(PERMISSIONS).resolve(TEAMS);
 >>>>>>> Initial commit of permissions. Not compiling yet as need to fix tests.o
+=======
+        Path teams = path.resolve(TEAMS);
+>>>>>>> More weird merges.
         if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
@@ -52,11 +56,16 @@ public class Zebedee {
         this.users = new Users(users, this);
         this.sessions = new Sessions(sessions);
 <<<<<<< HEAD
+<<<<<<< HEAD
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
 =======
         this.permissions = new Permissions(permissions, teams);
 >>>>>>> Initial commit of permissions. Not compiling yet as need to fix tests.o
+=======
+        this.permissions = new Permissions(permissions, this);
+        this.teams = new Teams(teams, this);
+>>>>>>> More weird merges.
     }
 
     /**
@@ -76,10 +85,14 @@ public class Zebedee {
         Files.createDirectory(path.resolve(SESSIONS));
         Files.createDirectory(path.resolve(PERMISSIONS));
 <<<<<<< HEAD
+<<<<<<< HEAD
         Files.createDirectory(path.resolve(TEAMS));
 =======
         Files.createDirectory(path.resolve(PERMISSIONS).resolve(TEAMS));
 >>>>>>> Initial commit of permissions. Not compiling yet as need to fix tests.o
+=======
+        Files.createDirectory(path.resolve(TEAMS));
+>>>>>>> More weird merges.
 
         Zebedee zebedee = new Zebedee(path);
 

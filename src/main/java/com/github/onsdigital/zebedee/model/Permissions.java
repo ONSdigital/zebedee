@@ -39,12 +39,9 @@ public class Permissions {
         System.out.println("Access mapping path: " + accessMappingPath);
     }
 
-
-    cp src.bak/main/java/com/github/onsdigital/zebedee/model/Permissions.java src/main/java/com/github/onsdigital/zebedee/model/Permissions.java
-    cp src.bak/test/java/com/github/onsdigital/zebedee/model/PermissionsTest.java src/test/java/com/github/onsdigital/zebedee/model/PermissionsTest.java
-    cp src.bak/test/java/com/github/onsdigital/zebedee/Builder.java src/test/java/com/github/onsdigital/zebedee/Builder.java
-    git add src
-    git rebase --continue
+    public boolean canView(String email, CollectionDescription collectionDescription) {
+        return true;
+    }
 
     /**
      * Determines whether the specified user has administator permissions.

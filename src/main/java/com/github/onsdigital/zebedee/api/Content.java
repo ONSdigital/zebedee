@@ -245,11 +245,13 @@ public class Content {
 
         // TODO User has delete access to the file HttpStatus#UNAUTHORIZED_401
 
-        // Get the collection
+        // Get the collection and the session
         java.nio.file.Path path = null;
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+
+        Session session = Root.zebedee.sessions.get(request);
+
         if (collection != null) {
-            Session session = Root.zebedee.sessions.get(request);
             path = collection.find(session.email, uri);
         }
 
@@ -266,7 +268,7 @@ public class Content {
         }
 
         // Delete the file
-        if( collection.deleteContent(uri) ) {
+        if( collection.deleteContent(session.email, uri) ) {
             response.setStatus(HttpStatus.OK_200);
         } else {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);

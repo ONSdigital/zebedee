@@ -450,15 +450,17 @@ public class Collection {
      *
      * @return True if the file system has been amended
      */
-    public boolean deleteContent(String uri) throws IOException {
+    public boolean deleteContent(String email, String uri) throws IOException {
         // Find the relevant collection for the uri and delete
+        boolean hasDeleted = false;
         if(isInProgress(uri)) {
-            return inProgress.delete(uri);
+            hasDeleted = inProgress.delete(uri);
         } else if (isComplete(uri)) {
-            return complete.delete(uri);
+            hasDeleted = complete.delete(uri);
         } else if (isReviewed(uri)) {
-            return inProgress.delete(uri);
+            hasDeleted = inProgress.delete(uri);
         }
+        if(hasDeleted) { AddEvent(uri, new ContentEvent(new Date(), ContentEventType.DELETED, email )); }
         return false;
     }
 }

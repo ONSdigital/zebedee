@@ -48,8 +48,8 @@ public class Permission {
 
         // Content owner
         if (StringUtils.isNotBlank(permissionDefinition.teamName)) {
-            Team team = Root.zebedee.permissions.findTeam(permissionDefinition.teamName);
-            Root.zebedee.permissions.addTeamMember(permissionDefinition.email, team, session);
+            Team team = Root.zebedee.teams.findTeam(permissionDefinition.teamName);
+            Root.zebedee.teams.addTeamMember(permissionDefinition.email, team, session);
         }
 
         return "Permissions updated for " + permissionDefinition.email;
@@ -85,8 +85,8 @@ public class Permission {
 
         // Content owner
         if (StringUtils.isNotBlank(permissionDefinition.teamName)) {
-            Team team = Root.zebedee.permissions.findTeam(permissionDefinition.teamName);
-            Root.zebedee.permissions.removeTeamMember(permissionDefinition.email, team, session);
+            Team team = Root.zebedee.teams.findTeam(permissionDefinition.teamName);
+            Root.zebedee.teams.removeTeamMember(permissionDefinition.email, team, session);
         }
 
         return "Permissions updated for " + permissionDefinition.email;

@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class PermissionsTest {
 
@@ -88,11 +89,6 @@ public class PermissionsTest {
         assertFalse(unknownIsAdministrator);
         assertFalse(nullIsAdministrator);
     }
-
-    Split out
-    teams
-
-    @Test
 
     public void shouldAddAdministrator() throws IOException {
 

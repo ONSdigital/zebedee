@@ -39,10 +39,6 @@ public class Permissions {
         System.out.println("Access mapping path: " + accessMappingPath);
     }
 
-    public boolean canView(String email, CollectionDescription collectionDescription) {
-        return true;
-    }
-
     /**
      * Determines whether the specified user has administator permissions.
      *
@@ -230,7 +226,7 @@ public class Permissions {
         // Check to see if the email is a member of a team associated with the given collection:
         Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
         if (teams != null) {
-            for (Team team : zebedee.permissions.listTeams()) {
+            for (Team team : zebedee.teams.listTeams()) {
                 if (teams.contains(team.id)) {
                     return team.members.contains(standardise(email));
                 }

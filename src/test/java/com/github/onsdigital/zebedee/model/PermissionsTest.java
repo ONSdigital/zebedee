@@ -14,7 +14,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class PermissionsTest {
 
@@ -63,7 +62,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldBeAdministrator() throws IOException {
+    public void onlyAdminShouldBeAdministrator() throws IOException {
 
         // Given
         // A bunch of user email addresses (NB case-insensitive)
@@ -90,7 +89,11 @@ public class PermissionsTest {
         assertFalse(nullIsAdministrator);
     }
 
+    Split out
+    teams
+
     @Test
+
     public void shouldAddAdministrator() throws IOException {
 
         // Given

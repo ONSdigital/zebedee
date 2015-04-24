@@ -234,12 +234,14 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(jsonFile);
+        boolean result = collection.deleteContent(email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
         assertFalse(Files.exists(inProgress.resolve(jsonFile)));
         assertFalse(Files.exists(inProgress.resolve(csvFile)));
+        // check an event has been created for the content being deleted.
+        collection.description.eventsByUri.get(jsonFile).hasEventForType(ContentEventType.DELETED);
     }
 
     @Test
@@ -255,12 +257,13 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(jsonFile);
+        boolean result = collection.deleteContent(email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
         assertFalse(Files.exists(root.resolve(jsonFile)));
         assertFalse(Files.exists(root.resolve(csvFile)));
+        collection.description.eventsByUri.get(jsonFile).hasEventForType(ContentEventType.DELETED);
     }
 
     @Test
@@ -276,12 +279,13 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.REVIEWED);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(jsonFile);
+        boolean result = collection.deleteContent(email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
         assertFalse(Files.exists(root.resolve(jsonFile)));
         assertFalse(Files.exists(root.resolve(csvFile)));
+        collection.description.eventsByUri.get(jsonFile).hasEventForType(ContentEventType.DELETED);
     }
 
     @Test

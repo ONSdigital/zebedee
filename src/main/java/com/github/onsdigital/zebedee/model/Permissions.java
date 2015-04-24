@@ -119,15 +119,15 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addEditor(String email, Session session) throws IOException {
-        if (hasAdministrator() && !isAdministrator(session.email)) {
+        if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.digitalPublishingTeam == null) {
-            accessMapping.digitalPublishingTeam = new HashSet<>();
-        }
-        accessMapping.digitalPublishingTeam.add(email);
+        //if (accessMapping.digitalPublishingTeam == null) {
+        //    accessMapping.digitalPublishingTeam = new HashSet<>();
+        //}
+        accessMapping.digitalPublishingTeam.add(PathUtils.standardise(email));
         writeAccessMapping(accessMapping);
     }
 
@@ -144,9 +144,9 @@ public class Permissions {
         }
 
         AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.digitalPublishingTeam == null) {
-            accessMapping.digitalPublishingTeam = new HashSet<>();
-        }
+        //if (accessMapping.digitalPublishingTeam == null) {
+        //    accessMapping.digitalPublishingTeam = new HashSet<>();
+        //}
         accessMapping.digitalPublishingTeam.remove(email);
         writeAccessMapping(accessMapping);
     }

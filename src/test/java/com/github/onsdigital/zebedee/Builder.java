@@ -129,7 +129,6 @@ public class Builder {
 
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.digitalPublishingTeam.add(patricia.email);
-        accessMapping.digitalPublishingTeam.add(freddy.email);
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.id = Random.id();

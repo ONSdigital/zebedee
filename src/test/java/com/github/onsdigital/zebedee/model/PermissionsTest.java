@@ -41,6 +41,8 @@ public class PermissionsTest {
         cleanup.clear();
     }
 
+    //// Administrator tests ////////////////////////////////////////////////////////////////////////////////////////////
+
     @Test
     public void administratorShouldOnlyHaveAdminPermission() throws IOException {
 
@@ -88,9 +90,6 @@ public class PermissionsTest {
         assertFalse(unknownIsAdministrator);
         assertFalse(nullIsAdministrator);
     }
-
-    Split out
-    teams
 
     @Test
 
@@ -286,6 +285,188 @@ public class PermissionsTest {
         // There should be no administrator
         assertFalse(result);
     }
+
+    //// Publisher tests ////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @Test
+    public void publisherShouldHaveEditAndViewPermission() throws IOException {
+
+        // Given
+        // The Administrator user (NB case-insensitive)
+        String email = builder.publisher.email.toUpperCase();
+
+        // When
+        // We add the user as an administrator
+        boolean adminPermission = zebedee.permissions.isAdministrator(email);
+        boolean editPermission = zebedee.permissions.canEdit(email);
+        boolean viewPermission = zebedee.permissions.canView(email, labourMarketCollection.description);
+
+        // Then
+        // The new user should get only admin permission:
+        assertFalse(adminPermission);
+        assertTrue(editPermission);
+        assertTrue(viewPermission);
+    }
+
+    @Test
+    public void onlyPublisherShouldBePublisher() throws IOException {
+
+        // Given
+        // A bunch of user email addresses (NB case-insensitive)
+        String administratorEmail = builder.administrator.email.toUpperCase();
+        String publisherEmail = builder.publisher.email.toUpperCase();
+        String viewerEmail = builder.reviewer.email.toUpperCase();
+        String unknownEmail = "unknown@example.com";
+        String nullEmail = null;
+
+        // When
+        // We ask if they are publishers:
+        boolean adminIsPublisher = zebedee.permissions.canEdit(administratorEmail);
+        boolean publisherIsPublisher = zebedee.permissions.canEdit(publisherEmail);
+        boolean viewerIsPublisher = zebedee.permissions.canEdit(viewerEmail);
+        boolean unknownIsPublisher = zebedee.permissions.canEdit(unknownEmail);
+        boolean nullIsPublisher = zebedee.permissions.canEdit(nullEmail);
+
+        // Then
+        // Only the publisher should be, and null should not give an error
+        assertFalse(adminIsPublisher);
+        assertTrue(publisherIsPublisher);
+        assertFalse(viewerIsPublisher);
+        assertFalse(unknownIsPublisher);
+        assertFalse(nullIsPublisher);
+    }
+
+    @Test
+
+    public void shouldAddPublisher() throws IOException {
+
+        // Given
+        // A new publisher user
+        String email = "Harper.Collins@publishing.team";
+        Session session = zebedee.sessions.create(builder.administrator.email);
+
+        // When
+        // We add the user as a publisher (NB case-insensitive)
+        zebedee.permissions.addEditor(email.toUpperCase(), session);
+
+        // Then
+        // The new user should get publish permission:
+        assertTrue(zebedee.permissions.canEdit(email));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotAddPublisherIfPublisher() throws IOException {
+
+        // Given
+        // A new publisher user
+        String email = "Some.Guy@example.com";
+        Session session = zebedee.sessions.create(builder.publisher.email);
+
+        // When
+        // We add the user as a publisher (NB case-insensitive)
+        zebedee.permissions.addEditor(email.toUpperCase(), session);
+
+        // Then
+        // We should get unauthorized
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotAddPublisherIfViewer() throws IOException {
+
+        // Given
+        // A new publisher user
+        String email = "Some.Guy@example.com";
+        Session session = zebedee.sessions.create(builder.reviewer.email);
+
+        // When
+        // We add the user as a publisher (NB case-insensitive)
+        zebedee.permissions.addEditor(email.toUpperCase(), session);
+
+        // Then
+        // We should get unauthorized
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotAddPublisherIfNotLoggedIn() throws IOException {
+
+        // Given
+        // A new publisher user
+        String email = "Some.Guy@example.com";
+        Session session = null;
+
+        // When
+        // We add the user as a publisher (NB case-insensitive)
+        zebedee.permissions.addEditor(email.toUpperCase(), session);
+
+        // Then
+        // We should get unauthorized
+    }
+
+    @Test
+    public void shouldRemovePublisher() throws IOException {
+
+        // Given
+        // A short-lived publisher user (NB case-insensitive)
+        String email = "Pearson.Longman@whitehouse.gov";
+        Session session = zebedee.sessions.create("jukesie@example.com");
+        zebedee.permissions.addAdministrator(email.toUpperCase(), session);
+
+        // When
+        // We remove the user as a publisher
+        zebedee.permissions.removeEditor(email, session);
+
+        // Then
+        // The new user should get no publish permission
+        assertFalse(zebedee.permissions.canEdit(email));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotRemovePublisherIfPublisher() throws IOException {
+
+        // Given
+        // Users with insufficient permission
+        Session publisher = zebedee.sessions.create(builder.publisher.email);
+
+        // When
+        // We remove the user as an administrator
+        zebedee.permissions.removeEditor(builder.publisher.email, publisher);
+
+        // Then
+        // The administrator should not have been removed
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotRemovePublisherIfViewer() throws IOException {
+
+        // Given
+        // Users with insufficient permission
+        Session viewer = zebedee.sessions.create(builder.reviewer.email);
+
+        // When
+        // We remove the user as an administrator
+        zebedee.permissions.removeEditor(builder.publisher.email, viewer);
+
+        // Then
+        // The administrator should not have been removed
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotRemovePublisherIfNotLoggedIn() throws IOException {
+
+        // Given
+        // No login session
+        Session notLoggedIn = null;
+
+        // When
+        // We remove the user as an administrator
+        zebedee.permissions.removeEditor(builder.publisher.email, notLoggedIn);
+
+        // Then
+        // The administrator should not have been removed
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
 //    @Test
 //    public void shouldAddEditor() throws IOException {

@@ -46,6 +46,10 @@ public class Transfer {
 
         // get the source collection
         Collection source = getSource(params,request);
+        if(source == null) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            return false;
+        }
 
         Path sourcePath = source.find(session.email,params.uri);
         if (Files.notExists(sourcePath)) {

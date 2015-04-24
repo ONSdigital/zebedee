@@ -172,23 +172,30 @@ public class Content {
         Path path = toPath(uri);
 
         if (Files.exists(path)) { // If there is a file to be deleted
-
-            Files.delete(path); // Delete it
-
-            // Delete any empty firectories left in the folder tree by walking up the folder structure
-            Path folder = path.getParent();
-            while (!Files.isSameFile(this.path, folder)) { // Go no further than the Content root
-                List<Path> files = new ArrayList<>();
-                listFiles(folder, files, "*");
-                if (files.size() == 0) { // If the folder is empty
-                    FileUtils.deleteDirectory(folder.toFile());
-                    folder = folder.getParent();
-                } else {
-                    break;
-                }
-            }
+            Files.delete(path);
+            deleteEmptyParentDirectories(path);
             return true;
         }
         return false;
+    }
+
+    /**
+     * Delete any empty directories left in the folder tree by walking up the folder structure
+     *
+     * @param path
+     * @throws IOException
+     */
+    private void deleteEmptyParentDirectories(Path path) throws IOException {
+        Path folder = path.getParent();
+        while (!Files.isSameFile(this.path, folder)) { // Go no further than the Content root
+            List<Path> files = new ArrayList<>();
+            listFiles(folder, files, "*");
+            if (files.size() == 0) { // If the folder is empty
+                FileUtils.deleteDirectory(folder.toFile());
+                folder = folder.getParent();
+            } else {
+                break;
+            }
+        }
     }
 }

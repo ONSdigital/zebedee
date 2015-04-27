@@ -38,15 +38,15 @@ function run_tests {
 
 
 # update all projects concurrently with & wait
-#update_branch https://github.com/ONSdigital/florence.git $FLORENCE_DIRECTORY develop &
+update_branch https://github.com/ONSdigital/florence.git $FLORENCE_DIRECTORY develop &
 update_branch https://github.com/Carboni/zebedee.git $ZEBEDEE_DIRECTORY develop
-#update_branch https://github.com/ONSdigital/tredegar.git $TREDEGAR_DIRECTORY develop
-#wait
+update_branch https://github.com/ONSdigital/tredegar.git $TREDEGAR_DIRECTORY develop
+wait
 
-#$FLORENCE_DIRECTORY/run.sh &
-$ZEBEDEE_DIRECTORY/files.sh
-#$TREDEGAR_DIRECTORY/run.sh
-#wait
+$FLORENCE_DIRECTORY/run.sh &
+$ZEBEDEE_DIRECTORY/files.sh &
+$TREDEGAR_DIRECTORY/run.sh
+wait
 
 cd $ROOT_DIRECTORY
 

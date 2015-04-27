@@ -32,7 +32,6 @@ public class Permissions {
     public Permissions(Path permissions, Zebedee zebedee) {
         this.zebedee = zebedee;
         accessMappingPath = permissions.resolve("accessMapping.json");
-        System.out.println("Access mapping path: " + accessMappingPath);
     }
 
     /**

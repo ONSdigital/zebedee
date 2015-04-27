@@ -76,17 +76,17 @@ public class Teams {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
-        String filename = PathUtils.toFilename(teamName);
+        Path path = teamPath(teamName);
         int id = 0;
 
         // Check for a name conflict:
-        List<Team> teams = listTeams();
-        for (Team team : teams) {
+        if (Files.exists(path)) {
+            throw new ConflictException("There is already a team matching this name.");
+        }
+
+        // Work out the next id:
+        for (Team team : listTeams()) {
             id = Math.max(id, team.id);
-            String teamFilename = PathUtils.toFilename(team.name);
-            if (StringUtils.equalsIgnoreCase(filename, teamFilename)) {
-                throw new ConflictException("There is already a team matching this name.");
-            }
         }
 
         // Create the team object:
@@ -113,22 +113,34 @@ public class Teams {
 
         if (update != null && StringUtils.isNotBlank(update.name)) {
 
-            // Find the team to update:
-            Team existing = null;
-            List<Team> teams = listTeams();
-            for (Team team : teams) {
-                if (update.id == team.id) {
-                    existing = update;
-                }
-            }
-            if (existing == null) {
-                throw new NotFoundException("Team ID not found: " + update);
-            }
+            // Check for duplicate
+            if (teamExists(update.name)) {
 
-            // Create a file with the new name and then delete the old one:
-            if (!StringUtils.equals(PathUtils.toFilename(existing.name), PathUtils.toFilename(update.name))) {
-                writeTeam(update);
-                Files.delete(teamPath(existing));
+                // NB this makes attempting to rename a team to the same name a no-op
+                Team team = findTeam(update.name);
+                if (team.id != update.id) {
+                    throw new ConflictException("Cannot rename: a team already exists with this name.");
+                }
+
+            } else {
+
+                // Find the team to update:
+                Team existing = null;
+                List<Team> teams = listTeams();
+                for (Team team : teams) {
+                    if (update.id == team.id) {
+                        existing = update;
+                    }
+                }
+                if (existing == null) {
+                    throw new NotFoundException("Team ID not found: " + update);
+                }
+
+                // Create a file with the new name and then delete the old one:
+                if (!Files.exists(teamPath(update))) {
+                    writeTeam(update);
+                    Files.delete(teamPath(existing));
+                }
             }
 
         } else {
@@ -148,7 +160,7 @@ public class Teams {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
 
-        if (delete != null && StringUtils.isNotBlank(delete.name)) {
+        if (delete != null) {
 
             // Find the team to update:
             Team existing = null;

@@ -477,7 +477,7 @@ public class CollectionTest {
         String uri = CreateCompleteContent();
 
         // When
-        boolean reviewed = collection.review(builder.reviewer.email, uri);
+        boolean reviewed = collection.review(builder.reviewer1.email, uri);
 
         // Then
         assertTrue(reviewed);
@@ -512,7 +512,7 @@ public class CollectionTest {
 
         // When - the reviewer edits and reviews content
         collection.edit(email, uri);
-        boolean reviewed = collection.review(builder.reviewer.email, uri);
+        boolean reviewed = collection.review(builder.reviewer1.email, uri);
 
         // Then - the content is set to reviewed without going through completion.
         assertTrue(reviewed);
@@ -569,7 +569,7 @@ public class CollectionTest {
         collection.edit(email, uri);
 
         // When - A reviewer edits reviews content
-        boolean reviewed = collection.review(builder.reviewer.email, uri);
+        boolean reviewed = collection.review(builder.reviewer1.email, uri);
 
         // Then - the content is not set to reviewed.
         assertFalse(reviewed);

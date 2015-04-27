@@ -32,7 +32,8 @@ public class Builder {
 
     public User administrator;
     public User publisher;
-    public User reviewer;
+    public User reviewer1;
+    public User reviewer2;
 
     public Builder(Class<?> name) throws IOException {
 
@@ -102,7 +103,7 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(freddy.email) + ".json"))) {
             Serialiser.serialise(outputStream, freddy);
         }
-        reviewer = freddy;
+        reviewer1 = freddy;
 
         User ronny = new User();
         ronny.name = "Ronny Roller";
@@ -112,6 +113,7 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(ronny.email) + ".json"))) {
             Serialiser.serialise(outputStream, ronny);
         }
+        reviewer2 = ronny;
 
         Path sessions = zebedee.resolve(Zebedee.SESSIONS);
         Files.createDirectories(sessions);
@@ -261,7 +263,7 @@ public class Builder {
         session.email = email;
 
         // Determine the path in which to create the session Json
-        Path sessionPath = null;
+        Path sessionPath;
         String sessionFileName = PathUtils.toFilename(session.id);
         sessionFileName += ".json";
         sessionPath = zebedee.resolve(Zebedee.SESSIONS).resolve(sessionFileName);

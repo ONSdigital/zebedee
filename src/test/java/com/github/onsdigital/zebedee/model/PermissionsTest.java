@@ -62,7 +62,7 @@ public class PermissionsTest {
         // A bunch of user email addresses (NB case-insensitive)
         String administratorEmail = builder.administrator.email.toUpperCase();
         String publisherEmail = builder.publisher.email.toUpperCase();
-        String viewerEmail = builder.reviewer.email.toUpperCase();
+        String viewerEmail = builder.reviewer1.email.toUpperCase();
         String unknownEmail = "unknown@example.com";
         String nullEmail = null;
 
@@ -123,7 +123,7 @@ public class PermissionsTest {
         // Given
         // A new Administrator user
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.reviewer.email);
+        Session session = zebedee.sessions.create(builder.reviewer1.email);
 
         // When
         // We add the user as an administrator (NB case-insensitive)
@@ -220,7 +220,7 @@ public class PermissionsTest {
 
         // Given
         // Users with insufficient permission
-        Session viewer = zebedee.sessions.create(builder.reviewer.email);
+        Session viewer = zebedee.sessions.create(builder.reviewer1.email);
 
         // When
         // We remove the user as an administrator
@@ -308,7 +308,7 @@ public class PermissionsTest {
         // A bunch of user email addresses (NB case-insensitive)
         String administratorEmail = builder.administrator.email.toUpperCase();
         String publisherEmail = builder.publisher.email.toUpperCase();
-        String viewerEmail = builder.reviewer.email.toUpperCase();
+        String viewerEmail = builder.reviewer1.email.toUpperCase();
         String unknownEmail = "unknown@example.com";
         String nullEmail = null;
 
@@ -369,7 +369,7 @@ public class PermissionsTest {
         // Given
         // A new publisher user
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.reviewer.email);
+        Session session = zebedee.sessions.create(builder.reviewer1.email);
 
         // When
         // We add the user as a publisher (NB case-insensitive)
@@ -433,7 +433,7 @@ public class PermissionsTest {
 
         // Given
         // Users with insufficient permission
-        Session viewer = zebedee.sessions.create(builder.reviewer.email);
+        Session viewer = zebedee.sessions.create(builder.reviewer1.email);
 
         // When
         // We remove the user as an administrator

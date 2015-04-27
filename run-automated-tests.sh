@@ -44,9 +44,9 @@ update_branch https://github.com/Carboni/zebedee.git $ZEBEDEE_DIRECTORY develop
 #wait
 
 #$FLORENCE_DIRECTORY/run.sh &
-$ZEBEDEE_DIRECTORY/files.sh &
+$ZEBEDEE_DIRECTORY/files.sh
 #$TREDEGAR_DIRECTORY/run.sh
-wait
+#wait
 
 cd $ROOT_DIRECTORY
 

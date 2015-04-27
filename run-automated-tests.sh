@@ -4,6 +4,7 @@ ROOT_DIRECTORY="`pwd`"
 FLORENCE_DIRECTORY="$ROOT_DIRECTORY/florence-user-test"
 ZEBEDEE_DIRECTORY="$ROOT_DIRECTORY/zebedee-user-test"
 TREDEGAR_DIRECTORY="$ROOT_DIRECTORY/tredegar-user-test"
+MR_RUSTY_DIRECTORY="$ROOT_DIRECTORY/mr-rusty-user-test"
 
 function update_branch {
     #echo "Updating $3 branch of $1 into $2"
@@ -25,7 +26,7 @@ function send_slack_message {
 
 function run_tests {
     # build the tests
-    #mvn package
+    mvn package
     echo "Running tests..."
 
     # run the tests, and add the output to the output variable
@@ -43,13 +44,15 @@ update_branch https://github.com/Carboni/zebedee.git $ZEBEDEE_DIRECTORY develop
 update_branch https://github.com/ONSdigital/tredegar.git $TREDEGAR_DIRECTORY develop
 wait
 
+(
 $FLORENCE_DIRECTORY/run.sh &
 $ZEBEDEE_DIRECTORY/files.sh &
 $TREDEGAR_DIRECTORY/run.sh
 wait
+)
 
-cd $ROOT_DIRECTORY
-
+update_branch https://github.com/Carboni/MrRusty.git $MR_RUSTY_DIRECTORY master
+cd "$MR_RUSTY_DIRECTORY"
 run_tests
 
 

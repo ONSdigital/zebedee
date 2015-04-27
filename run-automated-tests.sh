@@ -26,7 +26,7 @@ function send_slack_message {
 
 function run_tests {
     # build the tests
-    mvn package
+    mvn package > /dev/null
     echo "Running tests..."
 
     # run the tests, and add the output to the output variable
@@ -44,15 +44,18 @@ update_branch https://github.com/Carboni/zebedee.git $ZEBEDEE_DIRECTORY develop
 update_branch https://github.com/ONSdigital/tredegar.git $TREDEGAR_DIRECTORY develop
 wait
 
-(
-$FLORENCE_DIRECTORY/run.sh &
-$ZEBEDEE_DIRECTORY/files.sh &
-$TREDEGAR_DIRECTORY/run.sh
-wait
-)
 
-update_branch https://github.com/Carboni/MrRusty.git $MR_RUSTY_DIRECTORY master
-cd "$MR_RUSTY_DIRECTORY"
-run_tests
+$FLORENCE_DIRECTORY/run.sh > /dev/null &
+$ZEBEDEE_DIRECTORY/files.sh > /dev/null &
+$TREDEGAR_DIRECTORY/run.sh > /dev/null &
+(
+    update_branch https://github.com/Carboni/MrRusty.git $MR_RUSTY_DIRECTORY master
+    cd "$MR_RUSTY_DIRECTORY"
+    run_tests
+)
+wait
+
+
+
 
 

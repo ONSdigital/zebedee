@@ -9,8 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -21,8 +19,6 @@ public class PermissionsTest {
     Builder builder;
     Collection inflationCollection;
     Collection labourMarketCollection;
-
-    List<Builder> cleanup = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
@@ -35,10 +31,6 @@ public class PermissionsTest {
     @After
     public void tearDown() throws Exception {
         builder.delete();
-        for (Builder additional : cleanup) {
-            additional.delete();
-        }
-        cleanup.clear();
     }
 
     //// Administrator tests ////////////////////////////////////////////////////////////////////////////////////////////

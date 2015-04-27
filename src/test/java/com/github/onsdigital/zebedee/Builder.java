@@ -135,8 +135,8 @@ public class Builder {
         accessMapping.collections = new HashMap<>();
 
         Zebedee z = new Zebedee(zebedee);
-        Team labourMarketTeam = createTeam(freddy, "Labour Market Team", teams);
-        Team inflationTeam = createTeam(ronny, "Inflation and Price Indices Team", teams);
+        Team labourMarketTeam = createTeam(freddy, teamNames[0], teams);
+        Team inflationTeam = createTeam(ronny, teamNames[1], teams);
         accessMapping.collections.put(new Collection(collections.get(0), z).description.id, set(labourMarketTeam));
         accessMapping.collections.put(new Collection(collections.get(1), z).description.id, set(inflationTeam));
 
@@ -161,7 +161,7 @@ public class Builder {
         team.name = name;
         team.members = new HashSet<>();
         team.members.add(user.email);
-        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.name));
+        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.name + ".json"));
         try (OutputStream output = Files.newOutputStream(labourMarketTeamPath)) {
             Serialiser.serialise(output, team);
         }
@@ -170,7 +170,6 @@ public class Builder {
     }
 
     public void delete() throws IOException {
-        System.out.println("Deleting zebedee at " + parent);
         FileUtils.deleteDirectory(parent.toFile());
     }
 
@@ -293,7 +292,6 @@ public class Builder {
         Files.createDirectory(path.resolve(Zebedee.SESSIONS));
         Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
         Files.createDirectory(path.resolve(Zebedee.TEAMS));
-        System.out.println("Created zebedee at " + path);
         return path;
     }
 

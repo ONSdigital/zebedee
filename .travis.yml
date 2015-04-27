@@ -9,8 +9,6 @@ deploy:
   app: zebedee
   on:
     repo: davidcarboni/zebedee
-after_deploy:
-- mvn -DbaseUrl=$BASE_URL clean test-compile failsafe:integration-test failsafe:verify
 notifications:
   slack:
     secure: evQp5AUZzqE6zu1IMQPsd0vjeKGRXWWjMFk0lFNe4cMxZ6+hFTfwQK97ZJD08sUtkz/TmJps4gMA4gsk/Scy6wutecsJBTvD9hCnm41/YpOiQpizfn8sMEJkjxyHC1CYQKzW2yYa2L5YOoWbpjE9ayGGRno2xpvPrytc8HcEPNs=

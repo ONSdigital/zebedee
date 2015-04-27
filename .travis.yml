@@ -9,7 +9,7 @@ deploy:
   app: zebedee
   on:
     repo: davidcarboni/zebedee
-after_deploy:
+after_success:
 - ./run-automated-tests.sh
 notifications:
   slack:

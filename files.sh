@@ -16,7 +16,7 @@ java $JAVA_OPTS \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \
  -cp "target/dependency/*" \
  com.github.davidcarboni.restolino.Main
- 
+
 #mvn package && \
 #java $JAVA_OPTS \
 # -Drestolino.packageprefix=$PACKAGE_PREFIX \

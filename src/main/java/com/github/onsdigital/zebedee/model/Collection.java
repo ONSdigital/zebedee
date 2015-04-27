@@ -462,20 +462,45 @@ public class Collection {
     }
 
     /**
-     * Deletes this collection from the file system
+     * Deletes a single file.
      *
      * @return True if the file system has been amended
      */
-    public boolean deleteContent(String uri) throws IOException {
-        // Find the relevant collection for the uri and delete
+    public boolean deleteFile(String uri) throws IOException {
         if (isInProgress(uri)) {
             return inProgress.delete(uri);
         } else if (isComplete(uri)) {
             return complete.delete(uri);
         } else if (isReviewed(uri)) {
-            return inProgress.delete(uri);
+            return reviewed.delete(uri);
         }
         return false;
+    }
+
+    /**
+     * Delete all the content files in the directory of the given file.
+     *
+     * @param uri
+     * @return
+     * @throws IOException
+     */
+    public boolean deleteContent(String email, String uri) throws IOException {
+
+        boolean hasDeleted = true;
+
+        if (isInProgress(uri)) {
+            PathUtils.deleteFilesInDirectory(inProgress.toPath(uri));
+        } else if (isComplete(uri)) {
+            PathUtils.deleteFilesInDirectory(complete.toPath(uri));
+        } else if (isReviewed(uri)) {
+            PathUtils.deleteFilesInDirectory(reviewed.toPath(uri));
+        } else {
+            hasDeleted = false;
+        }
+
+        if (hasDeleted) AddEvent(uri, new ContentEvent(new Date(), ContentEventType.DELETED, email));
+
+        return hasDeleted;
     }
 }
 

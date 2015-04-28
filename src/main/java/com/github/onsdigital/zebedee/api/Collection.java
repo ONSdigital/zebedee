@@ -1,10 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.Sessions;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -21,15 +19,15 @@ public class Collection {
     /**
      * Retrieves a CollectionDescription object at the endpoint /Collection/[CollectionName]
      *
-     * @param request This should contain a X-Florence-Token header for the current session
+     * @param request  This should contain a X-Florence-Token header for the current session
      * @param response <ul>
-     *                      <li>If no collection exists:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                 <li>If no collection exists:  {@link HttpStatus#NOT_FOUND_404}</li>
      *                 </ul>
      * @return the CollectionDescription.
      * @throws IOException
      */
     @GET
-    public Object get(HttpServletRequest request, HttpServletResponse response)
+    public CollectionDescription get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections
@@ -46,8 +44,7 @@ public class Collection {
         if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
-        };
-
+        }
 
         // Collate the result:
         CollectionDescription result = new CollectionDescription();
@@ -64,52 +61,50 @@ public class Collection {
 
     /**
      * Creates or updates collection details the endpoint /Collection/
-     *
+     * <p/>
      * Checks if a collection exists using {@link CollectionDescription#name}
      *
-     * @param request This should contain a X-Florence-Token header for the current session
-     * @param response <ul>
-     *                 <li>If no name has been passed:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                 <li>If user cannot create collections:  {@link HttpStatus#UNAUTHORIZED_401}</li>
-     *                 <li>If collection with name already exists:  {@link HttpStatus#CONFLICT_409}</li>
-     *                 </ul>
+     * @param request               This should contain a X-Florence-Token header for the current session
+     * @param response              <ul>
+     *                              <li>If no name has been passed:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                              <li>If user cannot create collections:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                              <li>If collection with name already exists:  {@link HttpStatus#CONFLICT_409}</li>
+     *                              </ul>
      * @param collectionDescription
      * @return
      * @throws IOException
      */
     @POST
-    public boolean create(HttpServletRequest request,
-                          HttpServletResponse response,
-                          CollectionDescription collectionDescription) throws IOException {
+    public CollectionDescription create(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        CollectionDescription collectionDescription) throws IOException {
 
-        if(collectionDescription.name == null){
+        if (collectionDescription.name == null) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return false;
+            return null;
         }
 
         Session session = Root.zebedee.sessions.get(request);
         if (Root.zebedee.permissions.canEdit(session.email) == false) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return false;
+            return null;
         }
 
         collectionDescription.name = StringUtils.trim(collectionDescription.name);
         if (Root.zebedee.getCollections().hasCollection(
                 collectionDescription.name)) {
-                response.setStatus(HttpStatus.CONFLICT_409);
-                return false;
-            }
+            response.setStatus(HttpStatus.CONFLICT_409);
+            return null;
+        }
 
-        com.github.onsdigital.zebedee.model.Collection.create(
-                collectionDescription, Root.zebedee);
-
-        return true;
+        return com.github.onsdigital.zebedee.model.Collection.create(
+                collectionDescription, Root.zebedee).description;
     }
 
     /**
      * Deletes the collection details at the endpoint /Collection/[CollectionName]
      *
-     * @param request This should contain a X-Florence-Token header for the current session
+     * @param request  This should contain a X-Florence-Token header for the current session
      * @param response <ul>
      *                 <li>If the collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
      *                 <li>If user is not authorised to delete this collection:  {@link HttpStatus#UNAUTHORIZED_401}</li>
@@ -132,7 +127,7 @@ public class Collection {
 
         // Check whether user has permission to delete this collection
         Session session = Root.zebedee.sessions.get(request);
-        if(Root.zebedee.permissions.canEdit(session.email) == false) {
+        if (Root.zebedee.permissions.canEdit(session.email) == false) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return false;
         }
@@ -145,7 +140,7 @@ public class Collection {
 
         // Delete
         collection.delete();
-        
+
         response.setStatus(HttpStatus.OK_200);
         return true;
     }

@@ -65,7 +65,7 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addAdministrator(String email, Session session) throws IOException {
+    public void addAdministrator(String email, Session session) throws IOException, UnauthorizedException {
 
         // Allow the initial user to be set as an administrator:
         if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
@@ -86,7 +86,7 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeAdministrator(String email, Session session) throws IOException {
+    public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         if (session == null || !isAdministrator(session.email)) {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
@@ -117,7 +117,7 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addEditor(String email, Session session) throws IOException {
+    public void addEditor(String email, Session session) throws IOException, UnauthorizedException {
         if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
@@ -137,7 +137,7 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeEditor(String email, Session session) throws IOException {
+    public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         if (session == null || !isAdministrator(session.email)) {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }

@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +37,7 @@ public class Users {
      * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createAdmin(Zebedee zebedee, User user, String password, Session session) throws IOException {
+    public static void createAdmin(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException {
         user.passwordHash = Password.hash(password);
         zebedee.users.write(user);
         zebedee.permissions.addAdministrator(user.email, session);
@@ -51,7 +52,7 @@ public class Users {
      * @param password The plaintext password for the user.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException {
+    public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException {
 
         if (zebedee.permissions.hasAdministrator()) {
             return;

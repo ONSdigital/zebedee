@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -30,7 +31,7 @@ public class ZebedeeTest {
 	}
 
 	@Test
-	public void shouldCreate() throws IOException {
+	public void shouldCreate() throws IOException, UnauthorizedException {
 
 		// Given
 		// No existing Zebedee structure

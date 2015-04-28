@@ -1,6 +1,9 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
@@ -29,10 +32,12 @@ public class Permission {
      *                             </ul>
      * @param permissionDefinition The email and permission details for the user.
      * @return A String message confirming that the user's permissions were updated.
-     * @throws IOException
+     * @throws IOException           If an error occurs accessing data.
+     * @throws UnauthorizedException If the logged in user is not an administrator.
+     * @throws BadRequestException   If the {@link PermissionDefinition} contains an invalid team name.
      */
     @POST
-    public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException {
+    public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException, UnauthorizedException, NotFoundException {
 
         Session session = Root.zebedee.sessions.find(permissionDefinition.email);
 
@@ -66,10 +71,13 @@ public class Permission {
      *                             </ul>
      * @param permissionDefinition The email and permission details for the user.
      * @return A String message confirming that the user's permissions were updated.
-     * @throws IOException
+     * @throws IOException           If an error occurs accessing data.
+     * @throws UnauthorizedException If the logged in user is not an administrator.
+     * @throws UnauthorizedException If the logged in user is not an administrator.
+     * @throws BadRequestException   If the {@link PermissionDefinition} contains an invalid team name.
      */
     @DELETE
-    public String revokePermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException {
+    public String revokePermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException, UnauthorizedException, NotFoundException {
 
         Session session = Root.zebedee.sessions.find(permissionDefinition.email);
 

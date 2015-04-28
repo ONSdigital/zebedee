@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.exceptions;
 /**
  * Created by david on 28/04/2015.
  */
-public abstract class ApiException extends RuntimeException {
+public abstract class ApiException extends Exception {
 
     public final int statusCode;
 

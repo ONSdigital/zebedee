@@ -53,7 +53,7 @@ public class Teams {
         return result;
     }
 
-    public Team findTeam(String teamName) throws IOException {
+    public Team findTeam(String teamName) throws IOException, NotFoundException {
         Team result = null;
 
         if (teamExists(teamName)) {
@@ -71,7 +71,7 @@ public class Teams {
      * @return The created team.
      * @throws IOException If a filesystem error occurs.
      */
-    public Team createTeam(String teamName, Session session) throws IOException {
+    public Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
@@ -106,7 +106,7 @@ public class Teams {
      * @param session Only administrators can rename a team.
      * @throws IOException If a filesystem error occurs.
      */
-    public void renameTeam(Team update, Session session) throws IOException {
+    public void renameTeam(Team update, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException, BadRequestException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
@@ -155,10 +155,9 @@ public class Teams {
      * @param session Only an administrator can delete a team.
      * @throws IOException If a filesystem error occurs.
      */
-    public void deleteTeam(Team delete, Session session) throws IOException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
+    public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
+        if (session == null || !zebedee.permissions.isAdministrator(session.email))
             throw new UnauthorizedException("Session is not an administrator: " + session);
-        }
 
         if (delete != null) {
 
@@ -189,7 +188,7 @@ public class Teams {
      * @param team  The team to add the given email to.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addTeamMember(String email, Team team, Session session) throws IOException {
+    public void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
@@ -208,7 +207,7 @@ public class Teams {
      * @param team  The team to remove the given email from.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeTeamMember(String email, Team team, Session session) throws IOException {
+    public void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
             throw new UnauthorizedException("Session is not an administrator: " + session);
         }
@@ -242,43 +241,33 @@ public class Teams {
      * @return A {@link Team} with the given name.
      * @throws IOException If a filesystem error occurs.
      */
-    private Team readTeam(String teamName) throws IOException {
+    private Team readTeam(String teamName) throws IOException, NotFoundException {
         Team result = null;
 
         Path path = teamPath(teamName);
-        if (path != null) {
-            if (Files.exists(path)) {
+        if (path != null && Files.exists(path)) {
 
-                // Read the team
-                teamLock.readLock().lock();
-                try (InputStream input = Files.newInputStream(path)) {
-                    result = Serialiser.deserialise(input, Team.class);
-                } finally {
-                    teamLock.readLock().unlock();
-                }
+            // Read the team
+            teamLock.readLock().lock();
+            try (InputStream input = Files.newInputStream(path)) {
+                result = Serialiser.deserialise(input, Team.class);
+            } finally {
+                teamLock.readLock().unlock();
+            }
 
-                // Initialise the memers set if it's missing:
-                if (result.members == null) {
-                    result.members = new HashSet<>();
-                }
-
-            } else {
-
-                // Generate a new team:
-                Team team = new Team();
-                team.name = teamName;
-                team.members = new HashSet<>();
-                writeTeam(team);
+            // Initialise the memers set if it's missing:
+            if (result.members == null) {
+                result.members = new HashSet<>();
             }
 
         } else {
-            throw new BadRequestException("Invalid team name: " + teamName);
+            throw new NotFoundException("Team not found: " + teamName);
         }
 
         return result;
     }
 
-    private void writeTeam(Team team) throws IOException {
+    private void writeTeam(Team team) throws IOException, NotFoundException {
 
         Path path = teamPath(team);
 
@@ -290,7 +279,7 @@ public class Teams {
                 teamLock.writeLock().unlock();
             }
         } else {
-            throw new BadRequestException("Invalid team: " + team);
+            throw new NotFoundException("Team not found: " + team);
         }
     }
 

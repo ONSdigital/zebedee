@@ -85,7 +85,7 @@ public class PermissionsTest {
 
     @Test
 
-    public void shouldAddAdministrator() throws IOException {
+    public void shouldAddAdministrator() throws IOException, UnauthorizedException {
 
         // Given
         // A new Administrator user
@@ -102,7 +102,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddAdministratorIfPublisher() throws IOException {
+    public void shouldNotAddAdministratorIfPublisher() throws IOException, UnauthorizedException {
 
         // Given
         // A new Administrator user
@@ -118,7 +118,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddAdministratorIfViewer() throws IOException {
+    public void shouldNotAddAdministratorIfViewer() throws IOException, UnauthorizedException {
 
         // Given
         // A new Administrator user
@@ -134,7 +134,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddAdministratorIfNotLoggedIn() throws IOException {
+    public void shouldNotAddAdministratorIfNotLoggedIn() throws IOException, UnauthorizedException {
 
         // Given
         // A new Administrator user
@@ -150,7 +150,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldAddFirstAdministrator() throws IOException {
+    public void shouldAddFirstAdministrator() throws IOException, UnauthorizedException {
 
         // Given
         // The Administrator user has been removed (NB case-insensitive)
@@ -168,7 +168,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddFirstAdministratorAgain() throws IOException {
+    public void shouldNotAddFirstAdministratorAgain() throws IOException, UnauthorizedException {
 
         // Given
         // An initial administrator user is present
@@ -183,7 +183,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldRemoveAdministrator() throws IOException {
+    public void shouldRemoveAdministrator() throws IOException, UnauthorizedException {
 
         // Given
         // A short-lived Administrator user (NB case-insensitive)
@@ -201,7 +201,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveAdministratorIfPublisher() throws IOException {
+    public void shouldNotRemoveAdministratorIfPublisher() throws IOException, UnauthorizedException {
 
         // Given
         // Users with insufficient permission
@@ -216,7 +216,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveAdministratorIfViewer() throws IOException {
+    public void shouldNotRemoveAdministratorIfViewer() throws IOException, UnauthorizedException {
 
         // Given
         // Users with insufficient permission
@@ -231,7 +231,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveAdministratorIfNotLoggedIn() throws IOException {
+    public void shouldNotRemoveAdministratorIfNotLoggedIn() throws IOException, UnauthorizedException {
 
         // Given
         // No login session
@@ -246,7 +246,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldHaveAnAdministrator() throws IOException {
+    public void shouldHaveAnAdministrator() throws IOException, UnauthorizedException {
 
         // Given
         // An Administrator user
@@ -261,7 +261,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldHaveNoAdministrator() throws IOException {
+    public void shouldHaveNoAdministrator() throws IOException, UnauthorizedException {
 
         // Given
         // The Administrator user has been removed
@@ -282,7 +282,7 @@ public class PermissionsTest {
 
 
     @Test
-    public void publisherShouldHaveEditAndViewPermission() throws IOException {
+    public void publisherShouldHaveEditAndViewPermission() throws IOException, UnauthorizedException {
 
         // Given
         // The Administrator user (NB case-insensitive)
@@ -302,7 +302,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void onlyPublisherShouldBePublisher() throws IOException {
+    public void onlyPublisherShouldBePublisher() throws IOException, UnauthorizedException {
 
         // Given
         // A bunch of user email addresses (NB case-insensitive)
@@ -331,7 +331,7 @@ public class PermissionsTest {
 
     @Test
 
-    public void shouldAddPublisher() throws IOException {
+    public void shouldAddPublisher() throws IOException, UnauthorizedException {
 
         // Given
         // A new publisher user
@@ -348,7 +348,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddPublisherIfPublisher() throws IOException {
+    public void shouldNotAddPublisherIfPublisher() throws IOException, UnauthorizedException {
 
         // Given
         // A new publisher user
@@ -364,7 +364,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddPublisherIfViewer() throws IOException {
+    public void shouldNotAddPublisherIfViewer() throws IOException, UnauthorizedException {
 
         // Given
         // A new publisher user
@@ -380,7 +380,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddPublisherIfNotLoggedIn() throws IOException {
+    public void shouldNotAddPublisherIfNotLoggedIn() throws IOException, UnauthorizedException {
 
         // Given
         // A new publisher user
@@ -396,7 +396,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldRemovePublisher() throws IOException {
+    public void shouldRemovePublisher() throws IOException, UnauthorizedException {
 
         // Given
         // A short-lived publisher user (NB case-insensitive)
@@ -414,7 +414,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemovePublisherIfPublisher() throws IOException {
+    public void shouldNotRemovePublisherIfPublisher() throws IOException, UnauthorizedException {
 
         // Given
         // Users with insufficient permission
@@ -429,7 +429,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemovePublisherIfViewer() throws IOException {
+    public void shouldNotRemovePublisherIfViewer() throws IOException, UnauthorizedException {
 
         // Given
         // Users with insufficient permission
@@ -444,7 +444,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemovePublisherIfNotLoggedIn() throws IOException {
+    public void shouldNotRemovePublisherIfNotLoggedIn() throws IOException, UnauthorizedException {
 
         // Given
         // No login session
@@ -461,7 +461,7 @@ public class PermissionsTest {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
 //    @Test
-//    public void shouldAddEditor() throws IOException {
+//    public void shouldAddEditor() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A new Digital Publishing user
@@ -479,7 +479,7 @@ public class PermissionsTest {
 //    }
 
     @Test
-    public void shouldForbidEditToUnknownUser() throws IOException {
+    public void shouldForbidEditToUnknownUser() throws IOException, UnauthorizedException {
 
         // Given
         // An unknown user
@@ -495,7 +495,7 @@ public class PermissionsTest {
     }
 
 //    @Test
-//    public void shouldForbidViewToUnknownUser() throws IOException {
+//    public void shouldForbidViewToUnknownUser() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // An unknown user
@@ -511,7 +511,7 @@ public class PermissionsTest {
 //    }
 
     @Test
-    public void shouldAllowEditToDigitalPublishing() throws IOException {
+    public void shouldAllowEditToDigitalPublishing() throws IOException, UnauthorizedException {
 
         // Given
         // A user in the Digital Publishing team
@@ -527,7 +527,7 @@ public class PermissionsTest {
     }
 
 //    @Test
-//    public void shouldAllowViewToDigitalPublishing() throws IOException {
+//    public void shouldAllowViewToDigitalPublishing() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A user in the Digital Publishing team
@@ -543,7 +543,7 @@ public class PermissionsTest {
 //    }
 
     @Test
-    public void shouldForbidEditToContentOwner() throws IOException {
+    public void shouldForbidEditToContentOwner() throws IOException, UnauthorizedException {
 
         // Given
         // A Content owner user
@@ -559,7 +559,7 @@ public class PermissionsTest {
     }
 
 //    @Test
-//    public void shouldAllowViewToContentOwnerForAllowedPath() throws IOException {
+//    public void shouldAllowViewToContentOwnerForAllowedPath() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A Content owner user
@@ -575,7 +575,7 @@ public class PermissionsTest {
 //    }
 
 //    @Test
-//    public void shouldAllowViewToContentOwnerForAllowedSubpath() throws IOException {
+//    public void shouldAllowViewToContentOwnerForAllowedSubpath() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A Content owner user
@@ -591,7 +591,7 @@ public class PermissionsTest {
 //    }
 
 //    @Test
-//    public void shouldForbidViewToContentOwnerForUngrantedPath() throws IOException {
+//    public void shouldForbidViewToContentOwnerForUngrantedPath() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A Content owner user
@@ -607,7 +607,7 @@ public class PermissionsTest {
 //    }
 
 //    @Test
-//    public void shouldAddContentOwner() throws IOException {
+//    public void shouldAddContentOwner() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A new Content owner user
@@ -625,7 +625,7 @@ public class PermissionsTest {
 //    }
 
 //    @Test
-//    public void shouldRemoveDigitalPublisher() throws IOException {
+//    public void shouldRemoveDigitalPublisher() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A Digital Publishing user
@@ -643,7 +643,7 @@ public class PermissionsTest {
 //    }
 
 //    @Test
-//    public void shouldRemoveContentOwner() throws IOException {
+//    public void shouldRemoveContentOwner() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A Content owner user
@@ -661,7 +661,7 @@ public class PermissionsTest {
 //    }
 
 //    @Test
-//    public void shouldRemoveContentOwnerFromSubPath() throws IOException {
+//    public void shouldRemoveContentOwnerFromSubPath() throws IOException, UnauthorizedException {
 //
 //        // Given
 //        // A Content owner user is added to a sub-path

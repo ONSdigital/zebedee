@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
@@ -58,7 +59,7 @@ public class Zebedee {
      * @return A {@link Zebedee} instance representing the newly created folder.
      * @throws IOException If a filesystem error occurs.
      */
-    public static Zebedee create(Path parent) throws IOException {
+    public static Zebedee create(Path parent) throws IOException, UnauthorizedException {
 
         // Create the folder structure
         Path path = Files.createDirectory(parent.resolve(ZEBEDEE));

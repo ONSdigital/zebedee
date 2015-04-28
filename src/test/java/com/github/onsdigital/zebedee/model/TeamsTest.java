@@ -63,7 +63,7 @@ public class TeamsTest {
 
 
     @Test
-    public void shouldFindTeamByName() throws IOException {
+    public void shouldFindTeamByName() throws IOException, NotFoundException {
 
         // Given
         // The teams set up by the builder
@@ -84,7 +84,7 @@ public class TeamsTest {
 
 
     @Test
-    public void shouldCreateTeam() throws IOException {
+    public void shouldCreateTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team name
@@ -111,7 +111,7 @@ public class TeamsTest {
 
 
     @Test
-    public void shouldCreateTeamWithUniqueId() throws IOException {
+    public void shouldCreateTeamWithUniqueId() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A team name
@@ -135,7 +135,7 @@ public class TeamsTest {
 
 
     @Test(expected = ConflictException.class)
-    public void shouldNotCreateTeamWithDuplicateName() throws IOException {
+    public void shouldNotCreateTeamWithDuplicateName() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team
@@ -153,7 +153,7 @@ public class TeamsTest {
 
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotCreateTeamIfNotAdministrator() throws IOException {
+    public void shouldNotCreateTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team name
@@ -170,7 +170,7 @@ public class TeamsTest {
 
 
     @Test
-    public void shouldRenameTeam() throws IOException {
+    public void shouldRenameTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team name
@@ -196,7 +196,7 @@ public class TeamsTest {
 
 
     @Test(expected = ConflictException.class)
-    public void shouldNotRenameTeamToDuplicateName() throws IOException {
+    public void shouldNotRenameTeamToDuplicateName() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team name
@@ -215,7 +215,7 @@ public class TeamsTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void shouldNotRenameNonexistentTeam() throws IOException {
+    public void shouldNotRenameNonexistentTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // An updated team with an ID that doesn't exist
@@ -234,7 +234,7 @@ public class TeamsTest {
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotRenameToBlankName() throws IOException {
+    public void shouldNotRenameToBlankName() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // An updated team with an ID that doesn't exist
@@ -254,7 +254,7 @@ public class TeamsTest {
 
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRenameTeamIfNotAdministrator() throws IOException {
+    public void shouldNotRenameTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team name
@@ -274,7 +274,7 @@ public class TeamsTest {
 
 
     @Test
-    public void shouldDeleteTeam() throws IOException {
+    public void shouldDeleteTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // One of the teams
@@ -293,7 +293,7 @@ public class TeamsTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void shouldNotDeleteNonexistentTeam() throws IOException {
+    public void shouldNotDeleteNonexistentTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // An updated team with an ID that doesn't exist
@@ -312,7 +312,7 @@ public class TeamsTest {
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotDeleteNullTeam() throws IOException {
+    public void shouldNotDeleteNullTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // An updated team with an ID that doesn't exist
@@ -329,7 +329,7 @@ public class TeamsTest {
 
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotDeleteTeamIfNotAdministrator() throws IOException {
+public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A team to delete
@@ -346,7 +346,7 @@ public class TeamsTest {
 
 
     @Test
-    public void shouldAddTeamMember() throws IOException {
+    public void shouldAddTeamMember() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team
@@ -366,7 +366,7 @@ public class TeamsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddTeamMemberIfNotAdministrator() throws IOException {
+    public void shouldNotAddTeamMemberIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team
@@ -385,7 +385,7 @@ public class TeamsTest {
 
 
     @Test
-    public void shouldRemoveTeamMember() throws IOException {
+    public void shouldRemoveTeamMember() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team
@@ -407,7 +407,7 @@ public class TeamsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveTeamMemberIfNotAdministrator() throws IOException {
+    public void shouldNotRemoveTeamMemberIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
 
         // Given
         // A new team

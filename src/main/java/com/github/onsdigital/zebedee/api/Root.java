@@ -4,6 +4,7 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Content;
 import org.apache.commons.io.FileUtils;
@@ -60,8 +61,8 @@ public class Root implements Startup {
             List<Path> content = listContent(taxonomy);
             copyContent(content, taxonomy);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | UnauthorizedException e) {
+            throw new RuntimeException("Error initialising Zebedee ", e);
         }
 
         // Set the class that will be used to determine a ClassLoader when loading resources:

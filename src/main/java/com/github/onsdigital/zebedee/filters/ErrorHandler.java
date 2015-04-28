@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.filters;
 
 import com.github.davidcarboni.restolino.api.RequestHandler;
 import com.github.davidcarboni.restolino.framework.ServerError;
-import com.github.onsdigital.zebedee.exceptions.ApiException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,8 +15,8 @@ public class ErrorHandler implements ServerError {
     public String handle(HttpServletRequest req, HttpServletResponse res, RequestHandler requestHandler, Throwable t) {
 
         // If it's an ApiException subclass, set the status code and message
-        if (t != null && ApiException.class.isAssignableFrom(t.getClass())) {
-            ApiException exception = (ApiException) t;
+        if (t != null && ZebedeeException.class.isAssignableFrom(t.getClass())) {
+            ZebedeeException exception = (ZebedeeException) t;
             res.setStatus(exception.statusCode);
             return exception.getMessage();
         }

@@ -2,10 +2,10 @@ package com.github.onsdigital.zebedee.filters;
 
 import com.github.davidcarboni.restolino.api.RequestHandler;
 import com.github.davidcarboni.restolino.framework.ServerError;
+import com.github.onsdigital.zebedee.exceptions.ApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.WebApplicationException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -16,10 +16,10 @@ public class ErrorHandler implements ServerError {
     @Override
     public Object handle(HttpServletRequest req, HttpServletResponse res, RequestHandler requestHandler, Throwable t) {
 
-        if (t != null && WebApplicationException.class.isAssignableFrom(t.getClass())) {
+        if (t != null && ApiException.class.isAssignableFrom(t.getClass())) {
 
-            WebApplicationException exception = (WebApplicationException) t;
-            res.setStatus(exception.getResponse().getStatus());
+            ApiException exception = (ApiException) t;
+            res.setStatus(exception.statusCode);
 
             // Attempt to write out the exception message:
             try {

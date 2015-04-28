@@ -1,10 +1,12 @@
 package com.github.onsdigital.zebedee.exceptions;
 
+import org.eclipse.jetty.http.HttpStatus;
+
 /**
  * Created by david on 23/04/15.
  */
-public class BadRequestException extends RuntimeException {
+public class BadRequestException extends ApiException {
     public BadRequestException(String message) {
-        super(message);
+        super(message, HttpStatus.BAD_REQUEST_400);
     }
 }

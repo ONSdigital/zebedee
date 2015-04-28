@@ -34,7 +34,7 @@ public class CollectionTest {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
         collection = new Collection(builder.collections.get(1), zebedee);
-        email = builder.publisher.email;
+        email = builder.publisher1.email;
     }
 
     @After
@@ -477,9 +477,11 @@ public class CollectionTest {
         String uri = CreateCompleteContent();
 
         // When
-        boolean reviewed = collection.review(builder.reviewer1.email, uri);
+        // One of the digital publishing team reviews it
+        boolean reviewed = collection.review(builder.publisher2.email, uri);
 
         // Then
+        // The content should be reviewed and no longer located in "in progress"
         assertTrue(reviewed);
         Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
@@ -510,11 +512,13 @@ public class CollectionTest {
         // Given some content that has been edited and completed by a publisher:
         String uri = CreateCompleteContent();
 
-        // When - the reviewer edits and reviews content
+        // When
+        // One of the digital publishing team edits and reviews it
         collection.edit(email, uri);
-        boolean reviewed = collection.review(builder.reviewer1.email, uri);
+        boolean reviewed = collection.review(builder.publisher2.email, uri);
 
-        // Then - the content is set to reviewed without going through completion.
+        // Then
+        // The content is set to reviewed without going through completion.
         assertTrue(reviewed);
         Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
@@ -906,7 +910,7 @@ public class CollectionTest {
 
         // When
         // We attempt to find the file.
-        Path path = collection.find(builder.publisher.email, uri);
+        Path path = collection.find(builder.publisher1.email, uri);
 
         // Then
         // We get the path to the in progress file.
@@ -922,7 +926,7 @@ public class CollectionTest {
 
         // When
         // We attempt to find the file.
-        Path path = collection.find(builder.publisher.email, uri);
+        Path path = collection.find(builder.publisher1.email, uri);
 
         // Then
         // We get the path to the in progress file.
@@ -938,7 +942,7 @@ public class CollectionTest {
 
         // When
         // We attempt to find the file.
-        Path path = collection.find(builder.publisher.email, uri);
+        Path path = collection.find(builder.publisher1.email, uri);
 
         // Then
         // We get the path to the in progress file.

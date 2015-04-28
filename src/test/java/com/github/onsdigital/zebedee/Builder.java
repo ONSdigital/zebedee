@@ -31,7 +31,8 @@ public class Builder {
     public List<String> contentUris;
 
     public User administrator;
-    public User publisher;
+    public User publisher1;
+    public User publisher2;
     public User reviewer1;
     public User reviewer2;
 
@@ -93,7 +94,17 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(patricia.email) + ".json"))) {
             Serialiser.serialise(outputStream, patricia);
         }
-        publisher = patricia;
+        publisher1 = patricia;
+
+        User bernard = new User();
+        bernard.name = "Bernard Black";
+        bernard.email = "bernard@example.com";
+        bernard.passwordHash = Password.hash("grumpy");
+        bernard.inactive = false;
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(bernard.email) + ".json"))) {
+            Serialiser.serialise(outputStream, bernard);
+        }
+        publisher2 = bernard;
 
         User freddy = new User();
         freddy.name = "freddy Pumpkin";
@@ -131,6 +142,7 @@ public class Builder {
 
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.digitalPublishingTeam.add(patricia.email);
+        accessMapping.digitalPublishingTeam.add(bernard.email);
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.id = Random.id();

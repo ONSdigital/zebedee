@@ -61,7 +61,7 @@ public class PermissionsTest {
         // Given
         // A bunch of user email addresses (NB case-insensitive)
         String administratorEmail = builder.administrator.email.toUpperCase();
-        String publisherEmail = builder.publisher.email.toUpperCase();
+        String publisherEmail = builder.publisher1.email.toUpperCase();
         String viewerEmail = builder.reviewer1.email.toUpperCase();
         String unknownEmail = "unknown@example.com";
         String nullEmail = null;
@@ -107,7 +107,7 @@ public class PermissionsTest {
         // Given
         // A new Administrator user
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.publisher.email);
+        Session session = zebedee.sessions.create(builder.publisher1.email);
 
         // When
         // We add the user as an administrator (NB case-insensitive)
@@ -205,7 +205,7 @@ public class PermissionsTest {
 
         // Given
         // Users with insufficient permission
-        Session publisher = zebedee.sessions.create(builder.publisher.email);
+        Session publisher = zebedee.sessions.create(builder.publisher1.email);
 
         // When
         // We remove the user as an administrator
@@ -286,7 +286,7 @@ public class PermissionsTest {
 
         // Given
         // The Administrator user (NB case-insensitive)
-        String email = builder.publisher.email.toUpperCase();
+        String email = builder.publisher1.email.toUpperCase();
 
         // When
         // We add the user as an administrator
@@ -307,7 +307,7 @@ public class PermissionsTest {
         // Given
         // A bunch of user email addresses (NB case-insensitive)
         String administratorEmail = builder.administrator.email.toUpperCase();
-        String publisherEmail = builder.publisher.email.toUpperCase();
+        String publisherEmail = builder.publisher1.email.toUpperCase();
         String viewerEmail = builder.reviewer1.email.toUpperCase();
         String unknownEmail = "unknown@example.com";
         String nullEmail = null;
@@ -353,7 +353,7 @@ public class PermissionsTest {
         // Given
         // A new publisher user
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.publisher.email);
+        Session session = zebedee.sessions.create(builder.publisher1.email);
 
         // When
         // We add the user as a publisher (NB case-insensitive)
@@ -418,11 +418,11 @@ public class PermissionsTest {
 
         // Given
         // Users with insufficient permission
-        Session publisher = zebedee.sessions.create(builder.publisher.email);
+        Session publisher = zebedee.sessions.create(builder.publisher1.email);
 
         // When
         // We remove the user as an administrator
-        zebedee.permissions.removeEditor(builder.publisher.email, publisher);
+        zebedee.permissions.removeEditor(builder.publisher1.email, publisher);
 
         // Then
         // The administrator should not have been removed
@@ -437,7 +437,7 @@ public class PermissionsTest {
 
         // When
         // We remove the user as an administrator
-        zebedee.permissions.removeEditor(builder.publisher.email, viewer);
+        zebedee.permissions.removeEditor(builder.publisher1.email, viewer);
 
         // Then
         // The administrator should not have been removed
@@ -452,7 +452,7 @@ public class PermissionsTest {
 
         // When
         // We remove the user as an administrator
-        zebedee.permissions.removeEditor(builder.publisher.email, notLoggedIn);
+        zebedee.permissions.removeEditor(builder.publisher1.email, notLoggedIn);
 
         // Then
         // The administrator should not have been removed

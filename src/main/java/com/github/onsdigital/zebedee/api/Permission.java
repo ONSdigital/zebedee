@@ -29,6 +29,9 @@ public class Permission {
      *                             <li>If admin is true, grants administrator permission.</li>
      *                             <li>If editor is true, grants editing permission.</li>
      *                             <li>If a team name is provided, grants membership of the matching team.</li>
+     *                             <li>If session is not admin responds {@link org.eclipse.jetty.http.HttpStatus#UNAUTHORIZED_401}</li>
+     *                             <li>If permissions user is not found {@link org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404}</li>
+     *                             <li>If permissions team is not found {@link org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404}</li>
      *                             </ul>
      * @param permissionDefinition The email and permission details for the user.
      * @return A String message confirming that the user's permissions were updated.
@@ -39,7 +42,7 @@ public class Permission {
     @POST
     public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException, UnauthorizedException, NotFoundException {
 
-        Session session = Root.zebedee.sessions.find(permissionDefinition.email);
+        Session session = Root.zebedee.sessions.get(request);
 
         // Administrator
         if (permissionDefinition.admin) {
@@ -68,6 +71,9 @@ public class Permission {
      *                             <li>If admin is true, revokes administrator permission.</li>
      *                             <li>If editor is true, revokes editing permission.</li>
      *                             <li>If a team name is provided, revokes membership of the matching team.</li>
+     *                             <li>If session is not admin responds {@link org.eclipse.jetty.http.HttpStatus#UNAUTHORIZED_401}</li>
+     *                             <li>If permissions user is not found {@link org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404}</li>
+     *                             <li>If permissions team is not found {@link org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404}</li>
      *                             </ul>
      * @param permissionDefinition The email and permission details for the user.
      * @return A String message confirming that the user's permissions were updated.

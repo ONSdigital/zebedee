@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,18 +28,14 @@ public class Permission {
      *
      * @param request              Should be a {@link PermissionDefinition} Json message.
      * @param response             <ul>
-     *                             <li>If admin is true, grants administrator permission.</li>
-     *                             <li>If editor is true, grants editing permission.</li>
-     *                             <li>If a team name is provided, grants membership of the matching team.</li>
-     *                             <li>If session is not admin responds {@link org.eclipse.jetty.http.HttpStatus#UNAUTHORIZED_401}</li>
-     *                             <li>If permissions user is not found {@link org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404}</li>
-     *                             <li>If permissions team is not found {@link org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404}</li>
+     *                             <li>If admin is True, grants administrator permission. If admin is False, revokes</li>
+     *                             <li>If editor is True, grants editing permission. If editor is False, revokes</li>
      *                             </ul>
      * @param permissionDefinition The email and permission details for the user.
      * @return A String message confirming that the user's permissions were updated.
      * @throws IOException           If an error occurs accessing data.
      * @throws UnauthorizedException If the logged in user is not an administrator.
-     * @throws BadRequestException   If the {@link PermissionDefinition} contains an invalid team name.
+     * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
      */
     @POST
     public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException, UnauthorizedException, NotFoundException {
@@ -45,62 +43,17 @@ public class Permission {
         Session session = Root.zebedee.sessions.get(request);
 
         // Administrator
-        if (permissionDefinition.admin) {
+        if (BooleanUtils.isTrue(permissionDefinition.admin)) {
             Root.zebedee.permissions.addAdministrator(permissionDefinition.email, session);
-        }
-
-        // Digital publishing
-        if (permissionDefinition.editor) {
-            Root.zebedee.permissions.addEditor(permissionDefinition.email, session);
-        }
-
-        // Content owner
-        if (StringUtils.isNotBlank(permissionDefinition.teamName)) {
-            Team team = Root.zebedee.teams.findTeam(permissionDefinition.teamName);
-            Root.zebedee.teams.addTeamMember(permissionDefinition.email, team, session);
-        }
-
-        return "Permissions updated for " + permissionDefinition.email;
-    }
-
-    /**
-     * Revokes the specified permissions.
-     *
-     * @param request              Should be a {@link PermissionDefinition} Json message.
-     * @param response             <ul>
-     *                             <li>If admin is true, revokes administrator permission.</li>
-     *                             <li>If editor is true, revokes editing permission.</li>
-     *                             <li>If a team name is provided, revokes membership of the matching team.</li>
-     *                             <li>If session is not admin responds {@link org.eclipse.jetty.http.HttpStatus#UNAUTHORIZED_401}</li>
-     *                             <li>If permissions user is not found {@link org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404}</li>
-     *                             <li>If permissions team is not found {@link org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404}</li>
-     *                             </ul>
-     * @param permissionDefinition The email and permission details for the user.
-     * @return A String message confirming that the user's permissions were updated.
-     * @throws IOException           If an error occurs accessing data.
-     * @throws UnauthorizedException If the logged in user is not an administrator.
-     * @throws UnauthorizedException If the logged in user is not an administrator.
-     * @throws BadRequestException   If the {@link PermissionDefinition} contains an invalid team name.
-     */
-    @DELETE
-    public String revokePermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException, UnauthorizedException, NotFoundException {
-
-        Session session = Root.zebedee.sessions.find(permissionDefinition.email);
-
-        // Administrator
-        if (permissionDefinition.admin) {
+        } else if (BooleanUtils.isFalse(permissionDefinition.admin)) {
             Root.zebedee.permissions.removeAdministrator(permissionDefinition.email, session);
         }
 
         // Digital publishing
-        if (permissionDefinition.editor) {
+        if (BooleanUtils.isTrue(permissionDefinition.editor)) {
+            Root.zebedee.permissions.addEditor(permissionDefinition.email, session);
+        } else if (BooleanUtils.isFalse(permissionDefinition.editor)) {
             Root.zebedee.permissions.removeEditor(permissionDefinition.email, session);
-        }
-
-        // Content owner
-        if (StringUtils.isNotBlank(permissionDefinition.teamName)) {
-            Team team = Root.zebedee.teams.findTeam(permissionDefinition.teamName);
-            Root.zebedee.teams.removeTeamMember(permissionDefinition.email, team, session);
         }
 
         return "Permissions updated for " + permissionDefinition.email;

@@ -6,7 +6,6 @@ package com.github.onsdigital.zebedee.json;
 public class PermissionDefinition {
 
     public String email;
-    public boolean admin;
-    public boolean editor;
-    public String teamName;
+    public Boolean admin;
+    public Boolean editor;
 }

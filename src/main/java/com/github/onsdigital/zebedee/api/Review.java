@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
@@ -27,7 +28,7 @@ public class Review {
      * @throws IOException
      */
     @POST
-    public ResultMessage review(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResultMessage review(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException {
 
         // Locate the collection:
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);

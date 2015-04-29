@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentEvent;
 import com.github.onsdigital.zebedee.json.ContentEventType;
@@ -351,7 +352,7 @@ public class Collection {
      * to {@link #reviewed}.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean review(String email, String uri) throws IOException {
+    public boolean review(String email, String uri) throws IOException, BadRequestException {
         boolean result = false;
         boolean permission = zebedee.permissions.canEdit(email);
         boolean userCompletedContent = didUserCompleteContent(email, uri);
@@ -386,13 +387,13 @@ public class Collection {
         return this.description.eventsByUri.get(uri).hasEventForType(ContentEventType.COMPLETED);
     }
 
-    private boolean didUserCompleteContent(String email, String uri) {
+    private boolean didUserCompleteContent(String email, String uri) throws BadRequestException {
 
         if (this.description.eventsByUri == null)
-            throw new IllegalStateException("This content has not been completed. No events found.");
+            throw new BadRequestException("This content has not been completed. No events found.");
         ContentEvents contentEvents = this.description.eventsByUri.get(uri);
         if (contentEvents == null)
-            throw new IllegalStateException("This content has not been completed. No events found.");
+            throw new BadRequestException("This content has not been completed. No events found.");
 
         boolean userCompletedContent = false;
         ContentEvent mostRecentCompletedEvent = this.description.eventsByUri.get(uri).mostRecentEventForType(ContentEventType.COMPLETED);

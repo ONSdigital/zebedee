@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -87,7 +88,7 @@ public class Collection {
             throws IOException {
 
         String filename = PathUtils.toFilename(collectionDescription.name);
-        collectionDescription.id = filename;
+        collectionDescription.id = filename+ "-" + Random.id();
 
         // Create the folders:
         Path collection = zebedee.collections.resolve(filename);

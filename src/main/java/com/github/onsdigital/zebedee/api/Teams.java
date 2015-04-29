@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.json.TeamList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -125,7 +126,7 @@ public class Teams {
      *
      * @param request
      * @param response
-     * @return {@link Teams} or {@link Team} object
+     * @return {@link Teams} or {@link List<Team>} object
      * @throws IOException
      * @throws NotFoundException        {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if the team doesn't exist
      */
@@ -135,7 +136,7 @@ public class Teams {
         if(getTeamName(request) != null) {
             result = Root.zebedee.teams.findTeam(getTeamName(request));
         } else {
-            result = Root.zebedee.teams;
+            result = new TeamList(Root.zebedee.teams.listTeams());
         }
         return result;
     }

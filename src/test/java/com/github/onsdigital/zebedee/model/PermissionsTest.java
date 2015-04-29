@@ -1,9 +1,13 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.Team;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,12 +24,28 @@ public class PermissionsTest {
     Collection inflationCollection;
     Collection labourMarketCollection;
 
+    CollectionDescription collectionDescription;
+    Team team;
+    String viewerEmail;
+
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
         inflationCollection = new Collection(builder.collections.get(0), zebedee);
         labourMarketCollection = new Collection(builder.collections.get(1), zebedee);
+
+        Session session = zebedee.sessions.create(builder.administrator.email);
+
+        // A new collection
+        collectionDescription = new CollectionDescription();
+        collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
+        Collection.create(collectionDescription, zebedee);
+
+        // A new team for the new collection
+        team = zebedee.teams.createTeam(this.getClass().getSimpleName() + "-team-" + Random.id(), session);
+        viewerEmail = builder.reviewer1.email;
+        zebedee.teams.addTeamMember(viewerEmail, team, session);
     }
 
     @After
@@ -285,17 +305,17 @@ public class PermissionsTest {
     public void publisherShouldHaveEditAndViewPermission() throws IOException, UnauthorizedException {
 
         // Given
-        // The Administrator user (NB case-insensitive)
+        // A publisher user (NB case-insensitive)
         String email = builder.publisher1.email.toUpperCase();
 
         // When
-        // We add the user as an administrator
+        // We check the user's permissions
         boolean adminPermission = zebedee.permissions.isAdministrator(email);
         boolean editPermission = zebedee.permissions.canEdit(email);
         boolean viewPermission = zebedee.permissions.canView(email, labourMarketCollection.description);
 
         // Then
-        // The new user should get only admin permission:
+        // The new should get edit and view:
         assertFalse(adminPermission);
         assertTrue(editPermission);
         assertTrue(viewPermission);
@@ -421,11 +441,11 @@ public class PermissionsTest {
         Session publisher = zebedee.sessions.create(builder.publisher1.email);
 
         // When
-        // We remove the user as an administrator
+        // We remove the user as an editor
         zebedee.permissions.removeEditor(builder.publisher1.email, publisher);
 
         // Then
-        // The administrator should not have been removed
+        // The publisher should not have been removed
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -436,11 +456,11 @@ public class PermissionsTest {
         Session viewer = zebedee.sessions.create(builder.reviewer1.email);
 
         // When
-        // We remove the user as an administrator
+        // We remove the user as an publisher
         zebedee.permissions.removeEditor(builder.publisher1.email, viewer);
 
         // Then
-        // The administrator should not have been removed
+        // The publisher should not have been removed
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -451,231 +471,204 @@ public class PermissionsTest {
         Session notLoggedIn = null;
 
         // When
-        // We remove the user as an administrator
+        // We remove the user as an publisher
         zebedee.permissions.removeEditor(builder.publisher1.email, notLoggedIn);
 
         // Then
-        // The administrator should not have been removed
+        // The publisher should not have been removed
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    //// Viewer tests ////////////////////////////////////////////////////////////////////////////////////////////
 
-//    @Test
-//    public void shouldAddEditor() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A new Digital Publishing user
-//        String email = "blue@cat.com";
-//        Session session = zebedee.sessions.create("jukesie@example.com");
-//
-//        // When
-//        // We check view access
-//        zebedee.permissions.addEditor(email, session);
-//
-//        // Then
-//        // The new user should get both View and Edit permissions:
-//        assertTrue(zebedee.permissions.canView(email, "/economy"));
-//        assertTrue(zebedee.permissions.canEdit(email));
-//    }
 
     @Test
-    public void shouldForbidEditToUnknownUser() throws IOException, UnauthorizedException {
+    public void viewerShouldHaveOnlyViewPermission() throws IOException, UnauthorizedException {
 
         // Given
-        // An unknown user
-        String email = "blue@cat.com";
+        // The Viewer user (NB case-insensitive)
+        String email = builder.reviewer1.email.toUpperCase();
 
         // When
-        // We check edit access
-        boolean permission = zebedee.permissions.canEdit(email);
+        // We check the user's permissions
+        boolean adminPermission = zebedee.permissions.isAdministrator(email);
+        boolean editPermission = zebedee.permissions.canEdit(email);
+        boolean viewPermission = zebedee.permissions.canView(email, inflationCollection.description);
 
         // Then
-        // Computer should say no
-        assertFalse(permission);
+        // The user should get only view permission:
+        assertFalse(adminPermission);
+        assertFalse(editPermission);
+        assertTrue(viewPermission);
     }
-
-//    @Test
-//    public void shouldForbidViewToUnknownUser() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // An unknown user
-//        String email = "blue@cat.com";
-//
-//        // When
-//        // We check view access
-//        boolean permission = zebedee.permissions.canView(email, "/economy");
-//
-//        // Then
-//        // Computer should say no
-//        assertFalse(permission);
-//    }
 
     @Test
-    public void shouldAllowEditToDigitalPublishing() throws IOException, UnauthorizedException {
+    public void viewerShouldNotHaveViewPermissionToOtherCollection() throws IOException, UnauthorizedException {
 
         // Given
-        // A user in the Digital Publishing team
-        String email = "patricia@example.com";
+        // The Viewer user (NB case-insensitive)
+        String email = builder.reviewer1.email.toUpperCase();
 
         // When
-        // We check edit access
-        boolean permission = zebedee.permissions.canEdit(email);
+        // We check the user's permissions on a collection they aren't authorised for
+        boolean viewPermission = zebedee.permissions.canView(email, labourMarketCollection.description);
 
         // Then
-        // Computer should say yes
-        assertTrue(permission);
+        // The user should get only view permission:
+        assertFalse(viewPermission);
     }
-
-//    @Test
-//    public void shouldAllowViewToDigitalPublishing() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A user in the Digital Publishing team
-//        String email = "patricia@example.com";
-//
-//        // When
-//        // We check view access
-//        boolean permission = zebedee.permissions.canView(email, "/economy");
-//
-//        // Then
-//        // Computer should say yes
-//        assertTrue(permission);
-//    }
 
     @Test
-    public void shouldForbidEditToContentOwner() throws IOException, UnauthorizedException {
+    public void onlyViewerShouldBeViewer() throws IOException, UnauthorizedException, NotFoundException {
 
         // Given
-        // A Content owner user
-        String email = "ronny@example.com";
+        // A bunch of user email addresses (NB case-insensitive)
+        String administratorEmail = builder.administrator.email.toUpperCase();
+        String publisherEmail = builder.publisher1.email.toUpperCase();
+        String viewerEmail = builder.reviewer1.email.toUpperCase();
+        String unknownEmail = "unknown@example.com";
+        String nullEmail = null;
 
         // When
-        // We check edit access
-        boolean permission = zebedee.permissions.canEdit(email);
+        // We ask if they are viewers:
+        boolean adminIsViewer = zebedee.permissions.canView(administratorEmail, collectionDescription);
+        boolean publisherIsViewer = zebedee.permissions.canView(publisherEmail, collectionDescription);
+        boolean viewerIsViewer = zebedee.permissions.canView(viewerEmail, collectionDescription);
+        boolean unknownIsViewer = zebedee.permissions.canView(unknownEmail, collectionDescription);
+        boolean nullIsViewer = zebedee.permissions.canView(nullEmail, collectionDescription);
 
         // Then
-        // Computer should say no
-        assertFalse(permission);
+        // Only the publisher should be, and null should not give an error
+        assertFalse(adminIsViewer);
+        assertTrue(publisherIsViewer);
+        assertFalse(viewerIsViewer);
+        assertFalse(unknownIsViewer);
+        assertFalse(nullIsViewer);
     }
 
-//    @Test
-//    public void shouldAllowViewToContentOwnerForAllowedPath() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A Content owner user
-//        String email = "ronny@example.com";
-//
-//        // When
-//        // We check view access
-//        boolean permission = zebedee.permissions.canView(email, "/economy");
-//
-//        // Then
-//        // Computer should say yes
-//        assertTrue(permission);
-//    }
+    @Test
+    public void shouldAddViewer() throws IOException, UnauthorizedException, NotFoundException {
 
-//    @Test
-//    public void shouldAllowViewToContentOwnerForAllowedSubpath() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A Content owner user
-//        String email = "ronny@example.com";
-//
-//        // When
-//        // We check view access
-//        boolean permission = zebedee.permissions.canView(email, "/economy/subpath");
-//
-//        // Then
-//        // Computer should say yes
-//        assertTrue(permission);
-//    }
+        // Given
+        // A new publisher user
+        Session session = zebedee.sessions.create(builder.publisher1.email);
 
-//    @Test
-//    public void shouldForbidViewToContentOwnerForUngrantedPath() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A Content owner user
-//        String email = "ronny@example.com";
-//
-//        // When
-//        // We check view access
-//        boolean permission = zebedee.permissions.canView(email, "/labourmarket");
-//
-//        // Then
-//        // Computer should say no
-//        assertFalse(permission);
-//    }
+        // When
+        // We add the user as a viewer (NB case-insensitive)
+        zebedee.permissions.addViewerTeam(collectionDescription, team, session);
 
-//    @Test
-//    public void shouldAddContentOwner() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A new Content owner user
-//        String email = "blue@cat.com";
-//        Session session = zebedee.sessions.create("jukesie@example.com");
-//
-//        // When
-//        // We check view access
-//        ////zebedee.permissions.addViewer(email, "/economy", session);
-//
-//        // Then
-//        // The new user should get only View permission:
-//        assertTrue(zebedee.permissions.canView(email, "/economy"));
-//        assertFalse(zebedee.permissions.canEdit(email));
-//    }
+        // Then
+        // The user in this team should get view permission
+        assertTrue(zebedee.permissions.canView(builder.reviewer1.email, collectionDescription));
+    }
 
-//    @Test
-//    public void shouldRemoveDigitalPublisher() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A Digital Publishing user
-//        String email = "patricia@example.com";
-//        Session session = zebedee.sessions.create("jukesie@example.com");
-//
-//        // When
-//        // We remove edit access
-//        zebedee.permissions.removeEditor(email, session);
-//
-//        // Then
-//        // The new user should no longer have permission
-//        assertFalse(zebedee.permissions.canView(email, "/economy"));
-//        assertFalse(zebedee.permissions.canEdit(email));
-//    }
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotAddViewerIfAdmin() throws IOException, UnauthorizedException, NotFoundException {
 
-//    @Test
-//    public void shouldRemoveContentOwner() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A Content owner user
-//        String email = "ronny@example.com";
-//        Session session = zebedee.sessions.create("jukesie@example.com");
-//
-//        // When
-//        // We remove view access
-//        zebedee.permissions.removeViewer(email, "/economy", session);
-//
-//        // Then
-//        // The new user should no longer have permission
-//        assertFalse(zebedee.permissions.canView(email, "/economy"));
-//        assertFalse(zebedee.permissions.canEdit(email));
-//    }
+        // Given
+        // A session with insufficient permission
+        String email = "Some.Guy@example.com";
+        Session session = zebedee.sessions.create(builder.administrator.email);
 
-//    @Test
-//    public void shouldRemoveContentOwnerFromSubPath() throws IOException, UnauthorizedException {
-//
-//        // Given
-//        // A Content owner user is added to a sub-path
-//        String email = "ronny@example.com";
-//        Session session = zebedee.sessions.create("jukesie@example.com");
-//        ////zebedee.permissions.addViewer(email, "/economy/subpath", session);
-//
-//        // When
-//        // We remove access from the parent path
-//        zebedee.permissions.removeViewer(email, "/economy", session);
-//
-//        // Then
-//        // The content owner's permissions should be removed from the sub-path
-//        assertFalse(zebedee.permissions.canView(email, "/economy/subpath"));
-//        assertFalse(zebedee.permissions.canEdit(email));
-//    }
+        // When
+        // We add the user as a viewer (NB case-insensitive)
+        zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+
+        // Then
+        // We should get unauthorized
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotAddViewerIfViewer() throws IOException, UnauthorizedException, NotFoundException {
+
+        // Given
+        // A session with insufficient permission
+        String email = "Some.Guy@example.com";
+        Session session = zebedee.sessions.create(builder.reviewer1.email);
+
+        // When
+        // We add the user as a viewer (NB case-insensitive)
+        zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+
+        // Then
+        // We should get unauthorized
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotAddViewerIfNotLoggedIn() throws IOException, UnauthorizedException, NotFoundException {
+
+        // Given
+        // No login session
+        String email = "Some.Guy@example.com";
+        Session session = null;
+
+        // When
+        // We add the user as a viewer (NB case-insensitive)
+        zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+
+        // Then
+        // We should get unauthorized
+    }
+
+    @Test
+    public void shouldRemoveViewer() throws IOException, UnauthorizedException, NotFoundException {
+
+        // Given
+        // A short-lived publisher user (NB case-insensitive)
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+
+        // When
+        // We remove the viewer team
+        zebedee.permissions.removeViewerTeam(collectionDescription, team, session);
+
+        // Then
+        // The new user should get no view permission
+        assertFalse(zebedee.permissions.canView(builder.reviewer1.email, collectionDescription));
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotRemoveViewerIfAdministrator() throws IOException, UnauthorizedException {
+
+        // Given
+        // A user with insufficient permission
+        Session publisher = zebedee.sessions.create(builder.administrator.email);
+
+        // When
+        // We remove the viewer team
+        zebedee.permissions.removeViewerTeam(inflationCollection.description, builder.inflationTeam, publisher);
+
+        // Then
+        // The viewer team should not have been removed
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotRemoveViewerIfViewer() throws IOException, UnauthorizedException {
+
+        // Given
+        // Users with insufficient permission
+        Session viewer = zebedee.sessions.create(builder.reviewer1.email);
+
+        // When
+        // We remove the viewer team
+        zebedee.permissions.removeViewerTeam(labourMarketCollection.description, builder.labourMarketTeam, viewer);
+
+        // Then
+        // The viewer team should not have been removed
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotRemoveViewerIfNotLoggedIn() throws IOException, UnauthorizedException {
+
+        // Given
+        // No login session
+        Session notLoggedIn = null;
+
+        // When
+        // We remove the viewer team
+        zebedee.permissions.removeViewerTeam(inflationCollection.description, builder.inflationTeam, notLoggedIn);
+
+        // Then
+        // The viewer team should not have been removed
+    }
+
 }

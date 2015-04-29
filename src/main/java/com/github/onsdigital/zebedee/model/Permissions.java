@@ -172,9 +172,9 @@ public class Permissions {
      * @param session               Only editors can grant a team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException {
+    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session.email)) {
-            return;
+            throw new UnauthorizedException("This requires editing permission: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -195,9 +195,9 @@ public class Permissions {
      * @param session               Only editors can revoke team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException {
+    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session.email)) {
-            return;
+            throw new UnauthorizedException("This requires editing permission: " + session);
         }
 
         AccessMapping accessMapping = readAccessMapping();

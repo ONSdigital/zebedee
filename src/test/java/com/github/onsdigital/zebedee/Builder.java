@@ -35,6 +35,8 @@ public class Builder {
     public User publisher2;
     public User reviewer1;
     public User reviewer2;
+    public Team labourMarketTeam;
+    public Team inflationTeam;
 
     public Builder(Class<?> name) throws IOException {
 
@@ -149,10 +151,10 @@ public class Builder {
         accessMapping.collections = new HashMap<>();
 
         Zebedee z = new Zebedee(zebedee);
-        Team labourMarketTeam = createTeam(freddy, teamNames[0], teams);
-        Team inflationTeam = createTeam(ronny, teamNames[1], teams);
-        accessMapping.collections.put(new Collection(collections.get(0), z).description.id, set(labourMarketTeam));
-        accessMapping.collections.put(new Collection(collections.get(1), z).description.id, set(inflationTeam));
+        inflationTeam = createTeam(freddy, teamNames[0], teams);
+        labourMarketTeam = createTeam(ronny, teamNames[1], teams);
+        accessMapping.collections.put(new Collection(collections.get(0), z).description.id, set(inflationTeam));
+        accessMapping.collections.put(new Collection(collections.get(1), z).description.id, set(labourMarketTeam));
 
         Path path = permissions.resolve("accessMapping.json");
         try (OutputStream output = Files.newOutputStream(path)) {

@@ -20,6 +20,7 @@ public class AccessMapping {
 
     /**
      * Content owners can be assigned access to collections via one or more teams.
+     * <p>NB: This is a map of collection ID to the set of team IDs that have access to the collection.</p>
      */
     public Map<String, Set<Integer>> collections;
 }

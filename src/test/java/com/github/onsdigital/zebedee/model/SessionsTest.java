@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,20 +25,28 @@ public class SessionsTest {
     Zebedee zebedee;
     Builder builder;
 
+    int expiryUnit;
+    int expiryAmount;
+
+
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
+        expiryUnit = Sessions.expiryUnit;
+        expiryAmount = Sessions.expiryAmount;
     }
 
     @After
     public void tearDown() throws Exception {
         builder.delete();
+        Sessions.expiryUnit = expiryUnit;
+        Sessions.expiryAmount = expiryAmount;
     }
 
 
     @Test
-    public void shouldCreateSession() throws Exception {
+    public void shouldCreateSession() throws IOException {
 
         // Given
         // No session have been created
@@ -55,7 +64,7 @@ public class SessionsTest {
 
 
     @Test
-    public void shouldNotCreateDuplicateSession() throws Exception {
+    public void shouldNotCreateDuplicateSession() throws IOException {
 
         // Given
         // A session has been created
@@ -74,7 +83,7 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldGetSession() throws Exception {
+    public void shouldGetSession() throws IOException {
 
         // Given
         // A session has been created
@@ -92,7 +101,7 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldNotGetNonexistentSession() throws Exception {
+    public void shouldNotGetNonexistentSession() throws IOException {
 
         // Given
         // No session have been created
@@ -109,7 +118,7 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldNotThrowErrorForNullSessionToken() throws Exception {
+    public void shouldNotThrowErrorForNullSessionToken() throws IOException {
 
         // Given
         // An empty session token
@@ -152,6 +161,76 @@ public class SessionsTest {
         for (GetSession runnable : runnables) {
             assertFalse(runnable.failed);
         }
+    }
+
+    @Test
+    public void shouldFindSession() throws IOException {
+
+        // Given
+        // A session has been created
+        String email = "blue@cat.com";
+        Session existingSession = zebedee.sessions.create(email);
+
+        // When
+        // We attempt to get the session
+        Session session = zebedee.sessions.find(email);
+
+        // Then
+        // The expected session should be returned
+        Assert.assertNotNull(session);
+        Assert.assertEquals(existingSession.id, session.id);
+    }
+
+    @Test
+    public void shouldNotFindNonexistentSession() throws IOException {
+
+        // Given
+        // No session has been created for a given email
+        String email = Random.id() + "@nonexistent.com";
+
+        // When
+        // We try to get a session
+        Session session = zebedee.sessions.find(email);
+
+        // Then
+        // No session should be returned
+        Assert.assertNull(session);
+    }
+
+    @Test
+    public void shouldNotThrowErrorForNullEmail() throws IOException {
+
+        // Given
+        // A null email
+        String email = null;
+
+        // When
+        // We try to find a session
+        Session session = zebedee.sessions.find(email);
+
+        // Then
+        // No error should be thrown
+        Assert.assertNull(session);
+    }
+
+    @Test
+    public void shouldExpireSessions() throws IOException, InterruptedException {
+
+        // Given
+        // A short expiry time and a session
+        String email = "byebye@example.com";
+        Session session = zebedee.sessions.create(email);
+        Sessions.expiryUnit = Calendar.MILLISECOND;
+        Sessions.expiryAmount = 1;
+
+        // When
+        // We clear out expired sessions
+        Thread.sleep(10);
+        zebedee.sessions.deleteExpiredSessions();
+
+        // Then
+        // The session should be deleted
+        Assert.assertNull(zebedee.sessions.get(session.id));
     }
 
     public class GetSession implements Runnable {

@@ -20,6 +20,8 @@ import java.util.*;
 public class Sessions extends TimerTask {
 
     public static final String TOKEN_HEADER = "X-Florence-Token";
+    static int expiryUnit = Calendar.MINUTE;
+    static int expiryAmount = 60;
     Timer timer;
     private Path sessions;
 
@@ -172,8 +174,7 @@ public class Sessions extends TimerTask {
 
         List<Session> expired = new ArrayList<>();
 
-        // Find the session we're looking for:
-        iterate:
+        // Find the sessions we're looking for:
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessions)) {
             for (Path entry : stream) {
                 if (!Files.isDirectory(entry)) {
@@ -206,7 +207,7 @@ public class Sessions extends TimerTask {
 
         if (session != null) {
             Calendar expiry = Calendar.getInstance();
-            expiry.add(Calendar.MINUTE, -60);
+            expiry.add(expiryUnit, -expiryAmount);
             result = session.lastAccess.before(expiry.getTime());
         }
 

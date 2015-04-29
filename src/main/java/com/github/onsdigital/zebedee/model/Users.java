@@ -36,10 +36,9 @@ public class Users {
      * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createAdmin(Zebedee zebedee, User user, String password, Session session) throws IOException {
+    public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException {
         user.passwordHash = Password.hash(password);
         zebedee.users.write(user);
-        zebedee.permissions.addAdministrator(user.email, session);
         zebedee.permissions.addEditor(user.email, session);
     }
 

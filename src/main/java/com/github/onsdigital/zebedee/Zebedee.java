@@ -79,31 +79,31 @@ public class Zebedee {
         user.email = "p1@t.com";
         user.name = "p1";
         password = "Doug4l";
-        Users.createAdmin(zebedee, user, password, session);
+        Users.createPublisher(zebedee, user, password, session);
 
         user = new User();
         user.email = "p2@t.com";
         user.name = "p2";
         password = "Doug4l";
-        Users.createAdmin(zebedee, user, password, session);
+        Users.createPublisher(zebedee, user, password, session);
 
         user = new User();
         user.email = "p3@t.com";
         user.name = "p3";
         password = "Doug4l";
-        Users.createAdmin(zebedee, user, password, session);
+        Users.createPublisher(zebedee, user, password, session);
 
         user = new User();
         user.email = "p4@t.com";
         user.name = "p4";
         password = "Doug4l";
-        Users.createAdmin(zebedee, user, password, session);
+        Users.createPublisher(zebedee, user, password, session);
 
         user = new User();
         user.email = "p5@t.com";
         user.name = "p5";
         password = "Doug4l";
-        Users.createAdmin(zebedee, user, password, session);
+        Users.createPublisher(zebedee, user, password, session);
 
         return zebedee;
     }

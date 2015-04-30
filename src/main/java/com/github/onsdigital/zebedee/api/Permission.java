@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
@@ -57,6 +59,27 @@ public class Permission {
         }
 
         return "Permissions updated for " + permissionDefinition.email;
+    }
+
+    /**
+     * Grants the specified permissions.
+     *
+     * @param request              Should be of the form {@code /permission?email=florence@example.com}
+     * @param response             A permissions object for that user
+     * @return
+     * @throws IOException           If an error occurs accessing data.
+     * @throws UnauthorizedException If the user is not an administrator.
+     * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
+     */
+    @GET
+    public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException {
+
+        Session session = Root.zebedee.sessions.get(request);
+        String email = request.getParameter("email");
+
+        PermissionDefinition permissionDefinition = Root.zebedee.permissions.userPermissions(email, session);
+
+        return permissionDefinition;
     }
 
 }

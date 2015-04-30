@@ -2,11 +2,9 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.AccessMapping;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.json.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -305,4 +303,23 @@ public class Permissions {
         return PathUtils.standardise(email);
     }
 
+    /**
+     * User permission levels given an email
+     *
+     * @param email the user email
+     * @return a {@link PermissionDefinition} object
+     * @throws IOException
+     * @throws NotFoundException If the user cannot be found
+     * @throws UnauthorizedException If the request is not from an admin
+     */
+    public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
+
+        if((session == null) || !isAdministrator(session.email)) { throw new UnauthorizedException("Requires admin access"); }
+
+        PermissionDefinition definition = new PermissionDefinition();
+        definition.email = email;
+        definition.admin = isAdministrator(email);
+        definition.editor = canEdit(email);
+        return definition;
+    }
 }

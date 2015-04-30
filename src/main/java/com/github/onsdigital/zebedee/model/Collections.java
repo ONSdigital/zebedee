@@ -149,6 +149,27 @@ public class Collections {
         }
     }
 
+    public void delete(Collection collection, Session session) throws IOException, NotFoundException, UnauthorizedException, BadRequestException {
+
+        // User has permission
+        if (!Root.zebedee.permissions.canEdit(session.email)) {
+            throw new UnauthorizedException(session);
+        }
+
+        // Collection exists
+        if (collection == null) {
+            throw new NotFoundException("Please specify a valid collection");
+        }
+
+        // Collection is empty
+        if (!collection.isEmpty()) {
+            throw new BadRequestException("The collection is not empty.");
+        }
+
+        // Go ahead
+        collection.delete();
+    }
+
     /**
      * Represents the list of all collections currently in the system.
      * This adds a couple of utility methods to {@link ArrayList}.

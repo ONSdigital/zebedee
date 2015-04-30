@@ -1,6 +1,9 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
@@ -115,34 +118,12 @@ public class Collection {
      * @throws IOException
      */
     @DELETE
-    public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
 
-        com.github.onsdigital.zebedee.model.Collection collection;
-        collection = Collections.getCollection(request);
-
-        // Check whether we found the collection:
-        if (collection == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return false;
-        }
-
-        // Check whether user has permission to delete this collection
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.canEdit(session.email) == false) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return false;
-        }
 
-        // Check whether the collection can be deleted
-        if (!collection.isEmpty()) {
-            response.setStatus(HttpStatus.CONFLICT_409);
-            return false;
-        }
-
-        // Delete
-        collection.delete();
-
-        response.setStatus(HttpStatus.OK_200);
+        Root.zebedee.collections.delete(collection, session);
         return true;
     }
 }

@@ -58,7 +58,7 @@ public class Transfer {
         }
 
         // get the destination file
-        Collection destination = Root.zebedee.getCollections().getCollection(params.destination);
+        Collection destination = Root.zebedee.collections.list().getCollection(params.destination);
         if (destination == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return false;
@@ -78,6 +78,6 @@ public class Transfer {
     }
 
     private Collection getSource(TransferRequest params, HttpServletRequest request) throws  IOException{
-        return params.source == null ? Collections.getCollection(request) : Root.zebedee.getCollections().getCollection(params.source);
+        return params.source == null ? Collections.getCollection(request) : Root.zebedee.collections.list().getCollection(params.source);
     }
 }

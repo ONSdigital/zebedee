@@ -44,7 +44,8 @@ public class Collection {
         if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
-        };
+        }
+        ;
 
         // Collate the result:
         CollectionDescription result = new CollectionDescription();
@@ -91,7 +92,7 @@ public class Collection {
         }
 
         collectionDescription.name = StringUtils.trim(collectionDescription.name);
-        if (Root.zebedee.getCollections().hasCollection(
+        if (Root.zebedee.collections.list().hasCollection(
                 collectionDescription.name)) {
             response.setStatus(HttpStatus.CONFLICT_409);
             return null;

@@ -29,7 +29,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldFindCollection() throws IOException {
-        Collections collections = new Collections();
+        Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
         Collection secondCollection = Collection.create(new CollectionDescription("SecondCollection"), zebedee);
@@ -49,7 +49,7 @@ public class CollectionsTest {
     @Test
     public void shouldReturnNullIfNotFound() throws IOException {
 
-        Collections collections = new Collections();
+        Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
 
@@ -60,16 +60,16 @@ public class CollectionsTest {
 
     @Test
     public void shouldHaveCollectionForName() throws IOException {
-        Collections collections = new Collections();
+        Collections.CollectionList collectionList = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
         Collection secondCollection = Collection.create(new CollectionDescription("SecondCollection"), zebedee);
 
-        collections.add(firstCollection);
-        collections.add(secondCollection);
+        collectionList.add(firstCollection);
+        collectionList.add(secondCollection);
 
-        assertTrue(collections.hasCollection("FirstCollection"));
-        assertTrue(collections.hasCollection("SecondCollection"));
-        assertFalse(collections.hasCollection("SomeCollectionThatDoesNotExist"));
+        assertTrue(collectionList.hasCollection("FirstCollection"));
+        assertTrue(collectionList.hasCollection("SecondCollection"));
+        assertFalse(collectionList.hasCollection("SomeCollectionThatDoesNotExist"));
     }
 }

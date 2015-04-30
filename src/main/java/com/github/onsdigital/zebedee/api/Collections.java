@@ -26,7 +26,7 @@ public class Collections {
             collectionId = segments.get(1);
         }
 
-        return Root.zebedee.getCollections().getCollection(collectionId);
+        return Root.zebedee.collections.list().getCollection(collectionId);
     }
 
     /**
@@ -43,7 +43,7 @@ public class Collections {
 
         CollectionDescriptions result = new CollectionDescriptions();
 
-        List<Collection> collections = Root.zebedee.getCollections();
+        List<Collection> collections = Root.zebedee.collections.list();
         for (Collection collection : collections) {
 
             CollectionDescription description = new CollectionDescription();

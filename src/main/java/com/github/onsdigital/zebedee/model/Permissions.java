@@ -37,8 +37,19 @@ public class Permissions {
     /**
      * Determines whether the specified user has administator permissions.
      *
+     * @param session The user's login session.
+     * @return If the user is an administrator, true.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean isAdministrator(Session session) throws IOException {
+        return session != null && isAdministrator(session.email);
+    }
+
+    /**
+     * Determines whether the specified user has administator permissions.
+     *
      * @param email The user's emal.
-     * @return True if the user is an administrator.
+     * @return If the user is an administrator, true.
      * @throws IOException If a filesystem error occurs.
      */
     public boolean isAdministrator(String email) throws IOException {
@@ -69,7 +80,7 @@ public class Permissions {
 
         // Allow the initial user to be set as an administrator:
         if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -88,7 +99,7 @@ public class Permissions {
      */
     public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -102,8 +113,19 @@ public class Permissions {
     /**
      * Determines whether the specified user has editing rights.
      *
+     * @param session The user's session - this may be null.
+     * @return If the user is a member of the Digital Publishing team, true.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean canEdit(Session session) throws IOException {
+        return session != null && canEdit(session.email);
+    }
+
+    /**
+     * Determines whether the specified user has editing rights.
+     *
      * @param email The user's email.
-     * @return True if the user is a member of the Digital Publishing team.
+     * @return If the user is a member of the Digital Publishing team, true.
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canEdit(String email) throws IOException {
@@ -119,7 +141,7 @@ public class Permissions {
      */
     public void addEditor(String email, Session session) throws IOException, UnauthorizedException {
         if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -139,7 +161,7 @@ public class Permissions {
      */
     public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -174,7 +196,7 @@ public class Permissions {
      */
     public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session.email)) {
-            throw new UnauthorizedException("This requires editing permission: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -197,7 +219,7 @@ public class Permissions {
      */
     public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session.email)) {
-            throw new UnauthorizedException("This requires editing permission: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();

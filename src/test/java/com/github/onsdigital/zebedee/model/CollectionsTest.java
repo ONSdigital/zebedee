@@ -3,8 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +30,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldFindCollection() throws IOException {
-        Collections collections = new Collections();
+        Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
         Collection secondCollection = Collection.create(new CollectionDescription("SecondCollection"), zebedee);
@@ -47,7 +45,7 @@ public class CollectionsTest {
     @Test
     public void shouldReturnNullIfNotFound() throws IOException {
 
-        Collections collections = new Collections();
+        Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
 

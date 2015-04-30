@@ -91,7 +91,7 @@ public class Collection {
         }
 
         collectionDescription.name = StringUtils.trim(collectionDescription.name);
-        if (Root.zebedee.getCollections().hasCollection(
+        if (Root.zebedee.collections.list().hasCollection(
                 collectionDescription.name)) {
             response.setStatus(HttpStatus.CONFLICT_409);
             return null;

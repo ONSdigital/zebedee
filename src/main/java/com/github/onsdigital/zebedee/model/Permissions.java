@@ -37,8 +37,19 @@ public class Permissions {
     /**
      * Determines whether the specified user has administator permissions.
      *
+     * @param session The user's login session.
+     * @return If the user is an administrator, true.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean isAdministrator(Session session) throws IOException {
+        return session != null && isAdministrator(session.email);
+    }
+
+    /**
+     * Determines whether the specified user has administator permissions.
+     *
      * @param email The user's emal.
-     * @return True if the user is an administrator.
+     * @return If the user is an administrator, true.
      * @throws IOException If a filesystem error occurs.
      */
     public boolean isAdministrator(String email) throws IOException {
@@ -102,8 +113,19 @@ public class Permissions {
     /**
      * Determines whether the specified user has editing rights.
      *
+     * @param session The user's session - this may be null.
+     * @return If the user is a member of the Digital Publishing team, true.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean canEdit(Session session) throws IOException {
+        return session != null && canEdit(session.email);
+    }
+
+    /**
+     * Determines whether the specified user has editing rights.
+     *
      * @param email The user's email.
-     * @return True if the user is a member of the Digital Publishing team.
+     * @return If the user is a member of the Digital Publishing team, true.
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canEdit(String email) throws IOException {

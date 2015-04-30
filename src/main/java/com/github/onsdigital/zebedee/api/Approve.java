@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -30,39 +32,11 @@ public class Approve {
      * @throws IOException
      */
     @POST
-    public boolean approveCollection(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public boolean approveCollection(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, com.github.onsdigital.zebedee.exceptions.BadRequestException, UnauthorizedException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-
-        // Check collection exists
-        if (collection == null) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return false;
-        }
-
-        // TODO Check user permissions UNAUTHORISED_401
         Session session = Root.zebedee.sessions.get(request);
-        if (session == null || !Root.zebedee.permissions.canEdit(session.email)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return false;
-        }
-
-        // TODO Check collection exists BAD_REQUEST_400
-        if (collection == null) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return false;
-        }
-
-        // Check everything is completed
-        if (!collection.inProgressUris().isEmpty() || !collection.completeUris().isEmpty()) {
-            response.setStatus(HttpStatus.CONFLICT_409);
-            return false;
-        }
-
-        response.setStatus(HttpStatus.OK_200);
-        collection.description.approvedStatus = true;
-
-        return collection.save();
+        return Root.zebedee.collections.approve(collection, session);
     }
 
 

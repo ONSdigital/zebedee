@@ -4,6 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentEvent;
 import com.github.onsdigital.zebedee.json.ContentEventType;
@@ -354,11 +355,13 @@ public class Collection {
      * to {@link #reviewed}.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean review(String email, String uri) throws IOException, BadRequestException {
+    public boolean review(String email, String uri) throws IOException, BadRequestException, UnauthorizedException {
         boolean result = false;
         boolean permission = zebedee.permissions.canEdit(email);
         boolean userCompletedContent = didUserCompleteContent(email, uri);
         boolean contentWasCompleted = contentWasCompleted(uri);
+
+        if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
 
         if (permission && contentWasCompleted && !userCompletedContent) {
             // Move the complete copy to reviewed:

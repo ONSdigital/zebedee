@@ -3,8 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +38,13 @@ public class CollectionsTest {
         collections.add(firstCollection);
         collections.add(secondCollection);
 
-        assertEquals("FirstCollection", collections.getCollection("FirstCollection").description.name);
-        assertEquals("SecondCollection", collections.getCollection("SecondCollection").description.name);
+        Collection firstCollectionFound = collections.getCollection(firstCollection.description.id);
+        Collection secondCollectionFound = collections.getCollection(secondCollection.description.id);
+
+        assertEquals(firstCollection.description.id, firstCollectionFound.description.id);
+        assertEquals(firstCollection.description.name, firstCollectionFound.description.name);
+        assertEquals(secondCollection.description.id, secondCollectionFound.description.id);
+        assertEquals(secondCollection.description.name, secondCollectionFound.description.name);
     }
 
     @Test

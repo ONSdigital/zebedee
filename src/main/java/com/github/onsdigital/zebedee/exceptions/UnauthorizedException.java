@@ -14,7 +14,4 @@ public class UnauthorizedException extends ZebedeeException {
     public UnauthorizedException(String message) {
         super(message, HttpStatus.UNAUTHORIZED_401);
     }
-    public UnauthorizedException(String message) {
-        super(message, HttpStatus.UNAUTHORIZED_401);
-    }
 }

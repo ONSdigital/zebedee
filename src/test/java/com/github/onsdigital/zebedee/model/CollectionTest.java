@@ -529,6 +529,7 @@ public class CollectionTest {
 //        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
 //    }
 
+
     private String CreatePublishedContent() throws IOException {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);

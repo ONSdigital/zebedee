@@ -23,7 +23,7 @@ public class Zebedee {
 
     public final Path path;
     public final Content published;
-    public final Path collections;
+    public final Collections collections;
     public final Users users;
     public final Sessions sessions;
     public final Permissions permissions;
@@ -45,7 +45,7 @@ public class Zebedee {
                             + path.toAbsolutePath());
         }
         this.published = new Content(published);
-        this.collections = collections;
+        this.collections = new Collections(collections, this) ;
         this.users = new Users(users, this);
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
@@ -130,29 +130,12 @@ public class Zebedee {
         int result = 0;
 
         // Is this URI present anywhere else?
-        for (Collection collection : getCollections()) {
+        for (Collection collection : collections.list()) {
             if (collection.isInCollection(uri)) {
                 result++;
             }
         }
 
-        return result;
-    }
-
-    /**
-     * @return A list of all {@link Collection}s.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public Collections getCollections() throws IOException {
-        Collections result = new Collections();
-        try (DirectoryStream<Path> stream = Files
-                .newDirectoryStream(collections)) {
-            for (Path path : stream) {
-                if (Files.isDirectory(path)) {
-                    result.add(new Collection(path, this));
-                }
-            }
-        }
         return result;
     }
 

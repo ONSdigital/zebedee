@@ -24,12 +24,13 @@ public class Collection {
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
 
+    final Zebedee zebedee;
+    final Collections collections;
     public final CollectionDescription description;
-    public Path path;
-    public Content reviewed;
-    public Content complete;
-    public Content inProgress;
-    Zebedee zebedee;
+    public final Path path;
+    public final Content reviewed;
+    public final Content complete;
+    public final Content inProgress;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -66,13 +67,14 @@ public class Collection {
 
         // Set fields:
         this.zebedee = zebedee;
+        this.collections = zebedee.collections;
         this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
     }
 
     Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException {
-        this(zebedee.collections.resolve(PathUtils.toFilename(collectionDescription.name)), zebedee);
+        this(zebedee.collections.path.resolve(PathUtils.toFilename(collectionDescription.name)), zebedee);
     }
 
     /**
@@ -92,14 +94,14 @@ public class Collection {
         collectionDescription.id = filename+ "-" + Random.id();
 
         // Create the folders:
-        Path collection = zebedee.collections.resolve(filename);
+        Path collection = zebedee.collections.path.resolve(filename);
         Files.createDirectory(collection);
         Files.createDirectory(collection.resolve(REVIEWED));
         Files.createDirectory(collection.resolve(COMPLETE));
         Files.createDirectory(collection.resolve(IN_PROGRESS));
 
         // Create the description:
-        Path collectionDescriptionPath = zebedee.collections.resolve(filename
+        Path collectionDescriptionPath = zebedee.collections.path.resolve(filename
                 + ".json");
 
         try (OutputStream output = Files.newOutputStream(collectionDescriptionPath)) {
@@ -124,13 +126,13 @@ public class Collection {
         String filename = PathUtils.toFilename(collectionDescription.name);
         String newFilename = PathUtils.toFilename(newName);
 
-        Path collection = zebedee.collections.resolve(filename);
-        Path newCollection = zebedee.collections.resolve(newFilename);
+        Path collection = zebedee.collections.path.resolve(filename);
+        Path newCollection = zebedee.collections.path.resolve(newFilename);
 
         new File(collection.toUri()).renameTo(new File(newCollection.toUri()));
 
         // Create the description:
-        Path newPath = zebedee.collections.resolve(newFilename
+        Path newPath = zebedee.collections.path.resolve(newFilename
                 + ".json");
 
         CollectionDescription renamedCollectionDescription = new CollectionDescription(
@@ -142,7 +144,7 @@ public class Collection {
             Serialiser.serialise(output, renamedCollectionDescription);
         }
 
-        Files.delete(zebedee.collections.resolve(filename + ".json"));
+        Files.delete(zebedee.collections.path.resolve(filename + ".json"));
 
         return new Collection(renamedCollectionDescription, zebedee);
     }
@@ -162,7 +164,7 @@ public class Collection {
 
         // Delete the description file
         String filename = PathUtils.toFilename(this.description.name);
-        Path collectionDescriptionPath = zebedee.collections.resolve(filename + ".json");
+        Path collectionDescriptionPath = collections.path.resolve(filename + ".json");
         Files.delete(collectionDescriptionPath);
     }
 
@@ -174,7 +176,7 @@ public class Collection {
     }
 
     private Path descriptionPath() {
-        return zebedee.collections.resolve(this.description.id + ".json");
+        return collections.path.resolve(this.description.id + ".json");
     }
 
     /**

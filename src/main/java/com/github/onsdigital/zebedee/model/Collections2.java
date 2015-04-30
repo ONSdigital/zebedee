@@ -17,12 +17,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-public class Collections {
+public class Collections2 {
 
     public final Path path;
     Zebedee zebedee;
 
-    public Collections(Path path, Zebedee zebedee) {
+    public Collections2(Path path, Zebedee zebedee) {
         this.path = path;
         this.zebedee = zebedee;
     }

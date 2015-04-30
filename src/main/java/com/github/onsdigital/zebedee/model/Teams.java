@@ -71,7 +71,7 @@ public class Teams {
      */
     public Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         Path path = teamPath(teamName);
@@ -106,7 +106,7 @@ public class Teams {
      */
     public void renameTeam(Team update, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException, BadRequestException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         if (update != null && StringUtils.isNotBlank(update.name)) {
@@ -155,7 +155,7 @@ public class Teams {
      */
     public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email))
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
 
         if (delete != null) {
 
@@ -188,7 +188,7 @@ public class Teams {
      */
     public void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         if (!StringUtils.isBlank(email) && team != null) {
@@ -207,7 +207,7 @@ public class Teams {
      */
     public void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         if (!StringUtils.isBlank(email) && team != null) {

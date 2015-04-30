@@ -29,7 +29,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldFindCollection() throws IOException {
-        Collections collections = new Collections();
+        Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
         Collection secondCollection = Collection.create(new CollectionDescription("SecondCollection"), zebedee);
@@ -49,7 +49,7 @@ public class CollectionsTest {
     @Test
     public void shouldReturnNullIfNotFound() throws IOException {
 
-        Collections collections = new Collections();
+        Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
 
@@ -60,7 +60,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldHaveCollectionForName() throws IOException {
-        Collections collections = new Collections();
+        Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
         Collection secondCollection = Collection.create(new CollectionDescription("SecondCollection"), zebedee);

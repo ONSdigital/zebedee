@@ -81,7 +81,7 @@ public class ZebedeeTest {
 		Zebedee zebedee = new Zebedee(expectedPath);
 
 		// When
-		List<Collection> releases = zebedee.getCollections();
+		List<Collection> releases = zebedee.collections.list();
 
 		// Then
 		assertEquals(builder.collections.size(), releases.size());

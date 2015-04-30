@@ -20,29 +20,29 @@ public class Approve {
      *
      * @param request
      * @param response <ul>
-     *                      <li>If approval succeeds: {@link HttpStatus#OK_200}</li>
-     *                      <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
-     *                      <li>If the collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      <li>If the collection has incomplete items:  {@link HttpStatus#CONFLICT_409}</li>
+     *                 <li>If approval succeeds: {@link HttpStatus#OK_200}</li>
+     *                 <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                 <li>If the collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                 <li>If the collection has incomplete items:  {@link HttpStatus#CONFLICT_409}</li>
      *                 </ul>
      * @return Save successful status of the description.
      * @throws IOException
      */
     @POST
-    public boolean approveCollection(HttpServletRequest request,HttpServletResponse response) throws IOException {
+    public boolean approveCollection(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         // Check collection exists
-        if(collection == null) {
+        if (collection == null) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return false;
         }
 
         // TODO Check user permissions UNAUTHORISED_401
         Session session = Root.zebedee.sessions.get(request);
-        if (session==null || !Root.zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !Root.zebedee.permissions.canEdit(session.email)) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return false;
         }

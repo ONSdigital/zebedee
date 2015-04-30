@@ -27,7 +27,6 @@ public class Collections {
         this.zebedee = zebedee;
     }
 
-
     /**
      * @return A list of all {@link Collection}s.
      * @throws IOException If a filesystem error occurs.
@@ -97,7 +96,7 @@ public class Collections {
 
     private DirectoryListing listDirectory(java.nio.file.Path path)
             throws IOException {
-        
+
         // Get the directory listing:
         DirectoryListing listing = new DirectoryListing();
         try (DirectoryStream<java.nio.file.Path> stream = Files
@@ -122,6 +121,7 @@ public class Collections {
      * This adds a couple of utility methods to {@link ArrayList}.
      */
     public static class CollectionList extends ArrayList<Collection> {
+
 
         /**
          * Retrieves a collection with the given id.

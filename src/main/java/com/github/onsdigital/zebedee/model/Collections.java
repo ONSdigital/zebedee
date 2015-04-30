@@ -97,8 +97,7 @@ public class Collections {
 
     private DirectoryListing listDirectory(java.nio.file.Path path)
             throws IOException {
-
-
+        
         // Get the directory listing:
         DirectoryListing listing = new DirectoryListing();
         try (DirectoryStream<java.nio.file.Path> stream = Files

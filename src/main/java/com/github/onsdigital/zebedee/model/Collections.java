@@ -118,6 +118,37 @@ public class Collections {
         return listing;
     }
 
+    public static void complete(Collection collection, String uri, Session session) throws IOException, NotFoundException, UnauthorizedException, BadRequestException {
+
+        // Check the collection
+        if (collection == null) {
+            throw new NotFoundException("Collection not found.");
+        }
+
+        // Check authorisation
+        if (!Root.zebedee.permissions.canEdit(session)) {
+            throw new UnauthorizedException(session);
+        }
+
+        // Locate the path:
+        Path path = collection.inProgress.get(uri);
+        if (path == null) {
+            throw new NotFoundException("URI not in progress.");
+        }
+
+        // Check we're requesting a file:
+        if (java.nio.file.Files.isDirectory(path)) {
+            throw new BadRequestException("URI does not represent a file.");
+        }
+
+        // Attempt to review:
+        if (collection.complete(session.email, uri)) {
+            collection.save();
+        } else {
+            throw new BadRequestException("URI was not reviewed.");
+        }
+    }
+
     /**
      * Represents the list of all collections currently in the system.
      * This adds a couple of utility methods to {@link ArrayList}.

@@ -9,9 +9,18 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.DirectoryListing;
 import com.github.onsdigital.zebedee.json.Session;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.ProgressListener;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -168,6 +177,179 @@ public class Collections {
 
         // Go ahead
         collection.delete();
+    }
+
+    public void readContent(Collection collection, String uri, Session session, HttpServletResponse response) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
+
+        // Collection (null check before authorisation check)
+        if (collection == null) {
+            throw new BadRequestException("Please specify a collection");
+        }
+
+        // Authorisation
+        if (session == null || !Root.zebedee.permissions.canView(session.email, collection.description)) {
+            throw new UnauthorizedException(session);
+        }
+
+        // Requested path
+        if (StringUtils.isBlank(uri)) {
+            throw new BadRequestException("Please provide a URI");
+        }
+
+        // Path
+        Path path = collection.find(session.email, uri);
+        if (path == null || !Files.exists(path)) {
+            throw new NotFoundException("URI not found in collection: " + uri);
+        }
+
+        // Check we're requesting a file:
+        if (Files.isDirectory(path)) {
+            throw new BadRequestException("URI does not specify a file");
+        }
+
+        // Guess the MIME type
+        String contentType = Files.probeContentType(path);
+        if (contentType != null) {
+            response.setContentType(contentType);
+        }
+
+        // Write the file to the response
+        try (InputStream input = Files.newInputStream(path)) {
+            org.apache.commons.io.IOUtils.copy(input, response.getOutputStream());
+        }
+    }
+
+    public void writeContent(Collection collection, String uri, Session session, HttpServletRequest request, InputStream requestBody) throws IOException, BadRequestException, UnauthorizedException, ConflictException, NotFoundException {
+
+        // Collection (null check before authorisation check)
+        if (collection == null) {
+            throw new BadRequestException("Please specify a collection");
+        }
+
+        // Authorisation
+        if (session == null || !Root.zebedee.permissions.canEdit(session.email)) {
+            throw new UnauthorizedException(session);
+        }
+
+        // Requested path
+        if (StringUtils.isBlank(uri)) {
+            throw new BadRequestException("Please provide a URI");
+        }
+
+        // Find the file if it exists
+        Path path = collection.find(session.email, uri);
+
+        // Check we're writing a file:
+        if (Files.isDirectory(path)) {
+            throw new BadRequestException("Please provide a URI to a file");
+        }
+
+        // Create / edit
+        if (path == null) {
+            // create the file
+            if (!collection.create(session.email, uri)) {
+                // file may be being edited in a different collection
+                throw new ConflictException("It could be this URI is being edited in another collection");
+            }
+        } else {
+            // edit the file
+            boolean result = collection.edit(session.email, uri);
+            if (!result) {
+                // file may be being edited in a different collection
+                throw new ConflictException("It could be this URI is being edited in another collection");
+            }
+        }
+
+        // Save collection metadata
+        collection.save();
+
+        path = collection.getInProgressPath(uri);
+        if (!Files.exists(path)) {
+            throw new NotFoundException("Somehow we weren't able to edit the requested URI");
+        }
+
+        // Detect whether this is a multipart request
+        if (ServletFileUpload.isMultipartContent(request)) {
+            // If it is we're doing an xls/csv file upload
+            try {
+                postDataFile(request, path);
+            } catch (Exception e) {
+
+            }
+        } else {
+            // Otherwise we're doing a json content update
+            try (OutputStream output = Files.newOutputStream(path)) {
+                org.apache.commons.io.IOUtils.copy(requestBody, output);
+            }
+        }
+    }
+
+    public boolean deleteContent(Collection collection, String uri, Session session) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+
+        // Collection (null check before authorisation check)
+        if (collection == null) {
+            throw new BadRequestException("Please specify a collection");
+        }
+
+        // Authorisation
+        if (session == null || !Root.zebedee.permissions.canEdit(session.email)) {
+            throw new UnauthorizedException(session);
+        }
+
+        // Requested path
+        if (StringUtils.isBlank(uri)) {
+            throw new BadRequestException("Please provide a URI");
+        }
+
+        // Find the file if it exists
+        Path path = collection.find(session.email, uri);
+
+        // Check the user has access to the given file
+        if (path == null || !collection.isInCollection(uri)) {
+            throw new NotFoundException("This URI cannot be found in the collection");
+        }
+
+        // Go ahead
+        boolean deleted = false;
+        if (Files.isDirectory(path)) {
+            deleted = collection.deleteContent(session.email, uri);
+        } else {
+            deleted = collection.deleteFile(uri);
+        }
+
+        return deleted;
+    }
+
+    private void postDataFile(HttpServletRequest request, Path path) throws FileUploadException, IOException {
+
+        // Set up the objects that do all the heavy lifting
+        //PrintWriter out = response.getWriter();
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        ServletFileUpload upload = new ServletFileUpload(factory);
+
+        // Set up a progress listener that we can use to power a progress bar
+        ProgressListener progressListener = new ProgressListener() {
+            private long megaBytes = -1;
+
+            public void update(long pBytesRead, long pContentLength, int pItems) {
+                long mBytes = pBytesRead / 1000000;
+                if (megaBytes == mBytes) {
+                    return;
+                }
+                megaBytes = mBytes;
+            }
+        };
+        upload.setProgressListener(progressListener);
+
+        try {
+            // Read the items - this will save the values to temp files
+            for (FileItem item : upload.parseRequest(request)) {
+                item.write(path.toFile());
+            }
+        } catch (Exception e) {
+            // item.write throws Exception
+            throw new IOException("Error processing uploaded file", e);
+        }
     }
 
     /**

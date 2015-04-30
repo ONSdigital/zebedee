@@ -314,7 +314,7 @@ public class Permissions {
      */
     public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
 
-        if((session == null) || !isAdministrator(session.email)) { throw new UnauthorizedException("Requires admin access"); }
+        if((session == null) || !isAdministrator(session.email)) { throw new UnauthorizedException(session); }
 
         PermissionDefinition definition = new PermissionDefinition();
         definition.email = email;

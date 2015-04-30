@@ -499,7 +499,7 @@ public class CollectionTest {
         String uri = CreateCompleteContent();
 
         // When the original content creator attempts to review the content
-        boolean reviewed = collection.review(email, uri);
+        boolean reviewed = collection.review(new String(email), uri);
 
         // Then
         assertFalse(reviewed);

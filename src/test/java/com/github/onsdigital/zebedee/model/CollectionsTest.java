@@ -9,8 +9,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class CollectionsTest {
 
@@ -57,5 +56,20 @@ public class CollectionsTest {
         collections.add(firstCollection);
 
         assertNull(collections.getCollection("SecondCollection"));
+    }
+
+    @Test
+    public void shouldHaveCollectionForName() throws IOException {
+        Collections collections = new Collections();
+
+        Collection firstCollection = Collection.create(new CollectionDescription("FirstCollection"), zebedee);
+        Collection secondCollection = Collection.create(new CollectionDescription("SecondCollection"), zebedee);
+
+        collections.add(firstCollection);
+        collections.add(secondCollection);
+
+        assertTrue(collections.hasCollection("FirstCollection"));
+        assertTrue(collections.hasCollection("SecondCollection"));
+        assertFalse(collections.hasCollection("SomeCollectionThatDoesNotExist"));
     }
 }

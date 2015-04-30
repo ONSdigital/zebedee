@@ -166,7 +166,7 @@ public class Permissions {
         //if (accessMapping.digitalPublishingTeam == null) {
         //    accessMapping.digitalPublishingTeam = new HashSet<>();
         //}
-        accessMapping.digitalPublishingTeam.remove(email);
+        accessMapping.digitalPublishingTeam.remove(PathUtils.standardise(email));
         writeAccessMapping(accessMapping);
     }
 

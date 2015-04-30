@@ -5,6 +5,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentEventType;
 import org.apache.commons.io.FileUtils;
@@ -471,7 +472,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldReviewWithReviewer() throws IOException, BadRequestException {
+    public void shouldReviewWithReviewer() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given
         // The content exists, has been edited and complete:
@@ -491,8 +492,8 @@ public class CollectionTest {
         collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
     }
 
-    @Test
-    public void shouldNotReviewAsPublisher() throws IOException, BadRequestException {
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotReviewAsPublisher() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given
         // The content exists, has been edited and complete:
@@ -508,7 +509,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldReviewIfInProgressAsReviewer() throws IOException, BadRequestException {
+    public void shouldReviewIfInProgressAsReviewer() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given some content that has been edited and completed by a publisher:
         String uri = CreateCompleteContent();
@@ -546,8 +547,8 @@ public class CollectionTest {
         return uri;
     }
 
-    @Test
-    public void shouldNotReviewIfInProgressAsPublisher() throws IOException, BadRequestException {
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotReviewIfInProgressAsPublisher() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given some content that has been edited and completed by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
@@ -566,7 +567,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldNotReviewIfContentHasNotBeenCompleted() throws IOException, BadRequestException {
+    public void shouldNotReviewIfContentHasNotBeenCompleted() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given some content that has been edited by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
@@ -649,7 +650,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldNotReviewIfNotEditing() throws IOException, BadRequestException {
+    public void shouldNotReviewIfAlreadyReviewed() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given
         // The content already exists:
@@ -664,7 +665,7 @@ public class CollectionTest {
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotReviewIfNotPreviouslyCompleted() throws IOException, BadRequestException {
+    public void shouldNotReviewIfNotPreviouslyCompleted() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given
         // Some content:

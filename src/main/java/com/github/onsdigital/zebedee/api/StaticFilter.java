@@ -1,6 +1,9 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Filter;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,7 +22,7 @@ public class StaticFilter implements Filter
         if (isStaticContentRequest(req)) {
             try {
                 new Browse().browse(req, res);
-            } catch (IOException e) {
+            } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
                 return true;
             }
 

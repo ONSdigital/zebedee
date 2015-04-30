@@ -80,7 +80,7 @@ public class Permissions {
 
         // Allow the initial user to be set as an administrator:
         if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -99,7 +99,7 @@ public class Permissions {
      */
     public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -141,7 +141,7 @@ public class Permissions {
      */
     public void addEditor(String email, Session session) throws IOException, UnauthorizedException {
         if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -161,7 +161,7 @@ public class Permissions {
      */
     public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
         if (session == null || !isAdministrator(session.email)) {
-            throw new UnauthorizedException("Session is not an administrator: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -196,7 +196,7 @@ public class Permissions {
      */
     public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session.email)) {
-            throw new UnauthorizedException("This requires editing permission: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();
@@ -219,7 +219,7 @@ public class Permissions {
      */
     public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
         if (session == null || !canEdit(session.email)) {
-            throw new UnauthorizedException("This requires editing permission: " + session);
+            throw new UnauthorizedException(session);
         }
 
         AccessMapping accessMapping = readAccessMapping();

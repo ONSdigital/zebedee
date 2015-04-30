@@ -1,9 +1,13 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.DirectoryListing;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,7 +55,7 @@ public class Collections {
 
         // User has permission
         if (session == null || !zebedee.permissions.canEdit(session.email)) {
-            throw new UnauthorizedException("Session does not have edit permission: " + session);
+            throw new UnauthorizedException(session);
         }
 
         // Everything is completed
@@ -62,6 +66,55 @@ public class Collections {
         // Go ahead
         collection.description.approvedStatus = true;
         return collection.save();
+    }
+
+    public DirectoryListing listDirectory(Collection collection, String uri, Session session) throws NotFoundException, UnauthorizedException, IOException, BadRequestException {
+
+
+        if (collection == null) {
+            throw new NotFoundException("Please provide a valid collection.");
+        }
+
+        // Check view permissions
+        if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
+            throw new UnauthorizedException(session);
+        }
+
+        // Locate the path:
+        Path path = collection.find(session.email, uri);
+        if (path == null) {
+            throw new NotFoundException("URI not found in collection: " + uri);
+        }
+
+        // Check we're requesting a directory:
+        if (!Files.isDirectory(path)) {
+            throw new BadRequestException("Please provide a URI to a directory: " + uri);
+        }
+
+        return listDirectory(path);
+    }
+
+
+    private DirectoryListing listDirectory(java.nio.file.Path path)
+            throws IOException {
+
+        // Get the directory listing:
+        DirectoryListing listing = new DirectoryListing();
+        try (DirectoryStream<java.nio.file.Path> stream = Files
+                .newDirectoryStream(path)) {
+            for (java.nio.file.Path directory : stream) {
+                // Recursively delete directories only:
+                if (Files.isDirectory(directory)) {
+                    listing.folders.put(directory.getFileName().toString(),
+                            directory.toString());
+                } else {
+                    listing.files.put(directory.getFileName().toString(),
+                            directory.toString());
+                }
+            }
+        }
+        Serialiser.getBuilder().setPrettyPrinting();
+        return listing;
     }
 
     public static class CollectionList extends ArrayList<Collection> {

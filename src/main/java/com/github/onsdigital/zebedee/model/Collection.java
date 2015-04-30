@@ -397,7 +397,7 @@ public class Collection {
 
         boolean userCompletedContent = false;
         ContentEvent mostRecentCompletedEvent = this.description.eventsByUri.get(uri).mostRecentEventForType(ContentEventType.COMPLETED);
-        if (mostRecentCompletedEvent != null) userCompletedContent = mostRecentCompletedEvent.email == email;
+        if (mostRecentCompletedEvent != null) userCompletedContent = mostRecentCompletedEvent.email.equals(email);
         return userCompletedContent;
     }
 

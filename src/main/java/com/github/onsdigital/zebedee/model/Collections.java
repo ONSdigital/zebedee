@@ -9,22 +9,19 @@ import java.util.ArrayList;
 public class Collections extends ArrayList<Collection> {
 
     /**
-     * Retrieves a collection with the given name.
+     * Retrieves a collection with the given id.
      *
-     * @param name The name to look for.
+     * @param id The name to look for.
      * @return If a {@link Collection} matching the given name exists,
      * (according to {@link PathUtils#toFilename(String)}) the collection.
      * Otherwise null.
      */
-    public Collection getCollection(String name) {
+    public Collection getCollection(String id) {
         Collection result = null;
 
-        if (StringUtils.isNotBlank(name)) {
-
-            String filename = PathUtils.toFilename(name);
+        if (StringUtils.isNotBlank(id)) {
             for (Collection collection : this) {
-                String collectionFilename = collection.path.getFileName().toString();
-                if (StringUtils.equalsIgnoreCase(collectionFilename, filename)) {
+                if (StringUtils.equalsIgnoreCase(collection.description.id, id)) {
                     result = collection;
                     break;
                 }

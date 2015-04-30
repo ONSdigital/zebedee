@@ -21,12 +21,12 @@ public class Collections {
         Path path = Path.newInstance(request);
         List<String> segments = path.segments();
 
-        String collectionName = "";
+        String collectionId = "";
         if (segments.size() > 1) {
-            collectionName = segments.get(1);
+            collectionId = segments.get(1);
         }
 
-        return Root.zebedee.getCollections().getCollection(collectionName);
+        return Root.zebedee.getCollections().getCollection(collectionId);
     }
 
     /**

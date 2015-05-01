@@ -289,6 +289,26 @@ public class Builder {
 
         return session;
     }
+    public Session createSession(User user) throws IOException {
+
+        // Build the session object
+        Session session = new Session();
+        session.id = Random.id();
+        session.email = user.email;
+
+        // Determine the path in which to create the session Json
+        Path sessionPath;
+        String sessionFileName = PathUtils.toFilename(session.id);
+        sessionFileName += ".json";
+        sessionPath = zebedee.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
+
+        // Serialise
+        try (OutputStream output = Files.newOutputStream(sessionPath)) {
+            Serialiser.serialise(output, session);
+        }
+
+        return session;
+    }
 
     /**
      * This method creates the expected set of folders for a Zebedee structure.

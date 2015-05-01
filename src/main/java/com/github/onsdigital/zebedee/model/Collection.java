@@ -5,10 +5,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.ContentEvent;
-import com.github.onsdigital.zebedee.json.ContentEventType;
-import com.github.onsdigital.zebedee.json.ContentEvents;
+import com.github.onsdigital.zebedee.json.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -356,10 +353,12 @@ public class Collection {
      * @throws UnauthorizedException if user
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean review(String email, String uri) throws IOException, BadRequestException, UnauthorizedException {
+    public boolean review(Session session, String uri) throws IOException, BadRequestException, UnauthorizedException {
+        if(session == null) { throw new UnauthorizedException("Insufficient permissions"); }
+
         boolean result = false;
-        boolean permission = zebedee.permissions.canEdit(email);
-        boolean userCompletedContent = didUserCompleteContent(email, uri);
+        boolean permission = zebedee.permissions.canEdit(session.email);
+        boolean userCompletedContent = didUserCompleteContent(session.email, uri);
         boolean contentWasCompleted = contentWasCompleted(uri);
 
         if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
@@ -376,7 +375,7 @@ public class Collection {
 
             PathUtils.moveFilesInDirectory(source, destination);
 
-            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.REVIEWED, email));
+            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.REVIEWED, session.email));
             result = true;
         }
 

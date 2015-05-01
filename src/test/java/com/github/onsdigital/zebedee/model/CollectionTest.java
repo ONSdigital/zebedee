@@ -29,14 +29,14 @@ public class CollectionTest {
     Zebedee zebedee;
     Collection collection;
     Builder builder;
-    String email;
+    String publisher1Email;
 
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
         collection = new Collection(builder.collections.get(1), zebedee);
-        email = builder.publisher1.email;
+        publisher1Email = builder.publisher1.email;
     }
 
     @After
@@ -146,7 +146,7 @@ public class CollectionTest {
         String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
 
         // When
-        boolean created = collection.create(email, uri);
+        boolean created = collection.create(publisher1Email, uri);
 
         // Then
         assertTrue(created);
@@ -166,7 +166,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean created = collection.create(email, uri);
+        boolean created = collection.create(publisher1Email, uri);
 
         // Then
         assertFalse(created);
@@ -183,7 +183,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(email, uri);
+        boolean created = collection.create(publisher1Email, uri);
 
         // Then
         assertFalse(created);
@@ -200,7 +200,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(email, uri);
+        boolean created = collection.create(publisher1Email, uri);
 
         // Then
         assertFalse(created);
@@ -217,7 +217,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean created = collection.create(email, uri);
+        boolean created = collection.create(publisher1Email, uri);
 
         // Then
         assertFalse(created);
@@ -236,7 +236,7 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(email, jsonFile);
+        boolean result = collection.deleteContent(publisher1Email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -259,7 +259,7 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(email, jsonFile);
+        boolean result = collection.deleteContent(publisher1Email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -281,7 +281,7 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.REVIEWED);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(email, jsonFile);
+        boolean result = collection.deleteContent(publisher1Email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -362,7 +362,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean edited = collection.edit(email, uri);
+        boolean edited = collection.edit(publisher1Email, uri);
 
         // Then
         assertTrue(edited);
@@ -387,7 +387,7 @@ public class CollectionTest {
         builder.createCompleteFile(uri);
 
         // When
-        boolean edited = collection.edit(email, uri);
+        boolean edited = collection.edit(publisher1Email, uri);
 
         // Then
         // It should be edited
@@ -412,7 +412,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean edited = collection.edit(email, uri);
+        boolean edited = collection.edit(publisher1Email, uri);
 
         // Then
         // It should be edited
@@ -436,7 +436,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean edited = collection.edit(email, uri);
+        boolean edited = collection.edit(publisher1Email, uri);
 
         // Then
         assertTrue(edited);
@@ -451,7 +451,7 @@ public class CollectionTest {
         builder.isBeingEditedElsewhere(uri, 0);
 
         // When
-        boolean edited = collection.edit(email, uri);
+        boolean edited = collection.edit(publisher1Email, uri);
 
         // Then
         assertFalse(edited);
@@ -465,7 +465,7 @@ public class CollectionTest {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
 
         // When
-        boolean edited = collection.edit(email, uri);
+        boolean edited = collection.edit(publisher1Email, uri);
 
         // Then
         assertFalse(edited);
@@ -480,7 +480,7 @@ public class CollectionTest {
 
         // When
         // One of the digital publishing team reviews it
-        boolean reviewed = collection.review(builder.publisher2.email, uri);
+        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri);
 
         // Then
         // The content should be reviewed and no longer located in "in progress"
@@ -496,16 +496,15 @@ public class CollectionTest {
     public void shouldNotReviewAsPublisher() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given
-        // The content exists, has been edited and complete:
+        // The content exists, has been edited and complete by publisher1:
         String uri = CreateCompleteContent();
 
-        // When the original content creator attempts to review the content
-        boolean reviewed = collection.review(new String(email), uri);
+        // When
+        // the original content creator attempts to review the content
+        collection.review(builder.createSession(publisher1Email), uri);
 
         // Then
-        assertFalse(reviewed);
-        Path complete = builder.collections.get(1).resolve(Collection.COMPLETE);
-        assertTrue(Files.exists(complete.resolve(uri.substring(1))));
+        // expect an Unauthorized error
     }
 
 //    @Test
@@ -537,28 +536,28 @@ public class CollectionTest {
 
     private String CreateEditedContent() throws IOException {
         String uri = CreatePublishedContent();
-        collection.edit(email, uri);
+        collection.edit(publisher1Email, uri);
         return uri;
     }
 
     private String CreateCompleteContent() throws IOException {
         String uri = CreateEditedContent();
-        collection.complete(email, uri);
+        collection.complete(publisher1Email, uri);
         return uri;
     }
 
-    @Test(expected = UnauthorizedException.class)
-    public void shouldNotReviewIfInProgressAsPublisher() throws IOException, BadRequestException, UnauthorizedException {
+    @Test(expected = BadRequestException.class)
+    public void shouldNotReviewIfCompletedButReedited() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given some content that has been edited and completed by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        collection.edit(email, uri);
-        collection.complete(email, uri);
-        collection.edit(email, uri);
+        collection.edit(publisher1Email, uri);
+        collection.complete(publisher1Email, uri);
+        collection.edit(publisher1Email, uri);
 
         // When - A second publisher edits and reviews content
-        boolean reviewed = collection.review(email, uri);
+        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri);
 
         // Then - the content is set to reviewed without going through completion.
         assertFalse(reviewed);
@@ -572,10 +571,10 @@ public class CollectionTest {
         // Given some content that has been edited by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        collection.edit(email, uri);
+        collection.edit(publisher1Email, uri);
 
         // When - A reviewer edits reviews content
-        boolean reviewed = collection.review(builder.publisher2.email, uri);
+        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri);
 
         // Then
         // Expect an error
@@ -591,7 +590,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean complete = collection.complete(email, uri);
+        boolean complete = collection.complete(publisher1Email, uri);
 
         // Then
         assertTrue(complete);
@@ -611,7 +610,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean isComplete = collection.complete(email, uri);
+        boolean isComplete = collection.complete(publisher1Email, uri);
 
         // Then
         assertFalse(isComplete);
@@ -626,7 +625,7 @@ public class CollectionTest {
         builder.createCompleteFile(uri);
 
         // When
-        boolean isComplete = collection.complete(email, uri);
+        boolean isComplete = collection.complete(publisher1Email, uri);
 
         // Then
         assertFalse(isComplete);
@@ -641,7 +640,7 @@ public class CollectionTest {
         builder.createCompleteFile(uri);
 
         // When
-        boolean isComplete = collection.complete(email, uri);
+        boolean isComplete = collection.complete(publisher1Email, uri);
 
         // Then
         assertFalse(isComplete);
@@ -656,11 +655,11 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        String email2 = builder.publisher2.email;
-        boolean reviewed = collection.review(email2, uri);
+        // An alternative publisher reviews the content
+        collection.review(builder.createSession(builder.publisher2), uri);
 
         // Then
-        assertFalse(reviewed);
+        // Expect error
     }
 
     @Test(expected = BadRequestException.class)
@@ -671,7 +670,7 @@ public class CollectionTest {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
 
         // When content is trying to be reviewed before being completed
-        boolean reviewed = collection.review(email, uri);
+        boolean reviewed = collection.review(builder.createSession(publisher1Email), uri);
 
         // Then the expected exception is thrown.
     }

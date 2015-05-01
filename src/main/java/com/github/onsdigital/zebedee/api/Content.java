@@ -1,14 +1,12 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,10 +15,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 
 @Api
 public class Content {
@@ -32,59 +26,21 @@ public class Content {
      * <p>This may be working content from the collection. Defaults to current website content</p>
      *
      * @param request  This should contain a X-Florence-Token header for the current session
-     * @param response <ul>
-     *                 <li>If success: the contents of the object at the uri</li>
-     *                 <li>If no uri supplied:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                 <li>If uri doesn't exist:  {@link HttpStatus#NOT_FOUND_404}</li>
-     *                 <li>If uri supplied is for a folder:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     * @param response No respons message.
      * @return
-     * @throws IOException
+     * @throws IOException           If an error occurs in processing data, typically to the filesystem, but also on the HTTP connection.
+     * @throws NotFoundException     If the requested URI does not exist in the collection.
+     * @throws BadRequestException   IF the request cannot be completed because of a problem with request parameters
+     * @throws UnauthorizedException If the user does not have viewer permission.
      */
     @GET
-    public void read(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
 
+        Session session = Root.zebedee.sessions.get(request);
+        Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
-        if (StringUtils.isBlank(uri)) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return;
-        }
 
-        Path path = null;
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        if (collection != null) {
-            Session session = Root.zebedee.sessions.get(request);
-            path = collection.find(session.email, uri);
-        }
-
-        if (path == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return;
-        }
-
-        // Check the path exists:
-        if (!Files.exists(path)) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return;
-        }
-
-        // Check we're requesting a file:
-        if (Files.isDirectory(path)) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return;
-        }
-
-        // Guess the MIME type
-        String contentType = Files.probeContentType(path);
-        if (contentType != null) {
-            response.setContentType(contentType);
-        }
-
-        // Write the file to the response
-        try (InputStream input = Files.newInputStream(path)) {
-            org.apache.commons.io.IOUtils.copy(input, response.getOutputStream());
-        }
-
-        response.setStatus(HttpStatus.OK_200);
+        Root.zebedee.collections.readContent(collection, uri, session, response);
     }
 
     /**
@@ -95,125 +51,27 @@ public class Content {
      *                 <li>Page content - JSON Serialized content</li>
      *                 <li>File Upload - A multipart content object with part "file" as binary data </li>
      *                 </ul>
-     * @param response <ul>
-     *                 <li>If success: the contents of the object at the uri</li>
-     *                 <li>If no authorisation:  {@link HttpStatus#UNAUTHORIZED_401}</li>
-     *                 <li>If collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                 <li>If uri is being edited in a different collection:  {@link HttpStatus#CONFLICT_409}</li>
-     *                 <li>If uri supplied is for a folder:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     * @param response Returns true or false according to whether the URI was written.
      * @return true/false
-     * @throws IOException
+     * @throws IOException           If an error occurs in processing data, typically to the filesystem, but also on the HTTP connection.
+     * @throws BadRequestException   IF the request cannot be completed because of a problem with request parameters
+     * @throws UnauthorizedException If the user does not have publisher permission.
+     * @throws ConflictException     If the URI is being edited in another collection
+     * @throws NotFoundException     If the file cannot be edited for some other reason
      */
     @POST
-    public boolean write(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public boolean write(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException, UnauthorizedException, ConflictException {
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
         InputStream requestBody = request.getInputStream();
 
+        Session session = Root.zebedee.sessions.get(request);
+        Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
-        if (StringUtils.isBlank(uri))
-            uri = "/";
-
-        // Check the user has edit permission
-        Session session = Root.zebedee.sessions.get(request);
-        if (!Root.zebedee.permissions.canEdit(session.email)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return false;
-        }
-
-        // Find the collection if it exists
-        Path path = null;
-        Collection collection = Collections.getCollection(request);
-        if (collection != null) {
-            path = collection.find(session.email, uri); // see if the file exists anywhere.
-        } else {
-            // attempting to access non-existent collection
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return false;
-        }
-
-        if (path == null) {
-            // create the file
-            boolean result = collection.create(session.email, uri);
-            if (!result) {
-                // file is being edited in a different collection
-                response.setStatus(HttpStatus.CONFLICT_409);
-                return false;
-            }
-        } else {
-            // edit the file
-            boolean result = collection.edit(session.email, uri);
-            if (!result) {
-                response.setStatus(HttpStatus.BAD_REQUEST_400);
-                return false;
-            }
-        }
-
-        if (collection != null) {
-            collection.save();
-            path = collection.getInProgressPath(uri);
-        }
-
-        if (!Files.exists(path)) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return false;
-        }
-
-        // Check we're requesting a file:
-        if (Files.isDirectory(path)) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return false;
-        }
-
-
-        // Detect whether this is a multipart request
-        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-        if (isMultipart) { // If it is we are going to do an xls/csv file upload
-            try {
-                postDataFile(request, response, path);
-            } catch (Exception e) {
-
-            }
-        } else { // If it isn't we are going to be doing a straightforward content update
-            try (OutputStream output = Files.newOutputStream(path)) {
-                org.apache.commons.io.IOUtils.copy(requestBody, output);
-            }
-        }
-        response.setStatus(HttpStatus.OK_200);
-
+        Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
         return true;
-    }
-
-    void postDataFile(HttpServletRequest request, HttpServletResponse response, Path path) throws Exception {
-
-        // Set up the objects that do all the heavy lifting
-        //PrintWriter out = response.getWriter();
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        ServletFileUpload upload = new ServletFileUpload(factory);
-
-        // Set up a progress listener that we can use to power a progress bar
-        ProgressListener progressListener = new ProgressListener() {
-            private long megaBytes = -1;
-
-            public void update(long pBytesRead, long pContentLength, int pItems) {
-                long mBytes = pBytesRead / 1000000;
-                if (megaBytes == mBytes) {
-                    return;
-                }
-                megaBytes = mBytes;
-            }
-        };
-        upload.setProgressListener(progressListener);
-
-        // Read the items - this will save the values to temp files
-        List<FileItem> items = upload.parseRequest(request);
-
-        // Process the items
-        for (FileItem item : items) {
-            item.write(path.toFile());
-        }
     }
 
 
@@ -221,63 +79,21 @@ public class Content {
      * Deletes file content from the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
      *
      * @param request  This should contain a X-Florence-Token header for the current session
-     * @param response <ul>
-     *                 <li>If success: {@link HttpStatus#OK_200}</li>
-     *                 <li>If no uri parameter:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                 <li>If no authorisation:  {@link HttpStatus#UNAUTHORIZED_401}</li>
-     *                 <li>If file doesn't exist in collection:  {@link HttpStatus#NOT_FOUND_404}</li>
-     *                 <li>If delete fails:  {@link HttpStatus#EXPECTATION_FAILED_417}</li>
+     * @param response Returns true or false according to whether the URI was deleted.
      * @return
-     * @throws IOException
+     * @throws IOException           If an error occurs in processing data, typically to the filesystem, but also on the HTTP connection.
+     * @throws BadRequestException   IF the request cannot be completed because of a problem with request parameters
+     * @throws NotFoundException     If the requested URI does not exist in the collection.
+     * @throws UnauthorizedException If the user does not have publisher permission.
+     * @throws ConflictException     If the URI is being edited in another collection
      */
     @DELETE
-    public void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        String uri = request.getParameter("uri");
-        if (StringUtils.isBlank(uri)) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return;
-        }
-
-        // TODO User has delete access to the file HttpStatus#UNAUTHORIZED_401
-
-        // Get the collection and the session
-        Path path = null;
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, NotFoundException, UnauthorizedException {
 
         Session session = Root.zebedee.sessions.get(request);
+        Collection collection = Collections.getCollection(request);
+        String uri = request.getParameter("uri");
 
-        if (collection != null) {
-            path = collection.find(session.email, uri);
-        }
-
-        // Check the user has access to the given file
-        if (path == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return;
-        }
-
-        // Check the file we are requesting exists:
-        if (!collection.isInCollection(uri)) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return;
-        }
-
-        boolean deleted = false;
-
-        if (Files.isDirectory(path)) {
-            deleted = collection.deleteContent(session.email, uri);
-            ;
-        } else {
-            deleted = collection.deleteFile(uri);
-        }
-
-        if (deleted) {
-            response.setStatus(HttpStatus.OK_200);
-        } else {
-            response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
-        }
-
-        return;
+        return Root.zebedee.collections.deleteContent(collection, uri, session);
     }
 }

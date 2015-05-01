@@ -19,10 +19,12 @@ public class ErrorHandler implements ServerError {
         if (t != null && ZebedeeException.class.isAssignableFrom(t.getClass())) {
             ZebedeeException exception = (ZebedeeException) t;
             res.setStatus(exception.statusCode);
+            System.out.println(exception.statusCode+": "+exception.getMessage());
             return new ResultMessage(exception.getMessage());
         }
 
         // Otherwise leave the default 500 response
+        t.printStackTrace();
         return null;
     }
 }

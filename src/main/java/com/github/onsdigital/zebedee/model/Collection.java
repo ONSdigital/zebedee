@@ -372,6 +372,10 @@ public class Collection {
             // Move the complete copy to reviewed:
             Path source = complete.get(uri);
 
+            if (source == null) {
+                source = inProgress.get(uri);
+            }
+
             Path destination = reviewed.toPath(uri);
 
             PathUtils.moveFilesInDirectory(source, destination);

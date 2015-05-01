@@ -508,26 +508,26 @@ public class CollectionTest {
         assertTrue(Files.exists(complete.resolve(uri.substring(1))));
     }
 
-//    @Test
-//    public void shouldReviewIfInProgressAsReviewer() throws IOException, BadRequestException, UnauthorizedException {
-//
-//        // Given some content that has been edited and completed by a publisher:
-//        String uri = CreateCompleteContent();
-//
-//        // When
-//        // One of the digital publishing team edits and reviews it
-//        collection.edit(email, uri);
-//        boolean reviewed = collection.review(builder.publisher2.email, uri);
-//
-//        // Then
-//        // The content is set to reviewed without going through completion.
-//        assertTrue(reviewed);
-//        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
-//        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
-//
-//        // check an event has been created for the content being created.
-//        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
-//    }
+    @Test
+    public void shouldReviewIfInProgressAsReviewer() throws IOException, BadRequestException, UnauthorizedException {
+
+        // Given some content that has been edited and completed by a publisher:
+        String uri = CreateCompleteContent();
+
+        // When
+        // One of the digital publishing team edits and reviews it
+        collection.edit(email, uri);
+        boolean reviewed = collection.review(builder.publisher2.email, uri);
+
+        // Then
+        // The content is set to reviewed without going through completion.
+        assertTrue(reviewed);
+        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
+
+        // check an event has been created for the content being created.
+        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
+    }
 
     private String CreatePublishedContent() throws IOException {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
@@ -547,27 +547,8 @@ public class CollectionTest {
         return uri;
     }
 
-    @Test(expected = UnauthorizedException.class)
-    public void shouldNotReviewIfInProgressAsPublisher() throws IOException, BadRequestException, UnauthorizedException {
-
-        // Given some content that has been edited and completed by a publisher:
-        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
-        collection.edit(email, uri);
-        collection.complete(email, uri);
-        collection.edit(email, uri);
-
-        // When - A second publisher edits and reviews content
-        boolean reviewed = collection.review(email, uri);
-
-        // Then - the content is set to reviewed without going through completion.
-        assertFalse(reviewed);
-        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
-        assertTrue(Files.exists(edited.resolve(uri.substring(1))));
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldNotReviewIfContentHasNotBeenCompleted() throws IOException, BadRequestException, UnauthorizedException {
+    @Test
+    public void shouldReviewIfContentHasNotBeenCompleted() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given some content that has been edited by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";

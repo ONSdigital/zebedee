@@ -508,26 +508,26 @@ public class CollectionTest {
         assertTrue(Files.exists(complete.resolve(uri.substring(1))));
     }
 
-    @Test
-    public void shouldReviewIfInProgressAsReviewer() throws IOException, BadRequestException, UnauthorizedException {
-
-        // Given some content that has been edited and completed by a publisher:
-        String uri = CreateCompleteContent();
-
-        // When
-        // One of the digital publishing team edits and reviews it
-        collection.edit(email, uri);
-        boolean reviewed = collection.review(builder.publisher2.email, uri);
-
-        // Then
-        // The content is set to reviewed without going through completion.
-        assertTrue(reviewed);
-        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
-        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
-
-        // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
-    }
+//    @Test
+//    public void shouldReviewIfInProgressAsReviewer() throws IOException, BadRequestException, UnauthorizedException {
+//
+//        // Given some content that has been edited and completed by a publisher:
+//        String uri = CreateCompleteContent();
+//
+//        // When
+//        // One of the digital publishing team edits and reviews it
+//        collection.edit(email, uri);
+//        boolean reviewed = collection.review(builder.publisher2.email, uri);
+//
+//        // Then
+//        // The content is set to reviewed without going through completion.
+//        assertTrue(reviewed);
+//        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+//        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
+//
+//        // check an event has been created for the content being created.
+//        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
+//    }
 
     private String CreatePublishedContent() throws IOException {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
@@ -547,7 +547,7 @@ public class CollectionTest {
         return uri;
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = UnauthorizedException.class)
     public void shouldNotReviewIfInProgressAsPublisher() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given some content that has been edited and completed by a publisher:
@@ -566,7 +566,7 @@ public class CollectionTest {
         assertTrue(Files.exists(edited.resolve(uri.substring(1))));
     }
 
-    @Test
+    @Test(expected = BadRequestException.class)
     public void shouldNotReviewIfContentHasNotBeenCompleted() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given some content that has been edited by a publisher:
@@ -575,12 +575,10 @@ public class CollectionTest {
         collection.edit(email, uri);
 
         // When - A reviewer edits reviews content
-        boolean reviewed = collection.review(builder.reviewer1.email, uri);
+        boolean reviewed = collection.review(builder.publisher2.email, uri);
 
-        // Then - the content is not set to reviewed.
-        assertFalse(reviewed);
-        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
-        assertTrue(Files.exists(edited.resolve(uri.substring(1))));
+        // Then
+        // Expect an error
     }
 
     @Test
@@ -649,7 +647,7 @@ public class CollectionTest {
         assertFalse(isComplete);
     }
 
-    @Test
+    @Test(expected = BadRequestException.class)
     public void shouldNotReviewIfAlreadyReviewed() throws IOException, BadRequestException, UnauthorizedException {
 
         // Given
@@ -658,7 +656,8 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean reviewed = collection.review(email, uri);
+        String email2 = builder.publisher2.email;
+        boolean reviewed = collection.review(email2, uri);
 
         // Then
         assertFalse(reviewed);

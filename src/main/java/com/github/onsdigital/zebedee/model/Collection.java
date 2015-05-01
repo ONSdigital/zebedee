@@ -4,6 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
 
@@ -347,23 +348,31 @@ public class Collection {
     /**
      * Set the given uri to reviewed in this collection.
      *
-     * @param email The reviewing user's email.
+     * @param session The user session attempting to review
      * @param uri   The path you would like to review.
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
      * @throws UnauthorizedException if user
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean review(Session session, String uri) throws IOException, BadRequestException, UnauthorizedException {
+    public boolean review(Session session, String uri) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
         if(session == null) { throw new UnauthorizedException("Insufficient permissions"); }
 
         boolean result = false;
-        boolean permission = zebedee.permissions.canEdit(session.email);
-        boolean userCompletedContent = didUserCompleteContent(session.email, uri);
-        boolean contentWasCompleted = contentWasCompleted(uri);
 
-        if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
+        if(!this.isInCollection(uri)) {
+            throw new NotFoundException("File not found");
+        }
+
+        boolean permission = zebedee.permissions.canEdit(session.email);
         if(!permission) { throw new UnauthorizedException("Insufficient permissions"); }
+
+        boolean contentWasCompleted = contentWasCompleted(uri);
+        if(contentWasCompleted == false) { throw new BadRequestException("Item has not been marked completed"); }
+
+        boolean userCompletedContent = didUserCompleteContent(session.email, uri);
+        if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
+
         if(reviewed.get(uri) != null) { throw new BadRequestException("Item has already been reviewed"); }
 
         if (permission && contentWasCompleted && !userCompletedContent) {
@@ -388,25 +397,23 @@ public class Collection {
 
     private boolean contentWasCompleted(String uri) {
 
-        if (this.description.eventsByUri == null)
-            throw new IllegalStateException("This content has not been completed. No events found.");
-        ContentEvents contentEvents = this.description.eventsByUri.get(uri);
-        if (contentEvents == null)
-            throw new IllegalStateException("This content has not been completed. No events found.");
+        if (this.description.eventsByUri == null) { return false; }
 
-        return this.description.eventsByUri.get(uri).hasEventForType(ContentEventType.COMPLETED);
+        ContentEvents contentEvents = this.description.eventsByUri.get(uri);
+        if (contentEvents == null) { return false; }
+
+        return contentEvents.hasEventForType(ContentEventType.COMPLETED);
     }
 
     private boolean didUserCompleteContent(String email, String uri) throws BadRequestException {
 
-        if (this.description.eventsByUri == null)
-            throw new BadRequestException("This content has not been completed. No events found.");
+        if (this.description.eventsByUri == null) { return false; }
+
         ContentEvents contentEvents = this.description.eventsByUri.get(uri);
-        if (contentEvents == null)
-            throw new BadRequestException("This content has not been completed. No events found.");
+        if (contentEvents == null) { return false; }
 
         boolean userCompletedContent = false;
-        ContentEvent mostRecentCompletedEvent = this.description.eventsByUri.get(uri).mostRecentEventForType(ContentEventType.COMPLETED);
+        ContentEvent mostRecentCompletedEvent = contentEvents.mostRecentEventForType(ContentEventType.COMPLETED);
         if (mostRecentCompletedEvent != null) userCompletedContent = mostRecentCompletedEvent.email.equals(email);
         return userCompletedContent;
     }

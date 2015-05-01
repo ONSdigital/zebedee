@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
@@ -29,47 +30,14 @@ public class Review {
      * @throws IOException
      */
     @POST
-    public ResultMessage review(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, UnauthorizedException {
+    public ResultMessage review(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
 
-        // Locate the collection:
+        // Collate parameters
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-//        if (collection == null) {
-//            response.setStatus(HttpStatus.NOT_FOUND_404);
-//            return new ResultMessage("Collection not found.");
-//        }
-
         Session session = Root.zebedee.sessions.get(request);
-//        if(Root.zebedee.permissions.canEdit(session.email) == false) {
-//            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-//            return new ResultMessage("Review unauthorized.");
-//        }
-
-        // Check the uri exists in this collection
         String uri = request.getParameter("uri");
-//        if(collection.isInCollection(uri) == false) {
-//            response.setStatus(HttpStatus.NOT_FOUND_404);
-//            return new ResultMessage("URI is not complete.");
-//        }
 
-        // Locate the path in the complete section
-//        java.nio.file.Path path = collection.complete.get(uri);
-//        if (path == null) {
-//            response.setStatus(HttpStatus.BAD_REQUEST_400);
-//            return new ResultMessage("URI is not complete.");
-//        }
-
-        // Check we're requesting a file:
-//        if (java.nio.file.Files.isDirectory(path)) {
-//            response.setStatus(HttpStatus.BAD_REQUEST_400);
-//            return new ResultMessage("URI does not represent a file.");
-//        }
-
-        // Attempt to review:
-//        if (!collection.review(session.email, uri)) {
-//            response.setStatus(HttpStatus.BAD_REQUEST_400);
-//            return new ResultMessage("URI was not reviewed.");
-//        }
-
+        // Run the review
         collection.review(session, uri);
         collection.save();
         return new ResultMessage("URI reviewed.");

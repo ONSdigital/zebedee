@@ -240,7 +240,11 @@ public class Collections {
         Path path = collection.find(session.email, uri);
 
         // Check we're writing a file:
-        if (Files.isDirectory(path)) {
+        if (path != null) {
+            System.out.println(path.getFileSystem());
+            System.out.println(path.getFileSystem().provider());
+        }
+        if (path != null && Files.isDirectory(path)) {
             throw new BadRequestException("Please provide a URI to a file");
         }
 

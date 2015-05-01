@@ -4,6 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentEvent;
 import com.github.onsdigital.zebedee.json.ContentEventType;
@@ -353,23 +354,27 @@ public class Collection {
      * @param uri   The path you would like to review.
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
+     * @throws UnauthorizedException if user
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean review(String email, String uri) throws IOException, BadRequestException {
+    public boolean review(String email, String uri) throws IOException, BadRequestException, UnauthorizedException {
         boolean result = false;
         boolean permission = zebedee.permissions.canEdit(email);
         boolean userCompletedContent = didUserCompleteContent(email, uri);
         boolean contentWasCompleted = contentWasCompleted(uri);
 
+        if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
+        if(!permission) { throw new UnauthorizedException("Insufficient permissions"); }
+        if(reviewed.get(uri) != null) { throw new BadRequestException("Item has already been reviewed"); }
+        if(complete.get(uri) == null) { throw new BadRequestException("Item has not been marked completed"); }
+
         if (permission && contentWasCompleted && !userCompletedContent) {
+
             // Move the complete copy to reviewed:
             Path source = complete.get(uri);
 
-            if (source == null) {
-                source = inProgress.get(uri);
-            }
-
             Path destination = reviewed.toPath(uri);
+
             PathUtils.moveFilesInDirectory(source, destination);
 
             AddEvent(uri, new ContentEvent(new Date(), ContentEventType.REVIEWED, email));

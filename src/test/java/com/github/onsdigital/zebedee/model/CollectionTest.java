@@ -507,26 +507,26 @@ public class CollectionTest {
         // expect an Unauthorized error
     }
 
-//    @Test
-//    public void shouldReviewIfInProgressAsReviewer() throws IOException, BadRequestException, UnauthorizedException {
-//
-//        // Given some content that has been edited and completed by a publisher:
-//        String uri = CreateCompleteContent();
-//
-//        // When
-//        // One of the digital publishing team edits and reviews it
-//        collection.edit(email, uri);
-//        boolean reviewed = collection.review(builder.publisher2.email, uri);
-//
-//        // Then
-//        // The content is set to reviewed without going through completion.
-//        assertTrue(reviewed);
-//        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
-//        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
-//
-//        // check an event has been created for the content being created.
-//        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
-//    }
+    @Test
+    public void shouldReviewIfInProgressAsReviewer() throws IOException, BadRequestException, UnauthorizedException {
+
+        // Given some content that has been edited and completed by a publisher:
+        String uri = CreateCompleteContent();
+
+        // When
+        // One of the digital publishing team edits and reviews it
+        collection.edit(publisher1Email, uri);
+        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri);
+
+        // Then
+        // The content is set to reviewed without going through completion.
+        assertTrue(reviewed);
+        Path edited = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(edited.resolve(uri.substring(1))));
+
+        // check an event has been created for the content being created.
+        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
+    }
 
     private String CreatePublishedContent() throws IOException {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";

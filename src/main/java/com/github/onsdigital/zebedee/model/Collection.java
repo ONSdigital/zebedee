@@ -174,7 +174,8 @@ public class Collection {
     }
 
     private Path descriptionPath() {
-        return collections.path.resolve(this.description.id + ".json");
+        String filename = PathUtils.toFilename(this.description.name);
+        return collections.path.resolve(filename + ".json");
     }
 
     /**
@@ -364,12 +365,15 @@ public class Collection {
         if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
         if(!permission) { throw new UnauthorizedException("Insufficient permissions"); }
         if(reviewed.get(uri) != null) { throw new BadRequestException("Item has already been reviewed"); }
-        if(complete.get(uri) == null) { throw new BadRequestException("Item has not been marked completed"); }
 
         if (permission && contentWasCompleted && !userCompletedContent) {
 
             // Move the complete copy to reviewed:
             Path source = complete.get(uri);
+
+            if (source == null) {
+                source = inProgress.get(uri);
+            }
 
             Path destination = reviewed.toPath(uri);
 

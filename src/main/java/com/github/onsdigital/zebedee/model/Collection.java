@@ -358,24 +358,29 @@ public class Collection {
     public boolean review(Session session, String uri) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
         if(session == null) { throw new UnauthorizedException("Insufficient permissions"); }
 
+
         boolean result = false;
 
         if(!this.isInCollection(uri)) {
             throw new NotFoundException("File not found");
         }
 
+
         boolean permission = zebedee.permissions.canEdit(session.email);
         if(!permission) { throw new UnauthorizedException("Insufficient permissions"); }
 
-        boolean contentWasCompleted = contentWasCompleted(uri);
-        if(contentWasCompleted == false) { throw new BadRequestException("Item has not been marked completed"); }
+        if(Files.isDirectory(this.find(session.email, uri))) {
+            throw new BadRequestException("Cannot complete a directory");
+        }
+
+        if(!complete.exists(uri)) { throw new BadRequestException("Item has not been marked completed"); }
 
         boolean userCompletedContent = didUserCompleteContent(session.email, uri);
         if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
 
         if(reviewed.get(uri) != null) { throw new BadRequestException("Item has already been reviewed"); }
 
-        if (permission && contentWasCompleted && !userCompletedContent) {
+        if (permission && !userCompletedContent) {
 
             // Move the complete copy to reviewed:
             Path source = complete.get(uri);

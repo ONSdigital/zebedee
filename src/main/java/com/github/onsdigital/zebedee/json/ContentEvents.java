@@ -30,4 +30,13 @@ public class ContentEvents extends ArrayList<ContentEvent> {
 
         return mostRecentEvent;
     }
+
+    /**
+     *
+     */
+    public boolean mostRecentEventWasOfType(ContentEvent type) {
+        if(this.size() == 0) { return false; }
+        if(this.get(this.size() - 1).toString().equals(type)) { return true;}
+        return false;
+    }
 }

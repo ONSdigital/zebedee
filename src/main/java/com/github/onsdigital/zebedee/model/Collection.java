@@ -366,7 +366,6 @@ public class Collection {
         if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
         if(!permission) { throw new UnauthorizedException("Insufficient permissions"); }
         if(reviewed.get(uri) != null) { throw new BadRequestException("Item has already been reviewed"); }
-        if(complete.get(uri) == null) { throw new BadRequestException("Item has not been marked completed"); }
 
         if (permission && contentWasCompleted && !userCompletedContent) {
 

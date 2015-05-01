@@ -51,15 +51,8 @@ public class Review {
             return new ResultMessage("URI is not complete.");
         }
 
-        // Locate the path in the complete section
-        java.nio.file.Path path = collection.complete.get(uri);
-        if (path == null) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return new ResultMessage("URI is not complete.");
-        }
-
         // Check we're requesting a file:
-        if (java.nio.file.Files.isDirectory(path)) {
+        if (java.nio.file.Files.isDirectory(collection.complete.path.resolve(uri))) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return new ResultMessage("URI does not represent a file.");
         }

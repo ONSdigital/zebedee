@@ -8,6 +8,10 @@ import org.eclipse.jetty.http.HttpStatus;
  */
 public class UnauthorizedException extends ZebedeeException {
     public UnauthorizedException(Session session) {
-        super(session == null ? "Please log in" : "You do not have the right permission: " + session, HttpStatus.UNAUTHORIZED_401);
+        this(session == null ? "Please log in" : "You do not have the right permission: " + session);
+    }
+
+    public UnauthorizedException(String message) {
+        super(message, HttpStatus.UNAUTHORIZED_401);
     }
 }

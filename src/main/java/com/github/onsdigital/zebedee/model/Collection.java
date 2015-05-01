@@ -177,7 +177,8 @@ public class Collection {
     }
 
     private Path descriptionPath() {
-        return collections.path.resolve(this.description.id + ".json");
+        String filename = PathUtils.toFilename(this.description.name);
+        return collections.path.resolve(filename + ".json");
     }
 
     /**

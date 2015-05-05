@@ -1,23 +1,5 @@
 package com.github.onsdigital.zebedee.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
@@ -27,6 +9,22 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.DirectoryListing;
 import com.github.onsdigital.zebedee.json.Session;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.ProgressListener;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 
 public class Collections {
 
@@ -36,6 +34,39 @@ public class Collections {
 	public Collections(Path path, Zebedee zebedee) {
 		this.path = path;
 		this.zebedee = zebedee;
+	}
+
+	public static void complete(Collection collection, String uri,
+								Session session) throws IOException, NotFoundException,
+			UnauthorizedException, BadRequestException {
+
+		// Check the collection
+		if (collection == null) {
+			throw new BadRequestException("Please specify a valid collection.");
+		}
+
+		// Check authorisation
+		if (!Root.zebedee.permissions.canEdit(session)) {
+			throw new UnauthorizedException(session);
+		}
+
+		// Locate the path:
+		Path path = collection.inProgress.get(uri);
+		if (path == null) {
+			throw new NotFoundException("URI not in progress.");
+		}
+
+		// Check we're requesting a file:
+		if (java.nio.file.Files.isDirectory(path)) {
+			throw new BadRequestException("URI does not represent a file.");
+		}
+
+		// Attempt to review:
+		if (collection.complete(session.email, uri)) {
+			collection.save();
+		} else {
+			throw new BadRequestException("URI was not reviewed.");
+		}
 	}
 
 	/**
@@ -130,39 +161,6 @@ public class Collections {
 		}
 		Serialiser.getBuilder().setPrettyPrinting();
 		return listing;
-	}
-
-	public static void complete(Collection collection, String uri,
-			Session session) throws IOException, NotFoundException,
-			UnauthorizedException, BadRequestException {
-
-		// Check the collection
-		if (collection == null) {
-			throw new BadRequestException("Please specify a valid collection.");
-		}
-
-		// Check authorisation
-		if (!Root.zebedee.permissions.canEdit(session)) {
-			throw new UnauthorizedException(session);
-		}
-
-		// Locate the path:
-		Path path = collection.inProgress.get(uri);
-		if (path == null) {
-			throw new NotFoundException("URI not in progress.");
-		}
-
-		// Check we're requesting a file:
-		if (java.nio.file.Files.isDirectory(path)) {
-			throw new BadRequestException("URI does not represent a file.");
-		}
-
-		// Attempt to review:
-		if (collection.complete(session.email, uri)) {
-			collection.save();
-		} else {
-			throw new BadRequestException("URI was not reviewed.");
-		}
 	}
 
 	public void delete(Collection collection, Session session)
@@ -337,12 +335,14 @@ public class Collections {
 		}
 
 		// Go ahead
-		boolean deleted = false;
+		boolean deleted;
 		if (Files.isDirectory(path)) {
 			deleted = collection.deleteContent(session.email, uri);
 		} else {
 			deleted = collection.deleteFile(uri);
 		}
+
+		collection.save();
 
 		return deleted;
 	}

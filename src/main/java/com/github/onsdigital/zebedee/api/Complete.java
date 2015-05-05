@@ -37,7 +37,7 @@ public class Complete {
         Session session = Root.zebedee.sessions.get(request);
         String uri = request.getParameter("uri");
 
-        com.github.onsdigital.zebedee.model.Collections.complete(collection, uri, session);
+        Root.zebedee.collections.complete(collection, uri, session);
 
         return new ResultMessage("URI reviewed.");
     }

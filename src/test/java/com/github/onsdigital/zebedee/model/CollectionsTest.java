@@ -1,20 +1,5 @@
 package com.github.onsdigital.zebedee.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -23,6 +8,16 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+
+import static org.junit.Assert.*;
 
 public class CollectionsTest {
 
@@ -225,6 +220,142 @@ public class CollectionsTest {
 		Collection collection = null;
 		String uri = "test.json";
 		Session session = zebedee.sessions.create(builder.administrator.email);
+
+		// When
+		// We attempt to call the method
+		zebedee.collections.deleteContent(collection, uri, session);
+
+		// Then
+		// We should get the expected exception, not a null pointer.
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void shouldThrowUnauthorizedIfNotLoggedInOnApprove()
+			throws IOException, UnauthorizedException, BadRequestException,
+			ConflictException {
+
+		// Given
+		// A null session
+		Session session = null;
+		Collection collection = new Collection( builder.collections.get(0), zebedee);
+
+		// When
+		// We attempt to approve
+		zebedee.collections.approve(collection, session);
+
+		// Then
+		// We should get the expected exception, not a null pointer.
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void shouldThrowUnauthorizedIfNotLoggedInOnListDirectory()
+			throws IOException, UnauthorizedException, BadRequestException,
+			ConflictException, NotFoundException {
+
+		// Given
+		// A null session
+		Session session = null;
+		Collection collection = new Collection( builder.collections.get(0), zebedee);
+		String uri = "test.json";
+
+		// When
+		// We attempt to list directory
+		zebedee.collections.listDirectory(collection, uri, session);
+
+		// Then
+		// We should get the expected exception, not a null pointer.
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void shouldThrowUnauthorizedIfNotLoggedInOnComplete()
+			throws IOException, UnauthorizedException, BadRequestException,
+			ConflictException, NotFoundException {
+
+		// Given
+		// A null session
+		Session session = null;
+		Collection collection = new Collection( builder.collections.get(0), zebedee);
+		String uri = "test.json";
+
+		// When
+		// We attempt to complete
+		zebedee.collections.complete(collection, uri, session);
+
+		// Then
+		// We should get the expected exception, not a null pointer.
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void shouldThrowUnauthorizedIfNotLoggedInOnDelete()
+			throws IOException, UnauthorizedException, BadRequestException,
+			ConflictException, NotFoundException {
+
+		// Given
+		// A null session
+		Session session = null;
+		Collection collection = new Collection( builder.collections.get(0), zebedee);
+		String uri = "test.json";
+
+		// When
+		// We attempt to delete
+		zebedee.collections.delete(collection, session);
+
+		// Then
+		// We should get the expected exception, not a null pointer.
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void shouldThrowUnauthorizedIfNotLoggedInOnReadContent()
+			throws IOException, UnauthorizedException, BadRequestException,
+			ConflictException, NotFoundException {
+
+		// Given
+		// A null session
+		Session session = null;
+		Collection collection = new Collection( builder.collections.get(0), zebedee);
+		String uri = "test.json";
+		HttpServletResponse response = null;
+
+		// When
+		// We attempt to read content
+		zebedee.collections.readContent(collection, uri, session, response);
+
+		// Then
+		// We should get the expected exception, not a null pointer.
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void shouldThrowUnauthorizedIfNotLoggedInOnWriteContent()
+			throws IOException, UnauthorizedException, BadRequestException,
+			ConflictException, NotFoundException {
+
+		// Given
+		// A null session
+		Session session = null;
+		Collection collection = new Collection( builder.collections.get(0), zebedee);
+		String uri = "test.json";
+		HttpServletRequest request = null;
+		InputStream inputStream = null;
+
+		// When
+		// We attempt to call the method
+		zebedee.collections.writeContent(collection, uri, session, request,
+				inputStream);
+
+		// Then
+		// We should get the expected exception, not a null pointer.
+	}
+
+	@Test(expected = UnauthorizedException.class)
+	public void shouldThrowUnauthorizedIfNotLoggedInOnDeleteContent()
+			throws IOException, UnauthorizedException, BadRequestException,
+			ConflictException, NotFoundException {
+
+		// Given
+		// A null session
+		Session session = null;
+		Collection collection = new Collection( builder.collections.get(0), zebedee);
+		String uri = "test.json";
 
 		// When
 		// We attempt to call the method

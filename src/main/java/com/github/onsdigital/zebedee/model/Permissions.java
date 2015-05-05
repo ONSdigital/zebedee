@@ -173,6 +173,19 @@ public class Permissions {
     /**
      * Determines whether the specified user has viewing rights.
      *
+     * @param session               The user's session. Can be null.
+     * @param collectionDescription The collection to check access for.
+     * @return True if the user is a member of the Digital Publishing team or
+     * the user is a content owner with access to the given path or any parent path.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
+        return session != null && canView(session.email, collectionDescription);
+    }
+
+    /**
+     * Determines whether the specified user has viewing rights.
+     *
      * @param email                 The user's email.
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
@@ -309,12 +322,14 @@ public class Permissions {
      * @param email the user email
      * @return a {@link PermissionDefinition} object
      * @throws IOException
-     * @throws NotFoundException If the user cannot be found
+     * @throws NotFoundException     If the user cannot be found
      * @throws UnauthorizedException If the request is not from an admin
      */
     public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
 
-        if((session == null) || !isAdministrator(session.email)) { throw new UnauthorizedException(session); }
+        if ((session == null) || !isAdministrator(session.email)) {
+            throw new UnauthorizedException(session);
+        }
 
         PermissionDefinition definition = new PermissionDefinition();
         definition.email = email;

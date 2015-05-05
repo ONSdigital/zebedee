@@ -527,24 +527,6 @@ public class CollectionTest {
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotReviewIfCompletedButReedited() throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
-
-        // Given some content that has been edited and completed by a publisher:
-        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        builder.createPublishedFile(uri);
-        collection.edit(publisher1Email, uri);
-        collection.complete(publisher1Email, uri);
-        collection.edit(publisher1Email, uri);
-
-        // When
-        // A second publisher reviews content
-        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri);
-
-        // Then - the content is set to reviewed without going through completion.
-        // Expect UnauthorizedException
-    }
-
-    @Test(expected = BadRequestException.class)
     public void shouldNotReviewIfContentHasNotBeenCompleted() throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
 
         // Given some content that has been edited by a publisher:

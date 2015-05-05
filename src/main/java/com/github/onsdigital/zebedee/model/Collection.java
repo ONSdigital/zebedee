@@ -22,14 +22,13 @@ public class Collection {
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
-
-    final Zebedee zebedee;
-    final Collections collections;
     public final CollectionDescription description;
     public final Path path;
     public final Content reviewed;
     public final Content complete;
     public final Content inProgress;
+    final Zebedee zebedee;
+    final Collections collections;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -373,7 +372,10 @@ public class Collection {
             throw new BadRequestException("Cannot complete a directory");
         }
 
-        if(!complete.exists(uri)) { throw new BadRequestException("Item has not been marked completed"); }
+        boolean contentWasCompleted = contentWasCompleted(uri);
+        if (contentWasCompleted == false) {
+            throw new BadRequestException("Item has not been marked completed");
+        }
 
         boolean userCompletedContent = didUserCompleteContent(session.email, uri);
         if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }

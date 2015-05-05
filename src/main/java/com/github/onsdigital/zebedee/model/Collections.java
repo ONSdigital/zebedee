@@ -13,6 +13,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -208,7 +209,7 @@ public class Collections {
 
         // Path
         Path path = collection.find(session.email, uri);
-        if (path == null || !Files.exists(path)) {
+        if (path == null) {
             throw new NotFoundException("URI not found in collection: " + uri);
         }
 
@@ -218,8 +219,10 @@ public class Collections {
         }
 
         // Guess the MIME type
-        String contentType = Files.probeContentType(path);
-        if (contentType != null) {
+        if (StringUtils.equalsIgnoreCase("json", FilenameUtils.getExtension(path.toString()))) {
+            response.setContentType("application/json");
+        } else {
+            String contentType = Files.probeContentType(path);
             response.setContentType(contentType);
         }
 

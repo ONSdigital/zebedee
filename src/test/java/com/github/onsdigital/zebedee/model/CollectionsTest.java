@@ -19,10 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class CollectionsTest {
 
@@ -716,5 +716,169 @@ public class CollectionsTest {
         // Check the expected interactions
         verify(response).setContentType("application/json");
         verify(response, atLeastOnce()).getOutputStream();
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForWritingADirectoryAsAFile()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A directory instead of a file
+        String uri = "/this/is/a/directory/";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        assertTrue(collection.create(builder.publisher1.email, uri + "file.json"));
+        HttpServletRequest request = null;
+        InputStream inputStream = null;
+
+        // When
+        // We attempt to write to the directory as if it were a file
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+
+        // Then
+        // We should get the expected exception
+    }
+
+    @Test(expected = ConflictException.class)
+    public void shouldThrowConflictForCreatingFileBeingEditedElsewhere()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A file in a different collection
+        String uri = "/this/is/a/file/in/another/collection.json";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        Collection otherCollection = new Collection(builder.collections.get(1), zebedee);
+        assertTrue(otherCollection.create(builder.publisher1.email, uri));
+        HttpServletRequest request = null;
+        InputStream inputStream = null;
+
+        // When
+        // We attempt to write to the directory as if it were a file
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+
+        // Then
+        // We should get the expected exception
+    }
+
+    @Test(expected = ConflictException.class)
+    public void shouldThrowConflictForEditingFileBeingEditedElsewhere()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A file being edited in a different collection
+        String uri = "/this/is/a/file/in/another/collection.json";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        Collection otherCollection = new Collection(builder.collections.get(1), zebedee);
+        Path path = zebedee.published.toPath(uri);
+        Files.createDirectories(path.getParent());
+        Files.createFile(path);
+        assertTrue(otherCollection.edit(builder.publisher1.email, uri));
+        HttpServletRequest request = null;
+        InputStream inputStream = null;
+
+        // When
+        // We attempt to write to the directory as if it were a file
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+
+        // Then
+        // We should get the expected exception
+    }
+
+    @Test
+    public void shouldWriteContent()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A new file
+        String uri = "/this/a/file.json";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any(byte[].class))).thenReturn(-1);
+
+        // When
+        // We attempt to write to the directory as if it were a file
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+
+        // Then
+        // We should see the file
+        Path path = collection.getInProgressPath(uri);
+        assertNotNull(path);
+        assertTrue(Files.exists(path));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowNotFoundForDeletingNonexistentFile()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A file that doesn't exist in the collection
+        String uri = "/this/file/does/not/exist.json";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+
+        // When
+        // We attempt to delete the nonexistent file
+        zebedee.collections.deleteContent(collection, uri, session);
+
+        // Then
+        // We should get the expected exception
+    }
+
+    @Test
+    public void shouldDeleteFile()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A file that doesn't exist in the collection
+        String uri = "/this/is/a/file.json";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        collection.create(builder.publisher1.email, uri);
+
+        // When
+        // We attempt to delete the nonexistent file
+        boolean result = zebedee.collections.deleteContent(collection, uri, session);
+
+        // Then
+        // The file should be gone
+        assertTrue(result);
+        assertNull(collection.find(builder.publisher1.email, uri));
+    }
+
+    @Test
+    public void shouldDeleteFolderRecursively()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A file that doesn't exist in the collection
+        String folderUri = "/this/is/a/folder/";
+        String fileUri = folderUri + "file.json";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        collection.create(builder.publisher1.email, fileUri);
+
+        // When
+        // We attempt to delete the nonexistent file
+        boolean result = zebedee.collections.deleteContent(collection, folderUri, session);
+
+        // Then
+        // The file should be gone
+        // NB current behaviour is that files in the folder are deleted,
+        // but not the folder itself. This may need to be reviewed,
+        // however this test has been written to reflect current behaviour.
+        assertTrue(result);
+        assertNull(collection.find(builder.publisher1.email, fileUri));
+        assertNotNull(collection.find(builder.publisher1.email, folderUri));
     }
 }

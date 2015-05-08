@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -118,7 +117,7 @@ public class Content {
      */
     public List<ContentDetail> details() throws IOException {
         List<ContentDetail> details = new ArrayList<>();
-        for (String uri : this.uris()) {
+        for (String uri : this.uris("*data.json")) {
             details.add(details(uri));
         }
         return details;

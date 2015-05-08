@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ContentTest {
 
-    String filename = Random.id() + ".json";
+    String filename = Random.id() + "data.json";
     private Path basePath;
     private Path jsonFilePath;
     private ContentDetail contentDetail;

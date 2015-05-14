@@ -72,6 +72,14 @@
             <version>1.2.0</version>
         </dependency>
 
+
+        <!-- CSV generator (currently in Zebedee but should end up in Brian) -->
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>

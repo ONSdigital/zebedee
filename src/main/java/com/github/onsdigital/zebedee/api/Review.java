@@ -34,6 +34,10 @@ public class Review {
 
         // Collate parameters
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        if(collection == null) {
+            throw new NotFoundException("Collection not found");
+        }
+
         Session session = Root.zebedee.sessions.get(request);
         String uri = request.getParameter("uri");
 

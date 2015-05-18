@@ -31,16 +31,16 @@ public class JSONToFileConverterTest {
         chart.series = Arrays.asList("A", "B");
 
         LinkedHashMap<String, String> dataPoint = new LinkedHashMap<>();
-        dataPoint.put("A", "1.0"); dataPoint.put("B", "2.0");
-        chart.data.put("Row1", dataPoint);
+        dataPoint.put("Row", "Row1"); dataPoint.put("A", "1.0"); dataPoint.put("B", "2.0");
+        chart.data.add(dataPoint);
 
         dataPoint= new LinkedHashMap<>();
-        dataPoint.put("A", "5.0"); dataPoint.put("B", "1.0");
-        chart.data.put("Row2", dataPoint);
+        dataPoint.put("Row", "Row2"); dataPoint.put("A", "5.0"); dataPoint.put("B", "1.0");
+        chart.data.add(dataPoint);
 
         dataPoint = new LinkedHashMap<>();
-        dataPoint.put("A", "1.1"); dataPoint.put("B", "0.05");
-        chart.data.put("Row3", dataPoint);
+        dataPoint.put("Row", "Row3"); dataPoint.put("A", "1.1"); dataPoint.put("B", "0.05");
+        chart.data.add(dataPoint);
     }
 
     @Test

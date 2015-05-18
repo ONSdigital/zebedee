@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.json.converter.JSONToFileConverter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,22 +25,24 @@ public class DataServices {
     /**
      * Converts a .json object to data
      *
-     * Needs to contain meta-data if possible
+     * Output should be data plus meta-data
      *
      * @param request
      * @param response <ul>
      *                 </ul>
-     * @return the CollectionDescription.
+     * @return
      * @throws IOException
      */
     @POST
-    public void get(HttpServletRequest request, HttpServletResponse response)
+    public void convertFiles(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        // Check whether we found the collection:
 
-        // Check whether we have access
+        // Grab parameters
+        String output = request.getParameter("output");
+        String input = request.getParameter("input");
 
-        // Collate the result
+        // And write
+        JSONToFileConverter.writeRequestJSONToOutputFormat(request, response, input, output);
 
         return;
     }

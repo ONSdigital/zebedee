@@ -1,9 +1,8 @@
 package com.github.onsdigital.zebedee.json.converter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import org.apache.commons.lang.ArrayUtils;
+
+import java.util.*;
 
 /**
  * Created by thomasridd on 13/05/15.
@@ -13,12 +12,31 @@ public class ChartObject {
     public String subtitle;
     public String unit;
     public String source;
+    private String _categoryKey = null;
 
     public List<String> series;
-    public LinkedHashMap<String,HashMap<String, String>> data;
+    public List<HashMap<String, String>> data;
 
     public ChartObject() {
         series = new ArrayList<>();
-        data = new LinkedHashMap<>();
+        data = new ArrayList<>();
+    }
+
+    // works out the data dictionary key
+    public String categoryKey() {
+        if(_categoryKey == null) {
+            if(data.size() > 0) {
+                Set<String> allKeys = data.get(0).keySet();
+                String[] seriesNames = series.toArray(new String[series.size()]);
+
+                for(String key: allKeys) {
+                    if(!ArrayUtils.contains(seriesNames, key)) {
+                        _categoryKey = key;
+                        return _categoryKey;
+                    }
+                }
+            }
+        }
+        return _categoryKey;
     }
 }

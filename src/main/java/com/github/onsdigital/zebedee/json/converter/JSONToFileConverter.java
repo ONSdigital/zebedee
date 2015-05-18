@@ -2,8 +2,11 @@ package com.github.onsdigital.zebedee.json.converter;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.google.common.primitives.Chars;
-import sun.misc.IOUtils;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,20 +32,26 @@ public class JSONToFileConverter {
      */
     public static void writeRequestJSONToOutputFormat(HttpServletRequest request, HttpServletResponse response, String inputFormat, String outputFormat) throws IOException {
 
-        if(inputFormat.equals("chart")){
+        if(inputFormat.equalsIgnoreCase("chart")){
 
-            if(outputFormat.equals("csv")) {
+            ChartObject chartObject = Serialiser.deserialise(request, ChartObject.class);
+
+            if(outputFormat.equalsIgnoreCase("csv")) {
                 // Deserialise the chart object
-//                StringWriter writer = new StringWriter();
-//                org.apache.commons.io.IOUtils.copy(request.getInputStream(), writer);
-//                String json = writer.toString();
-
-                ChartObject chartObject = Serialiser.deserialise(request, ChartObject.class);
-
                 response.setContentType("application/csv");
                 try(OutputStream stream = response.getOutputStream()) {
                     writeChartToCSV(chartObject, stream);
                 }
+            }
+            else if (outputFormat.equalsIgnoreCase("xlsx")) {
+                response.setContentType("application/csv");
+                try(OutputStream stream = response.getOutputStream()) {
+                    writeChartToXLSX(chartObject, stream);
+                }
+            } else if (outputFormat.equalsIgnoreCase("jsonstat")) {
+
+            } else if (outputFormat.equalsIgnoreCase("json")) {
+
             }
 
         } else {
@@ -72,6 +81,56 @@ public class JSONToFileConverter {
         }
 
         return;
+    }
+
+    /**
+     * Writes chartObject to output stream as XLSX
+     *
+     * @param chartObject a chart object
+     * @param output
+     * @throws IOException
+     */
+    public static void writeChartToXLSX(ChartObject chartObject, OutputStream output) throws IOException {
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet meta = workbook.createSheet("meta");
+        Sheet sheet = workbook.createSheet("data");
+
+        writeChartMetadataXLSX(chartObject, meta);
+        writeChartDataXLSX(chartObject, sheet);
+
+        workbook.write(output);
+    }
+
+    private static void writeChartMetadataXLSX(ChartObject chartObject, Sheet sheet) {
+        Row title = sheet.createRow(0);
+        Row subtitle = sheet.createRow(1);
+        Row unit = sheet.createRow(2);
+        Row source = sheet.createRow(3);
+
+        title.createCell(0).setCellValue("Title"); title.createCell(1).setCellValue(chartObject.title);
+        subtitle.createCell(0).setCellValue("Subtitle"); subtitle.createCell(1).setCellValue(chartObject.subtitle);
+        unit.createCell(0).setCellValue("Unit"); unit.createCell(1).setCellValue(chartObject.unit);
+        source.createCell(0).setCellValue("Source"); source.createCell(1).setCellValue(chartObject.source);
+    }
+    private static void writeChartDataXLSX(ChartObject chartObject, Sheet sheet) {
+        Row title = sheet.createRow(0);
+
+        int col = 1;
+        for(String series: chartObject.series){
+            title.createCell(col++).setCellValue(series);
+        }
+
+        int rowNo = 1;
+        for(HashMap<String, String> rowData: chartObject.data) {
+            Row row = sheet.createRow(rowNo++);
+            row.createCell(0).setCellValue( rowData.get(chartObject.categoryKey()) );
+
+            col = 1;
+            for(String colName: chartObject.series) {
+                row.createCell(col++).setCellValue(rowData.get(colName));
+            }
+        }
     }
 
     private static void writeChartTitles(ChartObject chartObject, CSVWriter writer) throws IOException {

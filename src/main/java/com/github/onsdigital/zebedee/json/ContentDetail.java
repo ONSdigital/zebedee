@@ -6,4 +6,5 @@ package com.github.onsdigital.zebedee.json;
 public class ContentDetail {
     public String uri;
     public String name;
+    public String type;
 }

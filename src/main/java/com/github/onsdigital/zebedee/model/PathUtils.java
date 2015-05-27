@@ -168,4 +168,12 @@ public class PathUtils {
             Files.createDirectories(path.getParent());
         }
     }
+
+    public static String toUri(Path path) {
+        String uri = path.toString();
+        if (!uri.startsWith("/")) {
+            uri = "/" + uri;
+        }
+        return uri;
+    }
 }

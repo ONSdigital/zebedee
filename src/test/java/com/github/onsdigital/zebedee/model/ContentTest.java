@@ -14,27 +14,70 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ContentTest {
 
-    String filename = Random.id() + "data.json";
-    private Path basePath;
-    private Path jsonFilePath;
-    private ContentDetail contentDetail;
+    private String filename = "data.json";
+    private String directoryName = "subdir";
+    private String bulletinsDirectoryName = "bulletins";
+    private String exampleBulletinName = "gdppreliminaryestimateq32014";
+
+    private Path basePath; // base path for the working directory
+    private Path baseJsonFile; // path of the data.json file in the base directory (the home page)
+    private ContentDetail baseContent; // The object to serialise into the base directory data.json
+
+    private Path subDirectory; // an example sub directory in the base directory
+    private Path subDirectoryJsonFile; // a json file for the sub directory
+    private ContentDetail subContent; // the object to serialise into the sub directory data.json
+
+    private Path bulletinDirectory;
+    private Path exampleBulletinDirectory;
+    private Path exampleBulletinJsonFile;
+    private ContentDetail bulletinContent;
 
     @Before
     public void setUp() throws Exception {
         basePath = Files.createTempDirectory(this.getClass().getSimpleName());
-        jsonFilePath = basePath.resolve(filename);
-        Files.createFile(jsonFilePath);
-        contentDetail = new ContentDetail();
-        contentDetail.name = "Some release 2014";
+        baseJsonFile = basePath.resolve(filename);
+        subDirectory = basePath.resolve(directoryName);
+        subDirectoryJsonFile = subDirectory.resolve(filename);
+        Files.createFile(baseJsonFile);
+
+        baseContent = new ContentDetail();
+        baseContent.name = "Some release 2014";
+        baseContent.type = "home";
 
         // Serialise
-        try (OutputStream output = Files.newOutputStream(jsonFilePath)) {
-            Serialiser.serialise(output, contentDetail);
+        try (OutputStream output = Files.newOutputStream(baseJsonFile)) {
+            Serialiser.serialise(output, baseContent);
+        }
+
+        Files.createDirectory(subDirectory);
+
+        subContent = new ContentDetail();
+        subContent.name = "Some sub 2015";
+        subContent.type = "t2";
+
+        // Serialise
+        try (OutputStream output = Files.newOutputStream(subDirectoryJsonFile)) {
+            Serialiser.serialise(output, subContent);
+        }
+
+
+        bulletinDirectory = subDirectory.resolve(bulletinsDirectoryName);
+        Files.createDirectory(bulletinDirectory);
+        exampleBulletinDirectory = bulletinDirectory.resolve(exampleBulletinName);
+        Files.createDirectory(exampleBulletinDirectory);
+        exampleBulletinJsonFile = exampleBulletinDirectory.resolve(filename);
+
+        bulletinContent = new ContentDetail();
+        bulletinContent.name = "Some bulletin 2010";
+        bulletinContent.type = "bulletin";
+
+        // Serialise
+        try (OutputStream output = Files.newOutputStream(exampleBulletinJsonFile)) {
+            Serialiser.serialise(output, bulletinContent);
         }
     }
 
@@ -50,10 +93,12 @@ public class ContentTest {
         Content content = new Content(basePath);
 
         // When the details method is called with a uri
-        ContentDetail result = content.details(filename);
+        ContentDetail result = content.details(baseJsonFile);
 
         // The result has the expected values
-        assertEquals(contentDetail.name, result.name);
+        assertEquals(baseContent.name, result.name);
+        assertEquals(baseContent.type, result.type);
+        assertEquals("/", result.uri);
     }
 
     @Test
@@ -62,12 +107,72 @@ public class ContentTest {
         // Given an instance of content
         Content content = new Content(basePath);
 
-        // When the details method is called with a uri
+        // When the details method is called
         List<ContentDetail> results = content.details();
 
         // The result has the expected values
-        assertEquals(1, results.size());
-        assertEquals(contentDetail.name, results.get(0).name);
+        assertTrue(results.size() > 0);
+        assertEquals(baseContent.name, results.get(0).name);
+    }
+
+    @Test
+    public void shouldGetNestedDetails() throws IOException {
+
+        // Given an instance of content
+        Content content = new Content(basePath);
+
+        // When the nestedDetails method is called
+        ContentDetail root = content.nestedDetails();
+
+        // Then the result has child nodes defined.
+        assertNotNull(root);
+        assertNotNull(root.children);
+        assertTrue(root.children.size() > 0);
+        assertEquals(baseContent.name, root.name);
+    }
+
+    @Test
+    public void shouldGetNestedDetailsWithNoDataJsonFile() throws IOException {
+
+        // Given an instance of content
+        Content content = new Content(basePath);
+
+        // When the nestedDetails method is called
+        ContentDetail root = content.nestedDetails();
+
+        // Then a directory with no data.json file will still be evaluated but only the name returned without the URI.
+        ContentDetail bulletinDirectoryDetails = root.children.get(0).children.get(0);
+
+        assertNotNull(bulletinDirectoryDetails);
+        assertEquals(bulletinsDirectoryName, bulletinDirectoryDetails.name);
+        assertTrue(bulletinDirectoryDetails.children.size() > 0);
+
+        ContentDetail bulletinDetails = bulletinDirectoryDetails.children.get(0);
+        assertNotNull(bulletinDetails);
+        assertEquals(bulletinContent.name, bulletinDetails.name);
+        assertEquals("/" + basePath.relativize(exampleBulletinDirectory), bulletinDetails.uri);
+        assertTrue(bulletinDetails.children.size() == 0);
+    }
+
+    @Test
+    public void nestedDetailsShouldIgnoreReleasesFolder() throws IOException {
+
+        // Given an instance of content with a releases folder
+        Content content = new Content(basePath);
+        Path releases = basePath.resolve("releases");
+        Files.createDirectory(releases);
+
+        // When the nestedDetails method is called
+        ContentDetail root = content.nestedDetails();
+
+        // Then the releases directory will not be in the children.
+        assertNotNull(root);
+
+        for (ContentDetail child : root.children) {
+            if (child.name.equals("releases")) {
+                fail();
+            }
+        }
     }
 
     @Test

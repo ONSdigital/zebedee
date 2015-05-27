@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
@@ -307,5 +309,33 @@ public class PathUtilsTest {
         assertFalse(Files.exists(targetFile.resolve("some.csv")));
         assertTrue(Files.exists(subDirectory));
         assertTrue(Files.exists(subDirectoryFile));
+    }
+
+    @Test
+    public void shouldCreateUri() {
+
+        // Given - a path
+        String expected = "/some/path";
+        Path path = Paths.get(expected);
+
+        // When - we call toUri on the path
+        String actual = PathUtils.toUri(path);
+
+        // Then - the uri string is returned.
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldAddLeadingSlashToUri() {
+
+        // Given - a path
+        String expected = "/some/path";
+        Path path = Paths.get(expected.replaceFirst("/", ""));
+
+        // When - we call toUri on the path
+        String actual = PathUtils.toUri(path);
+
+        // Then - the uri string is returned.
+        assertEquals(expected, actual);
     }
 }

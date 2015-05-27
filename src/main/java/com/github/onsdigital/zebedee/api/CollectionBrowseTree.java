@@ -27,14 +27,20 @@ public class CollectionBrowseTree {
     public ContentDetail get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-//        com.github.onsdigital.zebedee.model.Collection collection = Collections
-//                .getCollection(request);
-//
-//        if (collection == null) {
-//            response.setStatus(HttpStatus.NOT_FOUND_404);
-//            return null;
-//        }
+        com.github.onsdigital.zebedee.model.Collection collection = Collections
+                .getCollection(request);
 
-        return Root.zebedee.published.nestedDetails();
+        if (collection == null) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            return null;
+        }
+
+        ContentDetail publishedDetails = Root.zebedee.published.nestedDetails();
+
+        publishedDetails.overlayDetails(collection.inProgress.details());
+        publishedDetails.overlayDetails(collection.complete.details());
+        publishedDetails.overlayDetails(collection.reviewed.details());
+
+        return publishedDetails;
     }
 }

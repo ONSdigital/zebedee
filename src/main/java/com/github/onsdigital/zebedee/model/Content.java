@@ -132,10 +132,9 @@ public class Content {
         ContentDetail detail = details(path.resolve("data.json"));
 
         if (detail == null) {
-            System.out.println("null detail: " + path.resolve("data.json").toString());
             detail = new ContentDetail();
-            //detail.uri = PathUtils.toUri(this.path.relativize(path));
             detail.name = path.getFileName().toString();
+            detail.uri = "";
         }
 
         detail.children = new ArrayList<>();
@@ -150,7 +149,6 @@ public class Content {
                 }
             }
         }
-
 
         return detail;
     }

@@ -1,6 +1,6 @@
 from java
 
-RUN apt-get update && sudo apt-get -y dist-upgrade
+RUN apt-get update && apt-get -y dist-upgrade
 RUN apt-get install -y git maven 
 
 WORKDIR /usr/src

@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.json;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Class to hold a file uri and any other properties required from that file.
@@ -10,5 +10,5 @@ public class ContentDetail {
     public String name;
     public String type;
 
-    public Collection<ContentDetail> children;
+    public List<ContentDetail> children;
 }

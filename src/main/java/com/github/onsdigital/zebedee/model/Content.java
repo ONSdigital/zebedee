@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -93,24 +92,19 @@ public class Content {
 
         // Get a list of files:
         List<Path> files = new ArrayList<>();
-        listFiles(path, files, glob);
+        listFilesRecursively(path, files, glob);
 
         // Convert to URIs:
         List<String> uris = new ArrayList<>();
-        String uri;
         for (Path path : files) {
-            uri = path.toString();
-            if (!uri.startsWith("/")) {
-                uri = "/" + uri;
-            }
-            uris.add(uri);
+            uris.add(PathUtils.toUri(path));
         }
 
         return uris;
     }
 
     /**
-     * Returns a list of {@link ContentDetail} objects for each file within this {@link Content}
+     * Returns a flat list of {@link ContentDetail} objects for each file within this {@link Content}
      *
      * @return
      * @throws IOException
@@ -118,9 +112,51 @@ public class Content {
     public List<ContentDetail> details() throws IOException {
         List<ContentDetail> details = new ArrayList<>();
         for (String uri : this.uris("*data.json")) {
-            details.add(details(uri));
+            details.add(details(path.resolve(uri.replaceFirst("/", ""))));
         }
         return details;
+    }
+
+    /**
+     * Returns a list of details with the details of child page details nested.
+     *
+     * @return
+     * @throws IOException
+     */
+    public ContentDetail nestedDetails() throws IOException {
+        return nestedDetails(this.path);
+    }
+
+    private ContentDetail nestedDetails(Path path) throws IOException {
+
+        ContentDetail detail = details(path.resolve("data.json"));
+
+        if (detail == null) {
+            System.out.println("null detail: " + path.resolve("data.json").toString());
+            detail = new ContentDetail();
+            //detail.uri = PathUtils.toUri(this.path.relativize(path));
+            detail.name = path.getFileName().toString();
+        }
+
+        detail.children = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry) && isNotRelease(entry)) {
+                    ContentDetail child = nestedDetails(entry);
+                    if (child != null) {
+                        detail.children.add(child);
+                    }
+                }
+            }
+        }
+
+
+        return detail;
+    }
+
+    private static boolean isNotRelease(Path p) {
+        return !p.getFileName().toString().contains("releases");
     }
 
     /**
@@ -129,12 +165,12 @@ public class Content {
      * @return
      * @throws IOException
      */
-    public ContentDetail details(String uri) throws IOException {
+    public ContentDetail details(Path path) throws IOException {
         ContentDetail result = null;
         if (Files.exists(path)) {
-            try (InputStream input = Files.newInputStream(new File(path.toFile(), uri).toPath())) {
+            try (InputStream input = Files.newInputStream(path)) {
                 result = Serialiser.deserialise(input, ContentDetail.class);
-                result.uri = uri;
+                result.uri = PathUtils.toUri(this.path.relativize(path));
             }
         }
         return result;
@@ -148,24 +184,41 @@ public class Content {
      * @param glob  The filter glob to apply to the list.
      * @throws IOException
      */
-    private void listFiles(Path path, List<Path> files, String glob) throws IOException {
+    private void listFilesRecursively(Path path, List<Path> files, String glob) throws IOException {
+        files.addAll(listFiles(path, glob));
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry)) {
+                    listFilesRecursively(entry, files, glob);
+                }
+            }
+        }
+    }
+
+    /**
+     * Return a list of files for the given path.
+     *
+     * @param path
+     * @param glob
+     * @return
+     * @throws IOException
+     */
+    private List<Path> listFiles(Path path, String glob) throws IOException {
+
+        List<Path> result = new ArrayList<>();
+
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, glob)) {
             for (Path entry : stream) {
                 if (!Files.isDirectory(entry)) {
                     Path relative = this.path.relativize(entry);
                     if (!relative.endsWith(".DS_Store")) // issue when in development on Mac's
-                        files.add(relative);
+                        result.add(relative);
                 }
             }
         }
 
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-            for (Path entry : stream) {
-                if (Files.isDirectory(entry)) {
-                    listFiles(entry, files, glob);
-                }
-            }
-        }
+        return result;
     }
 
     public boolean delete(String uri) throws IOException {
@@ -189,7 +242,7 @@ public class Content {
         Path folder = path.getParent();
         while (!Files.isSameFile(this.path, folder)) { // Go no further than the Content root
             List<Path> files = new ArrayList<>();
-            listFiles(folder, files, "*");
+            listFilesRecursively(folder, files, "*");
             if (files.size() == 0) { // If the folder is empty
                 FileUtils.deleteDirectory(folder.toFile());
                 folder = folder.getParent();

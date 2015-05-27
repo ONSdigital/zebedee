@@ -3,7 +3,7 @@ from java
 # Install git and maven
 RUN \
   apt-get update && \
-  apt-get -y dist-upgrade &&
+  apt-get -y dist-upgrade && \
   apt-get install -y git maven 
 
 # Consul agent - /usr/local/bin

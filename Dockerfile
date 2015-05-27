@@ -20,7 +20,7 @@ WORKDIR zebedee
 RUN git checkout develop
 
 # Build the entry point script
-RUN echo "# Disabled for now: consul agent -data-dir /tmp/consul -config-dir /etc/consul.d -join=192.168.15.7 -join=192.168.15.8 -join=192.168.15.10 -join=192.168.15.9 &" > container.sh
+# Disabled for now: RUN echo "consul agent -data-dir /tmp/consul -config-dir /etc/consul.d -join=192.168.15.7 -join=192.168.15.8 -join=192.168.15.10 -join=192.168.15.9 &" > container.sh
 RUN echo "./files.sh" >> container.sh
 RUN chmod u+x container.sh
 

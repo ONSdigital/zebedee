@@ -170,7 +170,7 @@ public class Content {
         if (Files.exists(path)) {
             try (InputStream input = Files.newInputStream(path)) {
                 result = Serialiser.deserialise(input, ContentDetail.class);
-                result.uri = PathUtils.toUri(this.path.relativize(path));
+                result.uri = PathUtils.toUri(this.path.relativize(path.getParent()));
             }
         }
         return result;

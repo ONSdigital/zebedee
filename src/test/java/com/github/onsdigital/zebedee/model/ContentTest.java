@@ -98,7 +98,7 @@ public class ContentTest {
         // The result has the expected values
         assertEquals(baseContent.name, result.name);
         assertEquals(baseContent.type, result.type);
-        assertEquals("/" + filename, result.uri);
+        assertEquals("/", result.uri);
     }
 
     @Test
@@ -150,7 +150,7 @@ public class ContentTest {
         ContentDetail bulletinDetails = bulletinDirectoryDetails.children.get(0);
         assertNotNull(bulletinDetails);
         assertEquals(bulletinContent.name, bulletinDetails.name);
-        assertEquals("/" + basePath.relativize(exampleBulletinJsonFile), bulletinDetails.uri);
+        assertEquals("/" + basePath.relativize(exampleBulletinDirectory), bulletinDetails.uri);
         assertTrue(bulletinDetails.children.size() == 0);
     }
 

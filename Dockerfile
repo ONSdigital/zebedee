@@ -1,4 +1,3 @@
-va
 
 # Install git and maven
 

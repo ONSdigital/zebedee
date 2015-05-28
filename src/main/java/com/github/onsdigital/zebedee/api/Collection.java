@@ -48,7 +48,6 @@ public class Collection {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
-        ;
 
         // Collate the result:
         CollectionDescription result = new CollectionDescription();

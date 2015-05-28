@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +32,12 @@ public class CollectionBrowseTree {
 
         if (collection == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
+            return null;
+        }
+
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
 

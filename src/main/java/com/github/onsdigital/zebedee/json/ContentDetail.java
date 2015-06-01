@@ -46,6 +46,12 @@ public class ContentDetail {
         return this.children.contains(child);
     }
 
+    /**
+     * Return the child item with the given uri
+     *
+     * @param uri
+     * @return
+     */
     public ContentDetail getChildWithUri(String uri) {
 
         if (this.children == null)
@@ -60,6 +66,12 @@ public class ContentDetail {
         return null;
     }
 
+    /**
+     * Return the child item with the given name.
+     *
+     * @param name
+     * @return
+     */
     public ContentDetail getChildWithName(String name) {
 
         if (this.children == null)
@@ -97,6 +109,7 @@ public class ContentDetail {
     }
 
     /**
+     * Equals override
      * If the type, name, and uri are the same they are considered equal.
      *
      * @param o
@@ -124,6 +137,12 @@ public class ContentDetail {
         return result;
     }
 
+    /**
+     * Overlay the given list of ContentDetail items nested into this ContentDetail instance.
+     *
+     * @param toOverlay
+     * @return
+     */
     public ContentDetail overlayDetails(List<ContentDetail> toOverlay) {
 
         for (ContentDetail contentDetail : toOverlay) {
@@ -141,6 +160,7 @@ public class ContentDetail {
         if (path.subpath(depth, path.getNameCount()).getNameCount() < 2) {
             if (this.children == null)
                 this.children = new ArrayList<>();
+
             this.children.add(contentDetail);
         } else {
             // recurse
@@ -149,10 +169,8 @@ public class ContentDetail {
             if (child == null)
                 child = this.getChildWithName(path.subpath(depth, depth + 1).toString());
 
-            if (child != null) {
+            if (child != null)
                 child.overlayContentDetail(contentDetail, depth + 1);
-            }
         }
-
     }
 }

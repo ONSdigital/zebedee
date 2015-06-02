@@ -25,6 +25,10 @@ RUN git checkout develop
 
 RUN mvn install
 
+# Expose port
+
+EXPOSE 8080
+
 # Build the entry point script
 
 ENV PACKAGE_PREFIX com.github.onsdigital.zebedee.api

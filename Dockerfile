@@ -4,7 +4,6 @@ from java
 
 RUN \
   apt-get update && \
-  apt-get -y dist-upgrade && \
   apt-get install -y git maven 
 
 # Consul agent - /usr/local/bin
@@ -30,8 +29,8 @@ RUN mvn install
 
 ENV PACKAGE_PREFIX com.github.onsdigital.zebedee.api
 RUN echo "#!/bin/bash" >> zebedee.sh
-# Disabled for now: RUN echo "consul agent -data-dir /tmp/consul -config-dir /etc/consul.d -join=192.168.15.7 -join=192.168.15.8 -join=192.168.15.10 -join=192.168.15.9 &" > zebedee.sh
+# Disabled for now: RUN echo "consul agent -data-dir /tmp/consul -config-dir /etc/consul.d -join=dockerhost &" > zebedee.sh
 RUN echo "java -Drestolino.packageprefix=$PACKAGE_PREFIX -jar target/*-jar-with-dependencies.jar" >> zebedee.sh
 RUN chmod u+x zebedee.sh
 
-CMD ["./zebedee.sh"]
+ENTRYPOINT ["./zebedee.sh"]

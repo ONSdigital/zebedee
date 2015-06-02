@@ -12,7 +12,7 @@ import org.w3c.dom.Document;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -24,7 +24,7 @@ import java.nio.file.Path;
 
 @Api
 public class Table {
-    @GET
+    @POST
     public void createTable(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ParserConfigurationException, TransformerException, BadRequestException, NotFoundException, UnauthorizedException {
 

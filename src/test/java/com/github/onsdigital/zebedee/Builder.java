@@ -328,6 +328,7 @@ public class Builder {
         Files.createDirectory(path.resolve(Zebedee.SESSIONS));
         Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
         Files.createDirectory(path.resolve(Zebedee.TEAMS));
+        Files.createDirectory(path.resolve(Zebedee.LAUNCHPAD));
         return path;
     }
 

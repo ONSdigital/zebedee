@@ -9,17 +9,19 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 public class Zebedee {
 
 
-    public static final String PUBLISHED = "published";
+    public static final String PUBLISHED = "master";
     public static final String COLLECTIONS = "collections";
     static final String ZEBEDEE = "zebedee";
     static final String USERS = "users";
     static final String SESSIONS = "sessions";
     static final String PERMISSIONS = "permissions";
     static final String TEAMS = "teams";
+    static final String LAUNCHPAD = "launchpad";
 
     public final Path path;
     public final Content published;
@@ -28,6 +30,7 @@ public class Zebedee {
     public final Sessions sessions;
     public final Permissions permissions;
     public final Teams teams;
+    public final Content launchpad;
 
     public Zebedee(Path path) {
 
@@ -39,6 +42,7 @@ public class Zebedee {
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
         Path teams = path.resolve(TEAMS);
+        Path launchpad = path.resolve(LAUNCHPAD);
         if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
@@ -50,6 +54,7 @@ public class Zebedee {
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
+        this.launchpad = new Content(launchpad);
     }
 
     /**

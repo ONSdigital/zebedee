@@ -82,12 +82,19 @@ public class Root implements Startup {
             throws IOException {
 
         // Extract the content:
+        // Copy to the master and launchpad content directories
         for (Path item : content) {
             Path source = taxonomy.resolve(item);
-            Path destination = zebedee.published.path.resolve(item);
-            Files.createDirectories(destination.getParent());
+            Path masterDestination = zebedee.published.path.resolve(item);
+            Path launchpadDestination = zebedee.launchpad.path.resolve(item);
+            Files.createDirectories(masterDestination.getParent());
+            Files.createDirectories(launchpadDestination.getParent());
             try (InputStream input = Files.newInputStream(source);
-                 OutputStream output = Files.newOutputStream(destination)) {
+                 OutputStream output = Files.newOutputStream(masterDestination)) {
+                IOUtils.copy(input, output);
+            }
+            try (InputStream input = Files.newInputStream(source);
+                 OutputStream output = Files.newOutputStream(launchpadDestination)) {
                 IOUtils.copy(input, output);
             }
         }

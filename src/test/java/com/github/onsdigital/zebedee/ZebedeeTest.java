@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
@@ -10,7 +11,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -18,9 +21,13 @@ public class ZebedeeTest {
 
 	Path expectedPath;
 	Builder builder;
+	Map<String, String> env;
 
 	@Before
 	public void setUp() throws Exception {
+		env = Root.env;
+		Root.env = new HashMap<>(); // Run tests with known environment variables
+
 		builder = new Builder(this.getClass());
 		expectedPath = builder.parent.resolve(Zebedee.ZEBEDEE);
 	}
@@ -28,6 +35,7 @@ public class ZebedeeTest {
 	@After
 	public void tearDown() throws Exception {
 		builder.delete();
+		Root.env = env;
 	}
 
 	@Test

@@ -13,15 +13,17 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class Root implements Startup {
+    // Environment variables are stored as a static variable so if necessary we can hijack them for testing
+    public static Map<String, String> env = System.getenv();
+    static final String ZEBEDEE_ROOT = "zebedee_root";
+
 
     public static Zebedee zebedee;
     static Path root;
@@ -52,17 +54,32 @@ public class Root implements Startup {
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
-        try {
+        // If we have an environment variable and it is
+        String rootDir = env.get(ZEBEDEE_ROOT);
+        boolean zebedeeCreated = false;
+        if(rootDir != null && rootDir!= "" && Files.exists(Paths.get(rootDir))) {
+            root = Paths.get(rootDir);
+            try {
+                zebedee = Zebedee.create(root);
+                zebedeeCreated = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            // Create a Zebedee folder:
-            root = Files.createTempDirectory("zebedee");
-            zebedee = Zebedee.create(root);
-            Path taxonomy = Paths.get(".").resolve("target/taxonomy");
-            List<Path> content = listContent(taxonomy);
-            copyContent(content, taxonomy);
+        }
+        if(!zebedeeCreated) {
+            try {
+                // Create a Zebedee folder:
+                root = Files.createTempDirectory("zebedee");
+                zebedee = Zebedee.create(root);
 
-        } catch (IOException | UnauthorizedException e) {
-            throw new RuntimeException("Error initialising Zebedee ", e);
+                // Initialise content folders from bundle
+                Path taxonomy = Paths.get(".").resolve("target/taxonomy");
+                List<Path> content = listContent(taxonomy);
+                copyContent(content, taxonomy);
+            } catch (IOException | UnauthorizedException e) {
+                throw new RuntimeException("Error initialising Zebedee ", e);
+            }
         }
 
         // Set the class that will be used to determine a ClassLoader when loading resources:

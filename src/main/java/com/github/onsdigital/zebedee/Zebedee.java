@@ -67,13 +67,19 @@ public class Zebedee {
     public static Zebedee create(Path parent) throws IOException, UnauthorizedException {
 
         // Create the folder structure
-        Path path = Files.createDirectory(parent.resolve(ZEBEDEE));
-        Files.createDirectory(path.resolve(PUBLISHED));
-        Files.createDirectory(path.resolve(COLLECTIONS));
-        Files.createDirectory(path.resolve(USERS));
-        Files.createDirectory(path.resolve(SESSIONS));
-        Files.createDirectory(path.resolve(PERMISSIONS));
-        Files.createDirectory(path.resolve(TEAMS));
+        Path path;
+        if(!Files.exists(parent.resolve(ZEBEDEE))) {
+            path = Files.createDirectory(parent.resolve(ZEBEDEE));
+        } else {
+            path = parent.resolve(ZEBEDEE);
+        }
+        if (!Files.exists(path.resolve(PUBLISHED))) { Files.createDirectory(path.resolve(PUBLISHED)); }
+        if (!Files.exists(path.resolve(COLLECTIONS))) { Files.createDirectory(path.resolve(COLLECTIONS)); }
+        if (!Files.exists(path.resolve(USERS))) {Files.createDirectory(path.resolve(USERS));}
+        if (!Files.exists(path.resolve(SESSIONS))) {Files.createDirectory(path.resolve(SESSIONS));}
+        if (!Files.exists(path.resolve(PERMISSIONS))) {Files.createDirectory(path.resolve(PERMISSIONS));}
+        if (!Files.exists(path.resolve(TEAMS))) {Files.createDirectory(path.resolve(TEAMS));}
+        if (!Files.exists(path.resolve(LAUNCHPAD))) {Files.createDirectory(path.resolve(LAUNCHPAD));}
 
         Zebedee zebedee = new Zebedee(path);
 

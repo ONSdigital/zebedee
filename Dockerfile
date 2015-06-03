@@ -32,9 +32,9 @@ EXPOSE 8080
 # Build the entry point script
 
 ENV PACKAGE_PREFIX com.github.onsdigital.zebedee.api
-RUN echo "#!/bin/bash" >> zebedee.sh
-# Disabled for now: RUN echo "consul agent -data-dir /tmp/consul -config-dir /etc/consul.d -join=dockerhost &" > zebedee.sh
-RUN echo "java -Drestolino.packageprefix=$PACKAGE_PREFIX -jar target/*-jar-with-dependencies.jar" >> zebedee.sh
-RUN chmod u+x zebedee.sh
+RUN echo "#!/bin/bash" >> container.sh
+# Disabled for now: RUN echo "consul agent -data-dir /tmp/consul -config-dir /etc/consul.d -join=dockerhost &" > container.sh
+RUN echo "java -Drestolino.packageprefix=$PACKAGE_PREFIX -jar target/*-jar-with-dependencies.jar" >> container.sh
+RUN chmod u+x container.sh
 
-ENTRYPOINT ["./zebedee.sh"]
+ENTRYPOINT ["./container.sh"]

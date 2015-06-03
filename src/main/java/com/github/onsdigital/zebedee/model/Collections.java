@@ -112,6 +112,64 @@ public class Collections {
         return collection.save();
     }
 
+    /**
+     * Publish the files
+     *
+     * @param collection the collection to publish
+     * @param session a session with editor priviledges
+     * @return
+     * @throws IOException
+     * @throws UnauthorizedException
+     * @throws BadRequestException
+     * @throws ConflictException - If there
+     */
+    public boolean publish(Collection collection, Session session)
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Collection exists
+        if (collection == null) {
+            throw new BadRequestException("Please provide a valid collection.");
+        }
+
+        // User has permission
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+            throw new UnauthorizedException(session);
+        }
+
+        // Go ahead
+        if (collection.description.approvedStatus == false) {
+            throw new ConflictException("This collection cannot be published because it is not approved");
+        }
+
+        // Todo: This section is going to be plugged into by the data upload process
+        // Move each item of content:
+        for (String uri : collection.reviewed.uris()) {
+            Path source = collection.reviewed.get(uri);
+            Path destination = zebedee.launchpad.toPath(uri);
+            PathUtils.moveFilesInDirectory(source, destination);
+        }
+
+        // Delete the folders:
+        delete(collection, session);
+
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public DirectoryListing listDirectory(Collection collection, String uri,
                                           Session session) throws NotFoundException, UnauthorizedException,
             IOException, BadRequestException {

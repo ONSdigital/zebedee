@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
@@ -39,6 +40,7 @@ public class Builder {
     public Team inflationTeam;
 
     public Builder(Class<?> name) throws IOException {
+        Root.env = new HashMap<>();
 
         // Create the structure:
         parent = Files.createTempDirectory(name.getSimpleName());

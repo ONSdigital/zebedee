@@ -141,8 +141,8 @@ public class ZebedeeTest {
 
 		// Then
 		assertTrue(published);
-		Path publishedPath = builder.zebedee.resolve(Zebedee.PUBLISHED);
-		assertTrue(Files.exists(publishedPath.resolve(uri.substring(1))));
+		Path launchpadPath = builder.zebedee.resolve(Zebedee.LAUNCHPAD);
+		assertTrue(Files.exists(launchpadPath.resolve(uri.substring(1))));
 	}
 
 	@Test

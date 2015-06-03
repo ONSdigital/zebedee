@@ -1,7 +1,12 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.ResultMessage;
+import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,36 +18,30 @@ import java.io.IOException;
 public class Publish {
 
 	/**
-	 * Creates or updates collection details the endpoint <code>/Publish/[CollectionName]</code>
-	 * <p>Marks a content item complete</p>
 	 *
-	 *
-	 * @param request This should contain a X-Florence-Token header for the current session
+	 * @param request
 	 * @param response <ul>
-	 *                 <li>If collection does not exist:  {@link HttpStatus#NOT_FOUND_404}</li>
-	 *                 <li>If user not authorised to publish:  {@link HttpStatus#UNAUTHORIZED_401}</li>
-	 *                 <li>If collection is not complete:  {@link HttpStatus#CONFLICT_409}</li>
-	 *                 <li>Complete fails for another reason:  {@link HttpStatus#BAD_REQUEST_400}</li>
-	 * @return success true/false
+	 *                 <li>If publish succeeds: {@link HttpStatus#OK_200}</li>
+	 *                 <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
+	 *                 <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+	 *                 <li>If the collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
+	 *                 <li>If the collection is not approved:  {@link HttpStatus#CONFLICT_409}</li>
+	 *                 </ul>
+	 * @return
 	 * @throws IOException
+	 * @throws NotFoundException
+	 * @throws BadRequestException
+	 * @throws UnauthorizedException
+	 * @throws ConflictException
 	 */
 	@POST
-	public boolean publish(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		boolean result = false;
+	public boolean publish(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, NotFoundException, BadRequestException, UnauthorizedException, ConflictException {
 
-		// Locate and publish the collection:
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        if (collection != null) {
-			result = Root.zebedee.publish(collection);
-		}
+		com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+		Session session = Root.zebedee.sessions.get(request);
+		return Root.zebedee.collections.publish(collection, session);
 
-		// Change the status code if necessary:
-		if (!result) {
-			response.setStatus(HttpStatus.BAD_REQUEST_400);
-		}
-
-		return result;
 	}
 
 }

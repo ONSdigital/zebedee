@@ -167,7 +167,7 @@ public class Zebedee {
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
             Path source = collection.reviewed.get(uri);
-            Path destination = published.toPath(uri);
+            Path destination = launchpad.toPath(uri);
             PathUtils.moveFilesInDirectory(source, destination);
         }
 

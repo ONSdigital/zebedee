@@ -179,8 +179,11 @@ public class Zebedee {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path directory : stream) {
                 // Recursively delete directories only - added .DS_Store files:
-                if (Files.isDirectory(directory) || directory.endsWith(".DS_Store")) {
+                if (Files.isDirectory(directory)) {
                     delete(directory);
+                }
+                if (directory.endsWith(".DS_Store")) {
+                    Files.delete(directory);
                 }
             }
         }

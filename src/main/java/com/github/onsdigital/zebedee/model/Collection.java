@@ -279,6 +279,16 @@ public class Collection {
         return result;
     }
 
+    public Path autocreatePath(String uri) throws IOException {
+        // Does this path already exist in the published area?
+        Path path = reviewed.get(uri);
+        if(path == null) {
+            path = reviewed.toPath(uri);
+            PathUtils.create(path);
+        }
+        return path;
+    }
+
     /**
      * @param uri The path you would like to edit.
      * @return True if the path was added to {@link #inProgress}. If the path is

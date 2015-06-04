@@ -27,6 +27,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Created by david on 12/03/2015.
  */
 public class Teams {
+    // TODO Delete errors - have been getting errors in Rusty when deleting - could be to do with the access mapping
+
     private Path teamsPath;
     private Zebedee zebedee;
     private ReadWriteLock teamLock = new ReentrantReadWriteLock();

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -142,7 +143,9 @@ public class Collections {
             throw new ConflictException("This collection cannot be published because it is not approved");
         }
 
-        // Todo: This section is going to be plugged into by the data upload process
+        // Do any processing of data files
+        DataPublisher.preprocessCollection(collection, session);
+
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
             Path source = collection.reviewed.get(uri);
@@ -155,20 +158,6 @@ public class Collections {
 
         return true;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public DirectoryListing listDirectory(Collection collection, String uri,
                                           Session session) throws NotFoundException, UnauthorizedException,

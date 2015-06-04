@@ -21,7 +21,7 @@ RUN git clone https://github.com/Carboni/zebedee.git
 WORKDIR zebedee
 RUN git checkout develop
 
-# Pne-download dependencies:
+# Build the jar-with-dependencies:
 
 RUN mvn install -DskipTests
 

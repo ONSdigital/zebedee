@@ -138,6 +138,9 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
     @Override
     protected void processSheetHeader(Element htmlBody, HSSFSheet sheet) {
+
+        // dont do anything with headers.
+
 //        Element h2 = htmlDocumentFacade.createHeader2();
 //        h2.appendChild(htmlDocumentFacade.createText(sheet.getSheetName()));
 //        htmlBody.appendChild( h2 );
@@ -171,17 +174,20 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         if (cellStyle.getFillPattern() == 0) {
             // no fill
         } else if (cellStyle.getFillPattern() == 1) {
-            final HSSFColor foregroundColor = cellStyle
-                    .getFillForegroundColorColor();
-            if (foregroundColor != null)
-                style.append("background-color:"
-                        + ExcelToHtmlUtils.getColor(foregroundColor) + ";");
+//            final HSSFColor foregroundColor = cellStyle
+//                    .getFillForegroundColorColor();
+//            if (foregroundColor != null)
+//                style.append("background-color:"
+//                        + ExcelToHtmlUtils.getColor(foregroundColor) + ";");
         } else {
-            final HSSFColor backgroundColor = cellStyle
-                    .getFillBackgroundColorColor();
-            if (backgroundColor != null)
-                style.append("background-color:"
-                        + ExcelToHtmlUtils.getColor(backgroundColor) + ";");
+
+            // ignore background colors
+
+//            final HSSFColor backgroundColor = cellStyle
+//                    .getFillBackgroundColorColor();
+//            if (backgroundColor != null)
+//                style.append("background-color:"
+//                        + ExcelToHtmlUtils.getColor(backgroundColor) + ";");
         }
 
         buildStyle_border(workbook, style, "top", cellStyle.getBorderTop(),
@@ -238,7 +244,8 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
                     + "; ");
 
         if (font.getFontHeightInPoints() != 0)
-            style.append("font-size:" + font.getFontHeightInPoints() + "pt;");
+            // ignore font size
+            //style.append("font-size:" + font.getFontHeightInPoints() + "pt;");
 
         if (font.getItalic()) {
             style.append("font-style:italic;");

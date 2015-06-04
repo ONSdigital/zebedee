@@ -23,7 +23,7 @@ RUN git checkout develop
 
 # Pne-download dependencies:
 
-RUN mvn install
+RUN mvn install -DskipTests
 
 # Expose port
 

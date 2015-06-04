@@ -1,4 +1,4 @@
-from java
+from java:8
 
 # Install git and maven
 
@@ -12,7 +12,7 @@ ADD https://dl.bintray.com/mitchellh/consul/0.5.2_linux_amd64.zip /tmp/0.5.2_lin
 WORKDIR /usr/local/bin
 RUN unzip /tmp/0.5.2_linux_amd64.zip
 WORKDIR /etc/consul.d
-RUN echo '{"service": {"name": "zebedee", "tags": ["blue"], "port": 8080, "check": {"script": "curl http://localhost:8080 >/dev/null 2>&1", "interval": "10s"}}}'  >zebedee.json
+RUN echo '{"service": {"name": "zebedee", "tags": ["blue"], "port": 8080, "check": {"script": "curl http://localhost:8080 >/dev/null 2>&1", "interval": "10s"}}}' > zebedee.json
 
 # Check out code from Github
 

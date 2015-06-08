@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -143,7 +144,7 @@ public class Collections {
         }
 
         // Do any processing of data files
-        //DataPublisher.preprocessCollection(collection, session);
+        DataPublisher.preprocessCollection(collection, session);
 
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {

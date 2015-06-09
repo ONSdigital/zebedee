@@ -11,6 +11,15 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
+    <repositories>
+        <!--Jitpack io allows us include projects and libraries available on github but not built and published to maven central-->
+        <!-- It is used for including internal project modules. See more on https://jitpack.io/-->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <!-- Test -->
@@ -43,6 +52,13 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.3</version>
+        </dependency>
+
+        <!-- ONS Content Library, fetched through jitpack.io -->
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>content-library</artifactId>
+            <version>content-library-1.0.4</version>
         </dependency>
 
         <!-- commons etc. -->

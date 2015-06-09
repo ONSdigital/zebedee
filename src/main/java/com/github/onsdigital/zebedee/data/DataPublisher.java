@@ -2,14 +2,11 @@ package com.github.onsdigital.zebedee.data;
 
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.json.DatasetPage;
 import com.github.onsdigital.zebedee.data.json.TimeSeriesObject;
 import com.github.onsdigital.zebedee.data.json.TimeSeriesObjects;
@@ -18,22 +15,15 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.mockito.internal.verification.Times;
-import sun.net.www.http.HttpClient;
 
-import javax.ws.rs.core.UriBuilder;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -76,8 +66,8 @@ public class DataPublisher {
             TimeSeriesObjects serieses = callBrianToProcessCSDB(dataset.get("file"));
             for(TimeSeriesObject series: serieses) {
 
-                String uri = datasetPage.uri + "/" + series.id;
-                Path path = collection.find("", uri).resolve("data.json");
+                String uri = datasetPage.uri + "/" + series.taxi;
+                Path path = collection.reviewed.toPath(uri).resolve("data.json");
 
                 // Begin with existing data if possible (this will preserve any manually entered data)
                 TimeseriesPage page = new TimeseriesPage();
@@ -117,7 +107,9 @@ public class DataPublisher {
                     HashMap<String, Path> csdbDataset = new HashMap<>();
                     csdbDataset.put("json", jsonPath);
                     csdbDataset.put("file", csdbPath);
+                    results.add(csdbDataset);
                 }
+
             }
         }
         return results;
@@ -150,6 +142,7 @@ public class DataPublisher {
 
             //
             HttpEntity entity = response.getEntity();
+
             if (entity != null) {
                 try (InputStream inputStream = entity.getContent()) {
                     try {

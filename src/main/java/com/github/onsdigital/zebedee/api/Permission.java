@@ -1,20 +1,14 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;

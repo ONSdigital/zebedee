@@ -124,14 +124,7 @@ public class Root implements Startup {
      */
     @Override
     protected void finalize() throws Throwable {
-        System.out.println(" - Deleting Zebeddee at: " + root);
-        try {
-            FileUtils.deleteDirectory(root.toFile());
-            System.out.println(" - Deleting Zebeddee complete: " + root);
-        } catch (Throwable t) {
-            System.out.println(" - Error deleting Zebedee: ");
-            System.out.println(t.getStackTrace());
-        }
+        
     }
 
 }

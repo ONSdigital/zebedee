@@ -106,6 +106,11 @@ public class PathUtils {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(sourceDirectory)) {
             for (Path entry : stream) {
                 if (!Files.isDirectory(entry)) {
+
+                    Path oldEntry = destinationDirectory.resolve(entry.getFileName());
+                    if (Files.exists(oldEntry)) {
+                        Files.delete(oldEntry);
+                    } // overwrite
                     FileUtils.moveFileToDirectory(entry.toFile(), destinationDirectory.toFile(), true);
                 }
             }

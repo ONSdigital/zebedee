@@ -279,7 +279,7 @@ public class Collection {
         return result;
     }
 
-    public Path autocreatePath(String uri) throws IOException {
+    public Path autocreateReviewedPath(String uri) throws IOException {
         // Does this path already exist in the published area?
         Path path = reviewed.get(uri);
         if(path == null) {

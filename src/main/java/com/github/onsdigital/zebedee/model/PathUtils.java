@@ -112,6 +112,7 @@ public class PathUtils {
                         Files.delete(oldEntry);
                     } // overwrite
                     FileUtils.moveFileToDirectory(entry.toFile(), destinationDirectory.toFile(), true);
+
                 }
             }
         }

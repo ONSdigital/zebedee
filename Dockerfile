@@ -23,7 +23,7 @@ RUN git checkout develop
 
 # Build the jar-with-dependencies:
 
-RUN mvn install -DskipTests
+RUN mvn clean install -DskipTests
 
 # Expose port
 

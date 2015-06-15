@@ -42,15 +42,20 @@ import java.util.*;
 public class DataPublisher {
     public static int insertions = 0;
     public static int corrections = 0;
+    static final String BRIAN_KEY = "brian_url";
 
     public static Map<String, String> env = System.getenv();
 
     public static void preprocessCollection(Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException {
-        System.out.println("Processing collection: " + collection.description.name);
+
+        if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() > 0) {
+            System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
+            return;
+        }
 
         preprocessCSDB(collection, session);
 
-        System.out.println("Insertions: " + insertions + "      Corrections: " + corrections);
+        System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
     }
 
     /**

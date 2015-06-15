@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The usually resident population of the United Kingdom was 63.2 million on census day, a growth of 7% (4.1 million) since 2001.",
-    "headline2": "Nearly one in five (18%, 11.4 million) of the UK population reported having a limiting long-term health problem or disability in 2011.",
-    "headline3": "In 2011 the majority of UK residents described themselves as belonging to a white ethnic group (87%, 55 million).",
-    "title": "Key Statistics and Quick Statistics for local authorities in the United Kingdom",
-    "summary": "This statistical bulletin presents key results for the UK population from the individual censuses of England and Wales, Scotland and Northern Ireland. The bulletin focuses on the topics of population, ethnicity, country of birth, health, housing and accommodation.",
-    "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid95",
@@ -40,6 +31,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The usually resident population of the United Kingdom was 63.2 million on census day, a growth of 7% (4.1 million) since 2001.",
+      "headline2": "Nearly one in five (18%, 11.4 million) of the UK population reported having a limiting long-term health problem or disability in 2011.",
+      "headline3": "In 2011 the majority of UK residents described themselves as belonging to a white ethnic group (87%, 55 million).",
       "title": "Key Statistics and Quick Statistics for local authorities in the United Kingdom",
       "summary": "This statistical bulletin presents key results for the UK population from the individual censuses of England and Wales, Scotland and Northern Ireland. The bulletin focuses on the topics of population, ethnicity, country of birth, health, housing and accommodation.",
       "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom",

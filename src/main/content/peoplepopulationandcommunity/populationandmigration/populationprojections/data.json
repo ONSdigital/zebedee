@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The UK population is projected to increase by 9.6 million over the next 25 years from an estimated 63.7 million in mid-2012 to 73.3 million in mid-2037.",
-    "headline2": "The UK population is projected to reach 70 million in 2027.",
-    "headline3": "Projected natural increase (more births than deaths) accounts for 57 per cent of the projected increase over the next 25 years.",
-    "title": "National Population Projections, 2012-based",
-    "summary": "This statistical bulletin presents the key findings from the 2012-based national population projections.",
-    "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/timeseries/raid130",
@@ -42,6 +33,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The UK population is projected to increase by 9.6 million over the next 25 years from an estimated 63.7 million in mid-2012 to 73.3 million in mid-2037.",
+      "headline2": "The UK population is projected to reach 70 million in 2027.",
+      "headline3": "Projected natural increase (more births than deaths) accounts for 57 per cent of the projected increase over the next 25 years.",
       "title": "National Population Projections, 2012-based",
       "summary": "This statistical bulletin presents the key findings from the 2012-based national population projections.",
       "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based",

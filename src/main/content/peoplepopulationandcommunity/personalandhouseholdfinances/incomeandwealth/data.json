@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "Median household wealth was about seven times larger than median household gross annual income.",
-    "headline2": "The distribution of wealth was more unequal than the distribution of income.",
-    "headline3": "Households in the top income quintile held 44% of aggregate total wealth.",
-    "title": "Wealth and Income, 2010-12",
-    "summary": "A combined analysis of income and wealth based upon results from the third wave of the Wealth and Assets Survey and covering the period 2010-12.",
-    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115",
@@ -28,6 +19,9 @@
   "datasets": [],
   "statsBulletins": [
     {
+      "headline1": "Median household wealth was about seven times larger than median household gross annual income.",
+      "headline2": "The distribution of wealth was more unequal than the distribution of income.",
+      "headline3": "Households in the top income quintile held 44% of aggregate total wealth.",
       "title": "Wealth and Income, 2010-12",
       "summary": "A combined analysis of income and wealth based upon results from the third wave of the Wealth and Assets Survey and covering the period 2010-12.",
       "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012",

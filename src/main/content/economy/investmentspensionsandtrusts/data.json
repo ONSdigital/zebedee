@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "Net investment flows into the UK (inward investment) increased in 2012 to £35.4 billion (current prices), from £28.9 billion in 2011.",
-    "headline2": "Both of these estimates are well below flows of net investment into the UK seen between 2005 and 2007.",
-    "headline3": "The net flow of direct investment abroad by UK companies (outward investment) decreased from £60.1 billion in 2011 to £26.5 billion in 2012, a fall of £33.6 billion.",
-    "title": "Foreign Direct Investment Involving UK Companies, 2012 (MA4)",
-    "summary": "Provides a detailed breakdown of UK foreign direct investment flows, positions (stocks) and earnings (both inward and outward), by country, component and industry.",
-    "uri": "/economy/investmentspensionsandtrusts/bulletins/foreigndirectinvestmentinvolvingukcompanies2012ma4",
-    "index": null
-  },
   "items": [
     {
       "uri": "/economy/investmentspensionsandtrusts/timeseries/raid135",
@@ -40,6 +31,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "Net investment flows into the UK (inward investment) increased in 2012 to £35.4 billion (current prices), from £28.9 billion in 2011.",
+      "headline2": "Both of these estimates are well below flows of net investment into the UK seen between 2005 and 2007.",
+      "headline3": "The net flow of direct investment abroad by UK companies (outward investment) decreased from £60.1 billion in 2011 to £26.5 billion in 2012, a fall of £33.6 billion.",
       "title": "Foreign Direct Investment Involving UK Companies, 2012 (MA4)",
       "summary": "Provides a detailed breakdown of UK foreign direct investment flows, positions (stocks) and earnings (both inward and outward), by country, component and industry.",
       "uri": "/economy/investmentspensionsandtrusts/bulletins/foreigndirectinvestmentinvolvingukcompanies2012ma4",

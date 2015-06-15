@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The number of business births increased by 8,000 (3.1%) between 2011 and 2012.",
-    "headline2": "The number of business deaths increased by 25,000 (11.0%) between 2011 and 2012.",
-    "headline3": "In 2012 the births of new businesses (270,000) was greater than business deaths (255,000).",
-    "title": "Business Demography - 2012",
-    "summary": "This statistical bulletin contains headline figures and commentary from the Business Demography 2012 publication.",
-    "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/bulletins/businessdemography2012",
-    "index": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid6",
@@ -40,6 +31,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The number of business births increased by 8,000 (3.1%) between 2011 and 2012.",
+      "headline2": "The number of business deaths increased by 25,000 (11.0%) between 2011 and 2012.",
+      "headline3": "In 2012 the births of new businesses (270,000) was greater than business deaths (255,000).",
       "title": "Business Demography - 2012",
       "summary": "This statistical bulletin contains headline figures and commentary from the Business Demography 2012 publication.",
       "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/bulletins/businessdemography2012",

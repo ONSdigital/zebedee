@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "In Q2 2014 there was estimated to be no growth in construction output when compared with Q1 2014.",
-    "headline2": "However, the annual growth between Q2 2014 and Q2 2013 was estimated to have increased by 4.8%.",
-    "headline3": "The monthly estimates for construction output for June 2014 increased by 1.2% when compared with May 2014, with new work increasing by 0.9% and repair \u0026 maintenance increasing by 1.6%.",
-    "title": "Output in the Construction Industry, June and Q2 2014",
-    "summary": "Construction output at current price and chained volume measures seasonally adjusted by public and private sector.",
-    "uri": "/businessindustryandtrade/constructionindustry/bulletins/outputintheconstructionindustryjuneandq22014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid9",
@@ -61,6 +52,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "In Q2 2014 there was estimated to be no growth in construction output when compared with Q1 2014.",
+      "headline2": "However, the annual growth between Q2 2014 and Q2 2013 was estimated to have increased by 4.8%.",
+      "headline3": "The monthly estimates for construction output for June 2014 increased by 1.2% when compared with May 2014, with new work increasing by 0.9% and repair \u0026 maintenance increasing by 1.6%.",
       "title": "Output in the Construction Industry, June and Q2 2014",
       "summary": "Construction output at current price and chained volume measures seasonally adjusted by public and private sector.",
       "uri": "/businessindustryandtrade/constructionindustry/bulletins/outputintheconstructionindustryjuneandq22014",

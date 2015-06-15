@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
-    "headline2": "Seasonally adjusted, the UK\u0027s deficit on trade in goods and services was estimated to have been £2.5 billion in June 2014, compared with £2.4 billion in May 2014.",
-    "headline3": "In June 2014 there was a deficit of £9.4 billion on goods, partly offset by an estimated surplus of £7.0 billion on services.",
-    "title": "UK Trade, June 2014",
-    "summary": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
-    "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj",
@@ -61,6 +52,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
+      "headline2": "Seasonally adjusted, the UK\u0027s deficit on trade in goods and services was estimated to have been £2.5 billion in June 2014, compared with £2.4 billion in May 2014.",
+      "headline3": "In June 2014 there was a deficit of £9.4 billion on goods, partly offset by an estimated surplus of £7.0 billion on services.",
       "title": "UK Trade, June 2014",
       "summary": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
       "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014",

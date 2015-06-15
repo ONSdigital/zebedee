@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "In 2012, the number of adoptions in England and Wales was 5,206, an increase of 9.8% since 2011 when there were 4,740 adoptions.",
-    "headline2": "In 2012, most children adopted (63%) were aged between one and four years, rising from 62% in 2011.",
-    "headline3": "The percentage of children adopted who were born outside of marriage increased slightly to 85% in 2012, up from 82% in 2011.",
-    "title": "Adoptions in England and Wales, 2012",
-    "summary": "Annual adoptions statistics following court orders. Analysed by sex, age and marital status of biological parents.",
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/bulletins/adoptionsinenglandandwales2012",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid19",
@@ -50,6 +41,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "In 2012, the number of adoptions in England and Wales was 5,206, an increase of 9.8% since 2011 when there were 4,740 adoptions.",
+      "headline2": "In 2012, most children adopted (63%) were aged between one and four years, rising from 62% in 2011.",
+      "headline3": "The percentage of children adopted who were born outside of marriage increased slightly to 85% in 2012, up from 82% in 2011.",
       "title": "Adoptions in England and Wales, 2012",
       "summary": "Annual adoptions statistics following court orders. Analysed by sex, age and marital status of biological parents.",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/bulletins/adoptionsinenglandandwales2012",

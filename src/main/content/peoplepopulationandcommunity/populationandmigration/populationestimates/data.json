@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The population of the UK grew to 64.1 million in mid-2013, representing a gain of 400,600 (0.63%) over the previous year mid-2012.",
-    "headline2": "This means that the UK’s population has increased by around 5 million since 2001, and by more than 10 million since 1964.",
-    "headline3": "Natural change (births minus deaths) contributed slightly more than net international migration to the population gain in the year.",
-    "title": "Annual Mid-year Population Estimates, 2013",
-    "summary": "Estimates of the usual resident population in the United Kingdom and its constituent countries as at 30 June 2013.",
-    "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates2013",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid121",
@@ -77,6 +68,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The population of the UK grew to 64.1 million in mid-2013, representing a gain of 400,600 (0.63%) over the previous year mid-2012.",
+      "headline2": "This means that the UK’s population has increased by around 5 million since 2001, and by more than 10 million since 1964.",
+      "headline3": "Natural change (births minus deaths) contributed slightly more than net international migration to the population gain in the year.",
       "title": "Annual Mid-year Population Estimates, 2013",
       "summary": "Estimates of the usual resident population in the United Kingdom and its constituent countries as at 30 June 2013.",
       "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates2013",

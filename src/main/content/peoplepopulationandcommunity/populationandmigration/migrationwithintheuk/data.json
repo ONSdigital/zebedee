@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "There were an estimated 2.71 million residents moving between local authorities in England and Wales between July 2012 and June 2013.",
-    "headline2": "53,200 people moved from England and Wales to Northern Ireland and Scotland; 46,800 moved from Northern Ireland and Scotland to England and Wales.",
-    "headline3": "The age with the highest proportion of movers was 19.",
-    "title": "Internal Migration, England and Wales, Year Ending June 2013",
-    "summary": "Summarised statistics on residential moves between local authorities and regions in England and Wales and the UK.",
-    "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/bulletins/internalmigrationenglandandwalesyearendingjune2013",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/timeseries/raid120",
@@ -30,6 +21,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "There were an estimated 2.71 million residents moving between local authorities in England and Wales between July 2012 and June 2013.",
+      "headline2": "53,200 people moved from England and Wales to Northern Ireland and Scotland; 46,800 moved from Northern Ireland and Scotland to England and Wales.",
+      "headline3": "The age with the highest proportion of movers was 19.",
       "title": "Internal Migration, England and Wales, Year Ending June 2013",
       "summary": "Summarised statistics on residential moves between local authorities and regions in England and Wales and the UK.",
       "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/bulletins/internalmigrationenglandandwalesyearendingjune2013",

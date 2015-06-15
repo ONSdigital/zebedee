@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "Production output increased by 0.3% and manufacturing output increased by 0.2% between Q1 2014 and Q2 2014.",
-    "headline2": "The largest contribution to the quarterly growth in production came from electricity, gas, steam \u0026 air conditioning output, which increased by 4.4%.",
-    "headline3": "Production output increased by 1.2% between June 2013 and June 2014. This reflected increases of 1.9% in manufacturing and 0.4% in water supply, sewerage \u0026 waste management.",
-    "title": "Index of Production, June 2014",
-    "summary": "Constant price seasonally adjusted indices and growth rates for Production and component industries for June 2014.",
-    "uri": "/businessindustryandtrade/manufacturingandproductionindustry/bulletins/indexofproductionjune2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q",
@@ -51,6 +42,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "Production output increased by 0.3% and manufacturing output increased by 0.2% between Q1 2014 and Q2 2014.",
+      "headline2": "The largest contribution to the quarterly growth in production came from electricity, gas, steam \u0026 air conditioning output, which increased by 4.4%.",
+      "headline3": "Production output increased by 1.2% between June 2013 and June 2014. This reflected increases of 1.9% in manufacturing and 0.4% in water supply, sewerage \u0026 waste management.",
       "title": "Index of Production, June 2014",
       "summary": "Constant price seasonally adjusted indices and growth rates for Production and component industries for June 2014.",
       "uri": "/businessindustryandtrade/manufacturingandproductionindustry/bulletins/indexofproductionjune2014",

@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The resident population of England and Wales on 27 March 2011 was 56.1 million, a 7% increase since 2001.",
-    "headline2": "Most residents of England and Wales belonged to the White ethnic group (86%, 48.2 million) in 2011.",
-    "headline3": "12% (2.0 million) of households with at least two people had partners or household members of different ethnic groups in 2011.",
-    "title": "2011 Census Key Statistics for England and Wales, March 2011",
-    "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
-    "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/timeseries/raid65",
@@ -50,6 +41,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The resident population of England and Wales on 27 March 2011 was 56.1 million, a 7% increase since 2001.",
+      "headline2": "Most residents of England and Wales belonged to the White ethnic group (86%, 48.2 million) in 2011.",
+      "headline3": "12% (2.0 million) of households with at least two people had partners or household members of different ethnic groups in 2011.",
       "title": "2011 Census Key Statistics for England and Wales, March 2011",
       "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
       "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011",

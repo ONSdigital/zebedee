@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "1.5% of adults in the UK identified themselves as Gay, Lesbian or Bisexual.",
-    "headline2": "2.7%t of 16 to 24 year olds in the UK identified themselves as Gay, Lesbian or Bisexual compared with 0.4% of 65 year olds and over.",
-    "headline3": "Across the UK, 78% of men and 75% of women reported that they perceived themselves to be ‘in good health’.",
-    "title": "Integrated Household Survey April 2011 to March 2012- Experimental Statistics",
-    "summary": "Findings on health, smoking, sexual identity and other social topics compiled from the UK Integrated Household Survey (IHS) between April 2011 to March 2012.",
-    "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid81",
@@ -48,6 +39,9 @@
   "datasets": [],
   "statsBulletins": [
     {
+      "headline1": "1.5% of adults in the UK identified themselves as Gay, Lesbian or Bisexual.",
+      "headline2": "2.7%t of 16 to 24 year olds in the UK identified themselves as Gay, Lesbian or Bisexual compared with 0.4% of 65 year olds and over.",
+      "headline3": "Across the UK, 78% of men and 75% of women reported that they perceived themselves to be ‘in good health’.",
       "title": "Integrated Household Survey April 2011 to March 2012- Experimental Statistics",
       "summary": "Findings on health, smoking, sexual identity and other social topics compiled from the UK Integrated Household Survey (IHS) between April 2011 to March 2012.",
       "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics",

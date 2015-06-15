@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "92% (49.8 million) of usual residents aged three years and over spoke English (English or Welsh in Wales) as their main language.",
-    "headline2": "Of the other 8% (4.2 million), 79% (3.3 million) could speak English very well or well.",
-    "headline3": "In 2011, less than half a per cent (138,000) of all usual residents aged three years and over could not speak English.",
-    "title": "2011 Census - Quick Statistics for England and Wales, March 2011",
-    "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
-    "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70",
@@ -45,6 +36,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "92% (49.8 million) of usual residents aged three years and over spoke English (English or Welsh in Wales) as their main language.",
+      "headline2": "Of the other 8% (4.2 million), 79% (3.3 million) could speak English very well or well.",
+      "headline3": "In 2011, less than half a per cent (138,000) of all usual residents aged three years and over could not speak English.",
       "title": "2011 Census - Quick Statistics for England and Wales, March 2011",
       "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
       "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011",

@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "This is the first estimate of the June 2014 public sector finances (financial year 2014/15). Financial year 2013/14 data have also been updated.",
-    "headline2": "For the financial year 2013/14, PSNB ex was £93.7 billion. This was £13.0 billion higher than the same period in 2012/13.",
-    "headline3": "During 2013/14, £31.1 billion was transferred from the APF to HM Treasury. Of this amount, £12.2 billion impacted on net borrowing.",
-    "title": "Public Sector Finances, June 2014",
-    "summary": "A presentational framework for the headline measures of Public Sector Finance Statistics (net borrowing, net cash requirement and net debt) is explained in this release. This includes the reasons for changes in net borrowing (deficit) and debt.",
-    "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinancesjune2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annx",
@@ -65,6 +56,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "This is the first estimate of the June 2014 public sector finances (financial year 2014/15). Financial year 2013/14 data have also been updated.",
+      "headline2": "For the financial year 2013/14, PSNB ex was £93.7 billion. This was £13.0 billion higher than the same period in 2012/13.",
+      "headline3": "During 2013/14, £31.1 billion was transferred from the APF to HM Treasury. Of this amount, £12.2 billion impacted on net borrowing.",
       "title": "Public Sector Finances, June 2014",
       "summary": "A presentational framework for the headline measures of Public Sector Finance Statistics (net borrowing, net cash requirement and net debt) is explained in this release. This includes the reasons for changes in net borrowing (deficit) and debt.",
       "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinancesjune2014",

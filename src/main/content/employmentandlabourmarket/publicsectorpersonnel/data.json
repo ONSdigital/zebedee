@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "Total UK public sector employment decreased by 103,000 from Q4 2013 to 5.409 million - the fall largely explained by the reclassification from the public sector to the private sector of Lloyds Banking Group.",
-    "headline2": "UK public sector employment is at its lowest level, on a headcount basis, since the start of the series in 1999.",
-    "headline3": "Employment in UK local government, at 2.370 million, is 27,000 lower than at Q4 2013.",
-    "title": "Public Sector Employment, Q1 2014",
-    "summary": "This bulletin contains detailed estimates of public sector employment, updated with the latest estimates for the first quarter of 2014.",
-    "uri": "/employmentandlabourmarket/publicsectorpersonnel/bulletins/publicsectoremploymentq12014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g7au",
@@ -55,6 +46,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "Total UK public sector employment decreased by 103,000 from Q4 2013 to 5.409 million - the fall largely explained by the reclassification from the public sector to the private sector of Lloyds Banking Group.",
+      "headline2": "UK public sector employment is at its lowest level, on a headcount basis, since the start of the series in 1999.",
+      "headline3": "Employment in UK local government, at 2.370 million, is 27,000 lower than at Q4 2013.",
       "title": "Public Sector Employment, Q1 2014",
       "summary": "This bulletin contains detailed estimates of public sector employment, updated with the latest estimates for the first quarter of 2014.",
       "uri": "/employmentandlabourmarket/publicsectorpersonnel/bulletins/publicsectoremploymentq12014",

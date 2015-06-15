@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The number of divorces in England and Wales in 2012 was 118,140, an increase of 0.5% since 2011, when there were 117,558 divorces.",
-    "headline2": "In 2012, 10.8 people divorced per thousand married population, a decrease of 19% compared with 13.3 in 2002.",
-    "headline3": "The number of divorces in 2012 was highest among men and women aged 40 to 44.",
-    "title": "Divorces in England and Wales, 2012",
-    "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39",
@@ -40,6 +31,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The number of divorces in England and Wales in 2012 was 118,140, an increase of 0.5% since 2011, when there were 117,558 divorces.",
+      "headline2": "In 2012, 10.8 people divorced per thousand married population, a decrease of 19% compared with 13.3 in 2002.",
+      "headline3": "The number of divorces in 2012 was highest among men and women aged 40 to 44.",
       "title": "Divorces in England and Wales, 2012",
       "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012",

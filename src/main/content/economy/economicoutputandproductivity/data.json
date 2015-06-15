@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "UK gross domestic product (GDP) in volume terms was estimated to have increased by 0.8% between Q4 2013 and Q1 2014.",
-    "headline2": "GDP is estimated to have increased by 1.7% in 2013, compared with 2012, unrevised from the estimate published on 22 May 2014.",
-    "headline3": "Between Q1 2013 and Q1 2014, GDP in volume terms increased by 3.0%, revised down 0.1 percentage points from the previously published estimate.",
-    "title": "Quarterly National Accounts, Q1 2014",
-    "summary": "Estimates of the key components of GDP from the output, income and expenditure approaches. Gross Domestic Product measures the chained volume index movements of the UK. The services sector accounts for more than three quarters of total gross domestic product. Figures are adjusted for seasonal variations unless otherwise stated and the reference year is 2010\u003d100.",
-    "uri": "/economy/economicoutputandproductivity/bulletins/quarterlynationalaccountsq12014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/economy/grossdomesticproductgdp/timeseries/l2kq",
@@ -50,6 +41,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "UK gross domestic product (GDP) in volume terms was estimated to have increased by 0.8% between Q4 2013 and Q1 2014.",
+      "headline2": "GDP is estimated to have increased by 1.7% in 2013, compared with 2012, unrevised from the estimate published on 22 May 2014.",
+      "headline3": "Between Q1 2013 and Q1 2014, GDP in volume terms increased by 3.0%, revised down 0.1 percentage points from the previously published estimate.",
       "title": "Quarterly National Accounts, Q1 2014",
       "summary": "Estimates of the key components of GDP from the output, income and expenditure approaches. Gross Domestic Product measures the chained volume index movements of the UK. The services sector accounts for more than three quarters of total gross domestic product. Figures are adjusted for seasonal variations unless otherwise stated and the reference year is 2010\u003d100.",
       "uri": "/economy/economicoutputandproductivity/bulletins/quarterlynationalaccountsq12014",

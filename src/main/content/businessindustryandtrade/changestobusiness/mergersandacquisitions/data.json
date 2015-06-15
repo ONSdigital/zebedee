@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "Domestic acquisitions (UK companies acquiring other UK companies) involving a change in majority ownership fell sharply to 26 transactions in Q1 2014, from 59 transactions in Q4 2013.",
-    "headline2": "There were 20 acquisitions in the UK by foreign companies in Q1 2014, which is one of the lowest levels on record.",
-    "headline3": "The number of acquisitions abroad by UK companies, however, increased to 26 in Q1 2014 from 11 in Q4 2013.",
-    "title": "Mergers and Acquisitions Involving UK Companies, Q1 2014",
-    "summary": "Estimates of the value and numbers of mergers, acquisitions and disposals involving UK companies with values of £1.0 million or more. The information provided reflects solely the change in majority ownership (ordinary shares) and therefore only transactions which result in a change of ultimate control of the target company are included.",
-    "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/bulletins/mergersandacquisitionsinvolvingukcompaniesq12014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbaq",
@@ -57,6 +48,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "Domestic acquisitions (UK companies acquiring other UK companies) involving a change in majority ownership fell sharply to 26 transactions in Q1 2014, from 59 transactions in Q4 2013.",
+      "headline2": "There were 20 acquisitions in the UK by foreign companies in Q1 2014, which is one of the lowest levels on record.",
+      "headline3": "The number of acquisitions abroad by UK companies, however, increased to 26 in Q1 2014 from 11 in Q4 2013.",
       "title": "Mergers and Acquisitions Involving UK Companies, Q1 2014",
       "summary": "Estimates of the value and numbers of mergers, acquisitions and disposals involving UK companies with values of £1.0 million or more. The information provided reflects solely the change in majority ownership (ordinary shares) and therefore only transactions which result in a change of ultimate control of the target company are included.",
       "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/bulletins/mergersandacquisitionsinvolvingukcompaniesq12014",

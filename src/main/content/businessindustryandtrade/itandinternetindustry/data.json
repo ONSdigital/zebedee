@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "E-commerce sales represented 18% of business turnover in 2012, down from 19% in 2011, but up 4.5 percentage points from the 2008 estimate of 14%.",
-    "headline2": "Sales by Electronic Data Interchange (EDI) made up two-thirds (67%) of total e-commerce sales in 2012, with the remainder (33%) from website sales.",
-    "headline3": "Website sales (£164 billion) represented 6% of business turnover in 2012, up from 5% (£133 billion) in 2011.",
-    "title": "E-Commerce and ICT Activity, 2012",
-    "summary": "This release provides estimates of the values of e-commerce and the adoption and use of Information and Communication Technologies (ICTs) by UK businesses. The source of the information is the E-commerce Survey of UK Businesses.",
-    "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012",
-    "index": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid15",
@@ -45,6 +36,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "E-commerce sales represented 18% of business turnover in 2012, down from 19% in 2011, but up 4.5 percentage points from the 2008 estimate of 14%.",
+      "headline2": "Sales by Electronic Data Interchange (EDI) made up two-thirds (67%) of total e-commerce sales in 2012, with the remainder (33%) from website sales.",
+      "headline3": "Website sales (£164 billion) represented 6% of business turnover in 2012, up from 5% (£133 billion) in 2011.",
       "title": "E-Commerce and ICT Activity, 2012",
       "summary": "This release provides estimates of the values of e-commerce and the adoption and use of Information and Communication Technologies (ICTs) by UK businesses. The source of the information is the E-commerce Survey of UK Businesses.",
       "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012",

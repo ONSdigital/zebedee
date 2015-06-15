@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "There were 506,790 deaths registered in England and Wales in 2013, compared with 499,331 in 2012 (a rise of 1.5%).",
-    "headline2": "Age-standardised mortality rates (ASMRs) have continued to decrease in 2013.",
-    "headline3": "The infant mortality rate decreased in 2013 to 4.0 deaths per thousand live births, compared with 4.2 in 2012.",
-    "title": "Deaths Registered in England and Wales, 2013",
-    "summary": "Annual data on death registrations. Contains death rates, cause of death data by sex and age and death registrations by area of residence and single year of age.",
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/deathsregisteredinenglandandwales2013",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid33",
@@ -61,6 +52,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "There were 506,790 deaths registered in England and Wales in 2013, compared with 499,331 in 2012 (a rise of 1.5%).",
+      "headline2": "Age-standardised mortality rates (ASMRs) have continued to decrease in 2013.",
+      "headline3": "The infant mortality rate decreased in 2013 to 4.0 deaths per thousand live births, compared with 4.2 in 2012.",
       "title": "Deaths Registered in England and Wales, 2013",
       "summary": "Annual data on death registrations. Contains death rates, cause of death data by sex and age and death registrations by area of residence and single year of age.",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/deathsregisteredinenglandandwales2013",

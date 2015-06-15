@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The Consumer Prices Index (CPI) grew by 1.9% in the year to June 2014, up from 1.5% in May.",
-    "headline2": "The largest contributions to the rise in the rate came from the clothing, food \u0026 non-alcoholic drinks and air transport sectors.",
-    "headline3": "CPIH grew by 1.8% in the year to June 2014, up from 1.4% in May. RPIJ grew by 2.0%, up from 1.7% in May.",
-    "title": "Consumer Price Inflation, June 2014",
-    "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
-    "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/economy/inflationandpriceindices/timeseries/d7g7",
@@ -87,6 +78,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The Consumer Prices Index (CPI) grew by 1.9% in the year to June 2014, up from 1.5% in May.",
+      "headline2": "The largest contributions to the rise in the rate came from the clothing, food \u0026 non-alcoholic drinks and air transport sectors.",
+      "headline3": "CPIH grew by 1.8% in the year to June 2014, up from 1.4% in May. RPIJ grew by 2.0%, up from 1.7% in May.",
       "title": "Consumer Price Inflation, June 2014",
       "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
       "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014",

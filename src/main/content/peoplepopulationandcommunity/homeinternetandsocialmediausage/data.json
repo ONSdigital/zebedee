@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "44.6 million adults (87%) in the UK had used the Internet in Q1 2014, an increase of 1.1 million since Q1 2013.",
-    "headline2": "6.4 million adults (13%) had never used the Internet, falling by 659,000 since Q1 2013.",
-    "headline3": "Almost all (99%) 16 to 24 year olds had used the Internet, compared with 37% of adults aged 75 years and over.",
-    "title": "Internet Access Quarterly Update, Q1 2014",
-    "summary": "Estimates of adult Internet users and non-users in the UK, by age, sex, disability, region, gross weekly pay, ethnicity and when adults last used the Internet.",
-    "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid101",
@@ -35,6 +26,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "44.6 million adults (87%) in the UK had used the Internet in Q1 2014, an increase of 1.1 million since Q1 2013.",
+      "headline2": "6.4 million adults (13%) had never used the Internet, falling by 659,000 since Q1 2013.",
+      "headline3": "Almost all (99%) 16 to 24 year olds had used the Internet, compared with 37% of adults aged 75 years and over.",
       "title": "Internet Access Quarterly Update, Q1 2014",
       "summary": "Estimates of adult Internet users and non-users in the UK, by age, sex, disability, region, gross weekly pay, ethnicity and when adults last used the Internet.",
       "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014",

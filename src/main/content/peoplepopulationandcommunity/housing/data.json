@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "44.6 million adults (87%) in the UK had used the Internet in Q1 2014, an increase of 1.1 million since Q1 2013.",
-    "headline2": "6.4 million adults (13%) had never used the Internet, falling by 659,000 since Q1 2013.",
-    "headline3": "Almost all (99%) 16 to 24 year olds had used the Internet, compared with 37% of adults aged 75 years and over.",
-    "title": "House Price Index, May 2014",
-    "summary": "Mix-adjusted average house prices and house price indices for the UK and its component countries and regions.",
-    "uri": "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/housing/timeseries/raid103",
@@ -55,6 +46,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "44.6 million adults (87%) in the UK had used the Internet in Q1 2014, an increase of 1.1 million since Q1 2013.",
+      "headline2": "6.4 million adults (13%) had never used the Internet, falling by 659,000 since Q1 2013.",
+      "headline3": "Almost all (99%) 16 to 24 year olds had used the Internet, compared with 37% of adults aged 75 years and over.",
       "title": "House Price Index, May 2014",
       "summary": "Mix-adjusted average house prices and house price indices for the UK and its component countries and regions.",
       "uri": "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014",

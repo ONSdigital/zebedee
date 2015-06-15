@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "In 2012 Gross Value Added (GVA) per head of population increased in all NUTS1 regions except for the East Midlands.",
-    "headline2": "In 2012 the South East had the largest increase in GVA per head at 2.5%, followed by the North West at 1.7% and Wales at 1.6%.",
-    "headline3": "In 2012 London had the largest GVA per head at £37,232, while Wales had the lowest at £15,401.",
-    "title": "Regional Gross Value Added (Income Approach), December 2013",
-    "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
-    "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013",
-    "index": null
-  },
   "items": [
     {
       "uri": "/economy/grossvalueaddedgva/timeseries/abml",
@@ -90,6 +81,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "In 2012 Gross Value Added (GVA) per head of population increased in all NUTS1 regions except for the East Midlands.",
+      "headline2": "In 2012 the South East had the largest increase in GVA per head at 2.5%, followed by the North West at 1.7% and Wales at 1.6%.",
+      "headline3": "In 2012 London had the largest GVA per head at £37,232, while Wales had the lowest at £15,401.",
       "title": "Regional Gross Value Added (Income Approach), December 2013",
       "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
       "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013",

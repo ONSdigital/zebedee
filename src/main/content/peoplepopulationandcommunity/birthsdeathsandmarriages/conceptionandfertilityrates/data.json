@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The under 18 conception rate for 2012 is the lowest since 1969 at 27.9 conceptions per thousand women aged 15-17.",
-    "headline2": "The estimated number of conceptions to women aged under 18 fell to 27,834 in 2012 compared with 31,051 in 2011, a decrease of 10%.",
-    "headline3": "The estimated number of conceptions to women aged under 16 was 5,432 in 2012, compared with 5,991 in 2011 (a fall of 9.3%).",
-    "title": "Conceptions in England and Wales, 2012",
-    "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid28",
@@ -50,12 +41,18 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The average completed family size for women born in 1967 and reaching age 45 in 2012, was 1.91 children per woman.",
+      "headline2": "This compares with their mothers’ generation, represented by women born in 1940, who had on average 2.36 children.",
+      "headline3": "Two children was the most common family size for women born in both 1940 and 1967.",
       "title": "Cohort Fertility, 2012",
       "summary": "Fertility on year of birth of mother rather than the year of birth of child. Includes average number of live-born children and the proportion of women remaining childless by year of birth.",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/cohortfertility2012",
       "index": null
     },
     {
+      "headline1": "The under 18 conception rate for 2012 is the lowest since 1969 at 27.9 conceptions per thousand women aged 15-17.",
+      "headline2": "The estimated number of conceptions to women aged under 18 fell to 27,834 in 2012 compared with 31,051 in 2011, a decrease of 10%.",
+      "headline3": "The estimated number of conceptions to women aged under 16 was 5,432 in 2012, compared with 5,991 in 2011 (a fall of 9.3%).",
       "title": "Conceptions in England and Wales, 2012",
       "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012",

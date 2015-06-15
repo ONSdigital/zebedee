@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "Comparing the estimates for March to May 2014 with those for December 2013 to February 2014, employment continued to rise and unemployment continued to fall.",
-    "headline2": "There were 30.64 million people in work, 254,000 more than for December 2013 to February 2014 and 929,000 more than a year earlier.",
-    "headline3": "The proportion of people aged from 16 to 64 in work (the employment rate) continued to rise, reaching 73.1% for March to May 2014.",
-    "title": "UK Labour Market, July 2014",
-    "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
-    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx",
@@ -76,6 +67,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "Comparing the estimates for March to May 2014 with those for December 2013 to February 2014, employment continued to rise and unemployment continued to fall.",
+      "headline2": "There were 30.64 million people in work, 254,000 more than for December 2013 to February 2014 and 929,000 more than a year earlier.",
+      "headline3": "The proportion of people aged from 16 to 64 in work (the employment rate) continued to rise, reaching 73.1% for March to May 2014.",
       "title": "UK Labour Market, July 2014",
       "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
       "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",

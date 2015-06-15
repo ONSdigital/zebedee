@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "In 2012, the provisional number of marriages in England and Wales increased by 5.3% to 262,240, from 249,133 in 2011.",
-    "headline2": "Civil ceremonies accounted for 70% of all marriages that took place in 2012, an increase from 66% in 2002.",
-    "headline3": "The greatest number of marriages was for men and women aged 25 to 29.",
-    "title": "Marriages in England and Wales (Provisional), 2012",
-    "summary": "Annual data on marriages in England and Wales. Marriages abroad not included. Non-residents are included. Derived as part of civil registration.",
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/marriagesinenglandandwalesprovisional2012",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid57",
@@ -46,12 +37,18 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The provisional number of civil partnerships in the UK in 2012 was 7,037, an increase of 3.6% since 2011.",
+      "headline2": "The average age of men forming a civil partnership in the UK in 2012 was 40.0 years, while for women the average age was 37.6 years. These figures represent a small decrease in average ages in comparison to 2011.",
+      "headline3": "These figures represent a small decrease in average ages in comparison to 2011.",
       "title": "Civil Partnerships in the UK, 2012",
       "summary": "Annual statistics on civil partnerships that were formed in the United Kingdom (UK) in 2012, as well as those which were dissolved. Civil partnership statistics are analysed by sex, age, previous marital status and area of occurrence. Figures on formations for Northern Ireland and the UK are provisional and all dissolution data are provisional.",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/civilpartnershipsintheuk2012",
       "index": null
     },
     {
+      "headline1": "In 2012, the provisional number of marriages in England and Wales increased by 5.3% to 262,240, from 249,133 in 2011.",
+      "headline2": "Civil ceremonies accounted for 70% of all marriages that took place in 2012, an increase from 66% in 2002.",
+      "headline3": "The greatest number of marriages was for men and women aged 25 to 29.",
       "title": "Marriages in England and Wales (Provisional), 2012",
       "summary": "Annual data on marriages in England and Wales. Marriages abroad not included. Non-residents are included. Derived as part of civil registration.",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/marriagesinenglandandwalesprovisional2012",

@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "In June 2014, the quantity bought in the retail industry increased by 3.6% compared with June 2013 and by 0.1% compared with May 2014.",
-    "headline2": "In June 2014, all retail sectors showed estimated increases in the quantity bought year-on-year. The last time this was seen was in March 2012.",
-    "headline3": "The three-month on previous three-month movement in the quantity bought showed continued growth for the sixteenth consecutive period increasing by 1.6%.",
-    "title": "Retail Sales, June 2014",
-    "summary": "A first estimate of retail sales in value and volume terms, seasonally and non-seasonally adjusted.",
-    "uri": "/businessindustryandtrade/retailindustry/bulletins/retailsalesjune2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/retailindustry/timeseries/j5c4",
@@ -61,6 +52,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "In June 2014, the quantity bought in the retail industry increased by 3.6% compared with June 2013 and by 0.1% compared with May 2014.",
+      "headline2": "In June 2014, all retail sectors showed estimated increases in the quantity bought year-on-year. The last time this was seen was in March 2012.",
+      "headline3": "The three-month on previous three-month movement in the quantity bought showed continued growth for the sixteenth consecutive period increasing by 1.6%.",
       "title": "Retail Sales, June 2014",
       "summary": "A first estimate of retail sales in value and volume terms, seasonally and non-seasonally adjusted.",
       "uri": "/businessindustryandtrade/retailindustry/bulletins/retailsalesjune2014",

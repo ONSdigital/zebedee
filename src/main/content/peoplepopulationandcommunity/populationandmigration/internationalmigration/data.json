@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "Net long-term migration to the UK was estimated to be 212,000 in the year ending December 2013.",
-    "headline2": "Recent patterns of net migration over the last two years show an increase since the lowest estimate of 154,000 (year ending September 2012).",
-    "headline3": "526,000 people immigrated to the UK in the year ending December 2013.",
-    "title": "Migration Statistics Quarterly Report, May 2014",
-    "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
-    "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117",
@@ -40,6 +31,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "Net long-term migration to the UK was estimated to be 212,000 in the year ending December 2013.",
+      "headline2": "Recent patterns of net migration over the last two years show an increase since the lowest estimate of 154,000 (year ending September 2012).",
+      "headline3": "526,000 people immigrated to the UK in the year ending December 2013.",
       "title": "Migration Statistics Quarterly Report, May 2014",
       "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
       "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014",

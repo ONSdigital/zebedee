@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "Latest figures from the CSEW show there were an estimated 7.3 million incidents of crime against households and resident adults in England and Wales for the year ending March 2014.",
-    "headline2": "Decreases were evident for most major crime types compared with the previous year.",
-    "headline3": "In contrast, police recorded crime shows no overall change from the previous year, with 3.7 million offences recorded.",
-    "title": "Crime in England and Wales, Year Ending March 2014",
-    "summary": "Crime statistics from the Crime Survey for England and Wales and police recorded crime.",
-    "uri": "/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwalesyearendingmarch2014",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/crimeandjustice/timeseries/raid62",
@@ -46,6 +37,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "Latest figures from the CSEW show there were an estimated 7.3 million incidents of crime against households and resident adults in England and Wales for the year ending March 2014.",
+      "headline2": "Decreases were evident for most major crime types compared with the previous year.",
+      "headline3": "In contrast, police recorded crime shows no overall change from the previous year, with 3.7 million offences recorded.",
       "title": "Crime in England and Wales, Year Ending March 2014",
       "summary": "Crime statistics from the Crime Survey for England and Wales and police recorded crime.",
       "uri": "/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwalesyearendingmarch2014",

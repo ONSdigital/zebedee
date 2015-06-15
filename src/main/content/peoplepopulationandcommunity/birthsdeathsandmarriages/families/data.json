@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "In 2013 there were 18.2 million families in the UK.",
-    "headline2": "Of these, 12.3 million consisted of a married couple with or without children.",
-    "headline3": "The number of opposite sex cohabiting couple families has increased significantly, from 2.2 million in 2003 to 2.9 million in 2013.",
-    "title": "Families and Households, 2013",
-    "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013",
-    "index": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid42",
@@ -60,6 +51,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "In 2013 there were 18.2 million families in the UK.",
+      "headline2": "Of these, 12.3 million consisted of a married couple with or without children.",
+      "headline3": "The number of opposite sex cohabiting couple families has increased significantly, from 2.2 million in 2003 to 2.9 million in 2013.",
       "title": "Families and Households, 2013",
       "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013",

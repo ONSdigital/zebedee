@@ -4,15 +4,6 @@
     "index": null,
     "data": null
   },
-  "statsBulletinHeadline": {
-    "headline1": "The number of VAT and/or PAYE businesses is estimated to have risen by 18,000 (0.9%) between March 2012 and March 2013.",
-    "headline2": "Companies and public corporations represent 64% of total businesses.",
-    "headline3": "The largest industry group is professional, scientific and technical with 16.9% of all registered businesses.",
-    "title": "UK Business: Activity, Size and Location - 2013",
-    "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
-    "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013",
-    "index": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid1",
@@ -50,6 +41,9 @@
   ],
   "statsBulletins": [
     {
+      "headline1": "The number of VAT and/or PAYE businesses is estimated to have risen by 18,000 (0.9%) between March 2012 and March 2013.",
+      "headline2": "Companies and public corporations represent 64% of total businesses.",
+      "headline3": "The largest industry group is professional, scientific and technical with 16.9% of all registered businesses.",
       "title": "UK Business: Activity, Size and Location - 2013",
       "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
       "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013",

@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid89"
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid89",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "The three most common cancers for men in 2012 remained prostate (25.9%), lung (13.6%) and colorectal (13.4%).",
@@ -8,43 +10,55 @@
     "headline3": "Liver cancer incidence has increased by 70% for males and 60% for females from 2003 to 2012. This is now the 18th most common cancer in England.",
     "title": "Cancer Statistics Registrations, England (Series MB1), No. 43, 2012",
     "summary": "The number of diagnoses and incidence rates of all types of cancer by age and sex, and by region of residence in England.",
-    "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012"
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012",
+    "index": null
   },
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid89"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid89",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid92"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid92",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid93"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid93",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
-      "title": "Deaths involving  MRSA",
+      "title": "Deaths involving Clostridium difficile",
       "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/deathsinvolvingmrsa"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/deathsinvolvingclostridiumdifficile",
+      "index": null
     },
     {
       "title": "Cancer registration statistics",
       "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/cancerregistrationstatistics"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/cancerregistrationstatistics",
+      "index": null
     },
     {
-      "title": "Deaths involving Clostridium difficile",
+      "title": "Deaths involving  MRSA",
       "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/deathsinvolvingclostridiumdifficile"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/deathsinvolvingmrsa",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Cancer Statistics Registrations, England (Series MB1), No. 43, 2012",
       "summary": "The number of diagnoses and incidence rates of all types of cancer by age and sex, and by region of residence in England.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 2,
   "type": "product_page",
   "title": "Conditions and diseases",
@@ -54,17 +68,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Health and social care",
       "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
+      "index": null
     }
   ]
 }

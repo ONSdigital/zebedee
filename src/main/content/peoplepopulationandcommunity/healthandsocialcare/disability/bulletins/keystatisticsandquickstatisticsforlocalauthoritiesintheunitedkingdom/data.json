@@ -3,6 +3,9 @@
   "headline2": "Nearly one in five (18%, 11.4 million) of the UK population reported having a limiting long-term health problem or disability in 2011.",
   "headline3": "In 2011 the majority of UK residents described themselves as belonging to a white ethnic group (87%, 55 million).",
   "relatedBulletins": [],
+  "phone": null,
+  "language": null,
+  "searchKeywords": null,
   "sections": [
     {
       "title": "Key figures",
@@ -43,10 +46,16 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
+  "data": null,
   "nationalStatistic": false,
   "contact": {
-    "email": "census.customerservices@ons.gsi.gov.uk"
+    "name": null,
+    "email": "census.customerservices@ons.gsi.gov.uk",
+    "organisation": null,
+    "telephone": null
   },
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "bulletin",
   "title": "Key Statistics and Quick Statistics for local authorities in the United Kingdom",
   "summary": "This statistical bulletin presents key results for the UK population from the individual censuses of England and Wales, Scotland and Northern Ireland. The bulletin focuses on the topics of population, ethnicity, country of birth, health, housing and accommodation.",
@@ -55,22 +64,26 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Health and social care",
       "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
+      "index": null
     },
     {
       "title": "Disability",
       "summary": "Statistics here focus on the numbers of people whose daily activities are limited a little, a lot or not at all. Breakdowns of these figures include area of UK and gender. These statistics are important in determining the types of services that are needed across the UK. ",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability",
+      "index": null
     }
   ]
 }

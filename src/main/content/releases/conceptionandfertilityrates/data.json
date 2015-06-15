@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Conception and fertility rates",
   "summary": "Conception statistics bring together records of birth registrations and abortion notifications. Fertility analysis adds value to information published on births by reporting statistics on those with no children and fertility among women born inside and outside the UK. Fertility projections are also used in the population projections. ",
-  "uri": "releases/conceptionandfertilityrates"
+  "uri": "releases/conceptionandfertilityrates",
+  "breadcrumb": null
 }

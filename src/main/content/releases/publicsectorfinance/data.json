@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Public sector finance",
   "summary": "These statistics are a compilation of figures on the main aspects of the UK’s public sector finances. These give an indication of the current state of the country’s financial position. They are published jointly by the Office for National Statistics (ONS) and HM Treasury. ",
-  "uri": "releases/publicsectorfinance"
+  "uri": "releases/publicsectorfinance",
+  "breadcrumb": null
 }

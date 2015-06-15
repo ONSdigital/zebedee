@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Construction industry",
   "summary": "The construction industry includes businesses that are involved with the construction of entirely new buildings or the repair, alterations or additions to existing properties. Also included are businesses involved in civil engineering projects. Output of the construction industry is defined as the amount charged by construction companies to customers for the value of work produced in a given period. Users of data on the construction industry include central government departments, Eurostat and various industry analysts.",
-  "uri": "releases/constructionindustry"
+  "uri": "releases/constructionindustry",
+  "breadcrumb": null
 }

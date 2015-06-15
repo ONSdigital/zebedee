@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Debt",
   "summary": "Debt statistics found here focus on debt levels for people and households. These statistics come from the Wealth and Assets Survey (WAS). They tell us about financial debt, which includes credit and store cards that are not settled each month, overdrafts and all forms of fixed term loans. They also tell us about property debt, which is defined as the liabilities held against a household\u0027s main residence (mainly mortgages). Also available is data on how people feel about their level of debt.  ",
-  "uri": "releases/debt"
+  "uri": "releases/debt",
+  "breadcrumb": null
 }

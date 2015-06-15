@@ -1,11 +1,19 @@
 {
+  "seasonalAdjustment": null,
   "date": "2010-12",
   "number": "32100",
+  "mainMeasure": null,
+  "keyNote": null,
+  "additionalText": null,
   "years": [
     {
       "date": "2010-12",
       "value": "32100",
-      "year": "12"
+      "year": "12",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     }
   ],
   "quarters": [],
@@ -15,38 +23,50 @@
   "unit": "",
   "preUnit": "£",
   "source": "Office for National Statistics",
+  "relatedDatasets": null,
+  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
       "title": "Wealth and Income, 2010-12",
       "summary": "A combined analysis of income and wealth based upon results from the third wave of the Wealth and Assets Survey and covering the period 2010-12.",
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012"
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012",
+      "index": null
     }
   ],
+  "methodology": null,
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "timeseries",
   "title": "Median household income",
+  "summary": null,
   "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115",
   "breadcrumb": [
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Personal and household finances",
       "summary": "Statistics on personal and household finances help us build a picture of how people in the UK are funding their lifestyles. Key statistics here are on household and personal debt, expenditure, income and wealth.",
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances"
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
+      "index": null
     },
     {
       "title": "Income and wealth",
       "summary": "Income and wealth are different because while income is a flow of money such as your monthly earnings, wealth is not a flow, it is a stock of assets such as shares in a company or property. Key statistics here are average household income and average household wealth. The average used is the median because this measure is not affected by outliers, i.e. those people who have levels of income or wealth that are very far away from the average. ",
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth"
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth",
+      "index": null
     }
   ]
 }

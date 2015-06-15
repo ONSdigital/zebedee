@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Language",
   "summary": "Statistics on language focus on the languages spoken across the UK. The key statistics here are the number and percentage of the population who speak English as their main language which can be viewed as a time series and for different areas across the UK. Statistics on welsh speakers can also be found here.",
-  "uri": "releases/language"
+  "uri": "releases/language",
+  "breadcrumb": null
 }

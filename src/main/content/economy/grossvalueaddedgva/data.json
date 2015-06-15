@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/economy/grossvalueaddedgva/timeseries/abml"
+    "uri": "/economy/grossvalueaddedgva/timeseries/abml",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "In 2012 Gross Value Added (GVA) per head of population increased in all NUTS1 regions except for the East Midlands.",
@@ -8,63 +10,93 @@
     "headline3": "In 2012 London had the largest GVA per head at £37,232, while Wales had the lowest at £15,401.",
     "title": "Regional Gross Value Added (Income Approach), December 2013",
     "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
-    "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013"
+    "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013",
+    "index": null
   },
   "items": [
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/abml"
+      "uri": "/economy/grossvalueaddedgva/timeseries/abml",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmpw"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmpw",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmpx"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmpx",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmpy"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmpy",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmpz"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmpz",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmqa"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqa",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/dgph"
+      "uri": "/economy/grossvalueaddedgva/timeseries/dgph",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/dgpi"
+      "uri": "/economy/grossvalueaddedgva/timeseries/dgpi",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/dgpj"
+      "uri": "/economy/grossvalueaddedgva/timeseries/dgpj",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmqe"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqe",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmqg"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqg",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmqh"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqh",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossvalueaddedgva/timeseries/tmqi"
+      "uri": "/economy/grossvalueaddedgva/timeseries/tmqi",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Regional GVA NUTS1",
       "summary": "Economic activity as measured by Gross Value Added (GVA)",
-      "uri": "/economy/grossvalueaddedgva/datasets/regionalgvanuts1"
+      "uri": "/economy/grossvalueaddedgva/datasets/regionalgvanuts1",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Regional Gross Value Added (Income Approach), December 2013",
       "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
-      "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013"
+      "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 5,
   "type": "product_page",
   "title": "Gross Value Added (GVA)",
@@ -74,12 +106,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     }
   ]
 }

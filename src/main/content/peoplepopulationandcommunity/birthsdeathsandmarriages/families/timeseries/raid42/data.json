@@ -1,96 +1,172 @@
 {
+  "seasonalAdjustment": null,
   "date": "2013",
   "number": "18.2",
+  "mainMeasure": null,
+  "keyNote": null,
+  "additionalText": null,
   "years": [
     {
       "date": "1996",
       "value": "16.560",
-      "year": "1996"
+      "year": "1996",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1997",
       "value": "16.655",
-      "year": "1997"
+      "year": "1997",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1998",
       "value": "16.729",
-      "year": "1998"
+      "year": "1998",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1999",
       "value": "16.793",
-      "year": "1999"
+      "year": "1999",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2000",
       "value": "16.893",
-      "year": "2000"
+      "year": "2000",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2001",
       "value": "16.966",
-      "year": "2001"
+      "year": "2001",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2002",
       "value": "16.991",
-      "year": "2002"
+      "year": "2002",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2003",
       "value": "17.087",
-      "year": "2003"
+      "year": "2003",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2004",
       "value": "17.219",
-      "year": "2004"
+      "year": "2004",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2005",
       "value": "17.367",
-      "year": "2005"
+      "year": "2005",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2006",
       "value": "17.393",
-      "year": "2006"
+      "year": "2006",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2007",
       "value": "17.466",
-      "year": "2007"
+      "year": "2007",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2008",
       "value": "17.599",
-      "year": "2008"
+      "year": "2008",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2009",
       "value": "17.789",
-      "year": "2009"
+      "year": "2009",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2010",
       "value": "17.914",
-      "year": "2010"
+      "year": "2010",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2011",
       "value": "17.923",
-      "year": "2011"
+      "year": "2011",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2012",
       "value": "18.188",
-      "year": "2012"
+      "year": "2012",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2013",
       "value": "18.212",
-      "year": "2013"
+      "year": "2013",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     }
   ],
   "quarters": [],
@@ -100,38 +176,50 @@
   "unit": "m",
   "preUnit": "",
   "source": "Labour Force Survey",
+  "relatedDatasets": null,
+  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
       "title": "Families and Households, 2013",
       "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013",
+      "index": null
     }
   ],
+  "methodology": null,
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "timeseries",
   "title": "Families",
+  "summary": null,
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid42",
   "breadcrumb": [
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Births, deaths and marriages",
       "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+      "index": null
     },
     {
       "title": "Families",
       "summary": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families",
+      "index": null
     }
   ]
 }

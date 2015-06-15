@@ -3,6 +3,9 @@
   "headline2": "The three most common cancers for women in 2012 remained breast (30.9%), lung (11.9%) and colorectal (10.9%).",
   "headline3": "Liver cancer incidence has increased by 70% for males and 60% for females from 2003 to 2012. This is now the 18th most common cancer in England.",
   "relatedBulletins": [],
+  "phone": null,
+  "language": null,
+  "searchKeywords": null,
   "sections": [
     {
       "title": "Key findings",
@@ -79,10 +82,16 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
+  "data": null,
   "nationalStatistic": false,
   "contact": {
-    "email": "cancer.newport@ons.gsi.gov.uk"
+    "name": null,
+    "email": "cancer.newport@ons.gsi.gov.uk",
+    "organisation": null,
+    "telephone": null
   },
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "bulletin",
   "title": "Cancer Statistics Registrations, England (Series MB1), No. 43, 2012",
   "summary": "The number of diagnoses and incidence rates of all types of cancer by age and sex, and by region of residence in England.",
@@ -91,22 +100,26 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Health and social care",
       "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
+      "index": null
     },
     {
       "title": "Conditions and diseases",
       "summary": "We publish statistics on many different health conditions and diseases collected from health bodies across the UK. However, key statistics in this area are on newly diagnosed cancers and deaths related to diseases mainly caught when a person is already in hospital, e.g. MRSA and Clostridium difficile.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases",
+      "index": null
     }
   ]
 }

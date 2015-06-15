@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117"
+    "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "Net long-term migration to the UK was estimated to be 212,000 in the year ending December 2013.",
@@ -8,33 +10,43 @@
     "headline3": "526,000 people immigrated to the UK in the year ending December 2013.",
     "title": "Migration Statistics Quarterly Report, May 2014",
     "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
-    "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014"
+    "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117"
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid118"
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid118",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid119"
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid119",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Long-Term International Migration",
       "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalmigration"
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalmigration",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Migration Statistics Quarterly Report, May 2014",
       "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014"
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 1,
   "type": "product_page",
   "title": "International migration",
@@ -44,17 +56,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Population and migration",
       "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration"
+      "uri": "/peoplepopulationandcommunity/populationandmigration",
+      "index": null
     }
   ]
 }

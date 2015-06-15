@@ -3,6 +3,9 @@
   "headline2": "Output per hour grew by 0.2% in the first quarter in service industries, and by 0.5% in production industries.",
   "headline3": "Whole economy unit labour costs increased by 0.1% in Q1 2014 and were 1.4% higher than a year ago, continuing the slow rate of growth of recent quarters.",
   "relatedBulletins": [],
+  "phone": null,
+  "language": null,
+  "searchKeywords": null,
   "sections": [
     {
       "title": "Labour Productivity, Q1 2014",
@@ -55,10 +58,16 @@
       "markdown": "###** 1. This statistical bulletin**\n\nThis statistical bulletin presents Labour Productivity estimates for the UK. More detail can be found on the [Productivity Measures Topic page](http://www.ons.gov.uk/ons/taxonomy/index.html?nscl\u003dProductivity+Measures \"Productivity Measures Topic page\") on the ONS website.\n\nIndex numbers are referenced to 2010\u003d100, are classified to the 2007 revision to the Standard Industrial Classification (SIC) and are seasonally adjusted.\n\nQuarter on previous quarter changes in output per job and output per hour worked for some of the manufacturing sub-divisions and services sections should be interpreted with caution as the small sample sizes used can cause volatility.\n\n###** 2. Quality and Methodology**\n\nA revised and updated [Quality and Methodology Information](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/economy/index.html \"Quality information - Economy\") paper for Labour Productivity was published in March 2012. This paper describes the intended uses of the statistics presented in this publication, their quality and methods used to produce them. It also includes more information on the uses and limitations of labour productivity estimates.\n\n###** 3. Future developments**\n\nONS has recently developed new and improved measures of labour input as part of ongoing work to comply with EU regulations.  Specifically, these new measures provide an industry breakdown of employment (i.e. on a headcount basis rather than a job basis), and provide a split between employees and the self-employed.  For methodological consistency, this work has also made some changes to the computation of corresponding hours series.  These series are currently available on the [Eurostat](http://epp.eurostat.ec.europa.eu/tgm/table.do?tab\u003dtable\u0026tableSelection\u003d1\u0026labeling\u003dlabels\u0026footnotes\u003dyes\u0026layout\u003dtime,geo,cat\u0026language\u003den\u0026pcode\u003dteina305\u0026plugin\u003d1 \"Eurostat: Employment by NACE rev2\") website and ONS has published an article entitled [Introducing New Labour Productivity Statistics](http://www.ons.gov.uk/ons/rel/productivity/introducing-new-labour-productivity-statistics/index.html \"Introducing New Labour Productivity Statistics index\") which describes these new series.\n\nIn response to user requests, ONS has now published selected estimates of labour productivity using the new and improved estimates of labour inputs, together with comparisons against the corresponding estimates from the existing productivity system. These are available as an additional reference table component (table NEWLPROD01) of the already published article Introducing New Labour Productivity Statistics.\n\nONS intends to publish a further article later in 2014 setting out the full impact of methodological changes and including a full set of productivity estimates under the proposed methodology. A user event will also be organised prior to implementation of the new methodology in this statistical release.\n\n###** 4. Other data on productivity**\n\nONS has published [Labour Productivity Measures from the ABS, 2008-2012](http://www.ons.gov.uk/ons/rel/icp/productivity-measures/index.html \" Productivity Measures index\").  This article uses published estimates from the Annual Business Survey (ABS) to provided more detailed information on recent trends in labour productivity by industry than those available from other sources.\n\nONS publishes [International comparisons of labour productivity](http://www.ons.gov.uk/ons/rel/icp/international-comparisons-of-productivity/index.html \"International comparisons of labour productivity index\") in levels and growth rates for the G7 countries.\n\nMore international data on productivity are available from the [OECD](http://www.ons.gov.uk/ons/external-links/organisations/oecd/oecd--main-economic-indicators--mei-.html \"OECD: Main Economic Indicators (MEI)\"), [Eurostat](http://epp.eurostat.ec.europa.eu/portal/page/portal/national_accounts/data/database \"Eurostat: Data on productivity\"), and the [Conference Board](http://www.conference-board.org/data/economydatabase \"Conference Board data on productivity\").\n\nONS publishes experimental estimates of [Multi-factor productivity](http://www.ons.gov.uk/ons/rel/icp/multi-factor-productivity--experimental-/index.html \"Multi-factor productivity (experimental) index\") (MFP), which decompose output growth into the contributions that can be accounted for by labour and capital inputs. In these estimates, the contribution of labour is further decomposed into quantity (hours worked) and quality dimensions.\n\nONS also publishes [experimental indices of labour costs per hour](http://www.ons.gov.uk/ons/rel/ilch/index-of-labour-costs-per-hour--experimental-/index.html \"Index of labour costs per hour (experimental) Index page\"). These differ from the concept of labour costs used in the unit labour cost estimates in this release. The main difference is that experimental indices of labour costs per hour relate to employees only, whereas unit labour costs also include the labour remuneration of the self-employed.\n\nLastly, ONS publishes a range of [Public sector productivity](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/economy/productivity-measures/public-service-productivity/faqs/index.html \"Public Sector Productivity Estimates: Frequently Asked Questions\") measures and related articles. These measures define productivity differently from that used in the ONS labour productivity and MFP estimates. Further information can be found in [Phelps (2010) (252.5 Kb Pdf)](http://www.ons.gov.uk/ons/rel/elmr/economic-and-labour-market-review/no--5--may-2010/comparing-different-estimates-of-productivity-produced-by-the-office-for-national-statistics.pdf \"Comparing different estimates of productivity produced by the Office for National Statistics\") .\n\nMore information on the range of ONS productivity estimates can be found in the [ONS Productivity Handbook](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/economy/productivity-measures/productivity-handbook/index.html \"The ONS Productivity Handbook - A Statistical overview and guide\").\n\n###** 5. User engagement**\n\nA note of the latest Productivity Statistics User Group Workshop held on 28 January 2014 is available here. If you are interested in attending future workshops or if you have any comments on this release please email \u003cProductivity@ons.gsi.gov.uk\u003e.\n\nYou can follow ONS on Twitter: [www.twitter.com/ons](http://www.twitter.com/ons \"Twitter\") and Facebook: [www.facebook.com/statisticsons](http://www.facebook.com/statisticsons \"Facebook\") and watch our videos at [www.youtube.com/onsstats](http://www.youtube.com/onsstats \"Youtube\")\n\n###** 6. Publication policy**\n\nDetails of the policy governing the release of new data are available from the [UK Statistics Authority](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html \"UK Statistics Authority Code of Practise\") or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e. A list of the names of those given pre-publication access to the contents of this bulletin is also available.\n\n###** 7. Policy**\nDetails of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThe United Kingdom Statistics Authority has designated these statistics as National Statistics, in accordance with the Statistics and Registration Service Act 2007 and signifying compliance with the Code of Practice for Official Statistics.\n\nDesignation can be broadly interpreted to mean that the statistics:\n\n- meet identified user needs;\n- are well explained and readily accessible;\n- are produced according to sound methods; and\n- are managed impartially and objectively in the public interest.\n\nOnce statistics have been designated as National Statistics it is a statutory requirement that the Code of Practice shall continue to be observed."
     }
   ],
+  "data": null,
   "nationalStatistic": false,
   "contact": {
-    "email": "productivity@ons.gsi.gov.uk"
+    "name": null,
+    "email": "productivity@ons.gsi.gov.uk",
+    "organisation": null,
+    "telephone": null
   },
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "bulletin",
   "title": "Labour Productivity, Q1 2014",
   "summary": "Output measures for the whole economy and a range of industries. Unit labour costs for the whole economy and unit wage costs for the whole economy and the manufacturing sector.",
@@ -67,22 +76,26 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Employment and Labour market",
       "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket"
+      "uri": "/employmentandlabourmarket",
+      "index": null
     },
     {
       "title": "People in work",
       "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork"
+      "uri": "/employmentandlabourmarket/peopleinwork",
+      "index": null
     },
     {
       "title": "Labour productivity",
       "summary": "Labour productivity measures the efficiency of the workforce. It is calculated as output per worker, output per job and output per hour. Labour productivity is an important factor in determining the productive potential of the economy. Countries with strong labour productivity growth tend to benefit from high rates of growth and low inflation. ",
-      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity"
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity",
+      "index": null
     }
   ]
 }

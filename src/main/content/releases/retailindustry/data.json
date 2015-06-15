@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Retail industry",
   "summary": "Businesses in the retail industry are those which sell directly to the customer. The key statistic for the retail industry is the retail sales index (RSI). This is published on a monthly basis and the data comes from a survey sent out to retail business in Great Britain. The data in the RSI only covers spending on goods, data on spending on services can be found in the Index of Services. ",
-  "uri": "releases/retailindustry"
+  "uri": "releases/retailindustry",
+  "breadcrumb": null
 }

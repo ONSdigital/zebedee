@@ -1,4 +1,5 @@
 {
+  "datasetId": null,
   "downloads": [
     {
       "title": "Visits and spending to UK",
@@ -11,11 +12,17 @@
         "GMAX",
         "GMAZ",
         "GMBB"
-      ]
+      ],
+      "xls": null,
+      "csv": null
     }
   ],
+  "notes": null,
   "description": "Visits and Spending by UK residents abroad and overseas residents in the UK.",
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "dataset",
   "title": "Visits and spending to UK",
   "summary": "Visits and Spending by UK residents abroad and overseas residents in the UK",
@@ -24,17 +31,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Leisure and tourism",
       "summary": "Statistics on leisure and tourism look at figures relating to the number of visits and visitors to the UK as well as the reason visitors give for visiting and the amount of money they spent when they were here. Also here are figures on the number of UK residents travelling abroad with the reason they gave for travelling and the amount of money they spent when away. These are useful for a variety of businesses involved in the tourism industry and statistics on UK residents travelling abroad are an informal indicator of living standards.",
-      "uri": "/peoplepopulationandcommunity/leisureandtourism"
+      "uri": "/peoplepopulationandcommunity/leisureandtourism",
+      "index": null
     }
   ]
 }

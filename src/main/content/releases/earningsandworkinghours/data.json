@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Earnings and working hours",
   "summary": "Earnings are the reward for work and they can be paid on a regular basis or as bonus pay. Total pay combines both regular and bonus pay. The Office for National Statistics reports the level and growth rate of average weekly total, regular and bonus pay. Working hours are given as the average weekly hours worked by full-time and part-time workers.",
-  "uri": "releases/earningsandworkinghours"
+  "uri": "releases/earningsandworkinghours",
+  "breadcrumb": null
 }

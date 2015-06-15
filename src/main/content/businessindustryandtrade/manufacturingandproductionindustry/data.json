@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q"
+    "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "Production output increased by 0.3% and manufacturing output increased by 0.2% between Q1 2014 and Q2 2014.",
@@ -8,41 +10,54 @@
     "headline3": "Production output increased by 1.2% between June 2013 and June 2014. This reflected increases of 1.9% in manufacturing and 0.4% in water supply, sewerage \u0026 waste management.",
     "title": "Index of Production, June 2014",
     "summary": "Constant price seasonally adjusted indices and growth rates for Production and component industries for June 2014.",
-    "uri": "/businessindustryandtrade/manufacturingandproductionindustry/bulletins/indexofproductionjune2014"
+    "uri": "/businessindustryandtrade/manufacturingandproductionindustry/bulletins/indexofproductionjune2014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q"
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k222"
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k222",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27y"
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27y",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k22a"
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k22a",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Output of the production industries",
       "summary": "Broad industry groups and main industrial groupings.",
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputoftheproductionindustries"
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputoftheproductionindustries",
+      "index": null
     },
     {
       "title": "Output by Manufacturing sub-sectors",
       "summary": "Brief description of dataset",
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputbymanufacturingsubsectors"
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputbymanufacturingsubsectors",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Index of Production, June 2014",
       "summary": "Constant price seasonally adjusted indices and growth rates for Production and component industries for June 2014.",
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/bulletins/indexofproductionjune2014"
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/bulletins/indexofproductionjune2014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 2,
   "type": "product_page",
   "title": "Manufacturing and production industry",
@@ -52,12 +67,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Business, industry and trade",
       "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade"
+      "uri": "/businessindustryandtrade",
+      "index": null
     }
   ]
 }

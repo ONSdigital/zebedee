@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+    "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
@@ -8,47 +10,64 @@
     "headline3": "In June 2014 there was a deficit of £9.4 billion on goods, partly offset by an estimated surplus of £7.0 billion on services.",
     "title": "UK Trade, June 2014",
     "summary": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
-    "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014"
+    "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbi"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbi",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/mhn9"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/mhn9",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/l87q"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/l87q",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/l87k"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/l87k",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
-      "title": "Trade in goods by area",
-      "summary": "Exports, imports and balance for EMU, EU and non-EU",
-      "uri": "/businessindustryandtrade/internationaltrade/datasets/tradeingoodsbyarea"
-    },
-    {
       "title": "Value of UK trade in goods and services",
       "summary": "Exports, imports and balance including total trade, trade in goods and oil",
-      "uri": "/businessindustryandtrade/internationaltrade/datasets/valueofuktradeingoodsandservices"
+      "uri": "/businessindustryandtrade/internationaltrade/datasets/valueofuktradeingoodsandservices",
+      "index": null
+    },
+    {
+      "title": "Trade in goods by area",
+      "summary": "Exports, imports and balance for EMU, EU and non-EU",
+      "uri": "/businessindustryandtrade/internationaltrade/datasets/tradeingoodsbyarea",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "UK Trade, June 2014",
       "summary": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
-      "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014"
+      "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 1,
   "type": "product_page",
   "title": "International trade",
@@ -58,12 +77,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Business, industry and trade",
       "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade"
+      "uri": "/businessindustryandtrade",
+      "index": null
     }
   ]
 }

@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/a4ym"
+    "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/a4ym",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "UK labour productivity was little changed in the first quarter of 2014, as growth of labour inputs broadly matched the expansion of economic output.",
@@ -8,33 +10,43 @@
     "headline3": "Whole economy unit labour costs increased by 0.1% in Q1 2014 and were 1.4% higher than a year ago, continuing the slow rate of growth of recent quarters.",
     "title": "Labour Productivity, Q1 2014",
     "summary": "Output measures for the whole economy and a range of industries. Unit labour costs for the whole economy and unit wage costs for the whole economy and the manufacturing sector.",
-    "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivityq12014"
+    "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivityq12014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/a4ym"
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/a4ym",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lnnn"
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lnnn",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lzvb"
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/timeseries/lzvb",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Labour productivity",
       "summary": "Brief description of dataset",
-      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/datasets/labourproductivity"
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/datasets/labourproductivity",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Labour Productivity, Q1 2014",
       "summary": "Output measures for the whole economy and a range of industries. Unit labour costs for the whole economy and unit wage costs for the whole economy and the manufacturing sector.",
-      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivityq12014"
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivityq12014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 2,
   "type": "product_page",
   "title": "Labour productivity",
@@ -44,17 +56,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Employment and Labour market",
       "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket"
+      "uri": "/employmentandlabourmarket",
+      "index": null
     },
     {
       "title": "People in work",
       "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork"
+      "uri": "/employmentandlabourmarket/peopleinwork",
+      "index": null
     }
   ]
 }

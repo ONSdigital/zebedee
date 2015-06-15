@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kab9"
+    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kab9",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "Comparing the estimates for March to May 2014 with those for December 2013 to February 2014, employment continued to rise and unemployment continued to fall.",
@@ -8,58 +10,80 @@
     "headline3": "The proportion of people aged from 16 to 64 in work (the employment rate) continued to rise, reaching 73.1% for March to May 2014.",
     "title": "UK Labour Market, July 2014",
     "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
-    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kab9"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kab9",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai7"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai7",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf4"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf4",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf6"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf6",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai9"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kai9",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf6"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/kaf6",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/ybuy"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/ybuy",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/ybvb"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/ybvb",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
-      "title": "Actual and usual weekly hours worked",
-      "summary": "Brief description of dataset",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/actualandusualweeklyhoursworked"
-    },
-    {
       "title": "Average Weekly Earnings",
       "summary": "Covering total pay, bonus pay and regular pay",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearnings"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearnings",
+      "index": null
+    },
+    {
+      "title": "Actual and usual weekly hours worked",
+      "summary": "Brief description of dataset",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/actualandusualweeklyhoursworked",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Annual Survey of Hours and Earnings, 2013 Provisional Results",
       "summary": "The Annual Survey of Hours and Earnings (ASHE) is based on a 1% sample of employee jobs. This is drawn from HM Revenue and Customs Pay As You Earn (PAYE) records. This bulletin contains provisional results from the 2013 survey and revised results from the 2012 survey.",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings2013provisionalresults"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings2013provisionalresults",
+      "index": null
     },
     {
       "title": "UK Labour Market, July 2014",
       "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 1,
   "type": "product_page",
   "title": "Earnings and working hours",
@@ -69,17 +93,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Employment and Labour market",
       "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket"
+      "uri": "/employmentandlabourmarket",
+      "index": null
     },
     {
       "title": "People in work",
       "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork"
+      "uri": "/employmentandlabourmarket/peopleinwork",
+      "index": null
     }
   ]
 }

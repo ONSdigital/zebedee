@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Investments, pensions and trusts",
   "summary": "Investment refers to the flow of money around and across countries for the purpose of making profit. A pension is a fixed sum to be paid regularly to a person, typically following retirement and a trust is a legal arrangement where one or more \u0027trustees\u0027 are made legally responsible for holding assets. Statistics here include net flows of investment into the UK, figures on the number of people who hold pensions of different types and investments made by various types of trusts.",
-  "uri": "releases/investmentspensionsandtrusts"
+  "uri": "releases/investmentspensionsandtrusts",
+  "breadcrumb": null
 }

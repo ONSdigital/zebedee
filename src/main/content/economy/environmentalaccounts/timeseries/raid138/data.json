@@ -1,71 +1,127 @@
 {
+  "seasonalAdjustment": null,
   "date": "2012",
   "number": "214.8",
+  "mainMeasure": null,
+  "keyNote": null,
+  "additionalText": null,
   "years": [
     {
       "date": "2000",
       "value": "241.1",
-      "year": "2000"
+      "year": "2000",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2001",
       "value": "246.2",
-      "year": "2001"
+      "year": "2001",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2002",
       "value": "240.3",
-      "year": "2002"
+      "year": "2002",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2003",
       "value": "244.8",
-      "year": "2003"
+      "year": "2003",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2004",
       "value": "247.1",
-      "year": "2004"
+      "year": "2004",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2005",
       "value": "247.5",
-      "year": "2005"
+      "year": "2005",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2006",
       "value": "242.9",
-      "year": "2006"
+      "year": "2006",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2007",
       "value": "237.8",
-      "year": "2007"
+      "year": "2007",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2008",
       "value": "232.7",
-      "year": "2008"
+      "year": "2008",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2009",
       "value": "218.9",
-      "year": "2009"
+      "year": "2009",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2010",
       "value": "225.3",
-      "year": "2010"
+      "year": "2010",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2011",
       "value": "212.2",
-      "year": "2011"
+      "year": "2011",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2012",
       "value": "214.8",
-      "year": "2012"
+      "year": "2012",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     }
   ],
   "quarters": [],
@@ -75,33 +131,44 @@
   "unit": "m tonnes",
   "preUnit": "",
   "source": "Office for National Statistics",
+  "relatedDatasets": null,
+  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
       "title": "UK Environmental Accounts, 2014",
       "summary": "Environmental accounts show how the environment contributes to the economy, the impacts that the economy has on the environment, and how society responds to environmental issues. They include natural capital accounts (oil and gas), physical accounts (fuel use, energy consumption, atmospheric emissions, material flows, and water), and monetary accounts (environmental taxes and environmental protection expenditure). For 2014, experimental natural capital accounts (land use and forestry) are also included. Environmental accounts are ‘satellite accounts’ to the main National Accounts and they are compiled in accordance with the System of Environmental Economic Accounting (SEEA), which closely follows the UN System of National Accounts (SNA). This means that they are comparable with economic indicators such as Gross Domestic Product (GDP).",
-      "uri": "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts2014"
+      "uri": "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts2014",
+      "index": null
     }
   ],
+  "methodology": null,
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "timeseries",
   "title": "Total energy consumption (oil equivalent)",
+  "summary": null,
   "uri": "/economy/environmentalaccounts/timeseries/raid138",
   "breadcrumb": [
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     },
     {
       "title": "Environmental accounts",
       "summary": "Environmental Accounts show the relationship between the environment and the economy. This is done by outlining how the environment contributes to the economy (e.g. through the extraction of raw materials), the impact the economy has on the environment (e.g. through energy consumption) and how society responds to environmental issues (e.g. through expenditure on environmental protection). These accounts are used to inform government policies and to evaluate the impact that different sectors have on the environment.",
-      "uri": "/economy/environmentalaccounts"
+      "uri": "/economy/environmentalaccounts",
+      "index": null
     }
   ]
 }

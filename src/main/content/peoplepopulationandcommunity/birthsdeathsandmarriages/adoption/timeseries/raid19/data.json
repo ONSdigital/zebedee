@@ -1,201 +1,361 @@
 {
+  "seasonalAdjustment": null,
   "date": "2012",
   "number": "5053",
+  "mainMeasure": null,
+  "keyNote": null,
+  "additionalText": null,
   "years": [
     {
       "date": "1974",
       "value": "22502",
-      "year": "1974"
+      "year": "1974",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1975",
       "value": "21299",
-      "year": "1975"
+      "year": "1975",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1976",
       "value": "17621",
-      "year": "1976"
+      "year": "1976",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1977",
       "value": "12748",
-      "year": "1977"
+      "year": "1977",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1978",
       "value": "12121",
-      "year": "1978"
+      "year": "1978",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1979",
       "value": "10870",
-      "year": "1979"
+      "year": "1979",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1980",
       "value": "10609",
-      "year": "1980"
+      "year": "1980",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1981",
       "value": "9284",
-      "year": "1981"
+      "year": "1981",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1982",
       "value": "10240",
-      "year": "1982"
+      "year": "1982",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1983",
       "value": "9029",
-      "year": "1983"
+      "year": "1983",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1984",
       "value": "8648",
-      "year": "1984"
+      "year": "1984",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1985",
       "value": "7615",
-      "year": "1985"
+      "year": "1985",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1986",
       "value": "7892",
-      "year": "1986"
+      "year": "1986",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1987",
       "value": "7201",
-      "year": "1987"
+      "year": "1987",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1988",
       "value": "7390",
-      "year": "1988"
+      "year": "1988",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1989",
       "value": "7044",
-      "year": "1989"
+      "year": "1989",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1990",
       "value": "6533",
-      "year": "1990"
+      "year": "1990",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1991",
       "value": "7170",
-      "year": "1991"
+      "year": "1991",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1992",
       "value": "7341",
-      "year": "1992"
+      "year": "1992",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1993",
       "value": "6854",
-      "year": "1993"
+      "year": "1993",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1994",
       "value": "6240",
-      "year": "1994"
+      "year": "1994",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1995",
       "value": "5797",
-      "year": "1995"
+      "year": "1995",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1996",
       "value": "5962",
-      "year": "1996"
+      "year": "1996",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1997",
       "value": "5300",
-      "year": "1997"
+      "year": "1997",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1998",
       "value": "4382",
-      "year": "1998"
+      "year": "1998",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "1999",
       "value": "4323",
-      "year": "1999"
+      "year": "1999",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2000",
       "value": "4943",
-      "year": "2000"
+      "year": "2000",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2001",
       "value": "5977",
-      "year": "2001"
+      "year": "2001",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2002",
       "value": "5671",
-      "year": "2002"
+      "year": "2002",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2003",
       "value": "4809",
-      "year": "2003"
+      "year": "2003",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2004",
       "value": "5555",
-      "year": "2004"
+      "year": "2004",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2005",
       "value": "5556",
-      "year": "2005"
+      "year": "2005",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2006",
       "value": "4978",
-      "year": "2006"
+      "year": "2006",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2007",
       "value": "4637",
-      "year": "2007"
+      "year": "2007",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2008",
       "value": "5065",
-      "year": "2008"
+      "year": "2008",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2009",
       "value": "4725",
-      "year": "2009"
+      "year": "2009",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2010",
       "value": "4550",
-      "year": "2010"
+      "year": "2010",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2011",
       "value": "4777",
-      "year": "2011"
+      "year": "2011",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2012",
       "value": "5053",
-      "year": "2012"
+      "year": "2012",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     }
   ],
   "quarters": [],
@@ -205,38 +365,50 @@
   "unit": "children",
   "preUnit": "",
   "source": "Office for National Statistics",
+  "relatedDatasets": null,
+  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
       "title": "Adoptions in England and Wales, 2012",
       "summary": "Annual adoptions statistics following court orders. Analysed by sex, age and marital status of biological parents.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/bulletins/adoptionsinenglandandwales2012"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/bulletins/adoptionsinenglandandwales2012",
+      "index": null
     }
   ],
+  "methodology": null,
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "timeseries",
   "title": "Adoptions in England and Wales",
+  "summary": null,
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/timeseries/raid19",
   "breadcrumb": [
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Births, deaths and marriages",
       "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+      "index": null
     },
     {
       "title": "Adoption",
       "summary": "Adoption statistics are available from adoption registrations. They are used to inform local and central governments about trends in adoptions and a long run time series is available to make comparisons and observations about the impact of various different government policies. These statistics are available by the age and gender of the children being adopted as well as by whether or not the adopted children were born inside marriage.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption",
+      "index": null
     }
   ]
 }

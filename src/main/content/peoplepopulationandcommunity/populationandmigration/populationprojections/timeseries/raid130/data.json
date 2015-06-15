@@ -1,131 +1,235 @@
 {
+  "seasonalAdjustment": null,
   "date": "2012",
   "number": "73.3",
+  "mainMeasure": null,
+  "keyNote": null,
+  "additionalText": null,
   "years": [
     {
       "date": "2013",
       "value": "64.1",
-      "year": "2013"
+      "year": "2013",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2014",
       "value": "64.5",
-      "year": "2014"
+      "year": "2014",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2015",
       "value": "64.9",
-      "year": "2015"
+      "year": "2015",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2016",
       "value": "65.4",
-      "year": "2016"
+      "year": "2016",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2017",
       "value": "65.8",
-      "year": "2017"
+      "year": "2017",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2018",
       "value": "66.3",
-      "year": "2018"
+      "year": "2018",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2019",
       "value": "66.7",
-      "year": "2019"
+      "year": "2019",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2020",
       "value": "67.1",
-      "year": "2020"
+      "year": "2020",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2021",
       "value": "67.5",
-      "year": "2021"
+      "year": "2021",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2022",
       "value": "68.0",
-      "year": "2022"
+      "year": "2022",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2023",
       "value": "68.4",
-      "year": "2023"
+      "year": "2023",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2024",
       "value": "68.8",
-      "year": "2024"
+      "year": "2024",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2025",
       "value": "69.2",
-      "year": "2025"
+      "year": "2025",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2026",
       "value": "69.6",
-      "year": "2026"
+      "year": "2026",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2027",
       "value": "70.0",
-      "year": "2027"
+      "year": "2027",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2028",
       "value": "70.3",
-      "year": "2028"
+      "year": "2028",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2029",
       "value": "70.7",
-      "year": "2029"
+      "year": "2029",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2030",
       "value": "71.0",
-      "year": "2030"
+      "year": "2030",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2031",
       "value": "71.4",
-      "year": "2031"
+      "year": "2031",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2032",
       "value": "71.7",
-      "year": "2032"
+      "year": "2032",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2033",
       "value": "72.0",
-      "year": "2033"
+      "year": "2033",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2034",
       "value": "72.4",
-      "year": "2034"
+      "year": "2034",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2035",
       "value": "72.7",
-      "year": "2035"
+      "year": "2035",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2036",
       "value": "73.0",
-      "year": "2036"
+      "year": "2036",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     },
     {
       "date": "2037",
       "value": "73.3",
-      "year": "2037"
+      "year": "2037",
+      "month": null,
+      "quarter": null,
+      "sourceDataset": null,
+      "updateDate": null
     }
   ],
   "quarters": [],
@@ -135,6 +239,8 @@
   "unit": "m",
   "preUnit": "",
   "source": "Office for National Statistics",
+  "relatedDatasets": null,
+  "description": null,
   "notes": [
     "Mid year estimates for 2002-2010 are due to be revised to take account of the 2011 Census for Scotland. Revised population estimates for Scotland and the UK for 2002–2010 were not available at the time of projection."
   ],
@@ -142,33 +248,43 @@
     {
       "title": "National Population Projections, 2012-based",
       "summary": "This statistical bulletin presents the key findings from the 2012-based national population projections.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based"
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based",
+      "index": null
     }
   ],
+  "methodology": null,
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "timeseries",
   "title": "Mid-2037 UK population projected to reach",
+  "summary": null,
   "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/timeseries/raid130",
   "breadcrumb": [
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Population and migration",
       "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration"
+      "uri": "/peoplepopulationandcommunity/populationandmigration",
+      "index": null
     },
     {
       "title": "Population projections",
       "summary": "National population projections are available by age and sex for the UK and its constituent countries. These population projections are based on mid-year population estimates and a set of underlying assumptions regarding future fertility, mortality and migration. They provide an indication of the impact that changes in demographic patterns might have on the size and age structure of the population in the future. These projections are widely used for resource allocation and planning. ",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections"
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections",
+      "index": null
     }
   ]
 }

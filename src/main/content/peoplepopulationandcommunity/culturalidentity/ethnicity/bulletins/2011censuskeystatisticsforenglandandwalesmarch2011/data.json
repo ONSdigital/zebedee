@@ -3,6 +3,9 @@
   "headline2": "Most residents of England and Wales belonged to the White ethnic group (86%, 48.2 million) in 2011.",
   "headline3": "12% (2.0 million) of households with at least two people had partners or household members of different ethnic groups in 2011.",
   "relatedBulletins": [],
+  "phone": null,
+  "language": null,
+  "searchKeywords": null,
   "sections": [
     {
       "title": "Key points",
@@ -103,10 +106,16 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
+  "data": null,
   "nationalStatistic": false,
   "contact": {
-    "email": "census.customerservices@ons.gsi.gov.uk"
+    "name": null,
+    "email": "census.customerservices@ons.gsi.gov.uk",
+    "organisation": null,
+    "telephone": null
   },
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "bulletin",
   "title": "2011 Census Key Statistics for England and Wales, March 2011",
   "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
@@ -115,22 +124,26 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Cultural identity",
       "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity"
+      "uri": "/peoplepopulationandcommunity/culturalidentity",
+      "index": null
     },
     {
       "title": "Ethnicity",
       "summary": "Ethnicity statistics found here focus on the number and proportion of people who state that they identify with a particular ethnic group. Time series data on these figures are also available and these allow us to get a picture of the changing population of the UK.  ",
-      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity"
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity",
+      "index": null
     }
   ]
 }

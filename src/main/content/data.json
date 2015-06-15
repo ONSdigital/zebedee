@@ -1,56 +1,77 @@
 {
   "sections": [
     {
+      "index": null,
       "theme": {
         "title": "Economy",
         "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-        "uri": "/economy"
+        "uri": "/economy",
+        "index": null
       },
       "statistics": {
-        "uri": "/economy/inflationandpriceindices/timeseries/d7g7"
+        "uri": "/economy/inflationandpriceindices/timeseries/d7g7",
+        "index": null,
+        "data": null
       }
     },
     {
+      "index": null,
       "theme": {
         "title": "Economy",
         "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-        "uri": "/economy"
+        "uri": "/economy",
+        "index": null
       },
       "statistics": {
-        "uri": "/economy/grossdomesticproductgdp/timeseries/ihyq"
+        "uri": "/economy/grossdomesticproductgdp/timeseries/ihyq",
+        "index": null,
+        "data": null
       }
     },
     {
+      "index": null,
       "theme": {
         "title": "Business, industry and trade",
         "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-        "uri": "/businessindustryandtrade"
+        "uri": "/businessindustryandtrade",
+        "index": null
       },
       "statistics": {
-        "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+        "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj",
+        "index": null,
+        "data": null
       }
     },
     {
+      "index": null,
       "theme": {
         "title": "Employment and Labour market",
         "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-        "uri": "/employmentandlabourmarket"
+        "uri": "/employmentandlabourmarket",
+        "index": null
       },
       "statistics": {
-        "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf24"
+        "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf24",
+        "index": null,
+        "data": null
       }
     },
     {
+      "index": null,
       "theme": {
         "title": "People, population and community",
         "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-        "uri": "/peoplepopulationandcommunity"
+        "uri": "/peoplepopulationandcommunity",
+        "index": null
       },
       "statistics": {
-        "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid121"
+        "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid121",
+        "index": null,
+        "data": null
       }
     }
   ],
+  "index": null,
   "type": "home_page",
   "title": "Home",
   "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",

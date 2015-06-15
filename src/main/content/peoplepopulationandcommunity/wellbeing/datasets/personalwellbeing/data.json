@@ -1,12 +1,19 @@
 {
+  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "xls": "http://www.ons.gov.uk/ons/rel/wellbeing/measuring-national-well-being/personal-well-being-across-the-uk--2012-13/rft-table-3.xls"
+      "cdids": null,
+      "xls": "http://www.ons.gov.uk/ons/rel/wellbeing/measuring-national-well-being/personal-well-being-across-the-uk--2012-13/rft-table-3.xls",
+      "csv": null
     }
   ],
+  "notes": null,
   "description": "Comparison over time of estimates of personal well-being from the Annual Population Survey (APS) Personal Well-being dataset:  by UK, country and region.",
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "dataset",
   "title": "Personal well-being",
   "summary": "Comparison over time of estimates of personal well-being",
@@ -15,17 +22,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Well-being",
       "summary": "Measuring National Well-being is about looking at measures of the UK as a whole that go beyond what we produce, which is measured by Gross Domestic Product (GDP). This section includes a wide range of headline indicators in areas such as health, relationships, education and skills, what we do, where we live, our finances, the economy, governance, the environment and measures of \u0027personal well-being\u0027 (individuals\u0027 assessment of their own well-being). This data comes from a variety of sources and much of the analysis is new.",
-      "uri": "/peoplepopulationandcommunity/wellbeing"
+      "uri": "/peoplepopulationandcommunity/wellbeing",
+      "index": null
     }
   ]
 }

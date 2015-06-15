@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Business activity, size and location",
   "summary": "Statistics here focus on business that are either registered for VAT or PAYE. This means some very small businesses are not be covered. Key figures are the number of businesses in the UK and the numbers across different areas of the UK. Business size is based on employment and turnover and business activity relates to the type of industry the business is related to. ",
-  "uri": "releases/businessactivitysizeandlocation"
+  "uri": "releases/businessactivitysizeandlocation",
+  "breadcrumb": null
 }

@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid95"
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid95",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "The usually resident population of the United Kingdom was 63.2 million on census day, a growth of 7% (4.1 million) since 2001.",
@@ -8,33 +10,43 @@
     "headline3": "In 2011 the majority of UK residents described themselves as belonging to a white ethnic group (87%, 55 million).",
     "title": "Key Statistics and Quick Statistics for local authorities in the United Kingdom",
     "summary": "This statistical bulletin presents key results for the UK population from the individual censuses of England and Wales, Scotland and Northern Ireland. The bulletin focuses on the topics of population, ethnicity, country of birth, health, housing and accommodation.",
-    "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom"
+    "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom",
+    "index": null
   },
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid95"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid95",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid96"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid96",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid97"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/timeseries/raid97",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Long-term health problem or disability",
       "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/datasets/longtermhealthproblemordisability"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/datasets/longtermhealthproblemordisability",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Key Statistics and Quick Statistics for local authorities in the United Kingdom",
       "summary": "This statistical bulletin presents key results for the UK population from the individual censuses of England and Wales, Scotland and Northern Ireland. The bulletin focuses on the topics of population, ethnicity, country of birth, health, housing and accommodation.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/disability/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 0,
   "type": "product_page",
   "title": "Disability",
@@ -44,17 +56,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Health and social care",
       "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
+      "index": null
     }
   ]
 }

@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Mergers and acquisitions",
   "summary": "These statistics tell us about the changing picture of businesses operating in the UK. A merger occurs when two companies or organisations of a similar size agree to join together in order to operate as one single company under a new name. An acquisition is a transaction which involves one company purchasing the shares of a second company which is usually of a smaller size. Other statistics here are on \u0027disposals\u0027, which refers to a company or organisation selling or liquidating an asset or subsidiary. ",
-  "uri": "releases/mergersandacquisitions"
+  "uri": "releases/mergersandacquisitions",
+  "breadcrumb": null
 }

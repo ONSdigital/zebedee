@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115"
+    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "Median household wealth was about seven times larger than median household gross annual income.",
@@ -8,14 +10,19 @@
     "headline3": "Households in the top income quintile held 44% of aggregate total wealth.",
     "title": "Wealth and Income, 2010-12",
     "summary": "A combined analysis of income and wealth based upon results from the third wave of the Wealth and Assets Survey and covering the period 2010-12.",
-    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012"
+    "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012",
+    "index": null
   },
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115"
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid115",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid116"
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/timeseries/raid116",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [],
@@ -23,9 +30,11 @@
     {
       "title": "Wealth and Income, 2010-12",
       "summary": "A combined analysis of income and wealth based upon results from the third wave of the Wealth and Assets Survey and covering the period 2010-12.",
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012"
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/bulletins/wealthandincome201012",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 2,
   "type": "product_page",
   "title": "Income and wealth",
@@ -35,17 +44,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Personal and household finances",
       "summary": "Statistics on personal and household finances help us build a picture of how people in the UK are funding their lifestyles. Key statistics here are on household and personal debt, expenditure, income and wealth.",
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances"
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
+      "index": null
     }
   ]
 }

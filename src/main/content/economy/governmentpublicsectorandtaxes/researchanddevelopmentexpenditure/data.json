@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glba"
+    "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glba",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "In constant prices, R\u0026D expenditure has increased by 56% from the 1985 estimate of £17.3 billion. Expenditure peaked in 2011 at £27.9 billion.",
@@ -8,42 +10,58 @@
     "headline3": "International comparisons show that UK R\u0026D expenditure in 2012 was below the EU-28 provisional estimate of 2.06% of GDP.",
     "title": "UK Gross Domestic Expenditure on Research and Development, 2012",
     "summary": "This release provides estimates of R\u0026D performed in and funded by the following four sectors of the economy, as defined in the ‘Frascati Manual’: Business Enterprise (BERD), Higher Education (HERD), Government (GovERD), which includes Research Councils, and Private Non-Profit (PNP) organisations. All these sectors’ R\u0026D data are known collectively as GERD, which represents the gross domestic expenditure on R\u0026D in the UK. GERD is unique in providing this information, and is the preferred measure of R\u0026D activity for use in international comparisons. This release reports on R\u0026D expenditure in the UK irrespective of the residence of the ultimate owner or users of the R\u0026D produced. The main purpose of collecting R\u0026D data from all sectors of the economy is to supply data for policy and monitoring purposes on science and technology, of which R\u0026D is an important part.",
-    "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/bulletins/ukgrossdomesticexpenditureonresearchanddevelopment2012"
+    "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/bulletins/ukgrossdomesticexpenditureonresearchanddevelopment2012",
+    "index": null
   },
   "items": [
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glba"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glba",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbk"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbk",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/dmrs"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/dmrs",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbl"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbl",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbm"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbm",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbn"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbn",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Expenditure on R\u0026D in the UK",
       "summary": "By performing and funding sectors",
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/datasets/expenditureonrdintheuk"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/datasets/expenditureonrdintheuk",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "UK Gross Domestic Expenditure on Research and Development, 2012",
       "summary": "This release provides estimates of R\u0026D performed in and funded by the following four sectors of the economy, as defined in the ‘Frascati Manual’: Business Enterprise (BERD), Higher Education (HERD), Government (GovERD), which includes Research Councils, and Private Non-Profit (PNP) organisations. All these sectors’ R\u0026D data are known collectively as GERD, which represents the gross domestic expenditure on R\u0026D in the UK. GERD is unique in providing this information, and is the preferred measure of R\u0026D activity for use in international comparisons. This release reports on R\u0026D expenditure in the UK irrespective of the residence of the ultimate owner or users of the R\u0026D produced. The main purpose of collecting R\u0026D data from all sectors of the economy is to supply data for policy and monitoring purposes on science and technology, of which R\u0026D is an important part.",
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/bulletins/ukgrossdomesticexpenditureonresearchanddevelopment2012"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/bulletins/ukgrossdomesticexpenditureonresearchanddevelopment2012",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 1,
   "type": "product_page",
   "title": "Research and Development expenditure",
@@ -53,17 +71,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     },
     {
       "title": "Government, public sector and taxes",
       "summary": "This section covers the latest figures on what the UK public sector has spent, raised in revenue and invested. The headline statistic here is Public Sector Net Borrowing, which is a measure of the amount of money the Government has had to borrow in order to bridge the gap between its revenue and expenditure. ",
-      "uri": "/economy/governmentpublicsectorandtaxes"
+      "uri": "/economy/governmentpublicsectorandtaxes",
+      "index": null
     }
   ]
 }

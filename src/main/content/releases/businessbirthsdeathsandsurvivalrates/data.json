@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Business births, deaths and survival rates",
   "summary": "Data on business births relates to businesses that register as VAT or PAYE businesses in a given time period. Data on business deaths relates to businesses that have ceased to trade in a given time period. Business survival rates are the percentage of businesses that are still registered a given number of years after they first registered. ",
-  "uri": "releases/businessbirthsdeathsandsurvivalrates"
+  "uri": "releases/businessbirthsdeathsandsurvivalrates",
+  "breadcrumb": null
 }

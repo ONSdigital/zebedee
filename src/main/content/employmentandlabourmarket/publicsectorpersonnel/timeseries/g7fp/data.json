@@ -1,102 +1,154 @@
 {
+  "seasonalAdjustment": null,
   "date": "Q2 2014",
   "number": "2.5",
+  "mainMeasure": null,
+  "keyNote": null,
+  "additionalText": null,
   "years": [
     {
       "date": "1999",
       "value": "1.984",
       "year": "1999",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2000",
       "value": "2.013",
       "year": "2000",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2001",
       "value": "2.076",
       "year": "2001",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2002",
       "value": "2.151",
       "year": "2002",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2003",
       "value": "2.239",
       "year": "2003",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2004",
       "value": "2.308",
       "year": "2004",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2005",
       "value": "2.353",
       "year": "2005",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2006",
       "value": "2.337",
       "year": "2006",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2007",
       "value": "2.310",
       "year": "2007",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2008",
       "value": "2.319",
       "year": "2008",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2009",
       "value": "2.412",
       "year": "2009",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2010",
       "value": "2.436",
       "year": "2010",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2011",
       "value": "2.404",
       "year": "2011",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2012",
       "value": "2.335",
       "year": "2012",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2013",
       "value": "2.411",
       "year": "2013",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2014",
       "value": "2.453",
       "year": "2014",
-      "sourceDataset": "PSE"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "PSE",
+      "updateDate": null
     }
   ],
   "quarters": [
@@ -104,435 +156,559 @@
       "date": "1999 Q1",
       "value": "1.980",
       "year": "1999",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "1999 Q2",
       "value": "1.984",
       "year": "1999",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "1999 Q3",
       "value": "1.993",
       "year": "1999",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "1999 Q4",
       "value": "2.000",
       "year": "1999",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2000 Q1",
       "value": "2.005",
       "year": "2000",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2000 Q2",
       "value": "2.013",
       "year": "2000",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2000 Q3",
       "value": "2.023",
       "year": "2000",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2000 Q4",
       "value": "2.034",
       "year": "2000",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2001 Q1",
       "value": "2.058",
       "year": "2001",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2001 Q2",
       "value": "2.076",
       "year": "2001",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2001 Q3",
       "value": "2.090",
       "year": "2001",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2001 Q4",
       "value": "2.109",
       "year": "2001",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2002 Q1",
       "value": "2.130",
       "year": "2002",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2002 Q2",
       "value": "2.151",
       "year": "2002",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2002 Q3",
       "value": "2.172",
       "year": "2002",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2002 Q4",
       "value": "2.195",
       "year": "2002",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2003 Q1",
       "value": "2.219",
       "year": "2003",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2003 Q2",
       "value": "2.239",
       "year": "2003",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2003 Q3",
       "value": "2.260",
       "year": "2003",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2003 Q4",
       "value": "2.275",
       "year": "2003",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2004 Q1",
       "value": "2.304",
       "year": "2004",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2004 Q2",
       "value": "2.308",
       "year": "2004",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2004 Q3",
       "value": "2.323",
       "year": "2004",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2004 Q4",
       "value": "2.325",
       "year": "2004",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2005 Q1",
       "value": "2.333",
       "year": "2005",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2005 Q2",
       "value": "2.353",
       "year": "2005",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2005 Q3",
       "value": "2.353",
       "year": "2005",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2005 Q4",
       "value": "2.353",
       "year": "2005",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2006 Q1",
       "value": "2.342",
       "year": "2006",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2006 Q2",
       "value": "2.337",
       "year": "2006",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2006 Q3",
       "value": "2.331",
       "year": "2006",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2006 Q4",
       "value": "2.329",
       "year": "2006",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2007 Q1",
       "value": "2.323",
       "year": "2007",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2007 Q2",
       "value": "2.310",
       "year": "2007",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2007 Q3",
       "value": "2.312",
       "year": "2007",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2007 Q4",
       "value": "2.308",
       "year": "2007",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2008 Q1",
       "value": "2.304",
       "year": "2008",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2008 Q2",
       "value": "2.319",
       "year": "2008",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2008 Q3",
       "value": "2.349",
       "year": "2008",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2008 Q4",
       "value": "2.384",
       "year": "2008",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2009 Q1",
       "value": "2.405",
       "year": "2009",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2009 Q2",
       "value": "2.412",
       "year": "2009",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2009 Q3",
       "value": "2.449",
       "year": "2009",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2009 Q4",
       "value": "2.467",
       "year": "2009",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2010 Q1",
       "value": "2.466",
       "year": "2010",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2010 Q2",
       "value": "2.436",
       "year": "2010",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2010 Q3",
       "value": "2.412",
       "year": "2010",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2010 Q4",
       "value": "2.412",
       "year": "2010",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2011 Q1",
       "value": "2.415",
       "year": "2011",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2011 Q2",
       "value": "2.404",
       "year": "2011",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2011 Q3",
       "value": "2.438",
       "year": "2011",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2011 Q4",
       "value": "2.440",
       "year": "2011",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2012 Q1",
       "value": "2.450",
       "year": "2012",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2012 Q2",
       "value": "2.335",
       "year": "2012",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2012 Q3",
       "value": "2.351",
       "year": "2012",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2012 Q4",
       "value": "2.367",
       "year": "2012",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2013 Q1",
       "value": "2.381",
       "year": "2013",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2013 Q2",
       "value": "2.411",
       "year": "2013",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2013 Q3",
       "value": "2.436",
       "year": "2013",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2013 Q4",
       "value": "2.445",
       "year": "2013",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2014 Q1",
       "value": "2.456",
       "year": "2014",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     },
     {
       "date": "2014 Q2",
       "value": "2.453",
       "year": "2014",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "PSE"
+      "sourceDataset": "PSE",
+      "updateDate": null
     }
   ],
   "months": [],
@@ -543,33 +719,44 @@
   "unit": "m",
   "preUnit": "",
   "source": "Office for National Statistics",
+  "relatedDatasets": null,
+  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
       "title": "Public Sector Employment, Q1 2014",
       "summary": "This bulletin contains detailed estimates of public sector employment, updated with the latest estimates for the first quarter of 2014.",
-      "uri": "/employmentandlabourmarket/publicsectorpersonnel/bulletins/publicsectoremploymentq12014"
+      "uri": "/employmentandlabourmarket/publicsectorpersonnel/bulletins/publicsectoremploymentq12014",
+      "index": null
     }
   ],
+  "methodology": null,
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "timeseries",
   "title": "Central government: Full-time equivalent",
+  "summary": null,
   "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g7fp",
   "breadcrumb": [
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Employment and Labour market",
       "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket"
+      "uri": "/employmentandlabourmarket",
+      "index": null
     },
     {
       "title": "Public sector personnel",
       "summary": "Public sector employment statistics relate to the number of people employed in central government, local government and public corporations. They are collected through returns from various organisations. Employees included in the headcount can be permanent, on a fixed-term contract, employed on a casual basis or working in a second job in the public sector. However, self-employed, contract workers and agency workers are excluded.",
-      "uri": "/employmentandlabourmarket/publicsectorpersonnel"
+      "uri": "/employmentandlabourmarket/publicsectorpersonnel",
+      "index": null
     }
   ]
 }

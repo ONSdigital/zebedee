@@ -1,198 +1,298 @@
 {
+  "seasonalAdjustment": null,
   "date": "2012",
   "number": "1360",
+  "mainMeasure": null,
+  "keyNote": null,
+  "additionalText": null,
   "years": [
     {
       "date": "1981",
       "value": "1243",
       "year": "1981",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1982",
       "value": "0",
       "year": "1982",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1983",
       "value": "1357",
       "year": "1983",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1984",
       "value": "0",
       "year": "1984",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1985",
       "value": "1457",
       "year": "1985",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1986",
       "value": "1212",
       "year": "1986",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1987",
       "value": "1264",
       "year": "1987",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1988",
       "value": "1360",
       "year": "1988",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1989",
       "value": "1603",
       "year": "1989",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1990",
       "value": "1638",
       "year": "1990",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1991",
       "value": "1946",
       "year": "1991",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1992",
       "value": "1846",
       "year": "1992",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1993",
       "value": "1928",
       "year": "1993",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1994",
       "value": "2051",
       "year": "1994",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1995",
       "value": "1462",
       "year": "1995",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1996",
       "value": "1553",
       "year": "1996",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1997",
       "value": "1403",
       "year": "1997",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1998",
       "value": "1471",
       "year": "1998",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "1999",
       "value": "1464",
       "year": "1999",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2000",
       "value": "1593",
       "year": "2000",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2001",
       "value": "1160",
       "year": "2001",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2002",
       "value": "1053",
       "year": "2002",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2003",
       "value": "1243",
       "year": "2003",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2004",
       "value": "1240",
       "year": "2004",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2005",
       "value": "1238",
       "year": "2005",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2006",
       "value": "1252",
       "year": "2006",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2007",
       "value": "1320",
       "year": "2007",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2008",
       "value": "1348",
       "year": "2008",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2009",
       "value": "1406",
       "year": "2009",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2010",
       "value": "1372",
       "year": "2010",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2011",
       "value": "1321",
       "year": "2011",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     },
     {
       "date": "2012",
       "value": "1360",
       "year": "2012",
-      "sourceDataset": "GERD"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "GERD",
+      "updateDate": null
     }
   ],
   "quarters": [],
@@ -204,38 +304,50 @@
   "unit": "bn",
   "preUnit": "£",
   "source": "Office for National Statistics",
+  "relatedDatasets": null,
+  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
       "title": "UK Gross Domestic Expenditure on Research and Development, 2012",
       "summary": "This release provides estimates of R\u0026D performed in and funded by the following four sectors of the economy, as defined in the ‘Frascati Manual’: Business Enterprise (BERD), Higher Education (HERD), Government (GovERD), which includes Research Councils, and Private Non-Profit (PNP) organisations. All these sectors’ R\u0026D data are known collectively as GERD, which represents the gross domestic expenditure on R\u0026D in the UK. GERD is unique in providing this information, and is the preferred measure of R\u0026D activity for use in international comparisons. This release reports on R\u0026D expenditure in the UK irrespective of the residence of the ultimate owner or users of the R\u0026D produced. The main purpose of collecting R\u0026D data from all sectors of the economy is to supply data for policy and monitoring purposes on science and technology, of which R\u0026D is an important part.",
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/bulletins/ukgrossdomesticexpenditureonresearchanddevelopment2012"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/bulletins/ukgrossdomesticexpenditureonresearchanddevelopment2012",
+      "index": null
     }
   ],
+  "methodology": null,
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "timeseries",
   "title": "Government expenditure on research and development",
+  "summary": null,
   "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbk",
   "breadcrumb": [
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     },
     {
       "title": "Government, public sector and taxes",
       "summary": "This section covers the latest figures on what the UK public sector has spent, raised in revenue and invested. The headline statistic here is Public Sector Net Borrowing, which is a measure of the amount of money the Government has had to borrow in order to bridge the gap between its revenue and expenditure. ",
-      "uri": "/economy/governmentpublicsectorandtaxes"
+      "uri": "/economy/governmentpublicsectorandtaxes",
+      "index": null
     },
     {
       "title": "Research and Development expenditure",
       "summary": "Expenditure on Research and Development (R\u0026D) is defined here as expenditure on “creative work undertaken on a systematic basis in order to increase the stock of knowledge”. The statistics here are based on estimates of R\u0026D performed in and funded by the following four sectors of the economy: Business Enterprise, Higher Education, Government and Private Non-Profit organisations. ",
-      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure"
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure",
+      "index": null
     }
   ]
 }

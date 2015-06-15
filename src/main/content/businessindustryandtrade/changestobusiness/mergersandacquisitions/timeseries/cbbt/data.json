@@ -1,156 +1,235 @@
 {
+  "seasonalAdjustment": null,
   "date": "Q1 2014",
   "number": "1412",
+  "mainMeasure": null,
+  "keyNote": null,
+  "additionalText": null,
   "years": [
     {
       "date": "1987",
       "value": "3961",
       "year": "1987",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1988",
       "value": "3880",
       "year": "1988",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1989",
       "value": "3659",
       "year": "1989",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1990",
       "value": "6175",
       "year": "1990",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1991",
       "value": "1757",
       "year": "1991",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1992",
       "value": "3536",
       "year": "1992",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1993",
       "value": "4779",
       "year": "1993",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1994",
       "value": "5733",
       "year": "1994",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1995",
       "value": "5989",
       "year": "1995",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1996",
       "value": "7807",
       "year": "1996",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1997",
       "value": "7348",
       "year": "1997",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1998",
       "value": "12814",
       "year": "1998",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1999",
       "value": "12586",
       "year": "1999",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2000",
       "value": "29857",
       "year": "2000",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2001",
       "value": "28494",
       "year": "2001",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2002",
       "value": "7074",
       "year": "2002",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2003",
       "value": "8643",
       "year": "2003",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2004",
       "value": "5485",
       "year": "2004",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2005",
       "value": "12668",
       "year": "2005",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2006",
       "value": "21214",
       "year": "2006",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2007",
       "value": "10221",
       "year": "2007",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2008",
       "value": "12062",
       "year": "2008",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2009",
       "value": "5101",
       "year": "2009",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2010",
       "value": "11411",
       "year": "2010",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2011",
       "value": "14111",
       "year": "2011",
-      "sourceDataset": "AM"
+      "month": null,
+      "quarter": null,
+      "sourceDataset": "AM",
+      "updateDate": null
     }
   ],
   "quarters": [
@@ -158,736 +237,946 @@
       "date": "1987 Q1",
       "value": "431",
       "year": "1987",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1987 Q2",
       "value": "1401",
       "year": "1987",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1987 Q3",
       "value": "1630",
       "year": "1987",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1987 Q4",
       "value": "499",
       "year": "1987",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1988 Q1",
       "value": "379",
       "year": "1988",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1988 Q2",
       "value": "635",
       "year": "1988",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1988 Q3",
       "value": "989",
       "year": "1988",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1988 Q4",
       "value": "1877",
       "year": "1988",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1989 Q1",
       "value": "593",
       "year": "1989",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1989 Q2",
       "value": "1013",
       "year": "1989",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1989 Q3",
       "value": "1608",
       "year": "1989",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1989 Q4",
       "value": "445",
       "year": "1989",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1990 Q1",
       "value": "1989",
       "year": "1990",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1990 Q2",
       "value": "1223",
       "year": "1990",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1990 Q3",
       "value": "1511",
       "year": "1990",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1990 Q4",
       "value": "1452",
       "year": "1990",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1991 Q1",
       "value": "340",
       "year": "1991",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1991 Q2",
       "value": "459",
       "year": "1991",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1991 Q3",
       "value": "539",
       "year": "1991",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1991 Q4",
       "value": "419",
       "year": "1991",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1992 Q1",
       "value": "634",
       "year": "1992",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1992 Q2",
       "value": "1031",
       "year": "1992",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1992 Q3",
       "value": "783",
       "year": "1992",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1992 Q4",
       "value": "1088",
       "year": "1992",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1993 Q1",
       "value": "1106",
       "year": "1993",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1993 Q2",
       "value": "1053",
       "year": "1993",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1993 Q3",
       "value": "1246",
       "year": "1993",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1993 Q4",
       "value": "1374",
       "year": "1993",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1994 Q1",
       "value": "1707",
       "year": "1994",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1994 Q2",
       "value": "952",
       "year": "1994",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1994 Q3",
       "value": "971",
       "year": "1994",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1994 Q4",
       "value": "2103",
       "year": "1994",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1995 Q1",
       "value": "1592",
       "year": "1995",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1995 Q2",
       "value": "580",
       "year": "1995",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1995 Q3",
       "value": "203",
       "year": "1995",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1995 Q4",
       "value": "3614",
       "year": "1995",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1996 Q1",
       "value": "1322",
       "year": "1996",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1996 Q2",
       "value": "2658",
       "year": "1996",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1996 Q3",
       "value": "2912",
       "year": "1996",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1996 Q4",
       "value": "915",
       "year": "1996",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1997 Q1",
       "value": "1732",
       "year": "1997",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1997 Q2",
       "value": "1385",
       "year": "1997",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1997 Q3",
       "value": "2001",
       "year": "1997",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1997 Q4",
       "value": "2230",
       "year": "1997",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1998 Q1",
       "value": "2055",
       "year": "1998",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1998 Q2",
       "value": "6469",
       "year": "1998",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1998 Q3",
       "value": "3092",
       "year": "1998",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1998 Q4",
       "value": "1198",
       "year": "1998",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1999 Q1",
       "value": "2188",
       "year": "1999",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1999 Q2",
       "value": "6573",
       "year": "1999",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1999 Q3",
       "value": "2271",
       "year": "1999",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "1999 Q4",
       "value": "1554",
       "year": "1999",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2000 Q1",
       "value": "8290",
       "year": "2000",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2000 Q2",
       "value": "2367",
       "year": "2000",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2000 Q3",
       "value": "15314",
       "year": "2000",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2000 Q4",
       "value": "3886",
       "year": "2000",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2001 Q1",
       "value": "7601",
       "year": "2001",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2001 Q2",
       "value": "7675",
       "year": "2001",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2001 Q3",
       "value": "7750",
       "year": "2001",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2001 Q4",
       "value": "5468",
       "year": "2001",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2002 Q1",
       "value": "1014",
       "year": "2002",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2002 Q2",
       "value": "1489",
       "year": "2002",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2002 Q3",
       "value": "1016",
       "year": "2002",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2002 Q4",
       "value": "3555",
       "year": "2002",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2003 Q1",
       "value": "1130",
       "year": "2003",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2003 Q2",
       "value": "1218",
       "year": "2003",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2003 Q3",
       "value": "1702",
       "year": "2003",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2003 Q4",
       "value": "4593",
       "year": "2003",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2004 Q1",
       "value": "816",
       "year": "2004",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2004 Q2",
       "value": "2353",
       "year": "2004",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2004 Q3",
       "value": "1305",
       "year": "2004",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2004 Q4",
       "value": "1011",
       "year": "2004",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2005 Q1",
       "value": "1435",
       "year": "2005",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2005 Q2",
       "value": "909",
       "year": "2005",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2005 Q3",
       "value": "1136",
       "year": "2005",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2005 Q4",
       "value": "9188",
       "year": "2005",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2006 Q1",
       "value": "5456",
       "year": "2006",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2006 Q2",
       "value": "9454",
       "year": "2006",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2006 Q3",
       "value": "2836",
       "year": "2006",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2006 Q4",
       "value": "3468",
       "year": "2006",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2007 Q1",
       "value": "3468",
       "year": "2007",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2007 Q2",
       "value": "1798",
       "year": "2007",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2007 Q3",
       "value": "3887",
       "year": "2007",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2007 Q4",
       "value": "1068",
       "year": "2007",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2008 Q1",
       "value": "787",
       "year": "2008",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2008 Q2",
       "value": "5210",
       "year": "2008",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2008 Q3",
       "value": "4691",
       "year": "2008",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2008 Q4",
       "value": "1374",
       "year": "2008",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2009 Q1",
       "value": "1299",
       "year": "2009",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2009 Q2",
       "value": "726",
       "year": "2009",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2010 Q1",
       "value": "2790",
       "year": "2010",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2010 Q2",
       "value": "866",
       "year": "2010",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2010 Q3",
       "value": "4189",
       "year": "2010",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2010 Q4",
       "value": "3566",
       "year": "2010",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2011 Q1",
       "value": "3268",
       "year": "2011",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2011 Q2",
       "value": "3110",
       "year": "2011",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2011 Q3",
       "value": "3620",
       "year": "2011",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2011 Q4",
       "value": "4113",
       "year": "2011",
+      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2012 Q1",
       "value": "2122",
       "year": "2012",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2012 Q2",
       "value": "1375",
       "year": "2012",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2012 Q3",
       "value": "632",
       "year": "2012",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2013 Q1",
       "value": "5546",
       "year": "2013",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2013 Q2",
       "value": "3572",
       "year": "2013",
+      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2013 Q3",
       "value": "439",
       "year": "2013",
+      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     },
     {
       "date": "2014 Q1",
       "value": "1412",
       "year": "2014",
+      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "AM"
+      "sourceDataset": "AM",
+      "updateDate": null
     }
   ],
   "months": [],
@@ -898,38 +1187,50 @@
   "unit": "m",
   "preUnit": "£",
   "source": "Office for National Statistics",
+  "relatedDatasets": null,
+  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
       "title": "Mergers and Acquisitions Involving UK Companies, Q1 2014",
       "summary": "Estimates of the value and numbers of mergers, acquisitions and disposals involving UK companies with values of £1.0 million or more. The information provided reflects solely the change in majority ownership (ordinary shares) and therefore only transactions which result in a change of ultimate control of the target company are included.",
-      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/bulletins/mergersandacquisitionsinvolvingukcompaniesq12014"
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/bulletins/mergersandacquisitionsinvolvingukcompaniesq12014",
+      "index": null
     }
   ],
+  "methodology": null,
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "timeseries",
   "title": "Value of disposals",
+  "summary": null,
   "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbbt",
   "breadcrumb": [
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Business, industry and trade",
       "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade"
+      "uri": "/businessindustryandtrade",
+      "index": null
     },
     {
       "title": "Changes to business",
       "summary": "Statistics here include a range of figures that provide a picture of how businesses in the UK are growing, surviving and changing over time. These figures are an informal indicator of the confidence in the UK economy. ",
-      "uri": "/businessindustryandtrade/changestobusiness"
+      "uri": "/businessindustryandtrade/changestobusiness",
+      "index": null
     },
     {
       "title": "Mergers and acquisitions",
       "summary": "These statistics tell us about the changing picture of businesses operating in the UK. A merger occurs when two companies or organisations of a similar size agree to join together in order to operate as one single company under a new name. An acquisition is a transaction which involves one company purchasing the shares of a second company which is usually of a smaller size. Other statistics here are on \u0027disposals\u0027, which refers to a company or organisation selling or liquidating an asset or subsidiary. ",
-      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions"
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions",
+      "index": null
     }
   ]
 }

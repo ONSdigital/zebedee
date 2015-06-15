@@ -1,12 +1,19 @@
 {
+  "datasetId": null,
   "downloads": [
     {
       "title": "Labour productivity",
-      "xls": "http://www.ons.gov.uk/ons/rel/productivity/labour-productivity/q1-2014/rftxlq114.xls"
+      "cdids": null,
+      "xls": "http://www.ons.gov.uk/ons/rel/productivity/labour-productivity/q1-2014/rftxlq114.xls",
+      "csv": null
     }
   ],
+  "notes": null,
   "description": "Comprehensive description of data contained within this dataset.",
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "dataset",
   "title": "Labour productivity",
   "summary": "Brief description of dataset",
@@ -15,22 +22,26 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Employment and Labour market",
       "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket"
+      "uri": "/employmentandlabourmarket",
+      "index": null
     },
     {
       "title": "People in work",
       "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork"
+      "uri": "/employmentandlabourmarket/peopleinwork",
+      "index": null
     },
     {
       "title": "Labour productivity",
       "summary": "Labour productivity measures the efficiency of the workforce. It is calculated as output per worker, output per job and output per hour. Labour productivity is an important factor in determining the productive potential of the economy. Countries with strong labour productivity growth tend to benefit from high rates of growth and low inflation. ",
-      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity"
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity",
+      "index": null
     }
   ]
 }

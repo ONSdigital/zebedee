@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid1"
+    "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid1",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "The number of VAT and/or PAYE businesses is estimated to have risen by 18,000 (0.9%) between March 2012 and March 2013.",
@@ -8,39 +10,53 @@
     "headline3": "The largest industry group is professional, scientific and technical with 16.9% of all registered businesses.",
     "title": "UK Business: Activity, Size and Location - 2013",
     "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
-    "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013"
+    "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013",
+    "index": null
   },
   "items": [
     {
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid1"
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid1",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid2"
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid2",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid3"
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid3",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid4"
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid4",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid5"
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid5",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Number of VAT and/or PAYE enterprises",
       "summary": "Analysis of UK local units and UK VAT and/or PAYE based Enterprises",
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/datasets/numberofvatandorpayeenterprises"
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/datasets/numberofvatandorpayeenterprises",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "UK Business: Activity, Size and Location - 2013",
       "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013"
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 4,
   "type": "product_page",
   "title": "Business activity, size and location",
@@ -50,12 +66,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Business, industry and trade",
       "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade"
+      "uri": "/businessindustryandtrade",
+      "index": null
     }
   ]
 }

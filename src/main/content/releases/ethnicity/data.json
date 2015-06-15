@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Ethnicity",
   "summary": "Ethnicity statistics found here focus on the number and proportion of people who state that they identify with a particular ethnic group. Time series data on these figures are also available and these allow us to get a picture of the changing population of the UK.  ",
-  "uri": "releases/ethnicity"
+  "uri": "releases/ethnicity",
+  "breadcrumb": null
 }

@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39"
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "The number of divorces in England and Wales in 2012 was 118,140, an increase of 0.5% since 2011, when there were 117,558 divorces.",
@@ -8,33 +10,43 @@
     "headline3": "The number of divorces in 2012 was highest among men and women aged 40 to 44.",
     "title": "Divorces in England and Wales, 2012",
     "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012"
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012",
+    "index": null
   },
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid40"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid40",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid41"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid41",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Number of couples divorcing",
       "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/datasets/numberofcouplesdivorcing"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/datasets/numberofcouplesdivorcing",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Divorces in England and Wales, 2012",
       "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 4,
   "type": "product_page",
   "title": "Divorce",
@@ -44,17 +56,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Births, deaths and marriages",
       "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+      "index": null
     }
   ]
 }

@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70"
+    "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "92% (49.8 million) of usual residents aged three years and over spoke English (English or Welsh in Wales) as their main language.",
@@ -8,36 +10,48 @@
     "headline3": "In 2011, less than half a per cent (138,000) of all usual residents aged three years and over could not speak English.",
     "title": "2011 Census - Quick Statistics for England and Wales, March 2011",
     "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
-    "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011"
+    "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011",
+    "index": null
   },
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70"
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid70",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid71"
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid71",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid72"
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid72",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid73"
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid73",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Language",
       "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/culturalidentity/language/datasets/language"
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/datasets/language",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "2011 Census - Quick Statistics for England and Wales, March 2011",
       "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011"
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 3,
   "type": "product_page",
   "title": "Language",
@@ -47,17 +61,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Cultural identity",
       "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity"
+      "uri": "/peoplepopulationandcommunity/culturalidentity",
+      "index": null
     }
   ]
 }

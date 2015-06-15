@@ -3,6 +3,9 @@
   "headline2": "Total energy consumption increased by 1.2% in 2012, contrary to the overall declining trend.",
   "headline3": "Greenhouse gas emissions have generally decreased since the mid-1990s, falling from a peak of 822.9 million tonnes of CO2 equivalent (CO2e) in 1991 to 642.0 million tonnes of CO2e in 2011.",
   "relatedBulletins": [],
+  "phone": null,
+  "language": null,
+  "searchKeywords": null,
   "sections": [
     {
       "title": "Key points",
@@ -79,10 +82,16 @@
       "markdown": "###** 1. Context and use of the statistics**\n\nIn the early 1990’s, government research on resource accounting recommended satellite accounting and the Office for National Statistics (ONS) published an article on environmental issues and the National Accounts. ONS then established a small unit supported by an expert advisory panel and published pilot UK environmental accounts. In 1999, ONS published the first regular UK environmental accounts alongside National Accounts in the annual Blue Book. Since then, the accounts have continually developed in line with international best practice.\n\n[Regulation (EU) No 691/2011](http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri\u003dOJ:L:2011:192:0001:0016:EN:PDF \"Regulation (EU) No 691/2011\") on European environmental economic accounts requires Member States to produce data on air emissions, environmental taxes, and economy-wide material flow accounts annually. These were required on an obligatory basis for the first time in 2013 (before this, the UK submitted data on a voluntary basis). European environmental accounts data can be found in Eurostat’s environmental accounts databases.\n\n[Regulation (EU) No 538/2014](http://eur-lex.europa.eu/legal-content/EN/TXT/?uri\u003duriserv:OJ.L_.2014.158.01.0113.01.ENG \"Regulation (EU) No 538/2014\") (amending Regulation (EU) No 691/2011) on European environmental economic accounts adds a further three modules on environmental protection expenditure, the environmental goods and services sector, and physical energy flow accounts. These are currently under development and are required on an obligatory basis in 2017.\n\nEnvironmental accounts are used nationally and internationally, primarily by governments, development organisations and researchers, to inform sustainable development policy, to evaluate the environmental impacts of different sectors of the economy, and to model impacts of fiscal or monetary measures.  \n\nFurther information is available in the [Uses of UK Environmental Accounts (19.6 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/economy/environmental-accounts/uses-of-the-uk-environmental-accounts.pdf \"[Uses of UK Environmental Accounts\") document. \n\n###** 2. Environmental Good and Services Sector**\n\nTo comply with Regulation (EU) No 538/2014 by 2017, work is currently ongoing at ONS to produce estimates on the Environmental Goods and Services Sector (EGSS). The estimates will contain data on turnover, value added, employment and exports of the environmental goods and services sector. These will be published UK Environmental Accounts, 2015.\n\n### **3. Quality and methodology**\n\nInformation on the [quality](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/economy/index.html \"economy\") and [methodology](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/economy/environmental-accounts/index.html \"Environmental Accounts\") of UK Environmental Accounts can be found on the ONS website. These documents are due to be updated during 2014–15. \n\n### **4. Industry classification**\n\nThe industry classification used in UK Environmental Accounts, 2014 is the [Standard Industrial Classification 2007](http://www.ons.gov.uk/ons/guide-method/classifications/current-standard-classifications/standard-industrial-classification/index.html \"UK Standard Industrial Classification 2007 (UK ISC 2007)\"). \n\n### **5. Measuring National Well-being**\n\nThe UK Environmental Accounts are an output of the Measuring National Well-being Programme. The programme aims to produce accepted and trusted measures of the well-being of the nation and how the UK as a whole is doing.\n\nFind out more on the Measuring National Well-being pages on the ONS website. \n\n### **6. Policy** \nDetails of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThe United Kingdom Statistics Authority has designated these statistics as National Statistics, in accordance with the Statistics and Registration Service Act 2007 and signifying compliance with the Code of Practice for Official Statistics.\n\nDesignation can be broadly interpreted to mean that the statistics:\n\n- meet identified user needs;\n- are well explained and readily accessible;\n- are produced according to sound methods; and\n- are managed impartially and objectively in the public interest.\n\nOnce statistics have been designated as National Statistics it is a statutory requirement that the Code of Practice shall continue to be observed."
     }
   ],
+  "data": null,
   "nationalStatistic": false,
   "contact": {
-    "email": "environment.accounts@ons.gsi.gov.uk"
+    "name": null,
+    "email": "environment.accounts@ons.gsi.gov.uk",
+    "organisation": null,
+    "telephone": null
   },
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "bulletin",
   "title": "UK Environmental Accounts, 2014",
   "summary": "Environmental accounts show how the environment contributes to the economy, the impacts that the economy has on the environment, and how society responds to environmental issues. They include natural capital accounts (oil and gas), physical accounts (fuel use, energy consumption, atmospheric emissions, material flows, and water), and monetary accounts (environmental taxes and environmental protection expenditure). For 2014, experimental natural capital accounts (land use and forestry) are also included. Environmental accounts are ‘satellite accounts’ to the main National Accounts and they are compiled in accordance with the System of Environmental Economic Accounting (SEEA), which closely follows the UN System of National Accounts (SNA). This means that they are comparable with economic indicators such as Gross Domestic Product (GDP).",
@@ -91,17 +100,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     },
     {
       "title": "Environmental accounts",
       "summary": "Environmental Accounts show the relationship between the environment and the economy. This is done by outlining how the environment contributes to the economy (e.g. through the extraction of raw materials), the impact the economy has on the environment (e.g. through energy consumption) and how society responds to environmental issues (e.g. through expenditure on environmental protection). These accounts are used to inform government policies and to evaluate the impact that different sectors have on the environment.",
-      "uri": "/economy/environmentalaccounts"
+      "uri": "/economy/environmentalaccounts",
+      "index": null
     }
   ]
 }

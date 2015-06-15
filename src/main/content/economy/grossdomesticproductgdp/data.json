@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/economy/grossdomesticproductgdp/timeseries/abmi"
+    "uri": "/economy/grossdomesticproductgdp/timeseries/abmi",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "Change in gross domestic product (GDP) is the main indicator of economic growth. GDP increased by 0.8% in Q2 2014, the second consecutive quarter on quarter increase of 0.8%.",
@@ -8,92 +10,139 @@
     "headline3": "In Q2 2014 GDP was estimated to be 0.2% above the peak in Q1 2008. From peak to trough in 2009, the economy shrank by 7.2%.",
     "title": "GDP Preliminary Estimate Q3 2014",
     "summary": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK. Data is available split by industrial sector.",
-    "uri": "/economy/grossdomesticproductgdp/bulletins/gdppreliminaryestimateq32014"
+    "uri": "/economy/grossdomesticproductgdp/bulletins/gdppreliminaryestimateq32014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/abmi"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/abmi",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyq"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyq",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyr"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyr",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/ybha"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ybha",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyn"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyn",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyo"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihyo",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kq"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kq",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kx"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kx",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kl"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kl",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/l2n8"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2n8",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/l2nc"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2nc",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/dtwm"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/dtwm",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/cgbz"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/cgbz",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/cgbx"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/cgbx",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/cmvl"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/cmvl",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/abpf"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/abpf",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/abnu"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/abnu",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/nmru"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/nmru",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/npqr"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/npqr",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/ihxt"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihxt",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/grossdomesticproductgdp/timeseries/ihxw"
+      "uri": "/economy/grossdomesticproductgdp/timeseries/ihxw",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
-      "title": "GDP by category of expenditure",
-      "summary": "Brief description of dataset",
-      "uri": "/economy/grossdomesticproductgdp/datasets/gdpbycategoryofexpenditure"
-    },
-    {
       "title": "Gross Domestic Product data collection",
       "summary": "High level overview of the economy",
-      "uri": "/economy/grossdomesticproductgdp/datasets/grossdomesticproductdatacollection"
+      "uri": "/economy/grossdomesticproductgdp/datasets/grossdomesticproductdatacollection",
+      "index": null
+    },
+    {
+      "title": "GDP by category of expenditure",
+      "summary": "Brief description of dataset",
+      "uri": "/economy/grossdomesticproductgdp/datasets/gdpbycategoryofexpenditure",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "GDP Preliminary Estimate Q3 2014",
       "summary": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK. Data is available split by industrial sector.",
-      "uri": "/economy/grossdomesticproductgdp/bulletins/gdppreliminaryestimateq32014"
+      "uri": "/economy/grossdomesticproductgdp/bulletins/gdppreliminaryestimateq32014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 1,
   "type": "product_page",
   "title": "Gross Domestic Product (GDP)",
@@ -103,12 +152,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     }
   ]
 }

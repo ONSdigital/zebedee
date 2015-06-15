@@ -1,4 +1,5 @@
 {
+  "datasetId": null,
   "downloads": [
     {
       "title": "Gross value added",
@@ -53,11 +54,17 @@
         "L3G2",
         "L3GT",
         "L3E2"
-      ]
+      ],
+      "xls": null,
+      "csv": null
     }
   ],
+  "notes": null,
   "description": "Gross value added at chained volume measures basic prices, by category of output (reference year 2010) for production and service industries.",
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "dataset",
   "title": "Gross value added",
   "summary": "By category of output (reference year 2010) for production and service industries",
@@ -66,17 +73,20 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     },
     {
       "title": "Economic output and productivity",
       "summary": "Economic output is the total value of goods and/or services produced in a process. Statistics on economic output include indices on manufacturing, production and services. Productivity is a measure of efficiency. It can be expressed as a ratio of output to input over a given period of time, for example output per person per hour. ",
-      "uri": "/economy/economicoutputandproductivity"
+      "uri": "/economy/economicoutputandproductivity",
+      "index": null
     }
   ]
 }

@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Income and wealth",
   "summary": "Income and wealth are different because while income is a flow of money such as your monthly earnings, wealth is not a flow, it is a stock of assets such as shares in a company or property. Key statistics here are average household income and average household wealth. The average used is the median because this measure is not affected by outliers, i.e. those people who have levels of income or wealth that are very far away from the average. ",
-  "uri": "releases/incomeandwealth"
+  "uri": "releases/incomeandwealth",
+  "breadcrumb": null
 }

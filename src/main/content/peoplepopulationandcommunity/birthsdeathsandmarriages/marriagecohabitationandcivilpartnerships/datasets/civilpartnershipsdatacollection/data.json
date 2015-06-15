@@ -1,12 +1,19 @@
 {
+  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "xls": "http://www.ons.gov.uk/ons/rel/vsob2/civil-partnership-statistics--united-kingdom/2012/rtd-formations.xls"
+      "cdids": null,
+      "xls": "http://www.ons.gov.uk/ons/rel/vsob2/civil-partnership-statistics--united-kingdom/2012/rtd-formations.xls",
+      "csv": null
     }
   ],
+  "notes": null,
   "description": "Comprehensive description of data contained within this dataset.",
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "dataset",
   "title": "Civil partnerships data collection",
   "summary": "Brief description of dataset",
@@ -15,22 +22,26 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Births, deaths and marriages",
       "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+      "index": null
     },
     {
       "title": "Marriage, cohabitation and civil partnerships",
       "summary": "Statistics on how people live together give us a fuller picture of the changing social landscape of the UK. Data on marriages and civil partnerships comes from registrations, but data on cohabitation comes from various different surveys.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships",
+      "index": null
     }
   ]
 }

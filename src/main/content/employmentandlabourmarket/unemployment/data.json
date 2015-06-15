@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx"
+    "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "Comparing the estimates for March to May 2014 with those for December 2013 to February 2014, employment continued to rise and unemployment continued to fall.",
@@ -8,56 +10,79 @@
     "headline3": "The proportion of people aged from 16 to 64 in work (the employment rate) continued to rise, reaching 73.1% for March to May 2014.",
     "title": "UK Labour Market, July 2014",
     "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
-    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+    "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsz"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsz",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsy"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsy",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsc"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsc",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgse"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgse",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsd"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsd",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/bcjd"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/bcjd",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/dpaf"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/dpaf",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment/timeseries/dpae"
+      "uri": "/employmentandlabourmarket/unemployment/timeseries/dpae",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
-      "title": "Unemployment data collection",
-      "summary": "People without a job who have been actively seeking work in the UK",
-      "uri": "/employmentandlabourmarket/unemployment/datasets/unemploymentdatacollection"
-    },
-    {
       "title": "Claimant Count data collection",
       "summary": "Data on the number of people claiming benefits principally for being unemployed",
-      "uri": "/employmentandlabourmarket/unemployment/datasets/claimantcountdatacollection"
+      "uri": "/employmentandlabourmarket/unemployment/datasets/claimantcountdatacollection",
+      "index": null
+    },
+    {
+      "title": "Unemployment data collection",
+      "summary": "People without a job who have been actively seeking work in the UK",
+      "uri": "/employmentandlabourmarket/unemployment/datasets/unemploymentdatacollection",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "UK Labour Market, July 2014",
       "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 1,
   "type": "product_page",
   "title": "Unemployment",
@@ -67,12 +92,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Employment and Labour market",
       "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket"
+      "uri": "/employmentandlabourmarket",
+      "index": null
     }
   ]
 }

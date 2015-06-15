@@ -3,6 +3,9 @@
   "headline2": "In 2012, 10.8 people divorced per thousand married population, a decrease of 19% compared with 13.3 in 2002.",
   "headline3": "The number of divorces in 2012 was highest among men and women aged 40 to 44.",
   "relatedBulletins": [],
+  "phone": null,
+  "language": null,
+  "searchKeywords": null,
   "sections": [
     {
       "title": "Key findings",
@@ -87,10 +90,16 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
+  "data": null,
   "nationalStatistic": false,
   "contact": {
-    "email": "vsob@ons.gsi.gov.uk"
+    "name": null,
+    "email": "vsob@ons.gsi.gov.uk",
+    "organisation": null,
+    "telephone": null
   },
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "bulletin",
   "title": "Divorces in England and Wales, 2012",
   "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
@@ -99,22 +108,26 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     },
     {
       "title": "Births, deaths and marriages",
       "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+      "index": null
     },
     {
       "title": "Divorce",
       "summary": "Statistics on divorces allow us to map changing social attitudes to divorce and give an indication of the number of children growing up with divorced parents. They are available by the age and sex of the divorcees, who divorce was granted to and the areas of the UK divorces are more likely to happen in. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce"
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce",
+      "index": null
     }
   ]
 }

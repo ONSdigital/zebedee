@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/economy/nationalaccounts/timeseries/hbop"
+    "uri": "/economy/nationalaccounts/timeseries/hbop",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "The United Kingdom’s (UK) current account deficit was £18.5 billion in Quarter 1 2014, down from a revised deficit of £23.5 billion in Quarter 4 2013.",
@@ -8,42 +10,58 @@
     "headline3": "The trade deficit narrowed to £5.5 billion in Quarter 1 2014, from £7.1 billion in Quarter 4 2013.",
     "title": "Balance of Payments, Q1 2014",
     "summary": "Contains summary of balance of payments accounts and detailed statistics for the current account including - trade in goods and services, income, current and capital transfers, transactions in UK external assets and liabilities, and levels of identified assets and liabilities.",
-    "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014"
+    "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/economy/nationalaccounts/timeseries/hbop"
+      "uri": "/economy/nationalaccounts/timeseries/hbop",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/nationalaccounts/timeseries/hboj"
+      "uri": "/economy/nationalaccounts/timeseries/hboj",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbi"
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbi",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/nationalaccounts/timeseries/ikbp"
+      "uri": "/economy/nationalaccounts/timeseries/ikbp",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Balance of Payments data collection",
       "summary": "Brief description of dataset",
-      "uri": "/economy/nationalaccounts/datasets/balanceofpaymentsdatacollection"
+      "uri": "/economy/nationalaccounts/datasets/balanceofpaymentsdatacollection",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Balance of Payments, Q1 2014",
       "summary": "Contains summary of balance of payments accounts and detailed statistics for the current account including - trade in goods and services, income, current and capital transfers, transactions in UK external assets and liabilities, and levels of identified assets and liabilities.",
-      "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014"
+      "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 6,
   "type": "product_page",
   "title": "National Accounts",
@@ -53,12 +71,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     }
   ]
 }

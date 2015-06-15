@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Disability",
   "summary": "Statistics here focus on the numbers of people whose daily activities are limited a little, a lot or not at all. Breakdowns of these figures include area of UK and gender. These statistics are important in determining the types of services that are needed across the UK. ",
-  "uri": "releases/disability"
+  "uri": "releases/disability",
+  "breadcrumb": null
 }

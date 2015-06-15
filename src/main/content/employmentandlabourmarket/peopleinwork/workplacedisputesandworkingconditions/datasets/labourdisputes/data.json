@@ -1,4 +1,5 @@
 {
+  "datasetId": null,
   "downloads": [
     {
       "title": "Labour disputes",
@@ -10,11 +11,17 @@
         "F8Y3",
         "F8Y4",
         "BLUT"
-      ]
+      ],
+      "xls": null,
+      "csv": null
     }
   ],
+  "notes": null,
   "description": "Estimates measuring strikes connected with terms and conditions of employment.",
   "nationalStatistic": true,
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "type": "dataset",
   "title": "Labour disputes",
   "summary": "Estimates measuring strikes connected with terms and conditions of employment",
@@ -23,22 +30,26 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Employment and Labour market",
       "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket"
+      "uri": "/employmentandlabourmarket",
+      "index": null
     },
     {
       "title": "People in work",
       "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork"
+      "uri": "/employmentandlabourmarket/peopleinwork",
+      "index": null
     },
     {
       "title": "Workplace disputes and working conditions",
       "summary": "Workplace disputes refer to stoppages of work related to a dispute between employer and employees. These include strikes (lawful and unlawful) and \u0027lock outs\u0027  (an employer barring employees from entering a place of work). Key figures here are the number of days lost to workplace disputes in the public and private sectors and the number of workers involved. ",
-      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions"
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions",
+      "index": null
     }
   ]
 }

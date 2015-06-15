@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/economy/inflationandpriceindices/timeseries/d7g7"
+    "uri": "/economy/inflationandpriceindices/timeseries/d7g7",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "The Consumer Prices Index (CPI) grew by 1.9% in the year to June 2014, up from 1.5% in May.",
@@ -8,64 +10,90 @@
     "headline3": "CPIH grew by 1.8% in the year to June 2014, up from 1.4% in May. RPIJ grew by 2.0%, up from 1.7% in May.",
     "title": "Consumer Price Inflation, June 2014",
     "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
-    "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
+    "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/d7g7"
+      "uri": "/economy/inflationandpriceindices/timeseries/d7g7",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/czbh"
+      "uri": "/economy/inflationandpriceindices/timeseries/czbh",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/l55o"
+      "uri": "/economy/inflationandpriceindices/timeseries/l55o",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/kvr9"
+      "uri": "/economy/inflationandpriceindices/timeseries/kvr9",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/d7bt"
+      "uri": "/economy/inflationandpriceindices/timeseries/d7bt",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/chaw"
+      "uri": "/economy/inflationandpriceindices/timeseries/chaw",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/l522"
+      "uri": "/economy/inflationandpriceindices/timeseries/l522",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/kvr8"
+      "uri": "/economy/inflationandpriceindices/timeseries/kvr8",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/jvz7"
+      "uri": "/economy/inflationandpriceindices/timeseries/jvz7",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/economy/inflationandpriceindices/timeseries/k646"
+      "uri": "/economy/inflationandpriceindices/timeseries/k646",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Inflation data collection",
       "summary": "Measures of inflation data, including CPI, RPI, CPIH and RPIJ",
-      "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection"
+      "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection",
+      "index": null
     },
     {
       "title": "Retail Prices Index",
       "summary": "Complete dataset covering all RPI statistics. Not a National Statistic.",
-      "uri": "/economy/inflationandpriceindices/datasets/retailpricesindex"
+      "uri": "/economy/inflationandpriceindices/datasets/retailpricesindex",
+      "index": null
     },
     {
       "title": "Producer Prices Inflation",
       "summary": "Comprehensive dataset covering input and output index series",
-      "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation"
+      "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Consumer Price Inflation, June 2014",
       "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
-      "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
+      "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 0,
   "type": "product_page",
   "title": "Inflation and price indices",
@@ -75,12 +103,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "Economy",
       "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy"
+      "uri": "/economy",
+      "index": null
     }
   ]
 }

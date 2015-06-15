@@ -1,6 +1,8 @@
 {
   "headline": {
-    "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+    "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat",
+    "index": null,
+    "data": null
   },
   "statsBulletinHeadline": {
     "headline1": "Visits to the UK by overseas residents continue to rise and are up 7% year to date (January to May), with holiday visits up 12% in the same period.",
@@ -8,36 +10,48 @@
     "headline3": "Visits abroad by UK residents are up 5% over the past twelve months and their expenditure has increased 1% in the same period.",
     "title": "Overseas Travel and Tourism, Provisional Results for May 2014",
     "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
-    "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+    "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014",
+    "index": null
   },
   "items": [
     {
-      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmax"
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmax",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmaz"
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmaz",
+      "index": null,
+      "data": null
     },
     {
-      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmbb"
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmbb",
+      "index": null,
+      "data": null
     }
   ],
   "datasets": [
     {
       "title": "Visits and spending to UK",
       "summary": "Visits and Spending by UK residents abroad and overseas residents in the UK",
-      "uri": "/peoplepopulationandcommunity/leisureandtourism/datasets/visitsandspendingtouk"
+      "uri": "/peoplepopulationandcommunity/leisureandtourism/datasets/visitsandspendingtouk",
+      "index": null
     }
   ],
   "statsBulletins": [
     {
       "title": "Overseas Travel and Tourism, Provisional Results for May 2014",
       "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
-      "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+      "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014",
+      "index": null
     }
   ],
+  "relatedArticles": null,
   "index": 8,
   "type": "product_page",
   "title": "Leisure and tourism",
@@ -47,12 +61,14 @@
     {
       "title": "Home",
       "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/"
+      "uri": "/",
+      "index": null
     },
     {
       "title": "People, population and community",
       "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity"
+      "uri": "/peoplepopulationandcommunity",
+      "index": null
     }
   ]
 }

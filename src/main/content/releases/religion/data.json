@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Religion",
   "summary": "Statistics on religion focus on what people state as their religion. The main source of data in this area is the 2011 Census. ",
-  "uri": "releases/religion"
+  "uri": "releases/religion",
+  "breadcrumb": null
 }

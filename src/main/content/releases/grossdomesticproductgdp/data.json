@@ -1,4 +1,7 @@
 {
+  "contact": null,
+  "releaseDate": null,
+  "nextReleaseDate": null,
   "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
@@ -6,5 +9,6 @@
   "type": "release",
   "title": "Gross Domestic Product (GDP)",
   "summary": "Gross domestic product (GDP) is a measure of economic activity which captures the value of goods and services that a country produces during a given period.",
-  "uri": "releases/grossdomesticproductgdp"
+  "uri": "releases/grossdomesticproductgdp",
+  "breadcrumb": null
 }

@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49",
@@ -28,15 +23,15 @@
   ],
   "datasets": [
     {
-      "title": "Life expectancy UK",
-      "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/lifeexpectancyuk",
-      "index": null
-    },
-    {
       "title": "Life expectancy England and Wales",
       "summary": "Brief description of dataset",
       "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/lifeexpectancyenglandandwales",
+      "index": null
+    },
+    {
+      "title": "Life expectancy UK",
+      "summary": "Brief description of dataset",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/lifeexpectancyuk",
       "index": null
     }
   ],

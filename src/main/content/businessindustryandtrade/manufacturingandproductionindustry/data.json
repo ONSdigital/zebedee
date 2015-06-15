@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q",
@@ -28,15 +23,15 @@
   ],
   "datasets": [
     {
-      "title": "Output of the production industries",
-      "summary": "Broad industry groups and main industrial groupings.",
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputoftheproductionindustries",
-      "index": null
-    },
-    {
       "title": "Output by Manufacturing sub-sectors",
       "summary": "Brief description of dataset",
       "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputbymanufacturingsubsectors",
+      "index": null
+    },
+    {
+      "title": "Output of the production industries",
+      "summary": "Broad industry groups and main industrial groupings.",
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputoftheproductionindustries",
       "index": null
     }
   ],

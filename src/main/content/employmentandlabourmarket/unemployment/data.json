@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/employmentandlabourmarket/unemployment/timeseries/mgsx",
@@ -53,15 +48,15 @@
   ],
   "datasets": [
     {
-      "title": "Claimant Count data collection",
-      "summary": "Data on the number of people claiming benefits principally for being unemployed",
-      "uri": "/employmentandlabourmarket/unemployment/datasets/claimantcountdatacollection",
-      "index": null
-    },
-    {
       "title": "Unemployment data collection",
       "summary": "People without a job who have been actively seeking work in the UK",
       "uri": "/employmentandlabourmarket/unemployment/datasets/unemploymentdatacollection",
+      "index": null
+    },
+    {
+      "title": "Claimant Count data collection",
+      "summary": "Data on the number of people claiming benefits principally for being unemployed",
+      "uri": "/employmentandlabourmarket/unemployment/datasets/claimantcountdatacollection",
       "index": null
     }
   ],

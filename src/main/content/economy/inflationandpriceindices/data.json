@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/economy/inflationandpriceindices/timeseries/d7g7",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/economy/inflationandpriceindices/timeseries/d7g7",
@@ -58,12 +53,6 @@
   ],
   "datasets": [
     {
-      "title": "Inflation data collection",
-      "summary": "Measures of inflation data, including CPI, RPI, CPIH and RPIJ",
-      "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection",
-      "index": null
-    },
-    {
       "title": "Retail Prices Index",
       "summary": "Complete dataset covering all RPI statistics. Not a National Statistic.",
       "uri": "/economy/inflationandpriceindices/datasets/retailpricesindex",
@@ -73,6 +62,12 @@
       "title": "Producer Prices Inflation",
       "summary": "Comprehensive dataset covering input and output index series",
       "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation",
+      "index": null
+    },
+    {
+      "title": "Inflation data collection",
+      "summary": "Measures of inflation data, including CPI, RPI, CPIH and RPIJ",
+      "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection",
       "index": null
     }
   ],

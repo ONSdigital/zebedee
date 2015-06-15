@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid121",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid121",
@@ -48,15 +43,15 @@
   ],
   "datasets": [
     {
-      "title": "Population by age and sex",
-      "summary": "Population estimates data by sex and single year of age for countries, regions and smaller geographic breakdowns",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationbyageandsex",
-      "index": null
-    },
-    {
       "title": "Population data collection",
       "summary": "Population estimates data overview by age group for the United Kingdom, England and Wales, and Great Britain",
       "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationdatacollection",
+      "index": null
+    },
+    {
+      "title": "Population by age and sex",
+      "summary": "Population estimates data by sex and single year of age for countries, regions and smaller geographic breakdowns",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationbyageandsex",
       "index": null
     },
     {

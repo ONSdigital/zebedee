@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbaq",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbaq",
@@ -34,15 +29,15 @@
       "index": null
     },
     {
-      "title": "Mergers and Acquisitions abroad by UK companies",
-      "summary": "Brief description of dataset",
-      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/datasets/mergersandacquisitionsabroadbyukcompanies",
-      "index": null
-    },
-    {
       "title": "Disposals abroad by UK companies",
       "summary": "Brief description of dataset",
       "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/datasets/disposalsabroadbyukcompanies",
+      "index": null
+    },
+    {
+      "title": "Mergers and Acquisitions abroad by UK companies",
+      "summary": "Brief description of dataset",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/datasets/mergersandacquisitionsabroadbyukcompanies",
       "index": null
     }
   ],

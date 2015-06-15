@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/economy/grossdomesticproductgdp/timeseries/abmi",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/economy/grossdomesticproductgdp/timeseries/abmi",
@@ -113,15 +108,15 @@
   ],
   "datasets": [
     {
-      "title": "Gross Domestic Product data collection",
-      "summary": "High level overview of the economy",
-      "uri": "/economy/grossdomesticproductgdp/datasets/grossdomesticproductdatacollection",
-      "index": null
-    },
-    {
       "title": "GDP by category of expenditure",
       "summary": "Brief description of dataset",
       "uri": "/economy/grossdomesticproductgdp/datasets/gdpbycategoryofexpenditure",
+      "index": null
+    },
+    {
+      "title": "Gross Domestic Product data collection",
+      "summary": "High level overview of the economy",
+      "uri": "/economy/grossdomesticproductgdp/datasets/grossdomesticproductdatacollection",
       "index": null
     }
   ],

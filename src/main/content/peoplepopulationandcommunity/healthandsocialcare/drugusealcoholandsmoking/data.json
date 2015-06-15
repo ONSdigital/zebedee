@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98",
@@ -23,15 +18,15 @@
   ],
   "datasets": [
     {
-      "title": "Alcohol-related deaths, UK",
-      "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/alcoholrelateddeathsuk",
-      "index": null
-    },
-    {
       "title": "Deaths from drug-related poisoning and drug misuse, by sex",
       "summary": "Brief description of dataset",
       "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/deathsfromdrugrelatedpoisoninganddrugmisusebysex",
+      "index": null
+    },
+    {
+      "title": "Alcohol-related deaths, UK",
+      "summary": "Brief description of dataset",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/alcoholrelateddeathsuk",
       "index": null
     }
   ],

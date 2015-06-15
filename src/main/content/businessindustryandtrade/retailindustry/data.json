@@ -1,9 +1,4 @@
 {
-  "headline": {
-    "uri": "/businessindustryandtrade/retailindustry/timeseries/j5c4",
-    "index": null,
-    "data": null
-  },
   "items": [
     {
       "uri": "/businessindustryandtrade/retailindustry/timeseries/j5c4",
@@ -38,15 +33,15 @@
   ],
   "datasets": [
     {
-      "title": "Value of retail sales by commodity",
-      "summary": "Brief description of dataset",
-      "uri": "/businessindustryandtrade/retailindustry/datasets/valueofretailsalesbycommodity",
-      "index": null
-    },
-    {
       "title": "Retail sales",
       "summary": "Value of retail sales index and percentage change",
       "uri": "/businessindustryandtrade/retailindustry/datasets/retailsales",
+      "index": null
+    },
+    {
+      "title": "Value of retail sales by commodity",
+      "summary": "Brief description of dataset",
+      "uri": "/businessindustryandtrade/retailindustry/datasets/valueofretailsalesbycommodity",
       "index": null
     }
   ],

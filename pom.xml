@@ -12,6 +12,15 @@
     </properties>
 
     <repositories>
+        <!-- Adding maven central repo explicitly to perent jitpack.io resolve artifacts that are already on Github. Otherwise handlebars-java fails -->
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
         <!--Jitpack io allows us include projects and libraries available on github but not built and published to maven central-->
         <!-- It is used for including internal project modules. See more on https://jitpack.io/-->
         <repository>
@@ -58,7 +67,7 @@
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>content-library</artifactId>
-            <version>content-library-1.0.8</version>
+            <version>content-library-1.0.14</version>
         </dependency>
 
         <!-- commons etc. -->

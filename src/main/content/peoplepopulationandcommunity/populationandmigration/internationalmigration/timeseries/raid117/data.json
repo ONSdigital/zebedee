@@ -1,0 +1,199 @@
+{
+  "date": "March 2014",
+  "number": "243000",
+  "years": [],
+  "quarters": [
+    {
+      "date": "YE Jun 04",
+      "value": "194000",
+      "year": "2004",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 04",
+      "value": "268000",
+      "year": "2004",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 05",
+      "value": "320000",
+      "year": "2005",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 05",
+      "value": "267000",
+      "year": "2005",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 06",
+      "value": "234000",
+      "year": "2006",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 06",
+      "value": "265000",
+      "year": "2006",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 07",
+      "value": "287000",
+      "year": "2007",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 07",
+      "value": "273000",
+      "year": "2007",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 08",
+      "value": "267000",
+      "year": "2008",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 08",
+      "value": "229000",
+      "year": "2008",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 09",
+      "value": "205000",
+      "year": "2009",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 09",
+      "value": "229000",
+      "year": "2009",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 10",
+      "value": "244000",
+      "year": "2010",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 10",
+      "value": "256000",
+      "year": "2010",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Jun 11",
+      "value": "263000",
+      "year": "2011",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Dec 11",
+      "value": "205000",
+      "year": "2011",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Mar 12",
+      "value": "184000",
+      "year": "2012",
+      "quarter": "Q1"
+    },
+    {
+      "date": "YE Jun 12",
+      "value": "167000",
+      "year": "2012",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Sep 12",
+      "value": "154000",
+      "year": "2012",
+      "quarter": "Q3"
+    },
+    {
+      "date": "YE Dec 12",
+      "value": "177000",
+      "year": "2012",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Mar 13",
+      "value": "175000",
+      "year": "2013",
+      "quarter": "Q1"
+    },
+    {
+      "date": "YE Jun 13",
+      "value": "183000",
+      "year": "2013",
+      "quarter": "Q2"
+    },
+    {
+      "date": "YE Sep 13",
+      "value": "212000",
+      "year": "2013",
+      "quarter": "Q3"
+    },
+    {
+      "date": "YE Dec 13",
+      "value": "212000",
+      "year": "2013",
+      "quarter": "Q4"
+    },
+    {
+      "date": "YE Mar 14",
+      "value": "243000",
+      "year": "2014",
+      "quarter": "Q1"
+    }
+  ],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID117",
+  "unit": "",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [
+    "YE Mar 13 onwards provisional"
+  ],
+  "relatedDocuments": [
+    {
+      "title": "Migration Statistics Quarterly Report, May 2014",
+      "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "Net long-term migration to the UK",
+  "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/timeseries/raid117",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Population and migration",
+      "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
+      "uri": "/peoplepopulationandcommunity/populationandmigration"
+    },
+    {
+      "title": "International migration",
+      "summary": "International migration statistics provide estimates of the number of people moving in and out of the UK. Data on long term migration, short term migration, and visitor data provide a picture of those entering and leaving the UK, covering all lengths of stay. ",
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration"
+    }
+  ]
+}

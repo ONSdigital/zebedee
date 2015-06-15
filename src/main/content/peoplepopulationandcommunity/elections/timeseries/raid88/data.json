@@ -1,0 +1,41 @@
+{
+  "date": "2013",
+  "number": "47.69",
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID88",
+  "unit": "m",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "Electoral Statistics for UK, 2013",
+      "summary": "Analysis of the annual counts of the number of people registered to vote in 2013, including comparisons over time and between the UK constituent countries.",
+      "uri": "/peoplepopulationandcommunity/elections/bulletins/electoralstatisticsforuk2013"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "European/local government electors",
+  "uri": "/peoplepopulationandcommunity/elections/timeseries/raid88",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Elections",
+      "summary": "The key statistic in this section is the number of people who are listed on electoral registers. This differs from the number of people who are eligible to vote. These statistics are available for the constituent countries of the UK. ",
+      "uri": "/peoplepopulationandcommunity/elections"
+    }
+  ]
+}

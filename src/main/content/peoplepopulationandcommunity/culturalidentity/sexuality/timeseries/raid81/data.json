@@ -1,0 +1,53 @@
+{
+  "date": "2011/12",
+  "number": "1.5",
+  "additionalText": "Experimental statistics",
+  "years": [
+    {
+      "date": "2011/12",
+      "value": "1.5",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID81",
+  "unit": "%",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "Integrated Household Survey April 2011 to March 2012- Experimental Statistics",
+      "summary": "Findings on health, smoking, sexual identity and other social topics compiled from the UK Integrated Household Survey (IHS) between April 2011 to March 2012.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics"
+    }
+  ],
+  "nationalStatistic": false,
+  "type": "timeseries",
+  "title": "Adults identifying themselves as Gay, Lesbian or Bisexual",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid81",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Cultural identity",
+      "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
+    },
+    {
+      "title": "Sexuality",
+      "summary": "Statistics on sexuality are obtained from large surveys which ask people to state their sexuality. Time series data on sexual identities is also available.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality"
+    }
+  ]
+}

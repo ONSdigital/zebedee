@@ -1,0 +1,82 @@
+{
+  "sections": [
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+      "index": 0
+    },
+    {
+      "title": "Population and migration",
+      "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
+      "uri": "/peoplepopulationandcommunity/populationandmigration",
+      "index": 1
+    },
+    {
+      "title": "Health and social care",
+      "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
+      "index": 2
+    },
+    {
+      "title": "Cultural identity",
+      "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity",
+      "index": 3
+    },
+    {
+      "title": "Crime and justice",
+      "summary": "Statistics on the number and types of crimes committed as well as the key characteristics of victims, are collected from crimes recorded by the police and the Crime Survey for England and Wales (CSEW). This survey is important as it covers crimes that may have not been reported or recorded by the police. Statistics on the outcomes of crime in terms of what happened to the criminal can also be found here. ",
+      "uri": "/peoplepopulationandcommunity/crimeandjustice",
+      "index": 4
+    },
+    {
+      "title": "Housing",
+      "summary": "Housing statistics focus mainly on data about house prices. These are often used as an informal indicator of the confidence people feel in the UK economy as well as being useful and of interest to the general public. Here you can find the latest figures on the level and growth of house prices across the UK. The data here is collected from a sample of mortgage completions and therefore does not include houses sold to cash buyers. ",
+      "uri": "/peoplepopulationandcommunity/housing",
+      "index": 5
+    },
+    {
+      "title": "Personal and household finances",
+      "summary": "Statistics on personal and household finances help us build a picture of how people in the UK are funding their lifestyles. Key statistics here are on household and personal debt, expenditure, income and wealth.",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
+      "index": 6
+    },
+    {
+      "title": "Well-being",
+      "summary": "Measuring National Well-being is about looking at measures of the UK as a whole that go beyond what we produce, which is measured by Gross Domestic Product (GDP). This section includes a wide range of headline indicators in areas such as health, relationships, education and skills, what we do, where we live, our finances, the economy, governance, the environment and measures of \u0027personal well-being\u0027 (individuals\u0027 assessment of their own well-being). This data comes from a variety of sources and much of the analysis is new.",
+      "uri": "/peoplepopulationandcommunity/wellbeing",
+      "index": 7
+    },
+    {
+      "title": "Leisure and tourism",
+      "summary": "Statistics on leisure and tourism look at figures relating to the number of visits and visitors to the UK as well as the reason visitors give for visiting and the amount of money they spent when they were here. Also here are figures on the number of UK residents travelling abroad with the reason they gave for travelling and the amount of money they spent when away. These are useful for a variety of businesses involved in the tourism industry and statistics on UK residents travelling abroad are an informal indicator of living standards.",
+      "uri": "/peoplepopulationandcommunity/leisureandtourism",
+      "index": 8
+    },
+    {
+      "title": "Home internet and social media usage",
+      "summary": "Statistics on usage of the internet and social media are useful for the government, businesses and other groups to make decisions on how best to communicate with  different groups of people. Here you can find statistics on the number of people who have used the internet, who use the internet frequently and who have never used the internet. Most of these statistics can be broken down by age and gender.",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage",
+      "index": 9
+    },
+    {
+      "title": "Elections",
+      "summary": "The key statistic in this section is the number of people who are listed on electoral registers. This differs from the number of people who are eligible to vote. These statistics are available for the constituent countries of the UK. ",
+      "uri": "/peoplepopulationandcommunity/elections",
+      "index": 10
+    }
+  ],
+  "index": 3,
+  "type": "taxonomy_landing_page",
+  "title": "People, population and community",
+  "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+  "uri": "/peoplepopulationandcommunity",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    }
+  ]
+}

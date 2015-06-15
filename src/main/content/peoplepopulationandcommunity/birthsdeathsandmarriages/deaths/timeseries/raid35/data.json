@@ -1,0 +1,46 @@
+{
+  "date": "2012",
+  "number": "466779",
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID35",
+  "unit": "",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "Deaths Registered in England and Wales, 2013",
+      "summary": "Annual data on death registrations. Contains death rates, cause of death data by sex and age and death registrations by area of residence and single year of age.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/deathsregisteredinenglandandwales2013"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "England deaths",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/timeseries/raid35",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+    },
+    {
+      "title": "Deaths",
+      "summary": "ONS receives data on deaths from the deaths register. This means only data on registered deaths is available. This data is available by age, sex, area of the UK and cause of death. Some of the datasets here are available as long run time series. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths"
+    }
+  ]
+}

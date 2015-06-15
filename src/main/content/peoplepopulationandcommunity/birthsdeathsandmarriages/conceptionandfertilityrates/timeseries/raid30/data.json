@@ -1,0 +1,51 @@
+{
+  "date": "2012",
+  "number": "5.6",
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID30",
+  "unit": "per 1000",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "Cohort Fertility, 2012",
+      "summary": "Fertility on year of birth of mother rather than the year of birth of child. Includes average number of live-born children and the proportion of women remaining childless by year of birth.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/cohortfertility2012"
+    },
+    {
+      "title": "Conceptions in England and Wales, 2012",
+      "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "Under 18 conception rate",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid30",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+    },
+    {
+      "title": "Conception and fertility rates",
+      "summary": "Conception statistics bring together records of birth registrations and abortion notifications. Fertility analysis adds value to information published on births by reporting statistics on those with no children and fertility among women born inside and outside the UK. Fertility projections are also used in the population projections. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates"
+    }
+  ]
+}

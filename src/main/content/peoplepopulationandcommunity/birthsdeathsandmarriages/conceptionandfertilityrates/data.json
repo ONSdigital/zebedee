@@ -1,0 +1,71 @@
+{
+  "headline": {
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid28"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "The under 18 conception rate for 2012 is the lowest since 1969 at 27.9 conceptions per thousand women aged 15-17.",
+    "headline2": "The estimated number of conceptions to women aged under 18 fell to 27,834 in 2012 compared with 31,051 in 2011, a decrease of 10%.",
+    "headline3": "The estimated number of conceptions to women aged under 16 was 5,432 in 2012, compared with 5,991 in 2011 (a fall of 9.3%).",
+    "title": "Conceptions in England and Wales, 2012",
+    "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012"
+  },
+  "items": [
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid28"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid29"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid30"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid31"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid32"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Teenage conceptions",
+      "summary": "Brief description of dataset",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/datasets/teenageconceptions"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Cohort Fertility, 2012",
+      "summary": "Fertility on year of birth of mother rather than the year of birth of child. Includes average number of live-born children and the proportion of women remaining childless by year of birth.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/cohortfertility2012"
+    },
+    {
+      "title": "Conceptions in England and Wales, 2012",
+      "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012"
+    }
+  ],
+  "index": 7,
+  "type": "product_page",
+  "title": "Conception and fertility rates",
+  "summary": "Conception statistics bring together records of birth registrations and abortion notifications. Fertility analysis adds value to information published on births by reporting statistics on those with no children and fertility among women born inside and outside the UK. Fertility projections are also used in the population projections. ",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+    }
+  ]
+}

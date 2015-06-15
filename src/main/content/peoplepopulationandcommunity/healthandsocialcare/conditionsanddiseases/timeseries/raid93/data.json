@@ -1,0 +1,46 @@
+{
+  "date": "2012",
+  "number": "1646",
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID93",
+  "unit": "",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "Cancer Statistics Registrations, England (Series MB1), No. 43, 2012",
+      "summary": "The number of diagnoses and incidence rates of all types of cancer by age and sex, and by region of residence in England.",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "Deaths Involving Clostridium difficile",
+  "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/timeseries/raid93",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Health and social care",
+      "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
+    },
+    {
+      "title": "Conditions and diseases",
+      "summary": "We publish statistics on many different health conditions and diseases collected from health bodies across the UK. However, key statistics in this area are on newly diagnosed cancers and deaths related to diseases mainly caught when a person is already in hospital, e.g. MRSA and Clostridium difficile.",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases"
+    }
+  ]
+}

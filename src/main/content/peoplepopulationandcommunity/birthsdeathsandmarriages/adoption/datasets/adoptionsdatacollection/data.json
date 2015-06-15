@@ -1,0 +1,36 @@
+{
+  "downloads": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/vsob1/adoptions-in-england-and-wales/2012/rtd-adoptions-tables--2012.xls"
+    }
+  ],
+  "description": "Data on adoptions are derived from the Adopted Children Register and are based on adoption orders made in England and Wales. The data here relates to those cases notified by the courts to the Registrar General and entered onto the Adopted Children Register in a given year.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "Adoptions data collection",
+  "summary": "Adoptions in the Adopted Children Register: sex, and whether the adopted child born within/outside marriage",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/datasets/adoptionsdatacollection",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+    },
+    {
+      "title": "Adoption",
+      "summary": "Adoption statistics are available from adoption registrations. They are used to inform local and central governments about trends in adoptions and a long run time series is available to make comparisons and observations about the impact of various different government policies. These statistics are available by the age and gender of the children being adopted as well as by whether or not the adopted children were born inside marriage.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption"
+    }
+  ]
+}

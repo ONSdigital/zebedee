@@ -1,0 +1,70 @@
+{
+  "sections": [
+    {
+      "title": "Inflation and price indices",
+      "summary": "Inflation measures the rate of increase in prices for goods and services using price indices. The rate of inflation used in the UK government’s inflation target is measured using the Consumer Prices Index (CPI). One way to understand the CPI is to think of a very large shopping basket containing a large selection of the goods and services bought by households, the CPI estimates changes to the total cost of this basket.",
+      "uri": "/economy/inflationandpriceindices",
+      "index": 0
+    },
+    {
+      "title": "Gross Domestic Product (GDP)",
+      "summary": "Gross domestic product (GDP) is a measure of economic activity which captures the value of goods and services that a country produces during a given period.",
+      "uri": "/economy/grossdomesticproductgdp",
+      "index": 1
+    },
+    {
+      "title": "Government, public sector and taxes",
+      "summary": "This section covers the latest figures on what the UK public sector has spent, raised in revenue and invested. The headline statistic here is Public Sector Net Borrowing, which is a measure of the amount of money the Government has had to borrow in order to bridge the gap between its revenue and expenditure. ",
+      "uri": "/economy/governmentpublicsectorandtaxes",
+      "index": 2
+    },
+    {
+      "title": "Economic output and productivity",
+      "summary": "Economic output is the total value of goods and/or services produced in a process. Statistics on economic output include indices on manufacturing, production and services. Productivity is a measure of efficiency. It can be expressed as a ratio of output to input over a given period of time, for example output per person per hour. ",
+      "uri": "/economy/economicoutputandproductivity",
+      "index": 3
+    },
+    {
+      "title": "Regional accounts",
+      "summary": "Regional Accounts are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts.  These accounts allow comparisons between regions and comparisons of a region against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income. ",
+      "uri": "/economy/regionalaccounts",
+      "index": 4
+    },
+    {
+      "title": "Gross Value Added (GVA)",
+      "summary": "Gross Value Added (GVA) measures the contribution to the economy of each individual producer, industry or sector. In the UK it is used in the estimation of Gross Domestic Product (GDP).",
+      "uri": "/economy/grossvalueaddedgva",
+      "index": 5
+    },
+    {
+      "title": "National Accounts",
+      "summary": "The National Accounts consistently estimate economic activity and the purpose of them has always been to provide data to inform policy. The ONS collects data from many sources such as businesses, manufacturers and service providers so that it can produce statistics on things such as GDP and indices of services, manufacturing and production.",
+      "uri": "/economy/nationalaccounts",
+      "index": 6
+    },
+    {
+      "title": "Environmental accounts",
+      "summary": "Environmental Accounts show the relationship between the environment and the economy. This is done by outlining how the environment contributes to the economy (e.g. through the extraction of raw materials), the impact the economy has on the environment (e.g. through energy consumption) and how society responds to environmental issues (e.g. through expenditure on environmental protection). These accounts are used to inform government policies and to evaluate the impact that different sectors have on the environment.",
+      "uri": "/economy/environmentalaccounts",
+      "index": 7
+    },
+    {
+      "title": "Investments, pensions and trusts",
+      "summary": "Investment refers to the flow of money around and across countries for the purpose of making profit. A pension is a fixed sum to be paid regularly to a person, typically following retirement and a trust is a legal arrangement where one or more \u0027trustees\u0027 are made legally responsible for holding assets. Statistics here include net flows of investment into the UK, figures on the number of people who hold pensions of different types and investments made by various types of trusts.",
+      "uri": "/economy/investmentspensionsandtrusts",
+      "index": 8
+    }
+  ],
+  "index": 1,
+  "type": "taxonomy_landing_page",
+  "title": "Economy",
+  "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+  "uri": "/economy",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    }
+  ]
+}

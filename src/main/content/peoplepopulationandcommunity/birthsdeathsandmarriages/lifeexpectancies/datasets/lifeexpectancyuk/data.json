@@ -1,0 +1,36 @@
+{
+  "downloads": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/subnational-health4/life-expec-at-birth-age-65/2006-08-to-2010-12/rft-table-1.xls"
+    }
+  ],
+  "description": "Comprehensive description of data contained within this dataset.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "Life expectancy UK",
+  "summary": "Brief description of dataset",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/lifeexpectancyuk",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+    },
+    {
+      "title": "Life expectancies",
+      "summary": "Life expectancy statistics use population estimates with statistics on the number of deaths to derive an estimate of how long, on average, people of various ages can expect to live.  These statistics are used by central and local governments to make planning and resource allocation decisions and are of general interest to the public. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies"
+    }
+  ]
+}

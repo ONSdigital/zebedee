@@ -1,0 +1,61 @@
+{
+  "headline": {
+    "uri": "/economy/grossdomesticproductgdp/timeseries/l2kq"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "UK gross domestic product (GDP) in volume terms was estimated to have increased by 0.8% between Q4 2013 and Q1 2014.",
+    "headline2": "GDP is estimated to have increased by 1.7% in 2013, compared with 2012, unrevised from the estimate published on 22 May 2014.",
+    "headline3": "Between Q1 2013 and Q1 2014, GDP in volume terms increased by 3.0%, revised down 0.1 percentage points from the previously published estimate.",
+    "title": "Quarterly National Accounts, Q1 2014",
+    "summary": "Estimates of the key components of GDP from the output, income and expenditure approaches. Gross Domestic Product measures the chained volume index movements of the UK. The services sector accounts for more than three quarters of total gross domestic product. Figures are adjusted for seasonal variations unless otherwise stated and the reference year is 2010\u003d100.",
+    "uri": "/economy/economicoutputandproductivity/bulletins/quarterlynationalaccountsq12014"
+  },
+  "items": [
+    {
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kq"
+    },
+    {
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kx"
+    },
+    {
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2kl"
+    },
+    {
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2n8"
+    },
+    {
+      "uri": "/economy/grossdomesticproductgdp/timeseries/l2nc"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Gross value added",
+      "summary": "By category of output (reference year 2010) for production and service industries",
+      "uri": "/economy/economicoutputandproductivity/datasets/grossvalueadded"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Quarterly National Accounts, Q1 2014",
+      "summary": "Estimates of the key components of GDP from the output, income and expenditure approaches. Gross Domestic Product measures the chained volume index movements of the UK. The services sector accounts for more than three quarters of total gross domestic product. Figures are adjusted for seasonal variations unless otherwise stated and the reference year is 2010\u003d100.",
+      "uri": "/economy/economicoutputandproductivity/bulletins/quarterlynationalaccountsq12014"
+    }
+  ],
+  "index": 3,
+  "type": "product_page",
+  "title": "Economic output and productivity",
+  "summary": "Economic output is the total value of goods and/or services produced in a process. Statistics on economic output include indices on manufacturing, production and services. Productivity is a measure of efficiency. It can be expressed as a ratio of output to input over a given period of time, for example output per person per hour. ",
+  "uri": "/economy/economicoutputandproductivity",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    }
+  ]
+}

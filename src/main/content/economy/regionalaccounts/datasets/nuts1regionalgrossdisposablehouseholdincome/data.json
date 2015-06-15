@@ -1,0 +1,31 @@
+{
+  "downloads": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/regional-accounts/regional-household-income/spring-2014/rft-nuts1.xls"
+    }
+  ],
+  "description": "Comprehensive description of data contained within this dataset.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "NUTS1 Regional Gross Disposable Household Income",
+  "summary": "Brief description of dataset",
+  "uri": "/economy/regionalaccounts/datasets/nuts1regionalgrossdisposablehouseholdincome",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    },
+    {
+      "title": "Regional accounts",
+      "summary": "Regional Accounts are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts.  These accounts allow comparisons between regions and comparisons of a region against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income. ",
+      "uri": "/economy/regionalaccounts"
+    }
+  ]
+}

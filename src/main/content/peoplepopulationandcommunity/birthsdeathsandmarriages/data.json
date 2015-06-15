@@ -1,0 +1,87 @@
+{
+  "sections": [
+    {
+      "title": "Live births",
+      "summary": "Statistics on live births are a subset of numbers from the data that the ONS obtains from the births and deaths registrations. They are available by sex, month of the year and region of the UK. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths",
+      "index": 0
+    },
+    {
+      "title": "Deaths",
+      "summary": "ONS receives data on deaths from the deaths register. This means only data on registered deaths is available. This data is available by age, sex, area of the UK and cause of death. Some of the datasets here are available as long run time series. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths",
+      "index": 1
+    },
+    {
+      "title": "Marriage, cohabitation and civil partnerships",
+      "summary": "Statistics on how people live together give us a fuller picture of the changing social landscape of the UK. Data on marriages and civil partnerships comes from registrations, but data on cohabitation comes from various different surveys.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships",
+      "index": 2
+    },
+    {
+      "title": "Life expectancies",
+      "summary": "Life expectancy statistics use population estimates with statistics on the number of deaths to derive an estimate of how long, on average, people of various ages can expect to live.  These statistics are used by central and local governments to make planning and resource allocation decisions and are of general interest to the public. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies",
+      "index": 3
+    },
+    {
+      "title": "Divorce",
+      "summary": "Statistics on divorces allow us to map changing social attitudes to divorce and give an indication of the number of children growing up with divorced parents. They are available by the age and sex of the divorcees, who divorce was granted to and the areas of the UK divorces are more likely to happen in. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce",
+      "index": 4
+    },
+    {
+      "title": "Adoption",
+      "summary": "Adoption statistics are available from adoption registrations. They are used to inform local and central governments about trends in adoptions and a long run time series is available to make comparisons and observations about the impact of various different government policies. These statistics are available by the age and gender of the children being adopted as well as by whether or not the adopted children were born inside marriage.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption",
+      "index": 5
+    },
+    {
+      "title": "Ageing",
+      "summary": "Ageing analysis builds on life expectancy and population estimates, summarising the latest analysis of official statistics on population ageing and the lives of older people. They also provide ageing indicators such as median age and sex ratios at older ages at the national and local level.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing",
+      "index": 6
+    },
+    {
+      "title": "Conception and fertility rates",
+      "summary": "Conception statistics bring together records of birth registrations and abortion notifications. Fertility analysis adds value to information published on births by reporting statistics on those with no children and fertility among women born inside and outside the UK. Fertility projections are also used in the population projections. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates",
+      "index": 7
+    },
+    {
+      "title": "Families",
+      "summary": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families",
+      "index": 8
+    },
+    {
+      "title": "Maternities",
+      "summary": "A maternity is a pregnancy resulting in the birth of one or more children, including stillbirths. Multiple births arising from a single pregnancy are counted as one maternity, therefore the number of maternities indicates the number of women having babies rather than the number of babies born. Here you can find the latest figures on the number of maternities in England and Wales. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/maternities",
+      "index": 9
+    },
+    {
+      "title": "Stillbirths",
+      "summary": "Statistics on stillbirths are obtained from birth registrations. Stillbirth data is available by the age of the parents, the time of year, the area of usual residence for the mother and hospital of occurrence (where applicable). ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/stillbirths",
+      "index": 10
+    }
+  ],
+  "index": 0,
+  "type": "taxonomy_landing_page",
+  "title": "Births, deaths and marriages",
+  "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    }
+  ]
+}

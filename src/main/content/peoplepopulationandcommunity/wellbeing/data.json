@@ -1,0 +1,58 @@
+{
+  "headline": {
+    "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid131"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "Personal well-being improved in the UK between 2011/12 and 2012/13.",
+    "headline2": "Ratings for life satisfaction and feeling that the things we do in life are worthwhile increased on average, whilst anxiety levels fell.",
+    "headline3": "Among the countries of the UK, Northern Ireland had the highest average ratings for life satisfaction, worthwhile and happiness in 2012/13.",
+    "title": "Personal Well-being Across the UK, 2012-2013",
+    "summary": "This bulletin presents experimental statistics from the second Personal Well-being Annual Population dataset, April 2012 to March 2013.  Overall estimates of personal well-being are provided for each country of the United Kingdom, as well as for lower level geographies in England, Scotland and Wales.",
+    "uri": "/peoplepopulationandcommunity/wellbeing/bulletins/personalwellbeingacrosstheuk20122013"
+  },
+  "items": [
+    {
+      "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid131"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid132"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid133"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/wellbeing/timeseries/raid134"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Personal well-being",
+      "summary": "Comparison over time of estimates of personal well-being",
+      "uri": "/peoplepopulationandcommunity/wellbeing/datasets/personalwellbeing"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Personal Well-being Across the UK, 2012-2013",
+      "summary": "This bulletin presents experimental statistics from the second Personal Well-being Annual Population dataset, April 2012 to March 2013.  Overall estimates of personal well-being are provided for each country of the United Kingdom, as well as for lower level geographies in England, Scotland and Wales.",
+      "uri": "/peoplepopulationandcommunity/wellbeing/bulletins/personalwellbeingacrosstheuk20122013"
+    }
+  ],
+  "index": 7,
+  "type": "product_page",
+  "title": "Well-being",
+  "summary": "Measuring National Well-being is about looking at measures of the UK as a whole that go beyond what we produce, which is measured by Gross Domestic Product (GDP). This section includes a wide range of headline indicators in areas such as health, relationships, education and skills, what we do, where we live, our finances, the economy, governance, the environment and measures of \u0027personal well-being\u0027 (individuals\u0027 assessment of their own well-being). This data comes from a variety of sources and much of the analysis is new.",
+  "uri": "/peoplepopulationandcommunity/wellbeing",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    }
+  ]
+}

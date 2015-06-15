@@ -4,6 +4,7 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Content;
@@ -74,7 +75,7 @@ public class Root implements Startup {
                 zebedee = Zebedee.create(root);
 
                 // Initialise content folders from bundle
-                Path taxonomy = Paths.get(".").resolve("target/taxonomy");
+                Path taxonomy = Paths.get(".").resolve(Configuration.getContentDirectory());
                 List<Path> content = listContent(taxonomy);
                 copyContent(content, taxonomy);
             } catch (IOException | UnauthorizedException e) {

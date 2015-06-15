@@ -1,0 +1,39 @@
+{
+  "sections": [
+    {
+      "title": "Debt",
+      "summary": "Debt statistics found here focus on debt levels for people and households. These statistics come from the Wealth and Assets Survey (WAS). They tell us about financial debt, which includes credit and store cards that are not settled each month, overdrafts and all forms of fixed term loans. They also tell us about property debt, which is defined as the liabilities held against a household\u0027s main residence (mainly mortgages). Also available is data on how people feel about their level of debt.  ",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt",
+      "index": 0
+    },
+    {
+      "title": "Expenditure",
+      "summary": "Household expenditure data can be broken down into twelve key headline areas, ranging from housing, fuel and power to clothing and footwear and alcoholic drinks, tobacco and narcotics. This data comes from the Living Costs and Food survey (LCF) which asks a sample of households to keep a diary of their costs over a period of time. This data gives us a headline figure of average weekly household spending.",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure",
+      "index": 1
+    },
+    {
+      "title": "Income and wealth",
+      "summary": "Income and wealth are different because while income is a flow of money such as your monthly earnings, wealth is not a flow, it is a stock of assets such as shares in a company or property. Key statistics here are average household income and average household wealth. The average used is the median because this measure is not affected by outliers, i.e. those people who have levels of income or wealth that are very far away from the average. ",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth",
+      "index": 2
+    }
+  ],
+  "index": 6,
+  "type": "taxonomy_landing_page",
+  "title": "Personal and household finances",
+  "summary": "Statistics on personal and household finances help us build a picture of how people in the UK are funding their lifestyles. Key statistics here are on household and personal debt, expenditure, income and wealth.",
+  "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "sections": [
+    {
+      "title": "Public sector finance",
+      "summary": "These statistics are a compilation of figures on the main aspects of the UK’s public sector finances. These give an indication of the current state of the country’s financial position. They are published jointly by the Office for National Statistics (ONS) and HM Treasury. ",
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance",
+      "index": 0
+    },
+    {
+      "title": "Research and Development expenditure",
+      "summary": "Expenditure on Research and Development (R\u0026D) is defined here as expenditure on “creative work undertaken on a systematic basis in order to increase the stock of knowledge”. The statistics here are based on estimates of R\u0026D performed in and funded by the following four sectors of the economy: Business Enterprise, Higher Education, Government and Private Non-Profit organisations. ",
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure",
+      "index": 1
+    }
+  ],
+  "index": 2,
+  "type": "taxonomy_landing_page",
+  "title": "Government, public sector and taxes",
+  "summary": "This section covers the latest figures on what the UK public sector has spent, raised in revenue and invested. The headline statistic here is Public Sector Net Borrowing, which is a measure of the amount of money the Government has had to borrow in order to bridge the gap between its revenue and expenditure. ",
+  "uri": "/economy/governmentpublicsectorandtaxes",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    }
+  ]
+}

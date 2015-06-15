@@ -1,0 +1,10 @@
+{
+  "nationalStatistics": false,
+  "articles": [],
+  "bulletins": [],
+  "datasets": [],
+  "type": "release",
+  "title": "Employment and employee types",
+  "summary": "Those in employment are classed as those working for pay or those working for no pay in a family business. Employment rates for those aged 16 and over and those aged 16 to 64 are calculated from the Labour Force Survey (LFS). Other figures found here are for men and women in employment (also from the LFS) and vacancies (from the Vacancies survey).",
+  "uri": "releases/employmentandemployeetypes"
+}

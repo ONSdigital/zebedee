@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 public class Configuration {
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
+    private static final String CONTENT_DIRECTORY = "target/content";
 
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
@@ -24,5 +25,9 @@ public class Configuration {
      */
     static String getValue(String key) {
         return StringUtils.defaultIfBlank(System.getProperty(key), System.getenv(key));
+    }
+
+    public static String getContentDirectory() {
+        return CONTENT_DIRECTORY;
     }
 }

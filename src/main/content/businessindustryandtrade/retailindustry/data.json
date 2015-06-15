@@ -1,0 +1,69 @@
+{
+  "headline": {
+    "uri": "/businessindustryandtrade/retailindustry/timeseries/j5c4"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "In June 2014, the quantity bought in the retail industry increased by 3.6% compared with June 2013 and by 0.1% compared with May 2014.",
+    "headline2": "In June 2014, all retail sectors showed estimated increases in the quantity bought year-on-year. The last time this was seen was in March 2012.",
+    "headline3": "The three-month on previous three-month movement in the quantity bought showed continued growth for the sixteenth consecutive period increasing by 1.6%.",
+    "title": "Retail Sales, June 2014",
+    "summary": "A first estimate of retail sales in value and volume terms, seasonally and non-seasonally adjusted.",
+    "uri": "/businessindustryandtrade/retailindustry/bulletins/retailsalesjune2014"
+  },
+  "items": [
+    {
+      "uri": "/businessindustryandtrade/retailindustry/timeseries/j5c4"
+    },
+    {
+      "uri": "/businessindustryandtrade/retailindustry/timeseries/j468"
+    },
+    {
+      "uri": "/businessindustryandtrade/retailindustry/timeseries/j5ek"
+    },
+    {
+      "uri": "/businessindustryandtrade/retailindustry/timeseries/j467"
+    },
+    {
+      "uri": "/businessindustryandtrade/retailindustry/timeseries/j5bs"
+    },
+    {
+      "uri": "/businessindustryandtrade/retailindustry/timeseries/j5eb"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Value of retail sales by commodity",
+      "summary": "Brief description of dataset",
+      "uri": "/businessindustryandtrade/retailindustry/datasets/valueofretailsalesbycommodity"
+    },
+    {
+      "title": "Retail sales",
+      "summary": "Value of retail sales index and percentage change",
+      "uri": "/businessindustryandtrade/retailindustry/datasets/retailsales"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Retail Sales, June 2014",
+      "summary": "A first estimate of retail sales in value and volume terms, seasonally and non-seasonally adjusted.",
+      "uri": "/businessindustryandtrade/retailindustry/bulletins/retailsalesjune2014"
+    }
+  ],
+  "index": 0,
+  "type": "product_page",
+  "title": "Retail industry",
+  "summary": "Businesses in the retail industry are those which sell directly to the customer. The key statistic for the retail industry is the retail sales index (RSI). This is published on a monthly basis and the data comes from a survey sent out to retail business in Great Britain. The data in the RSI only covers spending on goods, data on spending on services can be found in the Index of Services. ",
+  "uri": "/businessindustryandtrade/retailindustry",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Business, industry and trade",
+      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
+      "uri": "/businessindustryandtrade"
+    }
+  ]
+}

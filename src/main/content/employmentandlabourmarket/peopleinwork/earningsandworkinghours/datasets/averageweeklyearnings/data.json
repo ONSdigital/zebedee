@@ -1,0 +1,91 @@
+{
+  "downloads": [
+    {
+      "title": "Average Weekly Earnings",
+      "cdids": [
+        "KAB9",
+        "KAC2",
+        "KAC3",
+        "KAC4",
+        "KAC5",
+        "KAC6",
+        "KAC7",
+        "KAC8",
+        "KAC9",
+        "K5BZ",
+        "K5C2",
+        "K5C3",
+        "K5C4",
+        "K5C5",
+        "K5C6",
+        "KAD8",
+        "KAD9",
+        "KAE2",
+        "KAF4",
+        "KAF5",
+        "KAF6",
+        "KAF7",
+        "KAF8",
+        "KAF9",
+        "KAG2",
+        "KAG3",
+        "KAG4",
+        "K5CS",
+        "K5CT",
+        "K5CU",
+        "K5CV",
+        "K5CW",
+        "K5CX",
+        "KAH3",
+        "KAH4",
+        "KAH5",
+        "K5DL",
+        "K5DM",
+        "K5DN",
+        "K5DO",
+        "K5DP",
+        "K5DQ",
+        "KAK6",
+        "KAK7",
+        "KAK8",
+        "KAI7",
+        "KAI8",
+        "KAI9",
+        "KAJ2",
+        "KAJ3",
+        "KAJ4",
+        "KAJ5",
+        "KAJ6",
+        "KAJ7"
+      ]
+    }
+  ],
+  "description": "Average Weekly Earnings including total, bonus and regular pay.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "Average Weekly Earnings",
+  "summary": "Covering total pay, bonus pay and regular pay",
+  "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearnings",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Employment and Labour market",
+      "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
+      "uri": "/employmentandlabourmarket"
+    },
+    {
+      "title": "People in work",
+      "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
+      "uri": "/employmentandlabourmarket/peopleinwork"
+    },
+    {
+      "title": "Earnings and working hours",
+      "summary": "Earnings are the reward for work and they can be paid on a regular basis or as bonus pay. Total pay combines both regular and bonus pay. The Office for National Statistics reports the level and growth rate of average weekly total, regular and bonus pay. Working hours are given as the average weekly hours worked by full-time and part-time workers.",
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours"
+    }
+  ]
+}

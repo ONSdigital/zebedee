@@ -1,0 +1,45 @@
+{
+  "sections": [
+    {
+      "title": "Ethnicity",
+      "summary": "Ethnicity statistics found here focus on the number and proportion of people who state that they identify with a particular ethnic group. Time series data on these figures are also available and these allow us to get a picture of the changing population of the UK.  ",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity",
+      "index": 0
+    },
+    {
+      "title": "Sexuality",
+      "summary": "Statistics on sexuality are obtained from large surveys which ask people to state their sexuality. Time series data on sexual identities is also available.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality",
+      "index": 1
+    },
+    {
+      "title": "Religion",
+      "summary": "Statistics on religion focus on what people state as their religion. The main source of data in this area is the 2011 Census. ",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion",
+      "index": 2
+    },
+    {
+      "title": "Language",
+      "summary": "Statistics on language focus on the languages spoken across the UK. The key statistics here are the number and percentage of the population who speak English as their main language which can be viewed as a time series and for different areas across the UK. Statistics on welsh speakers can also be found here.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language",
+      "index": 3
+    }
+  ],
+  "index": 3,
+  "type": "taxonomy_landing_page",
+  "title": "Cultural identity",
+  "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
+  "uri": "/peoplepopulationandcommunity/culturalidentity",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    }
+  ]
+}

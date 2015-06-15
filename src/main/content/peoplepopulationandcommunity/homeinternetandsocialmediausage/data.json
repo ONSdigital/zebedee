@@ -1,0 +1,52 @@
+{
+  "headline": {
+    "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid101"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "44.6 million adults (87%) in the UK had used the Internet in Q1 2014, an increase of 1.1 million since Q1 2013.",
+    "headline2": "6.4 million adults (13%) had never used the Internet, falling by 659,000 since Q1 2013.",
+    "headline3": "Almost all (99%) 16 to 24 year olds had used the Internet, compared with 37% of adults aged 75 years and over.",
+    "title": "Internet Access Quarterly Update, Q1 2014",
+    "summary": "Estimates of adult Internet users and non-users in the UK, by age, sex, disability, region, gross weekly pay, ethnicity and when adults last used the Internet.",
+    "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014"
+  },
+  "items": [
+    {
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid101"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/timeseries/raid102"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Internet users and non-users, UK",
+      "summary": "Brief description of dataset",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/datasets/internetusersandnonusersuk"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Internet Access Quarterly Update, Q1 2014",
+      "summary": "Estimates of adult Internet users and non-users in the UK, by age, sex, disability, region, gross weekly pay, ethnicity and when adults last used the Internet.",
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdateq12014"
+    }
+  ],
+  "index": 9,
+  "type": "product_page",
+  "title": "Home internet and social media usage",
+  "summary": "Statistics on usage of the internet and social media are useful for the government, businesses and other groups to make decisions on how best to communicate with  different groups of people. Here you can find statistics on the number of people who have used the internet, who use the internet frequently and who have never used the internet. Most of these statistics can be broken down by age and gender.",
+  "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    }
+  ]
+}

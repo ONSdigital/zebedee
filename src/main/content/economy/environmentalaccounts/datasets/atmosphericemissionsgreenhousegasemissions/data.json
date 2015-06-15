@@ -1,0 +1,32 @@
+{
+  "downloads": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/environmental/uk-environmental-accounts/2014/rft-ghg-emissions.xls",
+      "csv": "#"
+    }
+  ],
+  "description": "Emissions of carbon dioxide, methane, nitrous oxide, hydro-fluorocarbons, perfluorocarbons, sulphur hexaflouride, and total greenhouse gas emissions.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "Atmospheric Emissions: Greenhouse Gas Emissions",
+  "summary": "By Economic Sector and Gas, United Kingdom",
+  "uri": "/economy/environmentalaccounts/datasets/atmosphericemissionsgreenhousegasemissions",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    },
+    {
+      "title": "Environmental accounts",
+      "summary": "Environmental Accounts show the relationship between the environment and the economy. This is done by outlining how the environment contributes to the economy (e.g. through the extraction of raw materials), the impact the economy has on the environment (e.g. through energy consumption) and how society responds to environmental issues (e.g. through expenditure on environmental protection). These accounts are used to inform government policies and to evaluate the impact that different sectors have on the environment.",
+      "uri": "/economy/environmentalaccounts"
+    }
+  ]
+}

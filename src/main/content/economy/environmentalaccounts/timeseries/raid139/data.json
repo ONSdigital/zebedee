@@ -1,0 +1,41 @@
+{
+  "date": "2012",
+  "number": "656.3",
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID139",
+  "unit": "m tonnes",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "UK Environmental Accounts, 2014",
+      "summary": "Environmental accounts show how the environment contributes to the economy, the impacts that the economy has on the environment, and how society responds to environmental issues. They include natural capital accounts (oil and gas), physical accounts (fuel use, energy consumption, atmospheric emissions, material flows, and water), and monetary accounts (environmental taxes and environmental protection expenditure). For 2014, experimental natural capital accounts (land use and forestry) are also included. Environmental accounts are ‘satellite accounts’ to the main National Accounts and they are compiled in accordance with the System of Environmental Economic Accounting (SEEA), which closely follows the UN System of National Accounts (SNA). This means that they are comparable with economic indicators such as Gross Domestic Product (GDP).",
+      "uri": "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts2014"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "Greenhouse gas emissions (CO2 equivalent)",
+  "uri": "/economy/environmentalaccounts/timeseries/raid139",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    },
+    {
+      "title": "Environmental accounts",
+      "summary": "Environmental Accounts show the relationship between the environment and the economy. This is done by outlining how the environment contributes to the economy (e.g. through the extraction of raw materials), the impact the economy has on the environment (e.g. through energy consumption) and how society responds to environmental issues (e.g. through expenditure on environmental protection). These accounts are used to inform government policies and to evaluate the impact that different sectors have on the environment.",
+      "uri": "/economy/environmentalaccounts"
+    }
+  ]
+}

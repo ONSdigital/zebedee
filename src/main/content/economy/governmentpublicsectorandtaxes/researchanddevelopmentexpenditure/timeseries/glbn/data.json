@@ -1,0 +1,241 @@
+{
+  "date": "2012",
+  "number": "515",
+  "years": [
+    {
+      "date": "1981",
+      "value": "170",
+      "year": "1981",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1982",
+      "value": "0",
+      "year": "1982",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1983",
+      "value": "194",
+      "year": "1983",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1984",
+      "value": "0",
+      "year": "1984",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1985",
+      "value": "210",
+      "year": "1985",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1986",
+      "value": "172",
+      "year": "1986",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1987",
+      "value": "162",
+      "year": "1987",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1988",
+      "value": "179",
+      "year": "1988",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1989",
+      "value": "197",
+      "year": "1989",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1990",
+      "value": "235",
+      "year": "1990",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1991",
+      "value": "220",
+      "year": "1991",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1992",
+      "value": "223",
+      "year": "1992",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1993",
+      "value": "232",
+      "year": "1993",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1994",
+      "value": "168",
+      "year": "1994",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1995",
+      "value": "177",
+      "year": "1995",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1996",
+      "value": "230",
+      "year": "1996",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1997",
+      "value": "245",
+      "year": "1997",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1998",
+      "value": "268",
+      "year": "1998",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "1999",
+      "value": "266",
+      "year": "1999",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2000",
+      "value": "296",
+      "year": "2000",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2001",
+      "value": "325",
+      "year": "2001",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2002",
+      "value": "374",
+      "year": "2002",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2003",
+      "value": "369",
+      "year": "2003",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2004",
+      "value": "406",
+      "year": "2004",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2005",
+      "value": "502",
+      "year": "2005",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2006",
+      "value": "513",
+      "year": "2006",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2007",
+      "value": "546",
+      "year": "2007",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2008",
+      "value": "595",
+      "year": "2008",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2009",
+      "value": "666",
+      "year": "2009",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2010",
+      "value": "652",
+      "year": "2010",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2011",
+      "value": "496",
+      "year": "2011",
+      "sourceDataset": "GERD"
+    },
+    {
+      "date": "2012",
+      "value": "515",
+      "year": "2012",
+      "sourceDataset": "GERD"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [
+    "GERD"
+  ],
+  "cdid": "GLBN",
+  "unit": "bn",
+  "preUnit": "£",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "UK Gross Domestic Expenditure on Research and Development, 2012",
+      "summary": "This release provides estimates of R\u0026D performed in and funded by the following four sectors of the economy, as defined in the ‘Frascati Manual’: Business Enterprise (BERD), Higher Education (HERD), Government (GovERD), which includes Research Councils, and Private Non-Profit (PNP) organisations. All these sectors’ R\u0026D data are known collectively as GERD, which represents the gross domestic expenditure on R\u0026D in the UK. GERD is unique in providing this information, and is the preferred measure of R\u0026D activity for use in international comparisons. This release reports on R\u0026D expenditure in the UK irrespective of the residence of the ultimate owner or users of the R\u0026D produced. The main purpose of collecting R\u0026D data from all sectors of the economy is to supply data for policy and monitoring purposes on science and technology, of which R\u0026D is an important part.",
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/bulletins/ukgrossdomesticexpenditureonresearchanddevelopment2012"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "Private non-Profit expenditure on research and development",
+  "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure/timeseries/glbn",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    },
+    {
+      "title": "Government, public sector and taxes",
+      "summary": "This section covers the latest figures on what the UK public sector has spent, raised in revenue and invested. The headline statistic here is Public Sector Net Borrowing, which is a measure of the amount of money the Government has had to borrow in order to bridge the gap between its revenue and expenditure. ",
+      "uri": "/economy/governmentpublicsectorandtaxes"
+    },
+    {
+      "title": "Research and Development expenditure",
+      "summary": "Expenditure on Research and Development (R\u0026D) is defined here as expenditure on “creative work undertaken on a systematic basis in order to increase the stock of knowledge”. The statistics here are based on estimates of R\u0026D performed in and funded by the following four sectors of the economy: Business Enterprise, Higher Education, Government and Private Non-Profit organisations. ",
+      "uri": "/economy/governmentpublicsectorandtaxes/researchanddevelopmentexpenditure"
+    }
+  ]
+}

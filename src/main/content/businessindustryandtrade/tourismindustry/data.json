@@ -1,0 +1,58 @@
+{
+  "headline": {
+    "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "Visits to the UK by overseas residents continue to rise and are up 7% year to date (January to May), with holiday visits up 12% in the same period.",
+    "headline2": "Over the last twelve months, estimates of earnings from overseas residents to the UK continue to rise and are up 8%.",
+    "headline3": "Visits abroad by UK residents are up 5% over the past twelve months and their expenditure has increased 1% in the same period.",
+    "title": "Overseas Travel and Tourism, Provisional Results for May 2014",
+    "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
+    "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+  },
+  "items": [
+    {
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+    },
+    {
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmax"
+    },
+    {
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmaz"
+    },
+    {
+      "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmbb"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Overseas travel and tourism",
+      "summary": "Visits and Spending by UK residents abroad and overseas residents in the UK",
+      "uri": "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Overseas Travel and Tourism, Provisional Results for May 2014",
+      "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
+      "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+    }
+  ],
+  "index": 7,
+  "type": "product_page",
+  "title": "Tourism industry",
+  "summary": "The tourism industries cover the following areas: accommodation services, food and beverage services, passenger transport services, vehicle hire, travel agencies and cultural, sports, recreational \u0026 conference services. Key figures here are employment levels and output of the tourism industries, the number of visitors to the UK and the amount visitors from different countries spend on average. ",
+  "uri": "/businessindustryandtrade/tourismindustry",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Business, industry and trade",
+      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
+      "uri": "/businessindustryandtrade"
+    }
+  ]
+}

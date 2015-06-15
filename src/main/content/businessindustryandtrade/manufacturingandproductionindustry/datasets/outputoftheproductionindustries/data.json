@@ -1,0 +1,43 @@
+{
+  "downloads": [
+    {
+      "title": "Output of the production industries",
+      "cdids": [
+        "K222",
+        "K224",
+        "K22A",
+        "K248",
+        "K24C",
+        "K226",
+        "K24Q",
+        "K24R",
+        "K24S",
+        "K24O",
+        "K24T"
+      ]
+    }
+  ],
+  "description": "Output of the Production Industries by, broad industry groups and main industrial groupings.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "Output of the production industries",
+  "summary": "Broad industry groups and main industrial groupings.",
+  "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputoftheproductionindustries",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Business, industry and trade",
+      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
+      "uri": "/businessindustryandtrade"
+    },
+    {
+      "title": "Manufacturing and production industry",
+      "summary": "A range of industries come under the heading \u0027production\u0027, the manufacturing industry is the biggest, but also included are the mining \u0026 quarrying, energy supply and water supply \u0026 waste management industries. These production industries make up around 14.6% of the UK\u0027s total output. The statistics here are widely used in the private and public sector, particularly by the Bank of England, Her Majesty’s Treasury and the Office for Budget Responsibility, to assist and inform policy and decision making.",
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry"
+    }
+  ]
+}

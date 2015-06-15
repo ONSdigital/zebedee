@@ -1,0 +1,47 @@
+{
+  "date": "2011",
+  "number": "8",
+  "keyNote": "English or Welsh in Wales",
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID72",
+  "unit": "%",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "2011 Census - Quick Statistics for England and Wales, March 2011",
+      "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "English not main language",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/language/timeseries/raid72",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Cultural identity",
+      "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
+    },
+    {
+      "title": "Language",
+      "summary": "Statistics on language focus on the languages spoken across the UK. The key statistics here are the number and percentage of the population who speak English as their main language which can be viewed as a time series and for different areas across the UK. Statistics on welsh speakers can also be found here.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language"
+    }
+  ]
+}

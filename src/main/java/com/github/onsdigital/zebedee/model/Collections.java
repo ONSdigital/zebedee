@@ -1,8 +1,12 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.content.page.base.Page;
+import com.github.onsdigital.content.service.ContentNotFoundException;
+import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.DataPublisher;
+import com.github.onsdigital.zebedee.data.DataReader;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -22,10 +26,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Collections {
 
@@ -117,12 +124,12 @@ public class Collections {
      * Publish the files
      *
      * @param collection the collection to publish
-     * @param session a session with editor priviledges
+     * @param session    a session with editor priviledges
      * @return
      * @throws IOException
      * @throws UnauthorizedException
      * @throws BadRequestException
-     * @throws ConflictException - If there
+     * @throws ConflictException     - If there
      */
     public boolean publish(Collection collection, Session session)
             throws IOException, UnauthorizedException, BadRequestException,
@@ -233,7 +240,7 @@ public class Collections {
         collection.delete();
     }
 
-    public void readContent(Collection collection, String uri, Session session,
+    public void readContent(Collection collection, String uri, boolean resolveReferences, Session session,
                             HttpServletResponse response) throws IOException,
             UnauthorizedException, BadRequestException, NotFoundException {
 
@@ -273,11 +280,27 @@ public class Collections {
             response.setContentType(contentType);
         }
 
-        // Write the file to the response
         try (InputStream input = Files.newInputStream(path)) {
-            org.apache.commons.io.IOUtils.copy(input,
-                    response.getOutputStream());
+            if (resolveReferences) {
+                Page page = ContentUtil.deserialisePage(input);
+                page.loadReferences(new DataReader());
+                // Write the file to the response
+                org.apache.commons.io.IOUtils.copy(new StringReader(page.toJson()),
+                        response.getOutputStream());
+            } else {
+                // Write the file to the response
+                org.apache.commons.io.IOUtils.copy(input,
+                        response.getOutputStream());
+            }
+        } catch (ContentNotFoundException e) {
+            //TODO: Exception management
+            e.printStackTrace();
+            Map<String, String> errorMessage = new HashMap<String, String>();
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            errorMessage.put("message", "Data you are looking for is not available");
+            errorMessage.put("status", String.valueOf(HttpServletResponse.SC_NOT_FOUND));
         }
+
     }
 
     public void writeContent(Collection collection, String uri,

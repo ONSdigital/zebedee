@@ -1,0 +1,41 @@
+{
+  "date": "May 2014",
+  "number": "166054",
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID106",
+  "unit": "",
+  "preUnit": "£",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "House Price Index, May 2014",
+      "summary": "Mix-adjusted average house prices and house price indices for the UK and its component countries and regions.",
+      "uri": "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "Wales average house price",
+  "uri": "/peoplepopulationandcommunity/housing/timeseries/raid106",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Housing",
+      "summary": "Housing statistics focus mainly on data about house prices. These are often used as an informal indicator of the confidence people feel in the UK economy as well as being useful and of interest to the general public. Here you can find the latest figures on the level and growth of house prices across the UK. The data here is collected from a sample of mortgage completions and therefore does not include houses sold to cash buyers. ",
+      "uri": "/peoplepopulationandcommunity/housing"
+    }
+  ]
+}

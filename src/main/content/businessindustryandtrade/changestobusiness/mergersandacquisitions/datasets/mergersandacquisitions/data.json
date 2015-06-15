@@ -1,0 +1,45 @@
+{
+  "downloads": [
+    {
+      "title": "Mergers and Acquisitions",
+      "cdids": [
+        "CBAQ",
+        "CBBI",
+        "CBAS",
+        "CBBT",
+        "CBAU",
+        "CBCQ",
+        "CBAW",
+        "CBDB"
+      ]
+    }
+  ],
+  "description": "Estimates on the values and numbers of mergers, acquisitions and disposals involving UK companies with values of £1.0 million or greater.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "Mergers and Acquisitions",
+  "summary": "Cross-Border Mergers, Acquisitions and Disposals",
+  "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/datasets/mergersandacquisitions",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Business, industry and trade",
+      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
+      "uri": "/businessindustryandtrade"
+    },
+    {
+      "title": "Changes to business",
+      "summary": "Statistics here include a range of figures that provide a picture of how businesses in the UK are growing, surviving and changing over time. These figures are an informal indicator of the confidence in the UK economy. ",
+      "uri": "/businessindustryandtrade/changestobusiness"
+    },
+    {
+      "title": "Mergers and acquisitions",
+      "summary": "These statistics tell us about the changing picture of businesses operating in the UK. A merger occurs when two companies or organisations of a similar size agree to join together in order to operate as one single company under a new name. An acquisition is a transaction which involves one company purchasing the shares of a second company which is usually of a smaller size. Other statistics here are on \u0027disposals\u0027, which refers to a company or organisation selling or liquidating an asset or subsidiary. ",
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions"
+    }
+  ]
+}

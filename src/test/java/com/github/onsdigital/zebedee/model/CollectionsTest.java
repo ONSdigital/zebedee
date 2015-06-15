@@ -187,7 +187,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read content
-        zebedee.collections.readContent(collection, uri, session, response);
+        zebedee.collections.readContent(collection, uri, false ,session, response);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -323,7 +323,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read content
-        zebedee.collections.readContent(collection, uri, session, response);
+        zebedee.collections.readContent(collection, uri, false , session, response);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -385,7 +385,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read content
-        zebedee.collections.readContent(collection, uri, session, response);
+        zebedee.collections.readContent(collection, uri, false , session, response);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -668,7 +668,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read the file
-        zebedee.collections.readContent(collection, uri, session, response);
+        zebedee.collections.readContent(collection, uri, false, session, response);
 
         // Then
         // We should get the expected exception
@@ -689,7 +689,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read the file
-        zebedee.collections.readContent(collection, uri, session, response);
+        zebedee.collections.readContent(collection, uri, false, session, response);
 
         // Then
         // We should get the expected exception
@@ -710,7 +710,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read the file
-        zebedee.collections.readContent(collection, uri, session, response);
+        zebedee.collections.readContent(collection, uri, false, session, response);
 
         // Then
         // Check the expected interactions

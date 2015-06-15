@@ -1,0 +1,147 @@
+{
+  "date": "2010-2012",
+  "number": "82.72",
+  "years": [
+    {
+      "date": "1991-1993",
+      "value": "78.86",
+      "year": "1993"
+    },
+    {
+      "date": "1992-1994",
+      "value": "79.09",
+      "year": "1994"
+    },
+    {
+      "date": "1993-1995",
+      "value": "79.17",
+      "year": "1995"
+    },
+    {
+      "date": "1994-1996",
+      "value": "79.38",
+      "year": "1996"
+    },
+    {
+      "date": "1995-1997",
+      "value": "79.44",
+      "year": "1997"
+    },
+    {
+      "date": "1996-1998",
+      "value": "79.6",
+      "year": "1998"
+    },
+    {
+      "date": "1997-1999",
+      "value": "79.72",
+      "year": "1999"
+    },
+    {
+      "date": "1998-2000",
+      "value": "79.94",
+      "year": "2000"
+    },
+    {
+      "date": "1999-2001",
+      "value": "80.16",
+      "year": "2001"
+    },
+    {
+      "date": "2000-2002",
+      "value": "80.41",
+      "year": "2002"
+    },
+    {
+      "date": "2001-2003",
+      "value": "80.47",
+      "year": "2003"
+    },
+    {
+      "date": "2002-2004",
+      "value": "80.65",
+      "year": "2004"
+    },
+    {
+      "date": "2003-2005",
+      "value": "80.88",
+      "year": "2005"
+    },
+    {
+      "date": "2004-2006",
+      "value": "81.27",
+      "year": "2006"
+    },
+    {
+      "date": "2005-2007",
+      "value": "81.51",
+      "year": "2007"
+    },
+    {
+      "date": "2006-2008",
+      "value": "81.71",
+      "year": "2008"
+    },
+    {
+      "date": "2007-2009",
+      "value": "81.97",
+      "year": "2009"
+    },
+    {
+      "date": "2008-2010",
+      "value": "82.22",
+      "year": "2010"
+    },
+    {
+      "date": "2009-2011",
+      "value": "82.6",
+      "year": "2011"
+    },
+    {
+      "date": "2010-2012",
+      "value": "82.72",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID49",
+  "unit": "years",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "Life Expectancy at Birth and at Age 65 by Local Areas in the United Kingdom, 2006-08 to 2010-12",
+      "summary": "2010-12 male and female period life expectancy at birth and at age 65 for the UK and local areas within the four constituent countries.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/lifeexpectancyatbirthandatage65bylocalareasintheunitedkingdom200608to201012"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "Female life expectancy at birth",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+    },
+    {
+      "title": "Life expectancies",
+      "summary": "Life expectancy statistics use population estimates with statistics on the number of deaths to derive an estimate of how long, on average, people of various ages can expect to live.  These statistics are used by central and local governments to make planning and resource allocation decisions and are of general interest to the public. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies"
+    }
+  ]
+}

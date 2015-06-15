@@ -1,0 +1,72 @@
+{
+  "headline": {
+    "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid74"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "The resident population of England and Wales on 27 March 2011 was 56.1 million, a 7% increase since 2001.",
+    "headline2": "Most residents of England and Wales belonged to the White ethnic group (86%, 48.2 million) in 2011.",
+    "headline3": "12% (2.0 million) of households with at least two people had partners or household members of different ethnic groups in 2011.",
+    "title": "2011 Census Key Statistics for England and Wales, March 2011",
+    "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
+    "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
+  },
+  "items": [
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid74"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid75"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid76"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid77"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid78"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid79"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid80"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Religion",
+      "summary": "Brief description of dataset",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/datasets/religion"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "2011 Census Key Statistics for England and Wales, March 2011",
+      "summary": "This bulletin, 2011 Census Key Statistics for England and Wales examines the defining characteristics of the population, who we are, how we live and what we do. The 2001 Census statistics covered are unique because the census is the only information source that measures these characteristics together across the whole population.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
+    }
+  ],
+  "index": 2,
+  "type": "product_page",
+  "title": "Religion",
+  "summary": "Statistics on religion focus on what people state as their religion. The main source of data in this area is the 2011 Census. ",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/religion",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Cultural identity",
+      "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
+    }
+  ]
+}

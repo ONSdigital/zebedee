@@ -1,0 +1,64 @@
+{
+  "headline": {
+    "uri": "/economy/nationalaccounts/timeseries/hbop"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "The United Kingdom’s (UK) current account deficit was £18.5 billion in Quarter 1 2014, down from a revised deficit of £23.5 billion in Quarter 4 2013.",
+    "headline2": "The narrowing of the current account deficit was due to all three components improving.",
+    "headline3": "The trade deficit narrowed to £5.5 billion in Quarter 1 2014, from £7.1 billion in Quarter 4 2013.",
+    "title": "Balance of Payments, Q1 2014",
+    "summary": "Contains summary of balance of payments accounts and detailed statistics for the current account including - trade in goods and services, income, current and capital transfers, transactions in UK external assets and liabilities, and levels of identified assets and liabilities.",
+    "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014"
+  },
+  "items": [
+    {
+      "uri": "/economy/nationalaccounts/timeseries/hbop"
+    },
+    {
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbj"
+    },
+    {
+      "uri": "/economy/nationalaccounts/timeseries/hboj"
+    },
+    {
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbh"
+    },
+    {
+      "uri": "/businessindustryandtrade/internationaltrade/timeseries/ikbi"
+    },
+    {
+      "uri": "/economy/nationalaccounts/timeseries/ikbp"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Balance of Payments data collection",
+      "summary": "Brief description of dataset",
+      "uri": "/economy/nationalaccounts/datasets/balanceofpaymentsdatacollection"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Balance of Payments, Q1 2014",
+      "summary": "Contains summary of balance of payments accounts and detailed statistics for the current account including - trade in goods and services, income, current and capital transfers, transactions in UK external assets and liabilities, and levels of identified assets and liabilities.",
+      "uri": "/economy/nationalaccounts/bulletins/balanceofpaymentsq12014"
+    }
+  ],
+  "index": 6,
+  "type": "product_page",
+  "title": "National Accounts",
+  "summary": "The National Accounts consistently estimate economic activity and the purpose of them has always been to provide data to inform policy. The ONS collects data from many sources such as businesses, manufacturers and service providers so that it can produce statistics on things such as GDP and indices of services, manufacturing and production.",
+  "uri": "/economy/nationalaccounts",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    }
+  ]
+}

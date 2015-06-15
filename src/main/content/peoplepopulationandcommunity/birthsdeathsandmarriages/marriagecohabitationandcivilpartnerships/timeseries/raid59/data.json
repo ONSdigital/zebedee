@@ -1,0 +1,51 @@
+{
+  "date": "2012",
+  "number": "9.3",
+  "years": [],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID59",
+  "unit": "%",
+  "preUnit": "",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [
+    {
+      "title": "Civil Partnerships in the UK, 2012",
+      "summary": "Annual statistics on civil partnerships that were formed in the United Kingdom (UK) in 2012, as well as those which were dissolved. Civil partnership statistics are analysed by sex, age, previous marital status and area of occurrence. Figures on formations for Northern Ireland and the UK are provisional and all dissolution data are provisional.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/civilpartnershipsintheuk2012"
+    },
+    {
+      "title": "Marriages in England and Wales (Provisional), 2012",
+      "summary": "Annual data on marriages in England and Wales. Marriages abroad not included. Non-residents are included. Derived as part of civil registration.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/marriagesinenglandandwalesprovisional2012"
+    }
+  ],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "General Marriage Rate",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/timeseries/raid59",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+    },
+    {
+      "title": "Marriage, cohabitation and civil partnerships",
+      "summary": "Statistics on how people live together give us a fuller picture of the changing social landscape of the UK. Data on marriages and civil partnerships comes from registrations, but data on cohabitation comes from various different surveys.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships"
+    }
+  ]
+}

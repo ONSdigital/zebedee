@@ -1,0 +1,72 @@
+{
+  "headline": {
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid42"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "In 2013 there were 18.2 million families in the UK.",
+    "headline2": "Of these, 12.3 million consisted of a married couple with or without children.",
+    "headline3": "The number of opposite sex cohabiting couple families has increased significantly, from 2.2 million in 2003 to 2.9 million in 2013.",
+    "title": "Families and Households, 2013",
+    "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
+    "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013"
+  },
+  "items": [
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid42"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid43"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid44"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid45"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid46"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid47"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid48"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Families by family type",
+      "summary": "Brief description of dataset",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesbyfamilytype"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Families and Households, 2013",
+      "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013"
+    }
+  ],
+  "index": 8,
+  "type": "product_page",
+  "title": "Families",
+  "summary": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
+  "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Births, deaths and marriages",
+      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "date": "2012",
+  "number": "677.8",
+  "years": [
+    {
+      "date": "2010",
+      "value": "664",
+      "year": "2010"
+    },
+    {
+      "date": "2011",
+      "value": "677.3",
+      "year": "2011"
+    },
+    {
+      "date": "2012",
+      "value": "677.8",
+      "year": "2012"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [],
+  "cdid": "RAID114",
+  "unit": "per week",
+  "preUnit": "£",
+  "source": "Office for National Statistics",
+  "notes": [],
+  "relatedDocuments": [],
+  "nationalStatistic": true,
+  "type": "timeseries",
+  "title": "Average total housing expenditure",
+  "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure/timeseries/raid114",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Personal and household finances",
+      "summary": "Statistics on personal and household finances help us build a picture of how people in the UK are funding their lifestyles. Key statistics here are on household and personal debt, expenditure, income and wealth.",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances"
+    },
+    {
+      "title": "Expenditure",
+      "summary": "Household expenditure data can be broken down into twelve key headline areas, ranging from housing, fuel and power to clothing and footwear and alcoholic drinks, tobacco and narcotics. This data comes from the Living Costs and Food survey (LCF) which asks a sample of households to keep a diary of their costs over a period of time. This data gives us a headline figure of average weekly household spending.",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/expenditure"
+    }
+  ]
+}

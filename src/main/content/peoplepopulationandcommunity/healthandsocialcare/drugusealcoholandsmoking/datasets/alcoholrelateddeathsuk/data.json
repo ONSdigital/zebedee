@@ -1,0 +1,36 @@
+{
+  "downloads": [
+    {
+      "title": "Latest",
+      "xls": "http://www.ons.gov.uk/ons/rel/subnational-health4/alcohol-related-deaths-in-the-united-kingdom/2012/rft-table-1.xls"
+    }
+  ],
+  "description": "Comprehensive description of data contained within this dataset.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "Alcohol-related deaths, UK",
+  "summary": "Brief description of dataset",
+  "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/alcoholrelateddeathsuk",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "People, population and community",
+      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "title": "Health and social care",
+      "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
+    },
+    {
+      "title": "Drug use, alcohol and smoking",
+      "summary": "Statistics on drug use, alcohol and smoking focus on deaths and illnesses related to these areas. Deaths related to drugs can be through drug poisoning or drug misuse. It is important to know whether deaths related to these areas are rising or falling overall or rising for some groups and falling for others as this information is key when making decisions on allocating resources and creating policies aimed at reducing these illnesses and deaths.",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking"
+    }
+  ]
+}

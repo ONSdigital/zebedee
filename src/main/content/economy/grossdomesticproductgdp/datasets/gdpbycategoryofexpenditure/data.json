@@ -1,0 +1,83 @@
+{
+  "downloads": [
+    {
+      "title": "GDP by category of expenditure",
+      "cdids": [
+        "ABJR",
+        "ABME",
+        "ABMG",
+        "ABMI",
+        "ABMQ",
+        "ABNU",
+        "ABPF",
+        "KG7F",
+        "KGW2",
+        "KGX6",
+        "KH23",
+        "KH2F",
+        "BKVT",
+        "CAFU",
+        "DMUM",
+        "GIXS",
+        "HAYO",
+        "IHYP",
+        "IHYQ",
+        "IHYR",
+        "IKBK",
+        "IKBL",
+        "KG7Q",
+        "KG7T",
+        "KGW6",
+        "KGW7",
+        "KGY2",
+        "KGY3",
+        "KGZ5",
+        "KGZ6",
+        "KGZ7",
+        "KH27",
+        "KH28",
+        "KH2J",
+        "KH2K",
+        "KH2R",
+        "KH2V",
+        "KH2W",
+        "KH3K",
+        "KH3O",
+        "KH3P",
+        "KTMZ",
+        "KTNB",
+        "NMRU",
+        "NMRY",
+        "NPJP",
+        "NPJR",
+        "NPQR",
+        "NPQT",
+        "YBIK",
+        "YBIM"
+      ]
+    }
+  ],
+  "description": "Comprehensive description of data contained within this dataset.",
+  "nationalStatistic": true,
+  "type": "dataset",
+  "title": "GDP by category of expenditure",
+  "summary": "Brief description of dataset",
+  "uri": "/economy/grossdomesticproductgdp/datasets/gdpbycategoryofexpenditure",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    },
+    {
+      "title": "Gross Domestic Product (GDP)",
+      "summary": "Gross domestic product (GDP) is a measure of economic activity which captures the value of goods and services that a country produces during a given period.",
+      "uri": "/economy/grossdomesticproductgdp"
+    }
+  ]
+}

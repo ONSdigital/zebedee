@@ -1,0 +1,86 @@
+{
+  "headline": {
+    "uri": "/economy/inflationandpriceindices/timeseries/d7g7"
+  },
+  "statsBulletinHeadline": {
+    "headline1": "The Consumer Prices Index (CPI) grew by 1.9% in the year to June 2014, up from 1.5% in May.",
+    "headline2": "The largest contributions to the rise in the rate came from the clothing, food \u0026 non-alcoholic drinks and air transport sectors.",
+    "headline3": "CPIH grew by 1.8% in the year to June 2014, up from 1.4% in May. RPIJ grew by 2.0%, up from 1.7% in May.",
+    "title": "Consumer Price Inflation, June 2014",
+    "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
+    "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
+  },
+  "items": [
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/d7g7"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/czbh"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/l55o"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/kvr9"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/d7bt"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/chaw"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/l522"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/kvr8"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/jvz7"
+    },
+    {
+      "uri": "/economy/inflationandpriceindices/timeseries/k646"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Inflation data collection",
+      "summary": "Measures of inflation data, including CPI, RPI, CPIH and RPIJ",
+      "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection"
+    },
+    {
+      "title": "Retail Prices Index",
+      "summary": "Complete dataset covering all RPI statistics. Not a National Statistic.",
+      "uri": "/economy/inflationandpriceindices/datasets/retailpricesindex"
+    },
+    {
+      "title": "Producer Prices Inflation",
+      "summary": "Comprehensive dataset covering input and output index series",
+      "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation"
+    }
+  ],
+  "statsBulletins": [
+    {
+      "title": "Consumer Price Inflation, June 2014",
+      "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
+      "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
+    }
+  ],
+  "index": 0,
+  "type": "product_page",
+  "title": "Inflation and price indices",
+  "summary": "Inflation measures the rate of increase in prices for goods and services using price indices. The rate of inflation used in the UK government’s inflation target is measured using the Consumer Prices Index (CPI). One way to understand the CPI is to think of a very large shopping basket containing a large selection of the goods and services bought by households, the CPI estimates changes to the total cost of this basket.",
+  "uri": "/economy/inflationandpriceindices",
+  "breadcrumb": [
+    {
+      "title": "Home",
+      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
+      "uri": "/"
+    },
+    {
+      "title": "Economy",
+      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
+      "uri": "/economy"
+    }
+  ]
+}

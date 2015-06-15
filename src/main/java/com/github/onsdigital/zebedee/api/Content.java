@@ -40,7 +40,10 @@ public class Content {
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
-        Root.zebedee.collections.readContent(collection, uri, session, response);
+        //Resolve references to other content types by reading referenced content into requested content
+        boolean resolveReferences = request.getParameter("resolve") != null;
+        System.out.println("Reading content under " + uri + " Resolve references: " + resolveReferences);
+        Root.zebedee.collections.readContent(collection, uri, resolveReferences, session, response);
     }
 
     /**

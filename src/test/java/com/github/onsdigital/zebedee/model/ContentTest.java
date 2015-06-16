@@ -45,7 +45,7 @@ public class ContentTest {
         Files.createFile(baseJsonFile);
 
         baseContent = new ContentDetail();
-        baseContent.name = "Some release 2014";
+        baseContent.title = "Some release 2014";
         baseContent.type = "home";
 
         // Serialise
@@ -56,7 +56,7 @@ public class ContentTest {
         Files.createDirectory(subDirectory);
 
         subContent = new ContentDetail();
-        subContent.name = "Some sub 2015";
+        subContent.title = "Some sub 2015";
         subContent.type = "t2";
 
         // Serialise
@@ -72,7 +72,7 @@ public class ContentTest {
         exampleBulletinJsonFile = exampleBulletinDirectory.resolve(filename);
 
         bulletinContent = new ContentDetail();
-        bulletinContent.name = "Some bulletin 2010";
+        bulletinContent.title = "Some bulletin 2010";
         bulletinContent.type = "bulletin";
 
         // Serialise
@@ -96,7 +96,7 @@ public class ContentTest {
         ContentDetail result = content.details(baseJsonFile);
 
         // The result has the expected values
-        assertEquals(baseContent.name, result.name);
+        assertEquals(baseContent.title, result.title);
         assertEquals(baseContent.type, result.type);
         assertEquals("/", result.uri);
     }
@@ -112,7 +112,7 @@ public class ContentTest {
 
         // The result has the expected values
         assertTrue(results.size() > 0);
-        assertEquals(baseContent.name, results.get(0).name);
+        assertEquals(baseContent.title, results.get(0).title);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class ContentTest {
         assertNotNull(root);
         assertNotNull(root.children);
         assertTrue(root.children.size() > 0);
-        assertEquals(baseContent.name, root.name);
+        assertEquals(baseContent.title, root.title);
     }
 
     @Test
@@ -144,12 +144,12 @@ public class ContentTest {
         ContentDetail bulletinDirectoryDetails = root.children.get(0).children.get(0);
 
         assertNotNull(bulletinDirectoryDetails);
-        assertEquals(bulletinsDirectoryName, bulletinDirectoryDetails.name);
+        assertEquals(bulletinsDirectoryName, bulletinDirectoryDetails.title);
         assertTrue(bulletinDirectoryDetails.children.size() > 0);
 
         ContentDetail bulletinDetails = bulletinDirectoryDetails.children.get(0);
         assertNotNull(bulletinDetails);
-        assertEquals(bulletinContent.name, bulletinDetails.name);
+        assertEquals(bulletinContent.title, bulletinDetails.title);
         assertEquals("/" + basePath.relativize(exampleBulletinDirectory), bulletinDetails.uri);
         assertTrue(bulletinDetails.children.size() == 0);
     }
@@ -169,7 +169,7 @@ public class ContentTest {
         assertNotNull(root);
 
         for (ContentDetail child : root.children) {
-            if (child.name.equals("releases")) {
+            if (child.title.equals("releases")) {
                 fail();
             }
         }

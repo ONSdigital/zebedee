@@ -32,6 +32,10 @@ public class Content {
         }
     }
 
+    private static boolean isNotRelease(Path p) {
+        return !p.getFileName().toString().contains("releases");
+    }
+
     boolean exists(URI uri) {
         return exists(uri.getPath());
     }
@@ -133,7 +137,7 @@ public class Content {
 
         if (detail == null) {
             detail = new ContentDetail();
-            detail.name = path.getFileName().toString();
+            detail.title = path.getFileName().toString();
             detail.uri = "";
         }
 
@@ -151,10 +155,6 @@ public class Content {
         }
 
         return detail;
-    }
-
-    private static boolean isNotRelease(Path p) {
-        return !p.getFileName().toString().contains("releases");
     }
 
     /**

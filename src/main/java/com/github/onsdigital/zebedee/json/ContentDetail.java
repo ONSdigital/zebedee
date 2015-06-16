@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ContentDetail {
     public String uri;
-    public String name;
+    public String title;
     public String type;
 
     public List<ContentDetail> children;
@@ -21,13 +21,13 @@ public class ContentDetail {
     /**
      * Convenience constructor taking the typical parameters.
      *
-     * @param name
+     * @param title
      * @param uri
      * @param type
      */
-    public ContentDetail(String name, String uri, String type) {
+    public ContentDetail(String title, String uri, String type) {
         this.uri = uri;
-        this.name = name;
+        this.title = title;
         this.type = type;
     }
 
@@ -66,7 +66,7 @@ public class ContentDetail {
             return null;
 
         for (ContentDetail child : this.children) {
-            if (child.name.equals(name)) {
+            if (child.title.equals(name)) {
                 return child;
             }
         }
@@ -97,7 +97,7 @@ public class ContentDetail {
     }
 
     /**
-     * If the type, name, and uri are the same they are considered equal.
+     * If the type, title, and uri are the same they are considered equal.
      *
      * @param o
      * @return
@@ -109,7 +109,7 @@ public class ContentDetail {
 
         ContentDetail that = (ContentDetail) o;
 
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (uri != null ? !uri.equals(that.uri) : that.uri != null) return false;
 
@@ -119,7 +119,7 @@ public class ContentDetail {
     @Override
     public int hashCode() {
         int result = uri != null ? uri.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         return result;
     }

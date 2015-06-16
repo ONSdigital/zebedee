@@ -48,7 +48,7 @@ public class DataPublisher {
 
     public static void preprocessCollection(Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException {
 
-        if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() > 0) {
+        if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
             return;
         }

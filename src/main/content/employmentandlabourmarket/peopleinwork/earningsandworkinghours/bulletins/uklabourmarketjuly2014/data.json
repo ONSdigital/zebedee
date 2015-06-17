@@ -1,21 +1,5 @@
 {
-  "headline1": "Comparing the estimates for March to May 2014 with those for December 2013 to February 2014, employment continued to rise and unemployment continued to fall.",
-  "headline2": "There were 30.64 million people in work, 254,000 more than for December 2013 to February 2014 and 929,000 more than a year earlier.",
-  "headline3": "The proportion of people aged from 16 to 64 in work (the employment rate) continued to rise, reaching 73.1% for March to May 2014.",
-  "relatedBulletins": [
-    {
-      "headline1": "In April 2013 median gross weekly earnings for full-time employees were £517, up 2.2% from £506 in 2012.",
-      "headline2": "For men, full-time earnings were £556 per week, up 1.8%, compared with £459 for women, up 2.2%.",
-      "headline3": "The gender pay gap (i.e. the difference between men\u0027s and women\u0027s earnings as a percentage of men\u0027s earnings) based on median gross hourly earnings (excluding overtime) for full-time employees increased to 10.0% from 9.5% in 2012.",
-      "title": "Annual Survey of Hours and Earnings, 2013 Provisional Results",
-      "summary": "The Annual Survey of Hours and Earnings (ASHE) is based on a 1% sample of employee jobs. This is drawn from HM Revenue and Customs Pay As You Earn (PAYE) records. This bulletin contains provisional results from the 2013 survey and revised results from the 2012 survey.",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings2013provisionalresults",
-      "index": null
-    }
-  ],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
+  "relatedBulletins": [],
   "sections": [
     {
       "title": "Summary of latest Labour Market Statistics",
@@ -108,9 +92,7 @@
     {
       "title": "Other Quality Information",
       "markdown": "[Quality and Methodology Information papers](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/labour-market/index.html \"Quality and Methodology Information papers\") for labour market statistics are available on the website.\n\nFurther information about the Labour Force Survey (LFS) is available from:\n\n- the [LFS User Guide](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/labour-market/labour-market-statistics/index.html \"LFS User Guide\"), and\n- [LFS Performance and Quality Monitoring Reports](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/labour-market/labour-force-survey/index.html \"LFS Performance and Quality Monitoring Reports\").\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "1. **This month’s release**\nA new data table (Excel spreadsheet) has been introduced providing an indicative representation of the Claimant Count including experimental Universal Credit statistics. See Background Note 4 below for further details.\n\n2. **Next month’s release**\nThere will be revisions to estimates of the proportion of the population (aged from 16 to 64) claiming key out of work benefits for 2013, published at Table 25 of the pdf version of this Statistical Bulletin and at [data table BEN01 (59 Kb Excel sheet)](http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/july-2014/table-ben01.xls \"data table BEN01\"). These revisions will result from taking on board the latest population estimates.\n\n3. **Revisions to Labour Force Survey estimates planned for October 2014**\nONS currently plans to revise estimates derived from the Labour Force Survey (including estimates of employment, unemployment and economic inactivity), in the October 2014 edition of this Statistical Bulletin, as a result of taking on board population estimates from the 2011 Census. Estimates will be revised back to June to August 2001. ONS plans to publish an article in late September 2014 which will include details of the back revisions to the headline estimates of employment, unemployment and economic inactivity.\n\n4. **Introduction of Universal Credit**\nThe Pathfinder for Universal Credit started on 29 April 2013 with the introduction of this new benefit in one Jobcentre Plus office (**Ashton under Lyne**). The pathfinder was extended to a second Jobcentre Plus office (**Wigan**) on 1 July 2013 and two further offices (**Oldham** and **Warrington**) joined the pathfinder on 29 July 2013.\n\nThe progressive national roll out of Universal Credit across the rest of the UK commenced with **Hammersmith** Jobcentre Plus office on 28 October 2013 and was followed by:\n\n- **Rugby** and **Inverness** Jobcentre Plus offices on 25 November 2013,\n- **Harrogate** and **Bath** Jobcentre Plus offices on 24 February 2014, and\n- **Shotton** Jobcentre Plus office on 7 April 2014.\n\nBy 12 June 2014 (the Claimant Count date for June 2014), Universal Credit had been introduced in the above mentioned 10 Jobcentre Plus offices. On 20 June 2014, the Department for Work and Pensions (DWP) published a press release announcing the further expansion of Universal Credit across the North West region.\n\nUniversal Credit will replace a number of means-tested benefits including the means-tested element of Jobseeker’s Allowance (JSA). It will not replace contributory based JSA.\n\nThe Claimant Count measures the number of people claiming benefits principally for the reason of being unemployed. Since October 1996 it has been a count of the number of people claiming JSA. Following a consultation in 2012 by ONS, it was decided that, with the introduction of Universal Credit, the Claimant Count would include:\n\n- people claiming contribution-based JSA (which is not affected by the introduction of Universal Credit),\n- people claiming income-based JSA during the transition period while this benefit is being gradually phased out, and\n- people claiming Universal Credit who are not earning and who are subject to a full set of labour market jobseeker requirements, that is required to be actively seeking work and available to start work.\n\n**The Claimant Count estimates from May 2013 onwards, published in this Statistical Bulletin, do not include claimants of Universal Credit**. ONS will include jobseeker Universal Credit claims in the Claimant Count statistics as soon as possible.\n\nIn this release, ONS is publishing a new spreadsheet, [data table CLA03 (66.5 Kb Excel sheet)](http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/july-2014/table-prod01.xls \"data table CLA03\"), providing an indicative adjusted Claimant Count which initially includes experimental estimates of all claimants of Universal Credit (not just those who are jobseekers) as well as all JSA claimants. To maintain continuity of table numbering, the Claimant Count revisions triangle data table has been renumbered from CLA03 to CLA04.\n\nThe absence of Universal Credit claimants is expected to have a small effect on the Claimant Count from May 2013. This assessment reflects the information published at [data table CLA03 (66.5 Kb Excel sheet)](http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/july-2014/table-prod01.xls \"data table CLA03\").\n\n5. **Publication policy**\nPublication dates up to the end of 2015 are available in the Background Notes to the [June 2014 edition of this Statistical Bulletin](http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/june-2014/statistical-bulletin.html \"June 2014 edition of this Statistical Bulletin\").\n\nA list of the job titles of those given [pre-publication access](http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/july-2014/pre-release-list.html \"pre-publication access\") to the contents of this Statistical Bulletin is available on the website.\n\n6. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html \"[www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html\") or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e.\n\nThe United Kingdom Statistics Authority has designated these statistics as National Statistics, in accordance with the Statistics and Registration Service Act 2007 and signifying compliance with the Code of Practice for Official Statistics.\n\nDesignation can be broadly interpreted to mean that the statistics:\n\n- meet identified user needs;\n- are well explained and readily accessible;\n- are produced according to sound methods; and\n- are managed impartially and objectively in the public interest.\n\nOnce statistics have been designated as National Statistics it is a statutory requirement that the Code of Practice shall continue to be observed.\n"
@@ -124,44 +106,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "labour.market@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "UK Labour Market, July 2014",
-  "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
   "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Employment and Labour market",
-      "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket",
-      "index": null
+      "uri": "/employmentandlabourmarket"
     },
     {
-      "title": "People in work",
-      "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork"
     },
     {
-      "title": "Earnings and working hours",
-      "summary": "Earnings are the reward for work and they can be paid on a regular basis or as bonus pay. Total pay combines both regular and bonus pay. The Office for National Statistics reports the level and growth rate of average weekly total, regular and bonus pay. Working hours are given as the average weekly hours worked by full-time and part-time workers.",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "Comparing the estimates for March to May 2014 with those for December 2013 to February 2014, employment continued to rise and unemployment continued to fall.",
+    "headline2": "There were 30.64 million people in work, 254,000 more than for December 2013 to February 2014 and 929,000 more than a year earlier.",
+    "headline3": "The proportion of people aged from 16 to 64 in work (the employment rate) continued to rise, reaching 73.1% for March to May 2014.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "labour.market@ons.gsi.gov.uk"
+    },
+    "title": "UK Labour Market, July 2014",
+    "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
+    "keywords": []
+  }
 }

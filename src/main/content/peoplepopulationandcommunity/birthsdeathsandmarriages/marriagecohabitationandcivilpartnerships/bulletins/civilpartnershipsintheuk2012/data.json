@@ -1,21 +1,5 @@
 {
-  "headline1": "The provisional number of civil partnerships in the UK in 2012 was 7,037, an increase of 3.6% since 2011.",
-  "headline2": "The average age of men forming a civil partnership in the UK in 2012 was 40.0 years, while for women the average age was 37.6 years. These figures represent a small decrease in average ages in comparison to 2011.",
-  "headline3": "These figures represent a small decrease in average ages in comparison to 2011.",
-  "relatedBulletins": [
-    {
-      "headline1": "In 2012, the provisional number of marriages in England and Wales increased by 5.3% to 262,240, from 249,133 in 2011.",
-      "headline2": "Civil ceremonies accounted for 70% of all marriages that took place in 2012, an increase from 66% in 2002.",
-      "headline3": "The greatest number of marriages was for men and women aged 25 to 29.",
-      "title": "Marriages in England and Wales (Provisional), 2012",
-      "summary": "Annual data on marriages in England and Wales. Marriages abroad not included. Non-residents are included. Derived as part of civil registration.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/marriagesinenglandandwalesprovisional2012",
-      "index": null
-    }
-  ],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
+  "relatedBulletins": [],
   "sections": [
     {
       "title": "Key Findings",
@@ -64,9 +48,7 @@
     {
       "title": "Further information",
       "markdown": "More data on [Civil Partnerships in the UK](http://www.ons.gov.uk/ons/rel/vsob2/civil-partnership-statistics--united-kingdom/index.html \"Civil Partnership Statistics, United Kingdom index\") in 2012 are available on the ONS website.\n\nA [Quality and Methodology Information (111.6 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/population/summary-quality-report-for-civil-partnerships.pdf \"Quality and Metholodgy Information for Civil Partnerships in the UK\") document for civil partnership statistics is available on the ONS website.\n\nAnnual civil partnership figures for the UK and constituent countries can be found in the [Vital Statistics: Population and Health Reference tables](http://www.ons.gov.uk/ons/rel/vsob1/vital-statistics--population-and-health-reference-tables/index.html \"Vital Statistics: Population and Health Reference Tables index\").\n\n[National Records of Scotland](http://www.ons.gov.uk/ons/external-links/devolved-admins/scottish-government/gro-scotland--civil-partnerships.html \"GRO Scotland: Civil Partnerships\") provides civil partnership formation statistics for Scotland.\n\n[Scottish Government](http://www.ons.gov.uk/ons/external-links/devolved-admins/scottish-government/scottish-government---divorces-and-dissolutions.html \"Scottish Government - Divorces and Dissolutions\") provides civil partnership dissolution statistics in Civil Law Statistics.\n\n[Northern Ireland Statistics and Research Agency](http://www.ons.gov.uk/ons/external-links/devolved-admins/nisra/nisra--civil-partnerships.html \"NISRA: Civil Partnerships\") provides civil partnership statistics for Northern Ireland.\n\nFurther statistics on [Marriages](http://www.ons.gov.uk/ons/rel/vsob1/marriages-in-england-and-wales--provisional-/index.html \"Marriages in England and Wales (provisional) index\") and [Divorces](http://www.ons.gov.uk/ons/rel/vsob1/divorces-in-england-and-wales/index.html \"Divorces in England and Wales index\"), are available on the ONS website. There is also data on [Families and Households](http://www.ons.gov.uk/ons/rel/family-demography/families-and-households/index.html \"Families and Households index\"), including [Cohabitation Figures](http://www.ons.gov.uk/ons/rel/family-demography/families-and-households/2012/cohabitation-rpt.html \"Cohabitation RPT\").\n\n[2011 Census (252 Kb Excel sheet)](http://www.ons.gov.uk/ons/rel/census/2011-census/key-statistics-for-local-authorities-in-england-and-wales/rft-table-ks103ew.xls \"RFT Table KS103EW\") data provides information on where civil partners are living in England and Wales.\n\n[Population Estimates by Marital Status](http://www.ons.gov.uk/ons/rel/pop-estimate/population-estimates-by-marital-status/index.html \"Population Estimates by Marital Status index\") provide the estimated resident population by single year of age, sex and marital status (single, married, divorced, and widowed) for England and Wales. Figures are currently available up to 2010. ONS are considering the future need for population estimates by marital status in their present form. Estimates of the population by marital status, age and sex from 2011 Census are being used to benchmark current methods and evaluate alternative sources of data on partnership status.\n\nAn article examining [civil partnerships in England and Wales five years](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--145--autumn-2011/index.html \"No. 145, Autumn 2011\") on from its introduction was published in the September 2011 edition of Population Trends. This article examines civil partnerships and dissolutions between 2005 and 2010, and compares these figures to marriage and divorce figures over the same period. The article had an accompanying [video podcast](http://www.youtube.com/user/onsstats?feature\u003dmhee#p/u/0/kbOhUFDPHfQ \"video podcast\"), using audio commentary and graphical animations to cover the key trends.\n\nA user feedback survey for the civil partnerships tables took place in July 2011. The [results and responses to this survey](http://www.ons.gov.uk/ons/about-ons/get-involved/consultations/user-surveys/index.html \"results and responses to this survey\") were published in August 2012.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "1. The [Civil Partnership Act 2004](http://www.ons.gov.uk/ons/external-links/parliament/legislation--the-civil-partnership-act-2004.html \"Legislation: Civil Partnership Act 2004\") came into force on 5 December 2005 in the UK, the first day couples could give notice of their intention to form a civil partnership. The Act enables same sex couples aged 16 and over to obtain legal recognition of their relationship. The first day that couples could normally form a partnership was 19 December 2005 in Northern Ireland, 20 December 2005 in Scotland and 21 December 2005 in England and Wales.\n\n2. Civil partnership formation statistics for Northern Ireland and the UK for 2012 are provisional. Civil partnership dissolution statistics for Northern Ireland and England and Wales for 2012 are provisional.\n\n3. Scottish Government took over sole responsibility for the publication of statistics on civil partnership dissolutions in Scotland at the end of 2012. Civil partnership dissolutions in Scotland for the year ending March 2013 will be published in Civil Law Statistics in Scotland in January 2014. Statistics for 2012 calendar year are not available until this time. Consequently, it is not possible to provide 2012 civil partnership dissolution statistics for Scotland or the UK at this time.\n\n4. The figures relate only to civil partnerships taking place in the constituent countries of the UK. They do not include civil partnerships of UK residents taking place abroad but will include non-UK residents who form a partnership in the UK.\n\n5. Figures for civil partnership formations in England and Wales are based on date of formation. Figures for Scotland and Northern Ireland are based on date of registration. The impact of this difference is negligible.\n\n6. Data on civil partnership formations are based on area of formation and not area of residence.\n\n7. Data on civil partnership dissolutions are based on country of dissolution and not country of residence.\n\n8. The figures on the percentage of civil partnerships ending in dissolution are derived from the numbers of civil partnerships and dissolutions taking place in England and Wales since the Civil Partnership Act 2004 came into force in December 2005. This does not take into account the fact that some civil partnerships which took place in the UK may be dissolved in another country or that some dissolutions may take place in the UK for a civil partnership which was formed in another country.\n\n9. Civil partnership rates are published for England and Wales (combined) only. The civil partnership rate is the number of people forming a civil partnership per 1,000 unmarried population aged 16 and over (unmarried means single, widowed or divorced). Civil partnership status is not included in the population estimates by marital status hence the unmarried population provides the most appropriate denominator for rates. Further information on [population estimates](http://www.ons.gov.uk/ons/publications/all-releases.html?definition\u003dtcm:77-22368 \"population estimates\") can be found on the ONS website. Marital status estimates are not produced for the UK or Northern Ireland hence the corresponding civil partnership rates are not available. The latest population estimates by marital status available for Scotland are for 2008, therefore no rates after 2008 have been calculated. The production of population estimates by marital status for 2009 and future years have been postponed and demand will be reviewed by National Records of Scotland in 2013/14. Population estimates by marital status are not available for Northern Ireland, hence rates cannot be calculated.\n\n10. Marital status estimates for 2011 and 2012 for England and Wales are not currently available (see further information section). Civil partnership rates for 2011 and 2012 are therefore based on estimated 2011 marital status population estimates. These use the mid-2011 population estimates based on the 2011 Census and the marital status distribution from the 2008-based marital status population projections for 2011. Analyses comparing the marital status distribution in the marital status estimates for mid-2008-2010 and the 2008-based marital status projections for 2008-2012 have shown that these estimates provide:\n- a plausible marital status distribution for 2011 and 2012; and\n- a more plausible marital status distribution than the 2010 marital status estimates.\n\n11. The mean (average) ages presented in this release have not been standardised for age and therefore do not take account of the changing structure of the male/female population by age and marital status.\n\n12. Follow ONS on [Twitter](http://www.ons.gov.uk/ons/external-links/social-media/ons-twitter.html \"Twitter\") and [Facebook](http://www.ons.gov.uk/ons/external-links/social-media/index.html \"Facebook\")\n\n13. A list of the names of those given pre-publication access to the statistics and written commentary is available in [Pre-release Access List – Civil Partnerships 2012](http://www.ons.gov.uk/ons/rel/vsob2/civil-partnership-statistics--united-kingdom/2012/pre-release-access-list--civil-partnerships--2012.html \"Pre-release Access List – Civil Partnerships 2012\").  The rules and principles which govern pre-release access are featured within the [Pre-release Access to Official Statistics Order 2008](http://www.ons.gov.uk/ons/external-links/parliament/pre-release-access-to-official-statistics-order-2008.html \"Pre-release Access to Official Statistics Order 2008\").\n\n14. Special extracts and tabulations of civil partnership data are available to order (subject to legal frameworks, disclosure control, resources and agreement of costs, where appropriate). Such enquiries should be made to:\n\nVital Statistics Output Branch\nOffice for National Statistics\nSegensworth Road\nTitchfield\nFareham\nHampshire PO15 5RR\nTel: +44 (0)1329 444110\nE-mail: \u003cvsob@ons.gsi.gov.uk\u003e\n\nThe ONS charging policy is available on the ONS website.\n\n15. We would welcome feedback on the content, format and relevance of this release. Please send feedback to the postal or email address above.\n\n16. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThe United Kingdom Statistics Authority has designated these statistics as National Statistics, in accordance with the Statistics and Registration Service Act 2007 and signifying compliance with the Code of Practice for Official Statistics.\n\nDesignation can be broadly interpreted to mean that the statistics:\n\n- meet identified user needs;\n- are well explained and readily accessible;\n- are produced according to sound methods; and\n- are managed impartially and objectively in the public interest.\n\nOnce statistics have been designated as National Statistics it is a statutory requirement that the Code of Practice shall continue to be observed.\n"
@@ -80,44 +62,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here.\n"
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "vsob@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Civil Partnerships in the UK, 2012",
-  "summary": "Annual statistics on civil partnerships that were formed in the United Kingdom (UK) in 2012, as well as those which were dissolved. Civil partnership statistics are analysed by sex, age, previous marital status and area of occurrence. Figures on formations for Northern Ireland and the UK are provisional and all dissolution data are provisional.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/civilpartnershipsintheuk2012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Marriage, cohabitation and civil partnerships",
-      "summary": "Statistics on how people live together give us a fuller picture of the changing social landscape of the UK. Data on marriages and civil partnerships comes from registrations, but data on cohabitation comes from various different surveys.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "The provisional number of civil partnerships in the UK in 2012 was 7,037, an increase of 3.6% since 2011.",
+    "headline2": "The average age of men forming a civil partnership in the UK in 2012 was 40.0 years, while for women the average age was 37.6 years. These figures represent a small decrease in average ages in comparison to 2011.",
+    "headline3": "These figures represent a small decrease in average ages in comparison to 2011.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "vsob@ons.gsi.gov.uk"
+    },
+    "title": "Civil Partnerships in the UK, 2012",
+    "summary": "Annual statistics on civil partnerships that were formed in the United Kingdom (UK) in 2012, as well as those which were dissolved. Civil partnership statistics are analysed by sex, age, previous marital status and area of occurrence. Figures on formations for Northern Ireland and the UK are provisional and all dissolution data are provisional.",
+    "keywords": []
+  }
 }

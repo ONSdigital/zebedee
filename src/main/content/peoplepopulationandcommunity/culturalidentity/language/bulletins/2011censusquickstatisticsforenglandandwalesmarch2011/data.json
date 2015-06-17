@@ -1,11 +1,5 @@
 {
-  "headline1": "92% (49.8 million) of usual residents aged three years and over spoke English (English or Welsh in Wales) as their main language.",
-  "headline2": "Of the other 8% (4.2 million), 79% (3.3 million) could speak English very well or well.",
-  "headline3": "In 2011, less than half a per cent (138,000) of all usual residents aged three years and over could not speak English.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key Figures",
@@ -50,9 +44,7 @@
     {
       "title": "Method of travel to work",
       "markdown": "Method of travel to work1 is the mode of transport used to cover the longest part, by distance, of a journey to work. This information is published by home address for usual residents aged between 16 and 74 years, who were working2 during the week before census day, 27 March 2011.\n\n\u003cdiv class\u003d\"chart-container\"\u003e\n\u003ciframe frameBorder \u003d\"0\" scrolling \u003d \"no\" src\u003d\"http://onsdigital.github.io/Alpha/bulletins/census5.html\"\u003e\u003c/iframe\u003e\n\u003c/div\u003e\n\nIn 2011 the majority of 16 to 74 year olds in employment travelled to work by driving a car or van (58 per cent, 15.3 million). A further five per cent (1.4 million) travelled to work as a passenger in a car or van.\n\nThe second most reported method of travel to work for 16 to 74 year olds in employment was by foot (11 per cent, 2.8 million), whilst the third was travel by bus, minibus or coach (seven per cent, 1.9 million).\n\n\u003cdiv class\u003d\"chart-container\"\u003e\n\u003ciframe frameBorder \u003d\"0\" scrolling \u003d \"no\" src\u003d\"http://onsdigital.github.io/Alpha/bulletins/census6.html\"\u003e\u003c/iframe\u003e\n\u003c/div\u003e\n\nFigure 6 shows that the main variation between the England regions and Wales is in the percentages using public transport (including buses, trains and underground trains/light rail/trams), and those using cars, motorcycles and taxis.\n\nIn London, 50 per cent (2.0 million) of the usual residents aged 16 to 74 who were in employment were primarily using public transport to travel to work, compared with 31 per cent (1.3 million) travelling by car, motorcycle or taxi.\n\nOutside London, the percentage of workers mainly using public transport ranged from six per cent (162,000) in the South West to 13 per cent (151,000) in the North East, with the percentage using cars, motorcycles or taxis ranging from 67 per cent (2.8 million) in the South East to 75 per cent (1.0 million) in Wales.\n\nAlthough the South West had the lowest percentage of journeys to work by public transport, it had the highest percentage of workers travelling on foot or using a bicycle (17 per cent, 439,000), together with the highest percentage of people working from home (seven per cent, 178,000). In other areas the percentage using foot or bicycle varied from 12 per cent (302,000) in the West Midlands to 14 per cent (348,000) in Yorkshire and the Humber.\n\nInformation on travel to work is provided in table [QS701EW (301 Kb Excel sheet)](http://www.ons.gov.uk/ons/rel/census/2011-census/key-statistics-and-quick-statistics-for-wards-and-output-areas-in-england-and-wales/rft-qs701ew.xls \"RFT QS701EW\") . A more detailed analysis of this data will be published later in 2013.\n\n##### Notes for Method of travel to work\n1. Due to definitional differences, and because the census questionnaire is self completed by the population of England and Wales, the census estimates of people travelling to work may differ from other sources. In addition, direct comparisons are not possible for mode of travel to work between 2001 and 2011. In 2001, people who recorded their place of work as working mainly at or from home were considered to have their mode of travel to work as working mainly at or from home. In 2011, people working mainly at or from home could record, for example, that they travelled to work as a driver in a car or van, despite being based at home. This extra information is useful for transport planning.\n2. Due to definitional differences, and because the census questionnaire is self completed by the population of England and Wales, the census estimates of people in employment may differ from other sources as, for example, some respondents may include voluntary work when asked about employment. The most authoritative and up to date estimates of the labour market status, including employment and unemployment, are the labour market statistics that ONS publishes monthly. The census is valuable in providing a detailed picture at the time of the census of the characteristics of the economically active population.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "1. This publication follows [previous releases of census data](http://www.ons.gov.uk/ons/rel/census/2011-census/index.html \"previous releases of census data\") including household and population totals and local authority level Key Statistics tables. The census provides estimates of the characteristics of all people and households in England and Wales on census day. These are produced for a variety of users including government, local and unitary authorities, business and communities. The census provides population statistics from a national to local level. This bulletin discusses the results at the national and regional level for England and Wales.\n\n2. In making comparisons to 2001, the population estimates (by age and sex) have been compared with the mid-year estimates for 2001, 52.4 million. For other characteristics, comparisons are made with 2001 Census estimates, 52.0 million. Footnotes are provided with tables to identify the data sources used.\n\n3. Both 2001 and 2011 Census data are available via the [Neighbourhood Statistics website](http://www.neighbourhood.statistics.gov.uk/dissemination/ \"Neighbourhood Statistics website\"). Relevant table numbers are provided in all download files within this publication.\n\n4. Interactive [data visualisations](http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/2011-census-interactive-content/index.html \"2011 Census Interactive\") developed by ONS are also available to aid interpretation of the results.\n\n5. Future releases from the 2011 Census will include more detail in cross tabulations, and tabulations at other geographies. These include wards, health areas, parliamentary constituencies, postcode sectors and national parks. Further information on future releases is available online in the [2011 Census Prospectus](http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/2011-census-prospectus/index.html \"2011 Census Prospectus\").\n\n6. Due to definitional differences, and because the census questionnaire is self completed by the population of England and Wales, the census estimates of people in employment may differ from other sources as, for example, some respondents may include voluntary work when asked about employment. The most authoritative and up to date estimates of the labour market status including employment and unemployment are the labour market statistics that ONS publishes monthly. The census is valuable in providing a detailed picture at the time of the census of the characteristics of the economically active population.\n\n7. Due to definitional differences, and because the census questionnaire is self completed by the population of England and Wales, the census estimates of people travelling to work may differ from other sources. In addition, direct comparisons are not possible for mode of travel to work between 2001 and 2011. In 2001, people who recorded their place of work as working mainly at or from home were considered to have their mode of travel to work as working mainly at or from home. In 2011, people working mainly at or from home could record, for example, that they travelled to work as a driver in a car or van, despite being based at home. This extra information is useful for transport planning.\n\n8. ONS has ensured that the data collected meet users\u0027 needs via an extensive [2011 Census outputs consultation](http://www.ons.gov.uk/ons/guide-method/census/2011/consultations--users-and-local-partners/index.html \"Consultations, users and local partners\") process in order to ensure that the 2011 Census outputs will be of increased use in the planning of housing, education, health and transport services in future years.\n\n9. Any reference to local authorities includes both local and unitary authorities.\n\n10. Figures in this publication may not sum due to rounding. Percentage point changes in the text are based on rounded data.\n\n11. The England and Wales census questionnaires asked the same questions with one exception; an additional question on Welsh language was included on the Wales questionnaire.\n\n12. ONS is responsible for carrying out the census in England and Wales. Simultaneous but separate censuses took place in Scotland and Northern Ireland. These were run by the National Records of Scotland (NRS) and the Northern Ireland Statistics and Research Agency (NISRA) respectively.\n\n13. ONS is responsible for the publication of UK statistics (compiling comparable statistics from the UK statistical agencies above). These will be compiled as each of the three statistical agencies involved publish the relevant data. The [Northern Ireland census prospectus](http://www.nisra.gov.uk/Census/2011CensusProposedOutputs.html \"Northern Ireland census prospectus\") and the [Scotland census prospectus](http://www.gro-scotland.gov.uk/census/censushm2011/index.html \"Scotland census prospectus\") are available online. The [first release of UK population estimates](http://www.ons.gov.uk/ons/rel/census/2011-census/population-and-household-estimates-for-the-united-kingdom/index.html \"Population and Household Estimates for the United Kingdom\") took place on 17 December 2012.\n\n14. A person\u0027s place of usual residence is in most cases the address at which they stay the majority of the time. For many people this will be their permanent or family home. If a member of the services did not have a permanent or family address at which they are usually resident, they were recorded as usually resident at their base address.\n\n15. A household is defined as one person living alone, or a group of people (not necessarily related) living at the same address who share cooking facilities and share a living room, sitting room or dining area.\n\n16. All key terms used in this publication, such as resident and short-term residents are explained in the [2011 Census user guide](http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/2011-census-user-guide/index.html \"2011 Census user guide\").\n\n17. All census population estimates were extensively quality assured, using other national and local sources of information for comparison and review by a series of quality assurance panels. An extensive range of [quality assurance, evaluation and methodology papers](http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/2011-census-user-guide/quality-and-methods/index.html \"quality and methods\") were published alongside the first release in July 2012 and have been updated in this release, including a Quality and Methodology Information (QMI) document (152.8 Kb Pdf)\n\n18. The 2011 Census achieved its overall target response rate of 94 per cent of the usually resident population of England and Wales, and over 80 per cent in all local and unitary authorities. The population estimate for England and Wales of 56.1 million is estimated with 95 per cent confidence to be accurate to within +/- 85,000 (0.15 per cent).\n\n19. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThese National Statistics are produced to high professional standards and released according to the arrangements approved by the UK Statistics Authority.\n"
@@ -66,44 +58,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "census.customerservices@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "2011 Census - Quick Statistics for England and Wales, March 2011",
-  "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
   "uri": "/peoplepopulationandcommunity/culturalidentity/language/bulletins/2011censusquickstatisticsforenglandandwalesmarch2011",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Cultural identity",
-      "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
     },
     {
-      "title": "Language",
-      "summary": "Statistics on language focus on the languages spoken across the UK. The key statistics here are the number and percentage of the population who speak English as their main language which can be viewed as a time series and for different areas across the UK. Statistics on welsh speakers can also be found here.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity/language",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "92% (49.8 million) of usual residents aged three years and over spoke English (English or Welsh in Wales) as their main language.",
+    "headline2": "Of the other 8% (4.2 million), 79% (3.3 million) could speak English very well or well.",
+    "headline3": "In 2011, less than half a per cent (138,000) of all usual residents aged three years and over could not speak English.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "census.customerservices@ons.gsi.gov.uk"
+    },
+    "title": "2011 Census - Quick Statistics for England and Wales, March 2011",
+    "summary": "2011 Census, Quick Statistics, Household resident, Communal establishment resident, Usual resident, Household composition, Dependent children, Long-term health problem, Lone parent households, Employment, Ethnic group, Ethnicity, Race, English language, Main language, Religion, Health, care, long-term health problem, accommodation type, household spaces, Qualifications,  economic activity, Hours worked, Employment, Industry, Occupation.",
+    "keywords": []
+  }
 }

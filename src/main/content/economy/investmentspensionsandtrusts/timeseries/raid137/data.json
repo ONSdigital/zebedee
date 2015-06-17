@@ -1,56 +1,34 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "-0.7",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID137",
-  "unit": "bn",
-  "preUnit": "£",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "Foreign Direct Investment Involving UK Companies, 2012 (MA4)",
-      "summary": "Provides a detailed breakdown of UK foreign direct investment flows, positions (stocks) and earnings (both inward and outward), by country, component and industry.",
-      "uri": "/economy/investmentspensionsandtrusts/bulletins/foreigndirectinvestmentinvolvingukcompanies2012ma4",
-      "index": null
+      "uri": "/economy/investmentspensionsandtrusts/bulletins/foreigndirectinvestmentinvolvingukcompanies2012ma4"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Net investment flows to Europe",
-  "summary": null,
   "uri": "/economy/investmentspensionsandtrusts/timeseries/raid137",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Investments, pensions and trusts",
-      "summary": "Investment refers to the flow of money around and across countries for the purpose of making profit. A pension is a fixed sum to be paid regularly to a person, typically following retirement and a trust is a legal arrangement where one or more \u0027trustees\u0027 are made legally responsible for holding assets. Statistics here include net flows of investment into the UK, figures on the number of people who hold pensions of different types and investments made by various types of trusts.",
-      "uri": "/economy/investmentspensionsandtrusts",
-      "index": null
+      "uri": "/economy/investmentspensionsandtrusts"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "-0.7",
+    "cdid": "RAID137",
+    "unit": "bn",
+    "preUnit": "£",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Net investment flows to Europe"
+  }
 }

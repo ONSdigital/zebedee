@@ -1,11 +1,5 @@
 {
-  "headline1": "In 2012, the number of adoptions in England and Wales was 5,206, an increase of 9.8% since 2011 when there were 4,740 adoptions.",
-  "headline2": "In 2012, most children adopted (63%) were aged between one and four years, rising from 62% in 2011.",
-  "headline3": "The percentage of children adopted who were born outside of marriage increased slightly to 85% in 2012, up from 82% in 2011.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key findings",
@@ -38,9 +32,7 @@
     {
       "title": "Further information",
       "markdown": "More [data on adoptions](http://www.ons.gov.uk/ons/rel/vsob1/adoptions-in-england-and-wales/index.html \"Adoptions in England and Wales Index\") in England and Wales are available on the ONS website.\n\nA [Quality and Methodology Information (114.2 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/population/quality-and-methodology-information-for-adoptions-in-england-and-wales.pdf \"Quality and Methodology Information for Adoptions in England and Wales\") document for adoption statistics is available on the ONS website.\n\nThe Ministry of Justice now publishes statistics on the volume and timeliness of adoption cases dealt with in courts, and is able to provide users with a detailed breakdown on the adopter’s relationship to the child. Figures for England and Wales are available in [Court Statistics (Quarterly)](http://www.gov.uk/government/publications/court-statistics-quarterly-jan-mar-2013 \"Court Statistics (Quarterly)\").\n\nA user feedback survey for the adoptions tables took place in July 2011. The results and responses to this survey were published in August 2012.\n\nStatistics on [looked after children](http://www.gov.uk/government/organisations/department-for-education/series/statistics-looked-after-children \"Statistics - Looked After Children\") in England as well as [intercountry adoptions](http://www.ons.gov.uk/ons/external-links/other-government-departments/dfe/intercountry-adoption.html \"intercountry adoptions\") are available from the Department for Education. Statistics on [looked after children in Wales](http://wales.gov.uk/topics/statistics/about/data-collection/social/child/lookedafter/?lang\u003den \"Welsh Government - Looked after Children\") are available from the Welsh Government.\n\n[Adoption statistics](http://www.ons.gov.uk/ons/external-links/devolved-admins/nisra/nisra---adoption-statistics.html \"NISRA - Adoption Statistics\") in Northern Ireland are provided by the Northern Ireland Statistics and Research Agency while statistics on the [adoption of looked after children](http://www.ons.gov.uk/ons/external-links/devolved-admins/nisra/adoption-of-looked-after-children.html \"adoption of looked after children\") are available from the Department of Health, Social Services and Public Safety.\n\n[Adoption statistics](http://www.ons.gov.uk/ons/external-links/devolved-admins/scottish-government/gro-scotland--vital-events---adoptions.html \"GRO Scotland: Vital Events - Adoptions\") in Scotland are provided by the National Records of Scotland while statistics on [children looked after](http://www.scotland.gov.uk/Topics/Statistics/Browse/Children/PubChildrenSocialWork \"Scottish Government - Children\u0027s Social Work Statistics\") are available from the Scottish Government.\n\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "1. Data on adoptions are derived from the Adopted Children Register (ACR) and are based on adoption orders made in England and Wales. The data here relate to those cases notified by the courts to the Registrar General and entered onto the ACR in a given year. Adoption figures are produced on two definitions: date of entry into the ACR and date of Court Order. The adoption figures in this bulletin are based on the date of court order and do not include foreign adoptions. The court order data are seen as preferable as there may be a time lag between the date of the court order and the subsequent entry into the Register.\n\n2. Children are defined as being under 18 years of age.\n\n3. On 30 December 2005 the [Adoption and Children Act 2002](http://www.ons.gov.uk/ons/external-links/other/adoption-and-children-act-2002.html \"Adoption and Children Act 2002\") was fully implemented. It replaced the Adoption Act 1976 and modernised the legal framework for adoption in England and Wales. The Act provides for an adoption order to be made in favour of single people, married couples and, for the first time, civil partners, same-sex couples and unmarried couples. The Act also introduced Special Guardianship as a new permanence option for children. Further information on [Special Guardianship](http://www.ons.gov.uk/ons/external-links/other/education---children-and-young-people--special-guardianship-regulations-2005.html \"Education - Children and young people, Special guardianship regulations 2005) is available on the Department for Education website.\n\n4. Special extracts and tabulations of adoption data for England and Wales are available to order (subject to legal frameworks, disclosure control, resources and agreements of costs, where appropriate). Such enquiries should be made to:\n\nVital Statistics Outputs Branch\nOffice for National Statistics\nSegensworth Road\nTitchfield\nFareham\nHampshire\nPO15 5RR\nTel: +44 (0)1329 444 110\nE-mail: \u003cvsob@ons.gsi.gov.uk\u003e\n\nThe ONS charging policy is available on the ONS website.\n\n5. We would welcome feedback on the content, format and relevance of this release. Please send feedback to the postal or email address above.\n\n6. Follow ONS on [Twitter](http://www.ons.gov.uk/ons/external-links/social-media/twitter.html \"Twitter\") and [Facebook](http://www.ons.gov.uk/ons/external-links/social-media/index.html \"Facebook\")\n\n7. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html \"Statistics Authority - Code of Practice\") or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThe United Kingdom Statistics Authority has designated these statistics as National Statistics, in accordance with the Statistics and Registration Service Act 2007 and signifying compliance with the Code of Practice for Official Statistics.\n\nDesignation can be broadly interpreted to mean that the statistics:\n\n- meet identified user needs;\n- are well explained and readily accessible;\n- are produced according to sound methods; and\n- are managed impartially and objectively in the public interest.\n\nOnce statistics have been designated as National Statistics it is a statutory requirement that the Code of Practice shall continue to be observed.\n"
@@ -54,44 +46,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "vsob@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Adoptions in England and Wales, 2012",
-  "summary": "Annual adoptions statistics following court orders. Analysed by sex, age and marital status of biological parents.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption/bulletins/adoptionsinenglandandwales2012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Adoption",
-      "summary": "Adoption statistics are available from adoption registrations. They are used to inform local and central governments about trends in adoptions and a long run time series is available to make comparisons and observations about the impact of various different government policies. These statistics are available by the age and gender of the children being adopted as well as by whether or not the adopted children were born inside marriage.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/adoption"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "In 2012, the number of adoptions in England and Wales was 5,206, an increase of 9.8% since 2011 when there were 4,740 adoptions.",
+    "headline2": "In 2012, most children adopted (63%) were aged between one and four years, rising from 62% in 2011.",
+    "headline3": "The percentage of children adopted who were born outside of marriage increased slightly to 85% in 2012, up from 82% in 2011.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "vsob@ons.gsi.gov.uk"
+    },
+    "title": "Adoptions in England and Wales, 2012",
+    "summary": "Annual adoptions statistics following court orders. Analysed by sex, age and marital status of biological parents.",
+    "keywords": []
+  }
 }

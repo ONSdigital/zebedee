@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Housing",
-  "summary": "Housing statistics focus mainly on data about house prices. These are often used as an informal indicator of the confidence people feel in the UK economy as well as being useful and of interest to the general public. Here you can find the latest figures on the level and growth of house prices across the UK. The data here is collected from a sample of mortgage completions and therefore does not include houses sold to cash buyers. ",
-  "uri": "releases/housing",
-  "breadcrumb": null
+  "uri": "releases/housing"
 }

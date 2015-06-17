@@ -1,91 +1,58 @@
 {
-  "seasonalAdjustment": "Not seasonally adjusted",
-  "date": "September 2014",
-  "number": "126.2",
-  "mainMeasure": "Consumer Prices Index including owner occupiers\u0027 housing costs (CPIH)",
-  "keyNote": null,
-  "additionalText": "Not a National Statistic. Index, 2005 \u003d 100",
   "years": [
     {
       "date": "2005",
       "value": "100",
       "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006",
       "value": "102.3",
       "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007",
       "value": "104.6",
       "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008",
       "value": "108.1",
       "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009",
       "value": "110.3",
       "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010",
       "value": "113.4",
       "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011",
       "value": "118",
       "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012",
       "value": "121.2",
       "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013",
       "value": "124.1",
       "year": "2013",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     }
   ],
   "quarters": [
@@ -93,343 +60,267 @@
       "date": "2005 Q1",
       "value": "99",
       "year": "2005",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 Q2",
       "value": "99.9",
       "year": "2005",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 Q3",
       "value": "100.3",
       "year": "2005",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 Q4",
       "value": "100.8",
       "year": "2005",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 Q1",
       "value": "100.8",
       "year": "2006",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 Q2",
       "value": "102.1",
       "year": "2006",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 Q3",
       "value": "102.7",
       "year": "2006",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 Q4",
       "value": "103.4",
       "year": "2006",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 Q1",
       "value": "103.6",
       "year": "2007",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 Q2",
       "value": "104.6",
       "year": "2007",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 Q3",
       "value": "104.5",
       "year": "2007",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 Q4",
       "value": "105.5",
       "year": "2007",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 Q1",
       "value": "106",
       "year": "2008",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 Q2",
       "value": "107.9",
       "year": "2008",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 Q3",
       "value": "109.2",
       "year": "2008",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 Q4",
       "value": "109.3",
       "year": "2008",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 Q1",
       "value": "109",
       "year": "2009",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 Q2",
       "value": "110",
       "year": "2009",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 Q3",
       "value": "110.7",
       "year": "2009",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 Q4",
       "value": "111.3",
       "year": "2009",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 Q1",
       "value": "112.1",
       "year": "2010",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 Q2",
       "value": "113.3",
       "year": "2010",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 Q3",
       "value": "113.6",
       "year": "2010",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 Q4",
       "value": "114.7",
       "year": "2010",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 Q1",
       "value": "116.2",
       "year": "2011",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 Q2",
       "value": "117.8",
       "year": "2011",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 Q3",
       "value": "118.5",
       "year": "2011",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 Q4",
       "value": "119.6",
       "year": "2011",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 Q1",
       "value": "120",
       "year": "2012",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 Q2",
       "value": "120.9",
       "year": "2012",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 Q3",
       "value": "121.3",
       "year": "2012",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 Q4",
       "value": "122.6",
       "year": "2012",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 Q1",
       "value": "123.1",
       "year": "2013",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 Q2",
       "value": "123.9",
       "year": "2013",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 Q3",
       "value": "124.3",
       "year": "2013",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 Q4",
       "value": "125",
       "year": "2013",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 Q1",
       "value": "125.1",
       "year": "2014",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 Q2",
       "value": "125.9",
       "year": "2014",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     }
   ],
   "months": [
@@ -438,1094 +329,851 @@
       "value": "98.7",
       "year": "2005",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 FEB",
       "value": "98.9",
       "year": "2005",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 MAR",
       "value": "99.3",
       "year": "2005",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 APR",
       "value": "99.7",
       "year": "2005",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 MAY",
       "value": "100",
       "year": "2005",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 JUN",
       "value": "100",
       "year": "2005",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 JUL",
       "value": "100.1",
       "year": "2005",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 AUG",
       "value": "100.4",
       "year": "2005",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 SEP",
       "value": "100.5",
       "year": "2005",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 OCT",
       "value": "100.7",
       "year": "2005",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 NOV",
       "value": "100.7",
       "year": "2005",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2005 DEC",
       "value": "101",
       "year": "2005",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 JAN",
       "value": "100.6",
       "year": "2006",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 FEB",
       "value": "100.9",
       "year": "2006",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 MAR",
       "value": "101.1",
       "year": "2006",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 APR",
       "value": "101.6",
       "year": "2006",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 MAY",
       "value": "102.2",
       "year": "2006",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 JUN",
       "value": "102.4",
       "year": "2006",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 JUL",
       "value": "102.4",
       "year": "2006",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 AUG",
       "value": "102.8",
       "year": "2006",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 SEP",
       "value": "102.9",
       "year": "2006",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 OCT",
       "value": "103.1",
       "year": "2006",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 NOV",
       "value": "103.3",
       "year": "2006",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2006 DEC",
       "value": "103.9",
       "year": "2006",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 JAN",
       "value": "103.2",
       "year": "2007",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 FEB",
       "value": "103.6",
       "year": "2007",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 MAR",
       "value": "104",
       "year": "2007",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 APR",
       "value": "104.3",
       "year": "2007",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 MAY",
       "value": "104.6",
       "year": "2007",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 JUN",
       "value": "104.8",
       "year": "2007",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 JUL",
       "value": "104.3",
       "year": "2007",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 AUG",
       "value": "104.6",
       "year": "2007",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 SEP",
       "value": "104.7",
       "year": "2007",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 OCT",
       "value": "105.2",
       "year": "2007",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 NOV",
       "value": "105.4",
       "year": "2007",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2007 DEC",
       "value": "106",
       "year": "2007",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 JAN",
       "value": "105.4",
       "year": "2008",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 FEB",
       "value": "106.1",
       "year": "2008",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 MAR",
       "value": "106.5",
       "year": "2008",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 APR",
       "value": "107.3",
       "year": "2008",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 MAY",
       "value": "107.9",
       "year": "2008",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 JUN",
       "value": "108.6",
       "year": "2008",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 JUL",
       "value": "108.6",
       "year": "2008",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 AUG",
       "value": "109.2",
       "year": "2008",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 SEP",
       "value": "109.8",
       "year": "2008",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 OCT",
       "value": "109.5",
       "year": "2008",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 NOV",
       "value": "109.4",
       "year": "2008",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2008 DEC",
       "value": "109.1",
       "year": "2008",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 JAN",
       "value": "108.4",
       "year": "2009",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 FEB",
       "value": "109.2",
       "year": "2009",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 MAR",
       "value": "109.4",
       "year": "2009",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 APR",
       "value": "109.6",
       "year": "2009",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 MAY",
       "value": "110.1",
       "year": "2009",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 JUN",
       "value": "110.4",
       "year": "2009",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 JUL",
       "value": "110.4",
       "year": "2009",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 AUG",
       "value": "110.8",
       "year": "2009",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 SEP",
       "value": "110.8",
       "year": "2009",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 OCT",
       "value": "111",
       "year": "2009",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 NOV",
       "value": "111.3",
       "year": "2009",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2009 DEC",
       "value": "111.8",
       "year": "2009",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 JAN",
       "value": "111.6",
       "year": "2010",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 FEB",
       "value": "112",
       "year": "2010",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 MAR",
       "value": "112.6",
       "year": "2010",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 APR",
       "value": "113.1",
       "year": "2010",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 MAY",
       "value": "113.4",
       "year": "2010",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 JUN",
       "value": "113.5",
       "year": "2010",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 JUL",
       "value": "113.3",
       "year": "2010",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 AUG",
       "value": "113.8",
       "year": "2010",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 SEP",
       "value": "113.8",
       "year": "2010",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 OCT",
       "value": "114.1",
       "year": "2010",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 NOV",
       "value": "114.5",
       "year": "2010",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2010 DEC",
       "value": "115.5",
       "year": "2010",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 JAN",
       "value": "115.6",
       "year": "2011",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 FEB",
       "value": "116.4",
       "year": "2011",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 MAR",
       "value": "116.7",
       "year": "2011",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 APR",
       "value": "117.7",
       "year": "2011",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 MAY",
       "value": "117.9",
       "year": "2011",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 JUN",
       "value": "117.9",
       "year": "2011",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 JUL",
       "value": "117.9",
       "year": "2011",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 AUG",
       "value": "118.5",
       "year": "2011",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 SEP",
       "value": "119.2",
       "year": "2011",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 OCT",
       "value": "119.3",
       "year": "2011",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 NOV",
       "value": "119.5",
       "year": "2011",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2011 DEC",
       "value": "120",
       "year": "2011",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 JAN",
       "value": "119.5",
       "year": "2012",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 FEB",
       "value": "120.1",
       "year": "2012",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 MAR",
       "value": "120.5",
       "year": "2012",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 APR",
       "value": "121.1",
       "year": "2012",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 MAY",
       "value": "121.1",
       "year": "2012",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 JUN",
       "value": "120.6",
       "year": "2012",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 JUL",
       "value": "120.8",
       "year": "2012",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 AUG",
       "value": "121.3",
       "year": "2012",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 SEP",
       "value": "121.7",
       "year": "2012",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 OCT",
       "value": "122.3",
       "year": "2012",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 NOV",
       "value": "122.5",
       "year": "2012",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2012 DEC",
       "value": "123",
       "year": "2012",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 JAN",
       "value": "122.5",
       "year": "2013",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 FEB",
       "value": "123.2",
       "year": "2013",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 MAR",
       "value": "123.6",
       "year": "2013",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 APR",
       "value": "123.8",
       "year": "2013",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 MAY",
       "value": "124",
       "year": "2013",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 JUN",
       "value": "123.8",
       "year": "2013",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 JUL",
       "value": "123.8",
       "year": "2013",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 AUG",
       "value": "124.3",
       "year": "2013",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 SEP",
       "value": "124.7",
       "year": "2013",
       "month": "September",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 OCT",
       "value": "124.8",
       "year": "2013",
       "month": "October",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 NOV",
       "value": "124.8",
       "year": "2013",
       "month": "November",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2013 DEC",
       "value": "125.3",
       "year": "2013",
       "month": "December",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 JAN",
       "value": "124.7",
       "year": "2014",
       "month": "January",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 FEB",
       "value": "125.2",
       "year": "2014",
       "month": "February",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 MAR",
       "value": "125.5",
       "year": "2014",
       "month": "March",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 APR",
       "value": "125.8",
       "year": "2014",
       "month": "April",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 MAY",
       "value": "125.8",
       "year": "2014",
       "month": "May",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 JUN",
       "value": "126",
       "year": "2014",
       "month": "June",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 JUL",
       "value": "125.7",
       "year": "2014",
       "month": "July",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     },
     {
       "date": "2014 AUG",
       "value": "126.1",
       "year": "2014",
       "month": "August",
-      "quarter": null,
-      "sourceDataset": "MM23",
-      "updateDate": null
+      "sourceDataset": "MM23"
     }
   ],
   "sourceDatasets": [
     "MM23"
   ],
-  "cdid": "L522",
-  "unit": "index",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": "Consumer price indices are important indicators of how the UK economy is performing.\n\nThe indices are used in many ways by the government, businesses, and society in general. They can affect interest rates, tax allowances, wages, state benefits, pensions, maintenance, contracts and many other payments. They also show the impact of inflation on family budgets and affect the value of the pound in your pocket.",
+  "section": {
+    "markdown": "Consumer price indices are important indicators of how the UK economy is performing.\n\nThe indices are used in many ways by the government, businesses, and society in general. They can affect interest rates, tax allowances, wages, state benefits, pensions, maintenance, contracts and many other payments. They also show the impact of inflation on family budgets and affect the value of the pound in your pocket."
+  },
   "notes": [
     "The National Statistics status of CPIH has been discontinued pending work by ONS to investigate and improve the method for measuring owner occupiers\u0027 housing costs in this index\n",
     null
   ],
   "relatedDocuments": [
     {
-      "title": "Consumer Price Inflation, June 2014",
-      "summary": "CPI, CPIH, RPI and RPIJ inflation price indices for June 2014 - brief description and analysis",
-      "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014",
-      "index": null
+      "uri": "/economy/inflationandpriceindices/bulletins/consumerpriceinflationjune2014"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": false,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "CPIH",
-  "summary": null,
   "uri": "/economy/inflationandpriceindices/timeseries/l522",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Inflation and price indices",
-      "summary": "Inflation measures the rate of increase in prices for goods and services using price indices. The rate of inflation used in the UK government’s inflation target is measured using the Consumer Prices Index (CPI). One way to understand the CPI is to think of a very large shopping basket containing a large selection of the goods and services bought by households, the CPI estimates changes to the total cost of this basket.",
-      "uri": "/economy/inflationandpriceindices",
-      "index": null
+      "uri": "/economy/inflationandpriceindices"
     }
-  ]
+  ],
+  "description": {
+    "date": "September 2014",
+    "number": "126.2",
+    "additionalText": "Not a National Statistic. Index, 2005 \u003d 100",
+    "cdid": "L522",
+    "unit": "index",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": false,
+    "title": "CPIH"
+  }
 }

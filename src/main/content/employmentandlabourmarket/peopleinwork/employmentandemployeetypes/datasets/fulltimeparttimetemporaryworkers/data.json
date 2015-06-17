@@ -1,47 +1,32 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Full-time, part-time \u0026 temporary workers",
-      "cdids": null,
-      "xls": "http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/july-2014/table-a01.xls",
-      "csv": null
+      "xls": "http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/july-2014/table-a01.xls"
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Full-time, part-time \u0026 temporary workers",
-  "summary": "Brief description of dataset",
   "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/fulltimeparttimetemporaryworkers",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Employment and Labour market",
-      "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket",
-      "index": null
+      "uri": "/employmentandlabourmarket"
     },
     {
-      "title": "People in work",
-      "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork"
     },
     {
-      "title": "Employment and employee types",
-      "summary": "Those in employment are classed as those working for pay or those working for no pay in a family business. Employment rates for those aged 16 and over and those aged 16 to 64 are calculated from the Labour Force Survey (LFS). Other figures found here are for men and women in employment (also from the LFS) and vacancies (from the Vacancies survey).",
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Full-time, part-time \u0026 temporary workers",
+    "summary": "Brief description of dataset"
+  }
 }

@@ -1,73 +1,47 @@
 {
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid103",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid103"
     },
     {
-      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid104",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid104"
     },
     {
-      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid105",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid105"
     },
     {
-      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid106",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid106"
     },
     {
-      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid107",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid107"
     },
     {
-      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid108",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/housing/timeseries/raid108"
     }
   ],
   "datasets": [
     {
-      "title": "Average house prices",
-      "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/housing/datasets/averagehouseprices",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/housing/datasets/averagehouseprices"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "44.6 million adults (87%) in the UK had used the Internet in Q1 2014, an increase of 1.1 million since Q1 2013.",
-      "headline2": "6.4 million adults (13%) had never used the Internet, falling by 659,000 since Q1 2013.",
-      "headline3": "Almost all (99%) 16 to 24 year olds had used the Internet, compared with 37% of adults aged 75 years and over.",
-      "title": "House Price Index, May 2014",
-      "summary": "Mix-adjusted average house prices and house price indices for the UK and its component countries and regions.",
-      "uri": "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/housing/bulletins/housepriceindexmay2014"
     }
   ],
-  "relatedArticles": null,
   "index": 5,
   "type": "product_page",
-  "title": "Housing",
-  "summary": "Housing statistics focus mainly on data about house prices. These are often used as an informal indicator of the confidence people feel in the UK economy as well as being useful and of interest to the general public. Here you can find the latest figures on the level and growth of house prices across the UK. The data here is collected from a sample of mortgage completions and therefore does not include houses sold to cash buyers. ",
   "uri": "/peoplepopulationandcommunity/housing",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     }
-  ]
+  ],
+  "description": {
+    "title": "Housing",
+    "summary": "Housing statistics focus mainly on data about house prices. These are often used as an informal indicator of the confidence people feel in the UK economy as well as being useful and of interest to the general public. Here you can find the latest figures on the level and growth of house prices across the UK. The data here is collected from a sample of mortgage completions and therefore does not include houses sold to cash buyers. "
+  }
 }

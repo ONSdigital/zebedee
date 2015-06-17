@@ -1,79 +1,50 @@
 {
   "items": [
     {
-      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid9",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid9"
     },
     {
-      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid10",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid10"
     },
     {
-      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid11",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid11"
     },
     {
-      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid12",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid12"
     },
     {
-      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid13",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid13"
     },
     {
-      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid14",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/constructionindustry/timeseries/raid14"
     }
   ],
   "datasets": [
     {
-      "title": "Construction output",
-      "summary": "Range of construction figures by sector and region",
-      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionoutput",
-      "index": null
+      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionoutput"
     },
     {
-      "title": "Construction - All work summary",
-      "summary": "Brief description of dataset",
-      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionallworksummary",
-      "index": null
+      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionallworksummary"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "In Q2 2014 there was estimated to be no growth in construction output when compared with Q1 2014.",
-      "headline2": "However, the annual growth between Q2 2014 and Q2 2013 was estimated to have increased by 4.8%.",
-      "headline3": "The monthly estimates for construction output for June 2014 increased by 1.2% when compared with May 2014, with new work increasing by 0.9% and repair \u0026 maintenance increasing by 1.6%.",
-      "title": "Output in the Construction Industry, June and Q2 2014",
-      "summary": "Construction output at current price and chained volume measures seasonally adjusted by public and private sector.",
-      "uri": "/businessindustryandtrade/constructionindustry/bulletins/outputintheconstructionindustryjuneandq22014",
-      "index": null
+      "uri": "/businessindustryandtrade/constructionindustry/bulletins/outputintheconstructionindustryjuneandq22014"
     }
   ],
-  "relatedArticles": null,
   "index": 3,
   "type": "product_page",
-  "title": "Construction industry",
-  "summary": "The construction industry includes businesses that are involved with the construction of entirely new buildings or the repair, alterations or additions to existing properties. Also included are businesses involved in civil engineering projects. Output of the construction industry is defined as the amount charged by construction companies to customers for the value of work produced in a given period. Users of data on the construction industry include central government departments, Eurostat and various industry analysts.",
   "uri": "/businessindustryandtrade/constructionindustry",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     }
-  ]
+  ],
+  "description": {
+    "title": "Construction industry",
+    "summary": "The construction industry includes businesses that are involved with the construction of entirely new buildings or the repair, alterations or additions to existing properties. Also included are businesses involved in civil engineering projects. Output of the construction industry is defined as the amount charged by construction companies to customers for the value of work produced in a given period. Users of data on the construction industry include central government departments, Eurostat and various industry analysts."
+  }
 }

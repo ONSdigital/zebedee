@@ -1,11 +1,5 @@
 {
-  "headline1": "Over half a million people aged 90 and over were living in the United Kingdom in 2012.",
-  "headline2": "For every 100 men aged 90 and over there were 264 women in 2012; this has fallen from 336 women in 2002.",
-  "headline3": "The number of centenarians living in the UK has risen by 73% over the last decade to 13,350 in 2012.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key points",
@@ -46,9 +40,7 @@
     {
       "title": "Quality and Methodological Review",
       "markdown": "ONS has an ongoing project reviewing the methods used to produce estimates for the population aged 90 and over and their accuracy. This review includes testing the assumptions inherent in the KT method and comparing the estimates of the very old and Census estimates with administrative data sources. When completed, results of the review will be published on the ONS website.\n\nEstimates of the Very Old are calculated from deaths data. The Kannisto-Thatcher methodology produces a lower estimate of the total population aged 90 and over in 2012 for England and Wales, for Scotland and for Northern Ireland than the official  mid year 90 and over total population estimates for those countries. However in order to provide users with a consistent set of single year estimates beyond age 89, once produced the Estimates of the Very Old for ages 90 and over are constrained to sum to the 90 and over totals in the Mid Year Estimates (MYE) for males and females separately (see Methodology section).\n\nThe MYE are produced by rolling forward the census population estimates allowing for ageing, births, deaths and migration. Any error in the 90 and over census estimate is thereby carried forward to the inter-censal mid-year population estimates and will be reflected in the Estimates of the Very Old.\n\nThere is some degree of uncertainty around all population estimates. In addition to non-response, other possible sources of error in the census estimate for people aged 90 and over include inaccuracies in reporting of dates of birth (for example proxy reporting by carers). Such inaccuracies have been documented in previous censuses1, 2.\n\nThe methodology used to produce the Estimates of the Very Old (including Centenarians) includes assumptions (namely the accuracy and completeness of the deaths data; the stability of mortality improvement; and no migration at older ages). Recording of date of birth at death registration may be more accurate than reporting of date of birth in the census, however as date of birth on death certificates is not validated there are also likely to be some inaccuracies in this data source.\n\nEstimates of the Very Old for the UK are aggregates of the single year estimates of the 90 and over population produced for England and Wales, Scotland and Northern Ireland (see Methodology section). It would be possible to produce these estimates for the UK by applying the KT methodology to an aggregation of population and deaths data for England and Wales, Scotland and Northern Ireland. The review will include an assessment of this alternative method.\n\nInitial results from the review indicate that the 2012 MYE 90+ totals that the KT estimates are constrained to are in line with comparable data for this age group available from administrative sources held by the Department of Work and Pensions (DWP) and Department of Health (DH).\n\n##### Notes for Quality and Methodological Review\n\n1. Thatcher, R. (Summer 1999). ‘The demography of centenarians in England and  Wales’, Population Trends, No. 96 pp 5-12.\n2. Census 2001 Quality report for England and Wales; 2011 Census Quality Survey report.\n3. Quality and Methodology Information for Estimates of the Very Old.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "1. ONS published population estimates for the 90-94 and 95 and over age groups at Lower Super Output area in December 2013. These estimates are not National Statistics. They were published in order to elicit feedback on whether the estimates meet user requirements. The reliability of these estimates is discussed in an accompanying research paper. The assessments and the research paper are available at http://www.ons.gov.uk/ons/guide-method/method-quality/specific/population-and-migration/pop-ests/lsoa-population-estimates-of-the-very-old--research-paper.zip\n\n2. Follow ONS on Twitter and Facebook\n\n3. Details of the policy governing the release of new data are available by visiting www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html or from the Media Relations Office email: media.relations@ons.gsi.gov.uk\n\nThese National Statistics are produced to high professional standards and released according to the arrangements approved by the UK Statistics Authority.\n"
@@ -62,44 +54,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "ageing@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Estimates of the Very Old (including Centenarians) for the United Kingdom, 2002-2012",
-  "summary": "Annual mid-year population estimates by sex and single of age for people aged 90 to 104 and for the 105 and over age group, 2002-2012 for the United Kingdom.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/bulletins/estimatesoftheveryoldincludingcentenariansfortheunitedkingdom20022012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Ageing",
-      "summary": "Ageing analysis builds on life expectancy and population estimates, summarising the latest analysis of official statistics on population ageing and the lives of older people. They also provide ageing indicators such as median age and sex ratios at older ages at the national and local level.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "Over half a million people aged 90 and over were living in the United Kingdom in 2012.",
+    "headline2": "For every 100 men aged 90 and over there were 264 women in 2012; this has fallen from 336 women in 2002.",
+    "headline3": "The number of centenarians living in the UK has risen by 73% over the last decade to 13,350 in 2012.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "ageing@ons.gsi.gov.uk"
+    },
+    "title": "Estimates of the Very Old (including Centenarians) for the United Kingdom, 2002-2012",
+    "summary": "Annual mid-year population estimates by sex and single of age for people aged 90 to 104 and for the 105 and over age group, 2002-2012 for the United Kingdom.",
+    "keywords": []
+  }
 }

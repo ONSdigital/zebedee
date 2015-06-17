@@ -1,249 +1,142 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "2597",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "1993",
       "value": "2178",
-      "year": "1993",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1993"
     },
     {
       "date": "1994",
       "value": "2350",
-      "year": "1994",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1994"
     },
     {
       "date": "1995",
       "value": "2540",
-      "year": "1995",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1995"
     },
     {
       "date": "1996",
       "value": "2618",
-      "year": "1996",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1996"
     },
     {
       "date": "1997",
       "value": "2817",
-      "year": "1997",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1997"
     },
     {
       "date": "1998",
       "value": "2976",
-      "year": "1998",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1998"
     },
     {
       "date": "1999",
       "value": "3110",
-      "year": "1999",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1999"
     },
     {
       "date": "2000",
       "value": "2932",
-      "year": "2000",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2000"
     },
     {
       "date": "2001",
       "value": "3093",
-      "year": "2001",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2001"
     },
     {
       "date": "2002",
       "value": "2830",
-      "year": "2002",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2002"
     },
     {
       "date": "2003",
       "value": "2623",
-      "year": "2003",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2003"
     },
     {
       "date": "2004",
       "value": "2787",
-      "year": "2004",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2004"
     },
     {
       "date": "2005",
       "value": "2762",
-      "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2005"
     },
     {
       "date": "2006",
       "value": "2570",
-      "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2006"
     },
     {
       "date": "2007",
       "value": "2640",
-      "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2007"
     },
     {
       "date": "2008",
       "value": "2928",
-      "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2008"
     },
     {
       "date": "2009",
       "value": "2878",
-      "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2009"
     },
     {
       "date": "2010",
       "value": "2747",
-      "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2010"
     },
     {
       "date": "2011",
       "value": "2652",
-      "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2011"
     },
     {
       "date": "2012",
       "value": "2597",
-      "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2012"
     }
   ],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID98",
-  "unit": "",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
-      "title": "Alcohol-related deaths in the United Kingdom, registered in 2012",
-      "summary": "This bulletin presents the latest figures for alcohol-related deaths in the UK, its four constituent countries and regions of England. Comparisons are made between 2012, the latest year, and previously published data from 2002 onwards.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/alcoholrelateddeathsintheunitedkingdomregisteredin2012",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/alcoholrelateddeathsintheunitedkingdomregisteredin2012"
     },
     {
-      "title": "Deaths Related to Drug Poisoning in England and Wales, 2012",
-      "summary": "Deaths related to drug poisoning in England and Wales for the last five years. Data from 1993 are available to download, and are discussed in the commentary to provide context to the latest (2012) data. Figures are presented by cause of death, sex, age, substance(s) involved in the death, country and region.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/deathsrelatedtodrugpoisoninginenglandandwales2012",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/deathsrelatedtodrugpoisoninginenglandandwales2012"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Deaths from drug-related poisoning",
-  "summary": null,
   "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Health and social care",
-      "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
     },
     {
-      "title": "Drug use, alcohol and smoking",
-      "summary": "Statistics on drug use, alcohol and smoking focus on deaths and illnesses related to these areas. Deaths related to drugs can be through drug poisoning or drug misuse. It is important to know whether deaths related to these areas are rising or falling overall or rising for some groups and falling for others as this information is key when making decisions on allocating resources and creating policies aimed at reducing these illnesses and deaths.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "2597",
+    "cdid": "RAID98",
+    "unit": "",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Deaths from drug-related poisoning"
+  }
 }

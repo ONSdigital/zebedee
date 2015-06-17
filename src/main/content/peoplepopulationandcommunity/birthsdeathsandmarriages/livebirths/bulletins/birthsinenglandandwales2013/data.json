@@ -1,11 +1,5 @@
 {
-  "headline1": "There were 698,512 live births in England and Wales in 2013, a decrease of 4.3% from 729,674 in 2012.",
-  "headline2": "In 2013, the Total Fertility Rate (TFR) decreased to 1.85 children per woman, from 1.94 in 2012.",
-  "headline3": "In 2013 the stillbirth rate fell to 4.7 per thousand total births, from 4.9 in 2012.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key Findings",
@@ -54,9 +48,7 @@
     {
       "title": "Further Information",
       "markdown": "More data on [births in England and Wales in 2013](http://www.ons.gov.uk/ons/publications/re-reference-tables.html?edition\u003dtcm%3A77-317529 \"2013\") are available on the ONS website.\n\nData on [deaths in England and Wales in 2013](http://www.ons.gov.uk/ons/rel/vsob1/death-reg-sum-tables/2013/index.html \"2013\") are available on the ONS website.\n\nA [Quality and Methodology Information (275.2 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/population/quality-and-methodology-information-for-birth-statistics.pdf \"Quality and Methodology Information for Birth Statistics\") document for birth statistics is available on the ONS website. Further information on data quality, legislation and procedures relating to births is available on the ONS website in [births metadata (439.7 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/user-guidance/health-and-life-events/births-metadata.pdf \"Births metadata\") .\n\nFurther 2013 births statistics will be published later in 2013; see the [Publication Hub](http://www.ons.gov.uk/ons/external-links/publication-hub.html \"Publication Hub\") for more details on releases.\n\nThere is a new version of the [interactive mapping tool](http://www.neighbourhood.statistics.gov.uk/HTMLDocs/dvc170/index.html \"interactive mapping tool\") which enables the total fertility rate to be analysed at the local level for the years 2001 to 2013. The tool now includes revised rates for 2002-2010 which have been calculated using population estimates revised to take account of the 2011 Census.\n\nFor births data for other UK countries please see the [latest birth statistics for Northern Ireland](http://www.ons.gov.uk/ons/external-links/devolved-admins/nisra/nisra---births-statistics.html \"NISRA Birth Statistics\") and the [latest birth statistics for Scotland](http://www.ons.gov.uk/ons/external-links/devolved-admins/scottish-government/gro-scotland--births.html \"GRO Scotland: Births\").\n\nInternational comparisons of live birth numbers and rates are available in the [Vital Statistics: Population and Health Reference Tables](http://www.ons.gov.uk/ons/rel/vsob1/vital-statistics--population-and-health-reference-tables/index.html \"[Vital Statistics: Population and Health Reference Tables index\").\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "References",
       "markdown": "1000 Lives Plus, Transforming Maternity Services- Welsh Initiative for Stillbirth Reduction (WISR) [accessed 01 July 2014], available at: [www.1000livesplus.wales.nhs.uk/maternity-services-stillbirth](http://www.1000livesplus.wales.nhs.uk/maternity-services-stillbirth \"1000 lives births\")\n\nDel Bono E, Weber A, Winter-Ebmer R (2014) Fertility and economic instability: the role of unemployment and job displacement, available at: [www.iser.essex.ac.uk/publications/working-papers/iser/2014-06.pdf](http://www.iser.essex.ac.uk/publications/working-papers/iser/2014-06.pdf \"www.iser.essex.ac.uk\")\n\nDepartment for Health (2013) Public Health Outcomes Framework, available at: [www.gov.uk/government/publications/healthy-lives-healthy-people-improving-outcomes-and-supporting-transparency](http://www.gov.uk/government/publications/healthy-lives-healthy-people-improving-outcomes-and-supporting-transparency \"GOV.UK - Healthy lives, healthy people; Improving outcomes\")\n\nDepartment for Health (2012) NHS Outcomes Framework, available at: [www.gov.uk/government/publications/nhs-outcomes-framework-2013-to-2014](http://www.gov.uk/government/publications/nhs-outcomes-framework-2013-to-2014 \"GOV.UK - NHS Outcomes 2013 to 2014\")\n\nDepartment for Work and Pensions (2013) Simplifying the welfare system and making sure work pays, available at: [www.gov.uk/government/policies/simplifying-the-welfare-system-and-making-sure-work-pays](http://https//www.gov.uk/government/policies/simplifying-the-welfare-system-and-making-sure-work-pays \"GOV.UK - Simplifying the walfare system\")\n\nGardosi J, Madurasinghe V, Williams M, Malik A and Francis A (2013) ‘Maternal and fetal risk factors for stillbirth: population based study’, British Medical Journal, 346:f108, available at: [www.ncbi.nlm.nih.gov/pmc/articles/PMC3554866/pdf/bmj.f108.pdf](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3554866/pdf/bmj.f108.pdf \"www.ncbi.nlm.nih.gov - Maternal and fetal risk factors for stillbirth: population based study\")\n\nJefferies J (2008) [Fertility Assumptions for the 2006-based national population projections (297 Kb Pdf)](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--131--spring-2008/fertility-assumptions-for-the-2006-based-national-population-projections.pdf \"[Fertility Assumptions for the 2006-based national population projections\") , Population Trends 131 pp 19–27, available at: [www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--131--spring-2008/2006-based-national-population-projections-for-the-uk-and-constituent-countries.pdf](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--131--spring-2008/2006-based-national-population-projections-for-the-uk-and-constituent-countries.pdf \"ONS.GOV.UK - Fertility Assumptions for the 2006-based national population projections\")\n\nLanzieri G (2013) Towards a ‘baby recession’ in Europe? Available at: [epp.eurostat.ec.europa.eu/cache/ITY_OFFPUB/KS-SF-13-013/EN/KS-SF-13-013-EN.PDF](http://epp.eurostat.ec.europa.eu/cache/ITY_OFFPUB/KS-SF-13-013/EN/KS-SF-13-013-EN.PDF \"eurostat.ec.europa.eu - Towards a ‘baby recession’ in Europe?\")\n\nNi Bhrolcháin M and Beaujouan E (2012) Fertility postponement is largely due to rising educational enrolment, Population Studies: A Journal of Demography, available at: [http://www.tandfonline.com/doi/pdf/10.1080/00324728.2012.697569](http://www.ons.gov.uk/ons/external-links/other/taylor---francis---fertility-postponement-due-to-rising-educational-enrolment.html \"www.tandfonline.com - Fertility postponement is largely due to rising educational enrolment, Population Studies\")\n\nONS (2012) ‘Childbearing of UK and non-UK born women living in the UK, 2011’, available at: [www.ons.gov.uk/ons/rel/fertility-analysis/childbearing-of-uk-and-non-uk-born-women-living-in-the-uk/2011/index.html](http://www.ons.gov.uk/ons/rel/fertility-analysis/childbearing-of-uk-and-non-uk-born-women-living-in-the-uk/2011.html \"ONS.GOV.UK - Childbearing of UK and non-UK born women living in the UK, 2011\")\n\nONS (2013) ‘Childbearing of UK and non-UK born women living in the UK, 2011 Census data’, available at: [www.ons.gov.uk/ons/rel/fertility-analysis/childbearing-of-uk-and-non-uk-born-women-living-in-the-uk/2011-census-data/index.html](http://www.ons.gov.uk/ons/rel/fertility-analysis/childbearing-of-uk-and-non-uk-born-women-living-in-the-uk/2011-census-data.html \"ONS.GOV.UK - Childbearing of UK and non-UK born women living in the UK, 2011 Census data\")\n\nONS (2013) ‘Why has the fertility rate risen over the last decade in England and Wales’, available at: [www.ons.gov.uk/ons/rel/vsob1/birth-summary-tables--england-and-wales/2011--final-/sty-fertility.html](http://www.ons.gov.uk/ons/rel/vsob1/birth-summary-tables--england-and-wales/2011--final-/sty-fertility.html \"ONS.GOV.UK - Why has the fertility rate risen over the last decade in England and Wales\")\n\nStillbirth and Neonatal Death charity (Sands) UK stillbirth and neonatal death charity, Sands and the Department of Health progress stillbirth public awareness initiative [accessed 23 June 2014], available at: [http://uk-sands.org/news/research/2013-03-06/sands-and-department-health-progress-stillbirth-public-awareness-initiative](http://www.ons.gov.uk/ons/external-links/other/sands.html \"uk-sands.org - Sands and the Department of Health progress stillbirth public awareness initiative\")\n\nTromans N, Natamba E, Jefferies J and Norman P (2008) ‘Have national trends in fertility between 1986 and 2006 occurred evenly across England and Wales?’, Population Trends 133, pp 7–19, autumn 2008, available at: [www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--133--autumn-2008/have-national-trends-in-fertility-between-1986-and-2006-occurred-evenly-across-england-and-wales-.pdf](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--133--autumn-2008/have-national-trends-in-fertility-between-1986-and-2006-occurred-evenly-across-england-and-wales-.pdf \"Have national trends in fertility between 1986 and 2006 occurred evenly across England and Wales?\")\n"
@@ -70,44 +62,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "vsob@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Births in England and Wales, 2013",
-  "summary": "Annual data of live births, fertility rates, percentage of births outside marriage, sex ratio, mean age of mother and country of birth of mother and father.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/birthsinenglandandwales2013",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Live births",
-      "summary": "Statistics on live births are a subset of numbers from the data that the ONS obtains from the births and deaths registrations. They are available by sex, month of the year and region of the UK. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "There were 698,512 live births in England and Wales in 2013, a decrease of 4.3% from 729,674 in 2012.",
+    "headline2": "In 2013, the Total Fertility Rate (TFR) decreased to 1.85 children per woman, from 1.94 in 2012.",
+    "headline3": "In 2013 the stillbirth rate fell to 4.7 per thousand total births, from 4.9 in 2012.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "vsob@ons.gsi.gov.uk"
+    },
+    "title": "Births in England and Wales, 2013",
+    "summary": "Annual data of live births, fertility rates, percentage of births outside marriage, sex ratio, mean age of mother and country of birth of mother and father.",
+    "keywords": []
+  }
 }

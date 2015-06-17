@@ -1,41 +1,29 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "cdids": null,
-      "xls": "http://www.ons.gov.uk/ons/rel/construction/output-in-the-construction-industry/june-and-q2-2014/rft-output-tables-june-2014.xls",
-      "csv": null
+      "xls": "http://www.ons.gov.uk/ons/rel/construction/output-in-the-construction-industry/june-and-q2-2014/rft-output-tables-june-2014.xls"
     }
   ],
-  "notes": null,
-  "description": "Range of construction data by sector and region.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Range of construction data by sector and region."
+  },
   "type": "dataset",
-  "title": "Construction output",
-  "summary": "Range of construction figures by sector and region",
   "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionoutput",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     },
     {
-      "title": "Construction industry",
-      "summary": "The construction industry includes businesses that are involved with the construction of entirely new buildings or the repair, alterations or additions to existing properties. Also included are businesses involved in civil engineering projects. Output of the construction industry is defined as the amount charged by construction companies to customers for the value of work produced in a given period. Users of data on the construction industry include central government departments, Eurostat and various industry analysts.",
-      "uri": "/businessindustryandtrade/constructionindustry",
-      "index": null
+      "uri": "/businessindustryandtrade/constructionindustry"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Construction output",
+    "summary": "Range of construction figures by sector and region"
+  }
 }

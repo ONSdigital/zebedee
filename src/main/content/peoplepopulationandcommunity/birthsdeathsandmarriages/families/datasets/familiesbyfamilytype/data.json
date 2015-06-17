@@ -1,47 +1,32 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "cdids": null,
-      "xls": "http://www.ons.gov.uk/ons/rel/family-demography/families-and-households/2013/rft-tables.xls",
-      "csv": null
+      "xls": "http://www.ons.gov.uk/ons/rel/family-demography/families-and-households/2013/rft-tables.xls"
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Families by family type",
-  "summary": "Brief description of dataset",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesbyfamilytype",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Families",
-      "summary": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Families by family type",
+    "summary": "Brief description of dataset"
+  }
 }

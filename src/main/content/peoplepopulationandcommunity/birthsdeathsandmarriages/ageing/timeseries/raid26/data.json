@@ -1,62 +1,37 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "141160",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID26",
-  "unit": "",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "Estimates of the Very Old (including Centenarians) for the United Kingdom, 2002-2012",
-      "summary": "Annual mid-year population estimates by sex and single of age for people aged 90 to 104 and for the 105 and over age group, 2002-2012 for the United Kingdom.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/bulletins/estimatesoftheveryoldincludingcentenariansfortheunitedkingdom20022012",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/bulletins/estimatesoftheveryoldincludingcentenariansfortheunitedkingdom20022012"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Men aged 90 and over",
-  "summary": null,
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing/timeseries/raid26",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Ageing",
-      "summary": "Ageing analysis builds on life expectancy and population estimates, summarising the latest analysis of official statistics on population ageing and the lives of older people. They also provide ageing indicators such as median age and sex ratios at older ages at the national and local level.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/ageing"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "141160",
+    "cdid": "RAID26",
+    "unit": "",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Men aged 90 and over"
+  }
 }

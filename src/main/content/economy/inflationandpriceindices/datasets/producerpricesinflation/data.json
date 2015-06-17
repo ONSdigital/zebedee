@@ -1,5 +1,4 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Producer Prices Inflation",
@@ -11,39 +10,28 @@
         "K646",
         "K644",
         "K647"
-      ],
-      "xls": null,
-      "csv": null
+      ]
     }
   ],
-  "notes": null,
-  "description": "Comprehensive dataset covering input and output index series. Price movement data at all manufacturing, aggregated industry and product group level. Data supplied from individual UK manufacturers, importers and exporters.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive dataset covering input and output index series. Price movement data at all manufacturing, aggregated industry and product group level. Data supplied from individual UK manufacturers, importers and exporters."
+  },
   "type": "dataset",
-  "title": "Producer Prices Inflation",
-  "summary": "Comprehensive dataset covering input and output index series",
   "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Inflation and price indices",
-      "summary": "Inflation measures the rate of increase in prices for goods and services using price indices. The rate of inflation used in the UK government’s inflation target is measured using the Consumer Prices Index (CPI). One way to understand the CPI is to think of a very large shopping basket containing a large selection of the goods and services bought by households, the CPI estimates changes to the total cost of this basket.",
-      "uri": "/economy/inflationandpriceindices",
-      "index": null
+      "uri": "/economy/inflationandpriceindices"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Producer Prices Inflation",
+    "summary": "Comprehensive dataset covering input and output index series"
+  }
 }

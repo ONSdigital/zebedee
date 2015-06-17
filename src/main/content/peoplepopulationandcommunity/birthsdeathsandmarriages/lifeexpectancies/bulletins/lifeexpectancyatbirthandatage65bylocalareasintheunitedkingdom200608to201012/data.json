@@ -1,11 +1,5 @@
 {
-  "headline1": "The inequality in life expectancy between the local areas with the highest and lowest figures decreased for only males at birth between 2000–02 and 2010–12.",
-  "headline2": "The majority of local areas in Scotland (72%) were in the fifth of local areas in the UK with the lowest male and female life expectancy at birth in 2010–12.",
-  "headline3": "None of the local areas in Scotland and Wales and only one in Northern Ireland were in the fifth of areas with the highest male and female life expectancy at birth.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key Findings",
@@ -57,44 +51,32 @@
     }
   ],
   "accordion": [],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "mortality@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "bulletin",
-  "title": "Life Expectancy at Birth and at Age 65 by Local Areas in the United Kingdom, 2006-08 to 2010-12",
-  "summary": "2010-12 male and female period life expectancy at birth and at age 65 for the UK and local areas within the four constituent countries.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/lifeexpectancyatbirthandatage65bylocalareasintheunitedkingdom200608to201012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Life expectancies",
-      "summary": "Life expectancy statistics use population estimates with statistics on the number of deaths to derive an estimate of how long, on average, people of various ages can expect to live.  These statistics are used by central and local governments to make planning and resource allocation decisions and are of general interest to the public. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "The inequality in life expectancy between the local areas with the highest and lowest figures decreased for only males at birth between 2000–02 and 2010–12.",
+    "headline2": "The majority of local areas in Scotland (72%) were in the fifth of local areas in the UK with the lowest male and female life expectancy at birth in 2010–12.",
+    "headline3": "None of the local areas in Scotland and Wales and only one in Northern Ireland were in the fifth of areas with the highest male and female life expectancy at birth.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "mortality@ons.gsi.gov.uk"
+    },
+    "title": "Life Expectancy at Birth and at Age 65 by Local Areas in the United Kingdom, 2006-08 to 2010-12",
+    "summary": "2010-12 male and female period life expectancy at birth and at age 65 for the UK and local areas within the four constituent countries.",
+    "keywords": []
+  }
 }

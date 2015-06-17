@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "International migration",
-  "summary": "International migration statistics provide estimates of the number of people moving in and out of the UK. Data on long term migration, short term migration, and visitor data provide a picture of those entering and leaving the UK, covering all lengths of stay. ",
-  "uri": "releases/internationalmigration",
-  "breadcrumb": null
+  "uri": "releases/internationalmigration"
 }

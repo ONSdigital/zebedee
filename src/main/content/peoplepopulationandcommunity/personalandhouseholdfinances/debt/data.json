@@ -1,57 +1,39 @@
 {
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid109",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid109"
     },
     {
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid110",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid110"
     },
     {
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid111",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid111"
     },
     {
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid112",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid112"
     },
     {
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid113",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt/timeseries/raid113"
     }
   ],
   "datasets": [],
   "statsBulletins": [],
-  "relatedArticles": null,
   "index": 0,
   "type": "product_page",
-  "title": "Debt",
-  "summary": "Debt statistics found here focus on debt levels for people and households. These statistics come from the Wealth and Assets Survey (WAS). They tell us about financial debt, which includes credit and store cards that are not settled each month, overdrafts and all forms of fixed term loans. They also tell us about property debt, which is defined as the liabilities held against a household\u0027s main residence (mainly mortgages). Also available is data on how people feel about their level of debt.  ",
   "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances/debt",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Personal and household finances",
-      "summary": "Statistics on personal and household finances help us build a picture of how people in the UK are funding their lifestyles. Key statistics here are on household and personal debt, expenditure, income and wealth.",
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances"
     }
-  ]
+  ],
+  "description": {
+    "title": "Debt",
+    "summary": "Debt statistics found here focus on debt levels for people and households. These statistics come from the Wealth and Assets Survey (WAS). They tell us about financial debt, which includes credit and store cards that are not settled each month, overdrafts and all forms of fixed term loans. They also tell us about property debt, which is defined as the liabilities held against a household\u0027s main residence (mainly mortgages). Also available is data on how people feel about their level of debt.  "
+  }
 }

@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Divorce",
-  "summary": "Statistics on divorces allow us to map changing social attitudes to divorce and give an indication of the number of children growing up with divorced parents. They are available by the age and sex of the divorcees, who divorce was granted to and the areas of the UK divorces are more likely to happen in. ",
-  "uri": "releases/divorce",
-  "breadcrumb": null
+  "uri": "releases/divorce"
 }

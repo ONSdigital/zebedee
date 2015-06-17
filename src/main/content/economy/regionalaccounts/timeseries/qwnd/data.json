@@ -1,604 +1,400 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "1069687",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "1948",
       "value": "8027",
       "year": "1948",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1949",
       "value": "8433",
       "year": "1949",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1950",
       "value": "8932",
       "year": "1950",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1951",
       "value": "9652",
       "year": "1951",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1952",
       "value": "10366",
       "year": "1952",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1953",
       "value": "11102",
       "year": "1953",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1954",
       "value": "11675",
       "year": "1954",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1955",
       "value": "12650",
       "year": "1955",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1956",
       "value": "13565",
       "year": "1956",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1957",
       "value": "14252",
       "year": "1957",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1958",
       "value": "14908",
       "year": "1958",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1959",
       "value": "15829",
       "year": "1959",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1960",
       "value": "17062",
       "year": "1960",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1961",
       "value": "18295",
       "year": "1961",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1962",
       "value": "19178",
       "year": "1962",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1963",
       "value": "20357",
       "year": "1963",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1964",
       "value": "21990",
       "year": "1964",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1965",
       "value": "23552",
       "year": "1965",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1966",
       "value": "25009",
       "year": "1966",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1967",
       "value": "26031",
       "year": "1967",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1968",
       "value": "27774",
       "year": "1968",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1969",
       "value": "29579",
       "year": "1969",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1970",
       "value": "32506",
       "year": "1970",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1971",
       "value": "35741",
       "year": "1971",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1972",
       "value": "41276",
       "year": "1972",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1973",
       "value": "47783",
       "year": "1973",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1974",
       "value": "55483",
       "year": "1974",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1975",
       "value": "68835",
       "year": "1975",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1976",
       "value": "79356",
       "year": "1976",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1977",
       "value": "89264",
       "year": "1977",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1978",
       "value": "104837",
       "year": "1978",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1979",
       "value": "125845",
       "year": "1979",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1980",
       "value": "148809",
       "year": "1980",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1981",
       "value": "164639",
       "year": "1981",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1982",
       "value": "178353",
       "year": "1982",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1983",
       "value": "191943",
       "year": "1983",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1984",
       "value": "209504",
       "year": "1984",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1985",
       "value": "228570",
       "year": "1985",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1986",
       "value": "248398",
       "year": "1986",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1987",
       "value": "263301",
       "year": "1987",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1988",
       "value": "291517",
       "year": "1988",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1989",
       "value": "323843",
       "year": "1989",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1990",
       "value": "364526",
       "year": "1990",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1991",
       "value": "400049",
       "year": "1991",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1992",
       "value": "430447",
       "year": "1992",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1993",
       "value": "459888",
       "year": "1993",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1994",
       "value": "476506",
       "year": "1994",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1995",
       "value": "505238",
       "year": "1995",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1996",
       "value": "539546",
       "year": "1996",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1997",
       "value": "572955",
       "year": "1997",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1998",
       "value": "601632",
       "year": "1998",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "1999",
       "value": "627077",
       "year": "1999",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2000",
       "value": "664662",
       "year": "2000",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2001",
       "value": "703968",
       "year": "2001",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2002",
       "value": "724861",
       "year": "2002",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2003",
       "value": "757637",
       "year": "2003",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2004",
       "value": "789515",
       "year": "2004",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2005",
       "value": "820218",
       "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2006",
       "value": "863252",
       "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2007",
       "value": "890363",
       "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2008",
       "value": "921444",
       "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2009",
       "value": "954247",
       "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2010",
       "value": "999828",
       "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2011",
       "value": "1027025",
       "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2012",
       "value": "1068078",
       "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "BB",
-      "updateDate": null
+      "sourceDataset": "BB"
     },
     {
       "date": "2013",
       "value": "1125626",
       "year": "2013",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     }
   ],
   "quarters": [
@@ -606,631 +402,491 @@
       "date": "1997 Q1",
       "value": "138870",
       "year": "1997",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1997 Q2",
       "value": "148548",
       "year": "1997",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1997 Q3",
       "value": "146304",
       "year": "1997",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1997 Q4",
       "value": "151187",
       "year": "1997",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1998 Q1",
       "value": "144597",
       "year": "1998",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1998 Q2",
       "value": "157972",
       "year": "1998",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1998 Q3",
       "value": "153277",
       "year": "1998",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1998 Q4",
       "value": "159421",
       "year": "1998",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1999 Q1",
       "value": "146613",
       "year": "1999",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1999 Q2",
       "value": "166737",
       "year": "1999",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1999 Q3",
       "value": "157070",
       "year": "1999",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1999 Q4",
       "value": "170626",
       "year": "1999",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000 Q1",
       "value": "159605",
       "year": "2000",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000 Q2",
       "value": "174113",
       "year": "2000",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000 Q3",
       "value": "172244",
       "year": "2000",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000 Q4",
       "value": "182670",
       "year": "2000",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001 Q1",
       "value": "172168",
       "year": "2001",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001 Q2",
       "value": "183910",
       "year": "2001",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001 Q3",
       "value": "179923",
       "year": "2001",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001 Q4",
       "value": "189623",
       "year": "2001",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002 Q1",
       "value": "175797",
       "year": "2002",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002 Q2",
       "value": "192534",
       "year": "2002",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002 Q3",
       "value": "185989",
       "year": "2002",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002 Q4",
       "value": "197691",
       "year": "2002",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003 Q1",
       "value": "183789",
       "year": "2003",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003 Q2",
       "value": "199835",
       "year": "2003",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003 Q3",
       "value": "193750",
       "year": "2003",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003 Q4",
       "value": "206282",
       "year": "2003",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004 Q1",
       "value": "189254",
       "year": "2004",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004 Q2",
       "value": "207467",
       "year": "2004",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004 Q3",
       "value": "202722",
       "year": "2004",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004 Q4",
       "value": "211127",
       "year": "2004",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005 Q1",
       "value": "198691",
       "year": "2005",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005 Q2",
       "value": "215073",
       "year": "2005",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005 Q3",
       "value": "210134",
       "year": "2005",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005 Q4",
       "value": "223588",
       "year": "2005",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006 Q1",
       "value": "207885",
       "year": "2006",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006 Q2",
       "value": "225009",
       "year": "2006",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006 Q3",
       "value": "220828",
       "year": "2006",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006 Q4",
       "value": "231982",
       "year": "2006",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007 Q1",
       "value": "219166",
       "year": "2007",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007 Q2",
       "value": "236556",
       "year": "2007",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007 Q3",
       "value": "231921",
       "year": "2007",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007 Q4",
       "value": "245059",
       "year": "2007",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008 Q1",
       "value": "227121",
       "year": "2008",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008 Q2",
       "value": "246577",
       "year": "2008",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008 Q3",
       "value": "236709",
       "year": "2008",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008 Q4",
       "value": "252230",
       "year": "2008",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009 Q1",
       "value": "232099",
       "year": "2009",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009 Q2",
       "value": "257516",
       "year": "2009",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009 Q3",
       "value": "247174",
       "year": "2009",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009 Q4",
       "value": "262967",
       "year": "2009",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010 Q1",
       "value": "252298",
       "year": "2010",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010 Q2",
       "value": "267646",
       "year": "2010",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010 Q3",
       "value": "260853",
       "year": "2010",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010 Q4",
       "value": "272015",
       "year": "2010",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011 Q1",
       "value": "254159",
       "year": "2011",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011 Q2",
       "value": "272803",
       "year": "2011",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011 Q3",
       "value": "265173",
       "year": "2011",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011 Q4",
       "value": "275788",
       "year": "2011",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012 Q1",
       "value": "260923",
       "year": "2012",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012 Q2",
       "value": "285687",
       "year": "2012",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012 Q3",
       "value": "274943",
       "year": "2012",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012 Q4",
       "value": "285487",
       "year": "2012",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013 Q1",
       "value": "263574",
       "year": "2013",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013 Q2",
       "value": "290212",
       "year": "2013",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013 Q3",
       "value": "280769",
       "year": "2013",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013 Q4",
       "value": "291071",
       "year": "2013",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2014 Q1",
       "value": "273404",
       "year": "2014",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2014 Q2",
       "value": "298872",
       "year": "2014",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     }
   ],
   "months": [],
@@ -1239,48 +895,32 @@
     "RGHI",
     "UKEA"
   ],
-  "cdid": "QWND",
-  "unit": "m",
-  "preUnit": "£",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "Regional Gross Disposable Household Income (GDHI), 2012",
-      "summary": "This bulletin presents the latest estimates of Gross Disposable Household Income (GDHI) for regions (see Table 1), sub-regions and local areas of the UK.",
-      "uri": "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012",
-      "index": null
+      "uri": "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "UK Gross Disposable Household Income",
-  "summary": null,
   "uri": "/economy/regionalaccounts/timeseries/qwnd",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Regional accounts",
-      "summary": "Regional Accounts are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts.  These accounts allow comparisons between regions and comparisons of a region against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income. ",
-      "uri": "/economy/regionalaccounts",
-      "index": null
+      "uri": "/economy/regionalaccounts"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "1069687",
+    "cdid": "QWND",
+    "unit": "m",
+    "preUnit": "£",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "UK Gross Disposable Household Income"
+  }
 }

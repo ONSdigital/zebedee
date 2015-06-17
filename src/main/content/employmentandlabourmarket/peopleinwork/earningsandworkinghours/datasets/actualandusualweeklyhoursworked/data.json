@@ -1,5 +1,4 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Actual and usual weekly hours worked",
@@ -19,45 +18,31 @@
         "YBVA",
         "YBVD",
         "YBVG"
-      ],
-      "xls": null,
-      "csv": null
+      ]
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Actual and usual weekly hours worked",
-  "summary": "Brief description of dataset",
   "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/actualandusualweeklyhoursworked",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Employment and Labour market",
-      "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket",
-      "index": null
+      "uri": "/employmentandlabourmarket"
     },
     {
-      "title": "People in work",
-      "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork"
     },
     {
-      "title": "Earnings and working hours",
-      "summary": "Earnings are the reward for work and they can be paid on a regular basis or as bonus pay. Total pay combines both regular and bonus pay. The Office for National Statistics reports the level and growth rate of average weekly total, regular and bonus pay. Working hours are given as the average weekly hours worked by full-time and part-time workers.",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Actual and usual weekly hours worked",
+    "summary": "Brief description of dataset"
+  }
 }

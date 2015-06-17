@@ -1,11 +1,5 @@
 {
-  "headline1": "The number of divorces in England and Wales in 2012 was 118,140, an increase of 0.5% since 2011, when there were 117,558 divorces.",
-  "headline2": "In 2012, 10.8 people divorced per thousand married population, a decrease of 19% compared with 13.3 in 2002.",
-  "headline3": "The number of divorces in 2012 was highest among men and women aged 40 to 44.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key findings",
@@ -74,9 +68,7 @@
     {
       "title": "Further information",
       "markdown": "More data on [divorces in England and Wales](http://www.ons.gov.uk/ons/rel/vsob1/divorces-in-england-and-wales/index.html \"Divorces in England and Wales index\") are available on the Office for National Statistics (ONS) website.\n\nONS [divorces metadata (187.4 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/user-guidance/health-and-life-events/divorces-metadata.pdf \"Divorces metadata\") provides further information on data quality, legislation and procedures relating to divorces.\n\nThe [ONS divorces Quality and Methodology Information (123.1 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/population/quality-and-methodology-information-for-divorces-in-england-and-wales.pdf \"Quality and Methodology Information for England and Wales index\") provides overview notes which pull together key qualitative information on the various dimensions of quality as well as providing a summary of methods used to compile the output.\n\nAnnual divorce figures for the UK and constituent countries can be found in the [Vital Statistics: Population and Health Reference tables](http://www.ons.gov.uk/ons/rel/vsob1/vital-statistics--population-and-health-reference-tables/index.html \"Vital Statistics: Population and Health Reference tables index\").\n\n[Scottish Government](http://www.ons.gov.uk/ons/external-links/devolved-admins/scottish-government/scottish-government---divorces-and-dissolutions.html \"Scottish Government - Divorces and Dissolutions\") provide divorce statistics for Scotland.\n\n[Northern Ireland Statistics and Research Agency](http://www.ons.gov.uk/ons/external-links/devolved-admins/nisra/nisra-divorces.html \"NISRA divorces\") provide divorce statistics for Northern Ireland.\n\nDivorce statistics are also available from the Ministry of Justice in [Court Statistics Quarterly](https://www.gov.uk/government/publications/court-statistics-quarterly-july-to-september-2013 \"Court Statistics Quarterly\").\n\nFurther statistics on [marriages](http://www.ons.gov.uk/ons/rel/vsob1/marriages-in-england-and-wales--provisional-/index.html \"Marriages in England and Wales (provisional) index\"), [civil partnership and civil partnership dissolutions](http://www.ons.gov.uk/ons/rel/vsob2/civil-partnership-statistics--united-kingdom/index.html \"Civil Partnership Statistics, United Kingdom index\") are available on the ONS website, as are data on [families and households](http://www.ons.gov.uk/ons/rel/family-demography/families-and-households/index.html \"Families and Households index\") which presents recent estimates of the number of families by type, people in families by type, and children in families by type.\n\n[Population estimates by marital status](http://www.ons.gov.uk/ons/rel/pop-estimate/population-estimates-by-marital-status/index.html \"Population Estimates by Marital Status index\") provide the estimated resident population by single year of age, sex and marital status (single, married, divorced, and widowed) for England and Wales.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "References",
       "markdown": "Beaujouan, E. and Bhrolcháin, M. (2011) [Cohabitation and marriage in Britain since the 1970s (283.5 Kb Pdf)](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--145--autumn-2011/ard-pt145-cohab-marriage-trends.pdf \"ARD PT145 Cohab Marriage Trends\") , Population Trends 145.\n\nBradford Wilcox, W. (2011) [The State of Our Unions, Marriage in America 2009](http://www.ons.gov.uk/ons/external-links/articles-and-summaries/articles/the-state-of-our-unions--marriage-in-america-2009--money-and-marriage.html \"The State of Our Unions, Marriage in America 2009, Money and Marriage\"), Money and Marriage, University of Virginia, The National Marriage Project.\n\nChowdhury, A (2013) ‘[Til recession do us part: booms, busts and divorce in the United States](http://www.tandfonline.com/doi/full/10.1080/13504851.2012.689104#preview \"Til recession do us part: booms, busts and divorce in the United States\"), Applied Economic Letters 20: 255-261.\n\nWilson, B. and Smallwood, S. (2008) [The proportion of marriages ending in divorce (244.2 Kb Pdf)](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--131--spring-2008/the-proportion-of-marriages-ending-in-divorce.pdf \"The proportion of marriages ending in divorce\") , Population Trends 131.\n\nVaitilingham, R. (2011) [Recession Britain](http://www.ons.gov.uk/ons/external-links/articles-and-summaries/articles/index.html \"Recession Britain, Economic and Social Research Council (ESRC)\") [pdf], Economic and Social Research Council (ESRC) Available at [www.esrc.ac.uk](http://http://www.esrc.ac.uk/ \"esrc.ac.uk\") [Accessed 11 December 2012].\n"
@@ -90,44 +82,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "vsob@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Divorces in England and Wales, 2012",
-  "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Divorce",
-      "summary": "Statistics on divorces allow us to map changing social attitudes to divorce and give an indication of the number of children growing up with divorced parents. They are available by the age and sex of the divorcees, who divorce was granted to and the areas of the UK divorces are more likely to happen in. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "The number of divorces in England and Wales in 2012 was 118,140, an increase of 0.5% since 2011, when there were 117,558 divorces.",
+    "headline2": "In 2012, 10.8 people divorced per thousand married population, a decrease of 19% compared with 13.3 in 2002.",
+    "headline3": "The number of divorces in 2012 was highest among men and women aged 40 to 44.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "vsob@ons.gsi.gov.uk"
+    },
+    "title": "Divorces in England and Wales, 2012",
+    "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
+    "keywords": []
+  }
 }

@@ -1,41 +1,29 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "cdids": null,
-      "xls": "http://www.ons.gov.uk/ons/rel/hpi/house-price-index/may-2014/rft-monthly-and-qtly-may14.xls",
-      "csv": null
+      "xls": "http://www.ons.gov.uk/ons/rel/hpi/house-price-index/may-2014/rft-monthly-and-qtly-may14.xls"
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Average house prices",
-  "summary": "Brief description of dataset",
   "uri": "/peoplepopulationandcommunity/housing/datasets/averagehouseprices",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Housing",
-      "summary": "Housing statistics focus mainly on data about house prices. These are often used as an informal indicator of the confidence people feel in the UK economy as well as being useful and of interest to the general public. Here you can find the latest figures on the level and growth of house prices across the UK. The data here is collected from a sample of mortgage completions and therefore does not include houses sold to cash buyers. ",
-      "uri": "/peoplepopulationandcommunity/housing",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/housing"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Average house prices",
+    "summary": "Brief description of dataset"
+  }
 }

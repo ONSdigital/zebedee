@@ -1,11 +1,5 @@
 {
-  "headline1": "The three most common cancers for men in 2012 remained prostate (25.9%), lung (13.6%) and colorectal (13.4%).",
-  "headline2": "The three most common cancers for women in 2012 remained breast (30.9%), lung (11.9%) and colorectal (10.9%).",
-  "headline3": "Liver cancer incidence has increased by 70% for males and 60% for females from 2003 to 2012. This is now the 18th most common cancer in England.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key findings",
@@ -62,9 +56,7 @@
     {
       "title": "Additional Information",
       "markdown": "Further cancer statistics are available on the ONS website:\n\n[Cancer incidence and mortality in the United Kingdom](http://www.ons.gov.uk/ons/publications/all-releases.html?definition\u003dtcm%3A77-21518 \"Cancer incidence and mortality in the United Kingdom\")\n\n[Cancer survival in England](http://www.ons.gov.uk/ons/publications/all-releases.html?definition\u003dtcm%3A77-21521 \"Cancer survival in England\")\n\n[Index of cancer survival for Clinical Commissioning Groups in England](http://www.ons.gov.uk/ons/rel/cancer-unit/a-cancer-survival-index-for-clinical-commissioning-groups/adults-diagnosed-1996-2011-and-followed-up-to-2012/index.html \"Adults Diagnosed 1996-2011 and Followed up to 2012\")\n\n[Cancer survival by NHS England Area Team](http://www.ons.gov.uk/ons/rel/cancer-unit/cancer-survival-by-nhs-england-area-teams/adults-diagnosed-1996-2011-and-followed-up-to-2012/index.html \"Adults Diagnosed 1996-2011 and Followed up to 2012\")\n\n[Geographic patterns of cancer survival in England](http://www.ons.gov.uk/ons/rel/cancer-unit/geographic-patterns-of-cancer-survival-in-england/index.html \"Geographic patterns of cancer survival in England index\")\n\n[Cancer survival for Children in England](http://www.ons.gov.uk/ons/rel/cancer-unit/cancer-survival-for-children-in-england/index.html \"Cancer survival for Children in England index\")\n\nFurther cancer statistics for the UK:\n\nStatistics on cancer in Scotland are available from the [Information Services Division (ISD)](http://www.isdscotland.org/Health-Topics/Cancer/ \"Information Services Division (ISD)\"), Scotland.\n\nStatistics on cancer in Wales are available from the [Welsh Cancer Intelligence Surveillance Unit](http://www.wales.nhs.uk/sites3/home.cfm?OrgID\u003d242 \"Welsh Cancer Intelligence Surveillance Unit\").\n\nStatistics on cancer in Northern Ireland are available from the [Northern Ireland Cancer Registry](http://www.qub.ac.uk/research-centres/nicr/ \"Northern Ireland Cancer Registry\").\n\nFurther information about statistics on cancer registrations published by the Office for National Statistics (ONS) can be found in the [Cancer Registration Statistics Quality and Methodology Information paper](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/health-and-social-care/index.html \"Cancer Registration Statistics Quality and Methodology Information paper\").\n\nQuality and Methodology Information papers are overview notes which pull together key qualitative information on the various dimensions of the quality of statistics as well as providing a summary of the methods used to compile the output. Information about key users of these statistics is also provided.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "References",
       "markdown": "Bosch FX, Ribes J, Díaz M, and Cléries R. (2004). [Primary liver cancer: worldwide incidence and trends](http://www.ncbi.nlm.nih.gov/pubmed/15508102 \"Primary liver cancer: worldwide incidence and trends\"). Gastroenterology. 127(5 Suppl 1): S5-S16.\n\nCancer Research UK (2012). [High risk groups for bowel cancer](http://www.cancerresearchuk.org/cancer-help/type/bowel-cancer/about/risks/high-risk-groups-for-bowel-cancer \"High risk groups for bowel cancer\").\n\nCommunities and Local Government (2011). [The English Indices of Deprivation 2010](https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/6871/1871208.pdf \"The English Indices of Deprivation 2010\").\n\nForman D, Bray F, Brewster DH, Gombe Mbalawa C, Kohler B, PiÃ±eros M, Steliarova-Foucher E, Swaminathan R and Ferlay J., eds (2013). [Cancer Incidence in Five Continents, Vol. X (electronic version)](http://ci5.iarc.fr/CI5I-X/Pages/Table10q_sel.aspx \"Cancer Incidence in Five Continents, Vol. X (electronic version)\") Lyon, IARC. http://ci5.iarc.fr last accessed on 16 June 2014.\n\nGiovannucci E, Harlan DM, Archer MC, Bergenstal RM, Gapstur SM, Habel LA, Pollak M, Regensteiner JG, and Yee D (2010). [Diabetes and Cancer. A consensus report](http://care.diabetesjournals.org/content/33/7/1674.long \"Diabetes and Cancer. A consensus report\"). Diabetes Care. 33, 1674-1685.\n\nHowson CP, Hiyama T and Wynder EL. (1986). [The decline in gastric cancer: epidemiology of an unplanned triumph](http://epirev.oxfordjournals.org/content/8/1/1.citation \"The decline in gastric cancer: epidemiology of an unplanned triumph\"). Epidemiologic Reviews. 8, 1-27.\n\nNational Cancer Intelligence Network (2008). [Cancer Incidence by Deprivation, England, 1995-2004](http://www.ncin.org.uk/publications/reports/ \"Cancer Incidence by Deprivation, England, 1995-2004\").\n\nOffice for National Statistics (2013). [General Lifestyle Survey, 2011](http://www.ons.gov.uk/ons/rel/ghs/general-lifestyle-survey/index.html \"General Lifestyle Survey, 2011\").\n\nOffice of Population Censuses and Surveys (1994). Registry/ONS Interface Document. National Cancer Registration System, England and Wales. London: OPCS 1994 (subsequently revised).\n\nParkin DM, Boyd L, and Walker LC (2011). [16. The fraction of cancer attributable to lifestyle and environmental factors in the UK in 2010. Summary and conclusions](http://www.nature.com/bjc/journal/v105/n2s/pdf/bjc2011489a.pdf \"The fraction of cancer attributable to lifestyle and environmental factors in the UK in 2010. Summary and conclusions\"), British Journal of Cancer 105 (S2), S77-S81.\n\nParkin DM, Chen VW, Ferlay J, Galceran J, Storm HH and Whelan SL (1994). Comparability and Quality Control in Cancer Registration. IARC Technical Report No. 19. Lyons: International Agency for Research on Cancer.\n\nParkin DM, Mesher D, and Sasieni P (2011). [13. Cancer attributable to solar (ultraviolet) radiation exposure in the UK in 2010](http://www.nature.com/bjc/journal/v105/n2s/pdf/bjc2011486a.pdf \"Cancer attributable to solar (ultraviolet) radiation exposure in the UK in 2010\"), British Journal of Cancer 105 (S2), S66-S69.\n\nQuinn M, Babb P, Brock A, Kirby L, and Jones J (2001). [Cancer trends in England and Wales, 1950–1999](http://www.ons.gov.uk/ons/rel/cancer-unit/cancer-trends-in-england-and-wales/smps-no--66/index.html \"SMPS No.66\"). Studies on Medical and Population Subjects No.66, London: The Stationery Office.\n\nShack L, Jordan C, Thomson C S, Mak V, and Møller H (2008). [Variation in incidence of breast, lung and cervical cancer and malignant melanoma of skin by socioeconomic group in England](http://www.biomedcentral.com/content/pdf/1471-2407-8-271.pdf \"Variation in incidence of breast, lung and cervical cancer and malignant melanoma of skin by socioeconomic group in England\"), BMC Cancer, 8, 271.\n"
@@ -82,44 +74,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "cancer.newport@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Cancer Statistics Registrations, England (Series MB1), No. 43, 2012",
-  "summary": "The number of diagnoses and incidence rates of all types of cancer by age and sex, and by region of residence in England.",
   "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/bulletins/cancerstatisticsregistrationsenglandseriesmb1no432012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Health and social care",
-      "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
     },
     {
-      "title": "Conditions and diseases",
-      "summary": "We publish statistics on many different health conditions and diseases collected from health bodies across the UK. However, key statistics in this area are on newly diagnosed cancers and deaths related to diseases mainly caught when a person is already in hospital, e.g. MRSA and Clostridium difficile.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "The three most common cancers for men in 2012 remained prostate (25.9%), lung (13.6%) and colorectal (13.4%).",
+    "headline2": "The three most common cancers for women in 2012 remained breast (30.9%), lung (11.9%) and colorectal (10.9%).",
+    "headline3": "Liver cancer incidence has increased by 70% for males and 60% for females from 2003 to 2012. This is now the 18th most common cancer in England.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "cancer.newport@ons.gsi.gov.uk"
+    },
+    "title": "Cancer Statistics Registrations, England (Series MB1), No. 43, 2012",
+    "summary": "The number of diagnoses and incidence rates of all types of cancer by age and sex, and by region of residence in England.",
+    "keywords": []
+  }
 }

@@ -1,145 +1,94 @@
 {
-  "seasonalAdjustment": null,
-  "date": "Q1 2014",
-  "number": "-13905",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "1999",
       "value": "-7393",
       "year": "1999",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000",
       "value": "-4495",
       "year": "2000",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001",
       "value": "-11392",
       "year": "2001",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002",
       "value": "-20940",
       "year": "2002",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003",
       "value": "-24782",
       "year": "2003",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004",
       "value": "-29127",
       "year": "2004",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005",
       "value": "-32659",
       "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006",
       "value": "-25130",
       "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007",
       "value": "-37074",
       "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008",
       "value": "-33440",
       "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009",
       "value": "-30839",
       "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010",
       "value": "-33139",
       "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011",
       "value": "-27928",
       "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012",
       "value": "-40622",
       "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013",
       "value": "-52385",
       "year": "2013",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     }
   ],
   "quarters": [
@@ -147,607 +96,467 @@
       "date": "1999 Q1",
       "value": "-2677",
       "year": "1999",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1999 Q2",
       "value": "-2174",
       "year": "1999",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1999 Q3",
       "value": "-1816",
       "year": "1999",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "1999 Q4",
       "value": "-726",
       "year": "1999",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000 Q1",
       "value": "-1159",
       "year": "2000",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000 Q2",
       "value": "-1332",
       "year": "2000",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000 Q3",
       "value": "-1254",
       "year": "2000",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2000 Q4",
       "value": "-750",
       "year": "2000",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001 Q1",
       "value": "-1862",
       "year": "2001",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001 Q2",
       "value": "-3048",
       "year": "2001",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001 Q3",
       "value": "-3058",
       "year": "2001",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2001 Q4",
       "value": "-3424",
       "year": "2001",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002 Q1",
       "value": "-4945",
       "year": "2002",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002 Q2",
       "value": "-4575",
       "year": "2002",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002 Q3",
       "value": "-5922",
       "year": "2002",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2002 Q4",
       "value": "-5498",
       "year": "2002",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003 Q1",
       "value": "-6046",
       "year": "2003",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003 Q2",
       "value": "-5830",
       "year": "2003",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003 Q3",
       "value": "-6021",
       "year": "2003",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2003 Q4",
       "value": "-6885",
       "year": "2003",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004 Q1",
       "value": "-7290",
       "year": "2004",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004 Q2",
       "value": "-7802",
       "year": "2004",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004 Q3",
       "value": "-6971",
       "year": "2004",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2004 Q4",
       "value": "-7064",
       "year": "2004",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005 Q1",
       "value": "-7698",
       "year": "2005",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005 Q2",
       "value": "-8012",
       "year": "2005",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005 Q3",
       "value": "-8505",
       "year": "2005",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2005 Q4",
       "value": "-8444",
       "year": "2005",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006 Q1",
       "value": "-6643",
       "year": "2006",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006 Q2",
       "value": "-4745",
       "year": "2006",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006 Q3",
       "value": "-6749",
       "year": "2006",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2006 Q4",
       "value": "-6993",
       "year": "2006",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007 Q1",
       "value": "-9204",
       "year": "2007",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007 Q2",
       "value": "-9412",
       "year": "2007",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007 Q3",
       "value": "-9429",
       "year": "2007",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2007 Q4",
       "value": "-9029",
       "year": "2007",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008 Q1",
       "value": "-9366",
       "year": "2008",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008 Q2",
       "value": "-9093",
       "year": "2008",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008 Q3",
       "value": "-7617",
       "year": "2008",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2008 Q4",
       "value": "-7364",
       "year": "2008",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009 Q1",
       "value": "-6983",
       "year": "2009",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009 Q2",
       "value": "-8007",
       "year": "2009",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009 Q3",
       "value": "-7225",
       "year": "2009",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2009 Q4",
       "value": "-8624",
       "year": "2009",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010 Q1",
       "value": "-7901",
       "year": "2010",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010 Q2",
       "value": "-7880",
       "year": "2010",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010 Q3",
       "value": "-9525",
       "year": "2010",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2010 Q4",
       "value": "-7833",
       "year": "2010",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011 Q1",
       "value": "-7362",
       "year": "2011",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011 Q2",
       "value": "-5231",
       "year": "2011",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011 Q3",
       "value": "-7722",
       "year": "2011",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2011 Q4",
       "value": "-7613",
       "year": "2011",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012 Q1",
       "value": "-9235",
       "year": "2012",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012 Q2",
       "value": "-10316",
       "year": "2012",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012 Q3",
       "value": "-10355",
       "year": "2012",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2012 Q4",
       "value": "-10716",
       "year": "2012",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013 Q1",
       "value": "-11981",
       "year": "2013",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013 Q2",
       "value": "-12648",
       "year": "2013",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013 Q3",
       "value": "-12529",
       "year": "2013",
-      "month": null,
       "quarter": "Q3",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2013 Q4",
       "value": "-15227",
       "year": "2013",
-      "month": null,
       "quarter": "Q4",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2014 Q1",
       "value": "-13916",
       "year": "2014",
-      "month": null,
       "quarter": "Q1",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     },
     {
       "date": "2014 Q2",
       "value": "-13366",
       "year": "2014",
-      "month": null,
       "quarter": "Q2",
-      "sourceDataset": "UKEA",
-      "updateDate": null
+      "sourceDataset": "UKEA"
     }
   ],
   "months": [],
   "sourceDatasets": [
     "UKEA"
   ],
-  "cdid": "MHN9",
-  "unit": "m",
-  "preUnit": "£",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "UK Trade, June 2014",
-      "summary": "UK Trade shows the extent of import and export activity and is a key contributor to the overall economic growth in the UK.",
-      "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014",
-      "index": null
+      "uri": "/businessindustryandtrade/internationaltrade/bulletins/uktradejune2014"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Balance of trade in goods from EMU member",
-  "summary": null,
   "uri": "/businessindustryandtrade/internationaltrade/timeseries/mhn9",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     },
     {
-      "title": "International trade",
-      "summary": "International trade is the exchange of goods and services across international borders. Here, you can find statistics on the types of goods traded internationally and the general trends in international trade. A key statistic is the balance on international trade, in recent times the UK has generally had a deficit on its trade in goods and a surplus on its trade in services which has led to an overall deficit in the UK\u0027s balance of international trade. ",
-      "uri": "/businessindustryandtrade/internationaltrade",
-      "index": null
+      "uri": "/businessindustryandtrade/internationaltrade"
     }
-  ]
+  ],
+  "description": {
+    "date": "Q1 2014",
+    "number": "-13905",
+    "cdid": "MHN9",
+    "unit": "m",
+    "preUnit": "£",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Balance of trade in goods from EMU member"
+  }
 }

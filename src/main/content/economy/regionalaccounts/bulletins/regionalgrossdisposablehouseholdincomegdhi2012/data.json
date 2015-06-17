@@ -1,11 +1,5 @@
 {
-  "headline1": "In 2012 London had the highest GDHI per head, where the average person had £21,446 available to save or spend.",
-  "headline2": "Of the 37 NUTS2 sub-regions, in 2012 Inner London had the highest GDHI per head, where the average person had £24,940 available to save or spend.",
-  "headline3": "Between 2011 and 2012, GDHI per head of population increased in all NUTS1 regions.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key points",
@@ -61,38 +55,29 @@
     }
   ],
   "accordion": [],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "trevor.fenton@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "bulletin",
-  "title": "Regional Gross Disposable Household Income (GDHI), 2012",
-  "summary": "This bulletin presents the latest estimates of Gross Disposable Household Income (GDHI) for regions (see Table 1), sub-regions and local areas of the UK.",
   "uri": "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Regional accounts",
-      "summary": "Regional Accounts are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts.  These accounts allow comparisons between regions and comparisons of a region against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income. ",
-      "uri": "/economy/regionalaccounts",
-      "index": null
+      "uri": "/economy/regionalaccounts"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "In 2012 London had the highest GDHI per head, where the average person had £21,446 available to save or spend.",
+    "headline2": "Of the 37 NUTS2 sub-regions, in 2012 Inner London had the highest GDHI per head, where the average person had £24,940 available to save or spend.",
+    "headline3": "Between 2011 and 2012, GDHI per head of population increased in all NUTS1 regions.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "trevor.fenton@ons.gsi.gov.uk"
+    },
+    "title": "Regional Gross Disposable Household Income (GDHI), 2012",
+    "summary": "This bulletin presents the latest estimates of Gross Disposable Household Income (GDHI) for regions (see Table 1), sub-regions and local areas of the UK.",
+    "keywords": []
+  }
 }

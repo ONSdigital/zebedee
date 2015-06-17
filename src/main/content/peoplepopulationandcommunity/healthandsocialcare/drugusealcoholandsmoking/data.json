@@ -1,79 +1,47 @@
 {
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid98"
     },
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid99",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid99"
     },
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid100",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/timeseries/raid100"
     }
   ],
   "datasets": [
     {
-      "title": "Deaths from drug-related poisoning and drug misuse, by sex",
-      "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/deathsfromdrugrelatedpoisoninganddrugmisusebysex",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/alcoholrelateddeathsuk"
     },
     {
-      "title": "Alcohol-related deaths, UK",
-      "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/alcoholrelateddeathsuk",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/datasets/deathsfromdrugrelatedpoisoninganddrugmisusebysex"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "In 2012 there were 8,367 alcohol-related deaths in the UK, 381 fewer than in 2011 (8,748).",
-      "headline2": "Males accounted for approximately 65% of all alcohol-related deaths in the UK in 2012.",
-      "headline3": "Death rates were highest among men aged 60 to 64 years (42.6 deaths per 100,000 population) and women aged 55 to 59 years (22.2 deaths per 100,000).",
-      "title": "Alcohol-related deaths in the United Kingdom, registered in 2012",
-      "summary": "This bulletin presents the latest figures for alcohol-related deaths in the UK, its four constituent countries and regions of England. Comparisons are made between 2012, the latest year, and previously published data from 2002 onwards.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/alcoholrelateddeathsintheunitedkingdomregisteredin2012",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/alcoholrelateddeathsintheunitedkingdomregisteredin2012"
     },
     {
-      "headline1": "There were 1,706 male drug poisoning deaths (involving both legal and illegal drugs) registered in 2012, a 4% decrease since 2011.",
-      "headline2": "Female drug poisoning deaths have increased every year since 2009, reaching 891 in 2012.",
-      "headline3": "1,086 in 2012; female deaths decreased by 1% from 413 in 2011 to 410 in 2012.",
-      "title": "Deaths Related to Drug Poisoning in England and Wales, 2012",
-      "summary": "Deaths related to drug poisoning in England and Wales for the last five years. Data from 1993 are available to download, and are discussed in the commentary to provide context to the latest (2012) data. Figures are presented by cause of death, sex, age, substance(s) involved in the death, country and region.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/deathsrelatedtodrugpoisoninginenglandandwales2012",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/deathsrelatedtodrugpoisoninginenglandandwales2012"
     }
   ],
-  "relatedArticles": null,
   "index": 1,
   "type": "product_page",
-  "title": "Drug use, alcohol and smoking",
-  "summary": "Statistics on drug use, alcohol and smoking focus on deaths and illnesses related to these areas. Deaths related to drugs can be through drug poisoning or drug misuse. It is important to know whether deaths related to these areas are rising or falling overall or rising for some groups and falling for others as this information is key when making decisions on allocating resources and creating policies aimed at reducing these illnesses and deaths.",
   "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Health and social care",
-      "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
     }
-  ]
+  ],
+  "description": {
+    "title": "Drug use, alcohol and smoking",
+    "summary": "Statistics on drug use, alcohol and smoking focus on deaths and illnesses related to these areas. Deaths related to drugs can be through drug poisoning or drug misuse. It is important to know whether deaths related to these areas are rising or falling overall or rising for some groups and falling for others as this information is key when making decisions on allocating resources and creating policies aimed at reducing these illnesses and deaths."
+  }
 }

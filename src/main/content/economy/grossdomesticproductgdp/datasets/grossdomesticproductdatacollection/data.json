@@ -1,5 +1,4 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Gross Domestic Product data collection",
@@ -25,39 +24,28 @@
         "NPQR",
         "IHXT",
         "IHXW"
-      ],
-      "xls": null,
-      "csv": null
+      ]
     }
   ],
-  "notes": null,
-  "description": "High level overview of the economy covering income, output and expenditure measures.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "High level overview of the economy covering income, output and expenditure measures."
+  },
   "type": "dataset",
-  "title": "Gross Domestic Product data collection",
-  "summary": "High level overview of the economy",
   "uri": "/economy/grossdomesticproductgdp/datasets/grossdomesticproductdatacollection",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Gross Domestic Product (GDP)",
-      "summary": "Gross domestic product (GDP) is a measure of economic activity which captures the value of goods and services that a country produces during a given period.",
-      "uri": "/economy/grossdomesticproductgdp",
-      "index": null
+      "uri": "/economy/grossdomesticproductgdp"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Gross Domestic Product data collection",
+    "summary": "High level overview of the economy"
+  }
 }

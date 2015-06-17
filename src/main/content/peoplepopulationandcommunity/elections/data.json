@@ -1,53 +1,35 @@
 {
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/elections/timeseries/raid87",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/elections/timeseries/raid87"
     },
     {
-      "uri": "/peoplepopulationandcommunity/elections/timeseries/raid88",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/elections/timeseries/raid88"
     }
   ],
   "datasets": [
     {
-      "title": "Electoral Statistics",
-      "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/elections/datasets/electoralstatistics",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/elections/datasets/electoralstatistics"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "The total number of UK parliamentary electors in 2013 was 46,139,900, a fall of 0.5% from 2012.",
-      "headline2": "The total number of UK local government electors in 2013 was 47,691,800, a fall of 0.1% from 2012.",
-      "headline3": "Between 2012 and 2013, the number of both parliamentary and local government electors declined in both England and Northern Ireland, while the number of parliamentary electors declined in Wales.",
-      "title": "Electoral Statistics for UK, 2013",
-      "summary": "Analysis of the annual counts of the number of people registered to vote in 2013, including comparisons over time and between the UK constituent countries.",
-      "uri": "/peoplepopulationandcommunity/elections/bulletins/electoralstatisticsforuk2013",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/elections/bulletins/electoralstatisticsforuk2013"
     }
   ],
-  "relatedArticles": null,
   "index": 10,
   "type": "product_page",
-  "title": "Elections",
-  "summary": "The key statistic in this section is the number of people who are listed on electoral registers. This differs from the number of people who are eligible to vote. These statistics are available for the constituent countries of the UK. ",
   "uri": "/peoplepopulationandcommunity/elections",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     }
-  ]
+  ],
+  "description": {
+    "title": "Elections",
+    "summary": "The key statistic in this section is the number of people who are listed on electoral registers. This differs from the number of people who are eligible to vote. These statistics are available for the constituent countries of the UK. "
+  }
 }

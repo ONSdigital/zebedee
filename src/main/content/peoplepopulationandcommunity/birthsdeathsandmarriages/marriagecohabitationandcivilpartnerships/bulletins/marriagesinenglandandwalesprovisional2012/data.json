@@ -1,21 +1,5 @@
 {
-  "headline1": "In 2012, the provisional number of marriages in England and Wales increased by 5.3% to 262,240, from 249,133 in 2011.",
-  "headline2": "Civil ceremonies accounted for 70% of all marriages that took place in 2012, an increase from 66% in 2002.",
-  "headline3": "The greatest number of marriages was for men and women aged 25 to 29.",
-  "relatedBulletins": [
-    {
-      "headline1": "The provisional number of civil partnerships in the UK in 2012 was 7,037, an increase of 3.6% since 2011.",
-      "headline2": "The average age of men forming a civil partnership in the UK in 2012 was 40.0 years, while for women the average age was 37.6 years. These figures represent a small decrease in average ages in comparison to 2011.",
-      "headline3": "These figures represent a small decrease in average ages in comparison to 2011.",
-      "title": "Civil Partnerships in the UK, 2012",
-      "summary": "Annual statistics on civil partnerships that were formed in the United Kingdom (UK) in 2012, as well as those which were dissolved. Civil partnership statistics are analysed by sex, age, previous marital status and area of occurrence. Figures on formations for Northern Ireland and the UK are provisional and all dissolution data are provisional.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/civilpartnershipsintheuk2012",
-      "index": null
-    }
-  ],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
+  "relatedBulletins": [],
   "sections": [
     {
       "title": "Key Findings",
@@ -76,9 +60,7 @@
     {
       "title": "Further Information",
       "markdown": "More data on [Marriages in England and Wales](http://www.ons.gov.uk/ons/rel/vsob1/marriages-in-england-and-wales--provisional-/index.html \"Marriages in England and Wales (provisional) index\") in 2012 are available on the Office for National Statistics (ONS) website.\n\n[ONS Marriages Metadata (420.6 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/user-guidance/health-and-life-events/marriages-2011.pdf \"Marriages metadata\") provides further information on data quality, legislation and procedures relating to marriages.\n\n[ONS Marriages Quality and Methodology Information (214.1 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/social-statistics/quality-and-methodology-information-for-marriages-in-england-and-wales.pdf \"Quality and Methodology Information for Marriages in England and Wales\") provides overview notes which pull together key qualitative information on the various dimensions of quality as well as providing a summary of methods used to compile the output.\n\nAnnual marriage figures for the UK and constituent countries can be found in the [Vital Statistics: Population and Health Reference tables](http://www.ons.gov.uk/ons/rel/vsob1/vital-statistics--population-and-health-reference-tables/index.html \"Vital Statistics: Population and Health Reference tables index\").\n\n[National Records of Scotland](http://www.ons.gov.uk/ons/external-links/devolved-admins/scottish-government/gro-scotland--marriages-and-civil-partnerships.html \"GRO Scotland: Marriages and civil partnerships\") provides marriage statistics for Scotland.\n\n[Northern Ireland Statistics and Research Agency](http://www.ons.gov.uk/ons/external-links/devolved-admins/nisra/nisra--marriages.html \"NISRA: Marriages\") provides marriage statistics for Northern Ireland.\n\nFurther statistics on [divorces](http://www.ons.gov.uk/ons/rel/vsob1/divorces-in-england-and-wales/index.html \"Divorces in England and Wales index\"), [civil partnerships and civil partnership dissolutions](http://www.ons.gov.uk/ons/rel/vsob2/civil-partnership-statistics--united-kingdom/index.html \"Civil Partnership Statistics, United Kingdom index\"), [families and households](http://www.ons.gov.uk/ons/rel/family-demography/families-and-households/index.html \"Families and Households index\") and [cohabitation estimates](http://www.ons.gov.uk/ons/rel/family-demography/cohabitation-estimates--england-and-wales/index.html \"Cohabitation Estimates index\") are available on the ONS website.\n\n[Population estimates by marital status](http://www.ons.gov.uk/ons/rel/pop-estimate/population-estimates-by-marital-status/index.html \"Population estimates by Marital Status index\") provide the estimated resident population by single year of age, sex and marital status (single, married, divorced, and widowed) for England and Wales. For information about 2011 and 2012 estimates see section titled ‘Availability of Population Estimates by Marital Status and the Calculation of Marriage Rates for 2011 and 2012’.\n\n[Population projections by marital status for England and Wales](http://www.ons.gov.uk/ons/rel/npp/marital-status-population-projections-for-england---wales/index.html \"Marital Status Populations Projections for England and Wales index\") are available on the ONS website. The latest figures are consistent with the 2008-based national principal population projection for England and Wales and cover the 25 years to 2033.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "References",
       "markdown": "Beaujouan E and Bhrolcháin M (2011) [Cohabitation and marriage in Britain since the 1970s](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--145--autumn-2011/ard-pt145-cohab-marriage-trends.pdf \"Cohabitation and marriage in Britain since the 1970s\"), Population Trends 145.\n\nONS (2013) [What percentages of marriage end in divorce?](http://www.ons.gov.uk/ons/rel/vsob1/divorces-in-england-and-wales/2011/sty-what-percentage-of-marriages-end-in-divorce.html \"STY What marriages end in divorce\")\n\nWilson B and Smallwood S (2008) [The proportion of marriages ending in divorce (244.2 Kb Pdf)](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--131--spring-2008/the-proportion-of-marriages-ending-in-divorce.pdf \"The proportion of marriages ending in divorce\") , Population Trends 131.\n\nWilson B and Smallwood S (2007) [Understanding recent trends in marriage (562.2 Kb Pdf)](http://www.ons.gov.uk/ons/rel/population-trends-rd/population-trends/no--128--summer-2007/understanding-recent-trends-in-marriage.pdf \"Understanding recent trends in marriage\") , Population Trends 128.\n"
@@ -92,44 +74,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "elizabeth.mclaren@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Marriages in England and Wales (Provisional), 2012",
-  "summary": "Annual data on marriages in England and Wales. Marriages abroad not included. Non-residents are included. Derived as part of civil registration.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/bulletins/marriagesinenglandandwalesprovisional2012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Marriage, cohabitation and civil partnerships",
-      "summary": "Statistics on how people live together give us a fuller picture of the changing social landscape of the UK. Data on marriages and civil partnerships comes from registrations, but data on cohabitation comes from various different surveys.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "In 2012, the provisional number of marriages in England and Wales increased by 5.3% to 262,240, from 249,133 in 2011.",
+    "headline2": "Civil ceremonies accounted for 70% of all marriages that took place in 2012, an increase from 66% in 2002.",
+    "headline3": "The greatest number of marriages was for men and women aged 25 to 29.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "elizabeth.mclaren@ons.gsi.gov.uk"
+    },
+    "title": "Marriages in England and Wales (Provisional), 2012",
+    "summary": "Annual data on marriages in England and Wales. Marriages abroad not included. Non-residents are included. Derived as part of civil registration.",
+    "keywords": []
+  }
 }

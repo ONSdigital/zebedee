@@ -1,11 +1,5 @@
 {
-  "headline1": "Net long-term migration to the UK was estimated to be 212,000 in the year ending December 2013.",
-  "headline2": "Recent patterns of net migration over the last two years show an increase since the lowest estimate of 154,000 (year ending September 2012).",
-  "headline3": "526,000 people immigrated to the UK in the year ending December 2013.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Migration Statistics Quarterly Report, May 2014",
@@ -38,9 +32,7 @@
     {
       "title": "6. Glossary",
       "markdown": "### Annual Population Survey\n\nThe Annual Population Survey (APS) is a continuous household survey, covering the UK, with the aim of providing estimates between censuses of key social and labour market variables at a local area level. The APS is not a stand-alone survey, but uses data combined from two waves from the main Labour Force Survey (LFS) with data collected on a local sample boost. Apart from employment and unemployment, the topics covered in the survey include housing, ethnicity, religion, health and education.\n\n### Citizenship\n\nThis is the term used in the International Passenger Survey (IPS) to define the country for which a migrant is a passport holder. This refers specifically to the passport being used to enter / leave the UK at the time of interview. It does not refer to any other passport(s) which migrants of multiple nationality may hold.\n\nMore generally a British citizen as described in IPS statistics includes those with UK nationality usually through a connection with the UK: birth, adoption, descent, registration, or naturalisation. British nationals have the right of abode in the UK.\n\n### Commonwealth (ONS Statistical Grouping)\n\nThe Commonwealth statistical grouping consists of countries of the Old Commonwealth and the New Commonwealth (see below).\n\n### Confidence Interval\n\nThis is the range within which the true value of a population parameter lies with known probability. For example the 95% confidence interval represents the range in which there are 19 chances out of 20 that the true figure would fall (had all migrants been surveyed). The uppermost and lowermost values of the confidence interval are termed ‘confidence limits’.\n\n### European Economic Area (EEA)\n\nThe EEA consists of the 27 countries of the EU (see below), plus Iceland, Liechtenstein and Norway. Swiss nationals are treated as EEA nationals for immigration purposes.\n\n### European Union (EU)\n\nThe EU consists of 28 countries: Austria, Belgium, Bulgaria, Croatia, Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Poland, Portugal, Republic of Ireland, Romania, Slovakia, Slovenia, Spain, Sweden and the United Kingdom. Croatia joined the EU in July 2013 - data with a reference period after that date will include Croatia within the EU grouping.\n\n### European Union (EU) Accession Countries\n\nThe Accession countries are those that joined the EU in 2004 or later. Ten joined in 2004 (the EU8, plus Cyprus and Malta), two joined in 2007 (the EU2) and Croatia joined in 2013.\n\n### EU2\n\nThe EU2 (formerly known as the A2) are the two countries that joined the EU on 1 January 2007: Bulgaria and Romania. Between 2007 and 2013, EU2 nationals had certain restrictions placed on them; in the first 12 months of stay, working Bulgarian and Romanian nationals were generally required to hold an accession worker card or apply for one of two lower-skilled quota schemes. Other Bulgarian and Romanian nationals could apply for a registration certificate, giving proof of a right to live in the UK. These restrictions were lifted on 1 January 2014.\n\n### EU8\n\nThe EU8 (formerly known as the A8) are the eight central and eastern European countries that joined the EU on 1 May 2004: Czech Republic, Estonia, Hungary, Latvia, Lithuania, Poland, Slovakia and Slovenia. The EU8 does not include the two other countries that joined on that date: Cyprus and Malta. EU8 nationals previously had restrictions on their rights to work and were required to register under the Worker Registration Scheme, but these restrictions were lifted from 1 May 2011.\n\n### EU15\n\nThe EU15 consists of Austria, Belgium, Denmark, Finland, France, Germany, Greece, Italy, Luxembourg, Netherlands, Portugal, Republic of Ireland, Spain, Sweden and the United Kingdom.\n\n### International Passenger Survey (IPS)\n\nThe International Passenger Survey (IPS) is a survey of a random sample of passengers entering and leaving the UK by air, sea or the Channel Tunnel. Between 700,000 and 800,000 people are interviewed on the IPS each year. Of those interviewed, approximately 4,000-5,000 people each year are identified as long-term international migrants.\n\n### Long-Term International Migration (LTIM)\n\nLong-Term International Migration (LTIM) estimates are produced by combining migration data from the IPS, Home Office data on asylum seekers, migration to and from Northern Ireland (from the Northern Ireland Statistics and Research Agency) and adjustments for visitor switchers and migrant switchers.\n\n### Nationality\n\nNationality is often used interchangeably with citizenship, and some datasets refer to ‘nationals’ of a country rather than ‘citizens’. Different datasets have different ways of establishing someone’s nationality. The APS, which underlies the population estimates by nationality, simply asks people ‘what is your nationality?’ However, the IPS, NINo and entry clearance visa data are based on people’s passports. For asylum statistics the nationality is as stated on the ‘Case Information Database’. This will usually be based on documentary evidence, but sometimes asylum seekers arrive in the UK without any such documentation.\n\n### New Commonwealth (ONS Statistical Grouping)\n\nThe New Commonwealth statistical grouping consists of  African Commonwealth countries (Botswana, Cameroon, The Gambia, Ghana, Kenya, Lesotho, Malawi, Mauritius, Mozambique, Namibia, Nigeria, Seychelles, Sierra Leone, Swaziland, Tanzania, Uganda, Zambia and Zimbabwe), Indian subcontinent countries (Bangladesh, India, Pakistan and Sri Lanka), and other Commonwealth countries in the Asian, Caribbean, and Oceania regions.\n\nIt also includes British Dependent Territories and British Overseas citizens. Up to and including 2003 Malta and Cyprus are included in the New Commonwealth grouping. For 2004, the year of accession, they are included in the EU. Malta and Cyprus are members of both the Commonwealth and the European Union from May 2004 onwards. However, for estimation purposes they have only been included in the EU grouping for 2004 onwards.\n\nRwanda was admitted to the Commonwealth in November 2009, but the definition for this statistical grouping has remained unchanged. Zimbabwe and Gambia withdrew from the Commonwealth in 2003 and 2013 respectively, but again the definition for this grouping has remained unchanged.\n\nOld Commonwealth (ONS Statistical Grouping)\n\nThe Old Commonwealth statistical grouping consists of four countries: Australia, Canada, New Zealand and South Africa.\n\n### Points Based System (PBS)\n\nThe PBS is a rationalisation of immigration control processes for people coming into the UK for the purposes of work or study who are not EEA or Swiss nationals. Entries are classed into five tiers. Tier 1 is for high value individuals such as investors and entrepreneurs. Tier 2 is for skilled workers with a job offer. Tier 3 is low skilled workers – this entry route was never opened and is currently suspended. Tier 4 is for students and Tier 5 is for youth mobility and temporary workers.\n\n### Statistical Significance\n\nThe International Passenger Survey interviews a sample of passengers passing through ports within the UK. As with all sample surveys, the estimates produced from them are based upon one of a number of different samples that could have been drawn at that point in time. This means that there is a degree of variability around the estimates produced. This variability sometimes may present misleading changes in figures as a result of the random selection of those included in the sample. If a change or a difference between estimates is described as \u0027statistically significant\u0027, it means that statistical tests have been carried out to reject the possibility that the change has occurred by chance. Therefore statistically significant changes are very likely to reflect real changes in migration patterns.\n\n### Student Visitor\n\nThe student visitor category provides for those people who wish to come to the UK as a visitor and undertake a short period of study which will be completed within the period of their leave (maximum six months unless applying under the concession for English language courses – 11 months). Short-term students (i.e. those studying on courses of six months duration or less) who do not intend to work part-time or undertake a paid or unpaid work placement as part of their course can also apply within this category.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "1. The Migration Statistics Quarterly Report is produced in partnership with the Home Office and the Department for Work and Pensions (DWP).\n2. Terms and conditions\n\nA National Statistics publication\n\nNational Statistics are produced to high professional standards set out in the Code of Practice for Official Statistics. They are produced free from any political interference. The United Kingdom Statistics Authority has designated these statistics as National Statistics, in accordance with the Statistics and Registration Service Act 2007 and signifying compliance with the Code of Practice for Official Statistics\n\nDesignation can be broadly interpreted to mean that the statistics:\n\n- meet identified user needs;\n- are well explained and readily accessible\n- are produced according to sound methods, and\n- are managed impartially and objectively in the public interest\n\nOnce statistics have been designated as National Statistics it is a statutory requirement that the Code of Practice shall continue to be observed.\n\n3. A list of those with Pre-release access to the MSQR and associated migration products is available.\n4. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThese National Statistics are produced to high professional standards and released according to the arrangements approved by the UK Statistics Authority.\n"
@@ -54,44 +46,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "migstatsunit@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Migration Statistics Quarterly Report, May 2014",
-  "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
   "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreportmay2014",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Population and migration",
-      "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration"
     },
     {
-      "title": "International migration",
-      "summary": "International migration statistics provide estimates of the number of people moving in and out of the UK. Data on long term migration, short term migration, and visitor data provide a picture of those entering and leaving the UK, covering all lengths of stay. ",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "Net long-term migration to the UK was estimated to be 212,000 in the year ending December 2013.",
+    "headline2": "Recent patterns of net migration over the last two years show an increase since the lowest estimate of 154,000 (year ending September 2012).",
+    "headline3": "526,000 people immigrated to the UK in the year ending December 2013.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "migstatsunit@ons.gsi.gov.uk"
+    },
+    "title": "Migration Statistics Quarterly Report, May 2014",
+    "summary": "The latest summary of provisional Long-term International migration data. A coordinated release between the ONS, Home Office and DWP.",
+    "keywords": []
+  }
 }

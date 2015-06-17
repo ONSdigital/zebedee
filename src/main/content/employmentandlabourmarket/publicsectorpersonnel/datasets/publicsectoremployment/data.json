@@ -1,5 +1,4 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Public Sector Employment",
@@ -10,39 +9,28 @@
         "G7AR",
         "G7AU",
         "G7D6"
-      ],
-      "xls": null,
-      "csv": null
+      ]
     }
   ],
-  "notes": null,
-  "description": "Public sector employment by sector classification.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Public sector employment by sector classification."
+  },
   "type": "dataset",
-  "title": "Public Sector Employment",
-  "summary": "Public sector employment by sector classification",
   "uri": "/employmentandlabourmarket/publicsectorpersonnel/datasets/publicsectoremployment",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Employment and Labour market",
-      "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket",
-      "index": null
+      "uri": "/employmentandlabourmarket"
     },
     {
-      "title": "Public sector personnel",
-      "summary": "Public sector employment statistics relate to the number of people employed in central government, local government and public corporations. They are collected through returns from various organisations. Employees included in the headcount can be permanent, on a fixed-term contract, employed on a casual basis or working in a second job in the public sector. However, self-employed, contract workers and agency workers are excluded.",
-      "uri": "/employmentandlabourmarket/publicsectorpersonnel",
-      "index": null
+      "uri": "/employmentandlabourmarket/publicsectorpersonnel"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Public Sector Employment",
+    "summary": "Public sector employment by sector classification"
+  }
 }

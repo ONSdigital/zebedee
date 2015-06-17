@@ -1,21 +1,5 @@
 {
-  "headline1": "The average completed family size for women born in 1967 and reaching age 45 in 2012, was 1.91 children per woman.",
-  "headline2": "This compares with their mothers’ generation, represented by women born in 1940, who had on average 2.36 children.",
-  "headline3": "Two children was the most common family size for women born in both 1940 and 1967.",
-  "relatedBulletins": [
-    {
-      "headline1": "The under 18 conception rate for 2012 is the lowest since 1969 at 27.9 conceptions per thousand women aged 15-17.",
-      "headline2": "The estimated number of conceptions to women aged under 18 fell to 27,834 in 2012 compared with 31,051 in 2011, a decrease of 10%.",
-      "headline3": "The estimated number of conceptions to women aged under 16 was 5,432 in 2012, compared with 5,991 in 2011 (a fall of 9.3%).",
-      "title": "Conceptions in England and Wales, 2012",
-      "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012",
-      "index": null
-    }
-  ],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
+  "relatedBulletins": [],
   "sections": [
     {
       "title": "Cohort Fertility, England and Wales, 2012",
@@ -64,9 +48,7 @@
     {
       "title": "Data Sources and Changes to Data",
       "markdown": "1. Birth data used in this publication are based on birth registrations collected under the Births and Deaths Registration Act 1953. Every Registrar of Births and Deaths is required to secure the prompt registration of births occurring within the sub-district covered. Registration of a birth is legally required within 42 days of its occurrence, and the Registrar will, if necessary, send a requisition to the person whose duty it is to register the birth.\n\n2.The coverage of the release is of births occurring, and then registered, in England and Wales. Births to residents of England and Wales which are registered elsewhere are thus excluded, while births registered in England and Wales to mothers whose usual residence is elsewhere are included. This means that births to women who subsequently migrate out of England and Wales are included in the numerator for calculations, but the women may not be included in the denominator. The reverse is true for women who give birth abroad then migrate to England and Wales (and do not have a subsequent birth).\n\nThe population figures used to calculate fertility rates are mid-year estimates of the resident population of England and Wales. These estimates include members of HM armed forces and non-UK armed forces stationed in England and Wales, but exclude those stationed outside. The population estimates used for the calculation of fertility rates are the latest consistent estimates available at the time of production. Further information on population estimates and their methodology can be found online.\n\nEstimates of childlessness and number of children are based on estimates of true birth order. At birth registration, the number of previous births was only collected from married women up to May 2012. This partial information on birth order from registration data was supplemented with data from the General Lifestyle Survey.\n\nDuring May 2012 changes were made to the Population Statistics Act 1938, which means that information on the number of previous children and whether previously married is now collected from all mothers at birth registration and not just from married women. This has a small impact on a number of tables and [proposals for changes (66.2 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/user-guidance/health-and-life-events/how-changes-to-population-statistics-act-will-affect-birth-statistics.pdf \"How changes to Population Statistics Act will affect birth statistics\") to outputs for 2012 and 2013 data were outlined on the ONS website in July 2012. Feedback from users was invited. No feedback was received so the planned changes are being implemented. The cohort fertility figures and tables presented in this report include a partial year of the newer, more complete, data.\n\nThis birth order information, both the new complete data, and the older estimated data, is combined over a number of years with population estimates to create a picture of the fertility for each cohort. As more years of data are added each cohort moves towards completed fertility by adding in births each year to the estimated population exposed to those births (that is childless women having a birth in one year, are then part of the population who could have a second birth in the next year). It is only possible to present cohort fertility information for women, as men are not required to give information on previous births at birth registration.\n\nChanges to the tables previously included within [Live Births by Socio-economic Status of Father](http://www.ons.gov.uk/ons/rel/vsob1/live-births-by-socio-economic-status-of-father--england-and-wales/index.html \"Live Births by Socio-economic Status of Father, England and Wales index\") are implemented in releases also published today in addition to implementing the combined method for deriving the National Statistics Socio-economic Classification (using the more advantaged NS-SEC of both parents rather than the NS-SEC of the father). An [outline of the changes to outputs for 2012 data](http://www.ons.gov.uk/ons/rel/vsob1/live-births-by-socio-economic-status-of-father--england-and-wales/2011.html \"Live births by socio-economic status of father, England and Wales - 2011\") was published on the ONS website alongside the release of 2011 data.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "1. Cohort fertility analysis allows the fertility experience of a group of women sharing the same year of birth (a cohort) to be traced through time and compared with the experience of other cohorts. Statistics relating to the family building of women born in given years shed light on the trends underlying year-to-year changes in fertility and are particularly valuable in helping to formulate models of future fertility. Period measures of fertility, such as the Total Fertility Rate (TFR), provide a timely snapshot of the intensity of childbearing in a particular year. However the TFR should not be interpreted as a measure of family size because it is affected by the timing of childbearing. The TFR is likely to under or overestimate average family size during periods where women are delaying having children or later catching up. Cohort fertility analysis may not be as timely, but provides an accurate measure of trends in family size. The TFR in England and Wales of 1.94 children per woman in 2012 represents the current level of childbearing among women of all childbearing ages. The average family size of 1.91 children is for women who have completed their childbearing in 2012. The two measures should not be directly compared for the reasons noted above.\n\n2. A woman is assumed to have completed her childbearing by the last day she is aged 45, that is by her 46th birthday (exact age 46). Completed fertility includes fertility rates up to and including age 45. See background note 4 for a more technical explanation.\n\n3. The ages of women are presented in \u0027exact years\u0027. Therefore figures should be interpreted as the average number of children a woman has had up to that birthday. So childbearing up to exact age 30 includes cumulative fertility through her lifetime up to the day before her 30th birthday. Any childbearing in the 12 months from her 29th birthday onwards will be included in fertility up to exact age 30. See background note 4 for a more technical explanation.\n\n4. Completed fertility is the sum of age-specific fertility rates for ages 15 to 45 and therefore relates to fertility up to the 46th birthday. In this bulletin the 1967 cohort, who are aged 45 in 2012, are presented as the latest to complete their fertility up to the 46th birthday. Although women born in 1967 will not reach their 46th birthday until 2013, the age-specific fertility rate at age 45 includes births to women aged from 45 years and 0 days to 45 years and 365 days in 2012 and thus fertility up to (but not including) the 46th birthday.In calculating estimates of completed family size for women born in different years, an assumption must be made about the year each woman was born, based on her age when she gives birth. In this case it is assumed that births at age 45 in 2012 are to women born in 1967. This assumption is necessary because information on the mother’s year of birth is not available in historic births datasets so has to be assumed from the age of the mother when she gives birth. However women giving birth at age 45 during 2012 were actually born between January 1966 and December 1967 – half of these women will have their 45th birthday in 2012 (those born in 1967 who give birth after their 45th birthday,) and half will have their 46th birthday in 2012 (those born in 1966 who give birth before their 46th birthday). However for simplicity the latest cohort to complete their childbearing is presented as the 1967 cohort, with their completed fertility based on the sum of age-specific fertility rates from age 15 in 1982 to age 45 in 2012.\n\nSimilarly, the bulletin presents fertility up to exact age 30 for the 1982 cohort and other cohorts, as age 30 may be considered the mid-point of childbearing age. However fertility up to the 31st birthday for the 1982 cohort is available in the published Tables 1 and 2 because cumulative fertility to exact age 31 includes the age-specific fertility rate for age 30 in 2012 (from Table 4).\n\n5. The methods used to create cohort fertility require use of data collected at birth registration from women on the number of previous children they have had. The birth registration system does not collect information on the number of previous children a man has had. Without this information it is not possible to produce estimates of the proportion of men who have not fathered a child.\n\nIt is also important to note that a man\u0027s reproductive span is not as well defined as a woman\u0027s, in terms of the upper age at which a man can father a child and so this means we would need a longer  time series to calculate cohort measures. Male period fertility rates can be found in another release from the ONS - [Further Parental Characteristics](http://www.ons.gov.uk/ons/rel/vsob1/further-parental-characteristics--england-and-wales/index.html \"Further Parental Characteristics\").\n\n6. Measures of male fertility are estimated. The age of the father is not collected for births that are registered solely by the mother (5.7% in 2012), therefore these ages are estimated. More information is available from the metadata in the ‘[Further Parental Characteristics](http://http//www.ons.gov.uk/ons/rel/vsob1/further-parental-characteristics--england-and-wales/index.html \"Further Parental Characteristics\")\u0027 package.\n\n7. The standardised mean age is a measure which allows fertility trends to be separated out from the effects of changes in the population’s age structure. It is therefore useful for comparing mean ages across population subgroups and over time.\n\n8. There is a large degree of comparability in birth and death statistics between countries within the UK. However, there are some differences although these are believed to have a negligible impact on the comparability of the statistics. These differences are outlined in [Quality and Methodology Information (275.2 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/population/quality-and-methodology-information-for-birth-statistics.pdf \"Quality and Methodology Information for Birth Statistics\") document for births.\n\n9. Special extracts and tabulations of births data for England and Wales are available to order for a charge (subject to legal frameworks, disclosure control, resources and agreements of costs, where appropriate). Such enquiries should be made to:\n\nVital Statistics Outputs Branch (VSOB)\nTel:  +44 (0)1329 444 110\nE-mail: \u003cvsob@ons.gsi.gov.uk\u003e\nEnquiries on Cohort Fertility should be made to:\nDemographic Analysis Unit (DAU)\nTel: +44 (0)1329 444 644\nE-mail: \u003cfertility@ons.gsi.gov.uk\u003e\n\n10. We would welcome feedback on the content, format and relevance of this release. If feedback relates to this Cohort fertility release, please send to: \u003cfertility@ons.gsi.gov.uk\u003e, if it relates to Characteristics of mother 2 or Further parental characteristics, please send feedback to: \u003cVSOB@ons.gsi.gov.uk\u003e.\n\n11. An [overview of Population Statistics](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/population-and-migration/an-overview-of-ons-s-population-statistics/index.html \"overview of Population Statistics\") is available.\n\n12. Follow ONS on [Twitter](http://www.ons.gov.uk/ons/external-links/social-media/twitter.html \"Twitter\"), [Youtube](http://www.ons.gov.uk/ons/external-links/social-media/youtube.html \"Youtube\") and [Facebook](http://www.ons.gov.uk/ons/external-links/social-media/index.html \"Facebook\")\n\n13. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThese National Statistics are produced to high professional standards and released according to the arrangements approved by the UK Statistics Authority.\n"
@@ -80,44 +62,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "oliver.dormon@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Cohort Fertility, 2012",
-  "summary": "Fertility on year of birth of mother rather than the year of birth of child. Includes average number of live-born children and the proportion of women remaining childless by year of birth.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/cohortfertility2012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Conception and fertility rates",
-      "summary": "Conception statistics bring together records of birth registrations and abortion notifications. Fertility analysis adds value to information published on births by reporting statistics on those with no children and fertility among women born inside and outside the UK. Fertility projections are also used in the population projections. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "The average completed family size for women born in 1967 and reaching age 45 in 2012, was 1.91 children per woman.",
+    "headline2": "This compares with their mothers’ generation, represented by women born in 1940, who had on average 2.36 children.",
+    "headline3": "Two children was the most common family size for women born in both 1940 and 1967.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "oliver.dormon@ons.gsi.gov.uk"
+    },
+    "title": "Cohort Fertility, 2012",
+    "summary": "Fertility on year of birth of mother rather than the year of birth of child. Includes average number of live-born children and the proportion of women remaining childless by year of birth.",
+    "keywords": []
+  }
 }

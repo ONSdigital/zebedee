@@ -1,465 +1,262 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "884700",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "1969",
       "value": "832700",
-      "year": "1969",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1969"
     },
     {
       "date": "1970",
       "value": "876900",
-      "year": "1970",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1970"
     },
     {
       "date": "1971",
       "value": "835500",
-      "year": "1971",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1971"
     },
     {
       "date": "1972",
       "value": "801000",
-      "year": "1972",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1972"
     },
     {
       "date": "1973",
       "value": "762100",
-      "year": "1973",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1973"
     },
     {
       "date": "1974",
       "value": "724300",
-      "year": "1974",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1974"
     },
     {
       "date": "1975",
       "value": "693300",
-      "year": "1975",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1975"
     },
     {
       "date": "1976",
       "value": "671600",
-      "year": "1976",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1976"
     },
     {
       "date": "1977",
       "value": "686400",
-      "year": "1977",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1977"
     },
     {
       "date": "1978",
       "value": "747900",
-      "year": "1978",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1978"
     },
     {
       "date": "1979",
       "value": "774100",
-      "year": "1979",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1979"
     },
     {
       "date": "1980",
       "value": "765000",
-      "year": "1980",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1980"
     },
     {
       "date": "1981",
       "value": "752300",
-      "year": "1981",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1981"
     },
     {
       "date": "1982",
       "value": "755300",
-      "year": "1982",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1982"
     },
     {
       "date": "1983",
       "value": "753400",
-      "year": "1983",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1983"
     },
     {
       "date": "1984",
       "value": "790100",
-      "year": "1984",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1984"
     },
     {
       "date": "1985",
       "value": "797200",
-      "year": "1985",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1985"
     },
     {
       "date": "1986",
       "value": "818900",
-      "year": "1986",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1986"
     },
     {
       "date": "1987",
       "value": "850400",
-      "year": "1987",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1987"
     },
     {
       "date": "1988",
       "value": "849500",
-      "year": "1988",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1988"
     },
     {
       "date": "1989",
       "value": "864700",
-      "year": "1989",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1989"
     },
     {
       "date": "1990",
       "value": "871500",
-      "year": "1990",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1990"
     },
     {
       "date": "1991",
       "value": "853700",
-      "year": "1991",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1991"
     },
     {
       "date": "1992",
       "value": "828000",
-      "year": "1992",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1992"
     },
     {
       "date": "1993",
       "value": "819000",
-      "year": "1993",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1993"
     },
     {
       "date": "1994",
       "value": "801600",
-      "year": "1994",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1994"
     },
     {
       "date": "1995",
       "value": "790300",
-      "year": "1995",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1995"
     },
     {
       "date": "1996",
       "value": "816900",
-      "year": "1996",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1996"
     },
     {
       "date": "1997",
       "value": "800400",
-      "year": "1997",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1997"
     },
     {
       "date": "1998",
       "value": "797000",
-      "year": "1998",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1998"
     },
     {
       "date": "1999",
       "value": "774000",
-      "year": "1999",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1999"
     },
     {
       "date": "2000",
       "value": "767000",
-      "year": "2000",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2000"
     },
     {
       "date": "2001",
       "value": "763700",
-      "year": "2001",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2001"
     },
     {
       "date": "2002",
       "value": "787000",
-      "year": "2002",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2002"
     },
     {
       "date": "2003",
       "value": "806800",
-      "year": "2003",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2003"
     },
     {
       "date": "2004",
       "value": "826800",
-      "year": "2004",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2004"
     },
     {
       "date": "2005",
       "value": "841800",
-      "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2005"
     },
     {
       "date": "2006",
       "value": "870000",
-      "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2006"
     },
     {
       "date": "2007",
       "value": "895900",
-      "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2007"
     },
     {
       "date": "2008",
       "value": "888600",
-      "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2008"
     },
     {
       "date": "2009",
       "value": "896500",
-      "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2009"
     },
     {
       "date": "2010",
       "value": "909200",
-      "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2010"
     },
     {
       "date": "2011",
       "value": "909100",
-      "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2011"
     },
     {
       "date": "2012",
       "value": "884700",
-      "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2012"
     }
   ],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID28",
-  "unit": "women",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
-      "title": "Cohort Fertility, 2012",
-      "summary": "Fertility on year of birth of mother rather than the year of birth of child. Includes average number of live-born children and the proportion of women remaining childless by year of birth.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/cohortfertility2012",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/cohortfertility2012"
     },
     {
-      "title": "Conceptions in England and Wales, 2012",
-      "summary": "Estimated numbers of conceptions, conception rates and the percentage of conceptions leading to abortion by age of woman at conception.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/bulletins/conceptionsinenglandandwales2012"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Conceptions (all ages)",
-  "summary": null,
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/timeseries/raid28",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Conception and fertility rates",
-      "summary": "Conception statistics bring together records of birth registrations and abortion notifications. Fertility analysis adds value to information published on births by reporting statistics on those with no children and fertility among women born inside and outside the UK. Fertility projections are also used in the population projections. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "884700",
+    "cdid": "RAID28",
+    "unit": "women",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Conceptions (all ages)"
+  }
 }

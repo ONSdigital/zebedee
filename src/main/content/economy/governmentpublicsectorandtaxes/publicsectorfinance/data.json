@@ -1,89 +1,56 @@
 {
   "items": [
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annx",
-      "index": null,
-      "data": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annx"
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/rutn",
-      "index": null,
-      "data": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/rutn"
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/ruto",
-      "index": null,
-      "data": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/ruto"
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6w",
-      "index": null,
-      "data": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6w"
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6x",
-      "index": null,
-      "data": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6x"
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/anmu",
-      "index": null,
-      "data": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/anmu"
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annw",
-      "index": null,
-      "data": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/annw"
     },
     {
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/rurq",
-      "index": null,
-      "data": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/rurq"
     }
   ],
   "datasets": [
     {
-      "title": "Public Sector data collection",
-      "summary": "Public sector summary excluding financial interventions",
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectordatacollection",
-      "index": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectordatacollection"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "This is the first estimate of the June 2014 public sector finances (financial year 2014/15). Financial year 2013/14 data have also been updated.",
-      "headline2": "For the financial year 2013/14, PSNB ex was £93.7 billion. This was £13.0 billion higher than the same period in 2012/13.",
-      "headline3": "During 2013/14, £31.1 billion was transferred from the APF to HM Treasury. Of this amount, £12.2 billion impacted on net borrowing.",
-      "title": "Public Sector Finances, June 2014",
-      "summary": "A presentational framework for the headline measures of Public Sector Finance Statistics (net borrowing, net cash requirement and net debt) is explained in this release. This includes the reasons for changes in net borrowing (deficit) and debt.",
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinancesjune2014",
-      "index": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinancesjune2014"
     }
   ],
-  "relatedArticles": null,
   "index": 0,
   "type": "product_page",
-  "title": "Public sector finance",
-  "summary": "These statistics are a compilation of figures on the main aspects of the UK’s public sector finances. These give an indication of the current state of the country’s financial position. They are published jointly by the Office for National Statistics (ONS) and HM Treasury. ",
   "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Government, public sector and taxes",
-      "summary": "This section covers the latest figures on what the UK public sector has spent, raised in revenue and invested. The headline statistic here is Public Sector Net Borrowing, which is a measure of the amount of money the Government has had to borrow in order to bridge the gap between its revenue and expenditure. ",
-      "uri": "/economy/governmentpublicsectorandtaxes",
-      "index": null
+      "uri": "/economy/governmentpublicsectorandtaxes"
     }
-  ]
+  ],
+  "description": {
+    "title": "Public sector finance",
+    "summary": "These statistics are a compilation of figures on the main aspects of the UK’s public sector finances. These give an indication of the current state of the country’s financial position. They are published jointly by the Office for National Statistics (ONS) and HM Treasury. "
+  }
 }

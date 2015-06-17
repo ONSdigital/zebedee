@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Families",
-  "summary": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
-  "uri": "releases/families",
-  "breadcrumb": null
+  "uri": "releases/families"
 }

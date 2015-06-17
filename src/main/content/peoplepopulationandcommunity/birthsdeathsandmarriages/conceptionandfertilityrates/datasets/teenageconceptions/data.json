@@ -1,47 +1,32 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "cdids": null,
-      "xls": "http://www.ons.gov.uk/ons/rel/vsob1/conception-statistics--england-and-wales/2012/rft-conception-statistics-2012.xls",
-      "csv": null
+      "xls": "http://www.ons.gov.uk/ons/rel/vsob1/conception-statistics--england-and-wales/2012/rft-conception-statistics-2012.xls"
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Teenage conceptions",
-  "summary": "Brief description of dataset",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/datasets/teenageconceptions",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Conception and fertility rates",
-      "summary": "Conception statistics bring together records of birth registrations and abortion notifications. Fertility analysis adds value to information published on births by reporting statistics on those with no children and fertility among women born inside and outside the UK. Fertility projections are also used in the population projections. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Teenage conceptions",
+    "summary": "Brief description of dataset"
+  }
 }

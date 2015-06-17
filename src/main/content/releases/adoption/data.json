@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Adoption",
-  "summary": "Adoption statistics are available from adoption registrations. They are used to inform local and central governments about trends in adoptions and a long run time series is available to make comparisons and observations about the impact of various different government policies. These statistics are available by the age and gender of the children being adopted as well as by whether or not the adopted children were born inside marriage.",
-  "uri": "releases/adoption",
-  "breadcrumb": null
+  "uri": "releases/adoption"
 }

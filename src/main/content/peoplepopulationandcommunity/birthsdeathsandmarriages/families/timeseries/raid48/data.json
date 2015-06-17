@@ -1,62 +1,37 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2013",
-  "number": "1",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID48",
-  "unit": "m",
-  "preUnit": "",
-  "source": "Labour Force Survey",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "Families and Households, 2013",
-      "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Lone parent families (without dependent children)",
-  "summary": null,
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/timeseries/raid48",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Families",
-      "summary": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families"
     }
-  ]
+  ],
+  "description": {
+    "date": "2013",
+    "number": "1",
+    "cdid": "RAID48",
+    "unit": "m",
+    "preUnit": "",
+    "source": "Labour Force Survey",
+    "nationalStatistic": true,
+    "title": "Lone parent families (without dependent children)"
+  }
 }

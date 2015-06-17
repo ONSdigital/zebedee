@@ -1,154 +1,100 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "130618",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "1997",
       "value": "73765",
       "year": "1997",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "1998",
       "value": "78382",
       "year": "1998",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "1999",
       "value": "82443",
       "year": "1999",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2000",
       "value": "83312",
       "year": "2000",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2001",
       "value": "88759",
       "year": "2001",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2002",
       "value": "93230",
       "year": "2002",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2003",
       "value": "98679",
       "year": "2003",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2004",
       "value": "105924",
       "year": "2004",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2005",
       "value": "109414",
       "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2006",
       "value": "116457",
       "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2007",
       "value": "122389",
       "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2008",
       "value": "124105",
       "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2009",
       "value": "124586",
       "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2010",
       "value": "127745",
       "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2011",
       "value": "127868",
       "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     },
     {
       "date": "2012",
       "value": "130618",
       "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RAGV",
-      "updateDate": null
+      "sourceDataset": "RAGV"
     }
   ],
   "quarters": [],
@@ -156,48 +102,32 @@
   "sourceDatasets": [
     "RAGV"
   ],
-  "cdid": "TMPX",
-  "unit": "m",
-  "preUnit": "£",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "Regional Gross Value Added (Income Approach), December 2013",
-      "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
-      "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013",
-      "index": null
+      "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "North West Gross Value Added",
-  "summary": null,
   "uri": "/economy/grossvalueaddedgva/timeseries/tmpx",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Gross Value Added (GVA)",
-      "summary": "Gross Value Added (GVA) measures the contribution to the economy of each individual producer, industry or sector. In the UK it is used in the estimation of Gross Domestic Product (GDP).",
-      "uri": "/economy/grossvalueaddedgva",
-      "index": null
+      "uri": "/economy/grossvalueaddedgva"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "130618",
+    "cdid": "TMPX",
+    "unit": "m",
+    "preUnit": "£",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "North West Gross Value Added"
+  }
 }

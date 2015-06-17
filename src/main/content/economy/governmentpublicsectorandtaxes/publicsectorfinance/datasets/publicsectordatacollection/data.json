@@ -1,5 +1,4 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Public Sector data collection",
@@ -15,45 +14,31 @@
         "ANNX",
         "RUTN",
         "RUTO"
-      ],
-      "xls": null,
-      "csv": null
+      ]
     }
   ],
-  "notes": null,
-  "description": "Public sector summary excluding financial interventions.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Public sector summary excluding financial interventions."
+  },
   "type": "dataset",
-  "title": "Public Sector data collection",
-  "summary": "Public sector summary excluding financial interventions",
   "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectordatacollection",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Government, public sector and taxes",
-      "summary": "This section covers the latest figures on what the UK public sector has spent, raised in revenue and invested. The headline statistic here is Public Sector Net Borrowing, which is a measure of the amount of money the Government has had to borrow in order to bridge the gap between its revenue and expenditure. ",
-      "uri": "/economy/governmentpublicsectorandtaxes",
-      "index": null
+      "uri": "/economy/governmentpublicsectorandtaxes"
     },
     {
-      "title": "Public sector finance",
-      "summary": "These statistics are a compilation of figures on the main aspects of the UK’s public sector finances. These give an indication of the current state of the country’s financial position. They are published jointly by the Office for National Statistics (ONS) and HM Treasury. ",
-      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance",
-      "index": null
+      "uri": "/economy/governmentpublicsectorandtaxes/publicsectorfinance"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Public Sector data collection",
+    "summary": "Public sector summary excluding financial interventions"
+  }
 }

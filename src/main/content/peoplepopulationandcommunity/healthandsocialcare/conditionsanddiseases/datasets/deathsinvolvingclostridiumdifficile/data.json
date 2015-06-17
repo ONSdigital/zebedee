@@ -1,47 +1,32 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "cdids": null,
-      "xls": "http://www.ons.gov.uk/ons/rel/subnational-health2/deaths-involving-clostridium-difficile/2012/reference-tables.xls",
-      "csv": null
+      "xls": "http://www.ons.gov.uk/ons/rel/subnational-health2/deaths-involving-clostridium-difficile/2012/reference-tables.xls"
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Deaths involving Clostridium difficile",
-  "summary": "Brief description of dataset",
   "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/datasets/deathsinvolvingclostridiumdifficile",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Health and social care",
-      "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
     },
     {
-      "title": "Conditions and diseases",
-      "summary": "We publish statistics on many different health conditions and diseases collected from health bodies across the UK. However, key statistics in this area are on newly diagnosed cancers and deaths related to diseases mainly caught when a person is already in hospital, e.g. MRSA and Clostridium difficile.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Deaths involving Clostridium difficile",
+    "summary": "Brief description of dataset"
+  }
 }

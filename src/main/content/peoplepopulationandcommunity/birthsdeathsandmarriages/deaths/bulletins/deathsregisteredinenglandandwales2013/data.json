@@ -1,11 +1,5 @@
 {
-  "headline1": "There were 506,790 deaths registered in England and Wales in 2013, compared with 499,331 in 2012 (a rise of 1.5%).",
-  "headline2": "Age-standardised mortality rates (ASMRs) have continued to decrease in 2013.",
-  "headline3": "The infant mortality rate decreased in 2013 to 4.0 deaths per thousand live births, compared with 4.2 in 2012.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key Findings",
@@ -54,9 +48,7 @@
     {
       "title": "Further Information",
       "markdown": "More data on [Deaths](http://www.ons.gov.uk/ons/publications/re-reference-tables.html?edition\u003dtcm%3A77-317522 \"Death registrations summary tables, England and Wales - 2013\") in England and Wales in 2013 are available on the ONS website.\n\nData on [Births in England and Wales in 2013](http://www.ons.gov.uk/ons/rel/vsob1/birth-summary-tables--england-and-wales/2013.html \"Birth summary tables, England and Wales 2013\") are also available on the ONS website.\n\nA [Quality and Methodology Information (382.3 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/quality-and-methodology-information-reports-by-theme/population/quality-and-methodology-information-for-mortality-statistics-in-england-and-wales.pdf \"Quality and Methodology Information for Mortality Statistics in England and Wales\") document for mortality statistics is available on the ONS website. Further information on data quality, legislation and procedures relating to mortality is available in the [mortality metadata (2.7 Mb Pdf)](http://www.ons.gov.uk/ons/guide-method/user-guidance/health-and-life-events/mortality-metadata.pdf \"Mortality metadata\").\n\nThere is also an [interactive mapping tool](http://www.ons.gov.uk/ons/external-links/other-ns-online/neighbourhood-statistics--ness-/mortality-map-interactive-tool.html \"Martality map interactive tool\") which enables trends in mortality to be analysed at the local level.\n\nFurther 2013 death statistics will be published later in 2014, see the [Publication Hub](http://www.ons.gov.uk/ons/external-links/stats-authority/publication-hub.html \"Publication Hub\") for more details on releases.\n\n[Mortality Statistics: Deaths registered in England and Wales (series DR), 2013](http://www.ons.gov.uk/ons/rel/vsob1/mortality-statistics--deaths-registered-in-england-and-wales--series-dr-/index.html \"Mortality Statistics: Deaths registered in England and Wales (series DR) index\") will be published in October/November 2014.\n\n[Mortality Statistics: Deaths registered in England and Wales by area of usual residence, 2013](http://www.ons.gov.uk/ons/rel/vsob1/deaths-registered-area-usual-residence/index.html \"Mortality Statistics: Deaths registered in England and Wales by area of usual residence index\") will be published in December 2014/January 2015.\n\nTo meet user needs, very timely but [provisional counts of death registrations are published: provisional counts of weekly death registrations by age-sex group and region](http://www.ons.gov.uk/ons/rel/vsob2/weekly-provisional-figures-on-deaths-registered-in-england-and-wales/index.html \"Weekly provisional figures on deaths registered in England and Wales index\") and [provisional counts of monthly death registrations by local authority](http://www.ons.gov.uk/ons/rel/vsob2/monthly-figures-on-deaths-registered-by-area-of-usual-residence--england-and-wales/index.html \"Monthly figures on deaths registered in England and Wales index\"). Users should note that figures for 2014 have not been subject to the full quality assurance process so figures are considered provisional. Monthly figures for 2013 will be updated to final figures on 22 July 2014.\n\nFor mortality data for other UK countries please see [statistics on deaths in Northern Ireland](http://www.ons.gov.uk/ons/external-links/devolved-admins/nisra/nisra----deaths.html \"NISRA -- Deaths\") and [statistics on deaths in Scotland](http://www.ons.gov.uk/ons/external-links/other-government-departments/gro/scotland---deaths.html \"\"Scotland - Deaths).\n\nInternational comparisons of live death numbers and rates are available in the [Vital Statistics: Population and Health Reference Tables](http://www.ons.gov.uk/ons/rel/vsob1/vital-statistics--population-and-health-reference-tables/index.html \"Vital Statistics: Population and Health Reference Tables index\").\n\nFuture changes to mortality outputs are outlined in the [plan for mortality outputs (116 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/user-guidance/health-and-life-events/plan-for-mortality-statistics.pdf \"plan for mortality statistics\") available on the ONS website.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "References",
       "markdown": "1000 Lives Plus, Transforming Maternity Services - Welsh Initiative for Stillbirth Reduction (WISR) [accessed 01 July 2014], available at: [www.1000livesplus.wales.nhs.uk/maternity-services-stillbirth](http://www.1000livesplus.wales.nhs.uk/maternity-services-stillbirth)\n\nDepartment for Communities and Local Government (2011) The English Indices of Deprivation 2010, available at: [www.gov.uk/government/uploads/system/uploads/attachment_data/file/6871/1871208.pdf](http://www.gov.uk/government/uploads/system/uploads/attachment_data/file/6871/1871208.pdf)\n\nDepartment for Health (2013) Living Well for Longer: National support for local action to reduce premature avoidable mortality, available at: [www.gov.uk/government/publications/helping-people-live-well-for-longer](http://www.gov.uk/government/publications/helping-people-live-well-for-longer)\n\nDepartment for Health (2013) Public Health Outcomes Framework, available at: [www.gov.uk/government/publications/healthy-lives-healthy-people-improving-outcomes-and-supporting-transparency](http://www.gov.uk/government/publications/healthy-lives-healthy-people-improving-outcomes-and-supporting-transparency)\n\nDepartment for Health (2012) NHS Outcomes Framework, available at: [www.gov.uk/government/publications/nhs-outcomes-framework-2013-to-2014](http://www.gov.uk/government/publications/nhs-outcomes-framework-2013-to-2014)\n\nEurostat (2013) Revision of the European Standard Population - Report of Eurostat\u0027s task force, available at: [http://epp.eurostat.ec.europa.eu/cache/ITY_OFFPUB/KS-RA-13-028/EN/KS-RA-13-028-EN.PDF](http://epp.eurostat.ec.europa.eu/cache/ITY_OFFPUB/KS-RA-13-028/EN/KS-RA-13-028-EN.PDF)\n\nGardosi J, Madurasinghe V, Williams M, Malik A and Francis A (2013) ‘Maternal and fetal risk factors for stillbirth: population based study’, British Medical Journal, 346:f108, available at: [www.ncbi.nlm.nih.gov/pmc/articles/PMC3554866/pdf/bmj.f108.pdf](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3554866/pdf/bmj.f108.pdf)\n\nOakley L, Maconochie N, Doyle P, Dattani N and Moser K (2009) ‘Multivariate analysis of infant death in England and Wales in 2005–06 with focus on socio-economic status and deprivation’, Health Statistics Quarterly 42, pp 22–39, available at: [www.ons.gov.uk/ons/rel/hsq/health-statistics-quarterly/no--42--summer-2009/multivariate-analysis-of-infant-death-in-england-and-wales-in-2005-06--with-focus-on-socio-economic-status-and-deprivation.pdf](http://www.ons.gov.uk/ons/rel/hsq/health-statistics-quarterly/no--42--summer-2009/multivariate-analysis-of-infant-death-in-england-and-wales-in-2005-06--with-focus-on-socio-economic-status-and-deprivation.pdf)\n\nRomeri E, Baker A and Griffiths C (2006) ‘Mortality by deprivation and cause of death in England and Wales, 1999-2003’. Health Statistics Quarterly 32, 19–34, available at: [www.ons.gov.uk/ons/rel/hsq/health-statistics-quarterly/no--38--summer-2008/index.html](http://www.ons.gov.uk/ons/rel/hsq/health-statistics-quarterly/no--38--summer-2008/index.html)\n\nStillbirth and Neonatal Death charity (Sands) UK stillbirth and neonatal death charity, Sands and the Department of Health progress stillbirth public awareness initiative [accessed 23 June 2014], available at: [http://uk-sands.org/news/research/2013-03-06/sands-and-department-health-progress-stillbirth-public-awareness-initiative](http://uk-sands.org/news/research/2013-03-06/sands-and-department-health-progress-stillbirth-public-awareness-initiative)\n\nWelsh Government Programme for Government [accessed 04 July 2014], available at: [http://wales.gov.uk/about/programmeforgov/?lang\u003den](http://wales.gov.uk/about/programmeforgov/?lang\u003den)\n\nWelsh Government (2013) Wales NHS Delivery Framework, available at: [http://wales.gov.uk/docs/dhss/publications/130524frameworken.pdf](http://wales.gov.uk/docs/dhss/publications/130524frameworken.pdf)\n\nWelsh Government (2011) Welsh Index of Multiple Deprivation (WIMD), available at: [http://wales.gov.uk/docs/statistics/2011/110831wimd11summaryen.pdf](http://wales.gov.uk/docs/statistics/2011/110831wimd11summaryen.pdf)\n"
@@ -70,44 +62,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "vsob@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Deaths Registered in England and Wales, 2013",
-  "summary": "Annual data on death registrations. Contains death rates, cause of death data by sex and age and death registrations by area of residence and single year of age.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/deathsregisteredinenglandandwales2013",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Deaths",
-      "summary": "ONS receives data on deaths from the deaths register. This means only data on registered deaths is available. This data is available by age, sex, area of the UK and cause of death. Some of the datasets here are available as long run time series. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "There were 506,790 deaths registered in England and Wales in 2013, compared with 499,331 in 2012 (a rise of 1.5%).",
+    "headline2": "Age-standardised mortality rates (ASMRs) have continued to decrease in 2013.",
+    "headline3": "The infant mortality rate decreased in 2013 to 4.0 deaths per thousand live births, compared with 4.2 in 2012.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "vsob@ons.gsi.gov.uk"
+    },
+    "title": "Deaths Registered in England and Wales, 2013",
+    "summary": "Annual data on death registrations. Contains death rates, cause of death data by sex and age and death registrations by area of residence and single year of age.",
+    "keywords": []
+  }
 }

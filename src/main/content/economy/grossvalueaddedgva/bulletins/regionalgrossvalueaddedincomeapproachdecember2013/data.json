@@ -1,11 +1,5 @@
 {
-  "headline1": "In 2012 Gross Value Added (GVA) per head of population increased in all NUTS1 regions except for the East Midlands.",
-  "headline2": "In 2012 the South East had the largest increase in GVA per head at 2.5%, followed by the North West at 1.7% and Wales at 1.6%.",
-  "headline3": "In 2012 London had the largest GVA per head at £37,232, while Wales had the lowest at £15,401.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key points",
@@ -50,9 +44,7 @@
     {
       "title": "Future work plans",
       "markdown": "- A full range of Scottish Census population became available in May 2014. Updated reference tables containing a complete time series of GVA per head and GVA per head indices for all regions of the UK were published on 7th July 2014.\n- ONS plans to publish estimates of regional Gross Value Added using the income approach (GVA(I)) for 1997 to 2013 in December 2014.\n- The publication of Regional Gross Disposable Household Income (GDHI) estimates for the period 1997 to 2012 is currently planned for Spring 2014. This will include 2011 Census updated population counts.\n- On the 18th December 2013 ONS Regional Accounts will publish experimental estimates of regional real Gross Value Added, compiled using the production approach (GVA(P)). These estimates will be in constant prices, deflated to remove the effect of inflation. ONS is committed to deliver estimates of real GVA growth rates to Eurostat from 2014, in accordance with EU legislation. In December 2014 regional GVA(I) and regional GVA(P) will be published in separate statistical bulletins. GVA(P) will remain experimental and GVA(I) will continue to be the lead National Statistic. In the longer term (2014-15) a regional GVA balancing project will consider the viability of producing a single balanced measure of regional GVA.\n- Relevant methodological changes arising from the introduction of the European System of National Accounts 2010 (ESA 2010) will be implemented in the regional accounts during the course of 2014, in step with the UK National Accounts.\n- During 2014 the Open Data Project will improve access to Regional Accounts data on the ONS website and offer greater facility for users to customise datasets.\n- A revised Regional Accounts Methodology Guide, GVA Inventory and GDHI Inventory will be published in 2014.\n- Changes in NUTS boundaries arising from the 2013 NUTS review will become active in January 2015. These changes will be implemented in the regional GDHI publication scheduled for Spring 2015 and the regional GVA(I) and GVA(P) publications scheduled for December 2015.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "The Nomenclature of Units for Territorial Statistics (NUTS) provides a single uniform breakdown for the production of regional statistics for the EU. These regional GVA estimates are compiled at three levels of NUTS geography:\n\n- NUTS1: Wales, Scotland, Northern Ireland and the nine English regions.\n- NUTS2: 37 areas – mainly groups of counties and unitary authorities; can be referred to as sub-regions.\n- NUTS3: 139 areas – principally individual counties and unitary authorities; also known as local areas.\n- Some areas appear at more than one level, for example Northern Ireland appears at NUTS1 and NUTS2 levels.\n\nThe NUTS classification was established by Eurostat in the early 1970s as a single, coherent system for dividing up European Union territory in order to produce regional statistics for the EU. Since 2003, any changes to boundaries to account for changes in, for instance, local authority boundaries, have needed to go through a formal process of application to the EU, with any changes being implemented at the end of pre-set periods of enforced stability.\n\nThe term Extra-Regio is applied to economic activity that cannot be assigned to any specific region within a country. The contribution to Compensation of Employees (CoE) of UK embassies abroad, UK forces stationed overseas and activities taking place on the continental shelf (North Sea oil and gas extraction) are treated as Extra-Regio in the workplace-based estimates but are allocated to regions in the residence-based estimates. However the contribution of continental shelf activity to gross trading profits is treated as Extra-Regio in both the residence-based and workplace-based estimates of regional GVA.\n\nThese estimates are presented in current basic prices. They do not allow for different regional price levels or changes in prices over time (inflation). The income approach to calculating GVA produces only current price estimates because some income components cannot easily be converted into prices and volume (e.g. gross operating surplus).\n\nThe NUTS1 GVA estimates presented here are on a workplace basis (allocated to the location where the economic activity takes place). Residence-based estimates, (where earnings of individuals are allocated to the region in which they live), are also published at NUTS1 level and are available in the NUTS1 reference table.\n\nGVA per head is a useful way of comparing regions of different sizes. It is not, however, a measure of regional productivity as the population estimates used to calculate it include the economically inactive population. ONS produces estimates of regional and sub-regional productivity based on the regional GVA data. The latest published productivity outputs can be found on the ONS website.\n\n##### Quality\n\nONS Regional Accounts published updated Quality and Methodology Information (QMI) reports for regional GVA and regional GDHI in November 2013, detailing methods used to produce these statistics.\n\nFigures for 2012 are provisional as national estimates have not been through Supply and Use balancing at the time of this publication.\n\nThe statistical discrepancy is the difference between the sum of the national income components and the definitive national estimate of GVA.\n\nAs with the National Accounts, regional, sub-regional and local GVA estimates are calculated as reliably as possible. There is no easy way to measure the reliability of the estimates but ONS carries out consistency checks on data inputs, applies methods consistently and makes use of local knowledge for England, Scotland, Wales and Northern Ireland through consultation with key users in the Devolved Administrations and other government departments. The estimates are partly based on sample surveys and the quality of the results therefore varies according to sample size. This means that the results for smaller regions are subject to a greater degree of uncertainty than those for larger regions.\n\n##### Revisions\n\nRevisions to NUTS1, NUTS2 and NUTS3 regional GVA estimates in this statistical bulletin cover the period 1997 to 2011.\n\nVery few statistical revisions arise as a result of errors in the popular sense of the word. All estimates, by definition, are subject to statistical error but in this context the word refers to the uncertainty in any process or calculation that uses sampling, estimation or modelling. Most revisions reflect either the adoption of new statistical techniques or the incorporation of new information which allows the statistical error of previous estimates to be reduced. Only rarely are there avoidable errors such as human or system errors and such mistakes are made clear when they are discovered and corrected.\n\nThe main reasons for revisions are detailed below:\n\nData are subject to revisions in light of revised National Accounts Blue Book data. In Blue Book 2013, the totals for national GVA by industry were revised as far back as 1997. These changes led to revisions in the regional data, which are constrained to sum to the national figures.\n\nFinal estimates for 2011 became available from various data providers. Source data are delivered by suppliers in accordance with the Standard Industrial Classification of All Economic Activities (UK SIC 2007).\n\nPAYE data from Her Majesty\u0027s Revenue and Customs (HMRC), used in the compilation of residence-based compensation of employees estimates, were revised for 2010/11 and new estimates supplied for 2011/12.\n\nThe methodological changes to the measurement of workplace and residence estimates of Compensation of Employees (CoE) and estimates of Gross Trading Profits of Other Corporations (GTPOC) have also led to revisions to regional GVA affecting all years in all regions. More information about these changes can be found in the ‘Recent Methodological Changes’ section of this bulletin."
@@ -66,38 +58,30 @@
       "markdown": ""
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "trevor.fenton@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Regional Gross Value Added (Income Approach), December 2013",
-  "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
   "uri": "/economy/grossvalueaddedgva/bulletins/regionalgrossvalueaddedincomeapproachdecember2013",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Gross Value Added (GVA)",
-      "summary": "Gross Value Added (GVA) measures the contribution to the economy of each individual producer, industry or sector. In the UK it is used in the estimation of Gross Domestic Product (GDP).",
-      "uri": "/economy/grossvalueaddedgva",
-      "index": null
+      "uri": "/economy/grossvalueaddedgva"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "In 2012 Gross Value Added (GVA) per head of population increased in all NUTS1 regions except for the East Midlands.",
+    "headline2": "In 2012 the South East had the largest increase in GVA per head at 2.5%, followed by the North West at 1.7% and Wales at 1.6%.",
+    "headline3": "In 2012 London had the largest GVA per head at £37,232, while Wales had the lowest at £15,401.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "trevor.fenton@ons.gsi.gov.uk"
+    },
+    "title": "Regional Gross Value Added (Income Approach), December 2013",
+    "summary": "Shows economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland including component totals and industry group totals.",
+    "keywords": []
+  }
 }

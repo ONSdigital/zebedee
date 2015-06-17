@@ -1,1458 +1,814 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "118140",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "1858",
       "value": "24",
-      "year": "1858",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1858"
     },
     {
       "date": "1859",
       "value": "117",
-      "year": "1859",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1859"
     },
     {
       "date": "1860",
       "value": "103",
-      "year": "1860",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1860"
     },
     {
       "date": "1861",
       "value": "196",
-      "year": "1861",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1861"
     },
     {
       "date": "1862",
       "value": "123",
-      "year": "1862",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1862"
     },
     {
       "date": "1863",
       "value": "134",
-      "year": "1863",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1863"
     },
     {
       "date": "1864",
       "value": "168",
-      "year": "1864",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1864"
     },
     {
       "date": "1865",
       "value": "179",
-      "year": "1865",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1865"
     },
     {
       "date": "1866",
       "value": "116",
-      "year": "1866",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1866"
     },
     {
       "date": "1867",
       "value": "119",
-      "year": "1867",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1867"
     },
     {
       "date": "1868",
       "value": "23",
-      "year": "1868",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1868"
     },
     {
       "date": "1869",
       "value": "159",
-      "year": "1869",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1869"
     },
     {
       "date": "1870",
       "value": "154",
-      "year": "1870",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1870"
     },
     {
       "date": "1871",
       "value": "166",
-      "year": "1871",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1871"
     },
     {
       "date": "1872",
       "value": "133",
-      "year": "1872",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1872"
     },
     {
       "date": "1873",
       "value": "215",
-      "year": "1873",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1873"
     },
     {
       "date": "1874",
       "value": "194",
-      "year": "1874",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1874"
     },
     {
       "date": "1875",
       "value": "194",
-      "year": "1875",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1875"
     },
     {
       "date": "1876",
       "value": "208",
-      "year": "1876",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1876"
     },
     {
       "date": "1877",
       "value": "249",
-      "year": "1877",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1877"
     },
     {
       "date": "1878",
       "value": "292",
-      "year": "1878",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1878"
     },
     {
       "date": "1879",
       "value": "358",
-      "year": "1879",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1879"
     },
     {
       "date": "1880",
       "value": "278",
-      "year": "1880",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1880"
     },
     {
       "date": "1881",
       "value": "311",
-      "year": "1881",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1881"
     },
     {
       "date": "1882",
       "value": "289",
-      "year": "1882",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1882"
     },
     {
       "date": "1883",
       "value": "334",
-      "year": "1883",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1883"
     },
     {
       "date": "1884",
       "value": "348",
-      "year": "1884",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1884"
     },
     {
       "date": "1885",
       "value": "396",
-      "year": "1885",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1885"
     },
     {
       "date": "1886",
       "value": "325",
-      "year": "1886",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1886"
     },
     {
       "date": "1887",
       "value": "440",
-      "year": "1887",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1887"
     },
     {
       "date": "1888",
       "value": "338",
-      "year": "1888",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1888"
     },
     {
       "date": "1889",
       "value": "351",
-      "year": "1889",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1889"
     },
     {
       "date": "1890",
       "value": "313",
-      "year": "1890",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1890"
     },
     {
       "date": "1891",
       "value": "369",
-      "year": "1891",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1891"
     },
     {
       "date": "1892",
       "value": "327",
-      "year": "1892",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1892"
     },
     {
       "date": "1893",
       "value": "387",
-      "year": "1893",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1893"
     },
     {
       "date": "1894",
       "value": "369",
-      "year": "1894",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1894"
     },
     {
       "date": "1895",
       "value": "407",
-      "year": "1895",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1895"
     },
     {
       "date": "1896",
       "value": "459",
-      "year": "1896",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1896"
     },
     {
       "date": "1897",
       "value": "503",
-      "year": "1897",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1897"
     },
     {
       "date": "1898",
       "value": "508",
-      "year": "1898",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1898"
     },
     {
       "date": "1899",
       "value": "468",
-      "year": "1899",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1899"
     },
     {
       "date": "1900",
       "value": "512",
-      "year": "1900",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1900"
     },
     {
       "date": "1901",
       "value": "477",
-      "year": "1901",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1901"
     },
     {
       "date": "1902",
       "value": "601",
-      "year": "1902",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1902"
     },
     {
       "date": "1903",
       "value": "606",
-      "year": "1903",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1903"
     },
     {
       "date": "1904",
       "value": "528",
-      "year": "1904",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1904"
     },
     {
       "date": "1905",
       "value": "604",
-      "year": "1905",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1905"
     },
     {
       "date": "1906",
       "value": "546",
-      "year": "1906",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1906"
     },
     {
       "date": "1907",
       "value": "644",
-      "year": "1907",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1907"
     },
     {
       "date": "1908",
       "value": "638",
-      "year": "1908",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1908"
     },
     {
       "date": "1909",
       "value": "694",
-      "year": "1909",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1909"
     },
     {
       "date": "1910",
       "value": "596",
-      "year": "1910",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1910"
     },
     {
       "date": "1911",
       "value": "580",
-      "year": "1911",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1911"
     },
     {
       "date": "1912",
       "value": "587",
-      "year": "1912",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1912"
     },
     {
       "date": "1913",
       "value": "577",
-      "year": "1913",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1913"
     },
     {
       "date": "1914",
       "value": "856",
-      "year": "1914",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1914"
     },
     {
       "date": "1915",
       "value": "680",
-      "year": "1915",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1915"
     },
     {
       "date": "1916",
       "value": "990",
-      "year": "1916",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1916"
     },
     {
       "date": "1917",
       "value": "703",
-      "year": "1917",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1917"
     },
     {
       "date": "1918",
       "value": "1111",
-      "year": "1918",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1918"
     },
     {
       "date": "1919",
       "value": "1654",
-      "year": "1919",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1919"
     },
     {
       "date": "1920",
       "value": "3090",
-      "year": "1920",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1920"
     },
     {
       "date": "1921",
       "value": "3522",
-      "year": "1921",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1921"
     },
     {
       "date": "1922",
       "value": "2588",
-      "year": "1922",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1922"
     },
     {
       "date": "1923",
       "value": "2667",
-      "year": "1923",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1923"
     },
     {
       "date": "1924",
       "value": "2286",
-      "year": "1924",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1924"
     },
     {
       "date": "1925",
       "value": "2605",
-      "year": "1925",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1925"
     },
     {
       "date": "1926",
       "value": "2622",
-      "year": "1926",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1926"
     },
     {
       "date": "1927",
       "value": "3190",
-      "year": "1927",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1927"
     },
     {
       "date": "1928",
       "value": "4018",
-      "year": "1928",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1928"
     },
     {
       "date": "1929",
       "value": "3396",
-      "year": "1929",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1929"
     },
     {
       "date": "1930",
       "value": "3563",
-      "year": "1930",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1930"
     },
     {
       "date": "1931",
       "value": "3764",
-      "year": "1931",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1931"
     },
     {
       "date": "1932",
       "value": "3894",
-      "year": "1932",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1932"
     },
     {
       "date": "1933",
       "value": "4042",
-      "year": "1933",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1933"
     },
     {
       "date": "1934",
       "value": "4287",
-      "year": "1934",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1934"
     },
     {
       "date": "1935",
       "value": "4069",
-      "year": "1935",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1935"
     },
     {
       "date": "1936",
       "value": "5146",
-      "year": "1936",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1936"
     },
     {
       "date": "1937",
       "value": "4886",
-      "year": "1937",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1937"
     },
     {
       "date": "1938",
       "value": "6250",
-      "year": "1938",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1938"
     },
     {
       "date": "1939",
       "value": "8254",
-      "year": "1939",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1939"
     },
     {
       "date": "1940",
       "value": "7755",
-      "year": "1940",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1940"
     },
     {
       "date": "1941",
       "value": "6368",
-      "year": "1941",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1941"
     },
     {
       "date": "1942",
       "value": "7618",
-      "year": "1942",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1942"
     },
     {
       "date": "1943",
       "value": "10012",
-      "year": "1943",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1943"
     },
     {
       "date": "1944",
       "value": "12312",
-      "year": "1944",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1944"
     },
     {
       "date": "1945",
       "value": "15634",
-      "year": "1945",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1945"
     },
     {
       "date": "1946",
       "value": "29829",
-      "year": "1946",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1946"
     },
     {
       "date": "1947",
       "value": "60254",
-      "year": "1947",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1947"
     },
     {
       "date": "1948",
       "value": "43698",
-      "year": "1948",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1948"
     },
     {
       "date": "1949",
       "value": "34856",
-      "year": "1949",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1949"
     },
     {
       "date": "1950",
       "value": "30870",
-      "year": "1950",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1950"
     },
     {
       "date": "1951",
       "value": "28767",
-      "year": "1951",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1951"
     },
     {
       "date": "1952",
       "value": "33922",
-      "year": "1952",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1952"
     },
     {
       "date": "1953",
       "value": "30326",
-      "year": "1953",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1953"
     },
     {
       "date": "1954",
       "value": "28027",
-      "year": "1954",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1954"
     },
     {
       "date": "1955",
       "value": "26816",
-      "year": "1955",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1955"
     },
     {
       "date": "1956",
       "value": "26265",
-      "year": "1956",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1956"
     },
     {
       "date": "1957",
       "value": "23785",
-      "year": "1957",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1957"
     },
     {
       "date": "1958",
       "value": "22654",
-      "year": "1958",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1958"
     },
     {
       "date": "1959",
       "value": "24286",
-      "year": "1959",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1959"
     },
     {
       "date": "1960",
       "value": "23868",
-      "year": "1960",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1960"
     },
     {
       "date": "1961",
       "value": "25394",
-      "year": "1961",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1961"
     },
     {
       "date": "1962",
       "value": "28935",
-      "year": "1962",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1962"
     },
     {
       "date": "1963",
       "value": "32052",
-      "year": "1963",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1963"
     },
     {
       "date": "1964",
       "value": "34868",
-      "year": "1964",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1964"
     },
     {
       "date": "1965",
       "value": "37785",
-      "year": "1965",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1965"
     },
     {
       "date": "1966",
       "value": "39067",
-      "year": "1966",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1966"
     },
     {
       "date": "1967",
       "value": "43093",
-      "year": "1967",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1967"
     },
     {
       "date": "1968",
       "value": "45794",
-      "year": "1968",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1968"
     },
     {
       "date": "1969",
       "value": "51310",
-      "year": "1969",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1969"
     },
     {
       "date": "1970",
       "value": "58239",
-      "year": "1970",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1970"
     },
     {
       "date": "1971",
       "value": "74437",
-      "year": "1971",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1971"
     },
     {
       "date": "1972",
       "value": "119025",
-      "year": "1972",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1972"
     },
     {
       "date": "1973",
       "value": "106003",
-      "year": "1973",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1973"
     },
     {
       "date": "1974",
       "value": "113500",
-      "year": "1974",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1974"
     },
     {
       "date": "1975",
       "value": "120522",
-      "year": "1975",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1975"
     },
     {
       "date": "1976",
       "value": "126694",
-      "year": "1976",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1976"
     },
     {
       "date": "1977",
       "value": "129053",
-      "year": "1977",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1977"
     },
     {
       "date": "1978",
       "value": "143667",
-      "year": "1978",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1978"
     },
     {
       "date": "1979",
       "value": "138706",
-      "year": "1979",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1979"
     },
     {
       "date": "1980",
       "value": "148301",
-      "year": "1980",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1980"
     },
     {
       "date": "1981",
       "value": "145713",
-      "year": "1981",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1981"
     },
     {
       "date": "1982",
       "value": "146698",
-      "year": "1982",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1982"
     },
     {
       "date": "1983",
       "value": "147479",
-      "year": "1983",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1983"
     },
     {
       "date": "1984",
       "value": "144501",
-      "year": "1984",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1984"
     },
     {
       "date": "1985",
       "value": "160300",
-      "year": "1985",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1985"
     },
     {
       "date": "1986",
       "value": "153903",
-      "year": "1986",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1986"
     },
     {
       "date": "1987",
       "value": "151007",
-      "year": "1987",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1987"
     },
     {
       "date": "1988",
       "value": "152633",
-      "year": "1988",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1988"
     },
     {
       "date": "1989",
       "value": "150872",
-      "year": "1989",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1989"
     },
     {
       "date": "1990",
       "value": "153386",
-      "year": "1990",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1990"
     },
     {
       "date": "1991",
       "value": "158745",
-      "year": "1991",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1991"
     },
     {
       "date": "1992",
       "value": "160385",
-      "year": "1992",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1992"
     },
     {
       "date": "1993",
       "value": "165018",
-      "year": "1993",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1993"
     },
     {
       "date": "1994",
       "value": "158175",
-      "year": "1994",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1994"
     },
     {
       "date": "1995",
       "value": "155499",
-      "year": "1995",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1995"
     },
     {
       "date": "1996",
       "value": "157107",
-      "year": "1996",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1996"
     },
     {
       "date": "1997",
       "value": "146689",
-      "year": "1997",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1997"
     },
     {
       "date": "1998",
       "value": "145214",
-      "year": "1998",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1998"
     },
     {
       "date": "1999",
       "value": "144556",
-      "year": "1999",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1999"
     },
     {
       "date": "2000",
       "value": "141135",
-      "year": "2000",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2000"
     },
     {
       "date": "2001",
       "value": "143818",
-      "year": "2001",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2001"
     },
     {
       "date": "2002",
       "value": "147735",
-      "year": "2002",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2002"
     },
     {
       "date": "2003",
       "value": "153065",
-      "year": "2003",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2003"
     },
     {
       "date": "2004",
       "value": "152923",
-      "year": "2004",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2004"
     },
     {
       "date": "2005",
       "value": "141322",
-      "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2005"
     },
     {
       "date": "2006",
       "value": "132140",
-      "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2006"
     },
     {
       "date": "2007",
       "value": "128131",
-      "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2007"
     },
     {
       "date": "2008",
       "value": "121708",
-      "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2008"
     },
     {
       "date": "2009",
       "value": "113949",
-      "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2009"
     },
     {
       "date": "2010",
       "value": "119589",
-      "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2010"
     },
     {
       "date": "2011",
       "value": "117558",
-      "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2011"
     },
     {
       "date": "2012",
       "value": "118140",
-      "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2012"
     }
   ],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID39",
-  "unit": "couples",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
-      "title": "Divorces in England and Wales, 2012",
-      "summary": "Tables contain dissolutions and annulments of marriage by previous marital status, sex and age of divorcees, children and facts proven and to whom granted.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/bulletins/divorcesinenglandandwales2012"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Number of divorces",
-  "summary": null,
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/timeseries/raid39",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Divorce",
-      "summary": "Statistics on divorces allow us to map changing social attitudes to divorce and give an indication of the number of children growing up with divorced parents. They are available by the age and sex of the divorcees, who divorce was granted to and the areas of the UK divorces are more likely to happen in. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "118140",
+    "cdid": "RAID39",
+    "unit": "couples",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Number of divorces"
+  }
 }

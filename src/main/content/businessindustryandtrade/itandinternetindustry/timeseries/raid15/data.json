@@ -1,102 +1,61 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "491.7",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "2008",
       "value": "334.6",
-      "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2008"
     },
     {
       "date": "2009",
       "value": "374.1",
-      "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2009"
     },
     {
       "date": "2010",
       "value": "418.5",
-      "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2010"
     },
     {
       "date": "2011",
       "value": "483.8",
-      "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2011"
     },
     {
       "date": "2012",
       "value": "491.7",
-      "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2012"
     }
   ],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID15",
-  "unit": "bn",
-  "preUnit": "£",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
-      "title": "E-Commerce and ICT Activity, 2012",
-      "summary": "This release provides estimates of the values of e-commerce and the adoption and use of Information and Communication Technologies (ICTs) by UK businesses. The source of the information is the E-commerce Survey of UK Businesses.",
-      "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012",
-      "index": null
+      "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Total e-commerce sales",
-  "summary": null,
   "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid15",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     },
     {
-      "title": "IT and internet industry",
-      "summary": "Key statistics here are on the value and percentage of business sales that take place over the internet. We also measure the percentage of businesses that have a website and a broadband connection. These figures allow us to monitor the growing importance of the internet to UK businesses. ",
-      "uri": "/businessindustryandtrade/itandinternetindustry",
-      "index": null
+      "uri": "/businessindustryandtrade/itandinternetindustry"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "491.7",
+    "cdid": "RAID15",
+    "unit": "bn",
+    "preUnit": "£",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Total e-commerce sales"
+  }
 }

@@ -1,56 +1,35 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2013",
-  "number": "87685",
-  "mainMeasure": null,
-  "keyNote": "Number of VAT and/or PAYE based enterprises",
-  "additionalText": null,
   "years": [],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID5",
-  "unit": "",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "UK Business: Activity, Size and Location - 2013",
-      "summary": "Tables on local units and enterprises by geography, industry, legal status and employment size band. Additional tables at enterprise level by age of business and turnover size band.",
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013",
-      "index": null
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation/bulletins/ukbusinessactivitysizeandlocation2013"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Wales businesses",
-  "summary": null,
   "uri": "/businessindustryandtrade/businessactivitysizeandlocation/timeseries/raid5",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     },
     {
-      "title": "Business activity, size and location",
-      "summary": "Statistics here focus on business that are either registered for VAT or PAYE. This means some very small businesses are not be covered. Key figures are the number of businesses in the UK and the numbers across different areas of the UK. Business size is based on employment and turnover and business activity relates to the type of industry the business is related to. ",
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation",
-      "index": null
+      "uri": "/businessindustryandtrade/businessactivitysizeandlocation"
     }
-  ]
+  ],
+  "description": {
+    "date": "2013",
+    "number": "87685",
+    "keyNote": "Number of VAT and/or PAYE based enterprises",
+    "cdid": "RAID5",
+    "unit": "",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Wales businesses"
+  }
 }

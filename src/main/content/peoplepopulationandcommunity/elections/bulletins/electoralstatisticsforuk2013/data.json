@@ -1,11 +1,5 @@
 {
-  "headline1": "The total number of UK parliamentary electors in 2013 was 46,139,900, a fall of 0.5% from 2012.",
-  "headline2": "The total number of UK local government electors in 2013 was 47,691,800, a fall of 0.1% from 2012.",
-  "headline3": "Between 2012 and 2013, the number of both parliamentary and local government electors declined in both England and Northern Ireland, while the number of parliamentary electors declined in Wales.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "UK Electoral Statistics, 2013",
@@ -34,9 +28,7 @@
     {
       "title": "Other Electoral Statistics",
       "markdown": "Other electoral statistics produced for areas in the UK include:\n\n### England\nStatistics for parliamentary electors for electoral wards in England for 2010 have been published by the Boundary Commission for England. These statistics are produced from data collected from Electoral Registration Officers by ONS and were those used for the cancelled 2013 boundary review process.\n\nThis data can be obtained from the Boundary Commission for England on request by emailing \u003cinformation@bcommengland.gsi.gov.uk\u003e.\n\n### Wales\nStatistics for National Assembly for Wales electors by Assembly Constituencies are published by the Welsh Government. Those electors who are eligible to vote in local government elections in Wales are eligible to vote in National Assembly for Wales elections. These statistics are produced from data collected from Electoral Registration Officers by ONS.\n\nThe data are available from [StatsWales](http://www.ons.gov.uk/ons/external-links/devolved-admins/welsh-assembly-government/statswales--electors-by-assembly-constituencies.html \"StatsWales: Electors by Assembly Consituencies\").\n\nThe Boundary Commission for Wales also publish [statistics for the parliamentary electorate by Electoral Divisions](http://www.ons.gov.uk/ons/external-links/other/electorates--excel-.html \"Electorates (Excel)\").\n\n### Scotland\nElectoral statistics for Scotland are produced and published by National Records of Scotland (NRS). Additional statistics not included in the overall UK publication cover Scottish Parliament Constituencies, Scottish regions and electoral wards.\n\nThe data are available from the [electoral statistics section of the NRS](http://www.ons.gov.uk/ons/external-links/devolved-admins/national-records-of-scotland/national-records-of-scotland--electoral-statistics.html \"National Records of Scotland: Electoral Statistics\").\n\n### Northern Ireland\nElectoral statistics for Northern Ireland are produced and published by the Electoral Office for Northern Ireland (EONI). Monthly electoral statistics for both the parliamentary and local government electorate are available at electoral ward level from the [electoral statistics section of the EONI website](http://www.ons.gov.uk/ons/external-links/other/electorate-statistics.html \"Electoral Statistics\").\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "1. National Statistics are produced to high professional standards set out in the Code of Practice for Official Statistics. They undergo regular quality assurance reviews to ensure that they meet customer needs. They are produced free from any political interference.\n\n2. Electoral statistics for 2013 are available from the [electoral statistics section](http://www.ons.gov.uk/ons/external-links/other/elections--local--national-and-european-.html \"Elections (Local, National and European)\") of the ONS website.\n\n3. Published tables include counts of local government electors and attainers by local government areas and parliamentary electors and attainers by parliamentary constituency. An attainer is a person who attains the age of 18 during the currency of the register, and is entitled to vote at an election on or after his or her eighteenth birthday.\n\n4. A report describing the methodology used to create the electoral statistics estimates can be found on our [Electoral Statistics Information Page](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/population-and-migration/uk-electoral-statistics/electoral-statistics.html \"Electoral Statistics\").\n\n5. Electoral statistics usually relate to registers published annually in December. Time series comparisons of electoral statistics in this release use figures for December each year, with the exception of 2012 and 2013 for England, Wales and Scotland. The 2012 electoral statistics relate to October 2012 instead of December 2012 in England and Wales (excluding London). The 2013 electoral statistics relate to February 2014 in England and March 2014 in Wales and Scotland. This means that changes between the 2012 and 2013 electoral statistics may not exactly reflect annual change, as the actual time difference between the two sets of figures may be up to 18 months (the maximum difference is in Wales – October 2012 to March 2014).\n\n6. Information on previous elections held in the UK or its constituent countries and a list of upcoming elections and referendums is available from the [Electoral Commission](http://www.ons.gov.uk/ons/external-links/other/elections-and-referendums.html \"Elections and referendum \").\n\n7. This is the first release of 2013 UK electoral statistics. No revisions of this dataset have been made.\n\n8. Release code: ELEC1BL1\n\n9. **Next publication:**\n2015\n\n**Issued by:**\nOffice for National Statistics, Government Buildings, Cardiff Road, Newport NP10 8XG\n\n**Media contact:**\nTel:  Media Relations Office    0845 6041858\n        Emergency on-call    07867 906553\nEmail: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\n**Statistical contact:**\nTel:  Pete Large    01329 444661\nEmail: \u003cpop.info@ons.gov.uk\u003e\n\n© Crown copyright 2014.\n\nYou may re-use this information (not including logos) free of charge in any format or medium, under the terms of the [Open Government Licence](http://www.ons.gov.uk/ons/external-links/other-government-departments/national-archives/index.html \"Open Government Licence\") or write to the Information Policy Team, The National Archives, Kew, London TW9 4DU\nEmail:  \u003cpsi@nationalarchives.gsi.gov.uk\u003e\n\n\nProduced in partnership with National Records of Scotland and Electoral Office for Northern Ireland\n\n11. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThe United Kingdom Statistics Authority has designated these statistics as National Statistics, in accordance with the Statistics and Registration Service Act 2007 and signifying compliance with the Code of Practice for Official Statistics.\n\nDesignation can be broadly interpreted to mean that the statistics:\n\n- meet identified user needs;\n- are well explained and readily accessible;\n- are produced according to sound methods; and\n- are managed impartially and objectively in the public interest.\n\nOnce statistics have been designated as National Statistics it is a statutory requirement that the Code of Practice shall continue to be observed.\n"
@@ -50,38 +42,30 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "pop.info@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Electoral Statistics for UK, 2013",
-  "summary": "Analysis of the annual counts of the number of people registered to vote in 2013, including comparisons over time and between the UK constituent countries.",
   "uri": "/peoplepopulationandcommunity/elections/bulletins/electoralstatisticsforuk2013",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Elections",
-      "summary": "The key statistic in this section is the number of people who are listed on electoral registers. This differs from the number of people who are eligible to vote. These statistics are available for the constituent countries of the UK. ",
-      "uri": "/peoplepopulationandcommunity/elections",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/elections"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "The total number of UK parliamentary electors in 2013 was 46,139,900, a fall of 0.5% from 2012.",
+    "headline2": "The total number of UK local government electors in 2013 was 47,691,800, a fall of 0.1% from 2012.",
+    "headline3": "Between 2012 and 2013, the number of both parliamentary and local government electors declined in both England and Northern Ireland, while the number of parliamentary electors declined in Wales.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "pop.info@ons.gsi.gov.uk"
+    },
+    "title": "Electoral Statistics for UK, 2013",
+    "summary": "Analysis of the annual counts of the number of people registered to vote in 2013, including comparisons over time and between the UK constituent countries.",
+    "keywords": []
+  }
 }

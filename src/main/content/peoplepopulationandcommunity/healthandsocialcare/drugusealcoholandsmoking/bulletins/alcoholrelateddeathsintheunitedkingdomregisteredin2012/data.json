@@ -1,21 +1,5 @@
 {
-  "headline1": "In 2012 there were 8,367 alcohol-related deaths in the UK, 381 fewer than in 2011 (8,748).",
-  "headline2": "Males accounted for approximately 65% of all alcohol-related deaths in the UK in 2012.",
-  "headline3": "Death rates were highest among men aged 60 to 64 years (42.6 deaths per 100,000 population) and women aged 55 to 59 years (22.2 deaths per 100,000).",
-  "relatedBulletins": [
-    {
-      "headline1": "There were 1,706 male drug poisoning deaths (involving both legal and illegal drugs) registered in 2012, a 4% decrease since 2011.",
-      "headline2": "Female drug poisoning deaths have increased every year since 2009, reaching 891 in 2012.",
-      "headline3": "1,086 in 2012; female deaths decreased by 1% from 413 in 2011 to 410 in 2012.",
-      "title": "Deaths Related to Drug Poisoning in England and Wales, 2012",
-      "summary": "Deaths related to drug poisoning in England and Wales for the last five years. Data from 1993 are available to download, and are discussed in the commentary to provide context to the latest (2012) data. Figures are presented by cause of death, sex, age, substance(s) involved in the death, country and region.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/deathsrelatedtodrugpoisoninginenglandandwales2012",
-      "index": null
-    }
-  ],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
+  "relatedBulletins": [],
   "sections": [
     {
       "title": "Alcohol-related Deaths in the United Kingdom, Registered in 2012",
@@ -64,9 +48,7 @@
     {
       "title": "Results on the Office for National Statistics website",
       "markdown": "Figures for alcohol-related deaths for the UK, England, Wales and regions of England can be found in Microsoft Excel workbooks on the Office for National Statistics website at:\n\nThe two workbooks contain:\n\n- Results for the UK – age-standardised rates per 100,000 (with 95% confidence intervals) and numbers of alcohol-related deaths for the period 1991 to 2012. Figures are available split by sex and broad age groups (All ages, 1¬-14, 15-34, 35-54, 55-74 and 75 and over)\n\n- Results for England and Wales – age-standardised rates per 100,000 (with 95% confidence intervals) and numbers of alcohol-related deaths for England and Wales, England, Wales and regions of England for the period 1991-2012. Figures are available split by sex and broad age groups (All ages, 1-14, 15-34, 35-54, 55-74 and 75 and over; figures presented by sex only for regions of England)\n\nStatistics for Scotland, published by National Records of Scotland and statistics for Northern Ireland, published by the Northern Ireland Statistics and Research Agency (NISRA) are available in the links below.\n\n[Scotland](http://www.ons.gov.uk/ons/rel/subnational-health4/alcohol-related-deaths-in-the-united-kingdom/2012/www.gro-scotland.gov.uk/statistics/theme/vital-events/deaths/alcohol-related/index.html \"Scotland\")\n\n[Northern Ireland](http://www.ons.gov.uk/ons/rel/subnational-health4/alcohol-related-deaths-in-the-united-kingdom/2012/www.nisra.gov.uk/demography/default.asp30.html \"Northern Ireland\")\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "References",
       "markdown": "Breakwell C, Baker A, Griffiths C, Jackson G, Fegan G and Marshall D (2007) [Trends and geographical variations in alcohol-related deaths in the United Kingdom, 1991-2004. Health Statistics Quarterly 33, 6-22. (2.95 Mb Pdf)](http://www.ons.gov.uk/ons/rel/hsq/health-statistics-quarterly/no--33--spring-2007/health-statistics-quarterly.pdf \"Health Statistics Quarterly\")\n\nDepartment of Health (2010) [Healthy lives, healthy people: our strategy for public health in England](http://www.ons.gov.uk/ons/external-links/other-government-departments/doh/dh---publications-policy-and-guidance.html \"DH Publications Policy and Guidance\")\n\nDepartment of Health (2014) Public Health Responsibility Deal.\n\nErskine, S., Maheswaran, R., Pearson, T. \u0026 Gleeson, D. (2010) Socioeconomic deprivation, urban-rural location and alcohol-related mortality in England and Wales. BMC Public Health, 10:99\n\nFaculty of Public Health (2008) [Alcohol and Public Health. Position statement](http://www.fph.org.uk/uploads/ps_alcohol.pdf \"[Alcohol and Public Health. Position statement\")\n\nHome Office (2012) Alcohol Strategy.\n\nONS (2013) [Opinions and Lifestyle Survey, Drinking Habits Amongst Adults, 2012](http://www.ons.gov.uk/ons/rel/ghs/opinions-and-lifestyle-survey/drinking-habits-amongst-adults--2012/index.html \"Drinking Habits Amongst Adults, 2012\").\n\nSiegler V, Al-Hamad A, Johnson B And Wells C (2011) [Social inequalities in alcohol-related adult mortality by National Statistics Socio-economic Classification, England and Wales, 2001-03. Health Statistics Quarterly 50. (353.9 Kb Pdf)](http://www.ons.gov.uk/ons/rel/hsq/health-statistics-quarterly/no--50--summer-2011/social-inequalities-in-alcohol-related-adult-mortality-by-national-statistics-socio-economic-classification--england-and-wales--2001-03.pdf \"Social inequalities in alcohol-related adult mortality by National Statistics Socio-economic Classification, England and Wales, 2001-03\")\n\nWorld Health Organisation (2014a) [Health Topics – Alcohol](http://www.who.int/topics/alcohol_drinking/en/ \"Health Topics – Alcohol\").\n\nWorld Health Organisation (2014b) [Alcohol factsheet](http://www.who.int/mediacentre/factsheets/fs349/en/index.html \"Alcohol factsheet\")\n"
@@ -80,44 +62,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "mortality@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Alcohol-related deaths in the United Kingdom, registered in 2012",
-  "summary": "This bulletin presents the latest figures for alcohol-related deaths in the UK, its four constituent countries and regions of England. Comparisons are made between 2012, the latest year, and previously published data from 2002 onwards.",
   "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking/bulletins/alcoholrelateddeathsintheunitedkingdomregisteredin2012",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Health and social care",
-      "summary": "Statistics for health and social care cover a wide range of topics including figures on people whose day to day activities are limited a lot, a little or not at all, deaths from drug misuse, deaths related to alcohol and figures on newly diagnosed cancers. Some of these statistics are collected from registrations while others are from surveys. They have a wide range of users and uses.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare"
     },
     {
-      "title": "Drug use, alcohol and smoking",
-      "summary": "Statistics on drug use, alcohol and smoking focus on deaths and illnesses related to these areas. Deaths related to drugs can be through drug poisoning or drug misuse. It is important to know whether deaths related to these areas are rising or falling overall or rising for some groups and falling for others as this information is key when making decisions on allocating resources and creating policies aimed at reducing these illnesses and deaths.",
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare/drugusealcoholandsmoking"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "In 2012 there were 8,367 alcohol-related deaths in the UK, 381 fewer than in 2011 (8,748).",
+    "headline2": "Males accounted for approximately 65% of all alcohol-related deaths in the UK in 2012.",
+    "headline3": "Death rates were highest among men aged 60 to 64 years (42.6 deaths per 100,000 population) and women aged 55 to 59 years (22.2 deaths per 100,000).",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "mortality@ons.gsi.gov.uk"
+    },
+    "title": "Alcohol-related deaths in the United Kingdom, registered in 2012",
+    "summary": "This bulletin presents the latest figures for alcohol-related deaths in the UK, its four constituent countries and regions of England. Comparisons are made between 2012, the latest year, and previously published data from 2002 onwards.",
+    "keywords": []
+  }
 }

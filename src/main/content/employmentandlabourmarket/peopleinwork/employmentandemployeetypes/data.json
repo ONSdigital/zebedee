@@ -1,90 +1,56 @@
 {
   "items": [
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf24",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf24"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf25",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/lf25"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsv",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsv"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgrz",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgrz"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsb",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsb"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsa",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/mgsa"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/ap2y",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/timeseries/ap2y"
     }
   ],
   "datasets": [
     {
-      "title": "Full-time, part-time \u0026 temporary workers",
-      "summary": "Brief description of dataset",
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/fulltimeparttimetemporaryworkers",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/fulltimeparttimetemporaryworkers"
     },
     {
-      "title": "Jobs by industry",
-      "summary": "Brief description of dataset",
-      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/jobsbyindustry",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/jobsbyindustry"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "Comparing the estimates for March to May 2014 with those for December 2013 to February 2014, employment continued to rise and unemployment continued to fall.",
-      "headline2": "There were 30.64 million people in work, 254,000 more than for December 2013 to February 2014 and 929,000 more than a year earlier.",
-      "headline3": "The proportion of people aged from 16 to 64 in work (the employment rate) continued to rise, reaching 73.1% for March to May 2014.",
-      "title": "UK Labour Market, July 2014",
-      "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
     }
   ],
-  "relatedArticles": null,
   "index": 0,
   "type": "product_page",
-  "title": "Employment and employee types",
-  "summary": "Those in employment are classed as those working for pay or those working for no pay in a family business. Employment rates for those aged 16 and over and those aged 16 to 64 are calculated from the Labour Force Survey (LFS). Other figures found here are for men and women in employment (also from the LFS) and vacancies (from the Vacancies survey).",
   "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Employment and Labour market",
-      "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket",
-      "index": null
+      "uri": "/employmentandlabourmarket"
     },
     {
-      "title": "People in work",
-      "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork"
     }
-  ]
+  ],
+  "description": {
+    "title": "Employment and employee types",
+    "summary": "Those in employment are classed as those working for pay or those working for no pay in a family business. Employment rates for those aged 16 and over and those aged 16 to 64 are calculated from the Labour Force Survey (LFS). Other figures found here are for men and women in employment (also from the LFS) and vacancies (from the Vacancies survey)."
+  }
 }

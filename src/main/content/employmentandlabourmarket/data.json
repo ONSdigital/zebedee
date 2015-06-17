@@ -1,35 +1,28 @@
 {
   "sections": [
     {
-      "title": "People in work",
-      "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
       "uri": "/employmentandlabourmarket/peopleinwork",
       "index": 0
     },
     {
-      "title": "Unemployment",
-      "summary": "The level and rate of UK unemployment is measured by the Labour Force Survey using a definition of unemployment specified by the International Labour Organisation. This defines unemployed people as those without a job who have been actively seeking work in the past four weeks and are available to start work in the next two weeks, or those who are out of work but have found a job and are waiting to start it in the next two weeks. Another measure related to unemployment is the claimant count which measures the number of people claiming Jobseeker\u0027s Allowance.",
       "uri": "/employmentandlabourmarket/unemployment",
       "index": 1
     },
     {
-      "title": "Public sector personnel",
-      "summary": "Public sector employment statistics relate to the number of people employed in central government, local government and public corporations. They are collected through returns from various organisations. Employees included in the headcount can be permanent, on a fixed-term contract, employed on a casual basis or working in a second job in the public sector. However, self-employed, contract workers and agency workers are excluded.",
       "uri": "/employmentandlabourmarket/publicsectorpersonnel",
       "index": 2
     }
   ],
   "index": 2,
   "type": "taxonomy_landing_page",
-  "title": "Employment and Labour market",
-  "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
   "uri": "/employmentandlabourmarket",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     }
-  ]
+  ],
+  "description": {
+    "title": "Employment and Labour market",
+    "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes."
+  }
 }

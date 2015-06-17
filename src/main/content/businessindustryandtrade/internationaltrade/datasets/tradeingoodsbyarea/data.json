@@ -1,5 +1,4 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Trade in goods by area",
@@ -16,39 +15,28 @@
         "BOKG",
         "BOKH",
         "BOKI"
-      ],
-      "xls": null,
-      "csv": null
+      ]
     }
   ],
-  "notes": null,
-  "description": "Trade in goods by area. Exports, imports and balance for European Monetary Union (EMU), European Union (EU) and non-EU.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Trade in goods by area. Exports, imports and balance for European Monetary Union (EMU), European Union (EU) and non-EU."
+  },
   "type": "dataset",
-  "title": "Trade in goods by area",
-  "summary": "Exports, imports and balance for EMU, EU and non-EU",
   "uri": "/businessindustryandtrade/internationaltrade/datasets/tradeingoodsbyarea",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     },
     {
-      "title": "International trade",
-      "summary": "International trade is the exchange of goods and services across international borders. Here, you can find statistics on the types of goods traded internationally and the general trends in international trade. A key statistic is the balance on international trade, in recent times the UK has generally had a deficit on its trade in goods and a surplus on its trade in services which has led to an overall deficit in the UK\u0027s balance of international trade. ",
-      "uri": "/businessindustryandtrade/internationaltrade",
-      "index": null
+      "uri": "/businessindustryandtrade/internationaltrade"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Trade in goods by area",
+    "summary": "Exports, imports and balance for EMU, EU and non-EU"
+  }
 }

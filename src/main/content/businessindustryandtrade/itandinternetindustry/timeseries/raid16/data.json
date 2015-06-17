@@ -1,56 +1,34 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "18.2",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID16",
-  "unit": "%",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "E-Commerce and ICT Activity, 2012",
-      "summary": "This release provides estimates of the values of e-commerce and the adoption and use of Information and Communication Technologies (ICTs) by UK businesses. The source of the information is the E-commerce Survey of UK Businesses.",
-      "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012",
-      "index": null
+      "uri": "/businessindustryandtrade/itandinternetindustry/bulletins/ecommerceandictactivity2012"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "E-commerce sales (% turnover)",
-  "summary": null,
   "uri": "/businessindustryandtrade/itandinternetindustry/timeseries/raid16",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     },
     {
-      "title": "IT and internet industry",
-      "summary": "Key statistics here are on the value and percentage of business sales that take place over the internet. We also measure the percentage of businesses that have a website and a broadband connection. These figures allow us to monitor the growing importance of the internet to UK businesses. ",
-      "uri": "/businessindustryandtrade/itandinternetindustry",
-      "index": null
+      "uri": "/businessindustryandtrade/itandinternetindustry"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "18.2",
+    "cdid": "RAID16",
+    "unit": "%",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "E-commerce sales (% turnover)"
+  }
 }

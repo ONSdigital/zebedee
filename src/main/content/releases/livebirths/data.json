@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Live births",
-  "summary": "Statistics on live births are a subset of numbers from the data that the ONS obtains from the births and deaths registrations. They are available by sex, month of the year and region of the UK. ",
-  "uri": "releases/livebirths",
-  "breadcrumb": null
+  "uri": "releases/livebirths"
 }

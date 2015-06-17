@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Stillbirths",
-  "summary": "Statistics on stillbirths are obtained from birth registrations. Stillbirth data is available by the age of the parents, the time of year, the area of usual residence for the mother and hospital of occurrence (where applicable). ",
-  "uri": "releases/stillbirths",
-  "breadcrumb": null
+  "uri": "releases/stillbirths"
 }

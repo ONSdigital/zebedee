@@ -1,154 +1,100 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2012",
-  "number": "90313",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "1997",
       "value": "47885",
       "year": "1997",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "1998",
       "value": "50242",
       "year": "1998",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "1999",
       "value": "52399",
       "year": "1999",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2000",
       "value": "55369",
       "year": "2000",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2001",
       "value": "58884",
       "year": "2001",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2002",
       "value": "60709",
       "year": "2002",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2003",
       "value": "63708",
       "year": "2003",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2004",
       "value": "66229",
       "year": "2004",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2005",
       "value": "69364",
       "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2006",
       "value": "73632",
       "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2007",
       "value": "75380",
       "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2008",
       "value": "77562",
       "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2009",
       "value": "80226",
       "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2010",
       "value": "84437",
       "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2011",
       "value": "87056",
       "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     },
     {
       "date": "2012",
       "value": "90313",
       "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": "RGHI",
-      "updateDate": null
+      "sourceDataset": "RGHI"
     }
   ],
   "quarters": [],
@@ -156,48 +102,32 @@
   "sourceDatasets": [
     "RGHI"
   ],
-  "cdid": "C92Q",
-  "unit": "m",
-  "preUnit": "£",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "Regional Gross Disposable Household Income (GDHI), 2012",
-      "summary": "This bulletin presents the latest estimates of Gross Disposable Household Income (GDHI) for regions (see Table 1), sub-regions and local areas of the UK.",
-      "uri": "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012",
-      "index": null
+      "uri": "/economy/regionalaccounts/bulletins/regionalgrossdisposablehouseholdincomegdhi2012"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "South West Gross Disposable Household Income",
-  "summary": null,
   "uri": "/economy/regionalaccounts/timeseries/c92q",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Regional accounts",
-      "summary": "Regional Accounts are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts.  These accounts allow comparisons between regions and comparisons of a region against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income. ",
-      "uri": "/economy/regionalaccounts",
-      "index": null
+      "uri": "/economy/regionalaccounts"
     }
-  ]
+  ],
+  "description": {
+    "date": "2012",
+    "number": "90313",
+    "cdid": "C92Q",
+    "unit": "m",
+    "preUnit": "£",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "South West Gross Disposable Household Income"
+  }
 }

@@ -1,62 +1,38 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2011/12",
-  "number": "93.9",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": "Experimental statistics",
   "years": [],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID82",
-  "unit": "%",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
-  "notes": [],
   "relatedDocuments": [
     {
-      "title": "Integrated Household Survey April 2011 to March 2012- Experimental Statistics",
-      "summary": "Findings on health, smoking, sexual identity and other social topics compiled from the UK Integrated Household Survey (IHS) between April 2011 to March 2012.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": false,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Heterosexual/Straight",
-  "summary": null,
   "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid82",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Cultural identity",
-      "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
     },
     {
-      "title": "Sexuality",
-      "summary": "Statistics on sexuality are obtained from large surveys which ask people to state their sexuality. Time series data on sexual identities is also available.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality"
     }
-  ]
+  ],
+  "description": {
+    "date": "2011/12",
+    "number": "93.9",
+    "additionalText": "Experimental statistics",
+    "cdid": "RAID82",
+    "unit": "%",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": false,
+    "title": "Heterosexual/Straight"
+  }
 }

@@ -1,5 +1,4 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Value of retail sales by commodity",
@@ -14,39 +13,28 @@
         "HN5U",
         "HN5V",
         "HN5W"
-      ],
-      "xls": null,
-      "csv": null
+      ]
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Value of retail sales by commodity",
-  "summary": "Brief description of dataset",
   "uri": "/businessindustryandtrade/retailindustry/datasets/valueofretailsalesbycommodity",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     },
     {
-      "title": "Retail industry",
-      "summary": "Businesses in the retail industry are those which sell directly to the customer. The key statistic for the retail industry is the retail sales index (RSI). This is published on a monthly basis and the data comes from a survey sent out to retail business in Great Britain. The data in the RSI only covers spending on goods, data on spending on services can be found in the Index of Services. ",
-      "uri": "/businessindustryandtrade/retailindustry",
-      "index": null
+      "uri": "/businessindustryandtrade/retailindustry"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Value of retail sales by commodity",
+    "summary": "Brief description of dataset"
+  }
 }

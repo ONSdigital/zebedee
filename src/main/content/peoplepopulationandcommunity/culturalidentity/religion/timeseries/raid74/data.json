@@ -1,65 +1,41 @@
 {
-  "seasonalAdjustment": null,
-  "date": "2011",
-  "number": "33.2",
-  "mainMeasure": null,
-  "keyNote": "England and Wales",
-  "additionalText": null,
   "years": [
     {
       "date": "2011",
       "value": "33.243175",
-      "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2011"
     }
   ],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID74",
-  "unit": "m",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
   "notes": [],
   "relatedDocuments": [],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "Christian",
-  "summary": null,
   "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid74",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Cultural identity",
-      "summary": "These statistics give us a picture of how people in the UK see themselves today and how this has changed over time. Key areas here are ethnicity, sexuality, religion and language. There are a wide range of sources for the data collected and presented here. Users of this data range from central and local governments to charities and special interest groups and the general public.",
-      "uri": "/peoplepopulationandcommunity/culturalidentity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
     },
     {
-      "title": "Religion",
-      "summary": "Statistics on religion focus on what people state as their religion. The main source of data in this area is the 2011 Census. ",
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion"
     }
-  ]
+  ],
+  "description": {
+    "date": "2011",
+    "number": "33.2",
+    "keyNote": "England and Wales",
+    "cdid": "RAID74",
+    "unit": "m",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "Christian"
+  }
 }

@@ -1,5 +1,4 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Regional GVA NUTS1",
@@ -50,39 +49,28 @@
         "DDBO",
         "DDBP",
         "DDBQ"
-      ],
-      "xls": null,
-      "csv": null
+      ]
     }
   ],
-  "notes": null,
-  "description": "Economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Economic activity as measured by Gross Value Added (GVA) for English regions, Scotland, Wales and Northern Ireland."
+  },
   "type": "dataset",
-  "title": "Regional GVA NUTS1",
-  "summary": "Economic activity as measured by Gross Value Added (GVA)",
   "uri": "/economy/grossvalueaddedgva/datasets/regionalgvanuts1",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Economy",
-      "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. ",
-      "uri": "/economy",
-      "index": null
+      "uri": "/economy"
     },
     {
-      "title": "Gross Value Added (GVA)",
-      "summary": "Gross Value Added (GVA) measures the contribution to the economy of each individual producer, industry or sector. In the UK it is used in the estimation of Gross Domestic Product (GDP).",
-      "uri": "/economy/grossvalueaddedgva",
-      "index": null
+      "uri": "/economy/grossvalueaddedgva"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Regional GVA NUTS1",
+    "summary": "Economic activity as measured by Gross Value Added (GVA)"
+  }
 }

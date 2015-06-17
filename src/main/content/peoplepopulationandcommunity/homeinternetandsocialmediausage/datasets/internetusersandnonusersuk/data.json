@@ -1,41 +1,29 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "cdids": null,
-      "xls": "http://www.ons.gov.uk/ons/rel/rdit2/internet-access-quarterly-update/q1-2014/rft-ia-q1-2014.xls",
-      "csv": null
+      "xls": "http://www.ons.gov.uk/ons/rel/rdit2/internet-access-quarterly-update/q1-2014/rft-ia-q1-2014.xls"
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Internet users and non-users, UK",
-  "summary": "Brief description of dataset",
   "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage/datasets/internetusersandnonusersuk",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Home internet and social media usage",
-      "summary": "Statistics on usage of the internet and social media are useful for the government, businesses and other groups to make decisions on how best to communicate with  different groups of people. Here you can find statistics on the number of people who have used the internet, who use the internet frequently and who have never used the internet. Most of these statistics can be broken down by age and gender.",
-      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Internet users and non-users, UK",
+    "summary": "Brief description of dataset"
+  }
 }

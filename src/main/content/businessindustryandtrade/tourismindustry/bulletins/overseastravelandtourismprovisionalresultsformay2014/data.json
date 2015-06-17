@@ -1,11 +1,5 @@
 {
-  "headline1": "Visits to the UK by overseas residents continue to rise and are up 7% year to date (January to May), with holiday visits up 12% in the same period.",
-  "headline2": "Over the last twelve months, estimates of earnings from overseas residents to the UK continue to rise and are up 8%.",
-  "headline3": "Visits abroad by UK residents are up 5% over the past twelve months and their expenditure has increased 1% in the same period.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Correction",
@@ -78,46 +72,36 @@
     {
       "title": "Background Notes",
       "markdown": "1. 1. The information provided to the ONS by respondents is treated as strictly confidential as directed by the Code of Practice for Official Statistics. It is used to produce statistics that will not identify any individuals.\n\n- 2. A list of the job titles of those given pre-publication access to the contents of this Statistical Bulletin is available on the website.\n\n- 3. **National Statistics** are produced to high professional standards set out in the Code of Practice for Official Statistics.\n\n2. **Next publication:**  14th August 2014\n\n3. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background Notes: Important change in IPS sampling",
       "markdown": "Traffic at all airports and seaports is monitored regularly to assess if they should be included in the IPS sample. As a consequence Liverpool and Prestwick airports were introduced  into the sample at the beginning of 2005. Between 2000 and 2004, traffic through Liverpool had quadrupled to \u0027over two and a half million\u0027 international passengers, while at Prestwick there was a fivefold increase to nearly \u0027one and a half million\u0027 passengers over the same period. The inclusion of these ports in the IPS sample were shown to cause a discontinuity in regional results and methodology was modified to account for this. Similarly in early 2008 each of Doncaster, Bournemouth, Southampton and Heathrow Terminal 5 were added to the sample and in 2009 Aberdeen and Belfast International airports were added.\n"
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "socialsurveys@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Overseas Travel and Tourism, Provisional Results for May 2014",
-  "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
   "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     },
     {
-      "title": "Tourism industry",
-      "summary": "The tourism industries cover the following areas: accommodation services, food and beverage services, passenger transport services, vehicle hire, travel agencies and cultural, sports, recreational \u0026 conference services. Key figures here are employment levels and output of the tourism industries, the number of visitors to the UK and the amount visitors from different countries spend on average. ",
-      "uri": "/businessindustryandtrade/tourismindustry",
-      "index": null
+      "uri": "/businessindustryandtrade/tourismindustry"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "Visits to the UK by overseas residents continue to rise and are up 7% year to date (January to May), with holiday visits up 12% in the same period.",
+    "headline2": "Over the last twelve months, estimates of earnings from overseas residents to the UK continue to rise and are up 8%.",
+    "headline3": "Visits abroad by UK residents are up 5% over the past twelve months and their expenditure has increased 1% in the same period.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "socialsurveys@ons.gsi.gov.uk"
+    },
+    "title": "Overseas Travel and Tourism, Provisional Results for May 2014",
+    "summary": "Monthly estimates of completed international visits to and from the UK and earnings and expenditure associated with these visits.",
+    "keywords": []
+  }
 }

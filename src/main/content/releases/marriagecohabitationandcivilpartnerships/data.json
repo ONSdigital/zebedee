@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Marriage, cohabitation and civil partnerships",
-  "summary": "Statistics on how people live together give us a fuller picture of the changing social landscape of the UK. Data on marriages and civil partnerships comes from registrations, but data on cohabitation comes from various different surveys.",
-  "uri": "releases/marriagecohabitationandcivilpartnerships",
-  "breadcrumb": null
+  "uri": "releases/marriagecohabitationandcivilpartnerships"
 }

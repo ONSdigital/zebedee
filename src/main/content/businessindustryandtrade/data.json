@@ -1,65 +1,48 @@
 {
   "sections": [
     {
-      "title": "Retail industry",
-      "summary": "Businesses in the retail industry are those which sell directly to the customer. The key statistic for the retail industry is the retail sales index (RSI). This is published on a monthly basis and the data comes from a survey sent out to retail business in Great Britain. The data in the RSI only covers spending on goods, data on spending on services can be found in the Index of Services. ",
       "uri": "/businessindustryandtrade/retailindustry",
       "index": 0
     },
     {
-      "title": "International trade",
-      "summary": "International trade is the exchange of goods and services across international borders. Here, you can find statistics on the types of goods traded internationally and the general trends in international trade. A key statistic is the balance on international trade, in recent times the UK has generally had a deficit on its trade in goods and a surplus on its trade in services which has led to an overall deficit in the UK\u0027s balance of international trade. ",
       "uri": "/businessindustryandtrade/internationaltrade",
       "index": 1
     },
     {
-      "title": "Manufacturing and production industry",
-      "summary": "A range of industries come under the heading \u0027production\u0027, the manufacturing industry is the biggest, but also included are the mining \u0026 quarrying, energy supply and water supply \u0026 waste management industries. These production industries make up around 14.6% of the UK\u0027s total output. The statistics here are widely used in the private and public sector, particularly by the Bank of England, Her Majesty’s Treasury and the Office for Budget Responsibility, to assist and inform policy and decision making.",
       "uri": "/businessindustryandtrade/manufacturingandproductionindustry",
       "index": 2
     },
     {
-      "title": "Construction industry",
-      "summary": "The construction industry includes businesses that are involved with the construction of entirely new buildings or the repair, alterations or additions to existing properties. Also included are businesses involved in civil engineering projects. Output of the construction industry is defined as the amount charged by construction companies to customers for the value of work produced in a given period. Users of data on the construction industry include central government departments, Eurostat and various industry analysts.",
       "uri": "/businessindustryandtrade/constructionindustry",
       "index": 3
     },
     {
-      "title": "Business activity, size and location",
-      "summary": "Statistics here focus on business that are either registered for VAT or PAYE. This means some very small businesses are not be covered. Key figures are the number of businesses in the UK and the numbers across different areas of the UK. Business size is based on employment and turnover and business activity relates to the type of industry the business is related to. ",
       "uri": "/businessindustryandtrade/businessactivitysizeandlocation",
       "index": 4
     },
     {
-      "title": "Changes to business",
-      "summary": "Statistics here include a range of figures that provide a picture of how businesses in the UK are growing, surviving and changing over time. These figures are an informal indicator of the confidence in the UK economy. ",
       "uri": "/businessindustryandtrade/changestobusiness",
       "index": 5
     },
     {
-      "title": "IT and internet industry",
-      "summary": "Key statistics here are on the value and percentage of business sales that take place over the internet. We also measure the percentage of businesses that have a website and a broadband connection. These figures allow us to monitor the growing importance of the internet to UK businesses. ",
       "uri": "/businessindustryandtrade/itandinternetindustry",
       "index": 6
     },
     {
-      "title": "Tourism industry",
-      "summary": "The tourism industries cover the following areas: accommodation services, food and beverage services, passenger transport services, vehicle hire, travel agencies and cultural, sports, recreational \u0026 conference services. Key figures here are employment levels and output of the tourism industries, the number of visitors to the UK and the amount visitors from different countries spend on average. ",
       "uri": "/businessindustryandtrade/tourismindustry",
       "index": 7
     }
   ],
   "index": 0,
   "type": "taxonomy_landing_page",
-  "title": "Business, industry and trade",
-  "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
   "uri": "/businessindustryandtrade",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     }
-  ]
+  ],
+  "description": {
+    "title": "Business, industry and trade",
+    "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade."
+  }
 }

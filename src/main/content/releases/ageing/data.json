@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Ageing",
-  "summary": "Ageing analysis builds on life expectancy and population estimates, summarising the latest analysis of official statistics on population ageing and the lives of older people. They also provide ageing indicators such as median age and sex ratios at older ages at the national and local level.",
-  "uri": "releases/ageing",
-  "breadcrumb": null
+  "uri": "releases/ageing"
 }

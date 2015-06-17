@@ -1,450 +1,254 @@
 {
-  "seasonalAdjustment": null,
-  "date": "Mid-2013",
-  "number": "53.9",
-  "mainMeasure": null,
-  "keyNote": null,
-  "additionalText": null,
   "years": [
     {
       "date": "1971",
       "value": "46.411700",
-      "year": "1971",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1971"
     },
     {
       "date": "1972",
       "value": "46.571900",
-      "year": "1972",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1972"
     },
     {
       "date": "1973",
       "value": "46.686200",
-      "year": "1973",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1973"
     },
     {
       "date": "1974",
       "value": "46.682700",
-      "year": "1974",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1974"
     },
     {
       "date": "1975",
       "value": "46.674400",
-      "year": "1975",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1975"
     },
     {
       "date": "1976",
       "value": "46.659900",
-      "year": "1976",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1976"
     },
     {
       "date": "1977",
       "value": "46.639800",
-      "year": "1977",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1977"
     },
     {
       "date": "1978",
       "value": "46.638200",
-      "year": "1978",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1978"
     },
     {
       "date": "1979",
       "value": "46.698100",
-      "year": "1979",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1979"
     },
     {
       "date": "1980",
       "value": "46.787200",
-      "year": "1980",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1980"
     },
     {
       "date": "1981",
       "value": "46.820805",
-      "year": "1981",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1981"
     },
     {
       "date": "1982",
       "value": "46.777337",
-      "year": "1982",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1982"
     },
     {
       "date": "1983",
       "value": "46.813693",
-      "year": "1983",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1983"
     },
     {
       "date": "1984",
       "value": "46.912444",
-      "year": "1984",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1984"
     },
     {
       "date": "1985",
       "value": "47.057359",
-      "year": "1985",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1985"
     },
     {
       "date": "1986",
       "value": "47.187643",
-      "year": "1986",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1986"
     },
     {
       "date": "1987",
       "value": "47.300419",
-      "year": "1987",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1987"
     },
     {
       "date": "1988",
       "value": "47.412342",
-      "year": "1988",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1988"
     },
     {
       "date": "1989",
       "value": "47.552651",
-      "year": "1989",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1989"
     },
     {
       "date": "1990",
       "value": "47.699116",
-      "year": "1990",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1990"
     },
     {
       "date": "1991",
       "value": "47.875035",
-      "year": "1991",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1991"
     },
     {
       "date": "1992",
       "value": "47.997973",
-      "year": "1992",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1992"
     },
     {
       "date": "1993",
       "value": "48.102319",
-      "year": "1993",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1993"
     },
     {
       "date": "1994",
       "value": "48.228781",
-      "year": "1994",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1994"
     },
     {
       "date": "1995",
       "value": "48.383461",
-      "year": "1995",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1995"
     },
     {
       "date": "1996",
       "value": "48.519129",
-      "year": "1996",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1996"
     },
     {
       "date": "1997",
       "value": "48.664777",
-      "year": "1997",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1997"
     },
     {
       "date": "1998",
       "value": "48.820583",
-      "year": "1998",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1998"
     },
     {
       "date": "1999",
       "value": "49.032872",
-      "year": "1999",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "1999"
     },
     {
       "date": "2000",
       "value": "49.233311",
-      "year": "2000",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2000"
     },
     {
       "date": "2001",
       "value": "49.449746",
-      "year": "2001",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2001"
     },
     {
       "date": "2002",
       "value": "49.679267",
-      "year": "2002",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2002"
     },
     {
       "date": "2003",
       "value": "49.925517",
-      "year": "2003",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2003"
     },
     {
       "date": "2004",
       "value": "50.194600",
-      "year": "2004",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2004"
     },
     {
       "date": "2005",
       "value": "50.606034",
-      "year": "2005",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2005"
     },
     {
       "date": "2006",
       "value": "50.965186",
-      "year": "2006",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2006"
     },
     {
       "date": "2007",
       "value": "51.381093",
-      "year": "2007",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2007"
     },
     {
       "date": "2008",
       "value": "51.815853",
-      "year": "2008",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2008"
     },
     {
       "date": "2009",
       "value": "52.196381",
-      "year": "2009",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2009"
     },
     {
       "date": "2010",
       "value": "52.642452",
-      "year": "2010",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2010"
     },
     {
       "date": "2011",
       "value": "53.107169",
-      "year": "2011",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2011"
     },
     {
       "date": "2012",
       "value": "53.493729",
-      "year": "2012",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2012"
     },
     {
       "date": "2013",
       "value": "53.865817",
-      "year": "2013",
-      "month": null,
-      "quarter": null,
-      "sourceDataset": null,
-      "updateDate": null
+      "year": "2013"
     }
   ],
   "quarters": [],
   "months": [],
   "sourceDatasets": [],
-  "cdid": "RAID124",
-  "unit": "m",
-  "preUnit": "",
-  "source": "Office for National Statistics",
-  "relatedDatasets": null,
-  "description": null,
   "notes": [],
   "relatedDocuments": [
     {
-      "title": "Annual Mid-year Population Estimates, 2013",
-      "summary": "Estimates of the usual resident population in the United Kingdom and its constituent countries as at 30 June 2013.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates2013",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates2013"
     }
   ],
-  "methodology": null,
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
   "type": "timeseries",
-  "title": "England population",
-  "summary": null,
   "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/raid124",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Population and migration",
-      "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration"
     },
     {
-      "title": "Population estimates",
-      "summary": "Annual estimates of the size of the UK “usually resident population” are calculated at the mid-year point (30 June). The ONS compile and publish the UK estimates using estimates for England and Wales (produced by ONS directly), estimates for Scotland (produced by National Records of Scotland) and estimates for Northern Ireland (produced by the Northern Ireland Statistics \u0026 Research Agency). ",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates"
     }
-  ]
+  ],
+  "description": {
+    "date": "Mid-2013",
+    "number": "53.9",
+    "cdid": "RAID124",
+    "unit": "m",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "England population"
+  }
 }

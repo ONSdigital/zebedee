@@ -1,69 +1,44 @@
 {
   "items": [
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bbfw",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bbfw"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/f8xz",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/f8xz"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/f8y2",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/f8y2"
     },
     {
-      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bluu",
-      "index": null,
-      "data": null
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/timeseries/bluu"
     }
   ],
   "datasets": [
     {
-      "title": "Labour disputes",
-      "summary": "Estimates measuring strikes connected with terms and conditions of employment",
-      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputes",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputes"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "Comparing the estimates for March to May 2014 with those for December 2013 to February 2014, employment continued to rise and unemployment continued to fall.",
-      "headline2": "There were 30.64 million people in work, 254,000 more than for December 2013 to February 2014 and 929,000 more than a year earlier.",
-      "headline3": "The proportion of people aged from 16 to 64 in work (the employment rate) continued to rise, reaching 73.1% for March to May 2014.",
-      "title": "UK Labour Market, July 2014",
-      "summary": "Labour market statistics (including employment, unemployment and economic inactivity) for the United Kingdom.",
-      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/uklabourmarketjuly2014"
     }
   ],
-  "relatedArticles": null,
   "index": 3,
   "type": "product_page",
-  "title": "Workplace disputes and working conditions",
-  "summary": "Workplace disputes refer to stoppages of work related to a dispute between employer and employees. These include strikes (lawful and unlawful) and \u0027lock outs\u0027  (an employer barring employees from entering a place of work). Key figures here are the number of days lost to workplace disputes in the public and private sectors and the number of workers involved. ",
   "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Employment and Labour market",
-      "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes.",
-      "uri": "/employmentandlabourmarket",
-      "index": null
+      "uri": "/employmentandlabourmarket"
     },
     {
-      "title": "People in work",
-      "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, full and part time workers and earnings. ",
-      "uri": "/employmentandlabourmarket/peopleinwork",
-      "index": null
+      "uri": "/employmentandlabourmarket/peopleinwork"
     }
-  ]
+  ],
+  "description": {
+    "title": "Workplace disputes and working conditions",
+    "summary": "Workplace disputes refer to stoppages of work related to a dispute between employer and employees. These include strikes (lawful and unlawful) and \u0027lock outs\u0027  (an employer barring employees from entering a place of work). Key figures here are the number of days lost to workplace disputes in the public and private sectors and the number of workers involved. "
+  }
 }

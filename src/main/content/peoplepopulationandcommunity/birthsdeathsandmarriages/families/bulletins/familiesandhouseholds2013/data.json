@@ -1,11 +1,5 @@
 {
-  "headline1": "In 2013 there were 18.2 million families in the UK.",
-  "headline2": "Of these, 12.3 million consisted of a married couple with or without children.",
-  "headline3": "The number of opposite sex cohabiting couple families has increased significantly, from 2.2 million in 2003 to 2.9 million in 2013.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key points",
@@ -54,9 +48,7 @@
     {
       "title": "Background notes and methodology",
       "markdown": "1. The Office for National Statistics would appreciate feedback on the uses made of the statistics and the usefulness of the information provided. Please email \u003cfamilies@ons.gsi.gov.uk\u003e (preferred) or call +44 (0)1329 444677 to provide feedback.\n\n2. A family is a married, civil partnered or cohabiting couple with or without children, or a lone parent with at least one child. Children may be dependent or non-dependent.\n\n3. Dependent children are those aged under 16 living with at least one parent, or aged 16 to 18 in full-time education, excluding all children who have a spouse, partner or child living in the household.\n\n4. A small number of children are excluded from the analysis on families. These include (a) foster children and (b) children who live in communal establishments which are not covered by the Labour Force Survey.\n\n5. Since 2011 a household has been defined as one person living alone, or a group of people (not necessarily related) living at the same address who share cooking facilities and share a living room, sitting room or dining area. Previously a household was defined as a person living alone, or a group of people living at the same address who have the address as their only or main residence and either share one main meal a day or share living accommodation (or both). The aim of the change in definition was to ensure consistency with the definition used in the 2011 Census but has no impact on the comparability of the statistics over time.\n\n6. As estimates of the UK’s families and households are based on the Labour Force Survey, all estimates produced are subject to sampling variability. Indications of the robustness of the estimates are provided with the [tables (418.5 Kb Excel sheet)](http://www.ons.gov.uk/ons/rel/family-demography/families-and-households/2013/rft-tables.xls \"RFT Tables\") .\n\n7. The 2013 Labour Force Survey dataset was first published on 28 August 2013. It covers the period from April to June 2013. Further information about the quality of the Labour Force Survey can be found in the [Performance and Quality Monitoring Reports](http://www.ons.gov.uk/ons/guide-method/method-quality/specific/labour-market/labour-force-survey/index.html \"Labour Force Survey Performance and Quality Monitoring Reports\").\n\n8. Results from the 2011 Census have not yet been incorporated into any weighting for the Labour Force Survey. However the Labour Force Survey datasets will be reweighted to take account of the revised population estimates following the 2011 Census. These are due to be published in 2014 and estimates back to 2002 will be revised once this has occurred.\n\n9. The EU Statistics on income and living conditions (EU-SILC) is the source of the European comparisons in this bulletin. The statistics can be found on the [Eurostat web page Income and Living Conditions](http://www.ons.gov.uk/ons/external-links/other/eurostat/european-union-survey-of-income-and-living-conditions.html \"European Union Survey of Income and Living Conditions\") and the countries covered are the EU27 countries.\n\n10. To say that a change is statistically significant means that the change is probably true and unlikely to have occurred by chance. If a change is statistically significant, the confidence intervals around both estimates do not overlap. Further information about the accuracy of these statistics can be found in the [Quality and Methodology Information Report (245.9 Kb Pdf)](http://www.ons.gov.uk/ons/guide-method/method-quality/quality/quality-information/population/summary-quality-report-for-families-and-households.pdf \"Quality and Methodology Information for Families and Households\") .\n\n11. National Statistics are produced to high professional standards set out in the [Code of Practice for Official Statistics](http://www.ons.gov.uk/ons/guide-method/the-national-statistics-standard/code-of-practice/index.html \"Code of Practise\"). They undergo regular quality assurance reviews to ensure that they meet customer needs. They are produced free from any political interference.\n\n12. Follow ONS on [Twitter](http://www.ons.gov.uk/ons/external-links/social-media/ons-twitter.html \"Twitter\") and [Facebook](http://www.ons.gov.uk/ons/external-links/social-media/index.html \"Facebook\").\n\n13. Copyright and reproduction\n\n© Crown copyright 2013\n\nUnder the terms of the [Open Government Licence](http://www.ons.gov.uk/ons/external-links/other-government-departments/national-archives/index.html \"Open Government Licence\") and UK Government Licensing Framework, anyone wishing to use or re-use ONS material, whether commercially or privately, may do so freely without a specific application for a licence, subject to the conditions of the OGL and the Framework. \nFor further information, contact the Office of Public Sector Information, Crown Copyright Licensing and Public Sector Information, Kew, Richmond, Surrey, TW9 4DU.\n\nTel: +44 (0)20 8876 3444\n\nEmail \u003cpsi@nationalarchives.gsi.gov.uk\u003e\n\n14. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: \u003cmedia.relations@ons.gsi.gov.uk\u003e\n\nThese National Statistics are produced to high professional standards and released according to the arrangements approved by the UK Statistics Authority.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "References",
       "markdown": "This information will not be available in the prototype, however in the future all references related to this statistical bulletin will appear here.\n"
@@ -66,44 +58,33 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "families@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Families and Households, 2013",
-  "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families/bulletins/familiesandhouseholds2013",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     },
     {
-      "title": "Families",
-      "summary": "Statistics on families add value to the information published on marriages, divorces and civil partnerships, including analysis of children living in lone parent families, the number of married couples versus cohabiting couples, and young adults living with their parents. These statistics can be used to guide government policies and are of general interest to the public. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/families"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "In 2013 there were 18.2 million families in the UK.",
+    "headline2": "Of these, 12.3 million consisted of a married couple with or without children.",
+    "headline3": "The number of opposite sex cohabiting couple families has increased significantly, from 2.2 million in 2003 to 2.9 million in 2013.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "families@ons.gsi.gov.uk"
+    },
+    "title": "Families and Households, 2013",
+    "summary": "Shows families and children by family type including married couples, cohabiting couples and lone parents. Also shows household size and people living alone.",
+    "keywords": []
+  }
 }

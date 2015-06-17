@@ -1,69 +1,44 @@
 {
   "items": [
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27q"
     },
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k222",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k222"
     },
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27y",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k27y"
     },
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k22a",
-      "index": null,
-      "data": null
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/timeseries/k22a"
     }
   ],
   "datasets": [
     {
-      "title": "Output by Manufacturing sub-sectors",
-      "summary": "Brief description of dataset",
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputbymanufacturingsubsectors",
-      "index": null
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputoftheproductionindustries"
     },
     {
-      "title": "Output of the production industries",
-      "summary": "Broad industry groups and main industrial groupings.",
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputoftheproductionindustries",
-      "index": null
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/datasets/outputbymanufacturingsubsectors"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "Production output increased by 0.3% and manufacturing output increased by 0.2% between Q1 2014 and Q2 2014.",
-      "headline2": "The largest contribution to the quarterly growth in production came from electricity, gas, steam \u0026 air conditioning output, which increased by 4.4%.",
-      "headline3": "Production output increased by 1.2% between June 2013 and June 2014. This reflected increases of 1.9% in manufacturing and 0.4% in water supply, sewerage \u0026 waste management.",
-      "title": "Index of Production, June 2014",
-      "summary": "Constant price seasonally adjusted indices and growth rates for Production and component industries for June 2014.",
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/bulletins/indexofproductionjune2014",
-      "index": null
+      "uri": "/businessindustryandtrade/manufacturingandproductionindustry/bulletins/indexofproductionjune2014"
     }
   ],
-  "relatedArticles": null,
   "index": 2,
   "type": "product_page",
-  "title": "Manufacturing and production industry",
-  "summary": "A range of industries come under the heading \u0027production\u0027, the manufacturing industry is the biggest, but also included are the mining \u0026 quarrying, energy supply and water supply \u0026 waste management industries. These production industries make up around 14.6% of the UK\u0027s total output. The statistics here are widely used in the private and public sector, particularly by the Bank of England, Her Majesty’s Treasury and the Office for Budget Responsibility, to assist and inform policy and decision making.",
   "uri": "/businessindustryandtrade/manufacturingandproductionindustry",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "Business, industry and trade",
-      "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade.",
-      "uri": "/businessindustryandtrade",
-      "index": null
+      "uri": "/businessindustryandtrade"
     }
-  ]
+  ],
+  "description": {
+    "title": "Manufacturing and production industry",
+    "summary": "A range of industries come under the heading \u0027production\u0027, the manufacturing industry is the biggest, but also included are the mining \u0026 quarrying, energy supply and water supply \u0026 waste management industries. These production industries make up around 14.6% of the UK\u0027s total output. The statistics here are widely used in the private and public sector, particularly by the Bank of England, Her Majesty’s Treasury and the Office for Budget Responsibility, to assist and inform policy and decision making."
+  }
 }

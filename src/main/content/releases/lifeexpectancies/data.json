@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Life expectancies",
-  "summary": "Life expectancy statistics use population estimates with statistics on the number of deaths to derive an estimate of how long, on average, people of various ages can expect to live.  These statistics are used by central and local governments to make planning and resource allocation decisions and are of general interest to the public. ",
-  "uri": "releases/lifeexpectancies",
-  "breadcrumb": null
+  "uri": "releases/lifeexpectancies"
 }

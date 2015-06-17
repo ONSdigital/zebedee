@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Home internet and social media usage",
-  "summary": "Statistics on usage of the internet and social media are useful for the government, businesses and other groups to make decisions on how best to communicate with  different groups of people. Here you can find statistics on the number of people who have used the internet, who use the internet frequently and who have never used the internet. Most of these statistics can be broken down by age and gender.",
-  "uri": "releases/homeinternetandsocialmediausage",
-  "breadcrumb": null
+  "uri": "releases/homeinternetandsocialmediausage"
 }

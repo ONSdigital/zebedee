@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Deaths",
-  "summary": "ONS receives data on deaths from the deaths register. This means only data on registered deaths is available. This data is available by age, sex, area of the UK and cause of death. Some of the datasets here are available as long run time series. ",
-  "uri": "releases/deaths",
-  "breadcrumb": null
+  "uri": "releases/deaths"
 }

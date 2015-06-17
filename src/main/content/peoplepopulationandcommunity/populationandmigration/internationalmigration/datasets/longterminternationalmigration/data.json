@@ -1,47 +1,32 @@
 {
-  "datasetId": null,
   "downloads": [
     {
       "title": "Latest",
-      "cdids": null,
-      "xls": "http://www.ons.gov.uk/ons/rel/migration1/migration-statistics-quarterly-report/may-2014/provisional-13q4.xls",
-      "csv": null
+      "xls": "http://www.ons.gov.uk/ons/rel/migration1/migration-statistics-quarterly-report/may-2014/provisional-13q4.xls"
     }
   ],
-  "notes": null,
-  "description": "Comprehensive description of data contained within this dataset.",
-  "nationalStatistic": true,
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "section": {
+    "markdown": "Comprehensive description of data contained within this dataset."
+  },
   "type": "dataset",
-  "title": "Long-Term International Migration",
-  "summary": "Brief description of dataset",
   "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalmigration",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Population and migration",
-      "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration"
     },
     {
-      "title": "International migration",
-      "summary": "International migration statistics provide estimates of the number of people moving in and out of the UK. Data on long term migration, short term migration, and visitor data provide a picture of those entering and leaving the UK, covering all lengths of stay. ",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration"
     }
-  ]
+  ],
+  "description": {
+    "nationalStatistic": true,
+    "title": "Long-Term International Migration",
+    "summary": "Brief description of dataset"
+  }
 }

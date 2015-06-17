@@ -1,66 +1,41 @@
 {
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/timeseries/raid130",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/timeseries/raid130"
     }
   ],
   "datasets": [
     {
-      "title": "Principal population projection - England and Wales",
-      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionenglandandwales",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionuk"
     },
     {
-      "title": "Principal population projection - UK",
-      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionuk",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectiongreatbritain"
     },
     {
-      "title": "Principal population projection - Great Britain",
-      "summary": "Includes: population totals in broad age groups, components of change, births, deaths…",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectiongreatbritain",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/datasets/principalpopulationprojectionenglandandwales"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "The UK population is projected to increase by 9.6 million over the next 25 years from an estimated 63.7 million in mid-2012 to 73.3 million in mid-2037.",
-      "headline2": "The UK population is projected to reach 70 million in 2027.",
-      "headline3": "Projected natural increase (more births than deaths) accounts for 57 per cent of the projected increase over the next 25 years.",
-      "title": "National Population Projections, 2012-based",
-      "summary": "This statistical bulletin presents the key findings from the 2012-based national population projections.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections2012based"
     }
   ],
-  "relatedArticles": null,
   "index": 2,
   "type": "product_page",
-  "title": "Population projections",
-  "summary": "National population projections are available by age and sex for the UK and its constituent countries. These population projections are based on mid-year population estimates and a set of underlying assumptions regarding future fertility, mortality and migration. They provide an indication of the impact that changes in demographic patterns might have on the size and age structure of the population in the future. These projections are widely used for resource allocation and planning. ",
   "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Population and migration",
-      "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration"
     }
-  ]
+  ],
+  "description": {
+    "title": "Population projections",
+    "summary": "National population projections are available by age and sex for the UK and its constituent countries. These population projections are based on mid-year population estimates and a set of underlying assumptions regarding future fertility, mortality and migration. They provide an indication of the impact that changes in demographic patterns might have on the size and age structure of the population in the future. These projections are widely used for resource allocation and planning. "
+  }
 }

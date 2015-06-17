@@ -1,14 +1,7 @@
 {
-  "contact": null,
-  "releaseDate": null,
-  "nextReleaseDate": null,
-  "nationalStatistics": false,
   "articles": [],
   "bulletins": [],
   "datasets": [],
   "type": "release",
-  "title": "Regional accounts",
-  "summary": "Regional Accounts are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts.  These accounts allow comparisons between regions and comparisons of a region against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income. ",
-  "uri": "releases/regionalaccounts",
-  "breadcrumb": null
+  "uri": "releases/regionalaccounts"
 }

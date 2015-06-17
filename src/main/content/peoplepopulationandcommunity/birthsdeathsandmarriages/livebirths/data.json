@@ -1,69 +1,44 @@
 {
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid53",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid53"
     },
     {
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid54",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid54"
     },
     {
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid55",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid55"
     },
     {
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid56",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/timeseries/raid56"
     }
   ],
   "datasets": [
     {
-      "title": "Births data collection",
-      "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/birthsdatacollection",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/datasets/birthsdatacollection"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "There were 698,512 live births in England and Wales in 2013, a decrease of 4.3% from 729,674 in 2012.",
-      "headline2": "In 2013, the Total Fertility Rate (TFR) decreased to 1.85 children per woman, from 1.94 in 2012.",
-      "headline3": "In 2013 the stillbirth rate fell to 4.7 per thousand total births, from 4.9 in 2012.",
-      "title": "Births in England and Wales, 2013",
-      "summary": "Annual data of live births, fertility rates, percentage of births outside marriage, sex ratio, mean age of mother and country of birth of mother and father.",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/birthsinenglandandwales2013",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/birthsinenglandandwales2013"
     }
   ],
-  "relatedArticles": null,
   "index": 0,
   "type": "product_page",
-  "title": "Live births",
-  "summary": "Statistics on live births are a subset of numbers from the data that the ONS obtains from the births and deaths registrations. They are available by sex, month of the year and region of the UK. ",
   "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Births, deaths and marriages",
-      "summary": "Births, deaths and marriages or ‘life event’ statistics allow us to have a better understanding of the size and condition of the population.  The number of births and deaths affect the size of the usual resident population.  Definitive data on the number of births and deaths are published on a calendar year basis, whereas data for updating population estimates use mid-year to mid-year (1 July to 30 June) data, with some other minor differences. ",
-      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages"
     }
-  ]
+  ],
+  "description": {
+    "title": "Live births",
+    "summary": "Statistics on live births are a subset of numbers from the data that the ONS obtains from the births and deaths registrations. They are available by sex, month of the year and region of the UK. "
+  }
 }

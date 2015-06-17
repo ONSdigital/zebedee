@@ -1,11 +1,5 @@
 {
-  "headline1": "Latest figures from the CSEW show there were an estimated 7.3 million incidents of crime against households and resident adults in England and Wales for the year ending March 2014.",
-  "headline2": "Decreases were evident for most major crime types compared with the previous year.",
-  "headline3": "In contrast, police recorded crime shows no overall change from the previous year, with 3.7 million offences recorded.",
   "relatedBulletins": [],
-  "phone": null,
-  "language": null,
-  "searchKeywords": null,
   "sections": [
     {
       "title": "Key points",
@@ -150,9 +144,7 @@
     {
       "title": "List of Products",
       "markdown": "The following are URL links associated with the production of Crime Statistics.\n\n1. Crime statistics publications on the Home Office website\n\n2. Historic police recorded crime\n\n3. Previous quarterly publication\n\n4. User Guide to Crime Statistics for England and Wales\n\n5. Guide to Finding Crime Statistics\n\n6. The 2012/13 Crime Survey for England and Wales Technical Report Volume 1\n\n7. Analysis of Variation in Crime Trends (methodological note)\n\n8. Future Dissemination Strategy – Summary of Responses\n\n9. Methodological note: Presentational changes to National Statistics on police recorded crime in England and Wales\n\n10. ‘Focus on Public Perceptions of Policing, 2011/12’ (published 29 November 2012)\n\n11. ‘Short story on Anti-Social Behaviour, 2011/12’ (published 11 April 2013)\n\n12. ‘Focus on Property Crime, 2012/13’ (published 28 November 2013)\n\n13. ‘An overview of hate crime in England and Wales’ (published 17 December 2013)\n\n14. ‘Focus on: Violent Crime and Sexual Offences, 2012/13’ (published 13 February 2014)\n\n15. National Statistician’s Review of Crime Statistics\n\n16. Methodological note: Presentational and methodological improvements to National Statistics on the Crime Survey for England and Wales\n\n17. Focus on Victimisation and Public Perceptions, 2012/13\n\n Anonymised datasets from the Crime Survey for England and Wales (in SPSS format) currently are available on:\n\nthe UK Data Service through the Economic and Social Data Service (ESDS); and\n\nthe ONS Virtual Micro data Laboratory (VML).\n\nIn addition to these National Statistics releases, provisional police recorded crime data drawn from local management information systems sit behind, street level figures released each month, via:\n\nPolice recorded crime, street level mapping tool.\n\nCrime Statistics for Scotland are available from the Scottish Government.\n\nCrime Statistics for Northern Ireland are available from the Police Service of Northern Ireland.\n"
-    }
-  ],
-  "accordion": [
+    },
     {
       "title": "Background notes and methodology",
       "markdown": "This information will not be available in the prototype, however in the future the background notes related to this statistical bulletin will appear here.\n"
@@ -166,38 +158,30 @@
       "markdown": "This information will not be available in the prototype, however in the future the footnotes related to this statistical bulletin will appear here."
     }
   ],
-  "data": null,
-  "nationalStatistic": false,
-  "contact": {
-    "name": null,
-    "email": "crimestatistics@ons.gsi.gov.uk",
-    "organisation": null,
-    "telephone": null
-  },
-  "releaseDate": null,
-  "nextReleaseDate": null,
+  "accordion": [],
   "type": "bulletin",
-  "title": "Crime in England and Wales, Year Ending March 2014",
-  "summary": "Crime statistics from the Crime Survey for England and Wales and police recorded crime.",
   "uri": "/peoplepopulationandcommunity/crimeandjustice/bulletins/crimeinenglandandwalesyearendingmarch2014",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Crime and justice",
-      "summary": "Statistics on the number and types of crimes committed as well as the key characteristics of victims, are collected from crimes recorded by the police and the Crime Survey for England and Wales (CSEW). This survey is important as it covers crimes that may have not been reported or recorded by the police. Statistics on the outcomes of crime in terms of what happened to the criminal can also be found here. ",
-      "uri": "/peoplepopulationandcommunity/crimeandjustice",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/crimeandjustice"
     }
-  ]
+  ],
+  "description": {
+    "headline1": "Latest figures from the CSEW show there were an estimated 7.3 million incidents of crime against households and resident adults in England and Wales for the year ending March 2014.",
+    "headline2": "Decreases were evident for most major crime types compared with the previous year.",
+    "headline3": "In contrast, police recorded crime shows no overall change from the previous year, with 3.7 million offences recorded.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "crimestatistics@ons.gsi.gov.uk"
+    },
+    "title": "Crime in England and Wales, Year Ending March 2014",
+    "summary": "Crime statistics from the Crime Survey for England and Wales and police recorded crime.",
+    "keywords": []
+  }
 }

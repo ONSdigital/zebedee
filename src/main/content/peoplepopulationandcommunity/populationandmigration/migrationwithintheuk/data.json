@@ -1,54 +1,35 @@
 {
   "items": [
     {
-      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/timeseries/raid120",
-      "index": null,
-      "data": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/timeseries/raid120"
     }
   ],
   "datasets": [
     {
-      "title": "Internal migration by English regions and Wales",
-      "summary": "Brief description of dataset",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/datasets/internalmigrationbyenglishregionsandwales",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/datasets/internalmigrationbyenglishregionsandwales"
     }
   ],
   "statsBulletins": [
     {
-      "headline1": "There were an estimated 2.71 million residents moving between local authorities in England and Wales between July 2012 and June 2013.",
-      "headline2": "53,200 people moved from England and Wales to Northern Ireland and Scotland; 46,800 moved from Northern Ireland and Scotland to England and Wales.",
-      "headline3": "The age with the highest proportion of movers was 19.",
-      "title": "Internal Migration, England and Wales, Year Ending June 2013",
-      "summary": "Summarised statistics on residential moves between local authorities and regions in England and Wales and the UK.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/bulletins/internalmigrationenglandandwalesyearendingjune2013",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/bulletins/internalmigrationenglandandwalesyearendingjune2013"
     }
   ],
-  "relatedArticles": null,
   "index": 3,
   "type": "product_page",
-  "title": "Migration within the UK",
-  "summary": "Internal migration refers to residential moves between different geographic areas within the UK. These statistics are compiled from data from main three sources: The NHS Patient Register, The NHS Central Register (NHSCR) and the Higher Education Statistics Agency (HESA). ",
   "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     },
     {
-      "title": "Population and migration",
-      "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
-      "uri": "/peoplepopulationandcommunity/populationandmigration",
-      "index": null
+      "uri": "/peoplepopulationandcommunity/populationandmigration"
     }
-  ]
+  ],
+  "description": {
+    "title": "Migration within the UK",
+    "summary": "Internal migration refers to residential moves between different geographic areas within the UK. These statistics are compiled from data from main three sources: The NHS Patient Register, The NHS Central Register (NHSCR) and the Higher Education Statistics Agency (HESA). "
+  }
 }

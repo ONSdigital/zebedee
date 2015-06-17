@@ -1,47 +1,35 @@
 {
   "sections": [
     {
-      "title": "Population estimates",
-      "summary": "Annual estimates of the size of the UK “usually resident population” are calculated at the mid-year point (30 June). The ONS compile and publish the UK estimates using estimates for England and Wales (produced by ONS directly), estimates for Scotland (produced by National Records of Scotland) and estimates for Northern Ireland (produced by the Northern Ireland Statistics \u0026 Research Agency). ",
       "uri": "/peoplepopulationandcommunity/populationandmigration/populationestimates",
       "index": 0
     },
     {
-      "title": "International migration",
-      "summary": "International migration statistics provide estimates of the number of people moving in and out of the UK. Data on long term migration, short term migration, and visitor data provide a picture of those entering and leaving the UK, covering all lengths of stay. ",
       "uri": "/peoplepopulationandcommunity/populationandmigration/internationalmigration",
       "index": 1
     },
     {
-      "title": "Population projections",
-      "summary": "National population projections are available by age and sex for the UK and its constituent countries. These population projections are based on mid-year population estimates and a set of underlying assumptions regarding future fertility, mortality and migration. They provide an indication of the impact that changes in demographic patterns might have on the size and age structure of the population in the future. These projections are widely used for resource allocation and planning. ",
       "uri": "/peoplepopulationandcommunity/populationandmigration/populationprojections",
       "index": 2
     },
     {
-      "title": "Migration within the UK",
-      "summary": "Internal migration refers to residential moves between different geographic areas within the UK. These statistics are compiled from data from main three sources: The NHS Patient Register, The NHS Central Register (NHSCR) and the Higher Education Statistics Agency (HESA). ",
       "uri": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk",
       "index": 3
     }
   ],
   "index": 1,
   "type": "taxonomy_landing_page",
-  "title": "Population and migration",
-  "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups.",
   "uri": "/peoplepopulationandcommunity/populationandmigration",
   "breadcrumb": [
     {
-      "title": "Home",
-      "summary": "The UK\u0027s largest independent producer of official statistics and the recognised national statistical institute of the UK.",
-      "uri": "/",
-      "index": null
+      "uri": "/"
     },
     {
-      "title": "People, population and community",
-      "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. ",
-      "uri": "/peoplepopulationandcommunity",
-      "index": null
+      "uri": "/peoplepopulationandcommunity"
     }
-  ]
+  ],
+  "description": {
+    "title": "Population and migration",
+    "summary": "Population and migration statistics describe the size, age, sex structure and geographic distribution of the UK population. They also consider changes to the UK population and the factors driving these changes. These statistics have a wide range of uses; they are used by central government, local government and the health sector for planning, resource allocation and managing the economy. Additionally, they are used by a wide range of people such as market researchers, academics and those in special interest groups."
+  }
 }

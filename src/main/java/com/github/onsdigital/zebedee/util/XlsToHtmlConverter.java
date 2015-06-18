@@ -247,9 +247,9 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
             // ignore font size
             //style.append("font-size:" + font.getFontHeightInPoints() + "pt;");
 
-        if (font.getItalic()) {
-            style.append("font-style:italic;");
-        }
+            if (font.getItalic()) {
+                style.append("font-style:italic;");
+            }
     }
 
 //    @Override

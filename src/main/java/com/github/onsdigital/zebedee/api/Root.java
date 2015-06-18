@@ -8,24 +8,24 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Content;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class Root implements Startup {
+    static final String ZEBEDEE_ROOT = "zebedee_root";
     // Environment variables are stored as a static variable so if necessary we can hijack them for testing
     public static Map<String, String> env = System.getenv();
-    static final String ZEBEDEE_ROOT = "zebedee_root";
-
-
     public static Zebedee zebedee;
     static Path root;
 
@@ -125,7 +125,7 @@ public class Root implements Startup {
      */
     @Override
     protected void finalize() throws Throwable {
-        
+
     }
 
 }

@@ -9,22 +9,18 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.model.Sessions;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.util.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Time;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -71,15 +67,15 @@ public class DataPublisherTest {
         }
 
         String outPath = "/csdb/csdb_with_extension/CXNV.csdb";
-        try(InputStream inputStream = getClass().getResource(outPath).openStream();
-            OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
+        try (InputStream inputStream = getClass().getResource(outPath).openStream();
+             OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
             IOUtils.copy(inputStream, outputStream);
         }
 
         toPath = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/data.json");
         outPath = "/csdb/csdb_with_extension/data.json";
-        try(InputStream inputStream = getClass().getResource(outPath).openStream();
-            OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
+        try (InputStream inputStream = getClass().getResource(outPath).openStream();
+             OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
             IOUtils.copy(inputStream, outputStream);
         }
 
@@ -88,24 +84,24 @@ public class DataPublisherTest {
             Files.createDirectories(toPath.getParent());
         }
         outPath = "/csdb/csdb_no_extension/OTT";
-        try(InputStream inputStream = getClass().getResource(outPath).openStream();
-            OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
+        try (InputStream inputStream = getClass().getResource(outPath).openStream();
+             OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
             IOUtils.copy(inputStream, outputStream);
         }
 
         toPath = collection2.reviewed.toPath("/datapublishertest/csdb_no_extension/data.json");
         outPath = "/csdb/csdb_no_extension/data.json";
-        try(InputStream inputStream = getClass().getResource(outPath).openStream();
-            OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
+        try (InputStream inputStream = getClass().getResource(outPath).openStream();
+             OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
             IOUtils.copy(inputStream, outputStream);
         }
 
         String brianPath = "/csdb/csdb_no_extension/brian.json";
-        try(InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
+        try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
             serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
         }
         String datasetPath = "/csdb/csdb_no_extension/data.json";
-        try(InputStream inputStream = getClass().getResourceAsStream(datasetPath)) {
+        try (InputStream inputStream = getClass().getResourceAsStream(datasetPath)) {
             dataset = ContentUtil.deserialise(inputStream, Dataset.class);
         }
 
@@ -272,7 +268,7 @@ public class DataPublisherTest {
         // Given
         // the series from the standard taxonomy
         TimeSeries noCurrentSeries = null;
-        for (TimeSeries series: this.serieses) {
+        for (TimeSeries series : this.serieses) {
             if (series.cdid.equalsIgnoreCase("GMAA")) {
                 noCurrentSeries = series;
             }
@@ -287,7 +283,7 @@ public class DataPublisherTest {
 
         // Then
         // we expect it to have nothing in terms of data
-        assertEquals(0,startPage.months.size());
+        assertEquals(0, startPage.months.size());
         assertEquals(0, startPage.years.size());
         assertEquals(0, startPage.quarters.size());
     }
@@ -297,7 +293,7 @@ public class DataPublisherTest {
         // Given
         // the gmbb series which we upload to an existing point
         TimeSeries hasCurrentSeries = null;
-        for (TimeSeries series: this.serieses) {
+        for (TimeSeries series : this.serieses) {
             if (series.cdid.equalsIgnoreCase("GMBB")) {
                 hasCurrentSeries = series;
             }
@@ -326,11 +322,15 @@ public class DataPublisherTest {
         // and some values
         Set<TimeseriesValue> timeseriesValues = new HashSet<>();
         TimeseriesValue add = new TimeseriesValue();
-            add.year = "2010"; add.value = "1"; add.date = "2010";
-           timeseriesValues.add(add);
+        add.year = "2010";
+        add.value = "1";
+        add.date = "2010";
+        timeseriesValues.add(add);
         TimeseriesValue add2 = new TimeseriesValue();
-            add2.year = "2011"; add2.value = "1"; add2.date = "2011";
-            timeseriesValues.add(add2);
+        add2.year = "2011";
+        add2.value = "1";
+        add2.date = "2011";
+        timeseriesValues.add(add2);
 
         // When
         // we add these values

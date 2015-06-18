@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.data.json;
 
-import java.util.Date;
-
 /**
  * Created by thomasridd on 09/06/15.
  */

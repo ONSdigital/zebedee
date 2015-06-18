@@ -36,10 +36,10 @@
       "uri": "/economy/inflationandpriceindices/datasets/inflationdatacollection"
     },
     {
-      "uri": "/economy/inflationandpriceindices/datasets/retailpricesindex"
+      "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation"
     },
     {
-      "uri": "/economy/inflationandpriceindices/datasets/producerpricesinflation"
+      "uri": "/economy/inflationandpriceindices/datasets/retailpricesindex"
     }
   ],
   "statsBulletins": [

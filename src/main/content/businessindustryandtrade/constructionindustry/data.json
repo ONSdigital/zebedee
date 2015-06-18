@@ -21,10 +21,10 @@
   ],
   "datasets": [
     {
-      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionoutput"
+      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionallworksummary"
     },
     {
-      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionallworksummary"
+      "uri": "/businessindustryandtrade/constructionindustry/datasets/constructionoutput"
     }
   ],
   "statsBulletins": [

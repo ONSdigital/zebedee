@@ -21,10 +21,10 @@
   ],
   "datasets": [
     {
-      "uri": "/businessindustryandtrade/internationaltrade/datasets/valueofuktradeingoodsandservices"
+      "uri": "/businessindustryandtrade/internationaltrade/datasets/tradeingoodsbyarea"
     },
     {
-      "uri": "/businessindustryandtrade/internationaltrade/datasets/tradeingoodsbyarea"
+      "uri": "/businessindustryandtrade/internationaltrade/datasets/valueofuktradeingoodsandservices"
     }
   ],
   "statsBulletins": [

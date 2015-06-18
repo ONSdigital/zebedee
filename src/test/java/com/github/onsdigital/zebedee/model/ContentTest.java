@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -45,7 +46,7 @@ public class ContentTest {
         Files.createFile(baseJsonFile);
 
         baseContent = new ContentDetail();
-        baseContent.title = "Some release 2014";
+        baseContent.description = new ContentDetailDescription("Some release 2014");
         baseContent.type = "home";
 
         // Serialise
@@ -56,7 +57,7 @@ public class ContentTest {
         Files.createDirectory(subDirectory);
 
         subContent = new ContentDetail();
-        subContent.title = "Some sub 2015";
+        subContent.description = new ContentDetailDescription("Some sub 2015");
         subContent.type = "t2";
 
         // Serialise
@@ -72,7 +73,7 @@ public class ContentTest {
         exampleBulletinJsonFile = exampleBulletinDirectory.resolve(filename);
 
         bulletinContent = new ContentDetail();
-        bulletinContent.title = "Some bulletin 2010";
+        bulletinContent.description = new ContentDetailDescription("Some bulletin 2010");
         bulletinContent.type = "bulletin";
 
         // Serialise
@@ -96,7 +97,7 @@ public class ContentTest {
         ContentDetail result = content.details(baseJsonFile);
 
         // The result has the expected values
-        assertEquals(baseContent.title, result.title);
+        assertEquals(baseContent.description.title, result.description.title);
         assertEquals(baseContent.type, result.type);
         assertEquals("/", result.uri);
     }
@@ -112,7 +113,7 @@ public class ContentTest {
 
         // The result has the expected values
         assertTrue(results.size() > 0);
-        assertEquals(baseContent.title, results.get(0).title);
+        assertEquals(baseContent.description.title, results.get(0).description.title);
     }
 
     @Test
@@ -128,7 +129,7 @@ public class ContentTest {
         assertNotNull(root);
         assertNotNull(root.children);
         assertTrue(root.children.size() > 0);
-        assertEquals(baseContent.title, root.title);
+        assertEquals(baseContent.description.title, root.description.title);
     }
 
     @Test
@@ -144,12 +145,12 @@ public class ContentTest {
         ContentDetail bulletinDirectoryDetails = root.children.get(0).children.get(0);
 
         assertNotNull(bulletinDirectoryDetails);
-        assertEquals(bulletinsDirectoryName, bulletinDirectoryDetails.title);
+        assertEquals(bulletinsDirectoryName, bulletinDirectoryDetails.description.title);
         assertTrue(bulletinDirectoryDetails.children.size() > 0);
 
         ContentDetail bulletinDetails = bulletinDirectoryDetails.children.get(0);
         assertNotNull(bulletinDetails);
-        assertEquals(bulletinContent.title, bulletinDetails.title);
+        assertEquals(bulletinContent.description.title, bulletinDetails.description.title);
         assertEquals("/" + basePath.relativize(exampleBulletinDirectory), bulletinDetails.uri);
         assertTrue(bulletinDetails.children.size() == 0);
     }
@@ -169,7 +170,7 @@ public class ContentTest {
         assertNotNull(root);
 
         for (ContentDetail child : root.children) {
-            if (child.title.equals("releases")) {
+            if (child.description.title.equals("releases")) {
                 fail();
             }
         }

@@ -10,8 +10,8 @@ import java.util.List;
  */
 public class ContentDetail {
     public String uri;
-    public String title;
     public String type;
+    public ContentDetailDescription description;
 
     public List<ContentDetail> children;
 
@@ -27,8 +27,8 @@ public class ContentDetail {
      */
     public ContentDetail(String title, String uri, String type) {
         this.uri = uri;
-        this.title = title;
         this.type = type;
+        this.description = new ContentDetailDescription(title);
     }
 
 
@@ -78,7 +78,7 @@ public class ContentDetail {
             return null;
 
         for (ContentDetail child : this.children) {
-            if (child.title.equals(name)) {
+            if (child.description.title.equals(name)) {
                 return child;
             }
         }
@@ -108,12 +108,6 @@ public class ContentDetail {
         return false;
     }
 
-    /**
-     * Equals override.
-     * If the type, title, and uri are the same they are considered equal.
-     * @param o
-     * @return
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,18 +115,17 @@ public class ContentDetail {
 
         ContentDetail that = (ContentDetail) o;
 
-        if (title != null ? !title.equals(that.title) : that.title != null) return false;
-        if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (uri != null ? !uri.equals(that.uri) : that.uri != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        return !(description != null ? !description.equals(that.description) : that.description != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
         int result = uri != null ? uri.hashCode() : 0;
-        result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
         return result;
     }
 

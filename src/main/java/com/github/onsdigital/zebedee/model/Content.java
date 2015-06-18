@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -137,7 +138,7 @@ public class Content {
 
         if (detail == null) {
             detail = new ContentDetail();
-            detail.title = path.getFileName().toString();
+            detail.description = new ContentDetailDescription(path.getFileName().toString());
             detail.uri = "";
         }
 

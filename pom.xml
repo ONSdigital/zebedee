@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>content-library</artifactId>
-            <version>1.0.24-SNAPSHOT</version>
+            <version>content-library-1.0.24</version>
         </dependency>
 
         <!-- commons etc. -->

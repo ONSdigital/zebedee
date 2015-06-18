@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=y"
+export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
 export PORT="8082"
 
 # Restolino configuration

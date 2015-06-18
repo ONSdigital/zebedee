@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model;
 
-import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;

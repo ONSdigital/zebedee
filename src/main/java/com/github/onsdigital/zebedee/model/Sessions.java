@@ -128,7 +128,7 @@ public class Sessions extends TimerTask {
         iterate:
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessions)) {
             for (Path entry : stream) {
-                if (!Files.isDirectory(entry)) {
+                if (!Files.isDirectory(entry) && !entry.endsWith(".DS_Store")) {
 
                     // Examine each session for a match to the email address:
                     Session candidate = read(entry);

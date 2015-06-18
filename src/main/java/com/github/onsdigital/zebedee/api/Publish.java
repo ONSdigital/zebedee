@@ -1,11 +1,11 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -40,6 +40,7 @@ public class Publish {
 
 		com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 		Session session = Root.zebedee.sessions.get(request);
+
 		return Root.zebedee.collections.publish(collection, session);
 
 	}

@@ -155,9 +155,12 @@ public class Collections {
 
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
+
             Path source = collection.reviewed.get(uri);
-            Path destination = zebedee.launchpad.toPath(uri);
-            PathUtils.moveFilesInDirectory(source, destination);
+            if (source != null) {
+                Path destination = zebedee.launchpad.toPath(uri);
+                PathUtils.moveFilesInDirectory(source, destination);
+            }
         }
 
         // Delete the folders:

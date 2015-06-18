@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.data;
 
-import com.github.onsdigital.content.page.statistics.Dataset;
-import com.github.onsdigital.content.page.statistics.data.TimeSeries;
+import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -78,8 +78,8 @@ public class DataPublisher {
 
             // Download the dataset page (for metadata)
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
-            if (dataset.datasetId == null) {
-                dataset.datasetId = datasetIdFromDatafilePath(csdbDataset.get("file"));
+            if (dataset.getDescription().getDatasetId() == null) {
+                dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
             }
 
             // Break down the csdb file to timeseries (part-built by extracting csdb files)
@@ -96,7 +96,7 @@ public class DataPublisher {
                 TimeSeries newPage = constructTimeSeriesPageFromComponents(path, uri, dataset, series);
 
                 // Save the new page to reviewed
-                Path savePath = collection.autocreateReviewedPath(newPage.uri + "/data.json");
+                Path savePath = collection.autocreateReviewedPath(newPage.getUri() + "/data.json");
                 IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
 
                 // Write csv and other files:
@@ -112,11 +112,11 @@ public class DataPublisher {
     }
 
     static String uriForSeriesInDataset(Dataset dataset, TimeSeries series) {
-        String[] split = StringUtils.split(dataset.uri.toString(), "/");
+        String[] split = StringUtils.split(dataset.getUri().toString(), "/");
         split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
 
         String uri = StringUtils.join(split, "/");
-        uri = "/" + uri + "/timeseries/" + series.cdid;
+        uri = "/" + uri + "/timeseries/" + series.getCdid();
 
         return uri;
     }
@@ -159,8 +159,8 @@ public class DataPublisher {
             page = ContentUtil.deserialise(FileUtils.openInputStream(path.resolve("data.json").toFile()), TimeSeries.class);
         } else {
             page = new TimeSeries();
-            page.cdid = series.cdid;
-            page.uri = URI.create(uri);
+            page.setCdid(series.getCdid());
+            page.setUri(URI.create(uri));
         }
 
         return page;
@@ -317,8 +317,8 @@ public class DataPublisher {
         populatePageFromSetOfValues(page, page.years, series.years, dataset);
         populatePageFromSetOfValues(page, page.quarters, series.quarters, dataset);
         populatePageFromSetOfValues(page, page.months, series.months, dataset);
-        page.seasonalAdjustment = series.seasonalAdjustment;
-        page.description = series.description;
+        page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
+        page.setDescription(series.getDescription());
 
         return page;
     }
@@ -339,7 +339,7 @@ public class DataPublisher {
 
                     // Update the point
                     current.value = value.value;
-                    current.sourceDataset = dataset.datasetId;
+                    current.sourceDataset = dataset.getDescription().getDatasetId();
 
                     current.updateDate = new Date();
 
@@ -347,7 +347,7 @@ public class DataPublisher {
                     logCorrection(page, old, current);
                 }
             } else {
-                value.sourceDataset = dataset.datasetId;
+                value.sourceDataset = dataset.getDescription().getDatasetId();
                 value.updateDate = new Date();
 
                 page.add(value);
@@ -393,19 +393,19 @@ public class DataPublisher {
     }
 
     static TimeSeries populatePageFromDataSetPage(TimeSeries page, Dataset datasetPage) {
-        page.nextReleaseDate = datasetPage.nextReleaseDate;
-        page.releaseDate = datasetPage.releaseDate;
+        page.getDescription().setNextRelease(datasetPage.getDescription().getNextRelease());
+        page.getDescription().setReleaseDate(datasetPage.getDescription().getReleaseDate());
 
         // Add the dataset id if relevant
         boolean datasetIsNew = true;
         for (String datasetId : page.sourceDatasets) {
-            if (datasetPage.datasetId.equalsIgnoreCase(datasetId)) {
+            if (datasetPage.getDescription().getDatasetId().equalsIgnoreCase(datasetId)) {
                 datasetIsNew = false;
                 break;
             }
         }
         if (datasetIsNew) {
-            page.sourceDatasets.add(datasetPage.datasetId);
+            page.sourceDatasets.add(datasetPage.getDescription().getDatasetId());
         }
 
         return page;

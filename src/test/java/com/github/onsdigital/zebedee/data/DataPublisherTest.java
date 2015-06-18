@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.data;
 
-import com.github.onsdigital.content.page.statistics.Dataset;
-import com.github.onsdigital.content.page.statistics.data.TimeSeries;
+import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Builder;
@@ -226,8 +226,8 @@ public class DataPublisherTest {
         // Then
         // we expect a dataset and check a couple of fields
         assertNotNull(dataset);
-        assertEquals("Visits and Spending by UK residents abroad and overseas residents in the UK.", dataset.description);
-        assertEquals("/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism", dataset.uri.toString());
+        assertEquals("Visits and Spending by UK residents abroad and overseas residents in the UK.", dataset.getDescription());
+        assertEquals("/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism", dataset.getUri().toString());
     }
 
     @Test
@@ -250,7 +250,7 @@ public class DataPublisherTest {
         // the series and dataset we loaded at setup
         String datasetURI = "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism";
         TimeSeries series = serieses.get(0);
-        String seriesId = series.cdid;
+        String seriesId = series.getCdid();
 
         // When
         // we use these to generate a timeseries uri
@@ -269,7 +269,7 @@ public class DataPublisherTest {
         // the series from the standard taxonomy
         TimeSeries noCurrentSeries = null;
         for (TimeSeries series : this.serieses) {
-            if (series.cdid.equalsIgnoreCase("GMAA")) {
+            if (series.getCdid().equalsIgnoreCase("GMAA")) {
                 noCurrentSeries = series;
             }
         }
@@ -294,7 +294,7 @@ public class DataPublisherTest {
         // the gmbb series which we upload to an existing point
         TimeSeries hasCurrentSeries = null;
         for (TimeSeries series : this.serieses) {
-            if (series.cdid.equalsIgnoreCase("GMBB")) {
+            if (series.getCdid().equalsIgnoreCase("GMBB")) {
                 hasCurrentSeries = series;
             }
         }
@@ -348,9 +348,9 @@ public class DataPublisherTest {
         // Given
         // a test dataset
         Dataset testSet = new Dataset();
-        testSet.datasetId = "dataSetPageDoesMoveValuesToTimeseries";
-        testSet.releaseDate = new GregorianCalendar(1877, 3, 15).getTime();
-        testSet.nextReleaseDate = new GregorianCalendar(1877, 3, 31).getTime();
+        testSet.getDescription().setDatasetId("dataSetPageDoesMoveValuesToTimeseries");
+        testSet.getDescription().setReleaseDate(new GregorianCalendar(1877, 3, 15).getTime());
+        testSet.getDescription().setNextRelease(new GregorianCalendar(1877, 3, 31).getTime().toString());
 
         // When
         // we populate a series
@@ -359,9 +359,9 @@ public class DataPublisherTest {
 
         // Then
         // we expect the data from the dataset to have transferred
-        assertEquals(testSet.releaseDate.toString(), page.releaseDate.toString());
-        assertEquals(testSet.nextReleaseDate.toString(), page.nextReleaseDate.toString());
-        assertEquals(testSet.datasetId, page.sourceDatasets.get(0));
+        assertEquals(testSet.getDescription().getReleaseDate().toString(), page.getDescription().getReleaseDate().toString());
+        assertEquals(testSet.getDescription().getNextRelease().toString(), page.getDescription().getNextRelease().toString());
+        assertEquals(testSet.getDescription().getDatasetId(), page.sourceDatasets.get(0));
 
     }
 }

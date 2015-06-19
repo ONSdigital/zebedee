@@ -117,13 +117,7 @@
             <version>2.3</version>
         </dependency>
 
-        <!-- ONS Content Library, fetched through jitpack.io -->
-        <dependency>
-            <groupId>com.github.onsdigital</groupId>
-            <artifactId>content-library</artifactId>
-            <version>content-library-1.0.23</version>
-            <!--<version>1.0.16-SNAPSHOT</version>-->
-        </dependency>
+
         <!-- Http -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

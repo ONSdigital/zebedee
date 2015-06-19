@@ -1,7 +1,5 @@
 [
   {
-    "seasonalAdjustment": "NSA",
-    "relatedTimeseries": [],
     "years": [
       {
         "date": "1980",
@@ -4195,19 +4193,19 @@
       }
     ],
     "sourceDatasets": [],
-    "cdid": "GMAK",
-    "unit": "",
-    "preUnit": "",
-    "source": "Office for National Statistics",
-    "description": "OS visits to UK:Earnings: Â£ Millions-NSA                                ",
-    "notes": [],
-    "relatedDocuments": [],
-    "nationalStatistic": false,
-    "type": "timeseries"
+    "section": {},
+    "type": "timeseries",
+    "description": {
+      "seasonalAdjustment": "NSA",
+      "cdid": "GMAK",
+      "unit": "",
+      "preUnit": "",
+      "source": "Office for National Statistics",
+      "nationalStatistic": false,
+      "title": "GMAK"
+    }
   },
   {
-    "seasonalAdjustment": "NSA",
-    "relatedTimeseries": [],
     "years": [
       {
         "date": "1980",
@@ -8408,19 +8406,19 @@
       }
     ],
     "sourceDatasets": [],
-    "cdid": "GMAM",
-    "unit": "",
-    "preUnit": "",
-    "source": "Office for National Statistics",
-    "description": "UK visits abroad:Expenditure: Â£ Millions-NSA                            ",
-    "notes": [],
-    "relatedDocuments": [],
-    "nationalStatistic": false,
-    "type": "timeseries"
+    "section": {},
+    "type": "timeseries",
+    "description": {
+      "seasonalAdjustment": "NSA",
+      "cdid": "GMAM",
+      "unit": "",
+      "preUnit": "",
+      "source": "Office for National Statistics",
+      "nationalStatistic": false,
+      "title": "GMAM"
+    }
   },
   {
-    "seasonalAdjustment": "NSA",
-    "relatedTimeseries": [],
     "years": [
       {
         "date": "1980",
@@ -12621,19 +12619,19 @@
       }
     ],
     "sourceDatasets": [],
-    "cdid": "GMAA",
-    "unit": "",
-    "preUnit": "",
-    "source": "Office for National Statistics",
-    "description": "OS visits to UK:All visits Thousands-NSA                                ",
-    "notes": [],
-    "relatedDocuments": [],
-    "nationalStatistic": false,
-    "type": "timeseries"
+    "section": {},
+    "type": "timeseries",
+    "description": {
+      "seasonalAdjustment": "NSA",
+      "cdid": "GMAA",
+      "unit": "",
+      "preUnit": "",
+      "source": "Office for National Statistics",
+      "nationalStatistic": false,
+      "title": "GMAA"
+    }
   },
   {
-    "seasonalAdjustment": "NSA",
-    "relatedTimeseries": [],
     "years": [
       {
         "date": "1986",
@@ -16120,19 +16118,19 @@
       }
     ],
     "sourceDatasets": [],
-    "cdid": "GMBB",
-    "unit": "",
-    "preUnit": "",
-    "source": "Office for National Statistics",
-    "description": "UK visits abroad:Expenditure abroad: Â£ Millions -(Cur.Price-SA)         ",
-    "notes": [],
-    "relatedDocuments": [],
-    "nationalStatistic": false,
-    "type": "timeseries"
+    "section": {},
+    "type": "timeseries",
+    "description": {
+      "seasonalAdjustment": "NSA",
+      "cdid": "GMBB",
+      "unit": "",
+      "preUnit": "",
+      "source": "Office for National Statistics",
+      "nationalStatistic": false,
+      "title": "GMBB"
+    }
   },
   {
-    "seasonalAdjustment": "NSA",
-    "relatedTimeseries": [],
     "years": [
       {
         "date": "1986",
@@ -19619,19 +19617,19 @@
       }
     ],
     "sourceDatasets": [],
-    "cdid": "GMAT",
-    "unit": "",
-    "preUnit": "",
-    "source": "Office for National Statistics",
-    "description": "OS visits to the UK: Thousands - SA                                     ",
-    "notes": [],
-    "relatedDocuments": [],
-    "nationalStatistic": false,
-    "type": "timeseries"
+    "section": {},
+    "type": "timeseries",
+    "description": {
+      "seasonalAdjustment": "NSA",
+      "cdid": "GMAT",
+      "unit": "",
+      "preUnit": "",
+      "source": "Office for National Statistics",
+      "nationalStatistic": false,
+      "title": "GMAT"
+    }
   },
   {
-    "seasonalAdjustment": "NSA",
-    "relatedTimeseries": [],
     "years": [
       {
         "date": "1980",
@@ -23825,19 +23823,19 @@
       }
     ],
     "sourceDatasets": [],
-    "cdid": "GMAF",
-    "unit": "",
-    "preUnit": "",
-    "source": "Office for National Statistics",
-    "description": "UK visits abroad:All visits Thousands-NSA                               ",
-    "notes": [],
-    "relatedDocuments": [],
-    "nationalStatistic": false,
-    "type": "timeseries"
+    "section": {},
+    "type": "timeseries",
+    "description": {
+      "seasonalAdjustment": "NSA",
+      "cdid": "GMAF",
+      "unit": "",
+      "preUnit": "",
+      "source": "Office for National Statistics",
+      "nationalStatistic": false,
+      "title": "GMAF"
+    }
   },
   {
-    "seasonalAdjustment": "NSA",
-    "relatedTimeseries": [],
     "years": [
       {
         "date": "1986",
@@ -27324,19 +27322,19 @@
       }
     ],
     "sourceDatasets": [],
-    "cdid": "GMAX",
-    "unit": "",
-    "preUnit": "",
-    "source": "Office for National Statistics",
-    "description": "UK visits abroad: All visits Thousands - SA                             ",
-    "notes": [],
-    "relatedDocuments": [],
-    "nationalStatistic": false,
-    "type": "timeseries"
+    "section": {},
+    "type": "timeseries",
+    "description": {
+      "seasonalAdjustment": "NSA",
+      "cdid": "GMAX",
+      "unit": "",
+      "preUnit": "",
+      "source": "Office for National Statistics",
+      "nationalStatistic": false,
+      "title": "GMAX"
+    }
   },
   {
-    "seasonalAdjustment": "NSA",
-    "relatedTimeseries": [],
     "years": [
       {
         "date": "1986",
@@ -30823,14 +30821,16 @@
       }
     ],
     "sourceDatasets": [],
-    "cdid": "GMAZ",
-    "unit": "",
-    "preUnit": "",
-    "source": "Office for National Statistics",
-    "description": "OS visits to UK :Earnings: Â£ Millions-(Cur.Price-SA)                    ",
-    "notes": [],
-    "relatedDocuments": [],
-    "nationalStatistic": false,
-    "type": "timeseries"
+    "section": {},
+    "type": "timeseries",
+    "description": {
+      "seasonalAdjustment": "NSA",
+      "cdid": "GMAZ",
+      "unit": "",
+      "preUnit": "",
+      "source": "Office for National Statistics",
+      "nationalStatistic": false,
+      "title": "GMAZ"
+    }
   }
 ]

@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee.data;
 
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.content.page.statistics.data.timeseries.TimeseriesDescription;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.content.page.statistics.dataset.DatasetDescription;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -393,8 +395,13 @@ public class DataPublisher {
     }
 
     static TimeSeries populatePageFromDataSetPage(TimeSeries page, Dataset datasetPage) {
-        page.getDescription().setNextRelease(datasetPage.getDescription().getNextRelease());
-        page.getDescription().setReleaseDate(datasetPage.getDescription().getReleaseDate());
+        TimeseriesDescription description = page.getDescription();
+        if (description == null) {
+            description = new TimeseriesDescription();
+            page.setDescription(description);
+        }
+        description.setNextRelease(datasetPage.getDescription().getNextRelease());
+        description.setReleaseDate(datasetPage.getDescription().getReleaseDate());
 
         // Add the dataset id if relevant
         boolean datasetIsNew = true;

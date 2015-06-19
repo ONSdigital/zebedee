@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.data;
 
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.content.page.statistics.dataset.DatasetDescription;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Builder;
@@ -117,7 +118,7 @@ public class DataPublisherTest {
     /**
      * Test the setup has worked
      */
-    //@Test
+    @Test
     public void prebuiltCollectionShouldContainFiles() {
         // Given
         // the prebuilt collection and expected files
@@ -135,7 +136,7 @@ public class DataPublisherTest {
         assertTrue(Files.exists(collection2.reviewed.toPath(json2)));
     }
 
-    //@Test
+    @Test
     public void datasetIdFromDatafilePathShouldGiveFilenameWithoutExtension() throws Exception {
         // Given
         // a couple of file names
@@ -153,7 +154,7 @@ public class DataPublisherTest {
         assertEquals("CXNV", DataPublisher.datasetIdFromDatafilePath(path2));
     }
 
-    //@Test
+    @Test
     public void csdbDatasetsInCollectionShouldContainFilesWithExtension() throws Exception {
         // Given
         // our pre setup collection with csdb extensions
@@ -174,7 +175,7 @@ public class DataPublisherTest {
         assertEquals(json1, dataset.get("json").toString());
     }
 
-    //@Test
+    @Test
     public void csdbDatasetsInCollectionShouldContainFilesWithoutExtension() throws Exception {
         // Given
         // our pre setup collection with csdb extensions
@@ -195,7 +196,7 @@ public class DataPublisherTest {
         assertEquals(json2, dataset.get("json").toString());
     }
 
-    //@Test
+    @Test
     public void csdbURIShouldComeFromEnvVariable() throws Exception {
         // Given
         // we set the env variable
@@ -213,7 +214,7 @@ public class DataPublisherTest {
         assertEquals("/csdbURIShouldComeFromEnvVariable/Services/ConvertCSDB", uri.toString());
     }
 
-    //@Test
+    @Test
     public void datasetShouldDeserialise() throws IOException {
         // Given
         // one of our collections
@@ -226,11 +227,11 @@ public class DataPublisherTest {
         // Then
         // we expect a dataset and check a couple of fields
         assertNotNull(dataset);
-        assertEquals("Visits and Spending by UK residents abroad and overseas residents in the UK.", dataset.getDescription());
+        assertEquals("Visits and Spending by UK residents abroad and overseas residents in the UK.", dataset.getSection().getMarkdown());
         assertEquals("/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism", dataset.getUri().toString());
     }
 
-    //@Test
+    @Test
     public void timeSeriesFromBrianShouldDeserialise() {
         // Given
         // the file returned by brian that corresponds to csdb_no_extension
@@ -244,7 +245,7 @@ public class DataPublisherTest {
         assertTrue(serieses.size() > 0);
     }
 
-    //@Test
+    @Test
     public void uriForSeriesInDatasetShouldBeCorrect() {
         // Given
         // the series and dataset we loaded at setup
@@ -263,7 +264,7 @@ public class DataPublisherTest {
 
     }
 
-    //@Test
+    @Test
     public void startPageForNewSeriesShouldBeVanilla() throws IOException {
         // Given
         // the series from the standard taxonomy
@@ -288,7 +289,7 @@ public class DataPublisherTest {
         assertEquals(0, startPage.quarters.size());
     }
 
-    //@Test
+    @Test
     public void startPageForExistingSeriesShouldBePopulated() throws IOException {
         // Given
         // the gmbb series which we upload to an existing point
@@ -314,7 +315,7 @@ public class DataPublisherTest {
         assertNotEquals(0, size);
     }
 
-    //@Test
+    @Test
     public void populateTimeSeriesShouldFillEmptySeries() throws IOException {
         // Given
         // a page with null values
@@ -343,14 +344,17 @@ public class DataPublisherTest {
         assertEquals(0, page.quarters.size());
     }
 
-    //@Test
+    @Test
     public void dataSetPageDoesMoveValuesToTimeseries() {
         // Given
         // a test dataset
         Dataset testSet = new Dataset();
-        testSet.getDescription().setDatasetId("dataSetPageDoesMoveValuesToTimeseries");
-        testSet.getDescription().setReleaseDate(new GregorianCalendar(1877, 3, 15).getTime());
-        testSet.getDescription().setNextRelease(new GregorianCalendar(1877, 3, 31).getTime().toString());
+        DatasetDescription description = new DatasetDescription();
+
+        description.setDatasetId("dataSetPageDoesMoveValuesToTimeseries");
+        description.setReleaseDate(new GregorianCalendar(1877, 3, 15).getTime());
+        description.setNextRelease(new GregorianCalendar(1877, 3, 31).getTime().toString());
+        testSet.setDescription(description);
 
         // When
         // we populate a series

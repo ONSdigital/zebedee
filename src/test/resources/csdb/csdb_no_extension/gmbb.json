@@ -1,17 +1,8 @@
 {
-  "cdid": "GMBB",
-  "note1": "This content is not available in the prototype but in future will provide a note about this timeseries.",
-  "note2": "This content is not available in the prototype but in future will provide a note about this timeseries.",
-  "number": "2277",
-  "unit": "m",
-  "preUnit": "£",
-  "date": "August 2014",
-  "source": "Office for National Statistics",
-  "nationalStatistic": true,
   "years": [
     {
       "date": "1986",
-      "value": "-1234",
+      "value": "6080",
       "year": "1986",
       "sourceDataset": "OTT"
     },
@@ -3388,32 +3379,35 @@
       "sourceDataset": "OTT"
     }
   ],
-  "relatedBulletins": [
-    "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
-  ],
-  "relatedTimeseries": [
-    "/businessindustryandtrade/tourismindustry/timeseries/gmaz"
-  ],
   "sourceDatasets": [
     "OTT"
   ],
+  "relatedDocuments": [
+    {
+      "uri": "/businessindustryandtrade/tourismindustry/bulletins/overseastravelandtourismprovisionalresultsformay2014"
+    }
+  ],
   "type": "timeseries",
-  "name": "UK visits abroad expenditure",
   "uri": "/businessindustryandtrade/tourismindustry/timeseries/gmbb",
-  "fileName": "gmbb",
   "breadcrumb": [
     {
-      "index": 0,
-      "type": "home",
-      "name": "Business, industry and trade",
-      "fileName": "businessindustryandtrade"
+      "uri": "/"
     },
     {
-      "index": 0,
-      "type": "home",
-      "name": "Tourism industry",
-      "fileName": "tourismindustry",
-      "breadcrumb": []
+      "uri": "/businessindustryandtrade"
+    },
+    {
+      "uri": "/businessindustryandtrade/tourismindustry"
     }
-  ]
+  ],
+  "description": {
+    "date": "August 2014",
+    "number": "2277",
+    "cdid": "GMBB",
+    "unit": "m",
+    "preUnit": "£",
+    "source": "Office for National Statistics",
+    "nationalStatistic": true,
+    "title": "UK visits abroad expenditure"
+  }
 }

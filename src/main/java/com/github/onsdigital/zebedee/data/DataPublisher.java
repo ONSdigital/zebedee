@@ -161,6 +161,7 @@ public class DataPublisher {
             page = ContentUtil.deserialise(FileUtils.openInputStream(path.resolve("data.json").toFile()), TimeSeries.class);
         } else {
             page = new TimeSeries();
+            page.setDescription(new TimeseriesDescription());
             page.setCdid(series.getCdid());
             page.setUri(URI.create(uri));
         }
@@ -319,8 +320,13 @@ public class DataPublisher {
         populatePageFromSetOfValues(page, page.years, series.years, dataset);
         populatePageFromSetOfValues(page, page.quarters, series.quarters, dataset);
         populatePageFromSetOfValues(page, page.months, series.months, dataset);
+
+        if (page.getDescription() == null || series.getDescription() == null) {
+            System.out.println("Problem");
+        }
         page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
-        page.setDescription(series.getDescription());
+        page.getDescription().setCdid(series.getDescription().getCdid());
+        if (page.getDescription().getTitle() == null) { page.getDescription().setTitle(series.getDescription().getTitle()); }
 
         return page;
     }

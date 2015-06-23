@@ -2,7 +2,9 @@ package com.github.onsdigital.zebedee.data;
 
 import com.github.onsdigital.content.service.ContentNotFoundException;
 import com.github.onsdigital.content.service.ContentService;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +28,7 @@ public class DataReader implements ContentService {
     private InputStream getDataStream(String uriString)
             throws IOException, ContentNotFoundException {
         System.out.println("Reading data under uri:" + uriString);
-        Path dataPath = FileSystems.getDefault().getPath(Configuration.getContentDirectory() + uriString);
+        Path dataPath = Root.zebedee.published.toPath(uriString);
 
         // Look for a data.json file, or
         // fall back to adding a .json file extension

@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -18,24 +18,38 @@ import static org.junit.Assert.assertTrue;
 public class XlsToHtmlConverterTest {
 
     @Test
-    public void convertShouldReturnDocument() throws IOException, ParserConfigurationException {
+    public void convertToHtmlPageShouldReturnDocument() throws IOException, ParserConfigurationException {
 
         // Given an xls file
         File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
 
         // When the convert method is called.
-        Document document = XlsToHtmlConverter.convert(xlsFile);
+        Node document = XlsToHtmlConverter.convertToHtmlPage(xlsFile);
 
         // Then a Document instance is returned with the HTML content of the XLS file.
         assertNotNull(document);
     }
 
     @Test
+    public void convertToTableShouldReturnDocument() throws IOException, ParserConfigurationException {
+
+        // Given an xls file
+        File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
+
+        // When the convert method is called.
+        Node document = XlsToHtmlConverter.convertToTable(xlsFile);
+
+        // Then a Document instance is returned with the HTML content of the XLS file.
+        assertNotNull(document);
+    }
+
+    //
+    @Test
     public void saveShouldPersistDocument() throws IOException, ParserConfigurationException, TransformerException {
 
         // Given a document instance.
         File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
-        Document document = XlsToHtmlConverter.convert(xlsFile);
+        Node document = XlsToHtmlConverter.convertToTable(xlsFile);
 
         // When the save method is called.
         Path fileToSaveTo = Paths.get("src/test/resources/xls/example-table.html");
@@ -45,15 +59,34 @@ public class XlsToHtmlConverterTest {
         assertTrue(Files.exists(fileToSaveTo));
     }
 
+
+    @Test
+    public void toStringForTableShouldReturnString() throws IOException, ParserConfigurationException, TransformerException {
+
+        // Given a document instance.
+        File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
+        Node table = XlsToHtmlConverter.convertToHtmlPage(xlsFile);
+
+        // When the toString method is called.
+        String output = XlsToHtmlConverter.docToString(table);
+
+        System.out.println(output);
+
+        // Then a Document instance is returned with the HTML content of the XLS file.
+        assertTrue(StringUtils.isNotBlank(output));
+    }
+
     @Test
     public void toStringShouldReturnString() throws IOException, ParserConfigurationException, TransformerException {
 
         // Given a document instance.
         File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
-        Document document = XlsToHtmlConverter.convert(xlsFile);
+        Node table = XlsToHtmlConverter.convertToTable(xlsFile);
 
         // When the toString method is called.
-        String output = XlsToHtmlConverter.docToString(document);
+        String output = XlsToHtmlConverter.docToString(table);
+
+        System.out.println(output);
 
         // Then a Document instance is returned with the HTML content of the XLS file.
         assertTrue(StringUtils.isNotBlank(output));

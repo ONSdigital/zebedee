@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.util.XlsToHtmlConverter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,11 +69,10 @@ public class Table {
         }
 
         File xlsFile = new File(uri);
-        Document document = XlsToHtmlConverter.convert(path.toFile());
+        Node table = XlsToHtmlConverter.convertToTable(path.toFile());
 
         // When the toString method is called.
-        String output = XlsToHtmlConverter.docToString(document);
-
+        String output = XlsToHtmlConverter.docToString(table);
 
         // Write the file to the response
         try (InputStream input = Files.newInputStream(path)) {

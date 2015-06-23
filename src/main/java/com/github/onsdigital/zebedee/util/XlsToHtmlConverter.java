@@ -1,15 +1,18 @@
 package com.github.onsdigital.zebedee.util;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.converter.ExcelToHtmlConverter;
 import org.apache.poi.hssf.converter.ExcelToHtmlUtils;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.hwpf.converter.HtmlDocumentFacade;
+import org.apache.poi.ss.formula.eval.ErrorEval;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,6 +27,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper class to convert an xls file to a html table.
@@ -45,7 +50,24 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
      * @throws TransformerException
      * @throws ParserConfigurationException
      */
-    public static Document convert(File xlsFileIn) throws ParserConfigurationException, IOException {
+    public static Node convertToTable(File xlsFileIn) throws ParserConfigurationException, IOException {
+        final HSSFWorkbook workbook = ExcelToHtmlUtils.loadXls(xlsFileIn);
+        XlsToHtmlConverter converter = createConverter();
+
+        Element table = converter.createTableFromWorkbook(workbook);
+
+        return table;
+    }
+
+    /**
+     * Convert the xls file at the given path
+     *
+     * @param xlsFileIn
+     * @throws IOException
+     * @throws TransformerException
+     * @throws ParserConfigurationException
+     */
+    public static Node convertToHtmlPage(File xlsFileIn) throws ParserConfigurationException, IOException {
         final HSSFWorkbook workbook = ExcelToHtmlUtils.loadXls(xlsFileIn);
         XlsToHtmlConverter converter = createConverter();
 
@@ -62,7 +84,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
      * @throws IOException
      * @throws TransformerException
      */
-    public static void save(Document document, Path fileOut) throws IOException, TransformerException {
+    public static void save(Node document, Path fileOut) throws IOException, TransformerException {
         WriteHtmlToFile(document, fileOut);
     }
 
@@ -74,7 +96,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
      * @throws IOException
      * @throws TransformerException
      */
-    private static void WriteHtmlToFile(Document doc, Path htmlFileOut) throws IOException, TransformerException {
+    private static void WriteHtmlToFile(Node doc, Path htmlFileOut) throws IOException, TransformerException {
         FileWriter out = new FileWriter(htmlFileOut.toFile());
         DOMSource domSource = new DOMSource(doc);
         StreamResult streamResult = new StreamResult(out);
@@ -90,7 +112,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         out.close();
     }
 
-    public static String docToString(Document doc) throws IOException, TransformerException {
+    public static String docToString(Node doc) throws IOException, TransformerException {
         StringWriter out = new StringWriter();
         DOMSource domSource = new DOMSource(doc);
         StreamResult streamResult = new StreamResult(out);
@@ -101,7 +123,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         serializer.setOutputProperty(OutputKeys.INDENT, "yes");
         serializer.setOutputProperty(OutputKeys.METHOD, "html");
-        serializer.setOutputProperty(OutputKeys.STANDALONE, "yes");
+        serializer.setOutputProperty(OutputKeys.STANDALONE, "no");
         serializer.transform(domSource, streamResult);
         out.close();
 
@@ -136,6 +158,20 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
                 .newDocument();
     }
 
+    public Element createTableFromWorkbook(HSSFWorkbook workbook) {
+        final SummaryInformation summaryInformation = workbook
+                .getSummaryInformation();
+        if (summaryInformation != null) {
+            processDocumentInformation(summaryInformation);
+        }
+
+        // take only the first sheet
+        HSSFSheet sheet = workbook.getSheetAt(0);
+        Element table = createTable(sheet);
+        return table;
+        //htmlDocument.updateStylesheet();
+    }
+
     @Override
     protected void processSheetHeader(Element htmlBody, HSSFSheet sheet) {
 
@@ -145,6 +181,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 //        h2.appendChild(htmlDocumentFacade.createText(sheet.getSheetName()));
 //        htmlBody.appendChild( h2 );
     }
+
 
     @Override
     protected void processColumnWidths(HSSFSheet sheet, int maxSheetColumns, Element table) {
@@ -252,8 +289,179 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
             }
     }
 
+    public void addStyleClass(Element element, String style) {
+        String existing = element.getAttribute("style");
+        String newStyleValue = StringUtils.isEmpty(existing) ? style
+                : (existing + " " + style);
+        element.setAttribute("style", newStyleValue);
+    }
+
+    protected Element createTable(HSSFSheet sheet) {
+        processSheetHeader(htmlDocument.getBody(), sheet);
+
+        Element table = htmlDocument.createTable();
+
+        final int physicalNumberOfRows = sheet.getPhysicalNumberOfRows();
+        if (physicalNumberOfRows <= 0)
+            return table;
+
+        addStyleClass(table, "border-collapse:collapse;border-spacing:0;");
+
+        Element tableBody = htmlDocument.createTableBody();
+
+        final CellRangeAddress[][] mergedRanges = ExcelToHtmlUtils
+                .buildMergedRangesMap(sheet);
+
+        final List<Element> emptyRowElements = new ArrayList<Element>(
+                physicalNumberOfRows);
+        int maxSheetColumns = 1;
+        for (int r = sheet.getFirstRowNum(); r <= sheet.getLastRowNum(); r++) {
+            HSSFRow row = sheet.getRow(r);
+
+            if (row == null)
+                continue;
+
+            if (!isOutputHiddenRows() && row.getZeroHeight())
+                continue;
+
+            Element tableRowElement = htmlDocument.createTableRow();
+            addStyleClass(tableRowElement, "height:" + (row.getHeight() / 20f) + "pt;");
+
+            int maxRowColumnNumber = processRow(mergedRanges, row,
+                    tableRowElement);
+
+            if (maxRowColumnNumber == 0) {
+                emptyRowElements.add(tableRowElement);
+            } else {
+                if (!emptyRowElements.isEmpty()) {
+                    for (Element emptyRowElement : emptyRowElements) {
+                        tableBody.appendChild(emptyRowElement);
+                    }
+                    emptyRowElements.clear();
+                }
+
+                tableBody.appendChild(tableRowElement);
+            }
+            maxSheetColumns = Math.max(maxSheetColumns, maxRowColumnNumber);
+        }
+
+        processColumnWidths(sheet, maxSheetColumns, table);
+
+        if (isOutputColumnHeaders()) {
+            processColumnHeaders(sheet, maxSheetColumns, table);
+        }
+
+        table.appendChild(tableBody);
+
+        htmlDocument.getBody().appendChild(table);
+
+        return table;
+    }
+
+    protected boolean processCell(HSSFCell cell, Element tableCellElement,
+                                  int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt) {
+        final HSSFCellStyle cellStyle = cell.getCellStyle();
+
+        String value;
+        switch (cell.getCellType()) {
+            case HSSFCell.CELL_TYPE_STRING:
+                // XXX: enrich
+                value = cell.getRichStringCellValue().getString();
+                break;
+            case HSSFCell.CELL_TYPE_FORMULA:
+                switch (cell.getCachedFormulaResultType()) {
+                    case HSSFCell.CELL_TYPE_STRING:
+                        HSSFRichTextString str = cell.getRichStringCellValue();
+                        if (str != null && str.length() > 0) {
+                            value = (str.toString());
+                        } else {
+                            value = "";
+                        }
+                        break;
+                    case HSSFCell.CELL_TYPE_NUMERIC:
+                        HSSFCellStyle style = cellStyle;
+                        if (style == null) {
+                            value = String.valueOf(cell.getNumericCellValue());
+                        } else {
+                            value = (_formatter.formatRawCellContents(
+                                    cell.getNumericCellValue(), style.getDataFormat(),
+                                    style.getDataFormatString()));
+                        }
+                        break;
+                    case HSSFCell.CELL_TYPE_BOOLEAN:
+                        value = String.valueOf(cell.getBooleanCellValue());
+                        break;
+                    case HSSFCell.CELL_TYPE_ERROR:
+                        value = ErrorEval.getText(cell.getErrorCellValue());
+                        break;
+                    default:
+                        value = "";
+                        break;
+                }
+                break;
+            case HSSFCell.CELL_TYPE_BLANK:
+                value = "";
+                break;
+            case HSSFCell.CELL_TYPE_NUMERIC:
+                value = _formatter.formatCellValue(cell);
+                break;
+            case HSSFCell.CELL_TYPE_BOOLEAN:
+                value = String.valueOf(cell.getBooleanCellValue());
+                break;
+            case HSSFCell.CELL_TYPE_ERROR:
+                value = ErrorEval.getText(cell.getErrorCellValue());
+                break;
+            default:
+                return true;
+        }
+
+        final boolean noText = StringUtils.isEmpty(value);
+
+        final short cellStyleIndex = cellStyle.getIndex();
+        if (cellStyleIndex != 0) {
+            HSSFWorkbook workbook = cell.getRow().getSheet().getWorkbook();
+            //String mainCssClass = getStyleClassName(workbook, cellStyle);
+
+            String cssStyle = buildStyle(workbook, cellStyle);
+            addStyleClass(tableCellElement, cssStyle);
+//            String cssClass = htmlDocumentFacade.getOrCreateCssClass(
+//                    cssClassPrefixCell, cssStyle);
+//            .setAttribute("class", mainCssClass);
+
+            if (noText) {
+                /*
+                 * if cell style is defined (like borders, etc.) but cell text
+                 * is empty, add "&nbsp;" to output, so browser won't collapse
+                 * and ignore cell
+                 */
+                value = "\u00A0";
+            }
+        }
+
+        if (isOutputLeadingSpacesAsNonBreaking() && value.startsWith(" ")) {
+            StringBuilder builder = new StringBuilder();
+            for (int c = 0; c < value.length(); c++) {
+                if (value.charAt(c) != ' ')
+                    break;
+                builder.append('\u00a0');
+            }
+
+            if (value.length() != builder.length())
+                builder.append(value.substring(builder.length()));
+
+            value = builder.toString();
+        }
+
+        Text text = htmlDocument.createText(value);
+
+
+        tableCellElement.appendChild(text);
+
+        return StringUtils.isEmpty(value) && cellStyleIndex == 0;
+    }
+
 //    @Override
-//    protected boolean processCell( HSSFCell cell, Element tableCellElement,
+//    protected boolean processCellApplySubScript( HSSFCell cell, Element tableCellElement,
 //                                   int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt )
 //    {
 //        boolean result = super.processCell(cell, tableCellElement, normalWidthPx, maxSpannedWidthPx, normalHeightPt);

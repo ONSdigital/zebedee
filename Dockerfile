@@ -8,8 +8,7 @@ RUN echo '{"service": {"name": "zebedee", "tags": ["blue"], "port": 8080, "check
 # Check out from Github
 
 WORKDIR /usr/src
-RUN git clone https://github.com/Carboni/zebedee.git .
-RUN git checkout develop
+RUN git clone -b develop --single-branch --depth 1 https://github.com/Carboni/zebedee.git .
 
 # Build jar-with-dependencies:
 

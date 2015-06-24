@@ -1,0 +1,62 @@
+{
+  "type": "chart",
+  "title": "Chart",
+  "filename": "9e5969b9",
+  "uri": "businessindustryandtrade/businessactivitysizeandlocation/bulletins/charts4/20150626/9e5969b9",
+  "subtitle": "sub",
+  "unit": "unit",
+  "source": "source",
+  "legend": "top-right",
+  "hideLegend": false,
+  "notes": "some notes",
+  "altText": "alt text is here",
+  "data": [
+    {
+      "names": "juicyness",
+      "apples": "5.5",
+      "oranges": "23"
+    },
+    {
+      "names": "color",
+      "apples": "10.2",
+      "oranges": "10"
+    },
+    {
+      "names": "flavor",
+      "apples": "6.1",
+      "oranges": "13"
+    },
+    {
+      "names": "travelability",
+      "apples": "3.8",
+      "oranges": "7"
+    }
+  ],
+  "headers": [
+    "names",
+    "apples",
+    "oranges"
+  ],
+  "series": [
+    "apples",
+    "oranges"
+  ],
+  "categories": [
+    "juicyness",
+    "color",
+    "flavor",
+    "travelability"
+  ],
+  "aspectRatio": "0.42",
+  "chartType": "bar",
+  "files": [
+    {
+      "type": "download-png",
+      "filename": "9e5969b9-download.png"
+    },
+    {
+      "type": "png",
+      "filename": "9e5969b9.png"
+    }
+  ]
+}

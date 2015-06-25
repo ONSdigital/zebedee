@@ -118,6 +118,8 @@ public class DataPublisher {
             sections.add(section);
             dataset.setDownloads(sections);
 
+
+
             Path savePath = collection.autocreateReviewedPath(dataset.getUri() + "/data.json");
             IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
         }
@@ -437,6 +439,9 @@ public class DataPublisher {
             page.sourceDatasets.add(datasetPage.getDescription().getDatasetId());
         }
 
+        // Fix the breadcrumb
+        page.setBreadcrumb(datasetPage.getBreadcrumb());
+;
         return page;
     }
 

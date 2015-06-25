@@ -4,6 +4,7 @@ import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeseriesDescription;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.page.statistics.dataset.DatasetDescription;
+import com.github.onsdigital.content.partial.DownloadSection;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -26,6 +27,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.bouncycastle.util.Strings;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -75,11 +77,16 @@ public class DataPublisher {
         // First find all csdb files in the collection
         List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
 
+
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
 
             // Download the dataset page (for metadata)
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
+            DownloadSection section = new DownloadSection();
+            section.setTitle(dataset.getDescription().getTitle());
+            section.setCdids(new ArrayList<String>());
+
             if (dataset.getDescription().getDatasetId() == null) {
                 dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
             }
@@ -96,6 +103,7 @@ public class DataPublisher {
 
                 // Construct the new page
                 TimeSeries newPage = constructTimeSeriesPageFromComponents(path, uri, dataset, series);
+                section.getCdids().add(newPage.getDescription().getCdid());
 
                 // Save the new page to reviewed
                 Path savePath = collection.autocreateReviewedPath(newPage.getUri() + "/data.json");
@@ -104,6 +112,14 @@ public class DataPublisher {
                 // Write csv and other files:
                 // ...
             }
+
+            // Save the new dataset to be reviewed
+            List<DownloadSection> sections = new ArrayList<>();
+            sections.add(section);
+            dataset.setDownloads(sections);
+
+            Path savePath = collection.autocreateReviewedPath(dataset.getUri() + "/data.json");
+            IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
         }
     }
 
@@ -118,7 +134,7 @@ public class DataPublisher {
         split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
 
         String uri = StringUtils.join(split, "/");
-        uri = "/" + uri + "/timeseries/" + series.getCdid();
+        uri = Strings.toLowerCase("/" + uri + "/timeseries/" + series.getCdid());
 
         return uri;
     }
@@ -326,7 +342,7 @@ public class DataPublisher {
         }
         page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
         page.getDescription().setCdid(series.getDescription().getCdid());
-        if (page.getDescription().getTitle() == null) { page.getDescription().setTitle(series.getDescription().getTitle()); }
+        page.getDescription().setTitle(series.getDescription().getTitle());
 
         return page;
     }

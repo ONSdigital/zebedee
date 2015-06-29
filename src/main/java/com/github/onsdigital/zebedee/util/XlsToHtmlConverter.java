@@ -36,10 +36,12 @@ import java.util.List;
 public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
     protected final HtmlDocumentFacade htmlDocument;
+    protected final Document document;
 
-    private XlsToHtmlConverter(HtmlDocument htmlDocument) {
+    private XlsToHtmlConverter(Document document, HtmlDocument htmlDocument) {
         super(htmlDocument);
         this.htmlDocument = htmlDocument;
+        this.document = document;
     }
 
     /**
@@ -123,7 +125,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         serializer.setOutputProperty(OutputKeys.INDENT, "yes");
         serializer.setOutputProperty(OutputKeys.METHOD, "html");
-        serializer.setOutputProperty(OutputKeys.STANDALONE, "no");
+        serializer.setOutputProperty(OutputKeys.STANDALONE, "yes");
         serializer.transform(domSource, streamResult);
         out.close();
 
@@ -137,7 +139,10 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
      * @throws ParserConfigurationException
      */
     private static XlsToHtmlConverter createConverter() throws ParserConfigurationException {
-        XlsToHtmlConverter converter = new XlsToHtmlConverter(new HtmlDocument(createDocument()));
+
+        Document document = createDocument();
+        HtmlDocument htmlDocument = new HtmlDocument(document);
+        XlsToHtmlConverter converter = new XlsToHtmlConverter(document, htmlDocument);
         converter.setOutputColumnHeaders(false);
         converter.setOutputRowNumbers(false);
         converter.setUseDivsToSpan(false);
@@ -358,7 +363,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         return table;
     }
 
-    protected boolean processCell(HSSFCell cell, Element tableCellElement,
+    protected boolean processCellContent(HSSFCell cell, Element tableCellElement,
                                   int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt) {
         final HSSFCellStyle cellStyle = cell.getCellStyle();
 
@@ -453,98 +458,119 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         }
 
         Text text = htmlDocument.createText(value);
-
-
         tableCellElement.appendChild(text);
 
         return StringUtils.isEmpty(value) && cellStyleIndex == 0;
     }
 
-//    @Override
-//    protected boolean processCellApplySubScript( HSSFCell cell, Element tableCellElement,
-//                                   int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt )
-//    {
-//        boolean result = super.processCell(cell, tableCellElement, normalWidthPx, maxSpannedWidthPx, normalHeightPt);
-//
-//        HSSFWorkbook workbook = cell.getRow().getSheet().getWorkbook();
-//        int formattingRunIndex = 0;
-//        int toIndex = 0;
-//        int fromIndex = 0;
-//
-//        if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-//
-//            HSSFRichTextString rts = cell.getRichStringCellValue();
-//            System.out.println("The cell contains [" +
-//                    rts.toString() +
-//                    "]");
-//
-//            HSSFCellStyle style = cell.getCellStyle();
-//            HSSFFont font = style.getFont(workbook);
-//
-//            if (rts.numFormattingRuns() > 0) {
-//
-//                for (formattingRunIndex = 0; formattingRunIndex < rts.numFormattingRuns(); formattingRunIndex++) {
-//                    toIndex = rts.getIndexOfFormattingRun(formattingRunIndex);
-//                    System.out.println("\tSubstring [" +
-//                            rts.toString().substring(fromIndex, toIndex) +
-//                            "]");
-//                    if(font.getTypeOffset() == HSSFFont.SS_SUPER || font.getTypeOffset() == HSSFFont.SS_SUB) {
-//                        System.out.println("\t\tSuperscripted");
-//                    }
-//                    else {
-//                        System.out.println("\t\tNOT Superscripted");
-//                    }
-//                    font = workbook.getFontAt(rts.getFontOfFormattingRun(formattingRunIndex));
-//                    fromIndex = toIndex;
-//                }
-//                toIndex = rts.length();
-//                System.out.println("\tSubstring [" +
-//                        rts.toString().substring(fromIndex, toIndex) +
-//                        "]");
-//                if(font.getTypeOffset() == HSSFFont.SS_SUPER || font.getTypeOffset() == HSSFFont.SS_SUB) {
-//
-//                    String content = rts.toString();
-//                    String toSuperscript = content.substring(fromIndex, toIndex);
-//                    String updated;
-//
-//                    if(font.getTypeOffset() == HSSFFont.SS_SUPER) {
-//                        updated = content.replace(toSuperscript, "<span>" + toSuperscript + "</span><p>hello</p><strong>there</strong>");
-//                    } else {
-//                        updated = content.replace(toSuperscript, "<span>" + toSuperscript + "</span><p>hello</p><strong>there</strong>");
-//                    }
-//                    // todo - replace all occurances of superscript
-//
-//                    tableCellElement.setTextContent(updated);
-//
-//                    System.out.println("\t\tSuperscripted");
-//                }
-//                else {
-//                    System.out.println("\t\tNOT Superscripted");
-//                }
-//            }
-//            else {
-//
-//                System.out.print("The String [" + rts.toString());
-//                if (font.getTypeOffset() == HSSFFont.SS_SUPER) {
-//                    System.out.print("] is ");
-//                }
-//                else {
-//                    System.out.print("] is not ");
-//                }
-//                System.out.println("superscripted.");
-//            }
-//        }
-//        else {
-//            System.out.println("The cell at row number " +
-//                    cell.getRowIndex() +
-//                    " and column number " +
-//                    cell.getColumnIndex() +
-//                    " does not contain a String.");
-//        }
-//
-//
-//        return result;
-//    }
+    protected boolean processCell(HSSFCell cell, Element tableCellElement,
+                                  int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt) {
+        boolean result = processCellContent(cell, tableCellElement, normalWidthPx, maxSpannedWidthPx, normalHeightPt);
+
+        HSSFWorkbook workbook = cell.getRow().getSheet().getWorkbook();
+        int formattingRunIndex = 0;
+        int toIndex = 0;
+        int fromIndex = 0;
+
+        if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+
+            HSSFRichTextString rts = cell.getRichStringCellValue();
+            System.out.println("The cell contains [" +
+                    rts.toString() +
+                    "]");
+
+            HSSFCellStyle style = cell.getCellStyle();
+            HSSFFont font = style.getFont(workbook);
+
+            StringBuilder builder = new StringBuilder();
+            String content = rts.toString();
+
+            if (rts.numFormattingRuns() > 0) {
+
+                // remove any existing elements as we want to replace them
+                while (tableCellElement.hasChildNodes())
+                    tableCellElement.removeChild(tableCellElement.getFirstChild());
+
+                for (formattingRunIndex = 0; formattingRunIndex < rts.numFormattingRuns(); formattingRunIndex++) {
+
+                    toIndex = rts.getIndexOfFormattingRun(formattingRunIndex);
+                    String subString = content.substring(fromIndex, toIndex);
+                    System.out.println("\tSubstring [" + subString + "]");
+
+                    if (font.getTypeOffset() == HSSFFont.SS_SUPER || font.getTypeOffset() == HSSFFont.SS_SUB) {
+
+                        System.out.println("\t\tSuperscripted");
+
+                        if (font.getTypeOffset() == HSSFFont.SS_SUPER) {
+                            builder.append("<sup>" + subString + "</sup>");
+                            Element element = document.createElement("sup");
+                            element.appendChild(htmlDocument.createText(subString));
+                            tableCellElement.appendChild(element);
+                        } else {
+                            builder.append("<sub>" + subString + "</sub>");
+                            Element element = document.createElement("sub");
+                            element.appendChild(htmlDocument.createText(subString));
+                            tableCellElement.appendChild(element);
+                        }
+                    } else {
+                        builder.append(subString);
+                        tableCellElement.appendChild(htmlDocument.createText(subString));
+                        System.out.println("\t\tNOT Superscripted");
+                    }
+                    font = workbook.getFontAt(rts.getFontOfFormattingRun(formattingRunIndex));
+                    fromIndex = toIndex;
+
+                    //System.out.println("Builder: " + builder.toString());
+                }
+                toIndex = rts.length();
+
+                String subString = content.substring(fromIndex, toIndex);
+                System.out.println("\tSubstring [" + subString + "]");
+                if (font.getTypeOffset() == HSSFFont.SS_SUPER || font.getTypeOffset() == HSSFFont.SS_SUB) {
+
+
+                    if (font.getTypeOffset() == HSSFFont.SS_SUPER) {
+                        builder.append("<sup>" + subString + "</sup>");
+                        Element element = document.createElement("sup");
+                        element.appendChild(htmlDocument.createText(subString));
+                        tableCellElement.appendChild(element);
+                    } else {
+                        builder.append("<sub>" + subString + "</sub>");
+                        Element element = document.createElement("sub");
+                        element.appendChild(htmlDocument.createText(subString));
+                        tableCellElement.appendChild(element);
+                    }
+
+                    //tableCellElement.setTextContent(builder.toString());
+                    //tableCellElement.appendChild(htmlDocument.createText(subString));
+
+                    System.out.println("\t\tSuperscripted");
+                } else {
+                    System.out.println("\t\tNOT Superscripted");
+                    builder.append(subString);
+                    tableCellElement.appendChild(htmlDocument.createText(subString));
+                }
+            } else {
+
+                System.out.print("The String [" + rts.toString());
+                if (font.getTypeOffset() == HSSFFont.SS_SUPER) {
+                    System.out.print("] is ");
+                } else {
+                    System.out.print("] is not ");
+                }
+                System.out.println("superscripted.");
+            }
+        } else {
+            System.out.println("The cell at row number " +
+                    cell.getRowIndex() +
+                    " and column number " +
+                    cell.getColumnIndex() +
+                    " does not contain a String.");
+        }
+
+
+        return result;
+    }
 
     static class HtmlDocument extends HtmlDocumentFacade {
 

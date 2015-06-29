@@ -20,7 +20,9 @@ import static org.junit.Assert.*;
 public class ContentTest {
 
     private String filename = "data.json";
-    private String directoryName = "subdir";
+    private String directoryAName = "subdira";
+    private String directoryBName = "subdirb";
+    private String directoryCName = "subdirc";
     private String bulletinsDirectoryName = "bulletins";
     private String exampleBulletinName = "gdppreliminaryestimateq32014";
 
@@ -28,7 +30,6 @@ public class ContentTest {
     private Path baseJsonFile; // path of the data.json file in the base directory (the home page)
     private ContentDetail baseContent; // The object to serialise into the base directory data.json
 
-    private Path subDirectory; // an example sub directory in the base directory
     private Path subDirectoryJsonFile; // a json file for the sub directory
     private ContentDetail subContent; // the object to serialise into the sub directory data.json
 
@@ -41,8 +42,10 @@ public class ContentTest {
     public void setUp() throws Exception {
         basePath = Files.createTempDirectory(this.getClass().getSimpleName());
         baseJsonFile = basePath.resolve(filename);
-        subDirectory = basePath.resolve(directoryName);
-        subDirectoryJsonFile = subDirectory.resolve(filename);
+        Path subDirectoryA = basePath.resolve(directoryAName);
+        Path subDirectoryB = basePath.resolve(directoryBName);
+        Path subDirectoryC = basePath.resolve(directoryCName);
+        subDirectoryJsonFile = subDirectoryA.resolve(filename);
         Files.createFile(baseJsonFile);
 
         baseContent = new ContentDetail();
@@ -54,7 +57,9 @@ public class ContentTest {
             Serialiser.serialise(output, baseContent);
         }
 
-        Files.createDirectory(subDirectory);
+        Files.createDirectory(subDirectoryC);
+        Files.createDirectory(subDirectoryA);
+        Files.createDirectory(subDirectoryB);
 
         subContent = new ContentDetail();
         subContent.description = new ContentDetailDescription("Some sub 2015");
@@ -66,7 +71,7 @@ public class ContentTest {
         }
 
 
-        bulletinDirectory = subDirectory.resolve(bulletinsDirectoryName);
+        bulletinDirectory = subDirectoryA.resolve(bulletinsDirectoryName);
         Files.createDirectory(bulletinDirectory);
         exampleBulletinDirectory = bulletinDirectory.resolve(exampleBulletinName);
         Files.createDirectory(exampleBulletinDirectory);
@@ -131,6 +136,25 @@ public class ContentTest {
         assertTrue(root.children.size() > 0);
         assertEquals(baseContent.description.title, root.description.title);
     }
+
+    @Test
+    public void getNestedDetailsShouldAlphabeticallyOrderFiles() throws IOException {
+
+        // Given an instance of content with three subdirectories
+        Content content = new Content(basePath);
+
+        // When the nestedDetails method is called
+        ContentDetail root = content.nestedDetails();
+
+        // Then the result has child nodes ordered alphabetically
+        assertNotNull(root);
+        assertNotNull(root.children);
+        assertTrue(root.children.size() > 0);
+        assertEquals("Some sub 2015", root.children.get(0).description.title);
+        assertEquals(directoryBName, root.children.get(1).description.title);
+        assertEquals(directoryCName, root.children.get(2).description.title);
+    }
+
 
     @Test
     public void shouldGetNestedDetailsWithNoDataJsonFile() throws IOException {

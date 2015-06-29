@@ -43,7 +43,6 @@ public class XlsToHtmlConverterTest {
         assertNotNull(document);
     }
 
-    //
     @Test
     public void saveShouldPersistDocument() throws IOException, ParserConfigurationException, TransformerException {
 
@@ -91,4 +90,24 @@ public class XlsToHtmlConverterTest {
         // Then a Document instance is returned with the HTML content of the XLS file.
         assertTrue(StringUtils.isNotBlank(output));
     }
+
+    @Test
+    public void convertToTableShouldRenderSubscript() throws IOException, ParserConfigurationException, TransformerException {
+
+        // Given an xls file with subscript and superscript content
+        File xlsFile = new File(getClass().getResource("/xls/example-subscript-table.xls").getFile());
+
+        // When the convert method is called.
+        Node table = XlsToHtmlConverter.convertToTable(xlsFile);
+        String output = XlsToHtmlConverter.docToString(table);
+
+        System.out.println(output);
+        // Then a Document instance is returned with the HTML content of the XLS file including subscript / superscript.
+        assertTrue(StringUtils.isNotBlank(output));
+        assertTrue(StringUtils.contains(output, "<sub>This is subscript1 </sub>"));
+        assertTrue(StringUtils.contains(output, "<sub>subscript2</sub>"));
+        assertTrue(StringUtils.contains(output, "<sup>superscript1</sup>"));
+        assertTrue(StringUtils.contains(output, "<sup>superscript2</sup>"));
+    }
+
 }

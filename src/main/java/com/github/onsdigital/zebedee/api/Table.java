@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -68,10 +67,7 @@ public class Table {
             response.setContentType(contentType);
         }
 
-        File xlsFile = new File(uri);
         Node table = XlsToHtmlConverter.convertToTable(path.toFile());
-
-        // When the toString method is called.
         String output = XlsToHtmlConverter.docToString(table);
 
         // Write the file to the response

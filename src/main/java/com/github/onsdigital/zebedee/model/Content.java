@@ -13,6 +13,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Content {
@@ -153,6 +154,15 @@ public class Content {
                     }
                 }
             }
+        }
+
+        if (detail.children.size() > 1) {
+            java.util.Collections.sort(detail.children, new Comparator<ContentDetail>() {
+                @Override
+                public int compare(ContentDetail o1, ContentDetail o2) {
+                    return o1.description.title.compareTo(o2.description.title);
+                }
+            });
         }
 
         return detail;

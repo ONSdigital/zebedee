@@ -9,7 +9,7 @@ WORKDIR /usr/src
 ADD . /usr/src
 
 # Build jar-with-dependencies
-RUN mvn clean install -DskipTests
+RUN mvn install -DskipTests
 
 # Update the entry point script
 RUN mv /usr/entrypoint/container.sh /usr/src/

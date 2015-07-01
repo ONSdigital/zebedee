@@ -296,12 +296,7 @@ public class Collections {
                         response.getOutputStream());
             }
         } catch (ContentNotFoundException e) {
-            //TODO: Exception management
-            e.printStackTrace();
-            Map<String, String> errorMessage = new HashMap<String, String>();
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            errorMessage.put("message", "Data you are looking for is not available");
-            errorMessage.put("status", String.valueOf(HttpServletResponse.SC_NOT_FOUND));
+            throw new NotFoundException(e.getMessage());
         }
 
     }

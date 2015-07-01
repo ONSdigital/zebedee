@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.util.IOUtils;
+import org.bouncycastle.util.Strings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -259,7 +260,7 @@ public class DataPublisherTest {
 
         // Then
         // we expect a uri in the corresponding timeseries folder with CDID as a subfolder
-        assertEquals("/businessindustryandtrade/tourismindustry/timeseries/" + seriesId,
+        assertEquals("/businessindustryandtrade/tourismindustry/timeseries/" + Strings.toLowerCase(seriesId),
                 seriesURI);
 
     }

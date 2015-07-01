@@ -114,19 +114,12 @@ public class ContentDetail {
         if (o == null || getClass() != o.getClass()) return false;
 
         ContentDetail that = (ContentDetail) o;
-
-        if (uri != null ? !uri.equals(that.uri) : that.uri != null) return false;
-        if (type != null ? !type.equals(that.type) : that.type != null) return false;
-        return !(description != null ? !description.equals(that.description) : that.description != null);
-
+        return !(uri != null ? !uri.equals(that.uri) : that.uri != null);
     }
 
     @Override
     public int hashCode() {
-        int result = uri != null ? uri.hashCode() : 0;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        return result;
+        return uri != null ? uri.hashCode() : 0;
     }
 
     /**
@@ -155,11 +148,21 @@ public class ContentDetail {
 
             this.children.add(contentDetail);
         } else {
-            // recurse
+            // see if the content detail instance already exists at this level
             ContentDetail child = this.getChildWithUri("/" + path.subpath(0, depth + 1).toString());
 
+            // if it doesn't exists try and resolve it using the folder name
             if (child == null)
                 child = this.getChildWithName(path.subpath(depth, depth + 1).toString());
+
+            // if child is still null then its a directory and needs creating and added as a child
+            if (child == null) {
+                String directoryName = path.subpath(depth, depth + 1).toString();
+                String uri = "/" + path.subpath(0, depth + 1).toString();
+                child = new ContentDetail(directoryName, uri, null);
+                this.children = new ArrayList<>();
+                this.children.add(child);
+            }
 
             if (child != null)
                 child.overlayContentDetail(contentDetail, depth + 1);

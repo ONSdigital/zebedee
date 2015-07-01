@@ -5,8 +5,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ContentDetailTest {
 
@@ -27,6 +26,28 @@ public class ContentDetailTest {
 
         // Then the item is added into the tree
         assertTrue(detail.containsDescendant(descendant));
+    }
+
+    @Test
+    public void overlayDetailsShouldAddNewDirectories() {
+
+        // Given a content detail instance
+        ContentDetail detail = new ContentDetail("base content", "/", "home");
+
+        // When we call the overlayDetails method with a Content detail instace with new directories to create.
+        ContentDetail descendant = new ContentDetail("descendant content", "/childdir1/childdir2/descendant", "bulletin");
+        List<ContentDetail> toOverlay = new ArrayList<>();
+        toOverlay.add(descendant);
+        detail.overlayDetails(toOverlay);
+
+        // Then the directories are created as part of the overlay.
+        assertTrue(detail.containsDescendant(descendant));
+
+        ContentDetail childDir1 = detail.getChildWithName("childdir1");
+        assertNotNull(childDir1);
+
+        ContentDetail childDir2 = childDir1.getChildWithName("childdir2");
+        assertNotNull(childDir2);
     }
 
     @Test

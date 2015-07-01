@@ -5,6 +5,7 @@ package com.github.onsdigital.zebedee.json;
  */
 public class ContentDetailDescription {
     public String title;
+    public String edition;
 
     public ContentDetailDescription(String title) {
         this.title = title;

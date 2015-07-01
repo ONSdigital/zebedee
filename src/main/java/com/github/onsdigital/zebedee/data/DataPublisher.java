@@ -60,6 +60,7 @@ public class DataPublisher {
         System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
     }
 
+
     /**
      * The T5 timeseries objects are made by
      * 1. Searching for all .csdb files in a collection
@@ -80,9 +81,9 @@ public class DataPublisher {
 
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
-
             // Download the dataset page (for metadata)
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
+
             DownloadSection section = new DownloadSection();
             section.setTitle(dataset.getDescription().getTitle());
             section.setCdids(new ArrayList<String>());
@@ -122,6 +123,8 @@ public class DataPublisher {
 
             Path savePath = collection.autocreateReviewedPath(dataset.getUri() + "/data.json");
             IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
+
+            System.out.println("Published " + serieses.size() + " datasets for " + dataset.getUri().toString());
         }
     }
 
@@ -142,19 +145,19 @@ public class DataPublisher {
     }
 
 
+    /**
+     *
+     * @param existingSeries
+     * @param uri
+     * @param dataset
+     * @param series
+     * @return
+     * @throws IOException
+     */
     static TimeSeries constructTimeSeriesPageFromComponents(Path existingSeries, String uri, Dataset dataset, TimeSeries series) throws IOException {
 
         // Begin with existing data
         TimeSeries page = startPageForSeriesWithPublishedPath(uri, series);
-
-//        if ((existingSeries != null) && Files.exists(existingSeries.resolve("data.json"))) {
-//            System.out.println("Deserialising for " + existingSeries);
-//            page = ContentUtil.deserialise(FileUtils.openInputStream(existingSeries.resolve("data.json").toFile()), TimeSeries.class);
-//        } else {
-//            page = new TimeSeries();
-//            page.cdid = series.cdid;
-//            page.uri = URI.create(uri);
-//        }
 
         // Add stats data from the time series (as returned by Brian)
         // NOTE: This will log any corrections as it goes

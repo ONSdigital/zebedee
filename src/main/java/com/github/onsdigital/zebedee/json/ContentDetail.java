@@ -114,19 +114,12 @@ public class ContentDetail {
         if (o == null || getClass() != o.getClass()) return false;
 
         ContentDetail that = (ContentDetail) o;
-
-        if (uri != null ? !uri.equals(that.uri) : that.uri != null) return false;
-        if (type != null ? !type.equals(that.type) : that.type != null) return false;
-        return !(description != null ? !description.equals(that.description) : that.description != null);
-
+        return !(uri != null ? !uri.equals(that.uri) : that.uri != null);
     }
 
     @Override
     public int hashCode() {
-        int result = uri != null ? uri.hashCode() : 0;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        return result;
+        return uri != null ? uri.hashCode() : 0;
     }
 
     /**

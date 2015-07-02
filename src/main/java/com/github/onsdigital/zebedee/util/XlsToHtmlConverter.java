@@ -475,9 +475,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
 
             HSSFRichTextString rts = cell.getRichStringCellValue();
-            System.out.println("The cell contains [" +
-                    rts.toString() +
-                    "]");
+            //System.out.println("The cell contains [" + rts.toString() + "]");
 
             HSSFCellStyle style = cell.getCellStyle();
             HSSFFont font = style.getFont(workbook);
@@ -495,11 +493,11 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
                     toIndex = rts.getIndexOfFormattingRun(formattingRunIndex);
                     String subString = content.substring(fromIndex, toIndex);
-                    System.out.println("\tSubstring [" + subString + "]");
+                    //System.out.println("\tSubstring [" + subString + "]");
 
                     if (font.getTypeOffset() == HSSFFont.SS_SUPER || font.getTypeOffset() == HSSFFont.SS_SUB) {
 
-                        System.out.println("\t\tSuperscripted");
+                        //System.out.println("\t\tSuperscripted");
 
                         if (font.getTypeOffset() == HSSFFont.SS_SUPER) {
                             builder.append("<sup>" + subString + "</sup>");
@@ -515,7 +513,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
                     } else {
                         builder.append(subString);
                         tableCellElement.appendChild(htmlDocument.createText(subString));
-                        System.out.println("\t\tNOT Superscripted");
+                        //System.out.println("\t\tNOT Superscripted");
                     }
                     font = workbook.getFontAt(rts.getFontOfFormattingRun(formattingRunIndex));
                     fromIndex = toIndex;
@@ -525,7 +523,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
                 toIndex = rts.length();
 
                 String subString = content.substring(fromIndex, toIndex);
-                System.out.println("\tSubstring [" + subString + "]");
+                //System.out.println("\tSubstring [" + subString + "]");
                 if (font.getTypeOffset() == HSSFFont.SS_SUPER || font.getTypeOffset() == HSSFFont.SS_SUB) {
 
 
@@ -543,29 +541,28 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
                     //tableCellElement.setTextContent(builder.toString());
                     //tableCellElement.appendChild(htmlDocument.createText(subString));
-
-                    System.out.println("\t\tSuperscripted");
+                    //System.out.println("\t\tSuperscripted");
                 } else {
-                    System.out.println("\t\tNOT Superscripted");
+                    //System.out.println("\t\tNOT Superscripted");
                     builder.append(subString);
                     tableCellElement.appendChild(htmlDocument.createText(subString));
                 }
             } else {
 
-                System.out.print("The String [" + rts.toString());
+                //System.out.print("The String [" + rts.toString());
                 if (font.getTypeOffset() == HSSFFont.SS_SUPER) {
-                    System.out.print("] is ");
+                    //System.out.print("] is ");
                 } else {
-                    System.out.print("] is not ");
+                    //System.out.print("] is not ");
                 }
-                System.out.println("superscripted.");
+                //System.out.println("superscripted.");
             }
         } else {
-            System.out.println("The cell at row number " +
-                    cell.getRowIndex() +
-                    " and column number " +
-                    cell.getColumnIndex() +
-                    " does not contain a String.");
+//            System.out.println("The cell at row number " +
+//                    cell.getRowIndex() +
+//                    " and column number " +
+//                    cell.getColumnIndex() +
+//                    " does not contain a String.");
         }
 
 

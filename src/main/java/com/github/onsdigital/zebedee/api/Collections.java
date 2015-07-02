@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 @Api
@@ -45,7 +46,6 @@ public class Collections {
 
         List<Collection> collections = Root.zebedee.collections.list();
         for (Collection collection : collections) {
-
             CollectionDescription description = new CollectionDescription();
             description.id = collection.description.id;
             description.name = collection.description.name;
@@ -53,6 +53,14 @@ public class Collections {
             description.approvedStatus = collection.description.approvedStatus;
             result.add(description);
         }
+
+        // sort the collections alphabetically by name.
+        java.util.Collections.sort(result, new Comparator<CollectionDescription>() {
+            @Override
+            public int compare(CollectionDescription o1, CollectionDescription o2) {
+                return o1.name.compareTo(o2.name);
+            }
+        });
 
         return result;
     }

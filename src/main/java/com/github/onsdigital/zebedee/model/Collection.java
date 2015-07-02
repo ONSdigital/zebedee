@@ -522,16 +522,19 @@ public class Collection {
      */
     public boolean deleteContent(String email, String uri) throws IOException {
 
-        boolean hasDeleted = true;
+        boolean hasDeleted = false;
 
         if (isInProgress(uri)) {
             PathUtils.deleteFilesInDirectory(inProgress.toPath(uri));
-        } else if (isComplete(uri)) {
+            hasDeleted = true;
+        }
+        if (isComplete(uri)) {
             PathUtils.deleteFilesInDirectory(complete.toPath(uri));
-        } else if (isReviewed(uri)) {
+            hasDeleted = true;
+        }
+        if (isReviewed(uri)) {
             PathUtils.deleteFilesInDirectory(reviewed.toPath(uri));
-        } else {
-            hasDeleted = false;
+            hasDeleted = true;
         }
 
         if (hasDeleted) AddEvent(uri, new ContentEvent(new Date(), ContentEventType.DELETED, email));

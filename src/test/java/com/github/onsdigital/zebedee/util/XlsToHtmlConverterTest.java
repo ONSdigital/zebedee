@@ -69,7 +69,7 @@ public class XlsToHtmlConverterTest {
         // When the toString method is called.
         String output = XlsToHtmlConverter.docToString(table);
 
-        System.out.println(output);
+        //System.out.println(output);
 
         // Then a Document instance is returned with the HTML content of the XLS file.
         assertTrue(StringUtils.isNotBlank(output));
@@ -85,7 +85,7 @@ public class XlsToHtmlConverterTest {
         // When the toString method is called.
         String output = XlsToHtmlConverter.docToString(table);
 
-        System.out.println(output);
+        //System.out.println(output);
 
         // Then a Document instance is returned with the HTML content of the XLS file.
         assertTrue(StringUtils.isNotBlank(output));
@@ -101,7 +101,7 @@ public class XlsToHtmlConverterTest {
         Node table = XlsToHtmlConverter.convertToTable(xlsFile);
         String output = XlsToHtmlConverter.docToString(table);
 
-        System.out.println(output);
+        //System.out.println(output);
         // Then a Document instance is returned with the HTML content of the XLS file including subscript / superscript.
         assertTrue(StringUtils.isNotBlank(output));
         assertTrue(StringUtils.contains(output, "<sub>This is subscript1 </sub>"));

@@ -524,15 +524,15 @@ public class Collection {
 
         boolean hasDeleted = false;
 
-        if (isInProgress(uri)) {
+        if (inProgress.exists(uri)) {
             PathUtils.deleteFilesInDirectory(inProgress.toPath(uri));
             hasDeleted = true;
         }
-        if (isComplete(uri)) {
+        if (complete.exists(uri)) {
             PathUtils.deleteFilesInDirectory(complete.toPath(uri));
             hasDeleted = true;
         }
-        if (isReviewed(uri)) {
+        if (reviewed.exists(uri)) {
             PathUtils.deleteFilesInDirectory(reviewed.toPath(uri));
             hasDeleted = true;
         }

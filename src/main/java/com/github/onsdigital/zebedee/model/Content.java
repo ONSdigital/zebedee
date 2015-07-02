@@ -38,6 +38,11 @@ public class Content {
         return !p.getFileName().toString().contains("releases");
     }
 
+    // todo: remove timeseries filter once we are caching the browse tree.
+    private static boolean isNotTimeseries(Path p) {
+        return !p.getFileName().toString().contains("timeseries");
+    }
+
     boolean exists(URI uri) {
         return exists(uri.getPath());
     }
@@ -145,9 +150,10 @@ public class Content {
 
         detail.children = new ArrayList<>();
 
+        // todo: remove timeseries filter once we are caching the browse tree.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path entry : stream) {
-                if (Files.isDirectory(entry) && isNotRelease(entry)) {
+                if (Files.isDirectory(entry) && isNotRelease(entry) && isNotTimeseries(entry)) {
                     ContentDetail child = nestedDetails(entry);
                     if (child != null) {
                         detail.children.add(child);

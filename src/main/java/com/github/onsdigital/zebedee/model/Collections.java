@@ -286,7 +286,7 @@ public class Collections {
         try (InputStream input = Files.newInputStream(path)) {
             if (resolveReferences) {
                 Page page = ContentUtil.deserialisePage(input);
-                page.loadReferences(new DataReader());
+                page.loadReferences(new DataReader(session, collection));
                 // Write the file to the response
                 org.apache.commons.io.IOUtils.copy(new StringReader(page.toJson()),
                         response.getOutputStream());

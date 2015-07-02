@@ -50,6 +50,14 @@ public class File {
 
         Collection collection = Collections.getCollection(request);
         Session session = Root.zebedee.sessions.get(request);
+
+        // Authorisation
+        if (session == null
+                || !Root.zebedee.permissions.canView(session.email,
+                collection.description)) {
+            throw new UnauthorizedException(session);
+        }
+
         // Path
         Path path = collection.find(session.email, uriPath);
         if (path == null) {

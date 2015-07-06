@@ -25,7 +25,6 @@ public class Permissions {
     private Zebedee zebedee;
     private Path accessMappingPath;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
-    private ReadWriteLock teamLock = new ReentrantReadWriteLock();
 
     public Permissions(Path permissions, Zebedee zebedee) {
         this.zebedee = zebedee;

@@ -17,11 +17,16 @@ import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Collection {
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
+    private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     public final CollectionDescription description;
     public final Path path;
     public final Content reviewed;
@@ -29,6 +34,7 @@ public class Collection {
     public final Content inProgress;
     final Zebedee zebedee;
     final Collections collections;
+
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -58,9 +64,13 @@ public class Collection {
         }
 
         // Deserialise the description:
+        collectionLocks.putIfAbsent(this.path, new ReentrantReadWriteLock());
+        collectionLocks.get(this.path).readLock().lock();
         try (InputStream input = Files.newInputStream(description)) {
             this.description = Serialiser.deserialise(input,
                     CollectionDescription.class);
+        } finally {
+            collectionLocks.get(this.path).readLock().unlock();
         }
 
         // Set fields:
@@ -156,7 +166,6 @@ public class Collection {
     public void delete()
             throws IOException {
 
-
         // Delete folders:
         this.zebedee.delete(path);
 
@@ -164,12 +173,18 @@ public class Collection {
         String filename = PathUtils.toFilename(this.description.name);
         Path collectionDescriptionPath = collections.path.resolve(filename + ".json");
         Files.delete(collectionDescriptionPath);
+
+        // remove the lock for the collection
+        collectionLocks.remove(path);
     }
 
     public boolean save() throws IOException {
+        collectionLocks.get(this.path).writeLock().lock();
         try (OutputStream output = Files.newOutputStream(this.descriptionPath())) {
             Serialiser.serialise(output, this.description);
             return true;
+        } finally {
+            collectionLocks.get(this.path).writeLock().unlock();
         }
     }
 

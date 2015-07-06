@@ -1,18 +1,16 @@
 package com.github.onsdigital.zebedee.util;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import com.github.onsdigital.content.page.base.PageType;
+import com.github.onsdigital.content.link.PageReference;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
 
 import com.github.onsdigital.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
-import com.github.onsdigital.content.page.taxonomy.base.TaxonomyPage;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 
-import javax.swing.text.DateFormatter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -20,7 +18,6 @@ import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +47,204 @@ public class Validator {
         Path pages = csvOfPagesData();
         Files.deleteIfExists(path.resolve("pages.csv"));
         Files.copy(pages, path.resolve("pages.csv"));
+
+        Path invalidURIs = csvOfFalseURIs();
+        Files.deleteIfExists(path.resolve("falseURIs.csv"));
+        Files.copy(invalidURIs, path.resolve("falseURIs.csv"));
+
+        Path unfoundLinks = csvOfUnfoundLinks(path);
+        Files.deleteIfExists(path.resolve("unfoundLinks.csv"));
+        Files.copy(unfoundLinks, path.resolve("unfoundLinks.csv"));
     }
+
+    public Path csvOfUnfoundLinks(Path uriPath) throws IOException {
+        Path path = Files.createTempFile("unfoundlinks", ".csv");
+        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
+
+            String[] row;
+            row = new String[10];
+            row[0] = "Data type";
+            row[1] = "My URI";
+            row[2] = "Related URI";
+            writer.writeNext(row);
+
+            writeCSVForMissingLinks(uriPath, writer);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return path;
+    }
+
+    void writeCSVForMissingLinks(Path path, CSVWriter writer) throws IOException {
+        List<Path> paths = filesMatching(bulletinMatcher());
+        String[] row;
+        row = new String[10];
+        row[0] = "Data type";
+        row[1] = "My URI";
+        row[2] = "Related URI";
+
+        for (Path bulletinPath: paths) {
+            Bulletin bulletin;
+            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
+                bulletin = ContentUtil.deserialise(inputStream, Bulletin.class);
+            }
+            for (PageReference reference: bulletin.getRelatedBulletins()) {
+                String string = reference.getUri().toString();
+                if (string.startsWith("/")) { string = string.substring(1); }
+                Path checkpath = zebedee.published.path.resolve(string);
+                if (Files.exists(checkpath) == false) {
+                    row[0] = "Related bulletin";
+                    row[1] = bulletin.getUri().toString();
+                    row[2] = reference.getUri().toString();
+                    writer.writeNext(row);
+                }
+            }
+            for (PageReference reference: bulletin.getRelatedData()) {
+                String string = reference.getUri().toString();
+                if (string.startsWith("/")) { string = string.substring(1); }
+                Path checkpath = zebedee.published.path.resolve(string);
+                if (Files.exists(checkpath) == false) {
+                    row[0] = "Related data";
+                    row[1] = bulletin.getUri().toString();
+                    row[2] = reference.getUri().toString();
+                    writer.writeNext(row);
+                }
+            }
+        }
+
+        paths = filesMatching(articleMatcher());
+        for (Path articlePath: paths) {
+            Article article;
+            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
+                article = ContentUtil.deserialise(inputStream, Article.class);
+            }
+            if (article.getRelatedArticles() != null) {
+                for (PageReference reference : article.getRelatedArticles()) {
+                    String string = reference.getUri().toString();
+                    if (string.startsWith("/")) { string = string.substring(1); }
+                    Path checkpath = zebedee.published.path.resolve(string);
+                    if (Files.exists(checkpath) == false) {
+                        row[0] = "Related article";
+                        row[1] = article.getUri().toString();
+                        row[2] = reference.getUri().toString();
+                        writer.writeNext(row);
+                    }
+                }
+            }
+            if (article.getRelatedData() != null) {
+                for (PageReference reference : article.getRelatedData()) {
+                    String string = reference.getUri().toString();
+                    if (string.startsWith("/")) { string = string.substring(1); }
+                    Path checkpath = zebedee.published.path.resolve(string);
+                    if (Files.exists(checkpath) == false) {
+                        row[0] = "Related data";
+                        row[1] = article.getUri().toString();
+                        row[2] = reference.getUri().toString();
+                        writer.writeNext(row);
+                    }
+                }
+            }
+        }
+
+        paths = filesMatching(pageMatcher());
+        for (Path taxonomyPath: paths) {
+            ProductPage page;
+            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
+                page = ContentUtil.deserialise(inputStream, ProductPage.class);
+            }
+
+            if (page.getRelatedArticles() != null) {
+                for (PageReference reference : page.getRelatedArticles()) {
+                    String string = reference.getUri().toString();
+                    if (string.startsWith("/")) { string = string.substring(1); }
+                    Path checkpath = zebedee.published.path.resolve(string);
+                    if (Files.exists(checkpath) == false) {
+                        row[0] = "Related article";
+                        row[1] = page.getUri().toString();
+                        row[2] = reference.getUri().toString();
+                        writer.writeNext(row);
+                    }
+                }
+            }
+
+            if (page.getDatasets() != null) {
+                for (PageReference reference : page.getStatsBulletins()) {
+                    String string = reference.getUri().toString();
+                    if (string.startsWith("/")) { string = string.substring(1); }
+                    Path checkpath = zebedee.published.path.resolve(string);
+                    if (Files.exists(checkpath) == false) {
+                        row[0] = "Related bulletin";
+                        row[1] = page.getUri().toString();
+                        row[2] = reference.getUri().toString();
+                        writer.writeNext(row);
+                    }
+                }
+            }
+
+            if (page.getItems() != null) {
+                for (PageReference reference : page.getItems()) {
+                    String string = reference.getUri().toString();
+                    if (string.startsWith("/")) { string = string.substring(1); }
+                    Path checkpath = zebedee.published.path.resolve(string);
+                    if (Files.exists(checkpath) == false) {
+                        row[0] = "Related item";
+                        row[1] = page.getUri().toString();
+                        row[2] = reference.getUri().toString();
+                        writer.writeNext(row);
+                    }
+                }
+            }
+
+            if (page.getStatsBulletins() != null) {
+                for (PageReference reference : page.getStatsBulletins()) {
+                    String string = reference.getUri().toString();
+                    if (string.startsWith("/")) { string = string.substring(1); }
+                    Path checkpath = zebedee.published.path.resolve(string);
+                    if (string.contains("BLAH")) {
+                        System.out.println("BLAH");
+                    }
+                    if (Files.exists(checkpath) == false) {
+                        row[0] = "Related dataset";
+                        row[1] = page.getUri().toString();
+                        row[2] = reference.getUri().toString();
+                        writer.writeNext(row);
+                    }
+                }
+            }
+        }
+
+        paths = filesMatching(pageMatcher());
+        for (Path taxonomyPath: paths) {
+            TaxonomyLandingPage page;
+            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
+                page = ContentUtil.deserialise(inputStream, TaxonomyLandingPage.class);
+            }
+
+            if (page.getSections() != null) {
+                for (PageReference reference : page.getSections()) {
+                    if (reference.getUri() == null) {
+                        row[0] = "Related section";
+                        row[1] = page.getUri().toString();
+                        row[2] = "URI null";
+                    } else {
+                        String string = reference.getUri().toString();
+                        if (string.startsWith("/")) {
+                            string = string.substring(1);
+                        }
+                        Path checkpath = zebedee.published.path.resolve(string);
+                        if (Files.exists(checkpath) == false) {
+                            row[0] = "Related section";
+                            row[1] = page.getUri().toString();
+                            row[2] = reference.getUri().toString();
+                            writer.writeNext(row);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     public Path csvOfArticleData() throws IOException {
         Path path = Files.createTempFile("articles", ".csv");
@@ -259,6 +453,118 @@ public class Validator {
             e.printStackTrace();
         }
         return path;
+    }
+
+    public Path csvOfFalseURIs() throws IOException {
+        Path path = Files.createTempFile("bulletins", ".csv");
+        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
+
+            String[] row;
+            row = new String[10];
+            row[0] = "Theme";
+            row[1] = "Level2";
+            row[2] = "Level3";
+            row[3] = "Actual file path";
+            row[4] = "Internal URI";
+            writer.writeNext(row);
+
+            writeFalseURIsToCSV(writer);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return path;
+
+    }
+    public void writeFalseURIsToCSV(CSVWriter writer) throws IOException {
+
+        List<Path> paths = filesMatching(bulletinMatcher());
+        String[] row;
+        row = new String[10];
+        row[0] = "Theme";
+        row[1] = "Level2";
+        row[2] = "Level3";
+        row[3] = "Actual file path";
+        row[4] = "Internal URI";
+
+        for (Path bulletinPath: paths) {
+            Bulletin bulletin;
+            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
+                bulletin = ContentUtil.deserialise(inputStream, Bulletin.class);
+            }
+            String intendedURI = "/" + bulletinPath.subpath(1, bulletinPath.getNameCount() - 1).toString();
+            if (!bulletin.getUri().toString().equalsIgnoreCase(intendedURI)) {
+                row[0] = bulletinPath.subpath(1,2).toString();
+                row[1] = bulletinPath.subpath(2,3).toString();
+                row[2] = bulletinPath.subpath(3,4).toString();
+                if (row[2].equalsIgnoreCase("bulletins")) {
+                    row[2] = "";
+                }
+                row[3] = bulletinPath.toString();
+                row[4] = bulletin.getUri().toString();
+                writer.writeNext(row);
+            }
+
+        }
+
+        paths = filesMatching(articleMatcher());
+        for (Path articlePath: paths) {
+            Article article;
+            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
+                article = ContentUtil.deserialise(inputStream, Article.class);
+            }
+
+            String intendedURI = "/" + articlePath.subpath(1, articlePath.getNameCount() - 1).toString();
+            if (!article.getUri().toString().equalsIgnoreCase(intendedURI)) {
+                row[0] = articlePath.subpath(1,2).toString();
+                row[1] = articlePath.subpath(2,3).toString();
+                row[2] = articlePath.subpath(3,4).toString();
+                if (row[2].equalsIgnoreCase("articles")) {
+                    row[2] = "";
+                }
+                row[3] = articlePath.toString();
+                row[4] = article.getUri().toString();
+                writer.writeNext(row);
+            }
+
+        }
+
+        paths = filesMatching(pageMatcher());
+        for (Path taxonomyPath: paths) {
+            ProductPage page;
+            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
+                page = ContentUtil.deserialise(inputStream, ProductPage.class);
+            }
+
+            String intendedURI = (taxonomyPath.getNameCount() <= 2) ? "/" : "/" + taxonomyPath.subpath(1, taxonomyPath.getNameCount() - 1).toString();
+            if (!page.getUri().toString().equalsIgnoreCase(intendedURI)) {
+
+                if (taxonomyPath.subpath(1, 2).toString().equalsIgnoreCase("data.json")) {
+                    row[0] = "";
+                    row[1] = "";
+                    row[2] = "";
+                } else if (taxonomyPath.subpath(2, 3).toString().equalsIgnoreCase("data.json")) {
+                    row[0] = taxonomyPath.subpath(1, 2).toString();
+                    row[1] = "";
+                    row[2] = "";
+                } else if (taxonomyPath.subpath(3, 4).toString().equalsIgnoreCase("data.json")) {
+                    row[0] = taxonomyPath.subpath(1, 2).toString();
+                    row[1] = taxonomyPath.subpath(2, 3).toString();
+                    row[2] = "";
+                } else {
+                    row[0] = taxonomyPath.subpath(1, 2).toString();
+                    row[1] = taxonomyPath.subpath(2, 3).toString();
+                    row[2] = taxonomyPath.subpath(3, 4).toString();
+                }
+                row[3] = taxonomyPath.toString();
+                if (page.getUri() != null) {
+                    row[4] = page.getUri().toString();
+                } else {
+                    row[4] = "";
+                }
+                writer.writeNext(row);
+            }
+        }
     }
 
     public List<Path> filesMatching(final PathMatcher matcher) throws IOException {

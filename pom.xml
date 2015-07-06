@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>content-library</artifactId>
-            <version>content-library-1.0.46</version>
+            <version>content-library-1.0.47</version>
         </dependency>
 
         <!-- ONS Content Library, snapshot local install used for development, comment out -->

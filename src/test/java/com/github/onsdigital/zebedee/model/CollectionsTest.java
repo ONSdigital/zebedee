@@ -1,16 +1,12 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.content.DirectoryListing;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.ContentEvent;
-import com.github.onsdigital.zebedee.json.ContentEventType;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;

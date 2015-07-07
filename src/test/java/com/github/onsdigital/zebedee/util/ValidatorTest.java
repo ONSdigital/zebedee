@@ -33,7 +33,14 @@ public class ValidatorTest {
     public void basicTest() throws IOException {
         Validator validator = new Validator(zebedee);
 
-        validator.validate(zebedee.path.resolve("validator"));
+        //validator.validate(zebedee.path.resolve("validator"));
+    }
+
+    @Test
+    public void updateTimeseriesTest() throws IOException {
+        Validator validator = new Validator(zebedee);
+
+        validator.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
     }
 
     @AfterClass

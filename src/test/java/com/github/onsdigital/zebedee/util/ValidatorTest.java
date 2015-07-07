@@ -40,7 +40,8 @@ public class ValidatorTest {
     public void updateTimeseriesTest() throws IOException {
         Validator validator = new Validator(zebedee);
 
-        validator.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
+        validator.updateTimeSeriesNumbers();
+//        validator.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
 
     }
 

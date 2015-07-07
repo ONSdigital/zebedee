@@ -15,17 +15,16 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.json.TimeseriesPage;
 import com.github.onsdigital.zebedee.model.Content;
+import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
+import org.mockito.exceptions.verification.VerificationInOrderFailure;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by thomasridd on 06/07/15.
@@ -43,17 +42,51 @@ public class Validator {
 
         for (Path path: paths) {
             TimeSeries timeseries;
-            try (InputStream stream = Files.newInputStream(path)) {
+            try (InputStream stream = Files.newInputStream(zebedee.path.resolve(path))) {
                 timeseries = ContentUtil.deserialise(stream, TimeSeries.class);
             }
 
-            if (timeseries != null) {
+            List<TimeseriesValue> values = new ArrayList<>();
 
+            if (timeseries.years != null) {
+                Iterator<TimeseriesValue> iterator = timeseries.years.iterator();
+                while (iterator.hasNext()) {
+                    values.add(iterator.next());
+                }
+            }
+            if (timeseries.months != null) {
+                Iterator<TimeseriesValue> iterator = timeseries.months.iterator();
+                while (iterator.hasNext()) {
+                    values.add(iterator.next());
+                }
+            }
+            if (timeseries.quarters != null) {
+                Iterator<TimeseriesValue> iterator = timeseries.quarters.iterator();
+                while (iterator.hasNext()) {
+                    values.add(iterator.next());
+                }
             }
 
-            try (OutputStream stream = Files.newOutputStream(path)) {
-                IOUtils.write(ContentUtil.serialise(timeseries), stream);
+            class CustomComparator implements Comparator<TimeseriesValue> {
+                @Override
+                public int compare(TimeseriesValue o1, TimeseriesValue o2) {
+                    return o1.toDate().compareTo(o2.toDate());
+                }
             }
+
+            if (values.size() > 0) {
+                Collections.sort(values, new CustomComparator());
+                TimeseriesValue value = values.get(values.size() - 1);
+                timeseries.getDescription().setNumber(value.value);
+                System.out.println("Setting " + value.value + " (" + value.date + ") for series " + timeseries.getUri().toString());
+                try (OutputStream stream = Files.newOutputStream(path)) {
+                    IOUtils.write(ContentUtil.serialise(timeseries), stream);
+                }
+            }
+
+
+
+
         }
     }
 
@@ -65,7 +98,7 @@ public class Validator {
 
         // Build the details file into a hashmap
         HashMap<String, HashMap<String,String>> timeSeriesDetails = new HashMap<>();
-        try(CSVReader reader = new CSVReader(new InputStreamReader(Files.newInputStream(timeSeriesDetailsFile)))) {
+        try(CSVReader reader = new CSVReader(new InputStreamReader(Files.newInputStream(timeSeriesDetailsFile),"cp1252"))) {
             List<String[]> records = reader.readAll();
 
             Iterator<String[]> iterator = records.iterator();

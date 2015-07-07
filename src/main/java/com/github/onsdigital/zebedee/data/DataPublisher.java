@@ -1,9 +1,8 @@
 package com.github.onsdigital.zebedee.data;
 
+import com.github.onsdigital.content.page.base.PageDescription;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.content.page.statistics.data.timeseries.TimeseriesDescription;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
-import com.github.onsdigital.content.page.statistics.dataset.DatasetDescription;
 import com.github.onsdigital.content.partial.DownloadSection;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
@@ -182,7 +181,7 @@ public class DataPublisher {
             page = ContentUtil.deserialise(FileUtils.openInputStream(path.resolve("data.json").toFile()), TimeSeries.class);
         } else {
             page = new TimeSeries();
-            page.setDescription(new TimeseriesDescription());
+            page.setDescription(new PageDescription());
             page.setCdid(series.getCdid());
             page.setUri(URI.create(uri));
         }
@@ -422,9 +421,9 @@ public class DataPublisher {
     }
 
     static TimeSeries populatePageFromDataSetPage(TimeSeries page, Dataset datasetPage) {
-        TimeseriesDescription description = page.getDescription();
+        PageDescription description = page.getDescription();
         if (description == null) {
-            description = new TimeseriesDescription();
+            description = new PageDescription();
             page.setDescription(description);
         }
         description.setNextRelease(datasetPage.getDescription().getNextRelease());

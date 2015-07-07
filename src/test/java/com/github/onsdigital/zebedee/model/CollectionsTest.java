@@ -6,9 +6,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.DirectoryListing;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.*;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -187,7 +191,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read content
-        zebedee.collections.readContent(collection, uri, false ,session, response);
+        zebedee.collections.readContent(collection, uri, false, session, response);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -323,7 +327,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read content
-        zebedee.collections.readContent(collection, uri, false , session, response);
+        zebedee.collections.readContent(collection, uri, false, session, response);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -385,7 +389,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to read content
-        zebedee.collections.readContent(collection, uri, false , session, response);
+        zebedee.collections.readContent(collection, uri, false, session, response);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -881,4 +885,75 @@ public class CollectionsTest {
         assertNull(collection.find(builder.publisher1.email, fileUri));
         assertNotNull(collection.find(builder.publisher1.email, folderUri));
     }
+
+    @Test
+    public void shouldEditCollectionConcurrently() throws IOException, InterruptedException {
+
+        // Given
+        // A collection
+        Collection collection = Collection.create(
+                new CollectionDescription("collection"), zebedee);
+
+        // When the collection is updated concurrently.
+        ExecutorService executor = Executors.newCachedThreadPool();
+        List<UpdateCollection> runnables = new ArrayList<>();
+
+        long startTime = System.currentTimeMillis();
+
+
+        for (int i = 0; i < 20; ++i) {
+            runnables.add(new UpdateCollection(collection));
+        }
+
+        for (UpdateCollection runnable : runnables) {
+            executor.execute(runnable);
+        }
+
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+        }
+
+
+        long endTime = System.currentTimeMillis();
+        long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
+        System.out.println("duration: " + duration);
+
+        // Then the collection file should still be readable.
+        for (UpdateCollection runnable : runnables) {
+            assertFalse(runnable.failed);
+        }
+    }
+
+    public class UpdateCollection implements Runnable {
+        public boolean failed = false;
+        private Collection collection;
+
+        public UpdateCollection(Collection collection) throws IOException {
+            this.collection = collection;
+        }
+
+        @Override
+        public void run() {
+            try {
+                // When
+                // We attempt to get the session
+
+                Collection collectionToUpdate = collection.zebedee.collections.list().getCollection(collection.description.id);
+                collectionToUpdate.AddEvent("/", new ContentEvent(new Date(), ContentEventType.EDITED, "fred@testing.com"));
+                collectionToUpdate.save();
+                Collection updatedCollection = collection.zebedee.collections.list().getCollection(collection.description.id);
+
+                // Then
+                // The expected session should be returned
+                if (updatedCollection == null || !StringUtils.equals(updatedCollection.description.id, this.collection.description.id))
+                    failed = true;
+
+            } catch (Exception e) {
+                failed = true;
+                e.printStackTrace();
+                System.out.println();
+            }
+        }
+    }
+
 }

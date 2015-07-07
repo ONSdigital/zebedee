@@ -29,7 +29,7 @@ public class ValidatorTest {
 
     }
 
-    @Test
+    //@Test
     public void basicTest() throws IOException {
         Validator validator = new Validator(zebedee);
         String uri = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/cohortfertility/2013-12-05";
@@ -39,7 +39,16 @@ public class ValidatorTest {
             System.out.println(file);
         }
 
-        validator.validate(zebedee.path.resolve("validator"));
+        //validator.validate(zebedee.path.resolve("validator"));
+    }
+
+    //@Test
+    public void updateTimeseriesTest() throws IOException {
+        Validator validator = new Validator(zebedee);
+
+        validator.updateTimeSeriesNumbers();
+        validator.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
+
     }
 
     @AfterClass

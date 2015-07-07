@@ -32,6 +32,12 @@ public class ValidatorTest {
     @Test
     public void basicTest() throws IOException {
         Validator validator = new Validator(zebedee);
+        String uri = "/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/bulletins/cohortfertility/2013-12-05";
+        List<String> filesThatLinkToURI = validator.getFilesThatLinkToURI(uri);
+        System.out.println(filesThatLinkToURI.size() + " files found for " + uri);
+        for (String file: filesThatLinkToURI) {
+            System.out.println(file);
+        }
 
         validator.validate(zebedee.path.resolve("validator"));
     }

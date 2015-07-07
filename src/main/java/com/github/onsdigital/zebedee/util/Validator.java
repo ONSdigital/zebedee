@@ -59,7 +59,9 @@ public class Validator {
 
     // This will save
     public void updateTimeSeriesDetails(Path timeSeriesDetailsFile) throws IOException {
+
         int updates = 0;
+
 
         // Build the details file into a hashmap
         HashMap<String, HashMap<String,String>> timeSeriesDetails = new HashMap<>();
@@ -72,6 +74,7 @@ public class Validator {
             while(iterator.hasNext()){
                 String[] record = iterator.next();
                 HashMap<String, String> seriesDetails = new HashMap<>();
+
                 seriesDetails.put("CDID", record[0].toLowerCase());
                 seriesDetails.put("Pre unit", record[1]);
                 seriesDetails.put("Units", record[2]);
@@ -84,6 +87,7 @@ public class Validator {
         List<Path> paths = filesMatching(timeSeriesMatcher());
         for (Path path: paths) {
             TimeSeries timeseries;
+
             try (InputStream stream = Files.newInputStream(zebedee.path.resolve(path))) {
                 timeseries = ContentUtil.deserialise(stream, TimeSeries.class);
             }

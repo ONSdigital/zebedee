@@ -41,6 +41,7 @@ public class ValidatorTest {
         Validator validator = new Validator(zebedee);
 
         validator.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
+
     }
 
     @AfterClass

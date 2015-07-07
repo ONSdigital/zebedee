@@ -1,16 +1,18 @@
 package com.github.onsdigital.zebedee.data;
 
+import com.github.onsdigital.content.DirectoryListing;
 import com.github.onsdigital.content.service.ContentNotFoundException;
 import com.github.onsdigital.content.service.ContentService;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -35,6 +37,17 @@ public class DataReader implements ContentService {
             return getDataStream(uri);
         }  catch (IOException e) {
             throw new RuntimeException("Failed reading data at " + uri);
+        }
+    }
+
+    @Override
+    public DirectoryListing readDirectory(String uri) throws ContentNotFoundException {
+        try {
+            return Root.zebedee.collections.listDirectory(collection, uri, session);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed reading data at " + uri);
+        } catch (UnauthorizedException | NotFoundException | BadRequestException e) {
+            throw new ContentNotFoundException(e);
         }
     }
 

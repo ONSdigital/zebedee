@@ -1,12 +1,16 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.onsdigital.content.DirectoryListing;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.ContentEvent;
+import com.github.onsdigital.zebedee.json.ContentEventType;
+import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -617,6 +621,36 @@ public class CollectionsTest {
         // We should get the file
         assertEquals(1, directoryListing.files.size());
         assertEquals(1, directoryListing.folders.size());
+    }
+
+    @Test
+    public void shouldListDirectoryOverlayed()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A URI that points to a valid directory
+        String uri = "/this/is/a/directory";
+        String file = "file.json";
+        String folder = "folder";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        assertTrue(collection.create(builder.publisher1.email, uri + "/" + file));
+        assertTrue(collection.create(builder.publisher1.email, uri + "/" + folder + "/" + file));
+
+        builder.createPublishedFile(uri + "/" + file); // this file is in both published and the collection so there should be only one entry for it
+        builder.createPublishedFile(uri + "/publishedFile.json"); // This file is only in published and should be in the over layed listing.
+        builder.createPublishedFile(uri + "/publishedFolder/" + file); // This folder is only in published and should be in the overlayed listing
+
+        // When
+        // We attempt to list the directory
+        DirectoryListing directoryListing = zebedee.collections.listDirectoryOverlayed(collection, uri, session);
+
+        // Then
+        // We should get the file
+        assertEquals(2, directoryListing.files.size());
+        assertEquals(2, directoryListing.folders.size());
     }
 
     @Test(expected = BadRequestException.class)

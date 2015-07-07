@@ -36,13 +36,11 @@ public class ValidatorTest {
         //validator.validate(zebedee.path.resolve("validator"));
     }
 
-    //@Test
-    public void updateTimeseriesTest() throws IOException {
-        Validator validator = new Validator(zebedee);
-
-        validator.updateTimeSeriesNumbers();
-        validator.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
-
+    @Test
+    public void testWrangler() throws IOException {
+        Wrangler wrangler = new Wrangler(zebedee);
+        wrangler.updateTimeSeriesNumbers();
+        wrangler.updateTimeSeriesDetails();
     }
 
     @AfterClass

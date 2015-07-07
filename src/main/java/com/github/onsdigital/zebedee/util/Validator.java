@@ -36,112 +36,6 @@ public class Validator {
         this.zebedee = zebedee;
     }
 
-    // This will save
-    public void updateTimeSeriesNumbers() throws IOException {
-        List<Path> paths = launchpadMatching(timeSeriesMatcher());
-
-        for (Path path: paths) {
-            TimeSeries timeseries;
-            try (InputStream stream = Files.newInputStream(zebedee.path.resolve(path))) {
-                timeseries = ContentUtil.deserialise(stream, TimeSeries.class);
-            }
-
-            List<TimeseriesValue> values = new ArrayList<>();
-
-            if (timeseries.years != null) {
-                Iterator<TimeseriesValue> iterator = timeseries.years.iterator();
-                while (iterator.hasNext()) {
-                    values.add(iterator.next());
-                }
-            }
-            if (timeseries.months != null) {
-                Iterator<TimeseriesValue> iterator = timeseries.months.iterator();
-                while (iterator.hasNext()) {
-                    values.add(iterator.next());
-                }
-            }
-            if (timeseries.quarters != null) {
-                Iterator<TimeseriesValue> iterator = timeseries.quarters.iterator();
-                while (iterator.hasNext()) {
-                    values.add(iterator.next());
-                }
-            }
-
-            class CustomComparator implements Comparator<TimeseriesValue> {
-                @Override
-                public int compare(TimeseriesValue o1, TimeseriesValue o2) {
-                    return o1.toDate().compareTo(o2.toDate());
-                }
-            }
-
-            if (values.size() > 0) {
-                Collections.sort(values, new CustomComparator());
-                TimeseriesValue value = values.get(values.size() - 1);
-                timeseries.getDescription().setNumber(value.value);
-                System.out.println("Setting " + value.value + " (" + value.date + ") for series " + timeseries.getUri().toString());
-                try (OutputStream stream = Files.newOutputStream(path)) {
-                    IOUtils.write(ContentUtil.serialise(timeseries), stream);
-                }
-            }
-
-        }
-    }
-
-    // This will save
-    public void updateTimeSeriesDetails(Path timeSeriesDetailsFile) throws IOException {
-
-        int updates = 0;
-
-
-        // Build the details file into a hashmap
-        HashMap<String, HashMap<String,String>> timeSeriesDetails = new HashMap<>();
-        try(CSVReader reader = new CSVReader(new InputStreamReader(Files.newInputStream(timeSeriesDetailsFile),"cp1252"))) {
-            List<String[]> records = reader.readAll();
-
-            Iterator<String[]> iterator = records.iterator();
-            iterator.next();
-
-            while(iterator.hasNext()){
-                String[] record = iterator.next();
-                HashMap<String, String> seriesDetails = new HashMap<>();
-
-                seriesDetails.put("CDID", record[0].toLowerCase());
-                seriesDetails.put("Pre unit", record[1]);
-                seriesDetails.put("Units", record[2]);
-                timeSeriesDetails.put(record[0].toLowerCase(), seriesDetails);
-            }
-
-        }
-
-        // Iterate
-        List<Path> paths = launchpadMatching(timeSeriesMatcher());
-        for (Path path: paths) {
-            TimeSeries timeseries;
-
-            try (InputStream stream = Files.newInputStream(zebedee.path.resolve(path))) {
-                timeseries = ContentUtil.deserialise(stream, TimeSeries.class);
-            }
-
-            if (timeseries != null) {
-                HashMap<String, String> details = null;
-                for (String key: timeSeriesDetails.keySet()) {
-                    if (key.equalsIgnoreCase(timeseries.getCdid().toLowerCase())) {
-                        details = timeSeriesDetails.get(key);
-                        break;
-                    }
-                }
-                if (details != null) {
-                    System.out.println(++updates + ") Going to update timeseries with CDID: " + timeseries.getCdid() + " & uri: " + timeseries.getUri().toString());
-                    timeseries.getDescription().setPreUnit(details.get("Pre unit"));
-                    timeseries.getDescription().setUnit(details.get("Units"));
-                    try (OutputStream stream = Files.newOutputStream(zebedee.path.resolve(path))) {
-                        IOUtils.write(ContentUtil.serialise(timeseries), stream);
-                    }
-                }
-            }
-        }
-    }
-
     public void validate(Path path) throws IOException {
 
         Path bulletins = csvOfBulletinData();
@@ -355,7 +249,6 @@ public class Validator {
         }
     }
 
-
     public Path csvOfArticleData() throws IOException {
         Path path = Files.createTempFile("articles", ".csv");
         try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
@@ -519,45 +412,6 @@ public class Validator {
                     System.out.println("Could not deserialise page at: " + taxonomyPath);
                 }
 
-//                try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
-//                    TaxonomyLandingPage page;
-//                    page = ContentUtil.deserialise(inputStream, TaxonomyLandingPage.class);
-//                    if (taxonomyPath.subpath(1, 2).toString().equalsIgnoreCase("data.json")) {
-//                        row[0] = "";
-//                        row[1] = "";
-//                        row[2] = "";
-//                    } else if (taxonomyPath.subpath(2,3).toString().equalsIgnoreCase("data.json")) {
-//                        row[0] = taxonomyPath.subpath(1, 2).toString();
-//                        row[1] = "";
-//                        row[2] = "";
-//                    } else if (taxonomyPath.subpath(3,4).toString().equalsIgnoreCase("data.json")) {
-//                        row[0] = taxonomyPath.subpath(1, 2).toString();
-//                        row[1] = taxonomyPath.subpath(2,3).toString();
-//                        row[2] = "";
-//                    } else {
-//                        row[0] = taxonomyPath.subpath(1, 2).toString();
-//                        row[1] = taxonomyPath.subpath(2,3).toString();
-//                        row[2] = taxonomyPath.subpath(3,4).toString();
-//                    }
-//
-//                    row[4] = page.getType().toString();
-//                    row[5] = page.getUri().toString();
-//                    if (page.getDescription() != null && page.getDescription().getTitle() != null) {
-//                        row[6] = page.getDescription().getTitle();
-//                    } else {
-//                        row[6] = "";
-//                    }
-//
-//                    row[4] = page.getType().toString();
-//                    row[5] = page.getUri().toString();
-//                    row[6] = page.getDescription().getTitle();
-//                    writer.writeNext(row);
-//                } catch(Exception e) {
-//
-//                }
-
-
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -586,6 +440,7 @@ public class Validator {
         return path;
 
     }
+
     public void writeFalseURIsToCSV(CSVWriter writer) throws IOException {
 
         List<Path> paths = filesMatching(bulletinMatcher());

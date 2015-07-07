@@ -38,7 +38,7 @@ public class Validator {
 
     // This will save
     public void updateTimeSeriesNumbers() throws IOException {
-        List<Path> paths = filesMatching(timeSeriesMatcher());
+        List<Path> paths = launchpadMatching(timeSeriesMatcher());
 
         for (Path path: paths) {
             TimeSeries timeseries;
@@ -84,9 +84,6 @@ public class Validator {
                 }
             }
 
-
-
-
         }
     }
 
@@ -117,7 +114,7 @@ public class Validator {
         }
 
         // Iterate
-        List<Path> paths = filesMatching(timeSeriesMatcher());
+        List<Path> paths = launchpadMatching(timeSeriesMatcher());
         for (Path path: paths) {
             TimeSeries timeseries;
 
@@ -682,6 +679,24 @@ public class Validator {
 
     public List<Path> filesMatching(final PathMatcher matcher) throws IOException {
         Path startPath = zebedee.published.path;
+        final List<Path> paths = new ArrayList<>();
+
+        Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                    throws IOException
+            {
+                if (matcher.matches(file)) {
+                    paths.add(zebedee.path.relativize(file));
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return paths;
+    }
+
+    public List<Path> launchpadMatching(final PathMatcher matcher) throws IOException {
+        Path startPath = zebedee.launchpad.path;
         final List<Path> paths = new ArrayList<>();
 
         Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {

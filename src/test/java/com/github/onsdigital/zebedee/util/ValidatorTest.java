@@ -29,19 +29,19 @@ public class ValidatorTest {
 
     }
 
-    @Test
+    //@Test
     public void basicTest() throws IOException {
         Validator validator = new Validator(zebedee);
 
         //validator.validate(zebedee.path.resolve("validator"));
     }
 
-    @Test
+    //@Test
     public void updateTimeseriesTest() throws IOException {
         Validator validator = new Validator(zebedee);
 
         validator.updateTimeSeriesNumbers();
-//        validator.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
+        validator.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
 
     }
 

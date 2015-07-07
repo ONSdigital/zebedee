@@ -1,24 +1,30 @@
 package com.github.onsdigital.zebedee.util;
 
+import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.content.link.PageReference;
+import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
 
 import com.github.onsdigital.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
+import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.data.json.TimeseriesPage;
+import com.github.onsdigital.zebedee.model.Content;
+import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,8 +37,67 @@ public class Validator {
         this.zebedee = zebedee;
     }
 
-    public void validate(Path path) throws IOException {
+    // This will save
+    public void updateTimeSeriesNumbers() throws IOException {
+        List<Path> paths = filesMatching(timeSeriesMatcher());
 
+        for (Path path: paths) {
+            TimeSeries timeseries;
+            try (InputStream stream = Files.newInputStream(path)) {
+                timeseries = ContentUtil.deserialise(stream, TimeSeries.class);
+            }
+
+            if (timeseries != null) {
+
+            }
+
+            try (OutputStream stream = Files.newOutputStream(path)) {
+                IOUtils.write(ContentUtil.serialise(timeseries), stream);
+            }
+        }
+    }
+
+    // This will save
+    public void updateTimeSeriesDetails(Path timeSeriesDetailsFile) throws IOException {
+
+        // Build the details file into a hashmap
+        HashMap<String, HashMap<String,String>> timeSeriesDetails = new HashMap<>();
+        try(CSVReader reader = new CSVReader(new InputStreamReader(Files.newInputStream(timeSeriesDetailsFile)))) {
+            List<String[]> records = reader.readAll();
+
+            Iterator<String[]> iterator = records.iterator();
+            iterator.next();
+
+            while(iterator.hasNext()){
+                String[] record = iterator.next();
+                HashMap<String, String> seriesDetails = new HashMap<>();
+                seriesDetails.put("CDID", record[0]);
+                seriesDetails.put("Pre unit", record[1]);
+                seriesDetails.put("Units", record[2]);
+                timeSeriesDetails.put(record[0], seriesDetails);
+            }
+
+        }
+
+        // Iterate
+        List<Path> paths = filesMatching(timeSeriesMatcher());
+        for (Path path: paths) {
+            TimeSeries timeseries;
+            try (InputStream stream = Files.newInputStream(path)) {
+                timeseries = ContentUtil.deserialise(stream, TimeSeries.class);
+            }
+
+            if (timeseries != null && timeSeriesDetails.keySet().contains(timeseries.getCdid())) {
+                
+            }
+
+            try (OutputStream stream = Files.newOutputStream(path)) {
+                //IOUtils.write(ContentUtil.serialise(timeseries), stream);
+            }
+        }
+    }
+
+    public void validate(Path path) throws IOException {
 
         Path bulletins = csvOfBulletinData();
         Files.deleteIfExists(path.resolve("bulletins.csv"));
@@ -53,8 +118,8 @@ public class Validator {
         Files.copy(invalidURIs, path.resolve("falseURIs.csv"));
 
         Path unfoundLinks = csvOfUnfoundLinks(path);
-        Files.deleteIfExists(path.resolve("unfoundLinks.csv"));
-        Files.copy(unfoundLinks, path.resolve("unfoundLinks.csv"));
+        Files.deleteIfExists(path.resolve("brokenLinks.csv"));
+        Files.copy(unfoundLinks, path.resolve("brokenLinks.csv"));
     }
 
     public Path csvOfUnfoundLinks(Path uriPath) throws IOException {

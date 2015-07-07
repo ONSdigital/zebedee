@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee.data;
 
+import com.github.onsdigital.content.page.base.PageDescription;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
-import com.github.onsdigital.content.page.statistics.dataset.DatasetDescription;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Builder;
@@ -350,7 +350,7 @@ public class DataPublisherTest {
         // Given
         // a test dataset
         Dataset testSet = new Dataset();
-        DatasetDescription description = new DatasetDescription();
+        PageDescription description = new PageDescription();
 
         description.setDatasetId("dataSetPageDoesMoveValuesToTimeseries");
         description.setReleaseDate(new GregorianCalendar(1877, 3, 15).getTime());

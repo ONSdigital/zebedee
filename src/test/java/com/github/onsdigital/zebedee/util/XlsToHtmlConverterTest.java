@@ -22,7 +22,7 @@ public class XlsToHtmlConverterTest {
     public void convertToHtmlPageShouldReturnDocument() throws IOException, ParserConfigurationException {
 
         // Given an xls file
-        File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
+        File xlsFile = ResourceUtils.getFile("/xls/example-table.xls");
 
         // When the convert method is called.
         Node document = XlsToHtmlConverter.convertToHtmlPage(xlsFile);
@@ -35,7 +35,7 @@ public class XlsToHtmlConverterTest {
     public void convertToTableShouldReturnDocument() throws IOException, ParserConfigurationException {
 
         // Given an xls file
-        File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
+        File xlsFile = ResourceUtils.getFile("/xls/example-table.xls");
 
         // When the convert method is called.
         Node document = XlsToHtmlConverter.convertToTable(xlsFile);
@@ -48,7 +48,7 @@ public class XlsToHtmlConverterTest {
     public void saveShouldPersistDocument() throws IOException, ParserConfigurationException, TransformerException {
 
         // Given a document instance.
-        File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
+        File xlsFile = ResourceUtils.getFile("/xls/example-table.xls");
         Node document = XlsToHtmlConverter.convertToTable(xlsFile);
 
         // When the save method is called.
@@ -64,7 +64,7 @@ public class XlsToHtmlConverterTest {
     public void toStringForTableShouldReturnString() throws IOException, ParserConfigurationException, TransformerException {
 
         // Given a document instance.
-        File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
+        File xlsFile = ResourceUtils.getFile("/xls/example-table.xls");
         Node table = XlsToHtmlConverter.convertToHtmlPage(xlsFile);
 
         // When the toString method is called.

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.davidcarboni.ResourceUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.w3c.dom.Node;
@@ -79,7 +80,7 @@ public class XlsToHtmlConverterTest {
     public void toStringShouldReturnString() throws IOException, ParserConfigurationException, TransformerException {
 
         // Given a document instance.
-        File xlsFile = new File(getClass().getResource("/xls/example-table.xls").getFile());
+        File xlsFile = ResourceUtils.getFile("/xls/example-subscript-table.xls");
         Node table = XlsToHtmlConverter.convertToTable(xlsFile);
 
         // When the toString method is called.
@@ -95,7 +96,7 @@ public class XlsToHtmlConverterTest {
     public void convertToTableShouldRenderSubscript() throws IOException, ParserConfigurationException, TransformerException {
 
         // Given an xls file with subscript and superscript content
-        File xlsFile = new File(getClass().getResource("/xls/example-subscript-table.xls").getFile());
+        File xlsFile = ResourceUtils.getFile("/xls/example-subscript-table.xls");
 
         // When the convert method is called.
         Node table = XlsToHtmlConverter.convertToTable(xlsFile);

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.content.DirectoryListing;
 import com.github.onsdigital.content.page.base.Page;
 import com.github.onsdigital.content.service.ContentNotFoundException;
 import com.github.onsdigital.content.util.ContentUtil;
@@ -11,7 +12,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.DirectoryListing;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -31,8 +31,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Collections {
 
@@ -195,28 +193,34 @@ public class Collections {
                     "Please provide a URI to a directory: " + uri);
         }
 
-        return listDirectory(path);
+        Serialiser.getBuilder().setPrettyPrinting();
+        return ContentUtil.listDirectory(path);
     }
 
-    private DirectoryListing listDirectory(java.nio.file.Path path)
-            throws IOException {
+    /**
+     * List the given directory of a collection including the files that have already been published.
+     *
+     * @param collection
+     * @param uri
+     * @param session
+     * @return
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws IOException
+     * @throws BadRequestException
+     */
+    public DirectoryListing listDirectoryOverlayed(Collection collection, String uri,
+                                                   Session session) throws NotFoundException, UnauthorizedException,
+            IOException, BadRequestException {
 
-        // Get the directory listing:
-        DirectoryListing listing = new DirectoryListing();
-        try (DirectoryStream<java.nio.file.Path> stream = Files
-                .newDirectoryStream(path)) {
-            for (java.nio.file.Path directory : stream) {
-                // Recursively delete directories only:
-                if (Files.isDirectory(directory)) {
-                    listing.folders.put(directory.getFileName().toString(),
-                            directory.toString());
-                } else {
-                    listing.files.put(directory.getFileName().toString(),
-                            directory.toString());
-                }
-            }
-        }
-        Serialiser.getBuilder().setPrettyPrinting();
+        DirectoryListing listing = listDirectory(collection, uri, session);
+
+        Path publishedPath = zebedee.published.get(uri);
+        DirectoryListing publishedListing = ContentUtil.listDirectory(publishedPath);
+
+        listing.files.putAll(publishedListing.files);
+        listing.folders.putAll(publishedListing.folders);
+
         return listing;
     }
 

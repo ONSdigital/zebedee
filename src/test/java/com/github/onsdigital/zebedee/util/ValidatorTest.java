@@ -46,7 +46,10 @@ public class ValidatorTest {
     public void testWrangler() throws IOException {
         Wrangler wrangler = new Wrangler(zebedee);
         wrangler.updateTimeSeriesNumbers();
-        wrangler.updateTimeSeriesDetails(Paths.get("/Users/Tom.Ridd/Documents/onswebsite/source/timeseriesdetails.csv"));
+
+        wrangler.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
+        wrangler.moveURIListFromCSV(Paths.get("/Users/thomasridd/Documents/onswebsite/source/moveuris.csv"));
+
     }
 
     @AfterClass

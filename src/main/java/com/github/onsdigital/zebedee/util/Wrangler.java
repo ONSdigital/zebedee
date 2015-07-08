@@ -1,10 +1,12 @@
 package com.github.onsdigital.zebedee.util;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -155,29 +157,27 @@ public class Wrangler {
             String uriFrom = fromTo.get("from");
             String uriTo = fromTo.get("to");
 
+
             if ((uriFrom != null) && (uriTo != null)) {
+                Path uriToPath = zebedee.launchpad.toPath(uriTo);
+                Path uriFromPath = zebedee.launchpad.toPath(uriFrom);
+
+                // Copy from current position to new position
+
+                // Replace all internal references
+
+                // Remove all external references
+
+                // TODO: Whack in code to update 301 redirects from uriFrom to uriTo
 
             }
         }
     }
 
-    public List<Path> filesMatching(final PathMatcher matcher) throws IOException {
-        Path startPath = zebedee.published.path;
-        final List<Path> paths = new ArrayList<>();
 
-        Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                    throws IOException
-            {
-                if (matcher.matches(file)) {
-                    paths.add(zebedee.path.relativize(file));
-                }
-                return FileVisitResult.CONTINUE;
-            }
-        });
-        return paths;
-    }
+
+
+
 
     public List<Path> launchpadMatching(final PathMatcher matcher) throws IOException {
         Path startPath = zebedee.launchpad.path;
@@ -197,6 +197,9 @@ public class Wrangler {
         return paths;
     }
 
+
+
+
     public static PathMatcher timeSeriesMatcher() {
         PathMatcher matcher = new PathMatcher() {
             @Override
@@ -209,4 +212,23 @@ public class Wrangler {
         };
         return  matcher;
     }
+
+    public void stripBackTimeSeries(Path logPath) throws IOException {
+        List<Path> paths = launchpadMatching(timeSeriesMatcher());
+
+        for (Path path: paths) {
+            TimeSeries timeseries;
+            try (InputStream stream = Files.newInputStream(zebedee.path.resolve(path))) {
+                timeseries = ContentUtil.deserialise(stream, TimeSeries.class);
+            }
+            if (timeseries != null) {
+                if (timeseries.years != null && timeseries.years.size() > 0) {
+                    timeseries.years = new TreeSet<>();
+                    timeseries.months = new TreeSet<>();
+                    timeseries.quarters = new TreeSet<>();
+                }
+            }
+        }
+    }
+
 }

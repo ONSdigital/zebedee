@@ -42,11 +42,13 @@ public class ValidatorTest {
         //validator.validate(zebedee.path.resolve("validator"));
     }
 
-    @Test
+    //@Test
     public void testWrangler() throws IOException {
         Wrangler wrangler = new Wrangler(zebedee);
         wrangler.updateTimeSeriesNumbers();
-        wrangler.updateTimeSeriesDetails();
+        wrangler.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
+        wrangler.moveURIListFromCSV(Paths.get("/Users/thomasridd/Documents/onswebsite/source/moveuris.csv"));
+
     }
 
     @AfterClass

@@ -228,6 +228,7 @@ public class Wrangler {
                     timeseries.quarters = new TreeSet<>();
                 }
             }
+            FileUtils.writeStringToFile(path.toFile(), ContentUtil.serialise(timeseries));
         }
     }
 

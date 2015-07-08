@@ -68,7 +68,7 @@ public class Wrangler {
                 TimeseriesValue value = values.get(values.size() - 1);
                 timeseries.getDescription().setNumber(value.value);
                 System.out.println("Setting " + value.value + " (" + value.date + ") for series " + timeseries.getUri().toString());
-                try (OutputStream stream = Files.newOutputStream(path)) {
+                try (OutputStream stream = Files.newOutputStream(zebedee.path.resolve(path))) {
                     IOUtils.write(ContentUtil.serialise(timeseries), stream);
                 }
             }

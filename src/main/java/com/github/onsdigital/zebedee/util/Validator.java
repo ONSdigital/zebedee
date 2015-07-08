@@ -65,7 +65,7 @@ public class Validator {
 
         List<String> matches = new ArrayList<>();
 
-        List<Path> paths = filesMatching(bulletinMatcher());
+        List<Path> paths = launchpadMatching(bulletinMatcher());
         for (Path bulletinPath: paths) {
             Bulletin bulletin;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
@@ -83,7 +83,7 @@ public class Validator {
             }
         }
 
-        paths = filesMatching(articleMatcher());
+        paths = launchpadMatching(articleMatcher());
         for (Path articlePath: paths) {
             Article article;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
@@ -105,7 +105,7 @@ public class Validator {
             }
         }
 
-        paths = filesMatching(pageMatcher());
+        paths = launchpadMatching(pageMatcher());
         for (Path taxonomyPath: paths) {
             ProductPage page;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
@@ -145,7 +145,7 @@ public class Validator {
             }
         }
 
-        paths = filesMatching(pageMatcher());
+        paths = launchpadMatching(pageMatcher());
         for (Path taxonomyPath: paths) {
             TaxonomyLandingPage page;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
@@ -184,7 +184,7 @@ public class Validator {
     }
 
     void writeCSVForUnfoundLinks(Path path, CSVWriter writer) throws IOException {
-        List<Path> paths = filesMatching(bulletinMatcher());
+        List<Path> paths = launchpadMatching(bulletinMatcher());
         String[] row;
         row = new String[10];
         row[0] = "Data type";
@@ -220,7 +220,7 @@ public class Validator {
             }
         }
 
-        paths = filesMatching(articleMatcher());
+        paths = launchpadMatching(articleMatcher());
         for (Path articlePath: paths) {
             Article article;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
@@ -254,7 +254,7 @@ public class Validator {
             }
         }
 
-        paths = filesMatching(pageMatcher());
+        paths = launchpadMatching(pageMatcher());
         for (Path taxonomyPath: paths) {
             ProductPage page;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
@@ -321,7 +321,7 @@ public class Validator {
             }
         }
 
-        paths = filesMatching(pageMatcher());
+        paths = launchpadMatching(pageMatcher());
         for (Path taxonomyPath: paths) {
             TaxonomyLandingPage page;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
@@ -369,9 +369,8 @@ public class Validator {
             row[8] = "Next Release";
 
             writer.writeNext(row);
-            List<Bulletin> bulletins = bulletinList();
 
-            List<Path> paths = filesMatching(articleMatcher());
+            List<Path> paths = launchpadMatching(articleMatcher());
 
             for (Path articlePath: paths) {
                 Article article;
@@ -423,7 +422,7 @@ public class Validator {
             row[8] = "Next Release";
             writer.writeNext(row);
 
-            List<Path> paths = filesMatching(bulletinMatcher());
+            List<Path> paths = launchpadMatching(bulletinMatcher());
 
             for (Path bulletinPath: paths) {
                 Bulletin bulletin;
@@ -473,7 +472,7 @@ public class Validator {
 
             writer.writeNext(row);
 
-            List<Path> paths = filesMatching(pageMatcher());
+            List<Path> paths = launchpadMatching(pageMatcher());
 
             for (Path taxonomyPath: paths) {
 
@@ -546,7 +545,7 @@ public class Validator {
 
     public void writeFalseURIsToCSV(CSVWriter writer) throws IOException {
 
-        List<Path> paths = filesMatching(bulletinMatcher());
+        List<Path> paths = launchpadMatching(bulletinMatcher());
         String[] row;
         row = new String[10];
         row[0] = "Theme";
@@ -575,7 +574,7 @@ public class Validator {
 
         }
 
-        paths = filesMatching(articleMatcher());
+        paths = launchpadMatching(articleMatcher());
         for (Path articlePath: paths) {
             Article article;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
@@ -597,7 +596,7 @@ public class Validator {
 
         }
 
-        paths = filesMatching(pageMatcher());
+        paths = launchpadMatching(pageMatcher());
         for (Path taxonomyPath: paths) {
             ProductPage page;
             try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
@@ -672,7 +671,7 @@ public class Validator {
     }
 
     public List<Bulletin> bulletinList() throws IOException {
-        List<Path> paths = filesMatching(bulletinMatcher());
+        List<Path> paths = launchpadMatching(bulletinMatcher());
 
         List<Bulletin> bulletins = new ArrayList<>();
         for (Path path: paths) {

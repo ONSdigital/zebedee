@@ -266,4 +266,29 @@ public class Content {
             }
         }
     }
+
+    /**
+     * Move content from one uri to another
+     *
+     * 1. Copy all content
+     * 2. Cop
+     * This requires a full traverse of .json content so should not be done lightly
+     *
+     */
+    private void moveUri(String fromUri, String toUri) {
+
+    }
+
+    private boolean moveFile(String fromUri, String toUri) throws IOException {
+        Path pathFrom = toPath(fromUri);
+        Path pathTo = toPath(toUri);
+
+        if (Files.exists(pathFrom)) { // If there is a file to be deleted
+            Files.copy(pathFrom, pathTo);
+            Files.delete(pathFrom);
+            deleteEmptyParentDirectories(pathFrom);
+            return true;
+        }
+        return false;
+    }
 }

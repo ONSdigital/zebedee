@@ -48,7 +48,6 @@ public class ContentToolsTest {
     public void testWrangler() throws IOException {
         Wrangler wrangler = new Wrangler(zebedee);
         wrangler.updateTimeSeriesNumbers();
-
         wrangler.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
     }
 

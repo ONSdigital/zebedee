@@ -5,7 +5,6 @@ import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -185,6 +184,5 @@ public class Wrangler {
         };
         return  matcher;
     }
-
 
 }

@@ -1,23 +1,16 @@
 package com.github.onsdigital.zebedee.util;
 
-import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.content.link.PageReference;
-import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
 
 import com.github.onsdigital.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
-import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.data.json.TimeseriesPage;
-import com.github.onsdigital.zebedee.model.Content;
-import com.google.common.collect.Sets;
-import org.apache.commons.io.IOUtils;
-import org.mockito.exceptions.verification.VerificationInOrderFailure;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -29,36 +22,28 @@ import java.util.*;
 /**
  * Created by thomasridd on 06/07/15.
  */
-public class Validator {
+public class Librarian {
     Zebedee zebedee;
 
-    public Validator(Zebedee zebedee) {
+    List<HashMap<String, String>> bulletins = new ArrayList<>();
+    List<HashMap<String, String>> articles = new ArrayList<>();
+    List<HashMap<String, String>> pages = new ArrayList<>();
+    List<HashMap<String, String>> datasets = new ArrayList<>();
+
+    List<HashMap<String, String>> brokenLinks = new ArrayList<>();
+    List<HashMap<String, String>> falseUris = new ArrayList<>();
+
+    public Librarian(Zebedee zebedee) {
         this.zebedee = zebedee;
     }
 
-    public void validate(Path path) throws IOException {
+    public void catalogue() throws IOException {
 
-        Path bulletins = csvOfBulletinData();
-        Files.deleteIfExists(path.resolve("bulletins.csv"));
-        Files.copy(bulletins, path.resolve("bulletins.csv"));
+        findBulletins();
+        findArticles();
+        findPages();
+        findDatasets();
 
-
-        Path articles = csvOfArticleData();
-        Files.deleteIfExists(path.resolve("articles.csv"));
-        Files.copy(articles, path.resolve("articles.csv"));
-
-
-        Path pages = csvOfPagesData();
-        Files.deleteIfExists(path.resolve("pages.csv"));
-        Files.copy(pages, path.resolve("pages.csv"));
-
-        Path invalidURIs = csvOfFalseURIs();
-        Files.deleteIfExists(path.resolve("falseURIs.csv"));
-        Files.copy(invalidURIs, path.resolve("falseURIs.csv"));
-
-        Path unfoundLinks = csvOfUnfoundLinks(path);
-        Files.deleteIfExists(path.resolve("brokenLinks.csv"));
-        Files.copy(unfoundLinks, path.resolve("brokenLinks.csv"));
     }
 
     public List<String> getFilesThatLinkToURI(String uri) throws IOException {
@@ -164,6 +149,164 @@ public class Validator {
         return matches;
     }
 
+    /**
+     * Get all bulletins and list them
+     * 
+     * @throws IOException
+     */
+    private void findBulletins () throws IOException {
+        List<Path> bulletins = launchpadMatching(bulletinMatcher());
+        for (Path bulletinPath: bulletins) {
+            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
+                Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
+
+                HashMap<String,String > bulletinDetails = new HashMap<>();
+                bulletinDetails.put("Theme", bulletinPath.subpath(1, 2).toString());;
+                bulletinDetails.put("Level2", bulletinPath.subpath(2,3).toString());;
+                if(bulletinPath.subpath(3,4).toString().equalsIgnoreCase("bulletins")) {
+                    bulletinDetails.put("Level3", "");
+                    bulletinDetails.put("Title", bulletinPath.subpath(4,5).toString());
+                    bulletinDetails.put("DateInUri", bulletinPath.subpath(5,6).toString());
+                } else {
+                    bulletinDetails.put("Level3", bulletinPath.subpath(3,4).toString());;
+                    bulletinDetails.put("Title", bulletinPath.subpath(5,6).toString());;
+                    bulletinDetails.put("DateInUri", bulletinPath.subpath(6,7).toString());;
+                }
+                if (bulletin.getDescription().getReleaseDate() != null) {
+                    bulletinDetails.put("ReleaseDate", DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bulletin.getDescription().getReleaseDate()));
+                } else {
+                    bulletinDetails.put("ReleaseDate", "");
+                }
+                bulletinDetails.put("Title", bulletin.getDescription().getTitle());
+                bulletinDetails.put("Edition", bulletin.getDescription().getEdition());
+                bulletinDetails.put("NextRelease", bulletin.getDescription().getNextRelease());
+                bulletinDetails.put("Uri", bulletin.getUri().toString());
+                this.bulletins.add(bulletinDetails);
+            }
+        }
+    }
+
+    /**
+     * Get all articles and list them
+     *
+     * @throws IOException
+     */
+    private void findArticles() throws IOException {
+        List<Path> articles = launchpadMatching(articleMatcher());
+        for (Path articlePath: articles) {
+            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
+                Article article = ContentUtil.deserialise(stream, Article.class);
+
+                HashMap<String,String > articleDetails = new HashMap<>();
+                articleDetails.put("Theme", articlePath.subpath(1, 2).toString());;
+                articleDetails.put("Level2", articlePath.subpath(2,3).toString());;
+                if(articlePath.subpath(3,4).toString().equalsIgnoreCase("articles")) {
+                    articleDetails.put("Level3", "");
+                    articleDetails.put("Title", articlePath.subpath(4,5).toString());
+                    articleDetails.put("DateInUri", articlePath.subpath(5,6).toString());
+                } else {
+                    articleDetails.put("Level3", articlePath.subpath(3,4).toString());;
+                    articleDetails.put("TitleInUri", articlePath.subpath(5,6).toString());;
+                    articleDetails.put("DateInUri", articlePath.subpath(6,7).toString());;
+                }
+                if (article.getDescription().getReleaseDate() != null) {
+                    articleDetails.put("ReleaseDate", DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(article.getDescription().getReleaseDate()));
+                } else {
+                    articleDetails.put("ReleaseDate", "");
+                }
+                articleDetails.put("Title", article.getDescription().getTitle());
+                articleDetails.put("Edition", article.getDescription().getEdition());
+                articleDetails.put("NextRelease", article.getDescription().getNextRelease());
+                articleDetails.put("Uri", article.getUri().toString());
+                this.articles.add(articleDetails);
+            }
+        }
+    }
+
+    /**
+     * Get all T2 and T3s and list them
+     * 
+     * @throws IOException
+     */
+    private void findPages() throws IOException {
+        List<Path> pages = launchpadMatching(pageMatcher());
+        for (Path pagePath: pages) {
+            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(pagePath))) {
+                ProductPage page = ContentUtil.deserialise(stream, ProductPage.class);
+
+                HashMap<String,String > pageDetails = new HashMap<>();
+                if (pagePath.subpath(1, 2).toString().equalsIgnoreCase("data.json")) {
+                    pageDetails.put("Theme", "");
+                    pageDetails.put("Level2", "");
+                    pageDetails.put("Level3", "");
+                } else if (pagePath.subpath(2,3).toString().equalsIgnoreCase("data.json")) {
+                    pageDetails.put("Theme", pagePath.subpath(1, 2).toString());
+                    pageDetails.put("Level2", "");
+                    pageDetails.put("Level3", "");
+                } else if (pagePath.subpath(3,4).toString().equalsIgnoreCase("data.json")) {
+                    pageDetails.put("Theme", pagePath.subpath(1, 2).toString());
+                    pageDetails.put("Level2", pagePath.subpath(2,3).toString());
+                    pageDetails.put("Level3", "");
+                } else {
+                    pageDetails.put("Theme", pagePath.subpath(1, 2).toString());
+                    pageDetails.put("Level2", pagePath.subpath(2,3).toString());
+                    pageDetails.put("Level3", pagePath.subpath(3,4).toString());
+                }
+
+                pageDetails.put("Type", page.getType().toString());
+                if (page.getUri() != null) {
+                    pageDetails.put("Uri", page.getUri().toString());
+                } else {
+                    pageDetails.put("Uri", "");
+                }
+                if (page.getDescription() != null && page.getDescription().getTitle() != null) {
+                    pageDetails.put("Title", page.getDescription().getTitle());
+                } else {
+                    pageDetails.put("Title", "");
+                }
+
+                this.pages.add(pageDetails);
+            }
+        }
+    }
+    
+    private void findDatasets() throws IOException {
+        List<Path> datasets = launchpadMatching(dataSetMatcher());
+        for (Path datasetPath: datasets) {
+            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(datasetPath))) {
+                Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
+
+                HashMap<String,String > datasetDetails = new HashMap<>();
+                datasetDetails.put("Theme", datasetPath.subpath(1, 2).toString());;
+                datasetDetails.put("Level2", datasetPath.subpath(2,3).toString());;
+                if(datasetPath.subpath(3,4).toString().equalsIgnoreCase("datasets")) {
+                    datasetDetails.put("Level3", "");
+                    datasetDetails.put("TitleInUri", datasetPath.subpath(4,5).toString());
+                    datasetDetails.put("DateInUri", datasetPath.subpath(5,6).toString());
+                } else {
+                    datasetDetails.put("Level3", datasetPath.subpath(3,4).toString());;
+                    datasetDetails.put("Title", datasetPath.subpath(5,6).toString());;
+                    datasetDetails.put("DateInUri", datasetPath.subpath(6,7).toString());;
+                }
+                if (dataset.getDescription().getReleaseDate() != null) {
+                    datasetDetails.put("ReleaseDate", DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(dataset.getDescription().getReleaseDate()));
+                } else {
+                    datasetDetails.put("ReleaseDate", "");
+                }
+                datasetDetails.put("Title", dataset.getDescription().getTitle());
+                datasetDetails.put("Edition", dataset.getDescription().getEdition());
+                datasetDetails.put("NextRelease", dataset.getDescription().getNextRelease());
+                datasetDetails.put("Uri", dataset.getUri().toString());
+                this.datasets.add(datasetDetails);
+            }
+        }
+    }
+
+    private void findBrokenLinks() {
+
+    }
+
+
     public Path csvOfUnfoundLinks(Path uriPath) throws IOException {
         Path path = Files.createTempFile("unfoundlinks", ".csv");
         try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
@@ -182,7 +325,6 @@ public class Validator {
         }
         return path;
     }
-
     void writeCSVForUnfoundLinks(Path path, CSVWriter writer) throws IOException {
         List<Path> paths = launchpadMatching(bulletinMatcher());
         String[] row;
@@ -352,175 +494,6 @@ public class Validator {
         }
     }
 
-    public Path csvOfArticleData() throws IOException {
-        Path path = Files.createTempFile("articles", ".csv");
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
-
-            String[] row;
-            row = new String[10];
-            row[0] = "Theme";
-            row[1] = "Level2";
-            row[2] = "Level3";
-            row[3] = "Title";
-            row[4] = "URI Date";
-            row[5] = "ReleaseDate";
-            row[6] = "Title";
-            row[7] = "Edition";
-            row[8] = "Next Release";
-
-            writer.writeNext(row);
-
-            List<Path> paths = launchpadMatching(articleMatcher());
-
-            for (Path articlePath: paths) {
-                Article article;
-                try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
-                    article = ContentUtil.deserialise(inputStream, Article.class);
-                }
-
-                row[0] = articlePath.subpath(1,2).toString();;
-                row[1] = articlePath.subpath(2,3).toString();;
-                if(articlePath.subpath(3,4).toString().equalsIgnoreCase("articles")) {
-                    row[2] = "";
-                    row[3] = articlePath.subpath(4,5).toString();
-                    row[4] = articlePath.subpath(5,6).toString();
-                } else {
-                    row[2] = articlePath.subpath(3,4).toString();;
-                    row[3] = articlePath.subpath(5,6).toString();;
-                    row[4] = articlePath.subpath(6,7).toString();;
-                }
-                if (article.getDescription().getReleaseDate() != null) {
-                    row[5] = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(article.getDescription().getReleaseDate());
-                } else {
-                    row[5] = "";
-                }
-                row[6] = article.getDescription().getTitle();
-                row[7] = article.getDescription().getEdition();
-                row[8] = article.getDescription().getNextRelease();
-                writer.writeNext(row);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
-    }
-
-    public Path csvOfBulletinData() throws IOException {
-        Path path = Files.createTempFile("bulletins", ".csv");
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
-
-            String[] row;
-            row = new String[10];
-            row[0] = "Theme";
-            row[1] = "Level2";
-            row[2] = "Level3";
-            row[3] = "Title";
-            row[4] = "URI Date";
-            row[5] = "ReleaseDate";
-            row[6] = "Title";
-            row[7] = "Edition";
-            row[8] = "Next Release";
-            writer.writeNext(row);
-
-            List<Path> paths = launchpadMatching(bulletinMatcher());
-
-            for (Path bulletinPath: paths) {
-                Bulletin bulletin;
-                try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
-                    bulletin = ContentUtil.deserialise(inputStream, Bulletin.class);
-                }
-
-                row[0] = bulletinPath.subpath(1,2).toString();;
-                row[1] = bulletinPath.subpath(2,3).toString();;
-                if(bulletinPath.subpath(3,4).toString().equalsIgnoreCase("bulletins")) {
-                    row[2] = "";
-                    row[3] = bulletinPath.subpath(4,5).toString();
-                    row[4] = bulletinPath.subpath(5,6).toString();
-                } else {
-                    row[2] = bulletinPath.subpath(3,4).toString();;
-                    row[3] = bulletinPath.subpath(5,6).toString();;
-                    row[4] = bulletinPath.subpath(6,7).toString();;
-                }
-                if (bulletin.getDescription().getReleaseDate() != null) {
-                    row[5] = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bulletin.getDescription().getReleaseDate());
-                } else {
-                    row[5] = "";
-                }
-                row[6] = bulletin.getDescription().getTitle();
-                row[7] = bulletin.getDescription().getEdition();
-                row[8] = bulletin.getDescription().getNextRelease();
-                writer.writeNext(row);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
-    }
-
-    public Path csvOfPagesData() throws IOException {
-        Path path = Files.createTempFile("articles", ".csv");
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
-
-            String[] row;
-            row = new String[10];
-            row[0] = "Theme";
-            row[1] = "Level2";
-            row[2] = "Level3";
-            row[3] = "Type";
-            row[4] = "URI";
-            row[5] = "Title";
-
-            writer.writeNext(row);
-
-            List<Path> paths = launchpadMatching(pageMatcher());
-
-            for (Path taxonomyPath: paths) {
-
-                try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
-                    ProductPage page;
-                    page = ContentUtil.deserialise(inputStream, ProductPage.class);
-                    if (taxonomyPath.subpath(1, 2).toString().equalsIgnoreCase("data.json")) {
-                        row[0] = "";
-                        row[1] = "";
-                        row[2] = "";
-                    } else if (taxonomyPath.subpath(2,3).toString().equalsIgnoreCase("data.json")) {
-                        row[0] = taxonomyPath.subpath(1, 2).toString();
-                        row[1] = "";
-                        row[2] = "";
-                    } else if (taxonomyPath.subpath(3,4).toString().equalsIgnoreCase("data.json")) {
-                        row[0] = taxonomyPath.subpath(1, 2).toString();
-                        row[1] = taxonomyPath.subpath(2,3).toString();
-                        row[2] = "";
-                    } else {
-                        row[0] = taxonomyPath.subpath(1, 2).toString();
-                        row[1] = taxonomyPath.subpath(2,3).toString();
-                        row[2] = taxonomyPath.subpath(3,4).toString();
-                    }
-
-                    row[3] = page.getType().toString();
-                    if (page.getUri() != null) {
-                        row[4] = page.getUri().toString();
-                    } else {
-                        row[4] = "";
-                    }
-                    if (page.getDescription() != null && page.getDescription().getTitle() != null) {
-                        row[5] = page.getDescription().getTitle();
-                    } else {
-                        row[5] = "";
-                    }
-
-                    writer.writeNext(row);
-                } catch(Exception e) {
-                    System.out.println("Could not deserialise page at: " + taxonomyPath);
-                }
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
-    }
-
     public Path csvOfFalseURIs() throws IOException {
         Path path = Files.createTempFile("bulletins", ".csv");
         try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
@@ -634,23 +607,7 @@ public class Validator {
         }
     }
 
-    public List<Path> filesMatching(final PathMatcher matcher) throws IOException {
-        Path startPath = zebedee.published.path;
-        final List<Path> paths = new ArrayList<>();
-
-        Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                    throws IOException
-            {
-                if (matcher.matches(file)) {
-                    paths.add(zebedee.path.relativize(file));
-                }
-                return FileVisitResult.CONTINUE;
-            }
-        });
-        return paths;
-    }
+    // -----------------------------------------------------------------------------------------------------------------
 
     public List<Path> launchpadMatching(final PathMatcher matcher) throws IOException {
         Path startPath = zebedee.launchpad.path;
@@ -659,8 +616,7 @@ public class Validator {
         Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                    throws IOException
-            {
+                    throws IOException {
                 if (matcher.matches(file)) {
                     paths.add(zebedee.path.relativize(file));
                 }
@@ -668,18 +624,6 @@ public class Validator {
             }
         });
         return paths;
-    }
-
-    public List<Bulletin> bulletinList() throws IOException {
-        List<Path> paths = launchpadMatching(bulletinMatcher());
-
-        List<Bulletin> bulletins = new ArrayList<>();
-        for (Path path: paths) {
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(path))) {
-                bulletins.add(ContentUtil.deserialise(inputStream, Bulletin.class));
-            }
-        }
-        return bulletins;
     }
 
     public static PathMatcher bulletinMatcher() {
@@ -694,7 +638,6 @@ public class Validator {
         };
         return  matcher;
     }
-
     public static PathMatcher articleMatcher() {
         PathMatcher matcher = new PathMatcher() {
             @Override
@@ -707,7 +650,6 @@ public class Validator {
         };
         return  matcher;
     }
-
     public static PathMatcher pageMatcher() {
         PathMatcher matcher = new PathMatcher() {
             @Override
@@ -722,7 +664,6 @@ public class Validator {
         };
         return  matcher;
     }
-
     public static PathMatcher timeSeriesMatcher() {
         PathMatcher matcher = new PathMatcher() {
             @Override
@@ -735,7 +676,6 @@ public class Validator {
         };
         return  matcher;
     }
-
     public static PathMatcher dataSetMatcher() {
         PathMatcher matcher = new PathMatcher() {
             @Override
@@ -748,7 +688,6 @@ public class Validator {
         };
         return  matcher;
     }
-
     public static PathMatcher productPageMatcher() {
         PathMatcher matcher = new PathMatcher() {
             @Override
@@ -763,6 +702,6 @@ public class Validator {
     }
 
     public static void main(String[] args) {
-        Validator validator = new Validator(Root.zebedee);
+        Librarian librarian = new Librarian(Root.zebedee);
     }
 }

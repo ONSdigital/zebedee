@@ -608,6 +608,12 @@ public class Librarian {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    public void findIncorrectInternalUris() {
+
+        for (HashMap<String, String> dict: bulletins) {
+            
+        }
+    }
 
     public List<Path> launchpadMatching(final PathMatcher matcher) throws IOException {
         Path startPath = zebedee.launchpad.path;

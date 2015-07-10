@@ -284,7 +284,7 @@ public class Content {
         Path pathTo = toPath(toUri);
 
         if (Files.exists(pathFrom)) { // If there is a file to be deleted
-            Files.copy(pathFrom, pathTo);
+            Files.move(pathFrom, pathTo);
             Files.delete(pathFrom);
             deleteEmptyParentDirectories(pathFrom);
             return true;

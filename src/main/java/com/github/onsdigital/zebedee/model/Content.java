@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import org.apache.commons.io.FileUtils;
@@ -275,11 +276,11 @@ public class Content {
      * This requires a full traverse of .json content so should not be done lightly
      *
      */
-    private void moveUri(String fromUri, String toUri) {
+    public static void moveUri(String fromUri, String toUri, Zebedee zebedee) {
 
     }
 
-    private boolean moveFile(String fromUri, String toUri) throws IOException {
+    boolean moveFile(String fromUri, String toUri) throws IOException {
         Path pathFrom = toPath(fromUri);
         Path pathTo = toPath(toUri);
 

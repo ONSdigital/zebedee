@@ -44,109 +44,12 @@ public class Librarian {
         findPages();
         findDatasets();
 
+        findIncorrectInternalUris(); // Find uri's that do not match their position in the file tree
+        findBrokenLinks(); // Find references that do not link to an existent web page
     }
 
-    public List<String> getFilesThatLinkToURI(String uri) throws IOException {
-
-        List<String> matches = new ArrayList<>();
-
-        List<Path> paths = launchpadMatching(bulletinMatcher());
-        for (Path bulletinPath: paths) {
-            Bulletin bulletin;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
-                bulletin = ContentUtil.deserialise(inputStream, Bulletin.class);
-            }
-            for (PageReference reference: bulletin.getRelatedBulletins()) {
-                if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                    matches.add(bulletin.getUri().toString());
-                }
-            }
-            for (PageReference reference: bulletin.getRelatedData()) {
-                if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                    matches.add(bulletin.getUri().toString());
-                }
-            }
-        }
-
-        paths = launchpadMatching(articleMatcher());
-        for (Path articlePath: paths) {
-            Article article;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
-                article = ContentUtil.deserialise(inputStream, Article.class);
-            }
-            if (article.getRelatedArticles() != null) {
-                for (PageReference reference : article.getRelatedArticles()) {
-                    if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                        matches.add(article.getUri().toString());
-                    }
-                }
-            }
-            if (article.getRelatedData() != null) {
-                for (PageReference reference : article.getRelatedData()) {
-                    if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                        matches.add(article.getUri().toString());
-                    }
-                }
-            }
-        }
-
-        paths = launchpadMatching(pageMatcher());
-        for (Path taxonomyPath: paths) {
-            ProductPage page;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
-                page = ContentUtil.deserialise(inputStream, ProductPage.class);
-            }
-
-            if (page.getRelatedArticles() != null) {
-                for (PageReference reference : page.getRelatedArticles()) {
-                    if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                        matches.add(page.getUri().toString());
-                    }
-                }
-            }
-
-            if (page.getDatasets() != null) {
-                for (PageReference reference : page.getStatsBulletins()) {
-                    if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                        matches.add(page.getUri().toString());
-                    }
-                }
-            }
-
-            if (page.getItems() != null) {
-                for (PageReference reference : page.getItems()) {
-                    if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                        matches.add(page.getUri().toString());
-                    }
-                }
-            }
-
-            if (page.getStatsBulletins() != null) {
-                for (PageReference reference : page.getStatsBulletins()) {
-                    if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                        matches.add(page.getUri().toString());
-                    }
-                }
-            }
-        }
-
-        paths = launchpadMatching(pageMatcher());
-        for (Path taxonomyPath: paths) {
-            TaxonomyLandingPage page;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
-                page = ContentUtil.deserialise(inputStream, TaxonomyLandingPage.class);
-            }
-
-            if (page.getSections() != null) {
-                for (PageReference reference : page.getSections()) {
-                    if (reference.getUri() != null && reference.getUri().toString().equalsIgnoreCase(uri)) {
-                        matches.add(page.getUri().toString());
-                    }
-                }
-            }
-        }
-
-        return matches;
+    public boolean checkIntegrity() {
+        return false;
     }
 
     /**
@@ -515,7 +418,6 @@ public class Librarian {
         return path;
 
     }
-
     public void writeFalseURIsToCSV(CSVWriter writer) throws IOException {
 
         List<Path> paths = launchpadMatching(bulletinMatcher());

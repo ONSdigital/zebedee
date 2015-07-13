@@ -1,7 +1,10 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import org.apache.commons.io.FileUtils;
@@ -238,5 +241,19 @@ public class ContentTest {
         // The result has the expected values
         assertEquals(1, results.size());
         assertTrue(results.contains("/somedirectory/" + jsonFile));
+    }
+
+    @Test
+    public void moveBulletinShouldShiftDirectory() throws IOException {
+        // Given
+        // a bootstrapped version of zebedee
+        Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Zebedee zebedee = new Zebedee(bob.zebedee);
+
+        //
+        String currentUri = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
+        String movedUri = "/themea/landinga/productb/bulletins/bulletina/2015-01-01";
+
+
     }
 }

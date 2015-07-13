@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
@@ -162,6 +163,18 @@ public class Builder {
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
+    }
+
+    public Builder(Class<?> name, Path bootStrap) throws IOException {
+        this(name);
+
+        FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
+        FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
+        Files.createDirectory(this.zebedee.resolve(Zebedee.PUBLISHED));
+        Files.createDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD));
+
+        FileUtils.copyDirectory(bootStrap.toFile(), this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
+        FileUtils.copyDirectory(bootStrap.toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
     }
 
     private Set<Integer> set(Team team) {

@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.davidcarboni.ResourceUtils;
+import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -18,41 +20,29 @@ import static org.junit.Assert.*;
 public class ContentToolsTest {
     public static final String ZEBEDEE_ROOT = "zebedee_root";
 
-    static Zebedee zebedee;
     @BeforeClass
-    public static void setup () {
-        zebedee = new Zebedee(Paths.get(System.getenv(ZEBEDEE_ROOT)));
+    public static void setup () throws IOException {
 
     }
 
     @Test
     public void testTheLibrarian() throws IOException {
+        // With a basic zebedee setup
+        Builder bob = new Builder(ContentToolsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Zebedee zebedee = new Zebedee(bob.zebedee);
 
+        // When we run catalogue
         Librarian librarian = new Librarian(zebedee);
-
         librarian.catalogue();
 
-        assertNotEquals(0, librarian.articles.size());
-        assertNotEquals(0, librarian.bulletins.size());
-        assertNotEquals(0, librarian.datasets.size());
-        assertNotEquals(0, librarian.pages.size());
+        // Check the librarian has picked up 1 article, and 1 bulletin
+        assertEquals(1, librarian.articles.size());
+        assertEquals(1, librarian.bulletins.size());
     }
 
-    @Test
-    public void testPenelopeWillKnit() {
-        Penelope penelope = new Penelope(zebedee);
-        penelope.knit();
-    }
-
-    //@Test
-    public void testWrangler() throws IOException {
-        Wrangler wrangler = new Wrangler(zebedee);
-        wrangler.updateTimeSeriesNumbers();
-        wrangler.updateTimeSeriesDetails(Paths.get("/Users/thomasridd/Documents/onswebsite/source/timeseriesdetails.csv"));
-    }
 
     @AfterClass
     public static void shutdown() {
-        zebedee = null;
+
     }
 }

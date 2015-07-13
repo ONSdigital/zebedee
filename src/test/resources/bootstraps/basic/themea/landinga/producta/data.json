@@ -1,0 +1,35 @@
+{
+  "items": [
+  ],
+  "datasets": [
+  ],
+  "statsBulletins": [
+    {
+      "uri": "/themea/landinga/producta/bulletins/bulletina/2015-01-01"
+    }
+  ],
+  "index": 0,
+  "type": "product_page",
+  "uri": "/themea/landinga/producta",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/themea"
+    },
+    {
+      "uri": "/themea/landinga"
+    }
+  ],
+  "description": {
+    "title": "Landing A",
+    "summary": "Landing A"
+    },
+  "articles": [
+    {
+      "uri": "/themea/landinga/producta/articles/articlea/2015-01-01"
+    }
+  ],
+  "relatedArticles": []
+}

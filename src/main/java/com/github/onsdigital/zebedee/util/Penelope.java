@@ -25,11 +25,11 @@ import java.util.List;
  */
 public class Penelope {
     Zebedee zebedee;
-    Librarian librarian;
+    Yaffle librarian;
 
     public Penelope(Zebedee zebedee) {
         this.zebedee = zebedee;
-        this.librarian = new Librarian(zebedee);
+        this.librarian = new Yaffle(zebedee);
     }
 
     public void knit() throws IOException {

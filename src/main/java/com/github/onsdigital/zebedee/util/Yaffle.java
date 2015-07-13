@@ -22,7 +22,7 @@ import java.util.*;
 /**
  * Created by thomasridd on 06/07/15.
  */
-public class Librarian {
+public class Yaffle {
     Zebedee zebedee;
 
     List<HashMap<String, String>> bulletins = new ArrayList<>();
@@ -33,7 +33,7 @@ public class Librarian {
     List<HashMap<String, String>> brokenLinks = new ArrayList<>();
     List<HashMap<String, String>> falseUris = new ArrayList<>();
 
-    public Librarian(Zebedee zebedee) {
+    public Yaffle(Zebedee zebedee) {
         this.zebedee = zebedee;
     }
 
@@ -610,6 +610,6 @@ public class Librarian {
     }
 
     public static void main(String[] args) {
-        Librarian librarian = new Librarian(Root.zebedee);
+        Yaffle yaffle = new Yaffle(Root.zebedee);
     }
 }

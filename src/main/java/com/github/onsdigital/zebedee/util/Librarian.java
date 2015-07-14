@@ -24,6 +24,7 @@ import java.util.*;
  */
 public class Librarian {
     Zebedee zebedee;
+    int checkedUris = 0;
 
     List<HashMap<String, String>> bulletins = new ArrayList<>();
     List<HashMap<String, String>> articles = new ArrayList<>();
@@ -44,13 +45,28 @@ public class Librarian {
         findPages();
         findDatasets();
 
-        findIncorrectInternalUris(); // Find uri's that do not match their position in the file tree
-        findBrokenLinks(); // Find references that do not link to an existent web page
     }
 
-    public boolean checkIntegrity() {
+    public boolean checkIntegrity() throws IOException {
+        checkedUris = 0;
+
+        for (HashMap<String, String> bulletinMap : bulletins) {
+            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(bulletinMap.get("Uri")))) {
+                Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
+                for(String uri: GraphUtils.relatedUris(bulletin)) {
+                    if (zebedee.launchpad.get(uri) == null) {
+                        HashMap<String, String> map = new HashMap<>();
+                        map.put("source", bulletinMap.get("Uri"));
+                        map.put("link", uri);
+                        brokenLinks.add(map);
+                    }
+                    checkedUris ++;
+                }
+            }
+        }
         return false;
     }
+
 
     /**
      * Get all bulletins and list them
@@ -205,317 +221,7 @@ public class Librarian {
         }
     }
 
-    private void findBrokenLinks() {
-
-    }
-
-
-    public Path csvOfUnfoundLinks(Path uriPath) throws IOException {
-        Path path = Files.createTempFile("unfoundlinks", ".csv");
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
-
-            String[] row;
-            row = new String[10];
-            row[0] = "Data type";
-            row[1] = "My URI";
-            row[2] = "Related URI";
-            writer.writeNext(row);
-
-            writeCSVForUnfoundLinks(uriPath, writer);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
-    }
-    void writeCSVForUnfoundLinks(Path path, CSVWriter writer) throws IOException {
-        List<Path> paths = launchpadMatching(bulletinMatcher());
-        String[] row;
-        row = new String[10];
-        row[0] = "Data type";
-        row[1] = "My URI";
-        row[2] = "Related URI";
-
-        for (Path bulletinPath: paths) {
-            Bulletin bulletin;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
-                bulletin = ContentUtil.deserialise(inputStream, Bulletin.class);
-            }
-            for (PageReference reference: bulletin.getRelatedBulletins()) {
-                String string = reference.getUri().toString();
-                if (string.startsWith("/")) { string = string.substring(1); }
-                Path checkpath = zebedee.published.path.resolve(string);
-                if (Files.exists(checkpath) == false) {
-                    row[0] = "Related bulletin";
-                    row[1] = bulletin.getUri().toString();
-                    row[2] = reference.getUri().toString();
-                    writer.writeNext(row);
-                }
-            }
-            for (PageReference reference: bulletin.getRelatedData()) {
-                String string = reference.getUri().toString();
-                if (string.startsWith("/")) { string = string.substring(1); }
-                Path checkpath = zebedee.published.path.resolve(string);
-                if (Files.exists(checkpath) == false) {
-                    row[0] = "Related data";
-                    row[1] = bulletin.getUri().toString();
-                    row[2] = reference.getUri().toString();
-                    writer.writeNext(row);
-                }
-            }
-        }
-
-        paths = launchpadMatching(articleMatcher());
-        for (Path articlePath: paths) {
-            Article article;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
-                article = ContentUtil.deserialise(inputStream, Article.class);
-            }
-            if (article.getRelatedArticles() != null) {
-                for (PageReference reference : article.getRelatedArticles()) {
-                    String string = reference.getUri().toString();
-                    if (string.startsWith("/")) { string = string.substring(1); }
-                    Path checkpath = zebedee.published.path.resolve(string);
-                    if (Files.exists(checkpath) == false) {
-                        row[0] = "Related article";
-                        row[1] = article.getUri().toString();
-                        row[2] = reference.getUri().toString();
-                        writer.writeNext(row);
-                    }
-                }
-            }
-            if (article.getRelatedData() != null) {
-                for (PageReference reference : article.getRelatedData()) {
-                    String string = reference.getUri().toString();
-                    if (string.startsWith("/")) { string = string.substring(1); }
-                    Path checkpath = zebedee.published.path.resolve(string);
-                    if (Files.exists(checkpath) == false) {
-                        row[0] = "Related data";
-                        row[1] = article.getUri().toString();
-                        row[2] = reference.getUri().toString();
-                        writer.writeNext(row);
-                    }
-                }
-            }
-        }
-
-        paths = launchpadMatching(pageMatcher());
-        for (Path taxonomyPath: paths) {
-            ProductPage page;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
-                page = ContentUtil.deserialise(inputStream, ProductPage.class);
-            }
-
-            if (page.getRelatedArticles() != null) {
-                for (PageReference reference : page.getRelatedArticles()) {
-                    String string = reference.getUri().toString();
-                    if (string.startsWith("/")) { string = string.substring(1); }
-                    Path checkpath = zebedee.published.path.resolve(string);
-                    if (Files.exists(checkpath) == false) {
-                        row[0] = "Related article";
-                        row[1] = page.getUri().toString();
-                        row[2] = reference.getUri().toString();
-                        writer.writeNext(row);
-                    }
-                }
-            }
-
-            if (page.getDatasets() != null) {
-                for (PageReference reference : page.getStatsBulletins()) {
-                    String string = reference.getUri().toString();
-                    if (string.startsWith("/")) { string = string.substring(1); }
-                    Path checkpath = zebedee.published.path.resolve(string);
-                    if (Files.exists(checkpath) == false) {
-                        row[0] = "Related bulletin";
-                        row[1] = page.getUri().toString();
-                        row[2] = reference.getUri().toString();
-                        writer.writeNext(row);
-                    }
-                }
-            }
-
-            if (page.getItems() != null) {
-                for (PageReference reference : page.getItems()) {
-                    String string = reference.getUri().toString();
-                    if (string.startsWith("/")) { string = string.substring(1); }
-                    Path checkpath = zebedee.published.path.resolve(string);
-                    if (Files.exists(checkpath) == false) {
-                        row[0] = "Related item";
-                        row[1] = page.getUri().toString();
-                        row[2] = reference.getUri().toString();
-                        writer.writeNext(row);
-                    }
-                }
-            }
-
-            if (page.getStatsBulletins() != null) {
-                for (PageReference reference : page.getStatsBulletins()) {
-                    String string = reference.getUri().toString();
-                    if (string.startsWith("/")) { string = string.substring(1); }
-                    Path checkpath = zebedee.published.path.resolve(string);
-                    if (string.contains("BLAH")) {
-                        System.out.println("BLAH");
-                    }
-                    if (Files.exists(checkpath) == false) {
-                        row[0] = "Related dataset";
-                        row[1] = page.getUri().toString();
-                        row[2] = reference.getUri().toString();
-                        writer.writeNext(row);
-                    }
-                }
-            }
-        }
-
-        paths = launchpadMatching(pageMatcher());
-        for (Path taxonomyPath: paths) {
-            TaxonomyLandingPage page;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
-                page = ContentUtil.deserialise(inputStream, TaxonomyLandingPage.class);
-            }
-
-            if (page.getSections() != null) {
-                for (PageReference reference : page.getSections()) {
-                    if (reference.getUri() == null) {
-                        row[0] = "Related section";
-                        row[1] = page.getUri().toString();
-                        row[2] = "URI null";
-                    } else {
-                        String string = reference.getUri().toString();
-                        if (string.startsWith("/")) {
-                            string = string.substring(1);
-                        }
-                        Path checkpath = zebedee.published.path.resolve(string);
-                        if (Files.exists(checkpath) == false) {
-                            row[0] = "Related section";
-                            row[1] = page.getUri().toString();
-                            row[2] = reference.getUri().toString();
-                            writer.writeNext(row);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public Path csvOfFalseURIs() throws IOException {
-        Path path = Files.createTempFile("bulletins", ".csv");
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
-
-            String[] row;
-            row = new String[10];
-            row[0] = "Theme";
-            row[1] = "Level2";
-            row[2] = "Level3";
-            row[3] = "Actual file path";
-            row[4] = "Internal URI";
-            writer.writeNext(row);
-
-            writeFalseURIsToCSV(writer);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
-
-    }
-    public void writeFalseURIsToCSV(CSVWriter writer) throws IOException {
-
-        List<Path> paths = launchpadMatching(bulletinMatcher());
-        String[] row;
-        row = new String[10];
-        row[0] = "Theme";
-        row[1] = "Level2";
-        row[2] = "Level3";
-        row[3] = "Actual file path";
-        row[4] = "Internal URI";
-
-        for (Path bulletinPath: paths) {
-            Bulletin bulletin;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
-                bulletin = ContentUtil.deserialise(inputStream, Bulletin.class);
-            }
-            String intendedURI = "/" + bulletinPath.subpath(1, bulletinPath.getNameCount() - 1).toString();
-            if (!bulletin.getUri().toString().equalsIgnoreCase(intendedURI)) {
-                row[0] = bulletinPath.subpath(1,2).toString();
-                row[1] = bulletinPath.subpath(2,3).toString();
-                row[2] = bulletinPath.subpath(3,4).toString();
-                if (row[2].equalsIgnoreCase("bulletins")) {
-                    row[2] = "";
-                }
-                row[3] = bulletinPath.toString();
-                row[4] = bulletin.getUri().toString();
-                writer.writeNext(row);
-            }
-
-        }
-
-        paths = launchpadMatching(articleMatcher());
-        for (Path articlePath: paths) {
-            Article article;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
-                article = ContentUtil.deserialise(inputStream, Article.class);
-            }
-
-            String intendedURI = "/" + articlePath.subpath(1, articlePath.getNameCount() - 1).toString();
-            if (!article.getUri().toString().equalsIgnoreCase(intendedURI)) {
-                row[0] = articlePath.subpath(1,2).toString();
-                row[1] = articlePath.subpath(2,3).toString();
-                row[2] = articlePath.subpath(3,4).toString();
-                if (row[2].equalsIgnoreCase("articles")) {
-                    row[2] = "";
-                }
-                row[3] = articlePath.toString();
-                row[4] = article.getUri().toString();
-                writer.writeNext(row);
-            }
-
-        }
-
-        paths = launchpadMatching(pageMatcher());
-        for (Path taxonomyPath: paths) {
-            ProductPage page;
-            try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(taxonomyPath))) {
-                page = ContentUtil.deserialise(inputStream, ProductPage.class);
-            }
-
-            String intendedURI = (taxonomyPath.getNameCount() <= 2) ? "/" : "/" + taxonomyPath.subpath(1, taxonomyPath.getNameCount() - 1).toString();
-            if (!page.getUri().toString().equalsIgnoreCase(intendedURI)) {
-
-                if (taxonomyPath.subpath(1, 2).toString().equalsIgnoreCase("data.json")) {
-                    row[0] = "";
-                    row[1] = "";
-                    row[2] = "";
-                } else if (taxonomyPath.subpath(2, 3).toString().equalsIgnoreCase("data.json")) {
-                    row[0] = taxonomyPath.subpath(1, 2).toString();
-                    row[1] = "";
-                    row[2] = "";
-                } else if (taxonomyPath.subpath(3, 4).toString().equalsIgnoreCase("data.json")) {
-                    row[0] = taxonomyPath.subpath(1, 2).toString();
-                    row[1] = taxonomyPath.subpath(2, 3).toString();
-                    row[2] = "";
-                } else {
-                    row[0] = taxonomyPath.subpath(1, 2).toString();
-                    row[1] = taxonomyPath.subpath(2, 3).toString();
-                    row[2] = taxonomyPath.subpath(3, 4).toString();
-                }
-                row[3] = taxonomyPath.toString();
-                if (page.getUri() != null) {
-                    row[4] = page.getUri().toString();
-                } else {
-                    row[4] = "";
-                }
-                writer.writeNext(row);
-            }
-        }
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
-    public void findIncorrectInternalUris() {
-
-        for (HashMap<String, String> dict: bulletins) {
-            
-        }
-    }
 
     public List<Path> launchpadMatching(final PathMatcher matcher) throws IOException {
         Path startPath = zebedee.launchpad.path;

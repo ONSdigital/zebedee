@@ -8,6 +8,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -30,12 +32,12 @@ public class ContentToolsTest {
         Zebedee zebedee = new Zebedee(bob.zebedee);
 
         // When we run catalogue
-        Yaffle yaffle = new Yaffle(zebedee);
-        yaffle.catalogue();
+        Librarian librarian = new Librarian(zebedee);
+        librarian.catalogue();
 
         // Check the librarian has picked up 1 article, and 1 bulletin
-        assertEquals(1, yaffle.articles.size());
-        assertEquals(1, yaffle.bulletins.size());
+        assertEquals(1, librarian.articles.size());
+        assertEquals(1, librarian.bulletins.size());
     }
 
 

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.content.DirectoryListing;
 import com.github.onsdigital.content.page.base.Page;
@@ -12,6 +13,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.ContentEvent;
+import com.github.onsdigital.zebedee.json.ContentEventType;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -30,7 +33,9 @@ import java.io.StringReader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Collections {
 
@@ -159,7 +164,24 @@ public class Collections {
                 Path destination = zebedee.launchpad.toPath(uri);
                 PathUtils.moveFilesInDirectory(source, destination);
             }
+
+            // Add an event to the event log
+            collection.AddEvent(uri, new ContentEvent(new Date(), ContentEventType.PUBLISHED, session.email));
         }
+
+
+        // Save a published collections log
+        collection.save();
+        String filename = PathUtils.toFilename(collection.description.name);
+        Path collectionDescriptionPath = this.path.resolve(filename + ".json");
+        Path logPath = this.zebedee.path.resolve("publish-log");
+        if(Files.exists(logPath) == false) { Files.createDirectory(logPath); }
+
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
+        logPath = logPath.resolve(format.format(date) + " " + filename + ".json");
+
+        Files.copy(collectionDescriptionPath, logPath);
 
         // Delete the folders:
         delete(collection, session);

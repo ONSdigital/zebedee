@@ -159,8 +159,12 @@ public class ContentDetail {
             if (child == null) {
                 String directoryName = path.subpath(depth, depth + 1).toString();
                 String uri = "/" + path.subpath(0, depth + 1).toString();
-                child = new ContentDetail(directoryName, uri, null);
-                this.children = new ArrayList<>();
+
+                // Create the new content
+                child = new ContentDetail(directoryName, "", null);
+
+
+                if(this.children == null) { this.children = new ArrayList<>(); }
                 this.children.add(child);
             }
 

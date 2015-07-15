@@ -172,6 +172,8 @@ public class Collection {
         // Delete the description file
         String filename = PathUtils.toFilename(this.description.name);
         Path collectionDescriptionPath = collections.path.resolve(filename + ".json");
+
+        // delete
         Files.delete(collectionDescriptionPath);
 
         // remove the lock for the collection

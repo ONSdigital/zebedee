@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
@@ -96,14 +97,10 @@ public class Zebedee {
 
 
         // Initialise users
-        try {
-            URI uri = Zebedee.class.getClassLoader().getResource("users.json").toURI();
-            Path path1 = Paths.get(uri);
-            Configuration.buildUserAccounts(path1,zebedee,session);
-        } catch (URISyntaxException e) {
-            throw new IOException("Error copying resource to file.", e);
+        Path path1 = ResourceUtils.getPath("/users.json");
+        if (path1 != null && Files.exists(path1)) {
+            Configuration.buildUserAccounts(path1, zebedee, session);
         }
-
 
         // todo - remove these once access functionality is available.
         user = new User();

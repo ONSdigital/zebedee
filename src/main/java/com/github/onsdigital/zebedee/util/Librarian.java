@@ -39,8 +39,8 @@ public class Librarian {
     List<HashMap<String, String>> landings = new ArrayList<>();
 
 
-    List<HashMap<String, String>> brokenLinks = new ArrayList<>();
-    List<String> invalidJson = new ArrayList<>();
+    public List<HashMap<String, String>> brokenLinks = new ArrayList<>();
+    public List<String> invalidJson = new ArrayList<>();
     List<HashMap<String, String>> falseUris = new ArrayList<>();
 
     public Librarian(Zebedee zebedee) {

@@ -55,6 +55,9 @@ public class Root implements Startup {
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
+        // Set the class that will be used to determine a ClassLoader when loading resources:
+        ResourceUtils.classLoaderClass = Root.class;
+
         // If we have an environment variable and it is
         String rootDir = env.get(ZEBEDEE_ROOT);
         boolean zebedeeCreated = false;
@@ -83,8 +86,7 @@ public class Root implements Startup {
             }
         }
 
-        // Set the class that will be used to determine a ClassLoader when loading resources:
-        ResourceUtils.classLoaderClass = Root.class;
+
     }
 
     private List<Path> listContent(Path taxonomy) throws IOException {

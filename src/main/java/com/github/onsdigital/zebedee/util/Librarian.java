@@ -13,6 +13,7 @@ import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
+import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -26,6 +27,8 @@ import java.util.*;
  * Created by thomasridd on 06/07/15.
  */
 public class Librarian {
+    private static final Gson gson = new Gson();
+
     Zebedee zebedee;
     int checkedUris = 0;
 
@@ -37,6 +40,7 @@ public class Librarian {
 
 
     List<HashMap<String, String>> brokenLinks = new ArrayList<>();
+    List<String> invalidJson = new ArrayList<>();
     List<HashMap<String, String>> falseUris = new ArrayList<>();
 
     public Librarian(Zebedee zebedee) {
@@ -44,12 +48,10 @@ public class Librarian {
     }
 
     public void catalogue() throws IOException {
-
         findBulletins();
         findArticles();
         findPages();
         findDatasets();
-
     }
 
     public boolean checkIntegrity() throws IOException {
@@ -150,6 +152,32 @@ public class Librarian {
             }
         }
         return true;
+    }
+
+    public boolean validateJSON() throws IOException {
+        List<Path> jsonFiles = launchpadMatching(jsonMatcher());
+        for (Path file: jsonFiles) {
+            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(file))) {
+                String json = IOUtils.toString(stream);
+                if (!isJSONValid(json)) {
+                    invalidJson.add(file.toString());
+                }
+            }
+        }
+        if (invalidJson.size() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isJSONValid(String JSON_STRING) {
+        try {
+            gson.fromJson(JSON_STRING, Object.class);
+            return true;
+        } catch(com.google.gson.JsonSyntaxException ex) {
+            return false;
+        }
     }
 
     /**
@@ -391,6 +419,18 @@ public class Librarian {
             @Override
             public boolean matches(Path path) {
                 if (path.toString().contains("data.json") && path.toString().contains("bulletins")) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        return  matcher;
+    }
+    public static PathMatcher jsonMatcher() {
+        PathMatcher matcher = new PathMatcher() {
+            @Override
+            public boolean matches(Path path) {
+                if (path.toString().endsWith(".json")) {
                     return true;
                 }
                 return false;

@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -504,6 +505,8 @@ public class Collection {
      * @param event The event to add.
      */
     void AddEvent(String uri, ContentEvent event) {
+
+        if (!StringUtils.startsWith(uri, "/")) { uri = "/" + uri; }
 
         if (this.description.eventsByUri == null)
             this.description.eventsByUri = new HashMap<>();

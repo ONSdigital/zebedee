@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.util;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.content.link.PageReference;
+import com.github.onsdigital.content.page.base.Page;
+import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
@@ -11,6 +13,7 @@ import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -30,6 +33,8 @@ public class Librarian {
     List<HashMap<String, String>> articles = new ArrayList<>();
     List<HashMap<String, String>> pages = new ArrayList<>();
     List<HashMap<String, String>> datasets = new ArrayList<>();
+    List<HashMap<String, String>> landings = new ArrayList<>();
+
 
     List<HashMap<String, String>> brokenLinks = new ArrayList<>();
     List<HashMap<String, String>> falseUris = new ArrayList<>();
@@ -50,12 +55,21 @@ public class Librarian {
     public boolean checkIntegrity() throws IOException {
         checkedUris = 0;
 
+        checkBulletinIntegrity();
+        checkArticleIntegrity();
+        checkDatasetIntegrity();
+        checkProductPageIntegrity();
+
+        return false;
+    }
+    private boolean checkBulletinIntegrity() throws IOException {
         for (HashMap<String, String> bulletinMap : bulletins) {
-            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(bulletinMap.get("Uri")))) {
+            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(bulletinMap.get("Uri")).resolve("data.json"))) {
                 Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
                 for(String uri: GraphUtils.relatedUris(bulletin)) {
                     if (zebedee.launchpad.get(uri) == null) {
                         HashMap<String, String> map = new HashMap<>();
+                        map.put("type", "bulletin");
                         map.put("source", bulletinMap.get("Uri"));
                         map.put("link", uri);
                         brokenLinks.add(map);
@@ -64,9 +78,79 @@ public class Librarian {
                 }
             }
         }
-        return false;
+        return true;
     }
-
+    private boolean checkArticleIntegrity() throws IOException {
+        for (HashMap<String, String> articleMap : articles) {
+            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(articleMap.get("Uri")).resolve("data.json"))) {
+                Article article = ContentUtil.deserialise(stream, Article.class);
+                for(String uri: GraphUtils.relatedUris(article)) {
+                    if (zebedee.launchpad.get(uri) == null) {
+                        HashMap<String, String> map = new HashMap<>();
+                        map.put("type", "article");
+                        map.put("source", articleMap.get("Uri"));
+                        map.put("link", uri);
+                        brokenLinks.add(map);
+                    }
+                    checkedUris ++;
+                }
+            }
+        }
+        return true;
+    }
+    private boolean checkDatasetIntegrity() throws IOException {
+        for (HashMap<String, String> datasetMap : datasets) {
+            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(datasetMap.get("Uri")).resolve("data.json"))) {
+                Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
+                for(String uri: GraphUtils.relatedUris(dataset)) {
+                    if (zebedee.launchpad.get(uri) == null) {
+                        HashMap<String, String> map = new HashMap<>();
+                        map.put("type", "dataset");
+                        map.put("source", datasetMap.get("Uri"));
+                        map.put("link", uri);
+                        brokenLinks.add(map);
+                    }
+                    checkedUris ++;
+                }
+            }
+        }
+        return true;
+    }
+    private boolean checkProductPageIntegrity() throws IOException {
+        for (HashMap<String, String> pageMap : pages) {
+            try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(pageMap.get("Uri")).resolve("data.json"))) {
+                String json = IOUtils.toString(stream);
+                Page page = ContentUtil.deserialisePage(json);
+                System.out.println(page.getUri().toString());
+                if (page.getType() == PageType.product_page) {
+                    ProductPage productPage = ContentUtil.deserialise(json, ProductPage.class);
+                    for (String uri : GraphUtils.relatedUris(productPage)) {
+                        if (zebedee.launchpad.get(uri) == null) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("type", "product_page");
+                            map.put("source", pageMap.get("Uri"));
+                            map.put("link", uri);
+                            brokenLinks.add(map);
+                        }
+                        checkedUris++;
+                    }
+                } else {
+                    TaxonomyLandingPage taxonomyLandingPage = ContentUtil.deserialise(json, TaxonomyLandingPage.class);
+                    for (String uri : GraphUtils.relatedUris(taxonomyLandingPage)) {
+                        if (zebedee.launchpad.get(uri) == null) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("type", "taxonomy_page");
+                            map.put("source", pageMap.get("Uri"));
+                            map.put("link", uri);
+                            brokenLinks.add(map);
+                        }
+                        checkedUris++;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * Get all bulletins and list them

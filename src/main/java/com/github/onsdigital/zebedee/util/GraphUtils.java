@@ -1,11 +1,13 @@
 package com.github.onsdigital.zebedee.util;
 
 import com.github.onsdigital.content.link.PageReference;
+import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.staticpage.Methodology;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.content.page.taxonomy.ProductPage;
+import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.content.page.taxonomy.base.TaxonomyPage;
 import com.github.onsdigital.content.partial.DownloadSection;
 import com.github.onsdigital.content.partial.FigureSection;
@@ -73,6 +75,7 @@ public class GraphUtils {
 
     }
 
+
     public static List<String> relatedUris(Bulletin bulletin) {
         List<String > results = new ArrayList<>();
         for (PageReference ref: bulletin.getRelatedBulletins()) {
@@ -82,10 +85,14 @@ public class GraphUtils {
             results.add(ref.getUri().toString());
         }
         for (FigureSection ref: bulletin.getCharts()) {
-            results.add(ref.getUri().toString());
+            results.add(ref.getUri().toString() + ".json");
+            results.add(ref.getUri().toString() + ".png");
+            results.add(ref.getUri().toString() + "-download.png");
         }
         for (FigureSection ref: bulletin.getTables()) {
-            results.add(ref.getUri().toString());
+            results.add(ref.getUri().toString() + ".json");
+            results.add(ref.getUri().toString() + ".html");
+            results.add(ref.getUri().toString() + ".xls");
         }
         return results;
     }
@@ -98,10 +105,14 @@ public class GraphUtils {
             results.add(ref.getUri().toString());
         }
         for (FigureSection ref: article.getCharts()) {
-            results.add(ref.getUri().toString());
+            results.add(ref.getUri().toString() + ".json");
+            results.add(ref.getUri().toString() + ".png");
+            results.add(ref.getUri().toString() + "-download.png");
         }
         for (FigureSection ref: article.getTables()) {
-            results.add(ref.getUri().toString());
+            results.add(ref.getUri().toString() + ".json");
+            results.add(ref.getUri().toString() + ".html");
+            results.add(ref.getUri().toString() + ".xls");
         }
         return results;
     }
@@ -123,20 +134,40 @@ public class GraphUtils {
     }
     public static List<String> relatedUris(ProductPage productPage) {
         List<String > results = new ArrayList<>();
-        for (PageReference ref: productPage.getStatsBulletins()) {
-            results.add(ref.getUri().toString());
+        if (productPage.getStatsBulletins() != null) {
+            for (PageReference ref : productPage.getStatsBulletins()) {
+                results.add(ref.getUri().toString());
+            }
         }
-        for (PageReference ref: productPage.getItems()) {
-            results.add(ref.getUri().toString());
+        if (productPage.getItems() != null) {
+            for (PageReference ref : productPage.getItems()) {
+                results.add(ref.getUri().toString());
+            }
         }
-        for (PageReference ref: productPage.getDatasets()) {
-            results.add(ref.getUri().toString());
+        if (productPage.getDatasets() != null) {
+            for (PageReference ref : productPage.getDatasets()) {
+                results.add(ref.getUri().toString());
+            }
         }
-        for (PageReference ref: productPage.getRelatedArticles()) {
-            results.add(ref.getUri().toString());
+        if (productPage.getRelatedArticles() != null) {
+            for (PageReference ref : productPage.getRelatedArticles()) {
+                results.add(ref.getUri().toString());
+            }
+        }
+
+        return results;
+    }
+    public static List<String> relatedUris(TaxonomyLandingPage landingPage) {
+        List<String > results = new ArrayList<>();
+
+        if (landingPage.getSections() != null) {
+            for (PageReference ref : landingPage.getSections()) {
+                if (ref.getUri() != null) {
+                    results.add(ref.getUri().toString());
+                }
+            }
         }
         return results;
     }
-
 
 }

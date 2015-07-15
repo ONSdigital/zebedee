@@ -1,8 +1,30 @@
 package com.github.onsdigital.zebedee.configuration;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.model.Users;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+
+
 public class Configuration {
+
+    public static class UserList   {
+        ArrayList<UserObject>   users;
+    }
+    public static class UserObject {
+        public String email;
+        public String name;
+        public String password;
+    }
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
     private static final String CONTENT_DIRECTORY = "target/content";
@@ -30,4 +52,18 @@ public class Configuration {
     public static String getContentDirectory() {
         return CONTENT_DIRECTORY;
     }
+
+    public static void buildUserAccounts(Path path, Zebedee zebedee, Session superSession) throws IOException, UnauthorizedException {
+
+        try(InputStream stream = Files.newInputStream(path)) {
+            UserList list = Serialiser.deserialise(stream, UserList.class);
+            for (UserObject object: list.users) {
+                User user = new User();
+                user.email = object.email;
+                user.name = object.name;
+                Users.createPublisher(zebedee, user, object.password, superSession);
+            }
+        }
+    }
+
 }

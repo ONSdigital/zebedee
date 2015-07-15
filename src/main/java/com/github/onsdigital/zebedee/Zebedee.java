@@ -1,15 +1,18 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
+import java.nio.file.Paths;
 
 public class Zebedee {
 
@@ -90,6 +93,17 @@ public class Zebedee {
         String password = "Doug4l";
         Users.createSystemUser(zebedee, user, password);
         Session session = zebedee.sessions.create("florence@magicroundabout.ons.gov.uk");
+
+
+        // Initialise users
+        try {
+            URI uri = Zebedee.class.getClassLoader().getResource("users.json").toURI();
+            Path path1 = Paths.get(uri);
+            Configuration.buildUserAccounts(path1,zebedee,session);
+        } catch (URISyntaxException e) {
+            throw new IOException("Error copying resource to file.", e);
+        }
+
 
         // todo - remove these once access functionality is available.
         user = new User();

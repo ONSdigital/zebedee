@@ -279,4 +279,6 @@ public class Users {
     private String normalise(String email) {
         return StringUtils.lowerCase(StringUtils.trim(email));
     }
+
+
 }

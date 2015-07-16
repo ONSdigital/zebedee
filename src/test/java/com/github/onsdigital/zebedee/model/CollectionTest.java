@@ -244,7 +244,7 @@ public class CollectionTest {
         assertFalse(Files.exists(inProgress.resolve(jsonFile)));
         assertFalse(Files.exists(inProgress.resolve(csvFile)));
         // check an event has been created for the content being deleted.
-        collection.description.eventsByUri.get(jsonFile).hasEventForType(ContentEventType.DELETED);
+        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(ContentEventType.DELETED);
     }
 
     @Test
@@ -266,7 +266,7 @@ public class CollectionTest {
         assertTrue(result);
         assertFalse(Files.exists(root.resolve(jsonFile)));
         assertFalse(Files.exists(root.resolve(csvFile)));
-        collection.description.eventsByUri.get(jsonFile).hasEventForType(ContentEventType.DELETED);
+        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(ContentEventType.DELETED);
     }
 
     @Test
@@ -288,7 +288,7 @@ public class CollectionTest {
         assertTrue(result);
         assertFalse(Files.exists(root.resolve(jsonFile)));
         assertFalse(Files.exists(root.resolve(csvFile)));
-        collection.description.eventsByUri.get(jsonFile).hasEventForType(ContentEventType.DELETED);
+        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(ContentEventType.DELETED);
     }
 
     @Test

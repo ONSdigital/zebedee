@@ -1,5 +1,8 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.ResourceUtils;
+import com.github.onsdigital.zebedee.api.File;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
@@ -9,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 
 public class Zebedee {
 
@@ -90,6 +92,13 @@ public class Zebedee {
         String password = "Doug4l";
         Users.createSystemUser(zebedee, user, password);
         Session session = zebedee.sessions.create("florence@magicroundabout.ons.gov.uk");
+
+
+        // Initialise users
+        java.io.File file = ResourceUtils.getFile("/users.json");
+        if (file != null) {
+            Configuration.buildUserAccounts(file, zebedee, session);
+        }
 
         // todo - remove these once access functionality is available.
         user = new User();

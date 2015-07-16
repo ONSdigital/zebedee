@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
+import com.github.onsdigital.zebedee.util.GraphUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -276,17 +277,26 @@ public class Content {
      * This requires a full traverse of .json content so should not be done lightly
      *
      */
-    public static void moveUri(String fromUri, String toUri, Zebedee zebedee) {
+    public void moveUri(String fromUri, String toUri) throws IOException {
 
+        if (Files.exists(toPath(fromUri))) {
+            // remove current linking
+            GraphUtils.backwardStrip(this, fromUri);
+
+            // move file
+            moveFile(fromUri, toUri);
+
+            // implement new linking
+            GraphUtils.backwardLink(this, toUri);
+        }
     }
-
     boolean moveFile(String fromUri, String toUri) throws IOException {
         Path pathFrom = toPath(fromUri);
         Path pathTo = toPath(toUri);
 
         if (Files.exists(pathFrom)) { // If there is a file to be deleted
-            Files.move(pathFrom, pathTo);
-            Files.delete(pathFrom);
+            FileUtils.moveDirectory(pathFrom.toFile(), pathTo.toFile());
+            //Files.delete(pathFrom);
             deleteEmptyParentDirectories(pathFrom);
             return true;
         }

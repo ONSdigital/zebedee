@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.util;
 
-import au.com.bytecode.opencsv.CSVWriter;
-import com.github.onsdigital.content.link.PageReference;
 import com.github.onsdigital.content.page.base.Page;
 import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
@@ -13,11 +11,11 @@ import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.model.*;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
@@ -28,6 +26,7 @@ import java.util.*;
  */
 public class Librarian {
     private static final Gson gson = new Gson();
+    private static boolean catalogueMade = false;
 
     Zebedee zebedee;
     int checkedUris = 0;
@@ -36,155 +35,28 @@ public class Librarian {
     List<HashMap<String, String>> articles = new ArrayList<>();
     List<HashMap<String, String>> pages = new ArrayList<>();
     List<HashMap<String, String>> datasets = new ArrayList<>();
-    List<HashMap<String, String>> landings = new ArrayList<>();
 
+    public List<HashMap<String, String>> contentErrors = new ArrayList<>();
 
-    public List<HashMap<String, String>> brokenLinks = new ArrayList<>();
     public List<String> invalidJson = new ArrayList<>();
-    List<HashMap<String, String>> falseUris = new ArrayList<>();
 
     public Librarian(Zebedee zebedee) {
         this.zebedee = zebedee;
     }
 
+    /**
+     * Build a list of all content
+     *
+     * @throws IOException
+     */
     public void catalogue() throws IOException {
         findBulletins();
         findArticles();
         findPages();
         findDatasets();
+        catalogueMade  = true;
     }
 
-    public boolean checkIntegrity() throws IOException {
-        checkedUris = 0;
-
-        checkBulletinIntegrity();
-        checkArticleIntegrity();
-        checkDatasetIntegrity();
-        checkProductPageIntegrity();
-
-        return false;
-    }
-    private boolean checkBulletinIntegrity() throws IOException {
-        for (HashMap<String, String> bulletinMap : bulletins) {
-            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(bulletinMap.get("Uri")).resolve("data.json"))) {
-                Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
-                for(String uri: GraphUtils.relatedUris(bulletin)) {
-                    if (zebedee.launchpad.get(uri) == null) {
-                        HashMap<String, String> map = new HashMap<>();
-                        map.put("type", "bulletin");
-                        map.put("source", bulletinMap.get("Uri"));
-                        map.put("link", uri);
-                        brokenLinks.add(map);
-                    }
-                    checkedUris ++;
-                }
-            }
-        }
-        return true;
-    }
-    private boolean checkArticleIntegrity() throws IOException {
-        for (HashMap<String, String> articleMap : articles) {
-            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(articleMap.get("Uri")).resolve("data.json"))) {
-                Article article = ContentUtil.deserialise(stream, Article.class);
-                for(String uri: GraphUtils.relatedUris(article)) {
-                    if (zebedee.launchpad.get(uri) == null) {
-                        HashMap<String, String> map = new HashMap<>();
-                        map.put("type", "article");
-                        map.put("source", articleMap.get("Uri"));
-                        map.put("link", uri);
-                        brokenLinks.add(map);
-                    }
-                    checkedUris ++;
-                }
-            }
-        }
-        return true;
-    }
-    private boolean checkDatasetIntegrity() throws IOException {
-        for (HashMap<String, String> datasetMap : datasets) {
-            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(datasetMap.get("Uri")).resolve("data.json"))) {
-                Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
-                for(String uri: GraphUtils.relatedUris(dataset)) {
-                    if (zebedee.launchpad.get(uri) == null) {
-                        HashMap<String, String> map = new HashMap<>();
-                        map.put("type", "dataset");
-                        map.put("source", datasetMap.get("Uri"));
-                        map.put("link", uri);
-                        brokenLinks.add(map);
-                    }
-                    checkedUris ++;
-                }
-            }
-        }
-        return true;
-    }
-    private boolean checkProductPageIntegrity() throws IOException {
-        for (HashMap<String, String> pageMap : pages) {
-            try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(pageMap.get("Uri")).resolve("data.json"))) {
-                String json = IOUtils.toString(stream);
-                Page page = ContentUtil.deserialisePage(json);
-                System.out.println(page.getUri().toString());
-                if (page.getType() == PageType.product_page) {
-                    ProductPage productPage = ContentUtil.deserialise(json, ProductPage.class);
-                    for (String uri : GraphUtils.relatedUris(productPage)) {
-                        if (zebedee.launchpad.get(uri) == null) {
-                            HashMap<String, String> map = new HashMap<>();
-                            map.put("type", "product_page");
-                            map.put("source", pageMap.get("Uri"));
-                            map.put("link", uri);
-                            brokenLinks.add(map);
-                        }
-                        checkedUris++;
-                    }
-                } else {
-                    TaxonomyLandingPage taxonomyLandingPage = ContentUtil.deserialise(json, TaxonomyLandingPage.class);
-                    for (String uri : GraphUtils.relatedUris(taxonomyLandingPage)) {
-                        if (zebedee.launchpad.get(uri) == null) {
-                            HashMap<String, String> map = new HashMap<>();
-                            map.put("type", "taxonomy_page");
-                            map.put("source", pageMap.get("Uri"));
-                            map.put("link", uri);
-                            brokenLinks.add(map);
-                        }
-                        checkedUris++;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    public boolean validateJSON() throws IOException {
-        List<Path> jsonFiles = launchpadMatching(jsonMatcher());
-        for (Path file: jsonFiles) {
-            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(file))) {
-                String json = IOUtils.toString(stream);
-                if (!isJSONValid(json)) {
-                    invalidJson.add(file.toString());
-                }
-            }
-        }
-        if (invalidJson.size() == 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static boolean isJSONValid(String JSON_STRING) {
-        try {
-            gson.fromJson(JSON_STRING, Object.class);
-            return true;
-        } catch(com.google.gson.JsonSyntaxException ex) {
-            return false;
-        }
-    }
-
-    /**
-     * Get all bulletins and list them
-     * 
-     * @throws IOException
-     */
     private void findBulletins () throws IOException {
         List<Path> bulletins = launchpadMatching(bulletinMatcher());
         for (Path bulletinPath: bulletins) {
@@ -212,16 +84,12 @@ public class Librarian {
                 bulletinDetails.put("Edition", bulletin.getDescription().getEdition());
                 bulletinDetails.put("NextRelease", bulletin.getDescription().getNextRelease());
                 bulletinDetails.put("Uri", bulletin.getUri().toString());
+                bulletinDetails.put("Path", bulletinPath.toString());
                 this.bulletins.add(bulletinDetails);
             }
         }
     }
 
-    /**
-     * Get all articles and list them
-     *
-     * @throws IOException
-     */
     private void findArticles() throws IOException {
         List<Path> articles = launchpadMatching(articleMatcher());
         for (Path articlePath: articles) {
@@ -249,16 +117,12 @@ public class Librarian {
                 articleDetails.put("Edition", article.getDescription().getEdition());
                 articleDetails.put("NextRelease", article.getDescription().getNextRelease());
                 articleDetails.put("Uri", article.getUri().toString());
+                articleDetails.put("Path", articlePath.toString());
                 this.articles.add(articleDetails);
             }
         }
     }
 
-    /**
-     * Get all T2 and T3s and list them
-     * 
-     * @throws IOException
-     */
     private void findPages() throws IOException {
         List<Path> pages = launchpadMatching(pageMatcher());
         for (Path pagePath: pages) {
@@ -285,6 +149,7 @@ public class Librarian {
                 }
 
                 pageDetails.put("Type", page.getType().toString());
+                pageDetails.put("Path", pagePath.toString());
                 if (page.getUri() != null) {
                     pageDetails.put("Uri", page.getUri().toString());
                 } else {
@@ -300,7 +165,7 @@ public class Librarian {
             }
         }
     }
-    
+
     private void findDatasets() throws IOException {
         List<Path> datasets = launchpadMatching(dataSetMatcher());
         for (Path datasetPath: datasets) {
@@ -328,12 +193,179 @@ public class Librarian {
                 datasetDetails.put("Edition", dataset.getDescription().getEdition());
                 datasetDetails.put("NextRelease", dataset.getDescription().getNextRelease());
                 datasetDetails.put("Uri", dataset.getUri().toString());
+                datasetDetails.put("Path", datasetPath.toString());
                 this.datasets.add(datasetDetails);
             }
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+
+
+    /**
+     * Check the specific uri links inside the flat file database
+     *
+     * @return
+     * @throws IOException
+     */
+    public boolean checkIntegrity() throws IOException {
+        checkedUris = 0;
+        if (!catalogueMade) { catalogue(); }
+
+        checkBulletinIntegrity();
+        checkArticleIntegrity();
+        checkDatasetIntegrity();
+        checkProductPageIntegrity();
+
+        if (contentErrors.size() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private boolean checkBulletinIntegrity() throws IOException {
+        for (HashMap<String, String> bulletinMap : bulletins) {
+
+            Path path = zebedee.launchpad.get(bulletinMap.get("Uri"));
+            if(path != null) { path = path.resolve("data.json"); }
+
+            if (path == null || !Files.exists(path)) {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("type", "bulletin");
+                map.put("source", bulletinMap.get("Path"));
+                map.put("fault", "broken uri");
+                contentErrors.add(map);
+            } else {
+                try (InputStream stream = Files.newInputStream(path)) {
+                    Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
+                    System.out.println("Checking bulletin: " + bulletin.getUri().toString());
+                    for (String uri : GraphUtils.relatedUris(bulletin)) {
+                        if (zebedee.launchpad.get(uri) == null) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("type", "bulletin");
+                            map.put("source", bulletinMap.get("Uri"));
+                            map.put("link", uri);
+                            contentErrors.add(map);
+                        }
+                        checkedUris++;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    private boolean checkArticleIntegrity() throws IOException {
+        for (HashMap<String, String> articleMap : articles) {
+
+            Path path = zebedee.launchpad.get(articleMap.get("Uri"));
+            if(path != null) { path = path.resolve("data.json"); }
+
+            if (path == null || !Files.exists(path)) {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("type", "article");
+                map.put("source", articleMap.get("Path"));
+                map.put("fault", "broken uri");
+                contentErrors.add(map);
+            } else {
+                try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(articleMap.get("Uri")).resolve("data.json"))) {
+                    Article article = ContentUtil.deserialise(stream, Article.class);
+                    for (String uri : GraphUtils.relatedUris(article)) {
+                        if (zebedee.launchpad.get(uri) == null) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("type", "article");
+                            map.put("source", articleMap.get("Uri"));
+                            map.put("link", uri);
+                            contentErrors.add(map);
+                        }
+                        checkedUris++;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    private boolean checkDatasetIntegrity() throws IOException {
+        for (HashMap<String, String> datasetMap : datasets) {
+            try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(datasetMap.get("Uri")).resolve("data.json"))) {
+                Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
+                for(String uri: GraphUtils.relatedUris(dataset)) {
+                    if (zebedee.launchpad.get(uri) == null) {
+                        HashMap<String, String> map = new HashMap<>();
+                        map.put("type", "dataset");
+                        map.put("source", datasetMap.get("Uri"));
+                        map.put("link", uri);
+                        contentErrors.add(map);
+                    }
+                    checkedUris ++;
+                }
+            }
+        }
+        return true;
+    }
+    private boolean checkProductPageIntegrity() throws IOException {
+        for (HashMap<String, String> pageMap : pages) {
+            try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(pageMap.get("Uri")).resolve("data.json"))) {
+                String json = IOUtils.toString(stream);
+                Page page = ContentUtil.deserialisePage(json);
+                System.out.println(page.getUri().toString());
+                if (page.getType() == PageType.product_page) {
+                    ProductPage productPage = ContentUtil.deserialise(json, ProductPage.class);
+                    for (String uri : GraphUtils.relatedUris(productPage)) {
+                        if (zebedee.launchpad.get(uri) == null) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("type", "product_page");
+                            map.put("source", pageMap.get("Uri"));
+                            map.put("link", uri);
+                            contentErrors.add(map);
+                        }
+                        checkedUris++;
+                    }
+                } else {
+                    TaxonomyLandingPage taxonomyLandingPage = ContentUtil.deserialise(json, TaxonomyLandingPage.class);
+                    for (String uri : GraphUtils.relatedUris(taxonomyLandingPage)) {
+                        if (zebedee.launchpad.get(uri) == null) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("type", "taxonomy_page");
+                            map.put("source", pageMap.get("Uri"));
+                            map.put("link", uri);
+                            contentErrors.add(map);
+                        }
+                        checkedUris++;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+
+    public boolean validateJSON() throws IOException {
+        List<Path> jsonFiles = launchpadMatching(jsonMatcher());
+        for (Path file: jsonFiles) {
+            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(file))) {
+                String json = IOUtils.toString(stream);
+                if (!isJSONValid(json)) {
+                    invalidJson.add(file.toString());
+                }
+            }
+        }
+        if (invalidJson.size() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isJSONValid(String json) {
+        try {
+            gson.fromJson(json, Object.class);
+            return true;
+        } catch(com.google.gson.JsonSyntaxException ex) {
+            return false;
+        }
+    }
+
+   // -----------------------------------------------------------------------------------------------------------------
+
 
     public List<Path> launchpadMatching(final PathMatcher matcher) throws IOException {
         Path startPath = zebedee.launchpad.path;
@@ -390,35 +422,11 @@ public class Librarian {
         };
         return  matcher;
     }
-    public static PathMatcher timeSeriesMatcher() {
-        PathMatcher matcher = new PathMatcher() {
-            @Override
-            public boolean matches(Path path) {
-                if (path.toString().contains("data.json") && path.toString().contains("timeseries")) {
-                    return true;
-                }
-                return false;
-            }
-        };
-        return  matcher;
-    }
     public static PathMatcher dataSetMatcher() {
         PathMatcher matcher = new PathMatcher() {
             @Override
             public boolean matches(Path path) {
                 if (path.toString().contains("data.json") && path.toString().contains("datasets")) {
-                    return true;
-                }
-                return false;
-            }
-        };
-        return  matcher;
-    }
-    public static PathMatcher productPageMatcher() {
-        PathMatcher matcher = new PathMatcher() {
-            @Override
-            public boolean matches(Path path) {
-                if (path.toString().contains("data.json") && path.toString().contains("bulletins")) {
                     return true;
                 }
                 return false;
@@ -439,7 +447,4 @@ public class Librarian {
         return  matcher;
     }
 
-    public static void main(String[] args) {
-        Librarian librarian = new Librarian(Root.zebedee);
-    }
 }

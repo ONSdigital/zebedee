@@ -3,14 +3,15 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.util.Librarian;
-import org.eclipse.jetty.http.HttpStatus;
+import org.apache.poi.util.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by thomasridd on 15/07/15.
@@ -35,7 +36,14 @@ public class Utils {
         // Currently let's just
 
         Librarian librarian = new Librarian(Root.zebedee);
-        librarian.validateJSON();
-        return Serialiser.serialise(librarian.invalidJson);
+        librarian.catalogue();
+        librarian.checkIntegrity();
+        String json = Serialiser.serialise(librarian.contentErrors);
+
+        try(InputStream stream = org.apache.commons.io.IOUtils.toInputStream(json); OutputStream output = response.getOutputStream()) {
+            IOUtils.copy(stream, output);
+        }
+
+        return "X";
     }
 }

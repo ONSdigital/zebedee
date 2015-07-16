@@ -1,13 +1,17 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.content.link.PageReference;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
+import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.Zebedee;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +24,6 @@ import static org.junit.Assert.*;
  * Created by thomasridd on 16/07/15.
  */
 public class GraphUtilsTest {
-
 
     @Test
     public void graphUtilsShouldIdentifyRelatedLinksOnABulletin() {
@@ -162,5 +165,22 @@ public class GraphUtilsTest {
         // we expect the links above repeated
         List<String> expected = Arrays.asList("section1", "section2");
         assertArrayEquals(expected.toArray(), relatedUris.toArray());
+    }
+
+    @Test
+    public void graphUtilsShouldIdentifyProductPage() throws IOException {
+        // With a basic zebedee setup
+        Builder bob = new Builder(ContentToolsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Zebedee zebedee = new Zebedee(bob.zebedee);
+        String uri = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
+
+        // When we get the product page
+        ProductPage page = GraphUtils.productPageForPageWithURI(zebedee.launchpad, uri);
+
+        // Then
+        // we expect
+        String pageUri = "/themea/landinga/producta";
+        assertEquals(pageUri, page.getUri().toString());
+
     }
 }

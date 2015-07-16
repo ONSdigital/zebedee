@@ -1,10 +1,12 @@
 package com.github.onsdigital.zebedee.util;
 
 import com.github.onsdigital.content.link.PageReference;
+import com.github.onsdigital.content.page.base.Page;
 import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.staticpage.Methodology;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
+import com.github.onsdigital.content.page.statistics.document.base.StatisticalDocument;
 import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
@@ -13,10 +15,14 @@ import com.github.onsdigital.content.partial.DownloadSection;
 import com.github.onsdigital.content.partial.FigureSection;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.File;
+import com.github.onsdigital.zebedee.model.Content;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,10 +59,16 @@ public class GraphUtils {
     public void knit() throws IOException {
         librarian.catalogue(); // Builds an index to the website
 
+        // Ensure product pages have references to their children
+
+
+        // Ensure product page cross referencing
+
+
         // Same bulletin dataset<->dataset references
         checkDatasetsInTheSameStatsBulletinReferenceEachOther();
 
-        //
+        // If anything is linked do the vice versa
         checkNondirectionalityInGraph();
 
         // Except links to bulletins which should be to the current version
@@ -96,6 +108,95 @@ public class GraphUtils {
     }
     private void ensureDatasetsToPages(String uri1, String uri2) {
 
+    }
+
+    /**
+     * Reverses up the hierarchy
+     * @param uri
+     */
+    public static void backwardLink(Content content, String uri) throws IOException {
+
+        if (Files.exists(content.toPath(uri).resolve("data.json"))) {
+
+            try(InputStream stream = Files.newInputStream(content.toPath(uri).resolve("data.json"))) {
+                Page page = ContentUtil.deserialisePage(stream);
+                if (page.getType() == PageType.bulletin) {
+                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    ensureLink(productPage.getStatsBulletins(), uri);
+
+                } else if (page.getType() == PageType.article) {
+                    ProductPage productPage = productPageForPageWithURI(content,uri);
+                    ensureLink(productPage.getRelatedArticles(), uri);
+
+                }  else if (page.getType() == PageType.dataset) {
+                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    ensureLink(productPage.getDatasets(), uri);
+
+                } else if (page.getType() == PageType.timeseries || page.getType() == PageType.data_slice) {
+                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    ensureLink(productPage.getItems(), uri);
+
+                }
+            }
+        }
+    }
+    public static void backwardStrip(Content content, String uri) throws IOException {
+        Path path = content.toPath(uri).resolve("data.json");
+        if (Files.exists(path)) {
+
+            try(InputStream stream = Files.newInputStream(content.toPath(uri).resolve("data.json"))) {
+                Page page = ContentUtil.deserialisePage(stream);
+                if (page.getType() == PageType.bulletin) {
+                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    stripAnyLink(productPage.getStatsBulletins(), uri);
+
+                } else if (page.getType() == PageType.article) {
+                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    stripAnyLink(productPage.getRelatedArticles(), uri);
+
+                }  else if (page.getType() == PageType.dataset) {
+                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    stripAnyLink(productPage.getDatasets(), uri);
+
+                } else if (page.getType() == PageType.timeseries || page.getType() == PageType.data_slice) {
+                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    stripAnyLink(productPage.getItems(), uri);
+
+                }
+            }
+        }
+    }
+
+    static ProductPage productPageForPageWithURI(Content content, String uri) throws IOException {
+        String current = uri.toLowerCase();
+        while( !current.equalsIgnoreCase("/") ) {
+            current = current.substring(0, current.lastIndexOf("/"));
+            if (content.get(current + "/data.json") != null) {
+                try (InputStream stream = Files.newInputStream(content.toPath(current).resolve("data.json"))) {
+                    Page page = ContentUtil.deserialisePage(stream);
+                    if (page.getType() == PageType.product_page) {
+                        return (ProductPage) page;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    private static void ensureLink(List<PageReference> links, String uri) {
+        for (PageReference ref: links) {
+            if (ref.getUri().toString().equalsIgnoreCase(uri)) { return; }
+        }
+        links.add(new PageReference(URI.create(uri)));
+    }
+    private static void stripAnyLink(List<PageReference> links, String uri) {
+        PageReference strip = null;
+        for (PageReference ref: links) {
+            if (ref.getUri().toString().equalsIgnoreCase(uri)) {
+                strip = ref;
+                break;
+            }
+        }
+        if (strip != null) { links.remove(strip); }
     }
 
     // Related links ---------------------------------------------------------------------------------------------------
@@ -203,5 +304,6 @@ public class GraphUtils {
         }
         return results;
     }
+
 
 }

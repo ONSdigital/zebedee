@@ -42,20 +42,43 @@ public class GraphUtils {
         this.librarian = new Librarian(zebedee);
     }
 
+    // Knit functionality ----------------------------------------------------------------------------------------------
+    /**
+     * Knit checks through links made in the data and ensures a dense mesh of references without having to hand check
+     *
+     * TODO: Use and test this functionality in a wider context
+     *
+     * @throws IOException
+     */
     public void knit() throws IOException {
         librarian.catalogue(); // Builds an index to the website
 
+        // Same bulletin dataset<->dataset references
         checkDatasetsInTheSameStatsBulletinReferenceEachOther();
+
+        //
         checkNondirectionalityInGraph();
+
+        // Except links to bulletins which should be to the current version
         removeReverseRelationshipsToOutdatedStatsBulletins();
     }
 
     private void checkDatasetsInTheSameStatsBulletinReferenceEachOther() throws IOException {
+        // For every bulletin
         for (HashMap<String, String> bulletinDict: librarian.bulletins) {
             String uri = bulletinDict.get("Uri");
             try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(uri))) {
                 Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
                 List<PageReference> relatedData = bulletin.getRelatedData();
+
+                // For every pair of datasets referenced
+                for(int i = 0; i < relatedData.size() - 1; i++) {
+                    for (int j = i + 1; j < relatedData.size(); j++) {
+                        // Ensure they reference each other
+                        ensureDatasetsBidirectional(relatedData.get(i).getUri().toString(),
+                                relatedData.get(j).getUri().toString());
+                    }
+                }
             }
         }
     }
@@ -75,7 +98,13 @@ public class GraphUtils {
 
     }
 
-
+    // Related links ---------------------------------------------------------------------------------------------------
+    /**
+     * Find all links within the bulletin/article/dataset/...
+     *
+     * @param bulletin
+     * @return
+     */
     public static List<String> relatedUris(Bulletin bulletin) {
         List<String > results = new ArrayList<>();
         for (PageReference ref: bulletin.getRelatedBulletins()) {
@@ -127,8 +156,13 @@ public class GraphUtils {
         for (PageReference ref: dataset.getRelatedDatasets()) {
             results.add(ref.getUri().toString());
         }
-        for (PageReference ref: dataset.getRelatedMethodology()) {
-            results.add(ref.getUri().toString());
+
+        if (dataset.getRelatedMethodology() != null) {
+            for (PageReference ref : dataset.getRelatedMethodology()) {
+                if (ref.getUri() != null) {
+                    results.add(ref.getUri().toString());
+                }
+            }
         }
         return results;
     }

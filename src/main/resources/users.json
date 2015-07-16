@@ -47,6 +47,11 @@
 	},
 	{
 	  "name": "Matt Jukes",
+	  "email": "m.jukes@ons.gov.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Jukesie",
 	  "email": "jukesie@ons.gov.uk",
 	  "password": "Magic5yf&Roundabout"
 	},
@@ -148,6 +153,46 @@
 	{
 	  "name": "Onkar Chiroma",
 	  "email": "o.chiroma@methods.co.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Bren Esser",
+	  "email": "b.esser@methods.co.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Carl Hembrough",
+	  "email": "c.hembrough@methods.co.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Sarah Evans",
+	  "email": "s.evans@ons.gov.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "John Lewis",
+	  "email": "j.lewis@ons.gov.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Scott Griffith",
+	  "email": "s.griffith@ons.gov.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Claire Jones",
+	  "email": "c.jones@ons.gov.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Sam Hall",
+	  "email": "s.hall@ons.gov.uk",
+	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Rachel Meese",
+	  "email": "r.meese@ons.gov.uk",
 	  "password": "Magic5yf&Roundabout"
 	}
   ]

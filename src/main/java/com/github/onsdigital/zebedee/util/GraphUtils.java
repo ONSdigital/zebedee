@@ -17,12 +17,15 @@ import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.model.Content;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -305,5 +308,56 @@ public class GraphUtils {
         return results;
     }
 
+    public static List<String> relatedUrisForPage(Page page) {
+        if (page.getType() == PageType.article) {
+            return relatedUris((Article) page);
+        } else if (page.getType() == PageType.bulletin) {
+            return relatedUris((Bulletin) page);
+        } else if (page.getType() == PageType.dataset) {
+            return relatedUris((Dataset) page);
+        } else if (page.getType() == PageType.product_page) {
+            return relatedUris((ProductPage) page);
+        } else if (page.getType() == PageType.taxonomy_landing_page) {
+            return relatedUris((TaxonomyLandingPage) page);
+        } else {
+            return new ArrayList<>();
+        }
+    }
 
+
+    public static void main(String[] args) throws IOException {
+        final Path basePath = Paths.get("/Users/Tom.Ridd/Documents/onswebsite/workingcollections/collections");
+
+            final List<String> relations = new ArrayList<>();
+            final List<String> origins = new ArrayList<>();
+
+            final PathMatcher matcher = Librarian.dataDotJsonMatcher();
+
+            Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                        throws IOException {
+                    if (matcher.matches(file)) {
+                        try(InputStream stream = Files.newInputStream(file)) {
+                            Page page = ContentUtil.deserialisePage(stream);
+                            List<String> relatedUrisForPage = relatedUrisForPage(page);
+                            for(String relatedUri: relatedUrisForPage) {
+                                relations.add(relatedUri);
+                                origins.add(basePath.relativize(file).toString());
+                            }
+                        }
+
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+
+        List<String> outputLines = new ArrayList<>();
+        for(int i = 0; i < relations.size(); i++) {
+            outputLines.add(origins.get(i) + "\t" + relations.get(i));
+        }
+        Path outputPath = Paths.get("/Users/Tom.Ridd/Documents/onswebsite/links.tsv");
+        FileUtils.writeLines(outputPath.toFile(), outputLines);
+
+    }
 }

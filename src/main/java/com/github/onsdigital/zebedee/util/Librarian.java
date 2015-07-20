@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.content.page.base.Page;
 import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
@@ -266,6 +267,7 @@ public class Librarian {
             } else {
                 try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(articleMap.get("Uri")).resolve("data.json"))) {
                     Article article = ContentUtil.deserialise(stream, Article.class);
+                    System.out.println("Checking article: " + article.getUri().toString());
                     for (String uri : GraphUtils.relatedUris(article)) {
                         if (zebedee.launchpad.get(uri) == null) {
                             HashMap<String, String> map = new HashMap<>();
@@ -285,6 +287,7 @@ public class Librarian {
         for (HashMap<String, String> datasetMap : datasets) {
             try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(datasetMap.get("Uri")).resolve("data.json"))) {
                 Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
+                System.out.println("Checking dataset: " + dataset.getUri().toString());
                 for(String uri: GraphUtils.relatedUris(dataset)) {
                     if (zebedee.launchpad.get(uri) == null) {
                         HashMap<String, String> map = new HashMap<>();
@@ -307,6 +310,7 @@ public class Librarian {
                 System.out.println(page.getUri().toString());
                 if (page.getType() == PageType.product_page) {
                     ProductPage productPage = ContentUtil.deserialise(json, ProductPage.class);
+                    System.out.println("Checking product: " + productPage.getUri().toString());
                     for (String uri : GraphUtils.relatedUris(productPage)) {
                         if (zebedee.launchpad.get(uri) == null) {
                             HashMap<String, String> map = new HashMap<>();

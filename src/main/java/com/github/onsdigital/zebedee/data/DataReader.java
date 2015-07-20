@@ -58,10 +58,10 @@ public class DataReader implements ContentService {
         Path dataPath = collection.find(session.email, uri);
         // Look for a data.json file, or
         // fall back to adding a .json file extension
-        if (Files.exists(dataPath)) {
-            return Files.newInputStream(dataPath);
-        } else {
+        if (dataPath == null || !Files.exists(dataPath)) {
             throw new ContentNotFoundException("No data found under  " + uri);
+        } else {
+            return Files.newInputStream(dataPath);
         }
 
     }

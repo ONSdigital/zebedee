@@ -10,8 +10,6 @@ import com.github.onsdigital.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.model.*;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 
@@ -124,7 +122,7 @@ public class Librarian {
     }
 
     private void findPages() throws IOException {
-        List<Path> pages = launchpadMatching(pageMatcher());
+        List<Path> pages = launchpadMatching(taxonomyPageMatcher());
         for (Path pagePath: pages) {
             try(InputStream stream = Files.newInputStream(zebedee.path.resolve(pagePath))) {
                 ProductPage page = ContentUtil.deserialise(stream, ProductPage.class);
@@ -409,7 +407,7 @@ public class Librarian {
         };
         return  matcher;
     }
-    public static PathMatcher pageMatcher() {
+    public static PathMatcher taxonomyPageMatcher() {
         PathMatcher matcher = new PathMatcher() {
             @Override
             public boolean matches(Path path) {
@@ -448,5 +446,16 @@ public class Librarian {
         return  matcher;
     }
 
-
+    public static PathMatcher dataDotJsonMatcher() {
+        PathMatcher matcher = new PathMatcher() {
+            @Override
+            public boolean matches(Path path) {
+                if (path.toString().endsWith("data.json")) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        return  matcher;
+    }
 }

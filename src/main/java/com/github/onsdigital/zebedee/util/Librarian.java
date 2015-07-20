@@ -287,8 +287,9 @@ public class Librarian {
         for (HashMap<String, String> datasetMap : datasets) {
             try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(datasetMap.get("Uri")).resolve("data.json"))) {
                 Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
-                for(String uri: GraphUtils.relatedUris(dataset)) {
-                    if (zebedee.launchpad.get(uri) == null) {
+                List<String> relatedUris = GraphUtils.relatedUris(dataset);
+                for(String uri: relatedUris) {
+                    if ((uri == null) || zebedee.launchpad.get(uri) == null) {
                         HashMap<String, String> map = new HashMap<>();
                         map.put("type", "dataset");
                         map.put("source", datasetMap.get("Uri"));
@@ -446,5 +447,6 @@ public class Librarian {
         };
         return  matcher;
     }
+
 
 }

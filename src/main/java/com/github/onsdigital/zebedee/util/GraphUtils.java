@@ -228,36 +228,51 @@ public class GraphUtils {
     }
     public static List<String> relatedUris(Article article) {
         List<String > results = new ArrayList<>();
-        for (PageReference ref: article.getRelatedArticles()) {
-            results.add(ref.getUri().toString());
+        if (article == null) {return results;};
+
+        if (article.getRelatedArticles() != null) {
+            for (PageReference ref : article.getRelatedArticles()) {
+                results.add(ref.getUri().toString());
+            }
         }
-        for (PageReference ref: article.getRelatedData()) {
-            results.add(ref.getUri().toString());
+        if (article.getRelatedData() != null) {
+            for (PageReference ref : article.getRelatedData()) {
+                results.add(ref.getUri().toString());
+            }
         }
-        for (FigureSection ref: article.getCharts()) {
-            results.add(ref.getUri().toString() + ".json");
-            results.add(ref.getUri().toString() + ".png");
-            results.add(ref.getUri().toString() + "-download.png");
+        if (article.getCharts() != null) {
+            for (FigureSection ref : article.getCharts()) {
+                results.add(ref.getUri().toString() + ".json");
+                results.add(ref.getUri().toString() + ".png");
+                results.add(ref.getUri().toString() + "-download.png");
+            }
         }
-        for (FigureSection ref: article.getTables()) {
-            results.add(ref.getUri().toString() + ".json");
-            results.add(ref.getUri().toString() + ".html");
-            results.add(ref.getUri().toString() + ".xls");
+        if (article.getTables() != null) {
+            for (FigureSection ref : article.getTables()) {
+                results.add(ref.getUri().toString() + ".json");
+                results.add(ref.getUri().toString() + ".html");
+                results.add(ref.getUri().toString() + ".xls");
+            }
         }
         return results;
     }
     public static List<String> relatedUris(Dataset dataset) {
         List<String > results = new ArrayList<>();
-        for (PageReference ref: dataset.getRelatedDocuments()) {
-            results.add(ref.getUri().toString());
+        if (dataset.getRelatedDocuments() != null) {
+            for (PageReference ref : dataset.getRelatedDocuments()) {
+                results.add(ref.getUri().toString());
+            }
         }
-        for (DownloadSection ref: dataset.getDownloads()) {
-            results.add(ref.getFile());
+        if (dataset.getDownloads() != null) {
+            for (DownloadSection ref : dataset.getDownloads()) {
+                results.add(ref.getFile());
+            }
         }
-        for (PageReference ref: dataset.getRelatedDatasets()) {
-            results.add(ref.getUri().toString());
+        if (dataset.getRelatedDatasets() != null) {
+            for (PageReference ref : dataset.getRelatedDatasets()) {
+                results.add(ref.getUri().toString());
+            }
         }
-
         if (dataset.getRelatedMethodology() != null) {
             for (PageReference ref : dataset.getRelatedMethodology()) {
                 if (ref.getUri() != null) {
@@ -271,7 +286,11 @@ public class GraphUtils {
         List<String > results = new ArrayList<>();
         if (productPage.getStatsBulletins() != null) {
             for (PageReference ref : productPage.getStatsBulletins()) {
-                results.add(ref.getUri().toString());
+                if (ref != null && ref.getUri() != null) {
+                    results.add(ref.getUri().toString());
+                } else {
+                    results.add("NULLURI");
+                }
             }
         }
         if (productPage.getItems() != null) {

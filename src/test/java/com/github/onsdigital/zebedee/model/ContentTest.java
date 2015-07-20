@@ -244,7 +244,7 @@ public class ContentTest {
         assertTrue(results.contains("/somedirectory/" + jsonFile));
     }
 
-    @Test
+    //@Test
     public void moveBulletinShouldShiftDirectory() throws IOException {
         // Given
         // a bootstrapped version of zebedee

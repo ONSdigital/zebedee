@@ -231,7 +231,11 @@ public class GraphUtils {
     }
     public static List<String> relatedUris(Article article) {
         List<String > results = new ArrayList<>();
-        if(article.getRelatedArticles() != null) {
+
+        if (article == null) {return results;};
+
+        if (article.getRelatedArticles() != null) {
+
             for (PageReference ref : article.getRelatedArticles()) {
                 results.add(ref.getUri().toString());
             }
@@ -264,17 +268,16 @@ public class GraphUtils {
                 results.add(ref.getUri().toString());
             }
         }
-//        for (DownloadSection ref: dataset.getDownloads()) {
-//            if (ref.getFile() != null) {
-//                results.add(ref.getFile());
-//            }
-//        }
+        if (dataset.getDownloads() != null) {
+            for (DownloadSection ref : dataset.getDownloads()) {
+                results.add(ref.getFile());
+            }
+        }
         if (dataset.getRelatedDatasets() != null) {
             for (PageReference ref : dataset.getRelatedDatasets()) {
                 results.add(ref.getUri().toString());
             }
         }
-
         if (dataset.getRelatedMethodology() != null) {
             for (PageReference ref : dataset.getRelatedMethodology()) {
                 if (ref.getUri() != null) {
@@ -288,7 +291,11 @@ public class GraphUtils {
         List<String > results = new ArrayList<>();
         if (productPage.getStatsBulletins() != null) {
             for (PageReference ref : productPage.getStatsBulletins()) {
-                results.add(ref.getUri().toString());
+                if (ref != null && ref.getUri() != null) {
+                    results.add(ref.getUri().toString());
+                } else {
+                    results.add("NULLURI");
+                }
             }
         }
         if (productPage.getItems() != null) {

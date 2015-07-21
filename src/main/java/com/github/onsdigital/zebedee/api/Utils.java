@@ -36,9 +36,12 @@ public class Utils {
         // Currently let's just
 
         Librarian librarian = new Librarian(Root.zebedee);
-        librarian.catalogue();
-        librarian.checkIntegrity();
-        String json = Serialiser.serialise(librarian.contentErrors);
+        //librarian.catalogue();
+        //librarian.checkIntegrity();
+        librarian.validateJSON();
+
+        //String json = Serialiser.serialise(librarian.contentErrors);
+        String json = Serialiser.serialise(librarian.invalidJson);
 
         try(InputStream stream = org.apache.commons.io.IOUtils.toInputStream(json); OutputStream output = response.getOutputStream()) {
             IOUtils.copy(stream, output);

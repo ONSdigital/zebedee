@@ -8,9 +8,6 @@ RUN echo '{"service": {"name": "zebedee", "tags": ["blue"], "port": 8080, "check
 WORKDIR /usr/src
 ADD ./target/*-jar-with-dependencies.jar /usr/src/target/
 
-# Build jar-with-dependencies
-RUN mvn install -DskipTests
-
 # Update the entry point script
 RUN mv /usr/entrypoint/container.sh /usr/src/
 ENV PACKAGE_PREFIX com.github.onsdigital.zebedee.api

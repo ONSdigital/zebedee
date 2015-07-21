@@ -280,13 +280,16 @@ public class Content {
     public void moveUri(String fromUri, String toUri) throws IOException {
 
         if (Files.exists(toPath(fromUri))) {
-            // remove current linking
+            // remove current linking from current parent tree
             GraphUtils.backwardStrip(this, fromUri);
 
             // move file
+            GraphUtils.replaceLinks(this, fromUri, toUri);
+
             moveFile(fromUri, toUri);
 
-            // implement new linking
+
+            // implement new linking in parent tree
             GraphUtils.backwardLink(this, toUri);
         }
     }
@@ -301,5 +304,8 @@ public class Content {
             return true;
         }
         return false;
+    }
+    void updateURIs(String fromUri, String toUri) {
+
     }
 }

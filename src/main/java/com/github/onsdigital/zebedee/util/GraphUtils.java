@@ -19,11 +19,14 @@ import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.model.Content;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -121,26 +124,35 @@ public class GraphUtils {
 
         if (Files.exists(content.toPath(uri).resolve("data.json"))) {
 
+            // Insert file into appropriate set of links
+            ProductPage productPage = null;
             try(InputStream stream = Files.newInputStream(content.toPath(uri).resolve("data.json"))) {
                 Page page = ContentUtil.deserialisePage(stream);
                 if (page.getType() == PageType.bulletin) {
-                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    productPage = productPageForPageWithURI(content, uri);
                     ensureLink(productPage.getStatsBulletins(), uri);
 
                 } else if (page.getType() == PageType.article) {
-                    ProductPage productPage = productPageForPageWithURI(content,uri);
+                    productPage = productPageForPageWithURI(content,uri);
                     ensureLink(productPage.getRelatedArticles(), uri);
 
                 }  else if (page.getType() == PageType.dataset) {
-                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    productPage = productPageForPageWithURI(content, uri);
                     ensureLink(productPage.getDatasets(), uri);
 
                 } else if (page.getType() == PageType.timeseries || page.getType() == PageType.data_slice) {
-                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    productPage = productPageForPageWithURI(content, uri);
                     ensureLink(productPage.getItems(), uri);
 
                 }
             }
+
+            // Write the file
+            if (productPage != null) {
+                Path productPagePath = content.toPath(productPage.getUri().toString()).resolve("data.json");
+                FileUtils.writeStringToFile(productPagePath.toFile(), ContentUtil.serialise(productPage));
+            }
+
         }
     }
     public static void backwardStrip(Content content, String uri) throws IOException {
@@ -148,26 +160,80 @@ public class GraphUtils {
         if (Files.exists(path)) {
 
             try(InputStream stream = Files.newInputStream(content.toPath(uri).resolve("data.json"))) {
+                // Open the file
                 Page page = ContentUtil.deserialisePage(stream);
+                ProductPage productPage = null;
+
+                // Find the parent product page
+                // Strip any links
                 if (page.getType() == PageType.bulletin) {
-                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    productPage = productPageForPageWithURI(content, uri);
                     stripAnyLink(productPage.getStatsBulletins(), uri);
 
                 } else if (page.getType() == PageType.article) {
-                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    productPage = productPageForPageWithURI(content, uri);
                     stripAnyLink(productPage.getRelatedArticles(), uri);
 
                 }  else if (page.getType() == PageType.dataset) {
-                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    productPage = productPageForPageWithURI(content, uri);
                     stripAnyLink(productPage.getDatasets(), uri);
 
                 } else if (page.getType() == PageType.timeseries || page.getType() == PageType.data_slice) {
-                    ProductPage productPage = productPageForPageWithURI(content, uri);
+                    productPage = productPageForPageWithURI(content, uri);
                     stripAnyLink(productPage.getItems(), uri);
 
                 }
+
+                // Write the file
+                if (productPage != null) {
+                    Path productPagePath = content.toPath(productPage.getUri().toString()).resolve("data.json");
+                    FileUtils.writeStringToFile(productPagePath.toFile(), ContentUtil.serialise(productPage));
+                }
             }
         }
+    }
+
+    /**
+     * Replaces in path and subfolders through the simple mechanism of replacing uri
+     *
+     * @param content
+     * @param fromUri
+     * @param toUri
+     * @throws IOException
+     */
+    public static void replaceLinks(Content content, final String fromUri, final String toUri) throws IOException {
+        final Path path = content.toPath(fromUri).resolve("data.json");
+
+        if (Files.exists(path)) {
+
+            final PathMatcher matcher = new PathMatcher() {
+                @Override
+                public boolean matches(Path path) {
+                    if (path.toString().endsWith(".json")) {
+                        return true;
+                    }
+                    return false;
+                }
+            };
+
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                        throws IOException {
+                    if (matcher.matches(file)) {
+                        replaceInFile(file, fromUri, toUri);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
+    }
+    static void replaceInFile(Path path, String fromUri, String toUri) throws IOException {
+        Charset charset = StandardCharsets.UTF_8;
+
+        String content = new String(Files.readAllBytes(path), charset);
+        content = content.replaceAll(fromUri, toUri);
+        Files.write(path, content.getBytes(charset));
     }
 
     static ProductPage productPageForPageWithURI(Content content, String uri) throws IOException {

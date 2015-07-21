@@ -3,8 +3,13 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.content.page.statistics.document.article.Article;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.util.Librarian;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
+import org.bouncycastle.util.Strings;
+import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +17,10 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by thomasridd on 15/07/15.
@@ -22,31 +31,35 @@ public class Utils {
      *
      */
     @GET
-    public String utilMethods(HttpServletRequest request,
+    public void utilMethods(HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
 
-//        Session session = Root.zebedee.sessions.get(request);
-
-//        // Check whether we have access - currently this requires any logged in permissions
-//        if (Root.zebedee.permissions.isAdministrator(session) || Root.zebedee.permissions.canEdit(session)) {
-//            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-//            return null;
-//        }
-
         // Currently let's just
-
-        Librarian librarian = new Librarian(Root.zebedee);
-        //librarian.catalogue();
-        //librarian.checkIntegrity();
-        librarian.validateJSON();
-
-        //String json = Serialiser.serialise(librarian.contentErrors);
-        String json = Serialiser.serialise(librarian.invalidJson);
-
-        try(InputStream stream = org.apache.commons.io.IOUtils.toInputStream(json); OutputStream output = response.getOutputStream()) {
-            IOUtils.copy(stream, output);
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.canEdit(session.email) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return;
         }
 
-        return "X";
+        String[] sections = StringUtils.split(request.getRequestURI(), "/");
+        if (sections.length == 0) { return ; }
+        String util = sections[1];
+
+        if (util.equalsIgnoreCase("move")) {
+            return;
+        } else if (util.equalsIgnoreCase("catalogue")) {
+            Librarian librarian = new Librarian(Root.zebedee);
+            librarian.catalogue();
+
+            response.setContentType("text/csv");
+            response.setHeader("Content-Disposition", "attachment; filename=\"catalogue.csv\"");
+
+            Path catalogue = librarian.csvOfCatalogue();
+            try (OutputStream outputStream = response.getOutputStream(); InputStream inputStream = Files.newInputStream(catalogue))
+            {
+                IOUtils.copy(inputStream, outputStream);
+            }
+            return;
+        }
     }
 }

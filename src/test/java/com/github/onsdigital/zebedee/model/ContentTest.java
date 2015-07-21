@@ -244,8 +244,42 @@ public class ContentTest {
         assertTrue(results.contains("/somedirectory/" + jsonFile));
     }
 
-    //@Test
-    public void moveBulletinShouldShiftDirectory() throws IOException {
+    @Test
+         public void moveBulletinShouldShiftDirectory() throws IOException {
+        // Given
+        // a bootstrapped version of zebedee
+        Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Zebedee zebedee = new Zebedee(bob.zebedee);
+
+        // When we shift a file
+        String currentUri = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
+        String movedUri = "/themea/landinga/productb/bulletins/bulletina/2015-01-01";
+        zebedee.launchpad.moveUri(currentUri, movedUri);
+
+        // We expect
+        // The file to be moved...
+        assertTrue(Files.exists(zebedee.launchpad.toPath(movedUri)));
+    }
+
+    @Test
+    public void moveBulletinShouldRemoveOldDirectory() throws IOException {
+        // Given
+        // a bootstrapped version of zebedee
+        Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Zebedee zebedee = new Zebedee(bob.zebedee);
+
+        // When we shift a file
+        String currentUri = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
+        String movedUri = "/themea/landinga/productb/bulletins/bulletina/2015-01-01";
+        zebedee.launchpad.moveUri(currentUri, movedUri);
+
+        // We expect
+        // The file to be moved...
+        assertFalse(Files.exists(zebedee.launchpad.toPath(currentUri)));
+    }
+
+    @Test
+    public void moveBulletinShouldUpdateLinks() throws IOException {
         // Given
         // a bootstrapped version of zebedee
         Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));

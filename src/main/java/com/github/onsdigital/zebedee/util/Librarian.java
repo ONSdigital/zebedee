@@ -1,7 +1,8 @@
 package com.github.onsdigital.zebedee.util;
 
-import com.github.davidcarboni.restolino.json.Serialiser;
+import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.content.page.base.Page;
+import com.github.onsdigital.content.page.base.PageDescription;
 import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
@@ -14,7 +15,10 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
@@ -198,7 +202,84 @@ public class Librarian {
         }
     }
 
+    public Path csvOfCatalogue() throws IOException {
+        Path path = Files.createTempFile("catalogue", ".csv");
+        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
 
+            String[] row;
+            row = new String[10];
+            row[0] = "Title";
+            row[1] = "Edition";
+            row[2] = "Folder";
+            row[3] = "Theme";
+            row[4] = "Level2";
+            row[5] = "Level3";
+            row[6] = "Date on URI";
+            row[7] = "Release Date";
+            row[8] = "Next Release";
+            row[9] = "Type";
+
+            writer.writeNext(row);
+
+            List<Path> paths = launchpadMatching(articleMatcher());
+            paths.addAll(launchpadMatching(bulletinMatcher()));
+            paths.addAll(launchpadMatching(dataSetMatcher()));
+
+            for (Path pagePath: paths) {
+
+                row[3] = pagePath.subpath(1,2).toString();;
+                row[4] = pagePath.subpath(2,3).toString();;
+                if(pagePath.subpath(3,4).toString().equalsIgnoreCase("articles") || pagePath.subpath(3,4).toString().equalsIgnoreCase("bulletins") || pagePath.subpath(3,4).toString().equalsIgnoreCase("datasets")) {
+                    row[5] = "";
+                    row[2] = pagePath.subpath(4,5).toString();
+                    row[6] = pagePath.subpath(5,6).toString();
+                } else {
+                    row[5] = pagePath.subpath(3,4).toString();;
+                    row[2] = pagePath.subpath(5,6).toString();;
+                    row[6] = pagePath.subpath(6,7).toString();;
+                }
+
+                Page page = null;
+                try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(pagePath))) {
+                    page = ContentUtil.deserialisePage(inputStream);
+                }
+
+                if (page != null) {
+                    row[9] = page.getType().toString();
+
+                    PageDescription description = page.getDescription();
+                    if (description.getReleaseDate() != null) {
+                        row[7] = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(description.getReleaseDate());
+                    } else {
+                        row[7] = "";
+                    }
+
+                    if (description.getTitle() != null) {
+                        row[0] = description.getTitle();
+                    } else {
+                        row[0] = "";
+                    }
+
+                    if (description.getEdition() != null) {
+                        row[1] = description.getEdition();
+                    } else {
+                        row[1] = "";
+                    }
+
+                    if (description.getNextRelease() != null) {
+                        row[8] = description.getNextRelease();
+                    } else {
+                        row[8] = "";
+                    }
+
+                    writer.writeNext(row);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return path;
+    }
 
     /**
      * Check the specific uri links inside the flat file database
@@ -463,4 +544,6 @@ public class Librarian {
         };
         return  matcher;
     }
+
+
 }

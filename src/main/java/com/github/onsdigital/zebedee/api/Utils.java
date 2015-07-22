@@ -5,6 +5,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.util.Librarian;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
@@ -45,8 +46,14 @@ public class Utils {
         if (sections.length == 0) { return ; }
         String util = sections[1];
 
+        // Move function
         if (util.equalsIgnoreCase("move")) {
+            String fromUri = request.getParameter("fromUri");
+            String toUri = request.getParameter("toUri");
+            Root.zebedee.launchpad.moveUri(fromUri, toUri);
             return;
+
+            // Catalogue function
         } else if (util.equalsIgnoreCase("catalogue")) {
             Librarian librarian = new Librarian(Root.zebedee);
             librarian.catalogue();
@@ -60,6 +67,13 @@ public class Utils {
                 IOUtils.copy(inputStream, outputStream);
             }
             return;
+
+            // Full list of internal links
+        } else if (util.equalsIgnoreCase("links")) {
+
+            // Checks for broken links
+        } else if (util.equalsIgnoreCase("validate")) {
+
         }
     }
 }

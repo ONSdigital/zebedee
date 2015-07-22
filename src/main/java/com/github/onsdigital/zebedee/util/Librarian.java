@@ -207,7 +207,7 @@ public class Librarian {
         try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(path), Charset.forName("UTF8")), ',')) {
 
             String[] row;
-            row = new String[10];
+            row = new String[11];
             row[0] = "Title";
             row[1] = "Edition";
             row[2] = "Folder";
@@ -218,6 +218,7 @@ public class Librarian {
             row[7] = "Release Date";
             row[8] = "Next Release";
             row[9] = "Type";
+            row[10] = "URI";
 
             writer.writeNext(row);
 
@@ -246,7 +247,9 @@ public class Librarian {
 
                 if (page != null) {
                     row[9] = page.getType().toString();
-
+                    if (page.getUri() != null) {
+                        row[10] = page.getUri().toString();
+                    }
                     PageDescription description = page.getDescription();
                     if (description.getReleaseDate() != null) {
                         row[7] = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(description.getReleaseDate());

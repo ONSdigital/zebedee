@@ -440,10 +440,10 @@ public class DataPublisher {
                 contact.setName(datasetPage.getDescription().getContact().getName());
             }
             if(datasetPage.getDescription().getContact().getTelephone() != null) {
-                contact.setName(datasetPage.getDescription().getContact().getTelephone());
+                contact.setTelephone(datasetPage.getDescription().getContact().getTelephone());
             }
             if(datasetPage.getDescription().getContact().getEmail() != null) {
-                contact.setName(datasetPage.getDescription().getContact().getEmail());
+                contact.setEmail(datasetPage.getDescription().getContact().getEmail());
             }
 
             page.getDescription().setContact(contact);

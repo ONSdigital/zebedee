@@ -12,6 +12,7 @@ import com.github.onsdigital.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.data.SimpleReader;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 
@@ -42,6 +43,7 @@ public class Librarian {
     public List<HashMap<String, String>> contentErrors = new ArrayList<>();
 
     public List<String> invalidJson = new ArrayList<>();
+    public List<String> unresolvableContent = new ArrayList<>();
 
     public Librarian(Zebedee zebedee) {
         this.zebedee = zebedee;
@@ -92,7 +94,6 @@ public class Librarian {
             }
         }
     }
-
     private void findArticles() throws IOException {
         List<Path> articles = launchpadMatching(articleMatcher());
         for (Path articlePath: articles) {
@@ -125,7 +126,6 @@ public class Librarian {
             }
         }
     }
-
     private void findPages() throws IOException {
         List<Path> pages = launchpadMatching(taxonomyPageMatcher());
         for (Path pagePath: pages) {
@@ -168,7 +168,6 @@ public class Librarian {
             }
         }
     }
-
     private void findDatasets() throws IOException {
         List<Path> datasets = launchpadMatching(dataSetMatcher());
         for (Path datasetPath: datasets) {
@@ -284,6 +283,17 @@ public class Librarian {
         return path;
     }
 
+    //----------------------------------------------------------------------------------------------
+
+    public void checkResolvable() throws IOException {
+        List<Path> paths = launchpadMatching(dataDotJsonMatcher());
+        SimpleReader launchpadService = SimpleReader.launchpadReader(zebedee);
+
+
+    }
+
+    //----------------------------------------------------------------------------------------------
+
     /**
      * Check the specific uri links inside the flat file database
      *
@@ -305,6 +315,7 @@ public class Librarian {
             return false;
         }
     }
+
     private boolean checkBulletinIntegrity() throws IOException {
         for (HashMap<String, String> bulletinMap : bulletins) {
 

@@ -40,6 +40,12 @@ public class Builder {
     public Team labourMarketTeam;
     public Team inflationTeam;
 
+    /**
+     * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
+     *
+     * @param name
+     * @throws IOException
+     */
     public Builder(Class<?> name) throws IOException {
         Root.env = new HashMap<>();
 
@@ -165,6 +171,13 @@ public class Builder {
         }
     }
 
+    /**
+     * Constructor to build an instance of zebedee using a predefined set of content
+     *
+     * @param name
+     * @param bootStrap
+     * @throws IOException
+     */
     public Builder(Class<?> name, Path bootStrap) throws IOException {
         this(name);
 

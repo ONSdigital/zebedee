@@ -169,12 +169,15 @@ public class GraphUtilsTest {
 
     @Test
     public void graphUtilsShouldIdentifyProductPage() throws IOException {
-        // With a basic zebedee setup
-        Builder bob = new Builder(ContentToolsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        // With
+        // The Basic zebedee setup
+        Builder bob = new Builder(GraphUtils.class, ResourceUtils.getPath("/bootstraps/basic"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
-        String uri = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
 
-        // When we get the product page
+
+        // When
+        // We identify the product page for
+        String uri = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
         ProductPage page = GraphUtils.productPageForPageWithURI(zebedee.launchpad, uri);
 
         // Then

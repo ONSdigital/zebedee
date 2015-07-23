@@ -17,7 +17,7 @@ public class UtilsTest {
     @Test
     public void testTheLibrarian() throws IOException {
         // With a basic zebedee setup
-        Builder bob = new Builder(ContentToolsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Builder bob = new Builder(UtilsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
 
         // When we run catalogue
@@ -32,7 +32,7 @@ public class UtilsTest {
     @Test
     public void testIntegrityCheckDoesntPickUpGoodLinks() throws IOException {
         // With a basic zebedee setup
-        Builder bob = new Builder(ContentToolsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Builder bob = new Builder(UtilsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
 
         // When we run catalogue
@@ -48,7 +48,7 @@ public class UtilsTest {
     @Test
     public void testIntegrityCheckDetectsBrokenLinks() throws IOException {
         // With a basic zebedee setup
-        Builder bob = new Builder(ContentToolsTest.class, ResourceUtils.getPath("/bootstraps/broken"));
+        Builder bob = new Builder(UtilsTest.class, ResourceUtils.getPath("/bootstraps/broken"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
 
         // When we run integrity check
@@ -63,7 +63,7 @@ public class UtilsTest {
     @Test
     public void testJsonValidityDoesntPickupGoodJSON() throws IOException {
         // With a basic zebedee setup
-        Builder bob = new Builder(ContentToolsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Builder bob = new Builder(UtilsTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
 
         // When we validate all JSON
@@ -77,7 +77,7 @@ public class UtilsTest {
     @Test
     public void testJsonValidityDoesPickupBadJSON() throws IOException {
         // With a basic zebedee setup
-        Builder bob = new Builder(ContentToolsTest.class, ResourceUtils.getPath("/bootstraps/broken"));
+        Builder bob = new Builder(UtilsTest.class, ResourceUtils.getPath("/bootstraps/broken"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
 
         // When we validate all JSON

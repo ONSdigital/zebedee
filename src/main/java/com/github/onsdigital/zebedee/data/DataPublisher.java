@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.data;
 import com.github.onsdigital.content.page.base.PageDescription;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.content.partial.Contact;
 import com.github.onsdigital.content.partial.DownloadSection;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
@@ -348,6 +349,9 @@ public class DataPublisher {
         page.getDescription().setCdid(series.getDescription().getCdid());
         page.getDescription().setTitle(series.getDescription().getTitle());
 
+        page.getDescription().setDate(series.getDescription().getDate());
+        page.getDescription().setNumber(series.getDescription().getNumber());
+
         return page;
     }
 
@@ -428,6 +432,23 @@ public class DataPublisher {
         }
         description.setNextRelease(datasetPage.getDescription().getNextRelease());
         description.setReleaseDate(datasetPage.getDescription().getReleaseDate());
+
+        // Set some details
+        if (datasetPage.getDescription().getContact() != null) {
+            Contact contact = new Contact();
+            if(datasetPage.getDescription().getContact().getName() != null) {
+                contact.setName(datasetPage.getDescription().getContact().getName());
+            }
+            if(datasetPage.getDescription().getContact().getTelephone() != null) {
+                contact.setTelephone(datasetPage.getDescription().getContact().getTelephone());
+            }
+            if(datasetPage.getDescription().getContact().getEmail() != null) {
+                contact.setEmail(datasetPage.getDescription().getContact().getEmail());
+            }
+
+            page.getDescription().setContact(contact);
+        }
+
 
         // Add the dataset id if relevant
         boolean datasetIsNew = true;

@@ -4,12 +4,14 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.content.page.base.Page;
 import com.github.onsdigital.content.page.base.PageDescription;
 import com.github.onsdigital.content.page.base.PageType;
+import com.github.onsdigital.content.page.home.HomePage;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
 
 import com.github.onsdigital.content.page.taxonomy.ProductPage;
 import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
+import com.github.onsdigital.content.service.ContentNotFoundException;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.SimpleReader;
@@ -102,7 +104,7 @@ public class Librarian {
 
                 HashMap<String,String > articleDetails = new HashMap<>();
                 articleDetails.put("Theme", articlePath.subpath(1, 2).toString());;
-                articleDetails.put("Level2", articlePath.subpath(2,3).toString());;
+                articleDetails.put("Level2", articlePath.subpath(2, 3).toString());;
                 if(articlePath.subpath(3,4).toString().equalsIgnoreCase("articles")) {
                     articleDetails.put("Level3", "");
                     articleDetails.put("Title", articlePath.subpath(4,5).toString());
@@ -289,7 +291,36 @@ public class Librarian {
         List<Path> paths = launchpadMatching(dataDotJsonMatcher());
         SimpleReader launchpadService = SimpleReader.launchpadReader(zebedee);
 
+        unresolvableContent = new ArrayList<>();
+        for (Path path: paths) {
 
+            Path file = zebedee.path.resolve(path);
+            try(InputStream inputStream = Files.newInputStream(file)) {
+
+                Page page = ContentUtil.deserialisePage(inputStream);
+                if(page.getType() == PageType.bulletin) {
+                    Bulletin bulletin = (Bulletin) page;
+                    //bulletin.loadReferences(launchpadService);
+                } else if (page.getType() == PageType.article) {
+                    Article article = (Article) page;
+                    //article.loadReferences(launchpadService);
+                } else if (page.getType() == PageType.home_page) {
+                    HomePage typedPage = (HomePage) page;
+                    //typedPage.loadReferences(launchpadService);
+                } else if (page.getType() == PageType.taxonomy_landing_page) {
+                    TaxonomyLandingPage typedPage = (TaxonomyLandingPage) page;
+                    typedPage.loadReferences(launchpadService);
+                } else if (page.getType() == PageType.dataset) {
+                    Dataset typedPage = (Dataset) page;
+                    //typedPage.loadReferences(launchpadService);
+                } else if (page.getType() == PageType.product_page) {
+                    ProductPage typedPage = (ProductPage) page;
+                    //typedPage.loadReferences(launchpadService);
+                }
+            } catch (ContentNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //----------------------------------------------------------------------------------------------

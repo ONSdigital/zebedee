@@ -220,7 +220,7 @@ public class Sessions extends TimerTask {
      * @param session The session to update.
      * @throws IOException If a filesystem error occurs.
      */
-    private void updateLastAccess(Session session) throws IOException {
+    public void updateLastAccess(Session session) throws IOException {
         if (session != null) {
             session.lastAccess = new Date();
             write(session);

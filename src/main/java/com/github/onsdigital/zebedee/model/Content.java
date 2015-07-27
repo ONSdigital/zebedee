@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
+import com.github.onsdigital.zebedee.util.GraphUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -265,5 +267,45 @@ public class Content {
                 break;
             }
         }
+    }
+
+    /**
+     * Move content from one uri to another
+     *
+     * 1. Copy all content
+     * 2. Cop
+     * This requires a full traverse of .json content so should not be done lightly
+     *
+     */
+    public void moveUri(String fromUri, String toUri) throws IOException {
+
+        if (Files.exists(toPath(fromUri))) {
+            // remove current linking from current parent tree
+            GraphUtils.backwardStrip(this, fromUri);
+
+            // move file
+            GraphUtils.replaceLinks(this, fromUri, toUri);
+
+            moveFile(fromUri, toUri);
+
+
+            // implement new linking in parent tree
+            GraphUtils.backwardLink(this, toUri);
+        }
+    }
+    boolean moveFile(String fromUri, String toUri) throws IOException {
+        Path pathFrom = toPath(fromUri);
+        Path pathTo = toPath(toUri);
+
+        if (Files.exists(pathFrom)) { // If there is a file to be deleted
+            FileUtils.moveDirectory(pathFrom.toFile(), pathTo.toFile());
+            //Files.delete(pathFrom);
+            deleteEmptyParentDirectories(pathFrom);
+            return true;
+        }
+        return false;
+    }
+    void updateURIs(String fromUri, String toUri) {
+
     }
 }

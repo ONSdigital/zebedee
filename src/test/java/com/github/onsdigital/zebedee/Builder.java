@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
@@ -39,6 +40,12 @@ public class Builder {
     public Team labourMarketTeam;
     public Team inflationTeam;
 
+    /**
+     * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
+     *
+     * @param name
+     * @throws IOException
+     */
     public Builder(Class<?> name) throws IOException {
         Root.env = new HashMap<>();
 
@@ -162,6 +169,25 @@ public class Builder {
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
+    }
+
+    /**
+     * Constructor to build an instance of zebedee using a predefined set of content
+     *
+     * @param name
+     * @param bootStrap
+     * @throws IOException
+     */
+    public Builder(Class<?> name, Path bootStrap) throws IOException {
+        this(name);
+
+        FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
+        FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
+        Files.createDirectory(this.zebedee.resolve(Zebedee.PUBLISHED));
+        Files.createDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD));
+
+        FileUtils.copyDirectory(bootStrap.toFile(), this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
+        FileUtils.copyDirectory(bootStrap.toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
     }
 
     private Set<Integer> set(Team team) {

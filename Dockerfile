@@ -13,4 +13,4 @@ ADD ./zebedee-cms/target/*-jar-with-dependencies.jar /usr/src/target/
 # Update the entry point script
 RUN mv /usr/entrypoint/container.sh /usr/src/
 ENV PACKAGE_PREFIX com.github.onsdigital.zebedee.api
-RUN echo "java -Drestolino.packageprefix=$PACKAGE_PREFIX -jar zebedee-cms/target/*-jar-with-dependencies.jar" >> container.sh
+RUN echo "java -Drestolino.packageprefix=$PACKAGE_PREFIX -jar target/*-jar-with-dependencies.jar" >> container.sh

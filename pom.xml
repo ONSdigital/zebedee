@@ -5,11 +5,20 @@
     <groupId>com.github.onsdigital</groupId>
     <artifactId>zebedee</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>zebedee-cms</module>
+        <module>zebedee-reader</module>
+    </modules>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.7</java.version>
+        <encoding>UTF-8</encoding>
+        <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
     </properties>
+
 
     <repositories>
         <!-- Adding maven central repo explicitly to perent jitpack.io resolve artifacts that are already on Github. Otherwise handlebars-java fails -->
@@ -29,20 +38,28 @@
         </repository>
     </repositories>
 
+
     <dependencies>
 
-        <!-- Test -->
+        <!-- ONS Content Library, fetched through jitpack.io -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
+            <groupId>com.github.ONSdigital</groupId>
+            <artifactId>content-library</artifactId>
+            <version>content-library-1.0.59</version>
+        </dependency>
+
+        <!-- commons -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
         </dependency>
+
 
         <!-- Main -->
         <dependency>
@@ -56,119 +73,46 @@
             <version>1.2.5</version>
         </dependency>
 
-        <!-- File upload -->
+        <!-- Test -->
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.3</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- ONS Content Library, fetched through jitpack.io -->
-        <dependency>
-            <groupId>com.github.ONSdigital</groupId>
-            <artifactId>content-library</artifactId>
-            <version>content-library-1.0.57</version>
-        </dependency>
-
-
-        <!-- ONS Content Library, snapshot local install used for development, comment out -->
-        <!--<dependency>-->
-            <!--<groupId>com.github.onsdigital</groupId>-->
-            <!--<artifactId>content-library</artifactId>-->
-        <!--<version>1.0.53-SNAPSHOT</version>-->
-        <!--</dependency>-->
-
-        <!-- commons etc. -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.davidcarboni</groupId>
-            <artifactId>resource-utils</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-scratchpad</artifactId>
-            <version>3.10.1</version>
-        </dependency>
-
-        <!-- Spreadsheet handling -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.10.1</version>
-        </dependency>
-
-        <!-- CSV generator (currently in Zebedee but should end up in Brian) -->
-        <dependency>
-            <groupId>net.sf.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>2.3</version>
-        </dependency>
-
-
-        <!-- Http -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.4.1</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>2.3</version>
-        </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Any sub modules depending on Zebedee reader should depend on project version as all modules are released together under same version-->
+            <dependency>
+                <groupId>com.github.onsdigital</groupId>
+                <artifactId>zebedee-reader</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
     <build>
 
-        <resources>
-            <!-- Standard resources -->
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <!-- Taxonomy structure -->
-            <resource>
-                <directory>src/main/content</directory>
-                <targetPath>${project.build.directory}/content</targetPath>
-            </resource>
-        </resources>
-
         <plugins>
-
             <!-- Java 1.7 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <encoding>UTF-8</encoding>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${encoding}</encoding>
                 </configuration>
             </plugin>
 
@@ -182,50 +126,6 @@
                     <threadCount>5</threadCount>
                     <perCoreThreadCount>true</perCoreThreadCount>
                 </configuration>
-            </plugin>
-
-            <!-- Standalone assembly JAR (includes all dependencies) for deployment: -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.github.davidcarboni.restolino.Main</mainClass>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- A folder of dependencies is used in development when reloading classes: -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.9</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <!-- Default output folder is ${project.build.directory}/dependency -->
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>

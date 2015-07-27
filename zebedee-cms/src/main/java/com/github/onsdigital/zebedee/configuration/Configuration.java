@@ -29,7 +29,7 @@ public class Configuration {
     }
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
-    private static final String CONTENT_DIRECTORY = "target/content";
+    private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
 
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);

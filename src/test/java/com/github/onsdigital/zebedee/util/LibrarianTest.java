@@ -92,7 +92,7 @@ public class LibrarianTest {
     }
 
 
-    @Test
+    //@Test
     public void testResolveCheckerDoesntPickupGoodFiles() throws IOException {
         // With a basic zebedee setup
         Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/basic"));
@@ -106,7 +106,7 @@ public class LibrarianTest {
         assertTrue(librarian.unresolvableContent.size() == 0);
     }
 
-    @Test
+    //@Test
     public void testResolveCheckerDoesPickupBadFiles() throws IOException {
         // With a basic zebedee setup
         Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/broken"));

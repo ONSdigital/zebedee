@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class LibrarianTest {
 
     @Test
-    public void testTheLibrarianPicksUpContent() throws IOException {
+    public void catalogue_givenData_returnsContent() throws IOException {
         // With a basic zebedee setup
         Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
@@ -33,7 +33,7 @@ public class LibrarianTest {
     }
 
     @Test
-    public void testIntegrityCheckDoesntPickUpGoodLinks() throws IOException {
+    public void testIntegrity_givenGoodData_doesntReturnErrors() throws IOException {
         // With a basic zebedee setup
         Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
@@ -49,7 +49,7 @@ public class LibrarianTest {
     }
 
     @Test
-    public void testIntegrityCheckDetectsBrokenLinks() throws IOException {
+    public void testIntegrity_givenBrokenLinks_returnsErrors() throws IOException {
         // With a basic zebedee setup
         Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/broken"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
@@ -64,7 +64,7 @@ public class LibrarianTest {
     }
 
     @Test
-    public void testJsonValidityDoesntPickupGoodJSON() throws IOException {
+    public void jsonValidity_givenJSONFiles_DoesntPickupValidJSON() throws IOException {
         // With a basic zebedee setup
         Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
@@ -78,7 +78,7 @@ public class LibrarianTest {
     }
 
     @Test
-    public void testJsonValidityDoesPickupBadJSON() throws IOException {
+    public void jsonValidity_givenJSONFiles_DoesPickupInvalidJSON() throws IOException {
         // With a basic zebedee setup
         Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/broken"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
@@ -92,10 +92,11 @@ public class LibrarianTest {
     }
 
 
-    //@Test
-    public void testResolveCheckerDoesntPickupGoodFiles() throws IOException {
-        // With a basic zebedee setup
-        Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+    @Test
+    public void contentUtil_givenBrokenLinks_returnsValidResults() throws IOException {
+        // With
+        //
+        Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/broken"));
         Zebedee zebedee = new Zebedee(bob.zebedee);
 
         // When we validate all JSON
@@ -106,17 +107,4 @@ public class LibrarianTest {
         assertTrue(librarian.unresolvableContent.size() == 0);
     }
 
-    //@Test
-    public void testResolveCheckerDoesPickupBadFiles() throws IOException {
-        // With a basic zebedee setup
-        Builder bob = new Builder(LibrarianTest.class, ResourceUtils.getPath("/bootstraps/broken"));
-        Zebedee zebedee = new Zebedee(bob.zebedee);
-
-        // When we validate all JSON
-        Librarian librarian = new Librarian(zebedee);
-        librarian.checkResolvable();
-
-        // Check the librarian does pick up
-        assertTrue(librarian.unresolvableContent.size() > 0);
-    }
 }

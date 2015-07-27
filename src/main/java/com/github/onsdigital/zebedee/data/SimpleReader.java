@@ -1,11 +1,16 @@
 package com.github.onsdigital.zebedee.data;
 
+import com.github.onsdigital.content.DirectoryListing;
 import com.github.onsdigital.content.service.ContentNotFoundException;
 import com.github.onsdigital.content.service.ContentService;
+import com.github.onsdigital.content.util.ContentUtil;
+
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.model.Content;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -37,6 +42,15 @@ public class SimpleReader implements ContentService {
         try {
             return getDataStream(uri);
         }  catch (IOException e) {
+            throw new RuntimeException("Failed reading data at " + uri);
+        }
+    }
+
+    @Override
+    public DirectoryListing readDirectory(String uri) {
+        try {
+            return ContentUtil.listDirectory(this.content.path);
+        } catch (IOException e) {
             throw new RuntimeException("Failed reading data at " + uri);
         }
     }

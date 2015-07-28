@@ -6,10 +6,8 @@ RUN echo '{"service": {"name": "zebedee", "tags": ["blue"], "port": 8080, "check
 
 # Add the repo source
 WORKDIR /usr/src
-ADD . /usr/src
-
-# Build jar-with-dependencies
-RUN mvn install -DskipTests
+ADD git_commit_id /usr/src/
+ADD ./target/*-jar-with-dependencies.jar /usr/src/target/
 
 # Update the entry point script
 RUN mv /usr/entrypoint/container.sh /usr/src/

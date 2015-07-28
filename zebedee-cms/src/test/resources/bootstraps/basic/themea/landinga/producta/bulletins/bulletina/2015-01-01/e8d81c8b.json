@@ -1,0 +1,131 @@
+{
+  "type": "chart",
+  "title": "Figure 2: Percentage of VAT and/or PAYE based enterprises by year, 2009 to 2014",
+  "filename": "e8d81c8b",
+  "uri": "/themea/landinga/producta/bulletins/bulletina/2015-01-01/e8d81c8b",
+  "subtitle": "",
+  "unit": "%",
+  "source": "Inter Departmental Business Register (IDBR), Office for National Statistics",
+  "legend": "false",
+  "hideLegend": true,
+  "notes": "",
+  "altText": "",
+  "data": [
+    {
+      "Year": "2009",
+      "Sole Proprietors and Partnerships": "37.9",
+      "Companies and Public Corporations": "58.2",
+      "date": "2009-01-01T00:00:00.000Z",
+      "label": "2009"
+    },
+    {
+      "Year": "2010",
+      "Sole Proprietors and Partnerships": "37.0",
+      "Companies and Public Corporations": "58.9",
+      "date": "2010-01-01T00:00:00.000Z",
+      "label": "2010"
+    },
+    {
+      "Year": "2011",
+      "Sole Proprietors and Partnerships": "36.0",
+      "Companies and Public Corporations": "59.8",
+      "date": "2011-01-01T00:00:00.000Z",
+      "label": "2011"
+    },
+    {
+      "Year": "2012",
+      "Sole Proprietors and Partnerships": "34.0",
+      "Companies and Public Corporations": "61.9",
+      "date": "2012-01-01T00:00:00.000Z",
+      "label": "2012"
+    },
+    {
+      "Year": "2013",
+      "Sole Proprietors and Partnerships": "32.0",
+      "Companies and Public Corporations": "64.0",
+      "date": "2013-01-01T00:00:00.000Z",
+      "label": "2013"
+    },
+    {
+      "Year": "2014",
+      "Sole Proprietors and Partnerships": "29.9",
+      "Companies and Public Corporations": "66.1",
+      "date": "2014-01-01T00:00:00.000Z",
+      "label": "2014"
+    }
+  ],
+  "headers": [
+    "Year",
+    "Sole Proprietors and Partnerships",
+    "Companies and Public Corporations"
+  ],
+  "series": [
+    "Sole Proprietors and Partnerships",
+    "Companies and Public Corporations"
+  ],
+  "categories": [
+    "2009",
+    "2010",
+    "2011",
+    "2012",
+    "2013",
+    "2014"
+  ],
+  "aspectRatio": "0.56",
+  "chartType": "line",
+  "files": [
+    {
+      "type": "download-png",
+      "filename": "e8d81c8b-download.png"
+    },
+    {
+      "type": "png",
+      "filename": "e8d81c8b.png"
+    }
+  ],
+  "isTimeSeries": true,
+  "timeSeries": [
+    {
+      "Year": "2009",
+      "Sole Proprietors and Partnerships": "37.9",
+      "Companies and Public Corporations": "58.2",
+      "date": "2009-01-01T00:00:00.000Z",
+      "label": "2009"
+    },
+    {
+      "Year": "2010",
+      "Sole Proprietors and Partnerships": "37.0",
+      "Companies and Public Corporations": "58.9",
+      "date": "2010-01-01T00:00:00.000Z",
+      "label": "2010"
+    },
+    {
+      "Year": "2011",
+      "Sole Proprietors and Partnerships": "36.0",
+      "Companies and Public Corporations": "59.8",
+      "date": "2011-01-01T00:00:00.000Z",
+      "label": "2011"
+    },
+    {
+      "Year": "2012",
+      "Sole Proprietors and Partnerships": "34.0",
+      "Companies and Public Corporations": "61.9",
+      "date": "2012-01-01T00:00:00.000Z",
+      "label": "2012"
+    },
+    {
+      "Year": "2013",
+      "Sole Proprietors and Partnerships": "32.0",
+      "Companies and Public Corporations": "64.0",
+      "date": "2013-01-01T00:00:00.000Z",
+      "label": "2013"
+    },
+    {
+      "Year": "2014",
+      "Sole Proprietors and Partnerships": "29.9",
+      "Companies and Public Corporations": "66.1",
+      "date": "2014-01-01T00:00:00.000Z",
+      "label": "2014"
+    }
+  ]
+}

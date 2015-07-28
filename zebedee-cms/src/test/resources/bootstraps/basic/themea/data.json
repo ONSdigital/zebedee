@@ -1,0 +1,24 @@
+{
+  "sections": [
+    {
+      "uri": "/themea/landinga",
+      "index": 0
+    },
+    {
+      "uri": "/themea/landingb",
+      "index": 1
+    }
+  ],
+  "index": 1,
+  "type": "taxonomy_landing_page",
+  "uri": "/themea",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    }
+  ],
+  "description": {
+    "title": "Theme A",
+    "summary": "Top level taxonomy item A"
+  }
+}

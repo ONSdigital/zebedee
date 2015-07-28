@@ -1,0 +1,31 @@
+{
+  "intro": {
+    "title": "Welcome to Zebstrap",
+    "markdown": "A quick version of zebedee with two themes two levels "
+  },
+  "sections": [
+    {
+      "theme": {
+        "uri": "/themea"
+      },
+      "statistics": {
+        "uri": "/themea/level2aa/timeseries/d7g7"
+      }
+    },
+    {
+      "theme": {
+        "uri": "/themeb"
+      },
+      "statistics": {
+        "uri": "/economy/grossdomesticproductgdp/timeseries/ihyq"
+      }
+    }
+  ],
+  "type": "home_page",
+  "uri": "/",
+  "breadcrumb": [],
+  "description": {
+    "title": "Home",
+    "summary": "Zebstrap"
+	}
+}

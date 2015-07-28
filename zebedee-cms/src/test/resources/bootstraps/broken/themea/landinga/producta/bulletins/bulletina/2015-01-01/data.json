@@ -1,0 +1,105 @@
+{
+  "relatedBulletins": [],
+  "sections": [
+    {
+      "title": "Headline figures",
+      "markdown": "- The number of VAT and/or PAYE businesses is estimated to have risen by 96,000 (4.4%) between March 2013 and March 2014. This is in line with the performance of the UK economy\n- Companies and public corporations’ numbers have continued to rise and represent 66.1% of total businesses. The number of sole proprietors and partnerships has continued to decline and now represents 29.9% of total businesses.\n- The largest industry group is professional, scientific and technical, with 17.5% of all registered businesses in the UK.\n- London has the largest number of VAT and/or PAYE based businesses, with 17.7% of the UK total and has also experienced the largest growth of 7.7% between 2013 and 2014.\n"
+    },
+    {
+      "title": "Summary",
+      "markdown": "There were 2.26 million enterprises registered for VAT and/or PAYE in March 2014, compared with 2.17 million in March 2013, a rise of around 96,000 (4.4%).\n"
+    },
+    {
+      "title": "Economic context",
+      "markdown": "The rise and fall in the number of VAT and/or PAYE businesses (Figure 1) is broadly consistent with the performance of the UK economy over the past five years. The recent economic downturn was the deepest on record, as the UK experienced a peak-to-trough fall in real GDP of -6.0% between Q1 2008 and Q2 2009.\n\nAs economic conditions worsened, the number of VAT and/or PAYE registered enterprises started to fall, on a trend that continued until 2011: two years after the trough in GDP. This fall is also consistent with the sharp reduction in the employment rate, which reached a low of 70.1% in September 2011.\n\nThe subsequent pick up in business creation may also have supported the strengthening of the labour market since the end of 2011. In particular, stronger business creation may have followed a revival in confidence in labour market outcomes over this period.\n\nThe [October 2014 Economic Review](http://www.ons.gov.uk/ons/rel/elmr/economic-review/october-2014/art-oct-er.html \"ART_Oct_ER\") identified a rise in the number of job to job flows (the rate at which individuals move from one job to another) over this period, largely as a consequence of increasing job mobility and a larger number of voluntary moves, both between industries and occupational groups. These trends may indicate increasing employer and employee confidence, which may in turn have been reflected in the growing number of registered businesses. \n\n####Figure 1: Number of VAT and/or PAYE based enterprises, 2009 to 2014\n[![Figure 1: Number of VAT and/or PAYE based enterprises, 2009 to 2014](http://www.ons.gov.uk/ons/resources/2014chart1_tcm77-382610.png \"Figure 1: Number of VAT and/or PAYE based enterprises, 2009 to 2014\")](http://www.ons.gov.uk/ons/resources/2014chart1_tcm77-382610.png)\n#####Source: Office for National Statistics\n#####Notes:\n\n1. Approximately 31,000 of the change betwen 2011 and 2012 was caused by improvements to HMRC computer systems leading to previously excluded businesses being added to the IDBR (See background note 7).\n2. Between 2013 and 2014 HMRC introduced a Real Time Information system for PAYE (see background note 8).\n\nThe recovery in the number of registered businesses may also have been driven by a marked rise in the number of self-employed workers. Over the past 40 years, self-employment has generally risen at a gradual rate. However, in recent years it increased sharply, from 13.6% of all employment in May−July 2011, to 14.2% in August−October 2011 and rose to 15.0% of all employment in April−June 2014. This increase in self employment tracks the changes in the number of VAT and/or PAYE businesses over this period.\n\nThe high number and growth rate of VAT and/or PAYE businesses of 7.7% in London, compared to the rest of the UK, is also reflected in regional labour market data. The unemployment rate in London for 16−64 year olds fell by 2.3 percentage points in the year to June−August 2014, from 9.0% to 6.7%: the largest fall in unemployment in any of the UK regions. \n"
+    },
+    {
+      "title": "Business counts by legal form",
+      "markdown": "Between March 2013 and March 2014, there was a 2.2% reduction in the number of sole proprietors and partnerships, while corporate businesses increased by 7.9%.\n\nFigure 2 shows the gradual increase in incorporation and the decline in sole proprietors and partnerships over the last five years, which reflects a range of benefits that can be achieved by using this legal form.\n\nOver this period the new PAYE Real Time Information (RTI) system was rolled out across businesses. Please see background note 8 for more details.\n\n<ons-chart path=\"/themea/landinga/producta/bulletins/bulletina/2015-01-01/e8d81c8b\" />\n\n- Corporate businesses (companies and public corporations) represented 66.1% of total enterprises, up 2.1 percentage points from 64% in 2013. 42.9% of the corporate business figure is made up of single employee limited companies, which have increased by 42,000 between 2013 and 2014.\n\n- Sole proprietors represented 19.6% of total enterprises, down 1.1 percentage points from 20.7% in 2013.\n\n- Partnerships represented 10.3% of total enterprises, down 0.9 percentage points from    11.2% in 2013.\n\n- General government and non-profit making bodies represented 3.9% of total enterprises, compared with 4% in 2013. \n"
+    },
+    {
+      "title": "Business counts by broad industry",
+      "markdown": "In 2014, the professional, scientific and technical sector accounted for the largest number of businesses, with 17.5% of all registered enterprises in the UK. Wholesale, retail and repair of motor vehicles was the second largest sector, with 16% of all enterprises registered, although it experienced a decrease in percentage share of UK enterprises, from 16.5% in 2013. The third largest sector was construction, with 11.8% in 2014.\n\nThe professional, scientific and technical sector had the largest growth between 2013 and 2014, an increase of 30,000 businesses. This was followed by the information and communication sector which increased by 14,000 businesses in 2014 and business administration and support services which also increased by 14,000.\n\n<ons-table path=\"/themea/landinga/producta/bulletins/bulletina/2015-01-01/b4a1cd9e\" />\n"
+    },
+    {
+      "title": "Business counts by UK region",
+      "markdown": "London accounted for the largest number of businesses in March 2014, with 17.7% of the UK total. The region with the next largest share of businesses was the South East, at 15.6%.\n\nBetween 2013 and 2014, all regions except Northern Ireland saw an increase in the number of businesses, with London experiencing the greatest increase of nearly 29,000 businesses. London grew by 7.7% between 2013 and 2014 and this accounts for 29.7% of the growth in the UK.\n\n<ons-table path=\"/themea/landinga/producta/bulletins/bulletina/2015-01-01/a62c6ad0\" />"
+    },
+    {
+      "title": "Local unit site information",
+      "markdown": "Local units are sites that belong to an enterprise. In March 2014, there were 2.72 million local units belonging to VAT and/or PAYE based enterprises, compared with 2.63 million in March 2013, a rise of nearly 96,000 (3.6%). Out of the 2.26 million VAT and/or PAYE enterprises, only 58,000 (2.6%) operate from more than one site. These operated a total of 516,000 local units.\n\n<ons-table path=\"/themea/landinga/producta/bulletins/bulletina/2015-01-01/6f126267\" />"
+    }
+  ],
+  "accordion": [
+    {
+      "title": "Background notes",
+      "markdown": "1. UK Business: Activity, Size and Location is produced from an extract taken from the Inter-Departmental Business Register (IDBR) recording the position of units as at March of the reference year. Introduced in 1994, the IDBR provides the basis for the Office for National Statistics to conduct surveys of businesses.\n\n2. To support this release, datasets are available at [NOMIS](https://www.nomisweb.co.uk/ \"NOMIS\") and ONS Data Explorer in greater geographical and industrial detail. However, for various reasons, it is possible to get multiple business registrations at a single address and this can distort data for smaller geographical areas.\n\n3. From 2014 onwards, the ONS Data Explorer and Open API tool replaced reference tables, enabling users to access, use and customise ONS data more effectively. This has meant the tables are no longer produced and instead exist as a series of dataset collections. This enables ONS to meet the Government’s Open Data and Transparency policy.\n\n4. Estimates presented in this release and the associated datasets are rounded to prevent disclosure. Differences may exist in totals across tables due to disclosure methods used.\n\n5. Although the statistics in this release are derived from the IDBR, the total count of live businesses is less than the Business Demography publication. This is mainly because the definition used in Business Demography of an active business is based on activity at any time in the year, whereas UK Business: Activity, Size and Location is based on an annual snapshot at a point in time.\n\n6. This publication represents all enterprises that are registered for VAT and/or PAYE. The Department for Business Innovation and Skills (BIS) produce the [Business Population Estimates Publication](https://www.gov.uk/government/collections/business-population-estimates \"Business Population Estimates Publication\"). This estimates the total number of UK private sector businesses, including the unregistered business population. It also estimates the total number of businesses in the whole UK economy.\n\n7. Approximately 31,000 of the change between 2011 and 2012 was caused by improvements to HM Revenue & Customs (HMRC) computer systems leading to previously excluded businesses being added to the IDBR. These businesses were registered before 2012, so distort the year on year change.\n\n8. In 2014 HMRC information shows growing numbers of PAYE schemes and a rise in numbers of new scheme registrations. Those that are allied to company registration data have fuelled an increase in numbers of enterprises on the business register. While the growth in PAYE schemes coincides with the introduction of the Real Time PAYE reporting system (RTI), HMRC have indicated there are no technical reasons associated with RTI alone which would have increased the number of enterprises on the register during the period. HMRC have no evidence of behavioural changes in the timing of PAYE scheme registrations through the year.\n\n9. Approximately 9,725 Composite and Managed Services Companies have been excluded where the address does not represent the location of the activities of these businesses to avoid giving a false impression of growth in these locations. Identification of Composite and Managed Services Companies may be incomplete, inflating business counts primarily in the Professional, Scientific and Technical sector. Further details on [Composite and Managed Services Companies](http://www.hmrc.gov.uk/employment-status/msc.htm \"Composite and Managed Services Companies\") can be found on the HMRC website.\n\n10. National Statistics are produced to high professional standards set out in the Code of Practice for Official Statistics. They undergo regular quality assurance reviews to ensure that they meet customer needs. They are produced free from any political interference.\n\n11. Following ONS\n\n\tFollow ONS on [Twitter](http://www.ons.gov.uk/ons/external-links/social-media/twitter.html \"Twitter\") (@statisticsons) and [Facebook](http://www.ons.gov.uk/ons/external-links/social-media/index.html \"Facebook\") (statisticsons)\n\n\tView the latest podcasts on Youtube (ONSstats) \n\n12. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html](www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html) or from the Media Relations Office email: <media.relations@ons.gsi.gov.uk>"
+    }
+  ],
+  "relatedData": [],
+  "charts": [
+    {
+      "title": "Figure 2: Percentage of VAT and/or PAYE based enterprises by year, 2009 to 2014",
+      "filename": "e8d81c8b",
+      "uri": "/themea/landinga/producta/bulletins/bulletina/2015-01-01/e8d81c8b"
+    }
+  ],
+  "tables": [
+    {
+      "title": "Table 1: Number of VAT and/or PAYE based enterprise by broad industrial grouping, 2012 to 2014",
+      "filename": "b4a1cd9e",
+      "uri": "/themea/landinga/producta/bulletins/bulletina/2015-01-01/b4a1cd9e"
+    },
+    {
+      "title": "Table 2: Number of UK VAT and/or PAYE based enterprises by region, 2012 to 2014",
+      "filename": "a62c6ad0",
+      "uri": "/themea/landinga/producta/bulletins/bulletina/2015-01-01/a62c6ad0"
+    },
+    {
+      "title": "Table 3: Number of VAT and/or PAYE enterprises and their associated local units, 2014",
+      "filename": "6f126267",
+      "uri": "/themea/landinga/producta/bulletins/bulletina/2015-01-01/6f126267"
+    }
+  ],
+  "type": "bulletin",
+  "uri": "/themea/landinga/producta/bulletins/bulletina/2015-01-01",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/themea"
+    },
+    {
+      "uri": "/themea/landinga"
+    },
+    {
+      "uri": "/themea/landinga/producta"
+    }
+  ],
+  "description": {
+    "headline1": "The number of VAT and/or PAYE businesses is estimated to have risen by 96,000 (4.4%) between March 2013 and March 2014",
+    "headline2": "Companies and public corporations' numbers have continued to rise and represent 66.1% of total businesses",
+    "headline3": "The number of sole proprietors and partnerships has continued to decline and now represents 29.9% of total businesses",
+    "edition": "2014",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "karen.watkins@ons.gsi.gov.uk",
+      "name": "Karen Watkins",
+      "telephone": "+44 (0)1633 456902"
+    },
+    "releaseDate": "2014-10-29T00:00:00.000Z",
+    "language": "English",
+    "title": "UK Business - Activity, Size and Location",
+    "summary": "A count of UK business enterprises and local units from an Inter Departmental Business Register (IDBR) snapshot taken on 14 March 2014, headline figures and commentary.",
+    "keywords": [
+      "IDBR",
+      "Inter-Departmental Business Register",
+      "Enterprises",
+      "Local Units",
+      "Business Counts"
+    ],
+    "metaDescription": "A count of UK business enterprises and local units from an Inter Departmental Business Register (IDBR) snapshot taken on 14 March 2014, headline figures and commentary."
+  },
+  "links": []
+}

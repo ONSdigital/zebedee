@@ -4,11 +4,20 @@
     <groupId>com.github.onsdigital</groupId>
     <artifactId>zebedee-reader</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <name>Zebedee Reader</name>
 
     <parent>
         <groupId>com.github.onsdigital</groupId>
         <artifactId>zebedee</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+
+    <dependencies>
+        <!-- Zebedee Content Wrappers-->
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>zebedee-content-wrappers</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

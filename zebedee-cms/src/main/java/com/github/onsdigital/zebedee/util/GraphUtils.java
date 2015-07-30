@@ -36,14 +36,8 @@ import java.util.List;
 /**
  * Created by thomasridd on 09/07/15.
  *
- * Penelope the knitting spider is a character from the magic roundabout
+ * Graph utils
  *
- * Penelope's single function is to knit together the relationship network into a non-directional graph
- * She then removes edges that reference outdated bulletin nodes from datasets
- *
- * Standard algorithms exist but I'm not going to bother with optimisation just yet
- *
- * This is done on the launchpad
  */
 public class GraphUtils {
     Zebedee zebedee;
@@ -251,6 +245,23 @@ public class GraphUtils {
         }
         return null;
     }
+
+    static String productPageURIForPageWithURI(Content content, String uri) throws IOException {
+        String current = uri.toLowerCase();
+        while( !current.equalsIgnoreCase("/") ) {
+            current = current.substring(0, current.lastIndexOf("/"));
+            if (content.get(current + "/data.json") != null) {
+                try (InputStream stream = Files.newInputStream(content.toPath(current).resolve("data.json"))) {
+                    Page page = ContentUtil.deserialisePage(stream);
+                    if (page.getType() == PageType.product_page) {
+                        return current;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private static void ensureLink(List<PageReference> links, String uri) {
         for (PageReference ref: links) {
             if (ref.getUri().toString().equalsIgnoreCase(uri)) { return; }

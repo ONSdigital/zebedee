@@ -1,0 +1,35 @@
+{
+  "sections": [
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity",
+      "index": 0
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/language",
+      "index": 1
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/religion",
+      "index": 2
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality",
+      "index": 3
+    }
+  ],
+  "index": 3,
+  "type": "taxonomy_landing_page",
+  "uri": "/peoplepopulationandcommunity/culturalidentity",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity"
+    }
+  ],
+  "description": {
+    "title": "Cultural identity",
+    "summary": "We look at how people in the UK see themselves today, in terms of ethnicity, sexuality, religion and language, and how this has changed over time. We use a diverse range of sources for this data."
+  }
+}

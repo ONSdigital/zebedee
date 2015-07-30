@@ -1,0 +1,28 @@
+{
+  "sections": [
+    {
+      "uri": "/businessindustryandtrade/changestobusiness",
+      "index": 1
+    },
+    {
+      "uri": "/businessindustryandtrade/constructionindustry",
+      "index": 2
+    },
+    {
+      "uri": "/businessindustryandtrade/tourismindustry",
+      "index": 7
+    }
+  ],
+  "index": 0,
+  "type": "taxonomy_landing_page",
+  "uri": "/businessindustryandtrade",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    }
+  ],
+  "description": {
+    "title": "Business, industry and trade",
+    "summary": "Statistics about the production and trade of goods and services help us identify patterns and trends in the UK economy. We look at figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade."
+  }
+}

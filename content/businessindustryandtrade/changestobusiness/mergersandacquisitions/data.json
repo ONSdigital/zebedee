@@ -1,0 +1,33 @@
+{
+	"items": [{
+		"uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbbt"
+	}, {
+		"uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbbi"
+	}, {
+		"uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbas"
+	}, {
+		"uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbaq"
+	}],
+	"datasets": [{
+		"uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/datasets/mergersandacquisitionsuk"
+	}],
+	"statsBulletins": [{
+		"uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/bulletins/mergersandacquisitionsinvolvingukcompanies/2015-06-02"
+	}],
+	"index": 2,
+	"type": "product_page",
+	"uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions",
+	"breadcrumb": [{
+		"uri": "/"
+	}, {
+		"uri": "/businessindustryandtrade"
+	}, {
+		"uri": "/businessindustryandtrade/changestobusiness"
+	}],
+	"description": {
+		"title": "Mergers and acquisitions",
+		"summary": "A merger is when 2 companies or organisations of a similar size agree to join together to operate as a single company under a new name. An acquisition is when a company buys the shares of a second company which is usually smaller. Other statistics include disposals, that is, when a company or organisation sells or liquidates an asset or a subsidiary."
+	},
+	"articles": [],
+	"relatedArticles": []
+}

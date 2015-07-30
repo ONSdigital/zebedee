@@ -1,0 +1,35 @@
+{
+  "items": [],
+  "datasets": [],
+  "statsBulletins": [
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/detailedcharacteristicsforenglandandwales/2013-05-16"
+    }
+  ],
+  "relatedArticles": [
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales/2014-11-13"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/whatdoesthe2011censustellusaboutthecharacteristicsofgypsyoririshtravellersinenglandandwales/2014-01-21"
+    }
+  ],
+  "index": 0,
+  "type": "product_page",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
+    }
+  ],
+  "description": {
+    "title": "Ethnicity",
+    "summary": "How adults identify themselves in terms of their ethnicity."
+  }
+}

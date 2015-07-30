@@ -1,0 +1,23 @@
+{
+  "items": [],
+  "datasets": [],
+  "statsBulletins": [],
+  "index": 3,
+  "type": "product_page",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
+    }
+  ],
+  "description": {
+    "title": "Sexuality",
+    "summary": "How adults identify themselves in terms of their sexuality."
+  }
+}

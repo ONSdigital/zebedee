@@ -1,0 +1,31 @@
+{
+  "sections": [
+    {
+      "uri": "/businessindustryandtrade/changestobusiness/bankruptcyinsolvency",
+      "index": 0
+    },
+    {
+      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates",
+      "index": 1
+    },
+    {
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions",
+      "index": 2
+    }
+  ],
+  "index": 1,
+  "type": "taxonomy_landing_page",
+  "uri": "/businessindustryandtrade/changestobusiness",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/businessindustryandtrade"
+    }
+  ],
+  "description": {
+    "title": "Changes to business",
+    "summary": "We look at how UK businesses are growing, surviving and changing over time. These figures are an informal indicator of confidence in the UK economy."
+  }
+}

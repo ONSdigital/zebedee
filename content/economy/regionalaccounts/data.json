@@ -1,0 +1,23 @@
+{
+  "sections": [
+    {
+      "uri": "/economy/regionalaccounts/grossdisposablehouseholdincome",
+      "index": 0
+    }
+  ],
+  "index": 8,
+  "type": "taxonomy_landing_page",
+  "uri": "/economy/regionalaccounts",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/economy"
+    }
+  ],
+  "description": {
+    "title": "Regional accounts",
+    "summary": "These are accounts for regions, sub-regions and local areas of the UK, produced according to the same concepts and definitions used in the National Accounts. These accounts allow comparisons between regions and against a UK average. Key statistics here are regional Gross Value Added (GVA) statistics and figures on regional Gross Disposable Household Income (GDHI)."
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "years": [
+    {
+      "date": "2006",
+      "value": "14",
+      "year": "2006",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2007",
+      "value": "533",
+      "year": "2007",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2008",
+      "value": "234",
+      "year": "2008",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2009",
+      "value": "1002",
+      "year": "2009",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2010",
+      "value": "609",
+      "year": "2010",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "2008 Q1",
+      "value": "0",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "234",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "0",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "0",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "286",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "551",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "0",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "451",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "0",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "0",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "217",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "106",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "0",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "17",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "21",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.528Z"
+    }
+  ],
+  "months": [],
+  "sourceDatasets": [
+    "am"
+  ],
+  "type": "timeseries",
+  "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/hco6",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/businessindustryandtrade"
+    },
+    {
+      "uri": "/businessindustryandtrade/changestobusiness"
+    },
+    {
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions"
+    }
+  ],
+  "description": {
+    "title": "Australasia \u0026 Oceania Outward Disposals Value :£m                       ",
+    "nationalStatistic": false,
+    "releaseDate": "2015-06-02T00:00:00.000Z",
+    "nextRelease": "08-09-2015",
+    "cdid": "HCO6",
+    "unit": "",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "seasonalAdjustment": "NSA",
+    "number": "21",
+    "sampleSize": 0
+  }
+}

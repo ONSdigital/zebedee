@@ -1,0 +1,39 @@
+{
+  "sections": [
+    {
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours",
+      "index": 0
+    },
+    {
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes",
+      "index": 1
+    },
+    {
+      "uri": "/employmentandlabourmarket/peopleinwork/labourproductivity",
+      "index": 2
+    },
+    {
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions",
+      "index": 3
+    },
+    {
+      "uri": "/employmentandlabourmarket/peopleinwork/workplacepensions",
+      "index": 4
+    }
+  ],
+  "index": 0,
+  "type": "taxonomy_landing_page",
+  "uri": "/employmentandlabourmarket/peopleinwork",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/employmentandlabourmarket"
+    }
+  ],
+  "description": {
+    "title": "People in work",
+    "summary": "People in work are those classed as in employment. Figures here focus on employment rates, hours of work, vacancies, claimants and earnings."
+  }
+}

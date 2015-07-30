@@ -1,0 +1,55 @@
+{
+  "downloads": [
+    {
+      "title": "Visits and Spending by UK residents abroad and overseas residents in the UK",
+      "cdids": [
+        "GMAA",
+        "GMBB",
+        "GMAM",
+        "GMAK",
+        "GMAZ",
+        "GMAX",
+        "GMAF",
+        "GMAT"
+      ]
+    }
+  ],
+  "relatedMethodology": [],
+  "section": {
+    "markdown": "Visits and Spending by UK residents abroad and overseas residents in the UK"
+  },
+  "relatedDatasets": [],
+  "relatedDocuments": [],
+  "type": "dataset",
+  "uri": "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/businessindustryandtrade"
+    },
+    {
+      "uri": "/businessindustryandtrade/tourismindustry"
+    }
+  ],
+  "description": {
+    "title": "Visits and Spending by UK residents abroad and overseas residents in the UK",
+    "summary": "International Passenger Survey Time Series Dataset",
+    "metaDescription": "International Passenger Survey Time Series Dataset",
+    "nationalStatistic": false,
+    "latestRelease": false,
+    "contact": {
+      "email": "socialsurveys@ons.gsi.gov.uk ",
+      "name": "Fiona Dawe",
+      "telephone": "+44 (0)1633 455296"
+    },
+    "releaseDate": "2015-07-23T23:00:00.000Z",
+    "nextRelease": "21 August 2015",
+    "datasetId": "ott",
+    "unit": "",
+    "preUnit": "",
+    "source": "",
+    "sampleSize": 0
+  }
+}

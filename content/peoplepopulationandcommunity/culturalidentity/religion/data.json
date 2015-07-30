@@ -1,0 +1,23 @@
+{
+  "items": [],
+  "datasets": [],
+  "statsBulletins": [],
+  "index": 2,
+  "type": "product_page",
+  "uri": "/peoplepopulationandcommunity/culturalidentity/religion",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity"
+    }
+  ],
+  "description": {
+    "title": "Religion",
+    "summary": "How adults identify themselves in terms of religion."
+  }
+}

@@ -30,6 +30,16 @@
                 <directory>../content</directory>
                 <targetPath>${project.build.directory}/zebedee/master</targetPath>
             </resource>
+
+            <!--Collections to be used in unit tests-->
+            <resource>
+                <directory>../content/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16</directory>
+                <targetPath>${project.build.directory}/zebedee/collections/testcollection/inprogress/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16</targetPath>
+            </resource>
+            <resource>
+                <directory>../content/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/</directory>
+                <targetPath>${project.build.directory}/zebedee/collections/testcollection/reviewed/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/</targetPath>
+            </resource>
         </resources>
     </build>
 

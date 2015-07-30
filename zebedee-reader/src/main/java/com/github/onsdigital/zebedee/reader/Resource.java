@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.reader;
 
-import com.github.onsdigital.zebedee.util.VariableUtils;
-
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -10,10 +10,9 @@ import java.io.InputStream;
  * Represents a resource file accompanying a json content.json files itself can be read as a resource from file system
  *
  */
-public class Resource {
+public class Resource implements Closeable {
     private String name;
     private String mimeType;
-    private String encoding = VariableUtils.getSystemProperty("file.encoding"); //default resource encoding is system encoding
     private InputStream data;
 
     public String getName() {
@@ -22,14 +21,6 @@ public class Resource {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getEncoding() {
-        return encoding;
-    }
-
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
     }
 
     public InputStream getData() {
@@ -46,5 +37,12 @@ public class Resource {
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (data != null) {
+            getData().close();
+        }
     }
 }

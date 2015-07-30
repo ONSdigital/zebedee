@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
  * Created by david on 12/03/2015.
@@ -73,7 +75,7 @@ public class Teams {
      */
     public Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         Path path = teamPath(teamName);
@@ -108,7 +110,7 @@ public class Teams {
      */
     public void renameTeam(Team update, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException, BadRequestException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         if (update != null && StringUtils.isNotBlank(update.name)) {
@@ -157,7 +159,7 @@ public class Teams {
      */
     public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email))
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
 
         if (delete != null) {
 
@@ -190,7 +192,7 @@ public class Teams {
      */
     public void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         if (!StringUtils.isBlank(email) && team != null) {
@@ -209,7 +211,7 @@ public class Teams {
      */
     public void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
         if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         if (!StringUtils.isBlank(email) && team != null) {

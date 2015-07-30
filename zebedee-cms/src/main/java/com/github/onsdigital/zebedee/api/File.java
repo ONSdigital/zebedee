@@ -1,25 +1,23 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.Collection;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
 /**
  * Created by bren on 01/07/15.
@@ -55,7 +53,7 @@ public class File {
         if (session == null
                 || !Root.zebedee.permissions.canView(session.email,
                 collection.description)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Path

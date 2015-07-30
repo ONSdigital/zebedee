@@ -20,4 +20,17 @@
         </dependency>
     </dependencies>
 
+
+    <build>
+        <resources>
+            <!-- Master content is used when zebedee reader is started as a standalone service on development environment.
+            In this case no collections and users will be available.
+            Only master content will be served. If zebedee is started with cms and reader zebedee reader will read from directories created by zebedee cms startup-->
+            <resource>
+                <directory>../content</directory>
+                <targetPath>${project.build.directory}/zebedee/master</targetPath>
+            </resource>
+        </resources>
+    </build>
+
 </project>

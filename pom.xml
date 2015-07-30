@@ -32,6 +32,7 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
     </properties>
 
+
     <dependencies>
 
         <!-- Main -->
@@ -98,6 +99,7 @@
 
         </dependencies>
     </dependencyManagement>
+
 
     <build>
 

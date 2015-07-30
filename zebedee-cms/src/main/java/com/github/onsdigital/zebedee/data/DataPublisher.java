@@ -81,8 +81,10 @@ public class DataPublisher {
 
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
+
             // Download the dataset page (for metadata)
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
+            String datasetUri = Root.zebedee.toUri(csdbDataset.get("json"));
 
             DownloadSection section = new DownloadSection();
             section.setTitle(dataset.getDescription().getTitle());
@@ -99,7 +101,7 @@ public class DataPublisher {
             for (TimeSeries series : serieses) {
 
                 // Work out the correct timeseries path by working back from the dataset uri
-                String uri = uriForSeriesInDataset(dataset, series);
+                String uri = uriForSeriesInDataset(datasetUri, series);
                 Path path = collection.find("", uri);
 
                 // Construct the new page
@@ -107,7 +109,7 @@ public class DataPublisher {
                 section.getCdids().add(newPage.getDescription().getCdid());
 
                 // Save the new page to reviewed
-                Path savePath = collection.autocreateReviewedPath(newPage.getUri() + "/data.json");
+                Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
                 IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
 
                 // Write csv and other files:
@@ -119,12 +121,10 @@ public class DataPublisher {
             sections.add(section);
             dataset.setDownloads(sections);
 
-
-
-            Path savePath = collection.autocreateReviewedPath(dataset.getUri() + "/data.json");
+            Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
             IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
 
-            System.out.println("Published " + serieses.size() + " datasets for " + dataset.getUri().toString());
+            System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
         }
     }
 
@@ -134,16 +134,41 @@ public class DataPublisher {
         return sections[0];
     }
 
-    static String uriForSeriesInDataset(Dataset dataset, TimeSeries series) {
-        String[] split = StringUtils.split(dataset.getUri().toString(), "/");
-        split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
+//
+//    /**
+//     * Derive time series uris from time series cdid and the dataset path
+//     *
+//     * @param dataset
+//     * @param series
+//     * @return
+//     */
+//    static String uriForSeriesInDataset(Dataset dataset, TimeSeries series) {
+//        String[] split = StringUtils.split(dataset.getUri().toString(), "/");
+//        split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
+//
+//        String uri = StringUtils.join(split, "/");
+//        uri = Strings.toLowerCase("/" + uri + "/timeseries/" + series.getCdid());
+//
+//        return uri;
+//    }
+
+    /**
+     *
+     * Derive time series uris for a timeseries that belongs to a dataset by backtracking from datasetUri
+     *
+     * @param datasetUri
+     * @param series
+     * @return
+     */
+    static String uriForSeriesInDataset(String datasetUri, TimeSeries series) {
+        String[] split = StringUtils.split(datasetUri, "/");
+        split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2); // backtrack to product page
 
         String uri = StringUtils.join(split, "/");
-        uri = Strings.toLowerCase("/" + uri + "/timeseries/" + series.getCdid());
+        uri = Strings.toLowerCase("/" + uri + "/timeseries/" + series.getCdid()); // append timeseries
 
         return uri;
     }
-
 
     /**
      *
@@ -156,7 +181,7 @@ public class DataPublisher {
      */
     static TimeSeries constructTimeSeriesPageFromComponents(Path existingSeries, String uri, Dataset dataset, TimeSeries series) throws IOException {
 
-        // Begin with existing data
+        // Attempts to open an existing time series or creates a new one
         TimeSeries page = startPageForSeriesWithPublishedPath(uri, series);
 
         // Add stats data from the time series (as returned by Brian)
@@ -174,6 +199,15 @@ public class DataPublisher {
         return startPageForSeriesWithPublishedPath(Root.zebedee, uri, series);
     }
 
+    /**
+     * Attempts to open an existing time series page with uri otherwise creates a new one
+     *
+     * @param zebedee
+     * @param uri
+     * @param series
+     * @return
+     * @throws IOException
+     */
     static TimeSeries startPageForSeriesWithPublishedPath(Zebedee zebedee, String uri, TimeSeries series) throws IOException {
         TimeSeries page;
         Path path = zebedee.published.toPath(uri);
@@ -184,7 +218,7 @@ public class DataPublisher {
             page = new TimeSeries();
             page.setDescription(new PageDescription());
             page.setCdid(series.getCdid());
-            page.setUri(URI.create(uri));
+            // page.setUri(URI.create(uri));
         }
 
         return page;

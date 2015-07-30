@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.data;
 
 import com.github.onsdigital.content.page.base.PageDescription;
+import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.content.partial.TimeseriesValue;
@@ -229,7 +230,7 @@ public class DataPublisherTest {
         // we expect a dataset and check a couple of fields
         assertNotNull(dataset);
         assertEquals("Visits and Spending by UK residents abroad and overseas residents in the UK.", dataset.getSection().getMarkdown());
-        assertEquals("/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism", dataset.getUri().toString());
+        assertEquals(PageType.dataset, dataset.getType());
     }
 
     @Test

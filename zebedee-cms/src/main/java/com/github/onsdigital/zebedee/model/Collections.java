@@ -73,11 +73,11 @@ public class Collections {
             throw new BadRequestException("URI does not represent a file.");
         }
 
-        // Attempt to review:
+        // Attempt to complete:
         if (collection.complete(session.email, uri)) {
             collection.save();
         } else {
-            throw new BadRequestException("URI was not reviewed.");
+            throw new BadRequestException("URI was not completed.");
         }
     }
 

@@ -69,7 +69,9 @@ public class Librarian {
     private void findBulletins () throws IOException {
         List<Path> bulletins = launchpadMatching(bulletinMatcher());
         for (Path bulletinPath: bulletins) {
-            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(bulletinPath))) {
+
+            Path path = zebedee.path.resolve(bulletinPath);
+            try(InputStream stream = Files.newInputStream(path)) {
                 Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
 
                 HashMap<String,String > bulletinDetails = new HashMap<>();
@@ -92,7 +94,8 @@ public class Librarian {
                 bulletinDetails.put("Title", bulletin.getDescription().getTitle());
                 bulletinDetails.put("Edition", bulletin.getDescription().getEdition());
                 bulletinDetails.put("NextRelease", bulletin.getDescription().getNextRelease());
-                bulletinDetails.put("Uri", bulletin.getUri().toString());
+
+                bulletinDetails.put("Uri", stripDotJson(zebedee.launchpad.path.relativize(path).toString()));
                 bulletinDetails.put("Path", bulletinPath.toString());
                 this.bulletins.add(bulletinDetails);
             }
@@ -100,8 +103,10 @@ public class Librarian {
     }
     private void findArticles() throws IOException {
         List<Path> articles = launchpadMatching(articleMatcher());
+
         for (Path articlePath: articles) {
-            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(articlePath))) {
+            Path path = zebedee.path.resolve(articlePath);
+            try(InputStream stream = Files.newInputStream(path)) {
                 Article article = ContentUtil.deserialise(stream, Article.class);
 
                 HashMap<String,String > articleDetails = new HashMap<>();
@@ -124,8 +129,10 @@ public class Librarian {
                 articleDetails.put("Title", article.getDescription().getTitle());
                 articleDetails.put("Edition", article.getDescription().getEdition());
                 articleDetails.put("NextRelease", article.getDescription().getNextRelease());
-                articleDetails.put("Uri", article.getUri().toString());
-                articleDetails.put("Path", articlePath.toString());
+
+                articleDetails.put("Uri", stripDotJson(zebedee.launchpad.path.relativize(path).toString()));
+                articleDetails.put("Path", zebedee.path.relativize(path).toString());
+
                 this.articles.add(articleDetails);
             }
         }
@@ -133,7 +140,8 @@ public class Librarian {
     private void findPages() throws IOException {
         List<Path> pages = launchpadMatching(taxonomyPageMatcher());
         for (Path pagePath: pages) {
-            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(pagePath))) {
+            Path path = zebedee.path.resolve(pagePath);
+            try(InputStream stream = Files.newInputStream(path)) {
                 ProductPage page = ContentUtil.deserialise(stream, ProductPage.class);
 
                 HashMap<String,String > pageDetails = new HashMap<>();
@@ -156,12 +164,10 @@ public class Librarian {
                 }
 
                 pageDetails.put("Type", page.getType().toString());
-                pageDetails.put("Path", pagePath.toString());
-                if (page.getUri() != null) {
-                    pageDetails.put("Uri", page.getUri().toString());
-                } else {
-                    pageDetails.put("Uri", "");
-                }
+
+                pageDetails.put("Path", zebedee.path.relativize(path).toString());
+                pageDetails.put("Uri", stripDotJson(zebedee.launchpad.path.relativize(path).toString()));
+
                 if (page.getDescription() != null && page.getDescription().getTitle() != null) {
                     pageDetails.put("Title", page.getDescription().getTitle());
                 } else {
@@ -172,10 +178,12 @@ public class Librarian {
             }
         }
     }
+
     private void findDatasets() throws IOException {
         List<Path> datasets = launchpadMatching(dataSetMatcher());
         for (Path datasetPath: datasets) {
-            try(InputStream stream = Files.newInputStream(zebedee.path.resolve(datasetPath))) {
+            Path path = zebedee.path.resolve(datasetPath);
+            try(InputStream stream = Files.newInputStream(path)) {
                 Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
 
                 HashMap<String,String > datasetDetails = new HashMap<>();
@@ -198,8 +206,10 @@ public class Librarian {
                 datasetDetails.put("Title", dataset.getDescription().getTitle());
                 datasetDetails.put("Edition", dataset.getDescription().getEdition());
                 datasetDetails.put("NextRelease", dataset.getDescription().getNextRelease());
-                datasetDetails.put("Uri", dataset.getUri().toString());
-                datasetDetails.put("Path", datasetPath.toString());
+
+                datasetDetails.put("Uri", stripDotJson(zebedee.launchpad.path.relativize(path).toString()));
+                datasetDetails.put("Path", zebedee.path.relativize(path).toString());
+
                 this.datasets.add(datasetDetails);
             }
         }
@@ -250,9 +260,9 @@ public class Librarian {
 
                 if (page != null) {
                     row[9] = page.getType().toString();
-                    if (page.getUri() != null) {
-                        row[10] = page.getUri().toString();
-                    }
+
+                    row[10] = pagePath.toString();
+
                     PageDescription description = page.getDescription();
                     if (description.getReleaseDate() != null) {
                         row[7] = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(description.getReleaseDate());
@@ -372,7 +382,7 @@ public class Librarian {
             } else {
                 try (InputStream stream = Files.newInputStream(path)) {
                     Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
-                    System.out.println("Checking bulletin: " + bulletin.getUri().toString());
+                    System.out.println("Checking bulletin: " + bulletinMap.get("Uri"));
                     for (String uri : GraphUtils.relatedUris(bulletin)) {
                         if (zebedee.launchpad.get(uri) == null) {
                             HashMap<String, String> map = new HashMap<>();
@@ -403,7 +413,7 @@ public class Librarian {
             } else {
                 try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(articleMap.get("Uri")).resolve("data.json"))) {
                     Article article = ContentUtil.deserialise(stream, Article.class);
-                    System.out.println("Checking article: " + article.getUri().toString());
+                    System.out.println("Checking article: " + articleMap.get("Uri"));
                     for (String uri : GraphUtils.relatedUris(article)) {
                         if (zebedee.launchpad.get(uri) == null) {
                             HashMap<String, String> map = new HashMap<>();
@@ -445,7 +455,8 @@ public class Librarian {
             try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(pageMap.get("Uri")).resolve("data.json"))) {
                 String json = IOUtils.toString(stream);
                 Page page = ContentUtil.deserialisePage(json);
-                System.out.println(page.getUri().toString());
+                System.out.println(pageMap.get("Uri"));
+
                 if (page.getType() == PageType.product_page) {
                     ProductPage productPage = ContentUtil.deserialise(json, ProductPage.class);
                     System.out.println("Checking product: " + productPage.getUri().toString());
@@ -504,7 +515,7 @@ public class Librarian {
         }
     }
 
-   // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
 
     public List<Path> launchpadMatching(final PathMatcher matcher) throws IOException {
@@ -600,5 +611,10 @@ public class Librarian {
         return  matcher;
     }
 
-
+    private static String stripDotJson(String path) {
+        if (path.endsWith("data.json")) {
+            return path.substring(0, path.length() - "data.json".length());
+        }
+        return path;
+    }
 }

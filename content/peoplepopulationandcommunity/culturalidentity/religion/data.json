@@ -1,37 +1,7 @@
 {
-  "items": [
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid74"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid75"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid76"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid77"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid78"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid79"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/timeseries/raid80"
-    }
-  ],
-  "datasets": [
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/religion/datasets/religion"
-    }
-  ],
-  "statsBulletins": [
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/2011censuskeystatisticsforenglandandwalesmarch2011"
-    }
-  ],
+  "items": [],
+  "datasets": [],
+  "statsBulletins": [],
   "index": 2,
   "type": "product_page",
   "uri": "/peoplepopulationandcommunity/culturalidentity/religion",
@@ -48,6 +18,6 @@
   ],
   "description": {
     "title": "Religion",
-    "summary": "Statistics on religion focus on what people state as their religion. The main source of data in this area is the 2011 Census. "
+    "summary": "How adults identify themselves in terms of religion."
   }
 }

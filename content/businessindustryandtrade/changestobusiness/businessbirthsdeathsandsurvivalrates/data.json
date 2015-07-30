@@ -1,26 +1,8 @@
 {
-  "items": [
-    {
-      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid6"
-    },
-    {
-      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid7"
-    },
-    {
-      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/timeseries/raid8"
-    }
-  ],
-  "datasets": [
-    {
-      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/datasets/businessbirthsanddeaths"
-    }
-  ],
-  "statsBulletins": [
-    {
-      "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates/bulletins/businessdemography2012"
-    }
-  ],
-  "index": 0,
+  "items": [],
+  "datasets": [],
+  "statsBulletins": [],
+  "index": 1,
   "type": "product_page",
   "uri": "/businessindustryandtrade/changestobusiness/businessbirthsdeathsandsurvivalrates",
   "breadcrumb": [
@@ -36,6 +18,6 @@
   ],
   "description": {
     "title": "Business births, deaths and survival rates",
-    "summary": "Data on business births relates to businesses that register as VAT or PAYE businesses in a given time period. Data on business deaths relates to businesses that have ceased to trade in a given time period. Business survival rates are the percentage of businesses that are still registered a given number of years after they first registered. "
+    "summary": "We measure births by looking at the number of businesses that register for VAT or PAYE, and deaths by the number of businesses that have ceased to trade in a given time period. Survival rates measure the percentage of businesses still registered a given number of years after they first registered."
   }
 }

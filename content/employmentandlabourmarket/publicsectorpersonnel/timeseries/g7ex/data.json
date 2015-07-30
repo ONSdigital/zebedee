@@ -1,0 +1,766 @@
+{
+  "years": [
+    {
+      "date": "1999",
+      "value": "227",
+      "year": "1999",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2000",
+      "value": "225",
+      "year": "2000",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2001",
+      "value": "229",
+      "year": "2001",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2002",
+      "value": "238",
+      "year": "2002",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2003",
+      "value": "248",
+      "year": "2003",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2004",
+      "value": "264",
+      "year": "2004",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2005",
+      "value": "272",
+      "year": "2005",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2006",
+      "value": "274",
+      "year": "2006",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2007",
+      "value": "283",
+      "year": "2007",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2008",
+      "value": "286",
+      "year": "2008",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2009",
+      "value": "294",
+      "year": "2009",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2010",
+      "value": "292",
+      "year": "2010",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2011",
+      "value": "277",
+      "year": "2011",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2012",
+      "value": "266",
+      "year": "2012",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2013",
+      "value": "261",
+      "year": "2013",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "2014",
+      "value": "256",
+      "year": "2014",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "1999 Q1",
+      "value": "228",
+      "year": "1999",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "1999 Q2",
+      "value": "227",
+      "year": "1999",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.429Z"
+    },
+    {
+      "date": "1999 Q3",
+      "value": "226",
+      "year": "1999",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "1999 Q4",
+      "value": "226",
+      "year": "1999",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2000 Q1",
+      "value": "225",
+      "year": "2000",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2000 Q2",
+      "value": "225",
+      "year": "2000",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2000 Q3",
+      "value": "226",
+      "year": "2000",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2000 Q4",
+      "value": "227",
+      "year": "2000",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2001 Q1",
+      "value": "228",
+      "year": "2001",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2001 Q2",
+      "value": "229",
+      "year": "2001",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2001 Q3",
+      "value": "231",
+      "year": "2001",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2001 Q4",
+      "value": "234",
+      "year": "2001",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2002 Q1",
+      "value": "236",
+      "year": "2002",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2002 Q2",
+      "value": "238",
+      "year": "2002",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2002 Q3",
+      "value": "240",
+      "year": "2002",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2002 Q4",
+      "value": "242",
+      "year": "2002",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2003 Q1",
+      "value": "246",
+      "year": "2003",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2003 Q2",
+      "value": "248",
+      "year": "2003",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2003 Q3",
+      "value": "252",
+      "year": "2003",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2003 Q4",
+      "value": "256",
+      "year": "2003",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2004 Q1",
+      "value": "260",
+      "year": "2004",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2004 Q2",
+      "value": "264",
+      "year": "2004",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2004 Q3",
+      "value": "265",
+      "year": "2004",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2004 Q4",
+      "value": "267",
+      "year": "2004",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2005 Q1",
+      "value": "271",
+      "year": "2005",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2005 Q2",
+      "value": "272",
+      "year": "2005",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2005 Q3",
+      "value": "271",
+      "year": "2005",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2005 Q4",
+      "value": "274",
+      "year": "2005",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2006 Q1",
+      "value": "273",
+      "year": "2006",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "274",
+      "year": "2006",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "276",
+      "year": "2006",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "278",
+      "year": "2006",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "281",
+      "year": "2007",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "283",
+      "year": "2007",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "283",
+      "year": "2007",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "283",
+      "year": "2007",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "286",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "286",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "287",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "289",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "293",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "294",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "296",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "295",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "295",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "292",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "290",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "286",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "282",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "277",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "273",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "270",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "268",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "266",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "264",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "263",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "261",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "261",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "259",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "258",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "257",
+      "year": "2014",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2014 Q2",
+      "value": "256",
+      "year": "2014",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2014 Q3",
+      "value": "256",
+      "year": "2014",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2014 Q4",
+      "value": "255",
+      "year": "2014",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    },
+    {
+      "date": "2015 Q1",
+      "value": "254",
+      "year": "2015",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "",
+      "updateDate": "2015-07-09T00:48:25.430Z"
+    }
+  ],
+  "months": [],
+  "sourceDatasets": [
+    ""
+  ],
+  "type": "timeseries",
+  "uri": "/employmentandlabourmarket/publicsectorpersonnel/timeseries/g7ex",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/employmentandlabourmarket"
+    },
+    {
+      "uri": "/employmentandlabourmarket/publicsectorpersonnel"
+    }
+  ],
+  "description": {
+    "title": "Public Sector Employment by Industry;Police;UK;HC;SA;Thousands          ",
+    "nationalStatistic": false,
+    "latestRelease": false,
+    "releaseDate": "2015-06-16T23:00:00.000Z",
+    "nextRelease": "16 Sept 2015",
+    "cdid": "G7EX",
+    "unit": "",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "seasonalAdjustment": "NSA",
+    "number": "254",
+    "sampleSize": 0
+  }
+}

@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.json;
 
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 
 /**
  * Represents a user account. NB this record intentionally does not contain any permission-related information.

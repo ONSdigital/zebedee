@@ -17,7 +17,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,7 +27,6 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.bouncycastle.util.Strings;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -139,7 +138,7 @@ public class DataPublisher {
         split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
 
         String uri = StringUtils.join(split, "/");
-        uri = Strings.toLowerCase("/" + uri + "/timeseries/" + series.getCdid());
+        uri = ("/" + uri + "/timeseries/" + series.getCdid()).toLowerCase();
 
         return uri;
     }

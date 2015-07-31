@@ -11,4 +11,97 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+<<<<<<< HEAD
+=======
+    <dependencies>
+        <!--Restolino-->
+        <dependency>
+            <groupId>com.github.davidcarboni</groupId>
+            <artifactId>restolino</artifactId>
+        </dependency>
+
+        <!-- Zebedee Content Wrappers-->
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>zebedee-content-wrappers</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <resources>
+            <!-- Master content is used when zebedee reader is started as a standalone service on development environment.
+            In this case no collections and users will be available.
+            Only master content will be served. If zebedee is started with cms and reader zebedee reader will read from directories created by zebedee cms startup-->
+            <resource>
+                <directory>../content</directory>
+                <targetPath>${project.build.directory}/zebedee/master</targetPath>
+            </resource>
+
+            <!--Collections to be used in unit tests-->
+            <resource>
+                <directory>../content/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16</directory>
+                <targetPath>
+                    ${project.build.directory}/zebedee/collections/testcollection/inprogress/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16
+                </targetPath>
+            </resource>
+            <resource>
+                <directory>../content/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/</directory>
+                <targetPath>
+                    ${project.build.directory}/zebedee/collections/testcollection/reviewed/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/
+                </targetPath>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!-- A folder of dependencies is used in development when reloading classes: -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.9</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <!-- Default output folder is ${project.build.directory}/dependency -->
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Standalone assembly JAR (includes all dependencies) for deployment: -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.github.davidcarboni.restolino.Main</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+
+    </build>
+
+>>>>>>> 278a3d5... Fixed dependency issues in zebedee cms module
 </project>

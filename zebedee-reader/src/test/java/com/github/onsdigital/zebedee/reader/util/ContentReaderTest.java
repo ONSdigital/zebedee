@@ -1,13 +1,14 @@
-package com.github.onsdigital.zebedee.util;
+package com.github.onsdigital.zebedee.reader.util;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.base.ContentType;
-import com.github.onsdigital.zebedee.content.statistics.document.figure.table.Table;
+import com.github.onsdigital.zebedee.content.staticpage.StaticPage;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.configuration.TestConfiguration;
+import com.github.onsdigital.zebedee.reader.util.ContentReader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,37 +26,44 @@ import static org.junit.Assert.*;
 * -Run configuration points to zebedee-reader module root as it is default in maven and most ides (intellij seems to be not doing this)
 * */
 
-public class CollectionReaderTest {
+public class ContentReaderTest {
 
-    private CollectionContentReader collectionReader;
+    private ContentReader contentReader;
 
     @Before
     public void createContentReader() {
-        this.collectionReader = new CollectionContentReader(TestConfiguration.getTestZebedeeRoot() + "/collections/testcollection");
+        this.contentReader = new ContentReader(TestConfiguration.getTestZebedeeRoot());
     }
 
     @Test
     public void testGetAvailableContent() throws ZebedeeException, IOException {
-        Content content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
+        Content content = contentReader.getContent("master/about/accessibility/data.json///");
         assertNotNull(content);
-        assertEquals(content.getType(), ContentType.table);
-        assertTrue(content instanceof Table);
+        assertEquals(content.getType(), ContentType.static_page);
+        assertEquals("Accessibility",  content.getDescription().getTitle());
+        assertTrue(content instanceof StaticPage);
+        StaticPage staticPage = (StaticPage) content;
+        assertNotNull(staticPage.getMarkdown());
     }
 
     @Test(expected = NotFoundException.class)
     public void testGetNonexistingContent() throws ZebedeeException, IOException {
-        Content content = collectionReader.getContent("madeupfoldername/data.json");
+        Content content = contentReader.getContent("master/madeupfoldername/data.json");
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void testReadDirectoryAsContent() throws ZebedeeException, IOException {
+        Content content = contentReader.getContent("master/about/accessibility////");
     }
 
     @Test(expected = BadRequestException.class)
     public void testStartingWithForwardSlash() throws ZebedeeException, IOException {
-        Content content = collectionReader.getContent("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/nonexisting.xls");
+        Content content = contentReader.getContent("/master/madeupfoldername/data.json");
     }
-
 
     @Test
     public void testXlsResource() throws ZebedeeException, IOException {
-        try (Resource resource = collectionReader.getResource("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
+        try (Resource resource = contentReader.getResource("master/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb.xls")) {
             assertNotNull(resource != null);
             assertEquals("application/vnd.ms-excel", resource.getMimeType());
             assertTrue(isNotEmpty(resource));
@@ -64,7 +72,7 @@ public class CollectionReaderTest {
 
     @Test
     public void testPngResource() throws ZebedeeException, IOException {
-        try (Resource resource = collectionReader.getResource("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/96db1c4e.png/")) {
+        try (Resource resource = contentReader.getResource("master/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2015-07-09/5afe3d27-download.png")) {
             assertNotNull(resource != null);
             assertEquals("image/png", resource.getMimeType());
             assertTrue(resource.getData().available() > 0);
@@ -73,7 +81,7 @@ public class CollectionReaderTest {
 
     @Test
     public void testHtmlResource() throws ZebedeeException, IOException {
-        try (Resource resource = collectionReader.getResource("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/5b8d62b4.html")) {
+        try (Resource resource = contentReader.getResource("master/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales/2014-11-13/19df5bcf.html")) {
             assertNotNull(resource != null);
             assertEquals("text/html", resource.getMimeType());
             assertTrue(resource.getData().available() > 0);

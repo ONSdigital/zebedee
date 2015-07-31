@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.util;
+package com.github.onsdigital.zebedee.reader.util;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;

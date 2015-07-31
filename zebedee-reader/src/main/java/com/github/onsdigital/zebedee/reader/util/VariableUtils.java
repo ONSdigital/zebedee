@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.util;
+package com.github.onsdigital.zebedee.reader.util;
 
 import org.apache.commons.lang3.StringUtils;
 

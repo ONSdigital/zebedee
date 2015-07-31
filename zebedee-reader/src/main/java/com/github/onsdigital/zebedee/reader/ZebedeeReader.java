@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.util.CollectionContentReader;
@@ -92,9 +93,9 @@ public class ZebedeeReader {
         return collectionReader.getResource(removeForwardSlash(path));
     }
 
-    private CollectionContentReader createCollectionReader(String collectionName) {
+    private CollectionContentReader createCollectionReader(String collectionName) throws BadRequestException {
         if (collectionName == null) {
-            throw new NullPointerException("Connection name can not be null");
+            throw new BadRequestException("Please select a collection");
         }
         String path = ReaderConfiguration.getCollectionsFolder() + "/" + collectionName;
         return new CollectionContentReader(removeForwardSlash(path));

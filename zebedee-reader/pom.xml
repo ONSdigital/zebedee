@@ -24,6 +24,12 @@
             <groupId>com.github.onsdigital</groupId>
             <artifactId>zebedee-content-wrappers</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+
     </dependencies>
 
 

@@ -92,22 +92,18 @@ public class ContentReader {
     }
 
     private void checkExists(Path path) throws ZebedeeException {
-        if (!Files.exists(path)) {
-            throw new NotFoundException("Can not find content, path:" + path.toUri().toString());
-        } else if(Files.isDirectory(path)) {
-            throw new BadRequestException("Requested path is a directory, path:" + path.toUri().toString());
+        if (!Files.exists(path) || Files.isDirectory(path)) {
+            System.err.println("Could not find requested content, path:" + path.toUri().toString() );
+            throw new NotFoundException("404 - Not Found");
         }
-        return;
-
     }
 
     private Path resolvePath(Path root, String path) throws BadRequestException {
         if (path == null) {
-            throw new NullPointerException("Content path can not be null");
+            throw new NullPointerException("Path can not be null");
         }
-
         if (path.startsWith("/")) {
-            throw new BadRequestException("Absolute path requested, path must be relative to root folder, remove forward slash at the start?");
+            throw new IllegalArgumentException("Absolute path requested, path must be relative to root folder, remove forward slash at the start?");
         }
         return root.resolve(path);
     }

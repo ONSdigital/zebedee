@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ReaderConfiguration {
     private final static String ZEBEDEE_ROOT = "zebedee_root";
-    private static String defaultZebedeeRoot = "zebdee-reader/target/zebedee";
+    private static String defaultZebedeeRoot = "zebedee-reader/target/zebedee";
 
     private static final String IN_PROGRESS_FOLDER_NAME = "inprogress";
     private static final String COMPLETE_FOLDER_NAME = "complete";

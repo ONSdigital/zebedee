@@ -8,11 +8,14 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * Created by bren on 29/07/15.
@@ -40,10 +43,14 @@ public class Data {
      */
 
     @GET
-    public String get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
+    public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
         String uri = request.getParameter("uri");
+        if (StringUtils.isEmpty(uri)) {
+            throw new BadRequestException("Please specify uri");
+        }
         Content content = ZebedeeReader.getInstance().getPublishedContent(uri);
-        return ContentUtil.serialise(content);
+        IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());
+        return;
     }
 
 

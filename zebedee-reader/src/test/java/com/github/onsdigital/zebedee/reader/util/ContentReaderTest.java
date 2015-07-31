@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.reader.util;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.base.ContentType;
 import com.github.onsdigital.zebedee.content.staticpage.StaticPage;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -50,12 +49,12 @@ public class ContentReaderTest {
         Content content = contentReader.getContent("master/madeupfoldername/data.json");
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test(expected = NotFoundException.class)
     public void testReadDirectoryAsContent() throws ZebedeeException, IOException {
         Content content = contentReader.getContent("master/about/accessibility////");
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testStartingWithForwardSlash() throws ZebedeeException, IOException {
         Content content = contentReader.getContent("/master/madeupfoldername/data.json");
     }

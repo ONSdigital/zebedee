@@ -6,10 +6,13 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.reader.util.Authoriser;
 import org.apache.commons.io.IOUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
 public class Root implements Startup {
     static final String ZEBEDEE_ROOT = "zebedee_root";
@@ -61,7 +66,7 @@ public class Root implements Startup {
         // If we have an environment variable and it is
         String rootDir = env.get(ZEBEDEE_ROOT);
         boolean zebedeeCreated = false;
-        if(rootDir != null && rootDir!= "" && Files.exists(Paths.get(rootDir))) {
+        if (rootDir != null && rootDir != "" && Files.exists(Paths.get(rootDir))) {
             root = Paths.get(rootDir);
             try {
                 zebedee = Zebedee.create(root);
@@ -71,7 +76,7 @@ public class Root implements Startup {
             }
 
         }
-        if(!zebedeeCreated) {
+        if (!zebedeeCreated) {
             try {
                 // Create a Zebedee folder:
                 root = Files.createTempDirectory("zebedee");
@@ -128,6 +133,21 @@ public class Root implements Startup {
     @Override
     protected void finalize() throws Throwable {
 
+    }
+
+    public class CollectionViewAuthoriser implements Authoriser {
+        @Override
+        public void authorise(HttpServletRequest request) throws IOException, UnauthorizedException {
+            Session session = Root.zebedee.sessions.get(request);
+            com.github.onsdigital.zebedee.model.Collection collection = com.github.onsdigital.zebedee.api.Collections.getCollection(request);
+
+            // Authorisation
+            if (session == null
+                    || !zebedee.permissions.canView(session.email,
+                    collection.description)) {
+                throw new UnauthorizedException(getUnauthorizedMessage(session));
+            }
+        }
     }
 
 }

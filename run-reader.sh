@@ -4,7 +4,7 @@ export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,su
 export PORT="8082"
 
 # Restolino configuration
-export RESTOLINO_CLASSES="zebedee-readear/target/classes"
+export RESTOLINO_CLASSES="zebedee-reader/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee.reader.api
 
 # Development: reloadable

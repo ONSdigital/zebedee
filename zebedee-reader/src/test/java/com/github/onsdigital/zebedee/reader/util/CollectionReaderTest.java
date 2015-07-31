@@ -47,7 +47,7 @@ public class CollectionReaderTest {
         Content content = collectionReader.getContent("madeupfoldername/data.json");
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testStartingWithForwardSlash() throws ZebedeeException, IOException {
         Content content = collectionReader.getContent("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/nonexisting.xls");
     }

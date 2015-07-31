@@ -39,6 +39,10 @@ public class Resource implements Closeable {
         this.mimeType = mimeType;
     }
 
+    public boolean isNotEmpty() throws IOException {
+        return getData().available() > 0;
+    }
+
     @Override
     public void close() throws IOException {
         if (data != null) {

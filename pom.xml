@@ -35,18 +35,6 @@
 
     <dependencies>
 
-        <!-- Main -->
-        <dependency>
-            <groupId>com.github.davidcarboni</groupId>
-            <artifactId>restolino</artifactId>
-            <version>0.1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.davidcarboni</groupId>
-            <artifactId>cryptolite</artifactId>
-            <version>1.2.5</version>
-        </dependency>
-
         <!-- commons -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -84,6 +72,14 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- Main -->
+            <dependency>
+                <groupId>com.github.davidcarboni</groupId>
+                <artifactId>restolino</artifactId>
+                <version>0.1.8</version>
+            </dependency>
+
             <!-- Any sub modules depending on Zebedee reader and content wrappers should depend on project version as all modules are released together under same version-->
             <dependency>
                 <groupId>com.github.onsdigital</groupId>
@@ -96,6 +92,14 @@
                 <artifactId>zebedee-content-wrappers</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.9.9</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>

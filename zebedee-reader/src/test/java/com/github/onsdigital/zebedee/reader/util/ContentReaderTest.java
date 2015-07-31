@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.configuration.TestConfiguration;
-import com.github.onsdigital.zebedee.reader.util.ContentReader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,9 +63,9 @@ public class ContentReaderTest {
     @Test
     public void testXlsResource() throws ZebedeeException, IOException {
         try (Resource resource = contentReader.getResource("master/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb.xls")) {
-            assertNotNull(resource != null);
+            assertNotNull(resource);
             assertEquals("application/vnd.ms-excel", resource.getMimeType());
-            assertTrue(isNotEmpty(resource));
+            assertTrue(resource.isNotEmpty());
         }
     }
 
@@ -86,10 +85,6 @@ public class ContentReaderTest {
             assertEquals("text/html", resource.getMimeType());
             assertTrue(resource.getData().available() > 0);
         }
-    }
-
-    private boolean isNotEmpty(Resource resource) throws IOException {
-        return resource.getData().available() > 0;
     }
 
 

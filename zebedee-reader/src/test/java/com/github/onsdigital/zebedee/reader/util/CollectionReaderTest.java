@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.configuration.TestConfiguration;
-import com.github.onsdigital.zebedee.reader.util.CollectionContentReader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,7 +58,7 @@ public class CollectionReaderTest {
         try (Resource resource = collectionReader.getResource("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
             assertNotNull(resource != null);
             assertEquals("application/vnd.ms-excel", resource.getMimeType());
-            assertTrue(isNotEmpty(resource));
+            assertTrue(resource.isNotEmpty());
         }
     }
 
@@ -79,10 +78,6 @@ public class CollectionReaderTest {
             assertEquals("text/html", resource.getMimeType());
             assertTrue(resource.getData().available() > 0);
         }
-    }
-
-    private boolean isNotEmpty(Resource resource) throws IOException {
-        return resource.getData().available() > 0;
     }
 
 

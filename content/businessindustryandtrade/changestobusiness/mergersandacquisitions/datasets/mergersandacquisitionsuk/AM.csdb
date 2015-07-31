@@ -1,0 +1,1455 @@
+ 02015 6 2AM           9 4 1 1 4 4 212 4 8
+ 1 1IDENTIFIER
+ 1 2PERIODICITY
+ 1 3SEASONAL ADJUSTMENT
+ 1 4PRICES BASE YEAR
+ 1 5INDEX BASE YEAR
+ 1 6INDEX BASE MONTH
+ 1 7STANDARD INDUSTRIAL CLASSIFICATION
+ 1 8PUBLICATION
+ 1 9TABLE NUMBER
+92AIHAAU   0   0 0            MAFR8                      1  0  0  1  7
+93M&A : Domestic : Number of companies acquired                           
+96AS1969  12015 520   46             710 0
+97       846       793       884      1210      1205       504       315
+97       353       481       567       534       469       452       463
+97       447       568       474       842      1528      1499      1337
+97       779       506       432       526       674       505       584
+97       506       635       493       587       492       430       558
+97       741       769       779       869       558       286       325
+97       373       266       238       189
+92AIHAQU   0   0 0            MAFR8                      1  0  0  1 27
+93M&A : Domestic : Number of companies acquired                           
+96QS1969  12015 520  185             710 0
+97       235       236       187       188       206       203       178
+97       206       159       219       225       281       278       326
+97       285       321       362       256       276       311       191
+97       128       101        84        56        99        88        72
+97        93        93        95        72       101       112       144
+97       124       137       131       141       158       134       136
+97       124       140       138        99       116       116       120
+97       110       102       120       128       108       108       119
+97        95       111        93       148       141       153        97
+97       177       104       100       148       122       134       147
+97       241       320       301       382       456       389       339
+97       331       464       365       279       288       359       411
+97       230       181       202       166       102       162       115
+97       127       119       111        96       106       103       139
+97       120       164       182       185       157       150       139
+97       114       110       142       138       148       148       150
+97       115       120       142       129       140       155       178
+97       162       117       127       145       104       139       133
+97       163       152       131       108       129       124        83
+97       120        88       139       107       122       153       176
+97       151       169       211       210       166       215       211
+97       177       207       208       163       201       191       212
+97       258       208       172       183       104        99        88
+97        59        62        77        67        95        80        83
+97        76        94        97       106        62        81        62
+97        61        39        68        72        59        40        51
+97        42        56        28
+92AIHDAU   0   0 0            MAFR9                      1  0  0  1  2
+93M&A : Domestic : Value of ordinary shares : £m                          
+96AS2005  12015 528   10             710 0
+97      2768                4909      1910      8435      1560       719
+97       419       353      2782
+92AIHDQU   0   0 0            MAFR9                      1  0  0  1  3
+93M&A : Domestic : Value of ordinary shares : £m                          
+96QS2011  22015 528   16             710 0
+97       204        75       200       323        54         8        34
+97        26        80       230        17       612        50      2019
+97       101       281
+92AIHEAU   0   0 0            MAFR9                      1  0  0  1  7
+93M&A : Domestic : Value of preference & loan stock : £m                  
+96AS1972  12015 528   43             710 0
+97       580       147        47        25         7         8        23
+97       208        46        31       222        56       690       525
+97      2548       853      1853      1374       393       121        47
+97       211       144       459       265       323       595       351
+97      1272      1445       891       873      1168       431       335
+97      1691       375       114       350       271       268       147
+97        53
+92AIHEQU   0   0 0            MAFR9                      1  0  0  1  3
+93M&A : Domestic : Value of preference & loan stock : £m                  
+96QS2011  22015 528   16             710 0
+97        83        87        44        30       143        93         2
+97        16        50        17        64         2        46         0
+97         5        37
+92CBAQAU   0   0 0            MAFR1                      1  0  0  1  2
+93M&A : Outward : Number of acquisitions                                  
+96AS2005  12015 521   10             710 0
+97       365       405       441       298       118       199       286
+97       122        58       113
+92CBAQQU   0   0 0            MAFR1                      1  0  0  1 17
+93M&A : Outward : Number of acquisitions                                  
+96QS1987  12015 520  113             710 0
+97        66        97       132       136       140       178       164
+97       166       171       183       193       134       138       121
+97       173       154       127       113       162       148       191
+97       146       167       175       139       149        90       143
+97       112       115        88       107        99       102        75
+97        89       101       113       100       128       110        99
+97       118       137       132       144       128       165       141
+97       147       133       169       188       127       127       115
+97       109       111        85        66        68        68        74
+97        52        60        53        63        67        64        81
+97        74        86        91        74       109        91        94
+97        98        98       115       108       105       141        87
+97        86        91        72        49        17        32        28
+97        41        30        49        54        66        70        75
+97        77        64        25        41        21        35        27
+97        13         7        11        30        25        23        35
+97        41
+92CBASAU   0   0 0            MAFR1                      1  0  0  1  2
+93M&A : Outward : Number of disposals                                     
+96AS2005  12015 522   10             710 0
+97       110        89       104        71        37        73        80
+97        40                  36
+92CBASQU   0   0 0            MAFR1                      1  0  0  1  3
+93M&A : Outward : Number of disposals                                     
+96QS2011  22015 522   16             710 0
+97        19        22        21         8        14         7        11
+97        10        13         5                            20          
+97         4         8
+92CBAUAU   0   0 0            MAFR1                      1  0  0  1  2
+93M&A : Inward : Number of acquisitions                                   
+96AS2005  12015 521   10             710 0
+97       242       259       269       252       112       212       237
+97       161       141       110
+92CBAUQU   0   0 0            MAFR1                      1  0  0  1 17
+93M&A : Inward : Number of acquisitions                                   
+96QS1986  12015 520  117             710 0
+97        13        15        14        12        15        11        21
+97        14        16        25        26        32        24        44
+97        52        48        46        21        49        27        30
+97        41        41        34        48        43        47        72
+97        63        52        68        84        65        44        45
+97        48        30        34        25        42        26        34
+97        34        39        37        44        47        65        49
+97        75        61        67        75        56        52        69
+97        54        61        64        48        54        36        42
+97        30        30        27        40        20        33        34
+97        35        27        38        57        47        36        51
+97        65        67        59        54        62        71        72
+97        61        75        80        53        86        63        54
+97        49        28        22        28        34        54        48
+97        59        51        54        68        68        47        51
+97        48        39        23        19        33        59        30
+97        29        28        25        28        21
+92CBAWAU   0   0 0            MAFR1                      1  0  0  1  2
+93M&A : Inward : Number of disposals                                      
+96AS2005  12015 521   10             710 0
+97        61        55        66        49        38        58        69
+97        27        26        23
+92CBAWQU   0   0 0            MAFR1                      1  0  0  1  3
+93M&A : Inward : Number of disposals                                      
+96QS2011  22015 520   15             710 0
+97        15        17        22         8         7         4         8
+97         4         8         8         6                             9
+97         6
+92CBAYAU   0   0 0            MAFR6A                     1  0  0  1  2
+93M&A : Outward : Number of acquisitions in EU : Annual                   
+96AS2005  12015 521   10             710 0
+97       157       131       170       102        36        66        75
+97        34        16        33
+92CBAYQU   0   0 0            MAFR6A                     1  0  0  1  4
+93M&A : Outward : Number of acquisitions in EU : Annual                   
+96QS2008  22014 512   23             710 0
+97        25        25        18         4        11         7        14
+97         4        29        18        15        18        24        23
+97         6         8         8         7        11         7         4
+97         1         4
+92CBAZAU   0   0 0            MAFR6A                     1  0  0  1  2
+93M&A : Outward : Value of acquisitions in EU : Annual : £m               
+96AS2005  12015 522   10             710 0
+97      5056     12966      7397     13613      1800      2979     20666
+97      7932      6216     11404
+92CBAZQU   0   0 0            MAFR6A                     1  0  0  1  4
+93M&A : Outward : Value of acquisitions in EU : Annual : £m               
+96QS2008  22014 512   23             710 0
+97       958       466       848       861       130       575       234
+97       466      1606       669       238     16100      3444       911
+97       148       167      1700      5489       576       796       417
+97        85      4918
+92CBBAAU   0   0 0            MAFR6A                     1  0  0  1  2
+93M&A : Outward : Number of acquisitions in USA : Annual                  
+96AS2005  12015 521   10             710 0
+97       112       138       115        88        34        53        83
+97        41         8        27
+92CBBAQU   0   0 0            MAFR6A                     1  0  0  1  4
+93M&A : Outward : Number of acquisitions in USA : Annual                  
+96QS2008  22014 512   23             710 0
+97        33        21        14         6         6         9        13
+97         7         5        18        23        21        20        13
+97        21         7        15         8        11         2         3
+97         2         1
+92CBBBAU   0   0 0            MAFR6A                     1  0  0  1  2
+93M&A : Outward : Value of acquisitions in USA : Annual : £m              
+96AS2005  12015 521   10             710 0
+97     15683      7348     21676      7244      3250      6223      9342
+97      5384       600      4987
+92CBBBQU   0   0 0            MAFR6A                     1  0  0  1  4
+93M&A : Outward : Value of acquisitions in USA : Annual : £m              
+96QS2008  22014 512   23             710 0
+97      2401      2215       328       727       101      1863       559
+97       131       266      3875      1951       436      5643      1249
+97      1882       260      1420      2450      1254       261        47
+97       256        36
+92CBBIAU   0   0 0            MAFR1                      1  0  0  1  4
+93M&A : Outward : Value of acquisitions : £m                              
+96AS1987  12015 528   28             710 0
+97     12058     17300     22622     12952      9688      7264      9213
+97     15164     11967     13377     19176     54917    111193    181285
+97     41473     26626     20756     18709     32732     37412     57814
+97     29670     10148     12414     50234     17933               20647
+92CBBIQU   0   0 0            MAFR1                      1  0  0  1  3
+93M&A : Outward : Value of acquisitions : £m                              
+96QS2011  22015 528   16             710 0
+97     10982      6816     12588       772      6243      8231      2687
+97      1977      1045       474                1944      2481      4470
+97     11752      8485
+92CBBJAU   0   0 0            MAFR6D                     1  0  0  1  2
+93M&A : Outward : Number of disposals in EU : Annual                      
+96AS2005  12015 521    9             710 0
+97        47        33        44        30        15        27        32
+97                  12
+92CBBJQU   0   0 0            MAFR6D                     1  0  0  1  4
+93M&A : Outward : Number of disposals in EU : Annual                      
+96QS2008  22015 515   23             710 0
+97         7         8        11         4         3         2         6
+97         6         7         8         6         5        11        11
+97         3                                                 2         5
+97         3         2
+92CBBKAU   0   0 0            MAFR6D                     1  0  0  1  2
+93M&A : Outward : Value of disposals in EU : Annual : £m                  
+96AS2005  12015 521    9             710 0
+97      2059      3198      3583      3598      2134      1529      4857
+97                1589
+92CBBKQU   0   0 0            MAFR6D                     1  0  0  1  4
+93M&A : Outward : Value of disposals in EU : Annual : £m                  
+96QS2008  22015 515   23             710 0
+97      1127      1854       219       578         7       186      1363
+97        78       540       648       263      1422      1042      1966
+97       245                                                80      1232
+97       260        17
+92CBBLAU   0   0 0            MAFR6D                     1  0  0  1  2
+93M&A : Outward : Number of disposals in USA : Annual                     
+96AS2005  12015 521    9             710 0
+97        24        25        28        22         7        15        18
+97         7         9
+92CBBLQU   0   0 0            MAFR6D                     1  0  0  1  2
+93M&A : Outward : Number of disposals in USA : Annual                     
+96QS2012  12015 515    8             710 0
+97         1         2         2         2         5         2         1
+97         1
+92CBBMAU   0   0 0            MAFR6D                     1  0  0  1  2
+93M&A : Outward : Value of disposals in USA : Annual : £m                 
+96AS2005  12015 521    9             710 0
+97      7033      7273      4654      6197      1277      7465      4715
+97      1038      3691
+92CBBMQU   0   0 0            MAFR6D                     1  0  0  1  2
+93M&A : Outward : Value of disposals in USA : Annual : £m                 
+96QS2012  12015 515    8             710 0
+97         1        30       224       783       415      1672       134
+97      1470
+92CBBTAU   0   0 0            MAFR1                      1  0  0  1  2
+93M&A : Outward : Value of disposals : £m                                 
+96AS2005  12015 528   10             710 0
+97     12668     21214     10221     12062      5101     11411     14111
+97                          5288
+92CBBTQU   0   0 0            MAFR1                      1  0  0  1  3
+93M&A : Outward : Value of disposals : £m                                 
+96QS2011  22015 528   16             710 0
+97      3110      3620      4113      2122      1375       632          
+97      5546      3572       439                          2422          
+97      1323      3449
+92CBBUAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Number of acquisitions - direct transactions : Annual   
+96AS2005  12015 521   10             710 0
+97       239       277       289       196        97       149       223
+97        83        44        79
+92CBBUQU   0   0 0            MAFR2                      1  0  0  1  4
+93M&A : Outward : Number of acquisitions - direct transactions : Annual   
+96QS2008  22014 512   23             710 0
+97        52        48        32        10        27        24        36
+97        23        33        42        51        50        57        67
+97        31        18        31        15        19        22        10
+97         5         7
+92CBBVAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Value of acquisitions - direct transactions : Annual : £m
+96AS2005  12015 521   10             710 0
+97     20234     28800     34880     17972      7456     10507     36912
+97      9523      2935      6888
+92CBBVQU   0   0 0            MAFR2                      1  0  0  1  4
+93M&A : Outward : Value of acquisitions - direct transactions : Annual : £m
+96QS2008  22014 512   23             710 0
+97      2930      1022      1198      3541       854      2439       622
+97       720      1816      4724      3247     20666      6500      6338
+97      3970       604      5486      2666       767      1669       850
+97       273       143
+92CBBWAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Number of acquisitions - indirect funded in UK : Annual 
+96AS2005  12015 521   10             710 0
+97        69        96       105        75        17        38        47
+97        29        11        35
+92CBBWQU   0   0 0            MAFR2                      1  0  0  1  4
+93M&A : Outward : Number of acquisitions - indirect funded in UK : Annual 
+96QS2008  22014 512   23             710 0
+97        32        16        11         6         4         4         3
+97         5        12         9        12         8        13        10
+97        14         4         9         4        12         4         2
+97         2         3
+92CBBXAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Value of acquisitions - indirect funded in UK : Annual : £m
+96AS2005  12015 521   10             710 0
+97      5511      5498     14814      6688      2530      1166      4999
+97      8094                7641
+92CBBXQU   0   0 0            MAFR2                      1  0  0  1  3
+93M&A : Outward : Value of acquisitions - indirect funded in UK : Annual : £m
+96QS2008  22014 6 2   19             710 0
+97      1884       693      2440       147      1934        75       374
+97       257       385       128       396        95      4101       469
+97       324       113       657      5483      1841
+92CBBYAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Number of acquisitions - indirect funded locally : Annual
+96AS2005  12015 521   10             710 0
+97        83        54        66        44        11        26        35
+97        19         4        77
+92CBBYQU   0   0 0            MAFR2                      1  0  0  1  4
+93M&A : Outward : Number of acquisitions - indirect funded locally : Annual
+96QS2008  22014 512   23             710 0
+97        17        10         7         1         4         2         4
+97         3         6         9         8        13        10         2
+97         8         4         5         2         8         2         1
+97         0         1
+92CBBZAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Value of acquisitions - indirect funded locally : Annual : £m
+96AS2005  12015 521   10             710 0
+97      6987      3114      8120      5010       162       741      8323
+97       316                6118
+92CBBZQU   0   0 0            MAFR2                      1  0  0  1  3
+93M&A : Outward : Value of acquisitions - indirect funded locally : Annual : £m
+96QS2008  22014 6 2   19             710 0
+97       915      2532       110        56        23        60        23
+97        50        92       456       143       374       254         9
+97      7663        55       100        82        79
+92CBCAAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Number of disposals - direct transactions : Annual      
+96AS2005  12015 521   10             710 0
+97        85        65        87        54        33        59        66
+97        30        28        28
+92CBCAQU   0   0 0            MAFR2                      1  0  0  1  4
+93M&A : Outward : Number of disposals - direct transactions : Annual      
+96QS2008  22014 512   23             710 0
+97        16        13        16        11         6         6        10
+97        10        16        13        20        15        16        18
+97        15         9        11         3         7         7        12
+97         5         4
+92CBCBAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Value of disposals - direct transactions : Annual : £m  
+96AS2005  12015 521   10             710 0
+97      6530     17602      7650      7384      4198      8423     12533
+97      5817      5682      4610
+92CBCBQU   0   0 0            MAFR2                      1  0  0  1  4
+93M&A : Outward : Value of disposals - direct transactions : Annual : £m  
+96QS2008  22014 512   23             710 0
+97      4757      1378      1237       698       488       188      2824
+97      2460       794      2671      2498      2745      3072      2882
+97      3758      2194       295       401      2927       765      3558
+97       433       926
+92CBCCAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Number of disposals - indirect funded in UK : Annual    
+96AS2005  12015 521   10             710 0
+97        13        20         8         9         2         4         6
+97         3         2         7
+92CBCCQU   0   0 0            MAFR2                      1  0  0  1  4
+93M&A : Outward : Number of disposals - indirect funded in UK : Annual    
+96QS2008  22014 512   23             710 0
+97         1         3         2         1         1         0         0
+97         0         0         2         2         2         0         2
+97         1         0         0         1         2         1         0
+97         0         1
+92CBCDAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Value of disposals - indirect funded in UK : Annual : £m
+96AS2005  12015 521   10             710 0
+97       923      1860      1393      1021                  71       598
+97                           323
+92CBCDQU   0   0 0            MAFR2                      1  0  0  1  3
+93M&A : Outward : Value of disposals - indirect funded in UK : Annual : £m
+96QS2008  22014 6 2   15             710 0
+97         7       443       133        74        70         0         0
+97         0         0        64         7       125         0       234
+97        18
+92CBCEAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Number of disposals - indirect funded locally : Annual  
+96AS2005  12015 521   10             710 0
+97        22        21        20        15         3        15        13
+97        11                  11
+92CBCEQU   0   0 0            MAFR2                      1  0  0  1  3
+93M&A : Outward : Number of disposals - indirect funded locally : Annual  
+96QS2008  22014 6 2   19             710 0
+97         3         7         2         1         1         1         0
+97         3         2         5         5         4         2         3
+97         3         0         3         3         5
+92CBCFAU   0   0 0            MAFR2                      1  0  0  1  2
+93M&A : Outward : Value of disposals - indirect funded locally : Annual : £m
+96AS2005  12015 521   10             710 0
+97      5215      1752      1178      3657                2917       980
+97                           355
+92CBCFQU   0   0 0            MAFR2                      1  0  0  1  3
+93M&A : Outward : Value of disposals - indirect funded locally : Annual : £m
+96QS2008  22014 6 2   15             710 0
+97       446      2870         4       527       168        64         0
+97       330        72      1454      1061       398        24       459
+97        11
+92CBCGAU   0   0 0            MAFR7A                     1  0  0  1  2
+93M&A : Inward : Number of acquisitions in EU : Annual                    
+96AS2005  12015 521   10             710 0
+97        89        92        94        85        32        47        69
+97        53        35        31
+92CBCGQU   0   0 0            MAFR7A                     1  0  0  1  4
+93M&A : Inward : Number of acquisitions in EU : Annual                    
+96QS2008  22014 512   23             710 0
+97        22        12        18        11         6         7         8
+97         8        18        10         0        20        19        22
+97         7        13        19        12         9        10         6
+97        12         7
+92CBCHAU   0   0 0            MAFR7A                     1  0  0  1  2
+93M&A : Inward : Value of acquisitions in EU : Annual : £m                
+96AS2005  12015 521   10             710 0
+97     23907     42412     27489     17918     15277      3856      6238
+97      3533                4681
+92CBCHQU   0   0 0            MAFR7A                     1  0  0  1  3
+93M&A : Inward : Value of acquisitions in EU : Annual : £m                
+96QS2008  22014 6 2   19             710 0
+97      1036       912      3865     12031       136      2561       549
+97       103      3859       516       339      3900       694      1073
+97       148      1018       384      1699       432
+92CBCIAU   0   0 0            MAFR7A                     1  0  0  1  2
+93M&A : Inward : Number of acquisitions in USA : Annual                   
+96AS2005  12015 521   10             710 0
+97        73        84        79        74        31        85        87
+97        50        54        42
+92CBCIQU   0   0 0            MAFR7A                     1  0  0  1  4
+93M&A : Inward : Number of acquisitions in USA : Annual                   
+96QS2008  22014 512   23             710 0
+97        18        16        13         9         7         4        11
+97        28        13        17        16        18        25        26
+97        18        13        14        15         8         3        11
+97        24        16
+92CBCJAU   0   0 0            MAFR7A                     1  0  0  1  2
+93M&A : Inward : Value of acquisitions in USA : Annual : £m               
+96AS2005  12015 521   10             710 0
+97     11741      7606     14270      8269     11594     19124     21489
+97      6217      3408      6318
+92CBCJQU   0   0 0            MAFR7A                     1  0  0  1  4
+93M&A : Inward : Value of acquisitions in USA : Annual : £m               
+96QS2008  22014 512   23             710 0
+97       946       568      1790       254       206       458     10676
+97     13523      1058      5805      2027      1250      6537      3037
+97     10641      1189      1408      3097       523       242       664
+97      1402      1100
+92CBCQAU   0   0 0            MAFR1                      1  0  0  1  2
+93M&A : Inward : Value of acquisitions : £m                               
+96AS2005  12015 528   10             710 0
+97     50280     77750     82121     52552     31984     36643     32967
+97     17414     31839     15041
+92CBCQQU   0   0 0            MAFR1                      1  0  0  1  3
+93M&A : Inward : Value of acquisitions : £m                               
+96QS2011  22015 528   16             710 0
+97      9712      5108     12382      4235      2514      8778      1887
+97      3528     23506      2783      2022      5569      1864      3668
+97      3940      4739
+92CBCRAU   0   0 0            MAFR7D                     1  0  0  1  2
+93M&A : Inward : Number of disposals in EU : Annual                       
+96AS2005  12015 522    9             710 0
+97        27        16        12        18        12        19        26
+97        11         9
+92CBCRQU   0   0 0            MAFR7D                     1  0  0  1  4
+93M&A : Inward : Number of disposals in EU : Annual                       
+96QS2008  22015 515   23             710 0
+97         6         3         2         1         4         2         5
+97         4         4         8         3         6         5         6
+97         6         3         2         1         5         1         2
+97         3         3
+92CBCSAU   0   0 0            MAFR7D                     1  0  0  1  2
+93M&A : Inward : Value of disposals in EU : Annual : £m                   
+96AS2005  12015 522    9             710 0
+97      1873      8670      2851      2628      1370      6722      6539
+97      1054       862
+92CBCSQU   0   0 0            MAFR7D                     1  0  0  1  4
+93M&A : Inward : Value of disposals in EU : Annual : £m                   
+96QS2008  22015 515   23             710 0
+97       697        47      1607         1       148       118      1103
+97       256        67      3137      3262       303      4617       194
+97      1027        26        77       183       768        13       199
+97       224       426
+92CBCTAU   0   0 0            MAFR7D                     1  0  0  1  2
+93M&A : Inward : Number of disposals in USA : Annual                      
+96AS2005  12015 522    9             710 0
+97        15        22        31        12        10        15        18
+97         4         8
+92CBCTQU   0   0 0            MAFR7D                     1  0  0  1  4
+93M&A : Inward : Number of disposals in USA : Annual                      
+96QS2008  22015 515   23             710 0
+97         4         3         1         2         2         4         2
+97         1         5         6         3         5         6         4
+97         5         1         1         2         0         1         0
+97         5         2
+92CBCUAU   0   0 0            MAFR7D                     1  0  0  1  1
+93M&A : Inward : Value of disposals in USA : Annual : £m                  
+96AS2005  12015 522    7             710 0
+97      4736      1953      3063      1359      4648      1216      2993
+92CBCUQU   0   0 0            MAFR7D                     1  0  0  1  3
+93M&A : Inward : Value of disposals in USA : Annual : £m                  
+96QS2008  22015 515   15             710 0
+97      1054       134        41      2012         4      2597        35
+97         2       805       243       166       341       874      1220
+97       766
+92CBDBAU   0   0 0            MAFR1                      1  0  0  1  2
+93M&A : Inward : Value of disposals : £m                                  
+96AS2005  12015 528   10             710 0
+97      8387     14208      7524      5139      7820      9891     11748
+97                1913      2794
+92CBDBQU   0   0 0            MAFR1                      1  0  0  1  3
+93M&A : Inward : Value of disposals : £m                                  
+96QS2011  22015 528   15             710 0
+97      6102      1887      2834                                    1150
+97        89       710       623       491                          1280
+97       601
+92CBDCAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Number of acquisitions - direct transactions : Annual    
+96AS2005  12015 521   10             710 0
+97       175       178       200       179        87       161       158
+97       103        94        78
+92CBDCQU   0   0 0            MAFR4                      1  0  0  1  4
+93M&A : Inward : Number of acquisitions - direct transactions : Annual    
+96QS2008  22014 512   23             710 0
+97        43        39        36        17        17        24        29
+97        41        33        47        40        33        45        48
+97        26        35        25        29        14        14        25
+97        40        15
+92CBDDAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Value of acquisitions - direct transactions : Annual : £m
+96AS2005  12015 521   10             710 0
+97     32193     53578     62475     36101     21091     33540     17112
+97     11659      8391     10404
+92CBDDQU   0   0 0            MAFR4                      1  0  0  1  4
+93M&A : Inward : Value of acquisitions - direct transactions : Annual : £m
+96QS2008  22014 512   23             710 0
+97     11082      2829      6337      1995       500      3822     14774
+97     13649      1983     11659      6249      4237      6653      3554
+97      4000      3123      1870      5421      1245      2908      2544
+97      1892      1047
+92CBHZAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Number of acquisitions - indirect by overseas parent : Annual
+96AS2005  12015 521   10             710 0
+97        61        63        52        50        20        36        50
+97        48        39        27
+92CBHZQU   0   0 0            MAFR4                      1  0  0  1  4
+93M&A : Inward : Number of acquisitions - indirect by overseas parent : Annual
+96QS2008  22014 512   23             710 0
+97        16        10         9         8         3         4         5
+97         8        11         9         8        10        17        12
+97        10        13        17         9         9         4         9
+97        17         9
+92CBIAAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Value of acquisitions - indirect by overseas parent : Annual : £m
+96AS2005  12015 521   10             710 0
+97     11379      6123      6941      8739                1687     12598
+97      4217                2702
+92CBIAQU   0   0 0            MAFR4                      1  0  0  1  3
+93M&A : Inward : Value of acquisitions - indirect by overseas parent : Annual : £m
+96QS2008  22014 6 2   19             710 0
+97      5324       180       737     10274        94       111       181
+97       396       357       414       520      1065      2378      1536
+97      7578       588       336      2770       523
+92CBIBAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Number of acquisitions - indirect funded locally : Annual
+96AS2005  12015 521   10             710 0
+97        45        57        63        53        10        34        49
+97        35        25        61
+92CBIBQU   0   0 0            MAFR4                      1  0  0  1  4
+93M&A : Inward : Number of acquisitions - indirect funded locally : Annual
+96QS2008  22014 512   23             710 0
+97        12        11         8         4         2         2         2
+97         9        11         7         7        13        11        16
+97         5        12        14         7         2         3         4
+97         7        11
+92CBICAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Value of acquisitions - indirect funded locally : Annual : £m
+96AS2005  12015 521   10             710 0
+97      6708     18049     12705      7712                1416      3257
+97      1538                1934
+92CBICQU   0   0 0            MAFR4                      1  0  0  1  3
+93M&A : Inward : Value of acquisitions - indirect funded locally : Annual : £m
+96QS2008  22014 6 2   19             710 0
+97      3558       219      1200        85        51         1        96
+97       326       501       332       257       449       261       135
+97       124       524       308       587       119
+92CBIDAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Number of disposals - direct transactions : Annual       
+96AS2005  12015 521   10             710 0
+97        47        39        49        29        32        43        49
+97        23        19        17
+92CBIDQU   0   0 0            MAFR4                      1  0  0  1  4
+93M&A : Inward : Number of disposals - direct transactions : Annual       
+96QS2008  22014 512   23             710 0
+97         9         8         1         4        10         7        11
+97         7        11        11        14        12        12        14
+97        13         8         5         4         6         3         5
+97         6         5
+92CBIEAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Value of disposals - direct transactions : Annual : £m   
+96AS2005  12015 521   10             710 0
+97      4659      6246      4038      1485      6572      4961      8589
+97      5821      1541      2415
+92CBIEQU   0   0 0            MAFR4                      1  0  0  1  4
+93M&A : Inward : Value of disposals - direct transactions : Annual : £m   
+96QS2008  22014 512   23             710 0
+97       439       529         6      1125       169      2597      2681
+97       294       918      1931      1818       477      4718      1767
+97      2032      1184       713      2809      1115        55       402
+97       612       472
+92CBIFAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Number of disposals - indirect by overseas parent : Annual
+96AS2005  12015 521    9             710 0
+97        10        12        10         9         0         5         9
+97                   3
+92CBIFQU   0   0 0            MAFR4                      1  0  0  1  1
+93M&A : Inward : Number of disposals - indirect by overseas parent : Annual
+96QS2013  12015 515    4             710 0
+97         0         2         1         0
+92CBIGAU   0   0 0            MAFR4                      1  0  0  1  1
+93M&A : Inward : Value of disposals - indirect by overseas parent : Annual : £m
+96AS2005  12015 521    7             710 0
+97      1488      1923       226       682         0       928      1190
+92CBIGQU   0   0 0            MAFR4                      1  0  0  1  4
+93M&A : Inward : Value of disposals - indirect by overseas parent : Annual : £m
+96QS2008  22015 515   27             710 0
+97       371        26        39         0         0         0         0
+97         0       109       804        15         5      1114        71
+97         0                                                            
+97                             0         0         0         0
+92CBIHAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Number of disposals - indirect funded locally : Annual   
+96AS2005  12015 521    9             710 0
+97        17        15        25        15         7        15        22
+97         6         9
+92CBIHQU   0   0 0            MAFR4                      1  0  0  1  1
+93M&A : Inward : Number of disposals - indirect funded locally : Annual   
+96QS2013  12015 515    4             710 0
+97         2         4         2         1
+92CBIIAU   0   0 0            MAFR4                      1  0  0  1  2
+93M&A : Inward : Value of disposals - indirect funded locally : Annual : £m
+96AS2005  12015 521    8             710 0
+97      2240      6039      3260      2972      1248      4002      1969
+97        96
+92CBIIQU   0   0 0            MAFR4                      1  0  0  1  4
+93M&A : Inward : Value of disposals - indirect funded locally : Annual : £m
+96QS2008  22015 515   27             710 0
+97      1330        13      1620      1032        67       118        31
+97        38        65       713      3186       443       270        38
+97       763         0        61         0        35                    
+97                             0         0         0         0
+92DUCMAU   0   0 0            MAFR8                      1  0  0  1  7
+93M&A : Domestic : Total expenditure - (Initial plus deferred payments) : £m
+96AS1969  12015 528   46             710 0
+97      1069      1122       911      2532      1304       508       291
+97       448       824      1140      1656      1475      1144      2206
+97      2343      5474      7090     15370     16539     22839     27250
+97      8329     10434      5941      7063      8269     32600     30742
+97     26829     29525     26163    106916     28994     25236     18679
+97     31408     25134     28511     26778     36469     12195     12605
+97      8089      3413      7665      8032
+92DUCMQU   0   0 0            MAFR8                      1  0  0  1  3
+93M&A : Domestic : Total expenditure - (Initial plus deferred payments) : £m
+96QS2011  22015 528   16             710 0
+97      3346      1452      1791      1070      1041       610       692
+97      2825      2438      1166      1236      1613      1625      3152
+97      1642      1152
+92DWVHAU   0   0 0            MAFR8                      1  0  0  1  7
+93M&A : Domestic : M&A of independents : number acquired                  
+96AS1972  12015 520   43             710 0
+97       938       951       367       200       242       372       441
+97       417       368       327       299       305       398       340
+97       621      1188      1123       896       437       292       232
+97       337       465       299       336       384       485       400
+97       466       319       323       392       577       604       628
+97       698       445       198       243       276       216       175
+97       150
+92DWVHQU   0   0 0            MAFR8                      1  0  0  1 25
+93M&A : Domestic : M&A of independents : number acquired                  
+96QS1972  12015 520  173             710 0
+97         0         0         0       938         0         0         0
+97       951         0         0         0       367         0         0
+97         0       200         0         0         0       242         0
+97         0         0       372         0         0         0       441
+97         0         0         0       417         0         0         0
+97       368         0         0         0       327         0         0
+97         0       299         0         0         0       305         0
+97         0         0       398         0         0         0       340
+97       102       113       185       221       226       302       362
+97       298       235       250       360       278       184       187
+97       252       273       133       124       100        80        60
+97        88        73        71        67        70        58        37
+97        52        81        81       123       106       134       117
+97       108        89        63        65        82        69        75
+97        85       107        85        94       109        96       103
+97       114       143       125        95       101       115        89
+97       115       111       125       115        69        79        87
+97        84        58        95        66       104        72        81
+97       111       128       111       120       173       173       128
+97       166       174       136       163       166       135       164
+97       159       158       209       172       136       158        77
+97        74        59        41        43        55        50        70
+97        58        65        51        75        71        79        49
+97        65        55        47        23        53        55        44
+97        32        37        32        49        25
+92DWVLAU   0   0 0            MAFR8                      1  0  0  1  2
+93M&A : Domestic : Sales of subsidiaries between groups : number acquired 
+96AS2005  12015 520   10             710 0
+97       165       151       171       113        88        82        97
+97        50        63        39
+92DWVLQU   0   0 0            MAFR8                      1  0  0  1  3
+93M&A : Domestic : Sales of subsidiaries between groups : number acquired 
+96QS2011  22015 520   16             710 0
+97        19        26        27        13        16         7        14
+97        16        15        17        15         8        14        10
+97         7         3
+92DWVWAU   0   0 0            MAFR9                      1  0  0  1  2
+93M&A : Domestic : Cash expenditure on M&A of independent companies : £m  
+96AS2005  12015 528   10             710 0
+97     13425               13671     31333      2937      6175      4432
+97      1937      3690      3249
+92DWVWQU   0   0 0            MAFR9                      1  0  0  1  3
+93M&A : Domestic : Cash expenditure on M&A of independent companies : £m  
+96QS2011  22015 528   16             710 0
+97      2355       828       697       518       575       409       435
+97       567      1992       587       544       896       478       476
+97      1399       815
+92DWVXAU   0   0 0            MAFR9                      1  0  0  1  7
+93M&A : Domestic : Cash expenditure on M&A of subsidiaries : £m           
+96AS1972  12015 528   43             710 0
+97       120       218        63        60        81        79       149
+97       153       137       230       642       337       826       384
+97      2393      2519      4421      5307      2671      2796      1744
+97      3891      2239      5722      7984      4072      5298      3615
+97      6168      6704      7991      7183      7822      8510      8131
+97      6507      2851       709      4520      2667       789      3475
+97      1947
+92DWVXQU   0   0 0            MAFR9                      1  0  0  1  3
+93M&A : Domestic : Cash expenditure on M&A of subsidiaries : £m           
+96QS2011  22015 528   16             710 0
+97       704       462       850       199       269       100       221
+97      2216       316       332       611       103      1051       656
+97       137        19
+92DWVYAU   0   0 0            MAFR9                      1  0  0  1  2
+93M&A : Domestic : Percentage of M&A in cash                              
+96AI2005  12015 522   10             710 0
+97        87                  76        94        30        85        87
+97        82        92        65
+92DWVYQU   0   0 0            MAFR9                      1  0  0  1  3
+93M&A : Domestic : Percentage of M&A in cash                              
+96QI2011  12015 520   17             710 0
+97        80        92        89        87        67        81        84
+97        95        98        95        79        94        62        94
+97        36        94        72
+92DWVZAU   0   0 0            MAFR9                      1  0  0  1  2
+93M&A : Domestic : Percentage of M&A in ordinary shares                   
+96AI2005  12015 522   10             710 0
+97        11                  18         5        69        12        10
+97        10         6        35
+92DWVZQU   0   0 0            MAFR9                      1  0  0  1  3
+93M&A : Domestic : Percentage of M&A in ordinary shares                   
+96QI2011  12015 520   17             710 0
+97        16         6         5        11        30         5         1
+97         5         1         3        20         1        38         3
+97        64         6        24
+92DWWAAU   0   0 0            MAFR9                      1  0  0  1  2
+93M&A : Domestic : Percentage of M&A in fixed interest securities         
+96AI2005  12015 520   10             710 0
+97         2         2         6         1         1         3         4
+97         8         2         0
+92DWWAQU   0   0 0            MAFR9                      1  0  0  1  3
+93M&A : Domestic : Percentage of M&A in fixed interest securities         
+96QI2011  12015 520   17             710 0
+97         4         2         6         2         3        14        15
+97         0         1         2         1         5         0         3
+97         0         0         3
+92HCI7AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Europe Total Inward Acquisitions Number                                 
+96AS2005  12015 521   10             710 0
+97       113       119       127       125        51        76        92
+97        74        53        45
+92HCI7QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Europe Total Inward Acquisitions Number                                 
+96QS2008  22014 512   23             710 0
+97        30        26        30        13        10        11        17
+97        15        24        17        19        26        26        25
+97        13        26        25        13        10        13        13
+97        19         8
+92HCI8AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Europe Total Inward Acquisitions Value: £m                              
+96AS2005  12015 521   10             710 0
+97     27485     45031     39896     28981     19216      7935      7633
+97      4627     24172      5381
+92HCI8QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Europe Total Inward Acquisitions Value: £m                              
+96QS2008  22014 512   23             710 0
+97      9870      2318      4581     12065       296      2666      4189
+97       410      4139      1825      1637      4180      1613      1161
+97       376      1139       722      1708      1058       876     22265
+97       506       525
+92HCI9AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Europe Total Inward Disposals Number                                    
+96AS2005  12015 521   10             710 0
+97        35        21        16        27        18        29        35
+97        18        12        13
+92HCI9QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Europe Total Inward Disposals Number                                    
+96QS2008  22014 512   23             710 0
+97         9         5         3         2         6         2         8
+97         7         8        10         4         8         7         8
+97        10         5         5         2         6         2         3
+97         3         4
+92HCJ2AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Europe Total Inward Disposals Value: £m                                 
+96AS2005  12015 522   10             710 0
+97      2389                          3075                6993      6933
+97                 898      1949
+92HCJ2QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Europe Total Inward Disposals Value: £m                                 
+96QS2008  22014 512   23             710 0
+97       892       173      1619         1       148       118      2677
+97       330       178      3202      3283       519      4716       224
+97      1275                                                17       212
+97       224       445
+92HCJ3AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Europe Total Outward Acquisitions Number                                
+96AS2005  12015 521   10             710 0
+97       175       170       199       131        44        84       104
+97        46        23        48
+92HCJ3QU   0   0 0            MAFR6A                     1  0  0  1  4
+93Europe Total Outward Acquisitions Number                                
+96QS2008  22014 512   23             710 0
+97        36        32        22         4        15         8        17
+97        10        32        20        22        28        30        29
+97        11        12        13         8        13         8         5
+97         4         6
+92HCJ4AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Europe Total Outward Acquisitions Value :£m                             
+96AS2005  12015 521   10             710 0
+97      6822     18928      8459     15333      1969      3450     23426
+97      8774      6592     13683
+92HCJ4QU   0   0 0            MAFR6A                     1  0  0  1  4
+93Europe Total Outward Acquisitions Value :£m                             
+96QS2008  22014 512   23             710 0
+97      1443      1107       925       861       240       605       263
+97       579      1774       718       379     17149      3482      2360
+97       247       220      2035      5635       884       825       642
+97       185      4940
+92HCJ5AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Europe Total Outward Disposals Number                                   
+96AS2005  12015 521   10             710 0
+97        58        40        50        32        18        32        36
+97        17        15        18
+92HCJ5QU   0   0 0            MAFR6D                     1  0  0  1  4
+93Europe Total Outward Disposals Number                                   
+96QS2008  22014 512   23             710 0
+97         7         9        11         6         3         3         6
+97         6         9         9         8         6        12        12
+97         4         6         5         4         2         2         7
+97         4         2
+92HCJ6AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Europe Total Outward Disposals Value :£m                                
+96AS2005  12015 521   10             710 0
+97      2168      5217      4615                2198      1792      4914
+97      2764      1717      2887
+92HCJ6QU   0   0 0            MAFR6D                     1  0  0  1  4
+93Europe Total Outward Disposals Value :£m                                
+96QS2008  22014 512   23             710 0
+97      1127      2465       219       642         7       186      1363
+97        78       563       852       299      1428      1068      1989
+97       245      2119       218       387        40        80      1315
+97       305        17
+92HCJ7AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Other Europe Inward Acquisitions Number                                 
+96AS2005  12015 521   10             710 0
+97        24        27        33        40        19        29        23
+97        21        18        14
+92HCJ7QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Other Europe Inward Acquisitions Number                                 
+96QS2008  22014 512   23             710 0
+97         8        14        12         2         4         4         9
+97         7         6         7         3         6         7         3
+97         6        13         6         1         1         3         7
+97         7         1
+92HCJ8AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Other Europe Inward Acquisitions Value :£m                              
+96AS2005  12015 521   10             710 0
+97      3578      2619     12407     11063      3939      4079      1395
+97      1094                 700
+92HCJ8QU   0   0 0            MAFR7A                     1  0  0  1  3
+93Other Europe Inward Acquisitions Value :£m                              
+96QS2008  22014 6 2   19             710 0
+97      8834      1406       716        34       160       105      3640
+97       307       280      1309        37       280       919        88
+97       228       121       338         9       626
+92HCJ9AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Other Europe Inward Disposals Number                                    
+96AS2005  12015 522    9             710 0
+97         8         5         4         9         6        10         9
+97         7         3
+92HCJ9QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Other Europe Inward Disposals Number                                    
+96QS2008  22015 515   23             710 0
+97         3         2         1         1         2         0         3
+97         3         4         2         1         2         2         2
+97         4         2         3         1         1         1         1
+97         0         1
+92HCK2AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Other Europe Inward Disposals Value :£m                                 
+96AS2005  12015 522    9             710 0
+97       516                           447                 271       394
+97                  36
+92HCK2QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Other Europe Inward Disposals Value :£m                                 
+96QS2008  22015 515   23             710 0
+97       195       126        12         0         0         0      1574
+97        74       111        65        21       216        99        30
+97       248                                                 4        13
+97         0        19
+92HCK3AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Other Europe Outward Acquisitions Number                                
+96AS2005  12015 521   10             710 0
+97        18        39        29        29         8        18        29
+97        12         7        15
+92HCK3QU   0   0 0            MAFR6A                     1  0  0  1  4
+93Other Europe Outward Acquisitions Number                                
+96QS2008  22014 512   23             710 0
+97        11         7         4         0         4         1         3
+97         6         3         2         7        10         6         6
+97         5         4         5         1         2         1         1
+97         3         2
+92HCK4AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Other Europe Outward Acquisitions Value :£m                             
+96AS2005  12015 521   10             710 0
+97      1766      5962      1062      1720       169       471      2760
+97       842       376      2279
+92HCK4QU   0   0 0            MAFR6A                     1  0  0  1  4
+93Other Europe Outward Acquisitions Value :£m                             
+96QS2008  22014 512   23             710 0
+97       485       641        77         0       110        30        29
+97       113       168        49       141      1049        38      1449
+97        99        53       335       146       308        29       225
+97       100        22
+92HCK5AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Other Europe Outward Disposals Number                                   
+96AS2005  12015 521    9             710 0
+97        11         7         6         2         3         5         4
+97                   3
+92HCK5QU   0   0 0            MAFR6D                     1  0  0  1  6
+93Other Europe Outward Disposals Number                                   
+96QS2005  12015 515   36             710 0
+97         2         3         4         2         1         2         2
+97         2         0         4         1         1         1         0
+97         1         0         2         0         1         0         0
+97         2         1         2         1         1         1         1
+97                                                 0         2         1
+97         0
+92HCK6AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Other Europe Outward Disposals Value :£m                                
+96AS2005  12015 521    9             710 0
+97       109      2019      1032                  64       263        57
+97                 128
+92HCK6QU   0   0 0            MAFR6D                     1  0  0  1  6
+93Other Europe Outward Disposals Value :£m                                
+96QS2005  12015 515   36             710 0
+97        14        64        25         6       517         9       800
+97       693         0        94       758       180                    
+97                            64         0         0         0         0
+97        23       204        36         6        27        24         0
+97                                                 0        83        45
+97         0
+92HCK7AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Other Americas Inward Acquisitions Number                               
+96AS2005  12015 521   10             710 0
+97        14        14        28        16        14        30        22
+97        21        16         8
+92HCK7QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Other Americas Inward Acquisitions Number                               
+96QS2008  22014 512   23             710 0
+97         3         7         0         3         0         9         2
+97         8         8         8         6         1         6         7
+97         3         7         4         7         3         1         6
+97         5         4
+92HCK8AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Other Americas Inward Acquisitions Value :£m                            
+96AS2005  12015 521   10             710 0
+97      6126      3268      5245      9307       886      5156      1690
+97      4256      1529      1317
+92HCK8QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Other Americas Inward Acquisitions Value :£m                            
+96QS2008  22014 512   23             710 0
+97      7879        77         7        12         8       768        98
+97       366       191      3553      1046        84       472       319
+97       191      1231       323      2647        55        22       487
+97       645       375
+92HCK9AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Other Americas Inward Disposals Number                                  
+96AS2005  12015 522    9             710 0
+97         3         3        13         4         4         8         6
+97         3         2
+92HCK9QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Other Americas Inward Disposals Number                                  
+96QS2008  22015 515   23             710 0
+97         1         2         1         1         1         1         1
+97         0         1         0         7         1         1         2
+97         0         1         1         0         1         0         2
+97         0         0
+92HCL2AU   0   0 0            MAFR7D                     1  0  0  1  1
+93Other Americas Inward Disposals Value :£m                               
+96AS2005  12015 522    7             710 0
+97         0      1703       701                  42       642       687
+92HCL2QU   0   0 0            MAFR7D                     1  0  0  1  3
+93Other Americas Inward Disposals Value :£m                               
+96QS2008  22015 515   15             710 0
+97        87       187         5         0        42         0         0
+97         0       109         0       533        46       373       266
+97         0
+92HCL3AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Other Americas Outward Acquisitions Number                              
+96AS2005  12015 521   10             710 0
+97        28        25        38        17         7        20        30
+97        18        13        17
+92HCL3QU   0   0 0            MAFR6A                     1  0  0  1  4
+93Other Americas Outward Acquisitions Number                              
+96QS2008  22014 512   23             710 0
+97         6         5         3         1         0         4         2
+97         5         3         6         6         3         9        11
+97         4         2         8         5         3         9         1
+97         1         2
+92HCL4AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Other Americas Outward Acquisitions Value :£m                           
+96AS2005  12015 521   10             710 0
+97      3957               25040       394      1746       918      2410
+97      2640       323      1135
+92HCL4QU   0   0 0            MAFR6A                     1  0  0  1  4
+93Other Americas Outward Acquisitions Value :£m                           
+96QS2008  22014 512   23             710 0
+97       278        51        19      1574         0        63       109
+97        77       172       363       306       300      1172       163
+97       338       121      2365       124        30       219        70
+97        31         3
+92HCL5AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Other Americas Outward Disposals Number                                 
+96AS2005  12015 522    9             710 0
+97         2        10        10         6         2         4         9
+97         6         0
+92HCL5QU   0   0 0            MAFR6D                     1  0  0  1  4
+93Other Americas Outward Disposals Number                                 
+96QS2008  22015 515   23             710 0
+97         3         1         1         1         0         1         0
+97         2         0         0         2         4         1         3
+97         1         0         4         0         2         0         0
+97         0         0
+92HCL6AU   0   0 0            MAFR6D                     1  0  0  1  1
+93Other Americas Outward Disposals Value :£m                              
+96AS2007  12015 522    7             710 0
+97       195      1033       536       897      1559      2189         0
+92HCL6QU   0   0 0            MAFR6D                     1  0  0  1  4
+93Other Americas Outward Disposals Value :£m                              
+96QS2008  22015 515   23             710 0
+97        84       434       514       534         0         2         0
+97       296         0         0       601      1399        17       133
+97         6         0      1112         0      1077         0         0
+97         0         0
+92HCL7AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Americas Total Inward Acquisitions Number                               
+96AS2005  12015 521   10             710 0
+97        87        98       107        90        45       115       109
+97        71        70        50
+92HCL7QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Americas Total Inward Acquisitions Number                               
+96QS2008  22014 512   23             710 0
+97        21        23        13        12         7        13        13
+97        36        30        27        22        19        31        33
+97        21        20        18        22        11         4        17
+97        29        20
+92HCL8AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Americas Total Inward Acquisitions Value :£m                            
+96AS2005  12015 521   10             710 0
+97     17867     10874     19515     17576     12480     24280     23179
+97     10473      4937      7635
+92HCL8QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Americas Total Inward Acquisitions Value :£m                            
+96QS2008  22014 512   23             710 0
+97      8825       645      1797       266       214      1226     10774
+97     13889      2054      5264      3073      1334      7009      3356
+97     10832      2420      1731      5744       578       264      1151
+97      2047      1475
+92HCL9AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Americas Total Inward Disposals Number                                  
+96AS2005  12015 522   10             710 0
+97        18        25        44        16        14        23        24
+97         7        10         8
+92HCL9QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Americas Total Inward Disposals Number                                  
+96QS2008  22014 512   23             710 0
+97         5         5         2         3         3         5         3
+97         1         6         6        10         6         7         6
+97         5         2         2         2         1         1         2
+97         5         2
+92HCM2AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Americas Total Inward Disposals Value :£m                               
+96AS2005  12015 521   10             710 0
+97      4736      3656      3764                4690      1858      3680
+97      3601       611       809
+92HCM2QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Americas Total Inward Disposals Value :£m                               
+96QS2008  22014 512   23             710 0
+97      1141       321        46      2012        46      2597        35
+97         2       914       243       699       387      1247      1486
+97       766         9       676      2582       334        40       128
+97       398        45
+92HCM3AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Americas Total Outward Acquisitions Number                              
+96AS2005  12015 521   10             710 0
+97       140       163       153       105        41        73       113
+97        59        21        44
+92HCM3QU   0   0 0            MAFR6A                     1  0  0  1  4
+93Americas Total Outward Acquisitions Number                              
+96QS2008  22014 512   23             710 0
+97        39        26        17         7         6        13        15
+97        12         8        24        29        24        29        24
+97        25         9        23        13        14        11         4
+97         3         3
+92HCM4AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Americas Total Outward Acquisitions Value :£m                           
+96AS2005  12015 521   10             710 0
+97     19640               46716      7638      4996      7141     11752
+97      8024       923      6122
+92HCM4QU   0   0 0            MAFR6A                     1  0  0  1  4
+93Americas Total Outward Acquisitions Value :£m                           
+96QS2008  22014 512   23             710 0
+97      2679      2266       347      2301       101      1926       668
+97       208       438      4238      2257       736      6815      1412
+97      2220       381      3785      2574      1284       480       117
+97       287        39
+92HCM5AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Americas Total Outward Disposals Number                                 
+96AS2005  12015 521   10             710 0
+97        26        35        38        28         9        19        27
+97        13         9        14
+92HCM5QU   0   0 0            MAFR6D                     1  0  0  1  4
+93Americas Total Outward Disposals Number                                 
+96QS2008  22014 512   23             710 0
+97         8         7         6         3         2         1         3
+97         4         1         7         7         7         4         7
+97         7         1         6         2         4         5         2
+97         1         1
+92HCM6AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Americas Total Outward Disposals Value :£m                              
+96AS2007  12015 521    8             710 0
+97      4849      7230      1813      8362      6274      3227      3691
+97      2228
+92HCM6QU   0   0 0            MAFR6D                     1  0  0  1  4
+93Americas Total Outward Disposals Value :£m                              
+96QS2008  22014 512   23             710 0
+97      3713      2206       938       633       168         2      1010
+97      2417       290      3053      2602      1605      1948      1551
+97       957         1      1142       224      1860       415      1672
+97       134      1470
+92HCM7AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Asia Inward Acquisitions Number                                         
+96AS2005  12015 521   10             710 0
+97        22        24        19        26        12        16        18
+97        12        13        12
+92HCM7QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Asia Inward Acquisitions Number                                         
+96QS2008  22015 2 5   23             710 0
+97        11         4         5         2         4         4         2
+97         3         3         3         7         5         6         6
+97         0         4         3         3         2         2         1
+97         9         1
+92HCM8AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Asia Inward Acquisitions Value :£m                                      
+96AS2006  12015 522    9             710 0
+97     14017     15490      4839       199      4210      1367      2277
+97                1932
+92HCM8QU   0   0 0            MAFR7A                     1  0  0  1  3
+93Asia Inward Acquisitions Value :£m                                      
+96QS2008  22015 2 5   19             710 0
+97      1268       222      1893        12       131        42        14
+97        72         4      1892      2242       177       500       674
+97         2       665        47      1325       240
+92HCM9AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Asia Inward Disposals Number                                            
+96AS2005  12015 522    9             710 0
+97         3         6         5         3         2         3         8
+97                   3
+92HCM9QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Asia Inward Disposals Number                                            
+96QS2008  22015 515   23             710 0
+97         1         0         0         1         0         0         1
+97         0         1         1         1         1         1         3
+97         2                                                 1         2
+97         0         0
+92HCN2AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Asia Inward Disposals Value :£m                                         
+96AS2006  12015 522    8             710 0
+97       204                                    1033                    
+97       328
+92HCN2QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Asia Inward Disposals Value :£m                                         
+96QS2008  22015 515   23             710 0
+97         0         0         0       144         0         0         0
+97         0         0         0      1033        19       139       166
+97       158                                                32       294
+97         1         1
+92HCN3AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Asia Outward Acquisitions Number                                        
+96AS2005  12015 521   10             710 0
+97        26        37        35        29        14        16        33
+97         7                  12
+92HCN3QU   0   0 0            MAFR6A                     1  0  0  1  3
+93Asia Outward Acquisitions Number                                        
+96QS2008  22014 6 2   19             710 0
+97         4         7         8         2         5         3         4
+97         2         3         7         4         6        10         9
+97         8         1         3         0         3
+92HCN4AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Asia Outward Acquisitions Value :£m                                     
+96AS2005  12015 521   10             710 0
+97      2893      1643       422       809       964       630      6807
+97       458                 637
+92HCN4QU   0   0 0            MAFR6A                     1  0  0  1  3
+93Asia Outward Acquisitions Value :£m                                     
+96QS2008  22014 6 2   19             710 0
+97        38       291       275        67       864        26         7
+97       194        50       340        46       750       506      2889
+97      2662        23       388         0        47
+92HCN5AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Asia Outward Disposals Number                                           
+96AS2005  12015 526    8             710 0
+97        12         9         8         7         3        11        10
+97         2
+92HCN5QU   0   0 0            MAFR6D                     1  0  0  1  3
+93Asia Outward Disposals Number                                           
+96QS2008  22015 515   19             710 0
+97         2         3         1         0         1         2         0
+97         0         7         1         3         3         2         2
+97         4         0         0         0         2
+92HCN6AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Asia Ouward Disposals Value :£m                                         
+96AS2005  12015 521    8             710 0
+97       760      8085       195       388                 117          
+97      1220
+92HCN6QU   0   0 0            MAFR6D                     1  0  0  1  3
+93Asia Ouward Disposals Value :£m                                         
+96QS2008  22015 515   19             710 0
+97       136        20       217        10         0        64         0
+97         7        12        67        31        28        80        18
+97      2564         0         0         0      1220
+92HCN7AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Australasia & Oceania Inward Acquisitions Number                        
+96AS2005  12015 522    9             710 0
+97        17        13        13         7         4         3        14
+97         1         2
+92HCN7QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Australasia & Oceania Inward Acquisitions Number                        
+96QS2008  22015 515   23             710 0
+97         1         1         0         1         1         0         2
+97         0         0         1         2         2         4         5
+97         2         0         1         0         0         0         1
+97         0         1
+92HCN8AU   0   0 0            MAFR7A                     1  0  0  1  1
+93Australasia & Oceania Inward Acquisitions Value :£m                     
+96AS2005  12015 522    7             710 0
+97      3589                6900                  89        14       762
+92HCN8QU   0   0 0            MAFR7A                     1  0  0  1  3
+93Australasia & Oceania Inward Acquisitions Value :£m                     
+96QS2008  22015 515   15             710 0
+97         1        43         0        11         4         0        74
+97         0         0         6         8        55       164        27
+97       484
+92HCN9AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Australasia & Oceania Inward Disposals Number                           
+96AS2005  12015 521   10             710 0
+97         4         2         1         1         1         3         2
+97         0         1         0
+92HCN9QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Australasia & Oceania Inward Disposals Number                           
+96QS2008  22014 512   23             710 0
+97         1         0         0         0         1         0         0
+97         0         0         2         1         0         0         0
+97         1         0         0         0         0         0         1
+97         0         0
+92HCO2AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Australasia & Oceania Inward Disposals Value :£m                        
+96AS2005  12015 521   10             710 0
+97      1242                                                 7          
+97         0                   0
+92HCO2QU   0   0 0            MAFR7D                     1  0  0  1  3
+93Australasia & Oceania Inward Disposals Value :£m                        
+96QS2008  22014 6 2   19             710 0
+97        88         0         0         0        42         0         0
+97         0         0         3         4         0         0         0
+97       596         0         0         0         0
+92HCO3AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Australasia & Oceania Outward Acquisitions Number                       
+96AS2005  12015 521    8             710 0
+97        14        14        28        22        13        19        16
+97         5
+92HCO3QU   0   0 0            MAFR6A                     1  0  0  1  3
+93Australasia & Oceania Outward Acquisitions Number                       
+96QS2008  22015 515   19             710 0
+97         9         3         2         3         4         2         4
+97         4         4         2         9         2         3         7
+97         3         1         2         0         2
+92HCO4AU   0   0 0            MAFR6A                     1  0  0  1  1
+93Australasia & Oceania Outward Acquisitions Value :£m                    
+96AS2005  12015 521    7             710 0
+97       738       692      1306      5224       609       667      7666
+92HCO4QU   0   0 0            MAFR6A                     1  0  0  1  3
+93Australasia & Oceania Outward Acquisitions Value :£m                    
+96QS2008  22015 515   15             710 0
+97      1565        39      2201       512         3        15        79
+97        35        30         9       593      2144        41       137
+97      6757
+92HCO5AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Australasia & Oceania Outward Disposals Number                          
+96AS2005  12015 521    9             710 0
+97         5         4         3         2         3         5         5
+97         3         4
+92HCO5QU   0   0 0            MAFR6D                     1  0  0  1  4
+93Australasia & Oceania Outward Disposals Number                          
+96QS2008  22015 515   23             710 0
+97         2         0         0         0         1         1         1
+97         2         0         1         2         0         0         2
+97         2         1         1         0         1         2         2
+97         0         0
+92HCO6AU   0   0 0            MAFR6D                     1  0  0  1  1
+93Australasia & Oceania Outward Disposals Value :£m                       
+96AS2006  12015 522    5             710 0
+97        14       533       234      1002       609
+92HCO6QU   0   0 0            MAFR6D                     1  0  0  1  3
+93Australasia & Oceania Outward Disposals Value :£m                       
+96QS2008  22015 515   15             710 0
+97       234         0         0         0       551         0       451
+97       286         0       217       106         0         0        17
+97        21
+92HCO7AU   0   0 0            MAFR7A                     1  0  0  1  2
+93Africa Inward Acquisitions Number                                       
+96AS2005  12015 522    9             710 0
+97         3         5         3         4         0         2         4
+97         3         3
+92HCO7QU   0   0 0            MAFR7A                     1  0  0  1  4
+93Africa Inward Acquisitions Number                                       
+96QS2008  22015 515   23             710 0
+97         0         0         1         0         0         0         0
+97         0         0         1         1         1         1         1
+97         1         1         1         1         0         0         1
+97         2         0
+92HCO8AU   0   0 0            MAFR7A                     1  0  0  1  1
+93Africa Inward Acquisitions Value :£m                                    
+96AS2007  12015 522    5             710 0
+97       320                   0       204        26
+92HCO8QU   0   0 0            MAFR7A                     1  0  0  1  3
+93Africa Inward Acquisitions Value :£m                                    
+96QS2008  22015 515   15             710 0
+97         0         0         3         0         0         0         0
+97         0         0       138        66         5         6         7
+97         8
+92HCO9AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Africa Inward Disposals Number                                          
+96AS2005  12015 522    9             710 0
+97         1         1         0         2         3         0         0
+97                   0
+92HCO9QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Africa Inward Disposals Number                                          
+96QS2008  22015 515   23             710 0
+97         1         1         0         0         1         1         1
+97         0         0         0         0         0         0         0
+97         0                                                 0         0
+97         0         0
+92HCP2AU   0   0 0            MAFR7D                     1  0  0  1  2
+93Africa Inward Disposals Value :£m                                       
+96AS2006  12015 522    8             710 0
+97         1         0        93         0         0         0          
+97         0
+92HCP2QU   0   0 0            MAFR7D                     1  0  0  1  4
+93Africa Inward Disposals Value :£m                                       
+96QS2008  22015 515   23             710 0
+97        19        74         0         0         0         0         0
+97         0         0         0         0         0         0         0
+97         0                                                 0         0
+97         0         0
+92HCP3AU   0   0 0            MAFR6A                     1  0  0  1  2
+93Africa Outward Acquisitions Number                                      
+96AS2005  12015 521    8             710 0
+97         8        21        26        11         6         7        19
+97         5
+92HCP3QU   0   0 0            MAFR6A                     1  0  0  1  3
+93Africa Outward Acquisitions Number                                      
+96QS2008  22015 515   19             710 0
+97         3         4         0         1         2         2         1
+97         2         2         1         2         8         2         6
+97         1         2         0         0         3
+92HCP4AU   0   0 0            MAFR6A                     1  0  0  1  1
+93Africa Outward Acquisitions Value :£m                                   
+96AS2005  12015 521    7             710 0
+97      2639                 911       666      1610       526       583
+92HCP4QU   0   0 0            MAFR6A                     1  0  0  1  3
+93Africa Outward Acquisitions Value :£m                                   
+96QS2008  22015 515   15             710 0
+97         4       544         0         3      1603         2         2
+97        11         1         3       511       356        11        18
+97        71
+92HCP5AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Africa Outward Disposals Number                                         
+96AS2005  12015 521    8             710 0
+97         9         1         5         2         4         6         2
+97         6
+92HCP5QU   0   0 0            MAFR6D                     1  0  0  1  3
+93Africa Outward Disposals Number                                         
+96QS2008  22015 515   19             710 0
+97         0         0         0         4         0         0         0
+97         1         1         0         4         2         0         0
+97         0         1         2         1         2
+92HCP6AU   0   0 0            MAFR6D                     1  0  0  1  2
+93Africa Outward Disposals Value :£m                                      
+96AS2005  12015 521    8             710 0
+97       460                  29                           531          
+97        46
+92HCP6QU   0   0 0            MAFR6D                     1  0  0  1  3
+93Africa Outward Disposals Value :£m                                      
+96QS2008  22015 515   19             710 0
+97         0         0         0        14         0         0         0
+97         2         1         0       528       207         0         0
+97         0         0        11        21        14
+92HIKBAU   0   0 0            MAFR8                      1  0  0  1  4
+93M&A : Domestic : M&A of independents : Total payments : £m              
+96AS1987  12015 528   28             710 0
+97     11871     17307     21572      5388      7487      4108      2986
+97      5743     25647     23348     22453     24086     22211    100513
+97     21029     16998     10954     22882     16276     20180     19779
+97     33469     11455      7775      5265      2536      4135      5968
+92HIKBQU   0   0 0            MAFR8                      1  0  0  1  3
+93M&A : Domestic : M&A of independents : Total payments : £m              
+96QS2011  22015 528   16             710 0
+97      2571       941       924       871       695       510       460
+97       593      2104       829       609      1491       490      2487
+97      1500      1104
+92HIKCAU   0   0 0            MAFR8                      1  0  0  1  2
+93M&A : Domestic : Sales of subsidiaries between groups : Total payments : £m
+96AS2005  12015 528   10             710 0
+97      8858      8331      6999      3000       740      4830      2824
+97       877      3530      2063
+92HIKCQU   0   0 0            MAFR8                      1  0  0  1  3
+93M&A : Domestic : Sales of subsidiaries between groups : Total payments : £m
+96QS2011  22015 528   16             710 0
+97       775       511       867       199       346       100       232
+97      2232       334       337       627       122      1136       664
+97       141        48

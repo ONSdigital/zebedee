@@ -1,32 +1,12 @@
 {
   "sections": [
     {
-      "uri": "/businessindustryandtrade/retailindustry",
-      "index": 0
-    },
-    {
-      "uri": "/businessindustryandtrade/internationaltrade",
+      "uri": "/businessindustryandtrade/changestobusiness",
       "index": 1
     },
     {
-      "uri": "/businessindustryandtrade/manufacturingandproductionindustry",
-      "index": 2
-    },
-    {
       "uri": "/businessindustryandtrade/constructionindustry",
-      "index": 3
-    },
-    {
-      "uri": "/businessindustryandtrade/businessactivitysizeandlocation",
-      "index": 4
-    },
-    {
-      "uri": "/businessindustryandtrade/changestobusiness",
-      "index": 5
-    },
-    {
-      "uri": "/businessindustryandtrade/itandinternetindustry",
-      "index": 6
+      "index": 2
     },
     {
       "uri": "/businessindustryandtrade/tourismindustry",
@@ -43,6 +23,6 @@
   ],
   "description": {
     "title": "Business, industry and trade",
-    "summary": "Statistics in this area are related to the production and trade of good and services. These statistics are important for users looking to learn more about this section of the UK economy. Key statistics here are figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade."
+    "summary": "Statistics about the production and trade of goods and services help us identify patterns and trends in the UK economy. We look at figures on retail sales, business activity, indices for the construction and manufacturing industries and international trade."
   }
 }

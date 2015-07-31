@@ -5,11 +5,11 @@
       "index": 0
     },
     {
-      "uri": "/peoplepopulationandcommunity/populationandmigration",
+      "uri": "/peoplepopulationandcommunity/community",
       "index": 1
     },
     {
-      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
+      "uri": "/peoplepopulationandcommunity/crimeandjustice",
       "index": 2
     },
     {
@@ -17,32 +17,40 @@
       "index": 3
     },
     {
-      "uri": "/peoplepopulationandcommunity/crimeandjustice",
+      "uri": "/peoplepopulationandcommunity/educationandchildcare",
       "index": 4
     },
     {
-      "uri": "/peoplepopulationandcommunity/housing",
+      "uri": "/peoplepopulationandcommunity/elections",
       "index": 5
     },
     {
-      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
       "index": 6
     },
     {
-      "uri": "/peoplepopulationandcommunity/wellbeing",
+      "uri": "/peoplepopulationandcommunity/householdcharacteristics",
       "index": 7
     },
     {
-      "uri": "/peoplepopulationandcommunity/leisureandtourism",
+      "uri": "/peoplepopulationandcommunity/housing",
       "index": 8
     },
     {
-      "uri": "/peoplepopulationandcommunity/homeinternetandsocialmediausage",
+      "uri": "/peoplepopulationandcommunity/leisureandtourism",
       "index": 9
     },
     {
-      "uri": "/peoplepopulationandcommunity/elections",
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
       "index": 10
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/populationandmigration",
+      "index": 11
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/wellbeing",
+      "index": 12
     }
   ],
   "index": 3,
@@ -55,6 +63,6 @@
   ],
   "description": {
     "title": "People, population and community",
-    "summary": "Statistics in this area tell us a lot about the people living in the UK. From the level and growth in the population, to data and analysis on how households spend their money. We also have data on crime, divorce, diseases and religion here as well as much more. These statistics have a wide range of users and uses and they help us build a detailed picture of the country we live in. "
+    "summary": "We look at how many people live in the UK, changes in the population and how we spend our money. We also publish data on crime, relationships, health and religion. These statistics help us build a detailed picture of how we live."
   }
 }

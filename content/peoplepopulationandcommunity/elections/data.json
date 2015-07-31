@@ -1,24 +1,20 @@
 {
-  "items": [
+  "sections": [
     {
-      "uri": "/peoplepopulationandcommunity/elections/timeseries/raid87"
+      "uri": "/peoplepopulationandcommunity/elections/electoralregistration",
+      "index": 0
     },
     {
-      "uri": "/peoplepopulationandcommunity/elections/timeseries/raid88"
-    }
-  ],
-  "datasets": [
+      "uri": "/peoplepopulationandcommunity/elections/generalelections",
+      "index": 1
+    },
     {
-      "uri": "/peoplepopulationandcommunity/elections/datasets/electoralstatistics"
+      "uri": "/peoplepopulationandcommunity/elections/localgovernmentelections",
+      "index": 2
     }
   ],
-  "statsBulletins": [
-    {
-      "uri": "/peoplepopulationandcommunity/elections/bulletins/electoralstatisticsforuk2013"
-    }
-  ],
-  "index": 10,
-  "type": "product_page",
+  "index": 5,
+  "type": "taxonomy_landing_page",
   "uri": "/peoplepopulationandcommunity/elections",
   "breadcrumb": [
     {
@@ -30,6 +26,6 @@
   ],
   "description": {
     "title": "Elections",
-    "summary": "The key statistic in this section is the number of people who are listed on electoral registers. This differs from the number of people who are eligible to vote. These statistics are available for the constituent countries of the UK. "
+    "summary": "Analysis of the number of people registered to vote, including comparisons over time and between the UK constituent countries."
   }
 }

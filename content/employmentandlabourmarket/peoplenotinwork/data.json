@@ -1,0 +1,23 @@
+{
+  "sections": [
+    {
+      "uri": "/employmentandlabourmarket/peoplenotinwork/unemployment",
+      "index": 0
+    }
+  ],
+  "index": 1,
+  "type": "taxonomy_landing_page",
+  "uri": "/employmentandlabourmarket/peoplenotinwork",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/employmentandlabourmarket"
+    }
+  ],
+  "description": {
+    "title": "People not in work",
+    "summary": "We take a look at  the number of unemployed and economically inactive people in the UK."
+  }
+}

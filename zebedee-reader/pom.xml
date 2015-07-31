@@ -4,6 +4,7 @@
     <groupId>com.github.onsdigital</groupId>
     <artifactId>zebedee-reader</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <name>Zebedee Reader</name>
 
     <parent>
         <groupId>com.github.onsdigital</groupId>
@@ -11,8 +12,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-<<<<<<< HEAD
-=======
     <dependencies>
         <!--Restolino-->
         <dependency>
@@ -103,5 +102,4 @@
 
     </build>
 
->>>>>>> 278a3d5... Fixed dependency issues in zebedee cms module
 </project>

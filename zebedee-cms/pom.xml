@@ -56,6 +56,12 @@
             <artifactId>zebedee-reader</artifactId>
         </dependency>
 
+        <!-- Zebedee Content Wrappers-->
+        <dependency>
+            <groupId>com.github.onsdigital</groupId>
+            <artifactId>zebedee-content-wrappers</artifactId>
+        </dependency>
+
         <!-- File upload -->
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -68,11 +74,7 @@
             <artifactId>joda-time</artifactId>
             <version>2.7</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.3</version>
-        </dependency>
+
         <dependency>
             <groupId>com.github.davidcarboni</groupId>
             <artifactId>resource-utils</artifactId>

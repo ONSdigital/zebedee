@@ -107,7 +107,7 @@ public class ContentReader {
         }
 
         if (path.startsWith("/")) {
-            throw new BadRequestException("Absolute path requested, path must be relative to root folder, remove forward slash");
+            throw new BadRequestException("Absolute path requested, path must be relative to root folder, remove forward slash at the start?");
         }
         return root.resolve(path);
     }

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data;
 
+import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.content.page.base.PageDescription;
 import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
@@ -9,8 +10,10 @@ import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Content;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.util.IOUtils;
 import org.bouncycastle.util.Strings;
@@ -34,117 +37,38 @@ import static org.junit.Assert.*;
  */
 public class DataPublisherTest {
     Zebedee zebedee;
-    Collection collection1;
-    Collection collection2;
-    Builder builder;
-    String publisher1Email;
-    String publisher2Email;
-    Session session;
-
-    // Data for after we have dealt with Brian
-    TimeSerieses serieses;
-    Dataset dataset;
-    String datasetURI;
+    Builder bob;
+    Session publisher;
 
     Map<String, String> envVariables;
 
+    /**
+     * The bootstrap resource contains master data and one collection "collection"
+     *
+     * "collection" contains two reviewed datasets
+     *
+     * i) /themea/landinga/producta/datasets/a4fk_dataset - this has existing data (the a4fk timeseries)
+     * ii) /themea/landinga/producta/datasets/another_dataset - this has no existing data in master
+     *
+     * i) is a cut down version of Blue Book. ii) is a cut down version of PPI
+     *
+     * @throws Exception
+     */
     @Before
     public void setUp() throws Exception {
-        // Creates a zebedee with two collections, each of which contain a dataset
+        // Loads a zebedee with two collections, each of which contain a dataset
         //
-        // Note the collection event history will not be properly defined
-
-        builder = new Builder(this.getClass());
-        zebedee = new Zebedee(builder.zebedee);
-
-        collection1 = new Collection(builder.collections.get(0), zebedee);
-        collection2 = new Collection(builder.collections.get(1), zebedee);
-
-        publisher1Email = builder.publisher1.email;
-        publisher2Email = builder.publisher2.email;
-
-        session = zebedee.sessions.create(publisher1Email);
-
-        envVariables = DataPublisher.env;
-
-        Path toPath = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/CXNV.csdb");
-
-
-        if (!Files.exists(toPath.getParent())) {
-            Files.createDirectories(toPath.getParent());
-        }
-
-        String fromPath = "/csdb/csdb_with_extension/CXNV.csdb";
-        try (InputStream inputStream = getClass().getResource(fromPath).openStream();
-             OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
-            IOUtils.copy(inputStream, outputStream);
-        }
-
-        toPath = collection1.reviewed.toPath("/datapublishertest/=csdb_with_extension/data.json");
-        fromPath = "/csdb/csdb_with_extension/data.json";
-        try (InputStream inputStream = getClass().getResource(fromPath).openStream();
-             OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
-            IOUtils.copy(inputStream, outputStream);
-        }
-
-        toPath = collection2.reviewed.toPath("/datapublishertest/csdb_no_extension/OTT");
-        if (!Files.exists(toPath.getParent())) {
-            Files.createDirectories(toPath.getParent());
-        }
-        fromPath = "/csdb/csdb_no_extension/OTT";
-        try (InputStream inputStream = getClass().getResource(fromPath).openStream();
-             OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
-            IOUtils.copy(inputStream, outputStream);
-        }
-
-        toPath = collection2.reviewed.toPath("/datapublishertest/csdb_no_extension/data.json");
-        fromPath = "/csdb/csdb_no_extension/data.json";
-        try (InputStream inputStream = getClass().getResource(fromPath).openStream();
-             OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
-            IOUtils.copy(inputStream, outputStream);
-        }
-
-        String brianPath = "/csdb/csdb_no_extension/brian.json";
-        try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
-            serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
-        }
-
-        datasetURI = "/csdb/csdb_no_extension";
-        String datasetPath = "/csdb/csdb_no_extension/data.json";
-        try (InputStream inputStream = getClass().getResourceAsStream(datasetPath)) {
-            dataset = ContentUtil.deserialise(inputStream, Dataset.class);
-            dataset.setUri(null);
-        }
-
+        bob = new Builder(DataPublisherTest.class, ResourceUtils.getPath("/bootstraps/data_publisher"));
+        zebedee = new Zebedee(bob.zebedee);
+        publisher = bob.createSession(bob.publisher1);
 
     }
-
     @After
     public void tearDown() throws Exception {
-        builder.delete();
+        bob.delete();
         DataPublisher.env = envVariables;
     }
 
-//    /**
-//     * Test the setup has worked
-//     */
-//    @Test
-//    public void prebuiltCollectionShouldContainFiles() {
-//        // Given
-//        // the prebuilt collection and expected files
-//        String file1 = "/datapublishertest/csdb_with_extension/CXNV.csdb";
-//        String json1 = "/datapublishertest/csdb_with_extension/data.json";
-//
-//        String file2 = "/datapublishertest/csdb_no_extension/OTT";
-//        String json2 = "/datapublishertest/csdb_no_extension/data.json";
-//
-//        // Then
-//        // we expect these files to exist
-//        assertTrue(Files.exists(collection1.reviewed.toPath(file1)));
-//        assertTrue(Files.exists(collection1.reviewed.toPath(json1)));
-//        assertTrue(Files.exists(collection2.reviewed.toPath(file2)));
-//        assertTrue(Files.exists(collection2.reviewed.toPath(json2)));
-//    }
 
     /**
      *
@@ -153,59 +77,60 @@ public class DataPublisherTest {
      *
      */
     @Test
-    public void testFramework_afterBeforeMethod_isProperlySetUp() {
+    public void testFramework_afterBeforeMethod_isProperlySetUp() throws IOException {
         // Given
         // we have run the before method
 
-        // When
-        // we
-
         // We expect
+        // Correct setup
+        assertEquals(1, zebedee.collections.list().size());
 
+        // The collection exists
+        Collection collection = zebedee.collections.list().getCollection("collection");
+        assertNotNull(collection);
+        // It has four items
+        assertEquals(4, collection.reviewedUris().size());
+        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/BB.csdb")));
+        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/PPI.csdb")));
+
+        // The pre-existing items exist
+        assertTrue(Files.exists(zebedee.published.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json")));
+        assertTrue(Files.exists(zebedee.published.toPath("/themea/landinga/producta/timeseries/a4fk/data.json")));
     }
     @Test
     public void contentUtil_givenTestData_shouldDeserialise() throws IOException {
-        // Given
-        // one of our collections
-        List<HashMap<String, Path>> datasets = DataPublisher.csdbDatasetsInCollection(collection2, session);
 
-        // When
-        // we deserialise the dataset
-        Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(datasets.get(0).get("json").toFile()), Dataset.class);
+        // Given
+        // the files in our collection
+        Collection collection = zebedee.collections.list().getCollection("collection");
+        Path dataset1 = collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json");
+        Path dataset2 = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/data.json");
+        Path existingDataset = zebedee.published.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json");
+        Path existingTimeSeries = zebedee.published.toPath("/themea/landinga/producta/timeseries/a4fk/data.json");
 
         // Then
-        // we expect a dataset and check a couple of fields
-        assertNotNull(dataset);
-        assertEquals("Visits and Spending by UK residents abroad and overseas residents in the UK.", dataset.getSection().getMarkdown());
-        assertEquals("/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism", dataset.getUri().toString());
-    }
-    @Test
-    public void contentUtil_givenFileReturnedByBrian_shouldDeserialiseTimeSeries() {
-        // Given
-        // the file returned by brian that corresponds to csdb_no_extension
+        // we expect the files in our collection to deserialise properly
+        try(InputStream stream = Files.newInputStream(dataset1)) {
+            assertNotNull(ContentUtil.deserialise(stream, Dataset.class));
+        }
+        try(InputStream stream = Files.newInputStream(dataset2)) {
+            assertNotNull(ContentUtil.deserialise(stream, Dataset.class));
+        }
+        try(InputStream stream = Files.newInputStream(existingDataset)) {
+            assertNotNull(ContentUtil.deserialise(stream, Dataset.class));
+        }
+        try(InputStream stream = Files.newInputStream(existingDataset)) {
+            assertNotNull(ContentUtil.deserialise(stream, Dataset.class));
+        }
 
-        // When
-        // we deserialise it (as we did in setup)
-
-        // Then
-        // we expect it to be non null and to have data
-        assertNotNull(serieses);
-        assertTrue(serieses.size() > 0);
     }
+
 
     /**
      * Brian is called using environment variables. Check the function is working and returning an expected result
      */
-    @Test
-    public void urlForBrian_givenCorrectSetup_givesNonNullURI() {
-        // When
-        // we get the URI for brian
-        URI uri = DataPublisher.csdbURI();
-
-        // Then
-        // it is not null
-        assertNotNull(uri);
-    }
     @Test
     public void urlForBrian_whenEnvVariablesAreSet_givesURIBasedOnBrianURL() throws Exception {
         // Given
@@ -222,6 +147,27 @@ public class DataPublisherTest {
         // we expect a standard response
         assertEquals("/csdbURIShouldComeFromEnvVariable/Services/ConvertCSDB", uri.toString());
     }
+    @Test
+    public void contentUtil_givenFileReturnedByBrian_shouldDeserialiseTimeSeries() throws IOException {
+        // Given
+        // a file returned by brian
+        String brianPath = "/csdb/csdb_no_extension/brian.json";
+
+
+        // When
+        // we deserialise it
+        TimeSerieses serieses = null;
+        try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
+            serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
+        }
+
+        // Then
+        // we expect it to be non null and to have data
+        assertNotNull(serieses);
+        assertTrue(serieses.size() > 0);
+
+
+    }
 
     /**
      * The process starts by hooking into publish and pulling out pages that require being treated as CSDB datasets
@@ -234,187 +180,115 @@ public class DataPublisherTest {
     public void functionCsdbDatasetsInCollection_givenCollectionsSetupInBefore_shouldIdentifyCSDBdatasets() throws Exception {
         // Given
         // our pre setup collection with csdb extensions
-        String file1 = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/CXNV.csdb").toString();
-        String json1 = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/data.json").toString();
+        Collection collection = zebedee.collections.list().getCollection("collection");
 
         // When
-        // we search for csdb datasets
-        List<HashMap<String, Path>> datasets = DataPublisher.csdbDatasetsInCollection(collection1, session);
+        // we search for csdb datasets with a publisher
+        List<HashMap<String, Path>> datasetsInCollection = DataPublisher.csdbDatasetsInCollection(collection, publisher);
 
         // Then
-        // we expect a single result
-        assertEquals(1, datasets.size());
-        // with the correct paths
-        HashMap<String, Path> dataset = datasets.get(0);
-        assertEquals(file1, dataset.get("file").toString());
-        assertEquals(json1, dataset.get("json").toString());
-    }
-    @Test
-    public void functionCsdbDatasetsInCollection_givenCollectionsSetupInBefore_shouldIdentifyCSDBdatasetsWithoutAnExtension() throws Exception {
-        // Given
-        // our pre setup collection with csdb extensions
-        String file2 = collection2.reviewed.toPath("/datapublishertest/csdb_no_extension/OTT").toString();
-        String json2 = collection2.reviewed.toPath("/datapublishertest/csdb_no_extension/data.json").toString();
-
-
-        // When
-        // we search for csdb datasets
-        List<HashMap<String, Path>> datasets = DataPublisher.csdbDatasetsInCollection(collection2, session);
-
-        // Then
-        // we expect a single result
-        assertEquals(1, datasets.size());
-        // with the correct paths
-        HashMap<String, Path> dataset = datasets.get(0);
-        assertEquals(file2, dataset.get("file").toString());
-        assertEquals(json2, dataset.get("json").toString());
+        // we expect two results
+        assertEquals(2, datasetsInCollection.size());
     }
 
     /**
      * Dataset id is identified from the ?.csdb portion of the filename
      */
     @Test
-    public void datasetIdFromDatafilePath_withTypicalFilepaths_givesExpectedIds() {
+    public void datasetIdFromDatafilePath_withTypicalFilepaths_givesExpectedIds() throws IOException {
         // Given
-        // a couple of file names
-        String file1 = "/datapublishertest/csdb_with_extension/CXNV.csdb";
-        String file2 = "/datapublishertest/csdb_with_extension/CXNV";
+        // our pre setup collection with csdb extensions
+        Collection collection = zebedee.collections.list().getCollection("collection");
+        Path datasetPath = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/PPI.csdb");
 
         // When
-        // we turn these into paths
-        Path path1 = collection1.reviewed.toPath(file1);
-        Path path2 = collection1.reviewed.toPath(file2);
+        // we get a dataset Id from this
+        String datasetIdFromDatafilePath = DataPublisher.datasetIdFromDatafilePath(datasetPath);
 
         // Then
-        // we expect datasetIds that are the filename without extension
-        assertEquals("CXNV", DataPublisher.datasetIdFromDatafilePath(path1));
-        assertEquals("CXNV", DataPublisher.datasetIdFromDatafilePath(path2));
+        // we expect the result PPI
+        assertEquals("PPI", datasetIdFromDatafilePath);
     }
 
-
-
     @Test
-    public void functionUriForSeriesInDataset_givenDatasetsSetupInBefore_ShouldBeCorrect() {
+    public void functionUriForSeriesInDataset_givenDatasetsSetupInBefore_ShouldBeCorrect() throws IOException {
         // Given
-        // the series and dataset we loaded at setup
-        String datasetURI = "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism";
-        TimeSeries series = serieses.get(0);
-        String seriesId = series.getCdid();
+        // a file returned by brian
+        String datasetId = "/theme/product/datasets/1234";
+        TimeSeries series = new TimeSeries();
+        series.setCdid("ABCD");
 
         // When
         // we use these to generate a timeseries uri
-        String seriesURI = DataPublisher.uriForSeriesInDataset(datasetURI, series);
+        String uriForSeriesInDataset = DataPublisher.uriForSeriesInDataset(datasetId, series);
 
         // Then
         // we expect a uri in the corresponding timeseries folder with CDID as a subfolder
-        assertEquals("/businessindustryandtrade/tourismindustry/timeseries/" + Strings.toLowerCase(seriesId),
-                seriesURI);
+        assertEquals("/theme/product/timeseries/abcd", uriForSeriesInDataset);
+    }
+
+    @Test
+    public void startPage_GivenFreshTimeSeries_ShouldBeTheSame() throws IOException {
+
+    }
+    @Test
+    public void startPage_givenExistingTimeSeries_shouldBePopulatedByExistingData() throws IOException {
 
     }
 
     @Test
-    public void startPageForNewSeriesShouldBeVanilla() throws IOException {
-        // Given
-        // the series from the standard taxonomy
-        TimeSeries noCurrentSeries = null;
-        for (TimeSeries series : this.serieses) {
-            if (series.getCdid().equalsIgnoreCase("GMAA")) {
-                noCurrentSeries = series;
-            }
-        }
-        assertNotNull(noCurrentSeries);
+    public void populatePage_withoutExistingTimeSeries_shouldFillEmptySeries() throws IOException {
 
-        String uri = DataPublisher.uriForSeriesInDataset(datasetURI, noCurrentSeries); // TODO Review this test
-
-        // When
-        // we get a start page
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, uri, noCurrentSeries);
-
-        // Then
-        // we expect it to have nothing in terms of data
-        assertEquals(0, startPage.months.size());
-        assertEquals(0, startPage.years.size());
-        assertEquals(0, startPage.quarters.size());
     }
-
     @Test
-    public void startPageForExistingSeriesShouldBePopulated() throws IOException {
+    public void populatePage_overExistingTimeSeries_shouldAddNewPoints() {
         // Given
-        // the gmbb series which we upload to an existing point
-        TimeSeries hasCurrentSeries = null;
-        for (TimeSeries series : this.serieses) {
-            if (series.getCdid().equalsIgnoreCase("GMBB")) {
-                hasCurrentSeries = series;
-            }
-        }
-        String uri = DataPublisher.uriForSeriesInDataset(datasetURI, hasCurrentSeries); // TODO Review this test
-
-        Path path = zebedee.published.toPath(uri);
-        IOUtils.copy(getClass().getResourceAsStream("/csdb/csdb_no_extension/gmbb.json"),
-                FileUtils.openOutputStream(path.resolve("data.json").toFile()));
 
         // When
-        // we get a start page
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, uri, hasCurrentSeries);
 
         // Then
-        // we expect it to have some data
-        int size = startPage.months.size() + startPage.years.size() + startPage.quarters.size();
-        assertNotEquals(0, size);
     }
-
     @Test
-    public void populateTimeSeriesShouldFillEmptySeries() throws IOException {
-        // Given
-        // a page with null values
-        TimeSeries page = new TimeSeries();
-        // and some values
-        Set<TimeseriesValue> timeseriesValues = new HashSet<>();
-        TimeseriesValue add = new TimeseriesValue();
-        add.year = "2010";
-        add.value = "1";
-        add.date = "2010";
-        timeseriesValues.add(add);
-        TimeseriesValue add2 = new TimeseriesValue();
-        add2.year = "2011";
-        add2.value = "1";
-        add2.date = "2011";
-        timeseriesValues.add(add2);
+    public void populatePage_overExistingTimeSeries_shouldOverwriteExistingPoints() {
 
-        // When
-        // we add these values
-        DataPublisher.populatePageFromSetOfValues(page, page.years, timeseriesValues, dataset);
-
-        // Then
-        // we expect years to be populated
-        assertNotEquals(0, page.years.size());
-        assertEquals(0, page.months.size());
-        assertEquals(0, page.quarters.size());
     }
 
     // Quick
     @Test
-    public void dataSetPageDoesMoveValuesToTimeseries() throws URISyntaxException {
+    public void constructTimeseriesFromComponents_withDatasetValues_doesCopyToTimeseries() throws URISyntaxException {
         // Given
         // a test dataset
-        Dataset testSet = new Dataset();
-        PageDescription description = new PageDescription();
-
-        description.setDatasetId("dataSetPageDoesMoveValuesToTimeseries");
-        description.setReleaseDate(new GregorianCalendar(1877, 3, 15).getTime());
-        description.setNextRelease(new GregorianCalendar(1877, 3, 31).getTime().toString());
-        testSet.setDescription(description);
 
         // When
         // we populate a series
-        TimeSeries page = new TimeSeries();
-        DataPublisher.populatePageFromDataSetPage(page, testSet, "/"); // TODO Is this bit dodgy
 
         // Then
         // we expect the data from the dataset to have transferred
-        assertEquals(testSet.getDescription().getReleaseDate().toString(), page.getDescription().getReleaseDate().toString());
-        assertEquals(testSet.getDescription().getNextRelease().toString(), page.getDescription().getNextRelease().toString());
-        assertEquals(testSet.getDescription().getDatasetId(), page.sourceDatasets.get(0));
 
     }
+    @Test
+    public void constructTimeseriesFromComponents_withTimeseriesValues_doesUpdateTimeseriesName() throws URISyntaxException {
+        // Given
+        // a test dataset with an existing timeseries
+
+        // When
+        // we populate a series
+
+        // Then
+        // we expect the data from the dataset to have transferred
+
+    }
+    @Test
+    public void constructTimeseriesFromComponents_withTimeseriesValues_doesNotOverwriteManualUpdates() throws URISyntaxException {
+        // Given
+        // a test dataset with an existing timeseries
+
+        // When
+        // we populate a series
+
+        // Then
+        // we expect the data from the dataset to have transferred
+
+    }
+
 }

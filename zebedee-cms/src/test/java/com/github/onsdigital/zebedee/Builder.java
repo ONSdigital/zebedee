@@ -4,6 +4,7 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -183,11 +184,21 @@ public class Builder {
 
         FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
         FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
+        FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.COLLECTIONS).toFile());
         Files.createDirectory(this.zebedee.resolve(Zebedee.PUBLISHED));
         Files.createDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD));
+        Files.createDirectory(this.zebedee.resolve(Zebedee.COLLECTIONS));
 
-        FileUtils.copyDirectory(bootStrap.toFile(), this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
-        FileUtils.copyDirectory(bootStrap.toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
+        FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
+        if(Files.exists(bootStrap.resolve(Zebedee.LAUNCHPAD))) {
+            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.LAUNCHPAD).toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
+        } else {
+            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile()); // Not bothering with distinct launchpad
+        }
+
+        if(Files.exists(bootStrap.resolve(Zebedee.COLLECTIONS))) {
+            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.COLLECTIONS).toFile(), this.zebedee.resolve(Zebedee.COLLECTIONS).toFile());
+        }
     }
 
     private Set<Integer> set(Team team) {

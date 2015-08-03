@@ -48,14 +48,15 @@ public class DataPublisher {
     public static int corrections = 0;
     public static Map<String, String> env = System.getenv();
 
-    public static void preprocessCollection(Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
+
+    public static void preprocessCollection(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
 
         if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
             return;
         }
 
-        preprocessCSDB(collection, session);
+        preprocessCSDB(zebedee, collection, session);
 
         System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
     }
@@ -73,7 +74,7 @@ public class DataPublisher {
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    static void preprocessCSDB(Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
+    static void preprocessCSDB(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
 
         // First find all csdb files in the collection
         List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
@@ -84,7 +85,7 @@ public class DataPublisher {
 
             // Download the dataset page (for metadata)
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
-            String datasetUri = Root.zebedee.toUri(csdbDataset.get("json"));
+            String datasetUri = zebedee.toUri(csdbDataset.get("json"));
 
             DownloadSection section = new DownloadSection();
             section.setTitle(dataset.getDescription().getTitle());
@@ -102,7 +103,7 @@ public class DataPublisher {
 
                 // Work out the correct timeseries path by working back from the dataset uri
                 String uri = uriForSeriesInDataset(datasetUri, series);
-                Path path = collection.find("", uri);
+                //Path path = collection.find("", uri);
 
                 // Construct the new page
                 TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
@@ -134,35 +135,9 @@ public class DataPublisher {
         return sections[0];
     }
 
-//
-//    /**
-//     * Derive time series uris from time series cdid and the dataset path
-//     *
-//     * @param dataset
-//     * @param series
-//     * @return
-//     */
-//    static String uriForSeriesInDataset(Dataset dataset, TimeSeries series) {
-//        String[] split = StringUtils.split(dataset.getUri().toString(), "/");
-//        split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
-//
-//        String uri = StringUtils.join(split, "/");
-//        uri = Strings.toLowerCase("/" + uri + "/timeseries/" + series.getCdid());
-//
-//        return uri;
-//    }
-
-    /**
-     *
-     * Derive time series uris for a timeseries that belongs to a dataset by backtracking from datasetUri
-     *
-     * @param datasetUri
-     * @param series
-     * @return
-     */
     static String uriForSeriesInDataset(String datasetUri, TimeSeries series) {
         String[] split = StringUtils.split(datasetUri, "/");
-        split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2); // backtrack to product page
+        split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
 
         String uri = StringUtils.join(split, "/");
 
@@ -174,9 +149,10 @@ public class DataPublisher {
     /**
      * Combines sections of
      *
-     * @param uri - the uri for the new timeseries (allows you to identify the old timeseries)
-     * @param dataset - the dataset
-     * @param series - the new timeseries being merged
+     * Updated upstream
+     * @param uri
+     * @param dataset
+     * @param series
      * @return
      * @throws IOException
      */

@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.reader.util;
 
+import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.staticpage.StaticPage;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -10,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -29,12 +32,12 @@ public class ContentReaderTest {
 
     @Before
     public void createContentReader() {
-        this.contentReader = new ContentReader("target/zebedee");
+        this.contentReader = new ContentReader("target/test-content/master");
     }
 
     @Test
     public void testGetAvailableContent() throws ZebedeeException, IOException {
-        Page content = contentReader.getContent("master/about/accessibility/data.json///");
+        Page content = contentReader.getContent("about/accessibility/data.json///");
         assertNotNull(content);
         assertEquals(content.getType(), PageType.static_page);
         assertEquals("Accessibility",  content.getDescription().getTitle());
@@ -45,22 +48,22 @@ public class ContentReaderTest {
 
     @Test(expected = NotFoundException.class)
     public void testGetNonexistingContent() throws ZebedeeException, IOException {
-        Page content = contentReader.getContent("master/madeupfoldername/data.json");
+        Page content = contentReader.getContent("madeupfoldername/data.json");
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test(expected = BadRequestException.class)
     public void testReadDirectoryAsContent() throws ZebedeeException, IOException {
-        Page content = contentReader.getContent("master/about/accessibility////");
+        Page content = contentReader.getContent("about/accessibility////");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testStartingWithForwardSlash() throws ZebedeeException, IOException {
-        Page content = contentReader.getContent("/master/madeupfoldername/data.json");
+        Page content = contentReader.getContent("/about/accessibility/data.json");
     }
 
     @Test
     public void testXlsResource() throws ZebedeeException, IOException {
-        try (Resource resource = contentReader.getResource("master/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb.xls")) {
+        try (Resource resource = contentReader.getResource("economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb.xls")) {
             assertNotNull(resource);
 //            assertEquals("application/vnd.ms-excel", resource.getMimeType());
             assertTrue(resource.isNotEmpty());
@@ -69,7 +72,7 @@ public class ContentReaderTest {
 
     @Test
     public void testPngResource() throws ZebedeeException, IOException {
-        try (Resource resource = contentReader.getResource("master/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2015-07-09/5afe3d27-download.png")) {
+        try (Resource resource = contentReader.getResource("economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2015-07-09/5afe3d27-download.png")) {
             assertNotNull(resource != null);
 //            assertEquals("image/png", resource.getMimeType());
             assertTrue(resource.getData().available() > 0);
@@ -78,12 +81,37 @@ public class ContentReaderTest {
 
     @Test
     public void testHtmlResource() throws ZebedeeException, IOException {
-        try (Resource resource = contentReader.getResource("master/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales/2014-11-13/19df5bcf.html")) {
+        try (Resource resource = contentReader.getResource("peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales/2014-11-13/19df5bcf.html")) {
             assertNotNull(resource != null);
 //            assertEquals("text/html", resource.getMimeType());
             assertTrue(resource.getData().available() > 0);
         }
     }
 
+
+    @Test
+    public void testGetChildrenDirectories() throws ZebedeeException, IOException {
+        List<ContentNode> children = contentReader.getChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
+        assertTrue(children.size() == 1);
+        ContentNode contentNode = children.get(0);
+        assertEquals("articles", contentNode.getDescription().getTitle());
+        assertNull(contentNode.getType());//type is null for directories with no data.json
+        assertEquals("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/", contentNode.getUri().toString());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testNonExistingNodeChilren() throws ZebedeeException, IOException {
+        List<ContentNode> children = contentReader.getChildren("/nonexistingpath/test");
+    }
+
+    @Test
+    public void testGetChildrenContent() throws ZebedeeException, IOException {
+        List<ContentNode> children = contentReader.getChildren("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
+        assertTrue(children.size() == 1);
+        ContentNode contentNode = children.get(0);
+        assertEquals("UK Natural Capital Land Cover in the UK", contentNode.getDescription().getTitle());
+        assertEquals(PageType.article, contentNode.getType());
+        assertEquals("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/", contentNode.getUri().toString());
+    }
 
 }

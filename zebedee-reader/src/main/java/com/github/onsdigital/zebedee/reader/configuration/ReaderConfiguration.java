@@ -4,8 +4,6 @@ import com.github.onsdigital.zebedee.util.URIUtils;
 import com.github.onsdigital.zebedee.util.VariableUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Reader;
-
 /**
  * Created by bren on 29/07/15.
  * <p>
@@ -14,6 +12,8 @@ import java.io.Reader;
 public class ReaderConfiguration {
 
     private static ReaderConfiguration instance;
+
+    private final static String DATA_FILE_NAME = "data.json";
 
     private final static String ZEBEDEE_ROOT_ENV = "zebedee_root";
     private final static String CONTENT_DIR_ENV = "content_dir";
@@ -32,7 +32,7 @@ public class ReaderConfiguration {
 
     }
 
-    public static ReaderConfiguration getInstance() {
+    public static ReaderConfiguration getConfiguration() {
         if (instance == null) {
             synchronized (ReaderConfiguration.class) {
                 if (instance == null) {
@@ -110,6 +110,10 @@ public class ReaderConfiguration {
 
         dumpConfiguration();
 
+    }
+
+    public String getDataFileName() {
+        return DATA_FILE_NAME;
     }
 
     /**

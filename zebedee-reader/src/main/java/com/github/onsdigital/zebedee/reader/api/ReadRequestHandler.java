@@ -1,12 +1,13 @@
 package com.github.onsdigital.zebedee.reader.api;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.util.AuthorisationHandler;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,23 +33,24 @@ public class ReadRequestHandler {
      * Finds requested content , if a collection is required handles authorisation
      *
      * @param request
+     * @param dataFilter
      * @return Content
      * @throws ZebedeeException
      * @throws IOException
      */
-    public Page findContent(HttpServletRequest request) throws ZebedeeException, IOException {
+    public Content findContent(HttpServletRequest request, DataFilter dataFilter) throws ZebedeeException, IOException {
         String uri = extractUri(request);
         String collectionId = getCollectionId(request);
         if (collectionId != null) {
             authorise(request, collectionId);
             try {
-                return ZebedeeReader.getInstance().getCollectionContent(collectionId, uri);
+                return ZebedeeReader.getInstance().getCollectionContent(collectionId, uri, dataFilter);
             } catch (NotFoundException e) {
                 System.out.println("Could not found "+ uri +  " under collection "  + collectionId+  " , trying published content");
             }
         }
 
-        return ZebedeeReader.getInstance().getPublishedContent(uri);
+        return ZebedeeReader.getInstance().getPublishedContent(uri,dataFilter);
 
     }
 

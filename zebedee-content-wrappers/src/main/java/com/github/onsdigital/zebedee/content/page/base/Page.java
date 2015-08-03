@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.content.base.Content;
 /**
  * Created by bren on 10/06/15.
  * <p>
- * This is the generic content object that that has common properties of all content types on the website
+ * This is the generic content object that that has common properties of all page types on the website
  */
 public abstract class Page extends Content {
 

@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.base;
 
-import com.github.onsdigital.zebedee.content.link.PageReference;
+import com.github.onsdigital.zebedee.content.partial.PageReference;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;

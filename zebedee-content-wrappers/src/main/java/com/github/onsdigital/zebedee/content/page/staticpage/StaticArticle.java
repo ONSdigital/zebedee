@@ -2,8 +2,8 @@ package com.github.onsdigital.zebedee.content.page.staticpage;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.link.PageReference;
-import com.github.onsdigital.zebedee.content.link.Link;
+import com.github.onsdigital.zebedee.content.partial.PageReference;
+import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
 import java.util.ArrayList;

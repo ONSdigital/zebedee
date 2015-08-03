@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.staticpage.base;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.link.Link;
+import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.List;
 

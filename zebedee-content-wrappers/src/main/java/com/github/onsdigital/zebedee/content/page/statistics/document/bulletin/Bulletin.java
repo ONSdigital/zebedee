@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.bulletin;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.link.PageReference;
+import com.github.onsdigital.zebedee.content.partial.PageReference;
 import com.github.onsdigital.zebedee.content.page.statistics.document.base.StatisticalDocument;
 
 import java.util.ArrayList;

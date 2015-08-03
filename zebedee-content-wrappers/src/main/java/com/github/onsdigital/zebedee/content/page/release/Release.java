@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.content.page.release;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.link.PageReference;
+import com.github.onsdigital.zebedee.content.partial.PageReference;
 
 import java.util.ArrayList;
 import java.util.List;

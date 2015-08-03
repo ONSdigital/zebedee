@@ -24,9 +24,9 @@ public class TimeSeries extends StatisticalData implements  Comparable<TimeSerie
     /**
      * The nectar, the goodness, the very juice of the fireflower: data.
      */
-    public Set<TimeseriesValue> years = new TreeSet<>();
-    public Set<TimeseriesValue> quarters = new TreeSet<>();
-    public Set<TimeseriesValue> months = new TreeSet<>();
+    public Set<TimeSeriesValue> years = new TreeSet<>();
+    public Set<TimeSeriesValue> quarters = new TreeSet<>();
+    public Set<TimeSeriesValue> months = new TreeSet<>();
 
     /**
      * Enables the raw CSV values to be scaled to match the units defined here.
@@ -45,7 +45,7 @@ public class TimeSeries extends StatisticalData implements  Comparable<TimeSerie
      */
     public List<String> sourceDatasets = new ArrayList<String>();
 
-    public void add(TimeseriesValue value) {
+    public void add(TimeSeriesValue value) {
 
         try {
 

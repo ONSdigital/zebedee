@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.reader.Resource;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +16,16 @@ import java.io.StringReader;
  */
 public class ResponseUtils {
 
-    public static void sendResponse(Page content, HttpServletResponse response) throws IOException {
+    public static void sendResponse(Content content, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON);
         IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());
+    }
+
+    public static void sendResponse(Resource resource, HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType(resource.getMimeType());
+        IOUtils.copy(resource.getData(), response.getOutputStream());
     }
 
 }

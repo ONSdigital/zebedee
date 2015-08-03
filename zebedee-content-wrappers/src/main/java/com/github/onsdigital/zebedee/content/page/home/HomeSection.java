@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.home;
 
 import com.github.onsdigital.zebedee.content.base.Content;
-import com.github.onsdigital.zebedee.content.link.PageReference;
+import com.github.onsdigital.zebedee.content.partial.PageReference;
 
 /**
  * Represents sections on homepage with references to a taxonomy browse page and a timeseries page

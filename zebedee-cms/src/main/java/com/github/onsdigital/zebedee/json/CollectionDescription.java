@@ -33,9 +33,14 @@ public class CollectionDescription {
     public boolean approvedStatus;
 
     /**
-     * A List of {@link ContentEvent} for each uri in the collection.
+     * events related to this collection
      */
-    public Map<String, ContentEvents> eventsByUri;
+    public Events events;
+
+    /**
+     * A List of {@link Event} for each uri in the collection.
+     */
+    public Map<String, Events> eventsByUri;
 
     /**
      * Default constuructor for serialisation.
@@ -65,5 +70,17 @@ public class CollectionDescription {
         this.name = name;
     }
 
+
+    /**
+     * Add an event to this collection description.
+     * @param event
+     */
+    public void AddEvent(Event event) {
+
+        if (events == null)
+            events = new Events();
+
+        events.add(event);
+    }
 
 }

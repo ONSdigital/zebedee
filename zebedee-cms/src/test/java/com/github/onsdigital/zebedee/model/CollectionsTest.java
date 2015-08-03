@@ -8,8 +8,8 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.ContentEvent;
-import com.github.onsdigital.zebedee.json.ContentEventType;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -53,9 +53,9 @@ public class CollectionsTest {
         Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee);
+                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
         Collection secondCollection = Collection.create(
-                new CollectionDescription("SecondCollection"), zebedee);
+                new CollectionDescription("SecondCollection"), zebedee, builder.administrator.email);
 
         collections.add(firstCollection);
         collections.add(secondCollection);
@@ -81,7 +81,7 @@ public class CollectionsTest {
         Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee);
+                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
 
         collections.add(firstCollection);
 
@@ -93,9 +93,9 @@ public class CollectionsTest {
         Collections.CollectionList collectionList = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee);
+                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
         Collection secondCollection = Collection.create(
-                new CollectionDescription("SecondCollection"), zebedee);
+                new CollectionDescription("SecondCollection"), zebedee, builder.administrator.email);
 
         collectionList.add(firstCollection);
         collectionList.add(secondCollection);
@@ -926,7 +926,7 @@ public class CollectionsTest {
         // Given
         // A collection
         Collection collection = Collection.create(
-                new CollectionDescription("collection"), zebedee);
+                new CollectionDescription("collection"), zebedee, builder.administrator.email);
 
         // When the collection is updated concurrently.
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -973,7 +973,7 @@ public class CollectionsTest {
                 // We attempt to get the session
 
                 Collection collectionToUpdate = collection.zebedee.collections.list().getCollection(collection.description.id);
-                collectionToUpdate.AddEvent("/", new ContentEvent(new Date(), ContentEventType.EDITED, "fred@testing.com"));
+                collectionToUpdate.AddEvent("/", new Event(new Date(), EventType.EDITED, "fred@testing.com"));
                 collectionToUpdate.save();
                 Collection updatedCollection = collection.zebedee.collections.list().getCollection(collection.description.id);
 

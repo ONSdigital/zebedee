@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.json;
 /**
  * Enumeration to represent the events of a file.
  */
-public enum ContentEventType {
+public enum EventType {
     CREATED,
     DELETED,
     EDITED,

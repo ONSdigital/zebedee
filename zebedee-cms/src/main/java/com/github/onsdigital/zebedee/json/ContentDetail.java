@@ -14,6 +14,7 @@ public class ContentDetail {
     public ContentDetailDescription description;
 
     public List<ContentDetail> children;
+    public List<Event> events;
 
     public ContentDetail() {
     }

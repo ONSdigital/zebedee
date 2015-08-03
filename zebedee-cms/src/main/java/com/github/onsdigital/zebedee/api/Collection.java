@@ -101,7 +101,7 @@ public class Collection {
         }
 
         return com.github.onsdigital.zebedee.model.Collection.create(
-                collectionDescription, Root.zebedee).description;
+                collectionDescription, Root.zebedee, session.email).description;
     }
 
     /**

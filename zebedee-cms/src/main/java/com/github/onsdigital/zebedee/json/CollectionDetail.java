@@ -24,4 +24,6 @@ public class CollectionDetail {
     public List<ContentDetail> complete;
     public List<ContentDetail> reviewed;
     public boolean approvedStatus;
+
+    public Events events;
 }

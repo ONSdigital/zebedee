@@ -96,7 +96,7 @@ public class Collection {
      * @return
      * @throws IOException
      */
-    public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee)
+    public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, String email)
             throws IOException {
 
         String filename = PathUtils.toFilename(collectionDescription.name);
@@ -112,6 +112,8 @@ public class Collection {
         // Create the description:
         Path collectionDescriptionPath = zebedee.collections.path.resolve(filename
                 + ".json");
+
+        collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, email));
 
         try (OutputStream output = Files.newOutputStream(collectionDescriptionPath)) {
             Serialiser.serialise(output, collectionDescription);
@@ -289,7 +291,7 @@ public class Collection {
             Path path = inProgress.toPath(uri);
             PathUtils.create(path);
 
-            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.CREATED, email));
+            AddEvent(uri, new Event(new Date(), EventType.CREATED, email));
 
             result = true;
         }
@@ -340,7 +342,7 @@ public class Collection {
                 PathUtils.copyFilesInDirectory(source, destination);
             }
 
-            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.EDITED, email));
+            AddEvent(uri, new Event(new Date(), EventType.EDITED, email));
             result = true;
         }
 
@@ -365,7 +367,7 @@ public class Collection {
             Path destination = complete.toPath(uri);
             PathUtils.moveFilesInDirectory(source, destination);
 
-            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.COMPLETED, email));
+            AddEvent(uri, new Event(new Date(), EventType.COMPLETED, email));
             result = true;
         }
 
@@ -423,7 +425,7 @@ public class Collection {
 
             PathUtils.moveFilesInDirectory(source, destination);
 
-            AddEvent(uri, new ContentEvent(new Date(), ContentEventType.REVIEWED, session.email));
+            AddEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
             result = true;
         }
 
@@ -434,21 +436,25 @@ public class Collection {
 
         if (this.description.eventsByUri == null) { return false; }
 
-        ContentEvents contentEvents = this.description.eventsByUri.get(uri);
-        if (contentEvents == null) { return false; }
+        Events events = this.description.eventsByUri.get(uri);
+        if (events == null) {
+            return false;
+        }
 
-        return contentEvents.hasEventForType(ContentEventType.COMPLETED);
+        return events.hasEventForType(EventType.COMPLETED);
     }
 
     private boolean didUserCompleteContent(String email, String uri) throws BadRequestException {
 
         if (this.description.eventsByUri == null) { return false; }
 
-        ContentEvents contentEvents = this.description.eventsByUri.get(uri);
-        if (contentEvents == null) { return false; }
+        Events events = this.description.eventsByUri.get(uri);
+        if (events == null) {
+            return false;
+        }
 
         boolean userCompletedContent = false;
-        ContentEvent mostRecentCompletedEvent = contentEvents.mostRecentEventForType(ContentEventType.COMPLETED);
+        Event mostRecentCompletedEvent = events.mostRecentEventForType(EventType.COMPLETED);
         if (mostRecentCompletedEvent != null) userCompletedContent = mostRecentCompletedEvent.email.equals(email);
         return userCompletedContent;
     }
@@ -499,12 +505,12 @@ public class Collection {
 
 
     /**
-     * Add a {@link ContentEvent} for the given uri.
+     * Add a {@link Event} for the given uri.
      *
      * @param uri   The uri the event belongs to.
      * @param event The event to add.
      */
-    void AddEvent(String uri, ContentEvent event) {
+    void AddEvent(String uri, Event event) {
 
         if (!StringUtils.startsWith(uri, "/")) { uri = "/" + uri; }
 
@@ -512,7 +518,7 @@ public class Collection {
             this.description.eventsByUri = new HashMap<>();
 
         if (!this.description.eventsByUri.containsKey(uri))
-            this.description.eventsByUri.put(uri, new ContentEvents());
+            this.description.eventsByUri.put(uri, new Events());
 
         this.description.eventsByUri.get(uri).add(event);
     }
@@ -557,7 +563,7 @@ public class Collection {
             hasDeleted = true;
         }
 
-        if (hasDeleted) AddEvent(uri, new ContentEvent(new Date(), ContentEventType.DELETED, email));
+        if (hasDeleted) AddEvent(uri, new Event(new Date(), EventType.DELETED, email));
 
         return hasDeleted;
     }

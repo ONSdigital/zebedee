@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -154,7 +155,11 @@ public class Collections {
         }
 
         // Do any processing of data files
-        DataPublisher.preprocessCollection(collection, session);
+        try {
+            DataPublisher.preprocessCollection(collection, session);
+        } catch (URISyntaxException e) {
+            throw new BadRequestException("Brian could not process this collection");
+        }
 
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {

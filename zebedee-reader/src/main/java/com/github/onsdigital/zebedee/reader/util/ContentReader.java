@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.reader.util;
 
-import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -37,7 +37,7 @@ public class ContentReader {
      * @param path path of requested content under given root folder
      * @return Wrapper containing actual document data as text
      */
-    public Content getContent(String path) throws ZebedeeException, IOException {
+    public Page getContent(String path) throws ZebedeeException, IOException {
         Resource resource = getResource(getRootFolder(), path);
         checkJsonMime(resource, path);
         return deserialize(resource);
@@ -59,7 +59,7 @@ public class ContentReader {
      * @param path
      * @return
      */
-    public List<Content> listChildContents(String path) {
+    public List<Page> listChildContents(String path) {
         return null;
     }
 
@@ -77,7 +77,7 @@ public class ContentReader {
         return resource;
     }
 
-    protected Content deserialize(Resource resource) {
+    protected Page deserialize(Resource resource) {
         return ContentUtil.deserialiseContent(resource.getData());
     }
 
@@ -98,7 +98,7 @@ public class ContentReader {
         }
     }
 
-    private Path resolvePath(Path root, String path) throws BadRequestException {
+    protected Path resolvePath(Path root, String path) throws BadRequestException {
         if (path == null) {
             throw new NullPointerException("Path can not be null");
         }

@@ -1,21 +1,16 @@
 package com.github.onsdigital.zebedee.reader.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.content.base.Content;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.ZebedeeReader;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.github.onsdigital.zebedee.util.ResponseUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
-import java.io.StringReader;
 
 /**
  * Created by bren on 29/07/15.
@@ -27,12 +22,13 @@ import java.io.StringReader;
 public class Data {
 
     /**
-     * Retrieves content or content resource files for the endpoint <code>/data/?uri=[uri]</code>
+     * Retrieves content or content resource files for the endpoint <code>/data[CollectionName]/?uri=[uri]</code>
      * <p>
      * <p>
      * This endpoint retrieves content or file from either a collection or published data.
      *
      * @param request  This should contain a X-Florence-Token header for the current session and the collection name being worked on
+     *                 If no collection name is given published contents will be served
      * @param response Servlet response
      * @return
      * @throws IOException           If an error occurs in processing data, typically to the filesystem, but also on the HTTP connection.
@@ -43,14 +39,8 @@ public class Data {
      */
 
     @GET
-    public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        String uri = request.getParameter("uri");
-        if (StringUtils.isEmpty(uri)) {
-            throw new BadRequestException("Please specify uri");
-        }
-        Content content = ZebedeeReader.getInstance().getPublishedContent(uri);
-        IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());
-        return;
+    public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
+        ResponseUtils.sendResponse(new ReadRequestHandler().findContent(request),response);
     }
 
 

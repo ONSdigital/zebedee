@@ -1,13 +1,11 @@
 package com.github.onsdigital.zebedee.reader.util;
 
-import com.github.onsdigital.zebedee.content.base.Content;
-import com.github.onsdigital.zebedee.content.base.ContentType;
-import com.github.onsdigital.zebedee.content.statistics.document.figure.table.Table;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.reader.configuration.TestConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,25 +29,25 @@ public class CollectionReaderTest {
 
     @Before
     public void createContentReader() {
-        this.collectionReader = new CollectionContentReader(TestConfiguration.getTestZebedeeRoot() + "/collections/testcollection");
+        this.collectionReader = new CollectionContentReader("target/zebedee/collections", "testcollection-testid");
     }
 
     @Test
     public void testGetAvailableContent() throws ZebedeeException, IOException {
-        Content content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
+        Page content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
         assertNotNull(content);
-        assertEquals(content.getType(), ContentType.table);
+        assertEquals(content.getType(), PageType.table);
         assertTrue(content instanceof Table);
     }
 
     @Test(expected = NotFoundException.class)
     public void testGetNonexistingContent() throws ZebedeeException, IOException {
-        Content content = collectionReader.getContent("madeupfoldername/data.json");
+        Page content = collectionReader.getContent("madeupfoldername/data.json");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testStartingWithForwardSlash() throws ZebedeeException, IOException {
-        Content content = collectionReader.getContent("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/nonexisting.xls");
+        Page content = collectionReader.getContent("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/nonexisting.xls");
     }
 
 

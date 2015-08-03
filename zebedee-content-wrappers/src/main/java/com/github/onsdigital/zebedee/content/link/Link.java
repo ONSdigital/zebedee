@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.content.link;
 
+import com.github.onsdigital.zebedee.content.base.Content;
+
 import java.net.URI;
 
 /**
@@ -7,7 +9,7 @@ import java.net.URI;
  * <p/>
  * Represents any link on website
  */
-public class Link implements Comparable<Link> {
+public class Link extends Content implements Comparable<Link> {
 
     private String title;
     private URI uri;

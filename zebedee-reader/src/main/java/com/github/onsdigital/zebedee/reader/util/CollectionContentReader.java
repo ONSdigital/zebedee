@@ -1,12 +1,19 @@
 package com.github.onsdigital.zebedee.reader.util;
 
-import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.collection.Collection;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -14,18 +21,18 @@ import java.nio.file.Path;
  */
 public class CollectionContentReader extends ContentReader {
 
-    private final Path inprogressPath;
-    private final Path completePath;
-    private final Path reviewedPath;
+    private Path inprogressPath;
+    private Path completePath;
+    private Path reviewedPath;
+
+    private final String collectonId;
 
     /**
-     * @param collectionRoot path of collection including collection name
+     * @param collectionsRootPath path of the collections folder
      */
-    public CollectionContentReader(String collectionRoot) {
-        super(collectionRoot);
-        inprogressPath = getRootFolder().resolve(ReaderConfiguration.getInProgressFolderName());
-        completePath = getRootFolder().resolve(ReaderConfiguration.getCompleteFolderName());
-        reviewedPath = getRootFolder().resolve(ReaderConfiguration.getReviewedFolderName());
+    public CollectionContentReader(String collectionsRootPath, String collectionId) {
+        super(collectionsRootPath);
+        this.collectonId = collectionId;
     }
 
     /**
@@ -38,7 +45,7 @@ public class CollectionContentReader extends ContentReader {
      * @throws IOException
      */
     @Override
-    public Content getContent(String path) throws ZebedeeException, IOException {
+    public Page getContent(String path) throws ZebedeeException, IOException {
         Resource resource = findResource(path);
         checkJsonMime(resource, path);
         return deserialize(resource);
@@ -50,7 +57,30 @@ public class CollectionContentReader extends ContentReader {
         return findResource(path);
     }
 
+
+    //TODO: If collection folder names were ids or we saved cookie as collection's name we would not have search collection, just read the path
+    //Finds collection name with given id
+    private String findCollectionName(Path collectionsRoot, String collectionId) throws IOException, NotFoundException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(collectionsRoot)) {
+            for (Path path : stream) {
+                if (Files.isDirectory(path)) {
+                    continue;
+                } else {
+                    try (InputStream fileStream = Files.newInputStream(path)) {
+                        Collection collection = ContentUtil.deserialise(fileStream, Collection.class);
+                        if (StringUtils.equalsIgnoreCase(collection.getId(), this.collectonId)) {
+                            return collection.getName();
+                        }
+                    }
+                }
+            }
+            throw new NotFoundException("Collection with given id not found, id:" + collectionId);
+        }
+    }
+
     private Resource findResource(String path) throws IOException, ZebedeeException {
+        String collectionName = findCollectionName(getRootFolder(), collectonId);
+        resolvePaths(collectionName);
         Resource resource;
         resource = findResourceQuite(inprogressPath, path);
         if (resource == null) {
@@ -62,6 +92,13 @@ public class CollectionContentReader extends ContentReader {
             }
         }
         return resource;
+    }
+
+    private void resolvePaths(String collectionName) throws BadRequestException {
+        Path collectionRoot = resolvePath(getRootFolder(), collectionName);
+        inprogressPath = resolvePath(collectionRoot, ReaderConfiguration.getInstance().getInProgressFolderName());
+        completePath = resolvePath(collectionRoot, ReaderConfiguration.getInstance().getCompleteFolderName());
+        reviewedPath = resolvePath(collectionRoot, ReaderConfiguration.getInstance().getReviewedFolderName());
     }
 
     // read content under given folder, if not found return null

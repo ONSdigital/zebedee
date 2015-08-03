@@ -1,12 +1,11 @@
 package com.github.onsdigital.zebedee.reader.util;
 
-import com.github.onsdigital.zebedee.content.base.Content;
-import com.github.onsdigital.zebedee.content.base.ContentType;
-import com.github.onsdigital.zebedee.content.staticpage.StaticPage;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.staticpage.StaticPage;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.reader.configuration.TestConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,14 +29,14 @@ public class ContentReaderTest {
 
     @Before
     public void createContentReader() {
-        this.contentReader = new ContentReader(TestConfiguration.getTestZebedeeRoot());
+        this.contentReader = new ContentReader("target/zebedee");
     }
 
     @Test
     public void testGetAvailableContent() throws ZebedeeException, IOException {
-        Content content = contentReader.getContent("master/about/accessibility/data.json///");
+        Page content = contentReader.getContent("master/about/accessibility/data.json///");
         assertNotNull(content);
-        assertEquals(content.getType(), ContentType.static_page);
+        assertEquals(content.getType(), PageType.static_page);
         assertEquals("Accessibility",  content.getDescription().getTitle());
         assertTrue(content instanceof StaticPage);
         StaticPage staticPage = (StaticPage) content;
@@ -46,17 +45,17 @@ public class ContentReaderTest {
 
     @Test(expected = NotFoundException.class)
     public void testGetNonexistingContent() throws ZebedeeException, IOException {
-        Content content = contentReader.getContent("master/madeupfoldername/data.json");
+        Page content = contentReader.getContent("master/madeupfoldername/data.json");
     }
 
     @Test(expected = NotFoundException.class)
     public void testReadDirectoryAsContent() throws ZebedeeException, IOException {
-        Content content = contentReader.getContent("master/about/accessibility////");
+        Page content = contentReader.getContent("master/about/accessibility////");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testStartingWithForwardSlash() throws ZebedeeException, IOException {
-        Content content = contentReader.getContent("/master/madeupfoldername/data.json");
+        Page content = contentReader.getContent("/master/madeupfoldername/data.json");
     }
 
     @Test

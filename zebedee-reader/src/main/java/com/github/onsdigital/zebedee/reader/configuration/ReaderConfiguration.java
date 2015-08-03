@@ -1,7 +1,10 @@
 package com.github.onsdigital.zebedee.reader.configuration;
 
-import com.github.onsdigital.zebedee.reader.util.VariableUtils;
+import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.VariableUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.Reader;
 
 /**
  * Created by bren on 29/07/15.
@@ -9,67 +12,112 @@ import org.apache.commons.lang3.StringUtils;
  * Content reader configuration
  */
 public class ReaderConfiguration {
-    private final static String ZEBEDEE_ROOT = "zebedee_root";
-    private static String defaultZebedeeRoot = "zebedee-reader/target/zebedee";
 
+    private static ReaderConfiguration instance;
+
+    private final static String ZEBEDEE_ROOT_ENV = "zebedee_root";
+    private final static String CONTENT_DIR_ENV = "content_dir";
+
+    /*Zebedee folder layout*/
     private static final String IN_PROGRESS_FOLDER_NAME = "inprogress";
     private static final String COMPLETE_FOLDER_NAME = "complete";
     private static final String REVIEWED_FOLDER_NAME = "reviewed";
     private static final String COLLECTIONS_FOLDER_NAME = "collections";
     private static final String PUBLISHED_FOLDER_NAME = "master";
+
     private static String collectionsFolder;
-    private static String publishedFolder;
+    private static String contentDir;
 
+    private ReaderConfiguration() {
 
-    public static String getZebedeeRoot() {
-        return StringUtils.defaultIfBlank(VariableUtils.getVariableValue(ZEBEDEE_ROOT), defaultZebedeeRoot);
     }
 
-    static void setDefatultZebedeeRoot(String path) {
-        defaultZebedeeRoot = path;
-    }
-
-    public static String getInProgressFolderName() {
-        return IN_PROGRESS_FOLDER_NAME;
-    }
-
-    public static String getCompleteFolderName() {
-        return COMPLETE_FOLDER_NAME;
-    }
-
-    public static String getReviewedFolderName() {
-        return REVIEWED_FOLDER_NAME;
-    }
-
-    public static String getPublishedFolderName() {
-        if (publishedFolder == null) {
+    public static ReaderConfiguration getInstance() {
+        if (instance == null) {
             synchronized (ReaderConfiguration.class) {
-                String zebedeeRoot = getZebedeeRoot();
-                if (zebedeeRoot != null) {
-                    publishedFolder =  zebedeeRoot + (zebedeeRoot.endsWith("/") ? PUBLISHED_FOLDER_NAME : "/" + PUBLISHED_FOLDER_NAME);
+                if (instance == null) {
+                    init();
                 }
             }
         }
-        return publishedFolder;
+        return instance;
     }
+
 
     /**
      * Returns collections folder under zebedee root
      *
      * @return
      */
-    public static String getCollectionsFolder() {
-        if (collectionsFolder == null) {
-            synchronized (ReaderConfiguration.class) {
-                String zebedeeRoot = getZebedeeRoot();
-                if (zebedeeRoot != null) {
-                    collectionsFolder = zebedeeRoot + (zebedeeRoot.endsWith("/") ? COLLECTIONS_FOLDER_NAME : "/" + COLLECTIONS_FOLDER_NAME);
-                }
-            }
-        }
-
+    public String getCollectionsFolder() {
         return collectionsFolder;
     }
 
+    public String getContentDir() {
+        return contentDir;
+    }
+
+    public String getInProgressFolderName() {
+        return IN_PROGRESS_FOLDER_NAME;
+    }
+
+    public String getCompleteFolderName() {
+        return COMPLETE_FOLDER_NAME;
+    }
+
+    public String getReviewedFolderName() {
+        return REVIEWED_FOLDER_NAME;
+    }
+
+    /**
+     * Initialize configuration with environment variables
+     */
+    private static void init() {
+        if (instance == null) {
+            doInit(null);
+            instance = new ReaderConfiguration();
+        }
+    }
+
+
+    /**
+     * Initialize with given zebedee root dir
+     *
+     * @param zebedeeRoot
+     */
+    public static void init(String zebedeeRoot) {
+        if (instance == null) {
+            doInit(zebedeeRoot);
+            instance = new ReaderConfiguration();
+        }
+    }
+
+    private static void doInit(String zebedeeRoot) {
+        String zebedeeRootDir = StringUtils.defaultIfBlank(zebedeeRoot, VariableUtils.getVariableValue(ZEBEDEE_ROOT_ENV));
+        String contentDirValue = VariableUtils.getVariableValue(CONTENT_DIR_ENV);
+
+        /*Zebedee Root takes precedence over content dir*/
+        if (zebedeeRootDir != null) {
+            zebedeeRootDir = URIUtils.removeTrailingSlash(zebedeeRootDir);
+            collectionsFolder = zebedeeRootDir + "/" + COLLECTIONS_FOLDER_NAME;
+            contentDir = zebedeeRootDir + "/" + PUBLISHED_FOLDER_NAME;
+        } else if (contentDirValue != null) {
+            contentDir = URIUtils.removeTrailingSlash(contentDirValue) + "/";
+        } else {
+            //todo:can not prevent server startup if error just yet, need startup order for Restolino
+            System.err.println("Please set either zebedee_root or content_dir");
+        }
+
+        dumpConfiguration();
+
+    }
+
+    /**
+     * Prints configuration into console
+     */
+    public static void dumpConfiguration() {
+        System.out.println("Collections folder:" + collectionsFolder);
+        System.out.println("Published content dir:" + contentDir);
+    }
 
 }

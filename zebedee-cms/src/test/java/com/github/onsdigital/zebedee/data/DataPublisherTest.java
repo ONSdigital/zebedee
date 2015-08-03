@@ -56,15 +56,20 @@ public class DataPublisherTest {
 
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
+
         collection1 = new Collection(builder.collections.get(0), zebedee);
         collection2 = new Collection(builder.collections.get(1), zebedee);
+
         publisher1Email = builder.publisher1.email;
         publisher2Email = builder.publisher2.email;
+
         session = zebedee.sessions.create(publisher1Email);
 
         envVariables = DataPublisher.env;
 
         Path toPath = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/CXNV.csdb");
+
+
         if (!Files.exists(toPath.getParent())) {
             Files.createDirectories(toPath.getParent());
         }
@@ -120,52 +125,117 @@ public class DataPublisherTest {
         DataPublisher.env = envVariables;
     }
 
+//    /**
+//     * Test the setup has worked
+//     */
+//    @Test
+//    public void prebuiltCollectionShouldContainFiles() {
+//        // Given
+//        // the prebuilt collection and expected files
+//        String file1 = "/datapublishertest/csdb_with_extension/CXNV.csdb";
+//        String json1 = "/datapublishertest/csdb_with_extension/data.json";
+//
+//        String file2 = "/datapublishertest/csdb_no_extension/OTT";
+//        String json2 = "/datapublishertest/csdb_no_extension/data.json";
+//
+//        // Then
+//        // we expect these files to exist
+//        assertTrue(Files.exists(collection1.reviewed.toPath(file1)));
+//        assertTrue(Files.exists(collection1.reviewed.toPath(json1)));
+//        assertTrue(Files.exists(collection2.reviewed.toPath(file2)));
+//        assertTrue(Files.exists(collection2.reviewed.toPath(json2)));
+//    }
+
     /**
-     * Test the setup has worked
+     *
+     * Check the test is setting itself up as a collection
+     * and the files we are using to run the test are current
+     *
      */
     @Test
-    public void prebuiltCollectionShouldContainFiles() {
+    public void testFramework_afterBeforeMethod_isProperlySetUp() {
         // Given
-        // the prebuilt collection and expected files
-        String file1 = "/datapublishertest/csdb_with_extension/CXNV.csdb";
-        String json1 = "/datapublishertest/csdb_with_extension/data.json";
-
-        String file2 = "/datapublishertest/csdb_no_extension/OTT";
-        String json2 = "/datapublishertest/csdb_no_extension/data.json";
-
-        // Then
-        // we expect these files to exist
-        assertTrue(Files.exists(collection1.reviewed.toPath(file1)));
-        assertTrue(Files.exists(collection1.reviewed.toPath(json1)));
-        assertTrue(Files.exists(collection2.reviewed.toPath(file2)));
-        assertTrue(Files.exists(collection2.reviewed.toPath(json2)));
-    }
-
-    @Test
-    public void datasetIdFromDatafilePathShouldGiveFilenameWithoutExtension() throws Exception {
-        // Given
-        // a couple of file names
-        String file1 = "/datapublishertest/csdb_with_extension/CXNV.csdb";
-        String file2 = "/datapublishertest/csdb_with_extension/CXNV";
+        // we have run the before method
 
         // When
-        // we turn these into paths
-        Path path1 = collection1.reviewed.toPath(file1);
-        Path path2 = collection1.reviewed.toPath(file2);
+        // we
+
+        // We expect
+
+    }
+    @Test
+    public void contentUtil_givenTestData_shouldDeserialise() throws IOException {
+        // Given
+        // one of our collections
+        List<HashMap<String, Path>> datasets = DataPublisher.csdbDatasetsInCollection(collection2, session);
+
+        // When
+        // we deserialise the dataset
+        Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(datasets.get(0).get("json").toFile()), Dataset.class);
 
         // Then
-        // we expect datasetIds that are the filename without extension
-        assertEquals("CXNV", DataPublisher.datasetIdFromDatafilePath(path1));
-        assertEquals("CXNV", DataPublisher.datasetIdFromDatafilePath(path2));
+        // we expect a dataset and check a couple of fields
+        assertNotNull(dataset);
+        assertEquals("Visits and Spending by UK residents abroad and overseas residents in the UK.", dataset.getSection().getMarkdown());
+        assertEquals("/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism", dataset.getUri().toString());
+    }
+    @Test
+    public void contentUtil_givenFileReturnedByBrian_shouldDeserialiseTimeSeries() {
+        // Given
+        // the file returned by brian that corresponds to csdb_no_extension
+
+        // When
+        // we deserialise it (as we did in setup)
+
+        // Then
+        // we expect it to be non null and to have data
+        assertNotNull(serieses);
+        assertTrue(serieses.size() > 0);
     }
 
+    /**
+     * Brian is called using environment variables. Check the function is working and returning an expected result
+     */
     @Test
-    public void csdbDatasetsInCollectionShouldContainFilesWithExtension() throws Exception {
+    public void urlForBrian_givenCorrectSetup_givesNonNullURI() {
+        // When
+        // we get the URI for brian
+        URI uri = DataPublisher.csdbURI();
+
+        // Then
+        // it is not null
+        assertNotNull(uri);
+    }
+    @Test
+    public void urlForBrian_whenEnvVariablesAreSet_givesURIBasedOnBrianURL() throws Exception {
+        // Given
+        // we set the env variable
+        Map<String, String> envNew = new HashMap<>();
+        envNew.put("brian_url", "/csdbURIShouldComeFromEnvVariable");
+        DataPublisher.env = envNew;
+
+        // When
+        // we get the service csdbURI
+        URI uri = DataPublisher.csdbURI();
+
+        // Then
+        // we expect a standard response
+        assertEquals("/csdbURIShouldComeFromEnvVariable/Services/ConvertCSDB", uri.toString());
+    }
+
+    /**
+     * The process starts by hooking into publish and pulling out pages that require being treated as CSDB datasets
+     *
+     * Check the hooks identify data.json pages that are published alongside .csdb files or blank files with csdb content
+     *
+     * @throws Exception
+     */
+    @Test
+    public void functionCsdbDatasetsInCollection_givenCollectionsSetupInBefore_shouldIdentifyCSDBdatasets() throws Exception {
         // Given
         // our pre setup collection with csdb extensions
         String file1 = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/CXNV.csdb").toString();
         String json1 = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/data.json").toString();
-
 
         // When
         // we search for csdb datasets
@@ -179,9 +249,8 @@ public class DataPublisherTest {
         assertEquals(file1, dataset.get("file").toString());
         assertEquals(json1, dataset.get("json").toString());
     }
-
     @Test
-    public void csdbDatasetsInCollectionShouldContainFilesWithoutExtension() throws Exception {
+    public void functionCsdbDatasetsInCollection_givenCollectionsSetupInBefore_shouldIdentifyCSDBdatasetsWithoutAnExtension() throws Exception {
         // Given
         // our pre setup collection with csdb extensions
         String file2 = collection2.reviewed.toPath("/datapublishertest/csdb_no_extension/OTT").toString();
@@ -201,57 +270,31 @@ public class DataPublisherTest {
         assertEquals(json2, dataset.get("json").toString());
     }
 
+    /**
+     * Dataset id is identified from the ?.csdb portion of the filename
+     */
     @Test
-    public void csdbURIShouldComeFromEnvVariable() throws Exception {
+    public void datasetIdFromDatafilePath_withTypicalFilepaths_givesExpectedIds() {
         // Given
-        // we set the env variable
-        Map<String, String> envNew = new HashMap<>();
-        envNew.put("brian_url", "/csdbURIShouldComeFromEnvVariable");
-        DataPublisher.env = envNew;
-
+        // a couple of file names
+        String file1 = "/datapublishertest/csdb_with_extension/CXNV.csdb";
+        String file2 = "/datapublishertest/csdb_with_extension/CXNV";
 
         // When
-        // we get the service csdbURI
-        URI uri = DataPublisher.csdbURI();
+        // we turn these into paths
+        Path path1 = collection1.reviewed.toPath(file1);
+        Path path2 = collection1.reviewed.toPath(file2);
 
         // Then
-        // we expect a standard response
-        assertEquals("/csdbURIShouldComeFromEnvVariable/Services/ConvertCSDB", uri.toString());
+        // we expect datasetIds that are the filename without extension
+        assertEquals("CXNV", DataPublisher.datasetIdFromDatafilePath(path1));
+        assertEquals("CXNV", DataPublisher.datasetIdFromDatafilePath(path2));
     }
 
-    @Test
-    public void datasetShouldDeserialise() throws IOException {
-        // Given
-        // one of our collections
-        List<HashMap<String, Path>> datasets = DataPublisher.csdbDatasetsInCollection(collection2, session);
 
-        // When
-        // we deserialise the dataset
-        Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(datasets.get(0).get("json").toFile()), Dataset.class);
-
-        // Then
-        // we expect a dataset and check a couple of fields
-        assertNotNull(dataset);
-        assertEquals("Visits and Spending by UK residents abroad and overseas residents in the UK.", dataset.getSection().getMarkdown());
-        assertEquals(PageType.dataset, dataset.getType());
-    }
 
     @Test
-    public void timeSeriesFromBrianShouldDeserialise() {
-        // Given
-        // the file returned by brian that corresponds to csdb_no_extension
-
-        // When
-        // we deserialise it (as we did in setup)
-
-        // Then
-        // we expect it to be non null and to have data
-        assertNotNull(serieses);
-        assertTrue(serieses.size() > 0);
-    }
-
-    @Test
-    public void uriForSeriesInDatasetShouldBeCorrect() {
+    public void functionUriForSeriesInDataset_givenDatasetsSetupInBefore_ShouldBeCorrect() {
         // Given
         // the series and dataset we loaded at setup
         String datasetURI = "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism";

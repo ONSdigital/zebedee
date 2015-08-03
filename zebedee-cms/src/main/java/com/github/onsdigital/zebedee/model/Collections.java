@@ -7,6 +7,7 @@ import com.github.onsdigital.content.page.base.Page;
 import com.github.onsdigital.content.service.ContentNotFoundException;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.DataReader;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -156,7 +157,7 @@ public class Collections {
 
         // Do any processing of data files
         try {
-            DataPublisher.preprocessCollection(collection, session);
+            DataPublisher.preprocessCollection(zebedee, collection, session);
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }

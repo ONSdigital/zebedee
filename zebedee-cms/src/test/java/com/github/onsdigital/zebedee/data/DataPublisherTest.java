@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -43,6 +44,7 @@ public class DataPublisherTest {
     // Data for after we have dealt with Brian
     TimeSerieses serieses;
     Dataset dataset;
+    String datasetURI;
 
     Map<String, String> envVariables;
 
@@ -60,24 +62,22 @@ public class DataPublisherTest {
         publisher2Email = builder.publisher2.email;
         session = zebedee.sessions.create(publisher1Email);
 
-
         envVariables = DataPublisher.env;
-
 
         Path toPath = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/CXNV.csdb");
         if (!Files.exists(toPath.getParent())) {
             Files.createDirectories(toPath.getParent());
         }
 
-        String outPath = "/csdb/csdb_with_extension/CXNV.csdb";
-        try (InputStream inputStream = getClass().getResource(outPath).openStream();
+        String fromPath = "/csdb/csdb_with_extension/CXNV.csdb";
+        try (InputStream inputStream = getClass().getResource(fromPath).openStream();
              OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
             IOUtils.copy(inputStream, outputStream);
         }
 
-        toPath = collection1.reviewed.toPath("/datapublishertest/csdb_with_extension/data.json");
-        outPath = "/csdb/csdb_with_extension/data.json";
-        try (InputStream inputStream = getClass().getResource(outPath).openStream();
+        toPath = collection1.reviewed.toPath("/datapublishertest/=csdb_with_extension/data.json");
+        fromPath = "/csdb/csdb_with_extension/data.json";
+        try (InputStream inputStream = getClass().getResource(fromPath).openStream();
              OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
             IOUtils.copy(inputStream, outputStream);
         }
@@ -86,15 +86,15 @@ public class DataPublisherTest {
         if (!Files.exists(toPath.getParent())) {
             Files.createDirectories(toPath.getParent());
         }
-        outPath = "/csdb/csdb_no_extension/OTT";
-        try (InputStream inputStream = getClass().getResource(outPath).openStream();
+        fromPath = "/csdb/csdb_no_extension/OTT";
+        try (InputStream inputStream = getClass().getResource(fromPath).openStream();
              OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
             IOUtils.copy(inputStream, outputStream);
         }
 
         toPath = collection2.reviewed.toPath("/datapublishertest/csdb_no_extension/data.json");
-        outPath = "/csdb/csdb_no_extension/data.json";
-        try (InputStream inputStream = getClass().getResource(outPath).openStream();
+        fromPath = "/csdb/csdb_no_extension/data.json";
+        try (InputStream inputStream = getClass().getResource(fromPath).openStream();
              OutputStream outputStream = FileUtils.openOutputStream(toPath.toFile())) {
             IOUtils.copy(inputStream, outputStream);
         }
@@ -103,9 +103,12 @@ public class DataPublisherTest {
         try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
             serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
         }
+
+        datasetURI = "/csdb/csdb_no_extension";
         String datasetPath = "/csdb/csdb_no_extension/data.json";
         try (InputStream inputStream = getClass().getResourceAsStream(datasetPath)) {
             dataset = ContentUtil.deserialise(inputStream, Dataset.class);
+            dataset.setUri(null);
         }
 
 
@@ -257,7 +260,7 @@ public class DataPublisherTest {
 
         // When
         // we use these to generate a timeseries uri
-        String seriesURI = DataPublisher.uriForSeriesInDataset(dataset, series);
+        String seriesURI = DataPublisher.uriForSeriesInDataset(datasetURI, series);
 
         // Then
         // we expect a uri in the corresponding timeseries folder with CDID as a subfolder
@@ -278,7 +281,7 @@ public class DataPublisherTest {
         }
         assertNotNull(noCurrentSeries);
 
-        String uri = DataPublisher.uriForSeriesInDataset(dataset, noCurrentSeries);
+        String uri = DataPublisher.uriForSeriesInDataset(datasetURI, noCurrentSeries); // TODO Review this test
 
         // When
         // we get a start page
@@ -301,7 +304,7 @@ public class DataPublisherTest {
                 hasCurrentSeries = series;
             }
         }
-        String uri = DataPublisher.uriForSeriesInDataset(dataset, hasCurrentSeries);
+        String uri = DataPublisher.uriForSeriesInDataset(datasetURI, hasCurrentSeries); // TODO Review this test
 
         Path path = zebedee.published.toPath(uri);
         IOUtils.copy(getClass().getResourceAsStream("/csdb/csdb_no_extension/gmbb.json"),
@@ -346,8 +349,9 @@ public class DataPublisherTest {
         assertEquals(0, page.quarters.size());
     }
 
+    // Quick
     @Test
-    public void dataSetPageDoesMoveValuesToTimeseries() {
+    public void dataSetPageDoesMoveValuesToTimeseries() throws URISyntaxException {
         // Given
         // a test dataset
         Dataset testSet = new Dataset();
@@ -361,7 +365,7 @@ public class DataPublisherTest {
         // When
         // we populate a series
         TimeSeries page = new TimeSeries();
-        DataPublisher.populatePageFromDataSetPage(page, testSet);
+        DataPublisher.populatePageFromDataSetPage(page, testSet, "/"); // TODO Is this bit dodgy
 
         // Then
         // we expect the data from the dataset to have transferred

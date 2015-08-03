@@ -21,6 +21,8 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+
 @Api
 public class Table {
     @POST
@@ -40,7 +42,7 @@ public class Table {
         if (session == null
                 || !Root.zebedee.permissions.canView(session.email,
                 collection.description)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Requested path

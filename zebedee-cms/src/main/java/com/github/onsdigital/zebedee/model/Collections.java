@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.content.DirectoryListing;
 import com.github.onsdigital.content.page.base.Page;
@@ -13,8 +12,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.ContentEvent;
-import com.github.onsdigital.zebedee.json.ContentEventType;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -36,6 +35,8 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
 public class Collections {
 
@@ -59,7 +60,7 @@ public class Collections {
 
         // Check authorisation
         if (!zebedee.permissions.canEdit(session)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Locate the path:
@@ -108,7 +109,7 @@ public class Collections {
 
         // User has permission
         if (session == null || !zebedee.permissions.canEdit(session.email)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Everything is completed
@@ -145,7 +146,7 @@ public class Collections {
 
         // User has permission
         if (session == null || !zebedee.permissions.canEdit(session.email)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Go ahead
@@ -166,7 +167,7 @@ public class Collections {
             }
 
             // Add an event to the event log
-            collection.AddEvent(uri, new ContentEvent(new Date(), ContentEventType.PUBLISHED, session.email));
+            collection.AddEvent(uri, new Event(new Date(), EventType.PUBLISHED, session.email));
         }
 
 
@@ -200,7 +201,7 @@ public class Collections {
         // Check view permissions
         if (zebedee.permissions.canView(session,
                 collection.description) == false) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Locate the path:
@@ -257,7 +258,7 @@ public class Collections {
 
         // User has permission
         if (!zebedee.permissions.canEdit(session)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Collection is empty
@@ -282,7 +283,7 @@ public class Collections {
         if (session == null
                 || !zebedee.permissions.canView(session.email,
                 collection.description)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Requested path
@@ -339,7 +340,7 @@ public class Collections {
 
         // Authorisation
         if (session == null || !zebedee.permissions.canEdit(session.email)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Requested path
@@ -409,7 +410,7 @@ public class Collections {
 
         // Authorisation
         if (session == null || !zebedee.permissions.canEdit(session.email)) {
-            throw new UnauthorizedException(session);
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Requested path
@@ -472,6 +473,7 @@ public class Collections {
             throw new IOException("Error processing uploaded file", e);
         }
     }
+
 
     /**
      * Represents the list of all collections currently in the system. This adds
@@ -554,5 +556,6 @@ public class Collections {
         public boolean hasCollection(String name) {
             return getCollectionByName(name) != null;
         }
+
     }
 }

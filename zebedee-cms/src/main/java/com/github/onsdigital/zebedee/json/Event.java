@@ -2,12 +2,12 @@ package com.github.onsdigital.zebedee.json;
 
 import java.util.Date;
 
-public class ContentEvent {
+public class Event {
     public Date date;
-    public ContentEventType type;
+    public EventType type;
     public String email;
 
-    public ContentEvent(Date date, ContentEventType type, String email) {
+    public Event(Date date, EventType type, String email) {
         this.date = date;
         this.type = type;
         this.email = email;

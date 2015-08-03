@@ -68,4 +68,9 @@ public class Configuration {
         }
     }
 
+    public static String getUnauthorizedMessage(Session session) {
+        return session == null ? "Please log in" : "You do not have the right permission: " + session;
+    }
+
+
 }

@@ -13,11 +13,11 @@ public class ContentEventsTest {
 
         // given
         // an empty collection of content events.
-        ContentEvents events = new ContentEvents();
+        Events events = new Events();
 
         // when
         // we try and get the most recent event for a type.
-        ContentEvent result = events.mostRecentEventForType(ContentEventType.COMPLETED);
+        Event result = events.mostRecentEventForType(EventType.COMPLETED);
 
         // then
         // the result is null.
@@ -29,15 +29,35 @@ public class ContentEventsTest {
 
         // given
         // a number of content events.
-        ContentEvents events = new ContentEvents();
-        events.add(new ContentEvent(new DateTime(2015, 1, 1, 0, 0).toDate(), ContentEventType.COMPLETED, "user@test.com"));
-        ContentEvent mostRecentEvent = new ContentEvent(new DateTime(2015, 1, 3, 0, 0).toDate(), ContentEventType.COMPLETED, "user@test.com");
+        Events events = new Events();
+        events.add(new Event(new DateTime(2015, 1, 1, 0, 0).toDate(), EventType.COMPLETED, "user@test.com"));
+        Event mostRecentEvent = new Event(new DateTime(2015, 1, 3, 0, 0).toDate(), EventType.COMPLETED, "user@test.com");
         events.add(mostRecentEvent);
-        events.add(new ContentEvent(new DateTime(2015, 1, 2, 0, 0).toDate(), ContentEventType.COMPLETED, "user@test.com"));
+        events.add(new Event(new DateTime(2015, 1, 2, 0, 0).toDate(), EventType.COMPLETED, "user@test.com"));
 
         // when
         // we try and get the most recent event for a type.
-        ContentEvent result = events.mostRecentEventForType(ContentEventType.COMPLETED);
+        Event result = events.mostRecentEventForType(EventType.COMPLETED);
+
+        // then
+        // the result is the most recent event.
+        assertEquals(mostRecentEvent, result);
+    }
+
+    @Test
+    public void mostRecentEventShouldReturnMostRecentEvent() {
+
+        // given
+        // a number of content events.
+        Events events = new Events();
+        events.add(new Event(new DateTime(2015, 1, 1, 0, 0).toDate(), EventType.COMPLETED, "user@test.com"));
+        Event mostRecentEvent = new Event(new DateTime(2015, 1, 3, 0, 0).toDate(), EventType.COMPLETED, "user@test.com");
+        events.add(mostRecentEvent);
+        events.add(new Event(new DateTime(2015, 1, 2, 0, 0).toDate(), EventType.COMPLETED, "user@test.com"));
+
+        // when
+        // we try and get the most recent event for a type.
+        Event result = events.mostRecentEvent();
 
         // then
         // the result is the most recent event.

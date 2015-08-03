@@ -40,7 +40,7 @@ public class PermissionsTest {
         // A new collection
         collectionDescription = new CollectionDescription();
         collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
-        Collection.create(collectionDescription, zebedee);
+        Collection.create(collectionDescription, zebedee, session.email);
 
         // A new team for the new collection
         team = zebedee.teams.createTeam(this.getClass().getSimpleName() + "-team-" + Random.id(), session);

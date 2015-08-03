@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
@@ -9,6 +10,8 @@ import com.github.onsdigital.zebedee.reader.util.CollectionContentReader;
 import com.github.onsdigital.zebedee.reader.util.ContentReader;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 
@@ -129,6 +132,15 @@ public class ZebedeeReader {
     public Resource getCollectionResource(String collectionId, String path) throws ZebedeeException, IOException {
         assertId(collectionId);
         return collectionContentReader.getResource(collectionId, path);
+    }
+
+    public Set<ContentNode> getPublishedChildren(String path) throws ZebedeeException, IOException {
+        return publishedContentReader.getChildren(path);
+    }
+
+
+    public Set<ContentNode> getCollectionChildren(String collectionId, String path) throws ZebedeeException, IOException {
+        return collectionContentReader.getChildren(collectionId, path);
     }
 
     private void assertId(String collectionId) throws BadRequestException {

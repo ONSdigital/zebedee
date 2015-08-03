@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -91,9 +91,9 @@ public class ContentReaderTest {
 
     @Test
     public void testGetChildrenDirectories() throws ZebedeeException, IOException {
-        List<ContentNode> children = contentReader.getChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
+        Set<ContentNode> children = contentReader.getChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
         assertTrue(children.size() == 1);
-        ContentNode contentNode = children.get(0);
+        ContentNode contentNode = children.iterator().next();
         assertEquals("articles", contentNode.getDescription().getTitle());
         assertNull(contentNode.getType());//type is null for directories with no data.json
         assertEquals("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/", contentNode.getUri().toString());
@@ -101,14 +101,14 @@ public class ContentReaderTest {
 
     @Test(expected = NotFoundException.class)
     public void testNonExistingNodeChilren() throws ZebedeeException, IOException {
-        List<ContentNode> children = contentReader.getChildren("/nonexistingpath/test");
+        Set<ContentNode> children = contentReader.getChildren("/nonexistingpath/test");
     }
 
     @Test
     public void testGetChildrenContent() throws ZebedeeException, IOException {
-        List<ContentNode> children = contentReader.getChildren("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
+        Set<ContentNode> children = contentReader.getChildren("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
         assertTrue(children.size() == 1);
-        ContentNode contentNode = children.get(0);
+        ContentNode contentNode = children.iterator().next();
         assertEquals("UK Natural Capital Land Cover in the UK", contentNode.getDescription().getTitle());
         assertEquals(PageType.article, contentNode.getType());
         assertEquals("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/", contentNode.getUri().toString());

@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -80,17 +81,18 @@ public class CollectionContentReaderTest {
 
     @Test
     public void testGetChildrenDirectories() throws ZebedeeException, IOException {
-        List<ContentNode> children = collectionReader.getChildren(collectionId, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
+        Set<ContentNode> children = collectionReader.getChildren(collectionId, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
         assertTrue(children.size() == 1);
-        ContentNode contentNode = children.get(0);
+        ContentNode contentNode = children.iterator().next();
         assertEquals("Labour disputes by sector: LABD02", contentNode.getDescription().getTitle());
         assertEquals(PageType.dataset, contentNode.getType());//type is null for directories with no data.json
         assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/", contentNode.getUri().toString());
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void testNonExistingNodeChilren() throws ZebedeeException, IOException {
-        List<ContentNode> children = collectionReader.getChildren(collectionId, "/nonexistingpath/test");
+        Set<ContentNode> children = collectionReader.getChildren(collectionId, "/nonexistingpath/test");
+        assertTrue(children.isEmpty());
     }
 
 }

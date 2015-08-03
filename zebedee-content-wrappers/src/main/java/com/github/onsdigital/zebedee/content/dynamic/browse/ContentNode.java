@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by bren on 03/08/15.
@@ -16,7 +17,7 @@ public class ContentNode {
     private TitleWrapper description;
     private PageType type;
 
-    private List<ContentNode> children;
+    private Set<ContentNode> children;
 
     public ContentNode(URI uri, String title, PageType type) {
         this.uri = uri;
@@ -48,11 +49,27 @@ public class ContentNode {
         this.description = description;
     }
 
-    public List<ContentNode> getChildren() {
+    public Set<ContentNode> getChildren() {
         return children;
     }
 
-    public void setChildren(List<ContentNode> children) {
+    public void setChildren(Set<ContentNode> children) {
         this.children = children;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this.uri == null) {
+            return super.equals(obj);
+        }
+        return this.uri.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        if (this.uri == null) {
+            return super.hashCode();
+        }
+        return this.uri.hashCode();
     }
 }

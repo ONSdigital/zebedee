@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.reader.api;
 
 import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -14,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by bren on 31/07/15.
@@ -50,7 +53,7 @@ public class ReadRequestHandler {
             }
         }
 
-        return ZebedeeReader.getInstance().getPublishedContent(uri,dataFilter);
+        return ZebedeeReader.getInstance().getPublishedContent(uri, dataFilter);
 
     }
 
@@ -75,6 +78,24 @@ public class ReadRequestHandler {
         }
         return ZebedeeReader.getInstance().getPublishedResource(uri);
 
+    }
+
+    public Set<ContentNode> listChildren(HttpServletRequest request) throws ZebedeeException, IOException {
+        Set<ContentNode> children = new HashSet<>();
+        String uri = extractUri(request);
+        String collectionId = getCollectionId(request);
+        if (collectionId != null) {
+            authorise(request, collectionId);
+        }
+
+        try {
+            children.addAll(ZebedeeReader.getInstance().getPublishedChildren(uri));
+        } catch (NotFoundException n) {
+            System.out.println("No children to list under published content with uri:" + uri);
+        }
+        //Collection uris overwrites published uris
+        children.addAll(ZebedeeReader.getInstance().getCollectionChildren(collectionId, uri));
+        return children;
     }
 
     private void authorise(HttpServletRequest request, String collectionId) throws UnauthorizedException, IOException, NotFoundException {

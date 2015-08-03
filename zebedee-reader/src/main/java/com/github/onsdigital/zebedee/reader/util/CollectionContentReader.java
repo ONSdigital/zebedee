@@ -16,7 +16,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.*;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 
@@ -56,18 +56,16 @@ public class CollectionContentReader {
         return findResource(collectionId, path);
     }
 
-    public List<ContentNode> getChildren(String collectionId, String path) throws ZebedeeException, IOException {
+    public Set<ContentNode> getChildren(String collectionId, String path) throws ZebedeeException, IOException {
         Path collectionPath = findCollectionPath(collectionId);
         ContentReader inProgress = getContentReader(collectionPath, getConfiguration().getInProgressFolderName());
         ContentReader complete = getContentReader(collectionPath, getConfiguration().getCompleteFolderName());
         ContentReader reviewed = getContentReader(collectionPath, getConfiguration().getReviewedFolderName());
-        List<ContentNode> children = getChildrenQuite(path, inProgress);
-        if (children == null) {
-            children = getChildrenQuite(path, complete);
-            if (children == null) {
-                children = reviewed.getChildren(path);
-            }
-        }
+
+        Set<ContentNode> children = new HashSet<>();
+        children.addAll(getChildrenQuite(path, reviewed));
+        children.addAll(getChildrenQuite(path, complete));
+        children.addAll(getChildrenQuite(path, inProgress));
         return children;
     }
 
@@ -99,11 +97,11 @@ public class CollectionContentReader {
     }
 
     //If content not found with given reader do not shout
-    private List<ContentNode> getChildrenQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+    private Set<ContentNode> getChildrenQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
             return contentReader.getChildren(path);
         } catch (NotFoundException e) {
-            return null;
+            return Collections.emptySet();
         }
     }
 

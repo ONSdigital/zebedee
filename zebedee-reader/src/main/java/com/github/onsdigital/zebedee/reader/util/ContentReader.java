@@ -16,8 +16,8 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 
@@ -56,7 +56,7 @@ public class ContentReader {
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
         Path content = resolvePath(getRootFolder(), path);
-        checkNotDirectory(content);
+        assertNotDirectory(content);
         Resource resource = getResource(content);
         checkJsonMime(resource, path);
         return deserialize(resource);
@@ -79,14 +79,14 @@ public class ContentReader {
      * @param path
      * @return
      */
-    public List<ContentNode> getChildren(String path) throws ZebedeeException, IOException {
+    public Set<ContentNode> getChildren(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(getRootFolder(), path);
-        checkExists(node);
+        assertExists(node);
         return resolveChildren(node);
     }
 
-    protected List<ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
-        List<ContentNode> nodes = new ArrayList<>();
+    protected Set<ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
+        Set<ContentNode> nodes = new HashSet<>();
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(node)) {
             for (Path child : paths) {
                 if (Files.isDirectory(child)) {
@@ -114,7 +114,7 @@ public class ContentReader {
     }
 
     protected Resource getResource(Path resource) throws ZebedeeException, IOException {
-        checkExists(resource);
+        assertExists(resource);
         return buildResource(resource);
     }
 
@@ -139,14 +139,14 @@ public class ContentReader {
         return;
     }
 
-    private void checkExists(Path path) throws ZebedeeException {
+    private void assertExists(Path path) throws ZebedeeException {
         if (!Files.exists(path)) {
             System.err.println("Could not find requested content, path:" + path.toUri().toString());
             throw new NotFoundException("404 - Not Found");
         }
     }
 
-    private void checkNotDirectory(Path path) throws BadRequestException {
+    private void assertNotDirectory(Path path) throws BadRequestException {
         if (Files.isDirectory(path)) {
             throw new BadRequestException("Requested path is a directory, not a content file");
         }

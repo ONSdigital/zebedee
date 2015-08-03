@@ -7,6 +7,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
@@ -49,6 +50,9 @@ public class Builder {
      */
     public Builder(Class<?> name) throws IOException {
         Root.env = new HashMap<>();
+
+        // Set ISO date formatting in Gson to match Javascript Date.toISODate()
+        Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
         // Create the structure:
         parent = Files.createTempDirectory(name.getSimpleName());

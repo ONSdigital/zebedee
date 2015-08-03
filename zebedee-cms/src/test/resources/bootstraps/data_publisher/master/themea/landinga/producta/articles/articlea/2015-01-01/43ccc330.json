@@ -1,0 +1,988 @@
+{
+  "type": "chart",
+  "title": "Figure 2: Wages and salaries, quarter 1 (Jan to Mar) 1997 to 2015",
+  "filename": "43ccc330",
+  "uri": "/themea/landinga/producta/articles/articlea/2015-01-01/43ccc330",
+  "subtitle": "",
+  "unit": "£millions",
+  "source": "Source: Office for National Statistics",
+  "legend": "false",
+  "hideLegend": true,
+  "notes": "",
+  "altText": "",
+  "data": [
+    {
+      "Quarter": "1997 Q1",
+      "Wages and salaries": "91684",
+      "date": "1997-02-01T00:00:00.000Z",
+      "label": "1997 Q1"
+    },
+    {
+      "Quarter": "1997 Q2",
+      "Wages and salaries": "92500",
+      "date": "1997-04-30T23:00:00.000Z",
+      "label": "1997 Q2"
+    },
+    {
+      "Quarter": "1997 Q3",
+      "Wages and salaries": "93685",
+      "date": "1997-07-31T23:00:00.000Z",
+      "label": "1997 Q3"
+    },
+    {
+      "Quarter": "1997 Q4",
+      "Wages and salaries": "96423",
+      "date": "1997-11-01T00:00:00.000Z",
+      "label": "1997 Q4"
+    },
+    {
+      "Quarter": "1998 Q1",
+      "Wages and salaries": "98832",
+      "date": "1998-02-01T00:00:00.000Z",
+      "label": "1998 Q1"
+    },
+    {
+      "Quarter": "1998 Q2",
+      "Wages and salaries": "101174",
+      "date": "1998-04-30T23:00:00.000Z",
+      "label": "1998 Q2"
+    },
+    {
+      "Quarter": "1998 Q3",
+      "Wages and salaries": "103336",
+      "date": "1998-07-31T23:00:00.000Z",
+      "label": "1998 Q3"
+    },
+    {
+      "Quarter": "1998 Q4",
+      "Wages and salaries": "103786",
+      "date": "1998-11-01T00:00:00.000Z",
+      "label": "1998 Q4"
+    },
+    {
+      "Quarter": "1999 Q1",
+      "Wages and salaries": "105407",
+      "date": "1999-02-01T00:00:00.000Z",
+      "label": "1999 Q1"
+    },
+    {
+      "Quarter": "1999 Q2",
+      "Wages and salaries": "107689",
+      "date": "1999-04-30T23:00:00.000Z",
+      "label": "1999 Q2"
+    },
+    {
+      "Quarter": "1999 Q3",
+      "Wages and salaries": "109080",
+      "date": "1999-07-31T23:00:00.000Z",
+      "label": "1999 Q3"
+    },
+    {
+      "Quarter": "1999 Q4",
+      "Wages and salaries": "110731",
+      "date": "1999-11-01T00:00:00.000Z",
+      "label": "1999 Q4"
+    },
+    {
+      "Quarter": "2000 Q1",
+      "Wages and salaries": "112072",
+      "date": "2000-02-01T00:00:00.000Z",
+      "label": "2000 Q1"
+    },
+    {
+      "Quarter": "2000 Q2",
+      "Wages and salaries": "114189",
+      "date": "2000-04-30T23:00:00.000Z",
+      "label": "2000 Q2"
+    },
+    {
+      "Quarter": "2000 Q3",
+      "Wages and salaries": "117548",
+      "date": "2000-07-31T23:00:00.000Z",
+      "label": "2000 Q3"
+    },
+    {
+      "Quarter": "2000 Q4",
+      "Wages and salaries": "119207",
+      "date": "2000-11-01T00:00:00.000Z",
+      "label": "2000 Q4"
+    },
+    {
+      "Quarter": "2001 Q1",
+      "Wages and salaries": "121983",
+      "date": "2001-02-01T00:00:00.000Z",
+      "label": "2001 Q1"
+    },
+    {
+      "Quarter": "2001 Q2",
+      "Wages and salaries": "123319",
+      "date": "2001-04-30T23:00:00.000Z",
+      "label": "2001 Q2"
+    },
+    {
+      "Quarter": "2001 Q3",
+      "Wages and salaries": "123964",
+      "date": "2001-07-31T23:00:00.000Z",
+      "label": "2001 Q3"
+    },
+    {
+      "Quarter": "2001 Q4",
+      "Wages and salaries": "124268",
+      "date": "2001-11-01T00:00:00.000Z",
+      "label": "2001 Q4"
+    },
+    {
+      "Quarter": "2002 Q1",
+      "Wages and salaries": "124432",
+      "date": "2002-02-01T00:00:00.000Z",
+      "label": "2002 Q1"
+    },
+    {
+      "Quarter": "2002 Q2",
+      "Wages and salaries": "126821",
+      "date": "2002-04-30T23:00:00.000Z",
+      "label": "2002 Q2"
+    },
+    {
+      "Quarter": "2002 Q3",
+      "Wages and salaries": "128295",
+      "date": "2002-07-31T23:00:00.000Z",
+      "label": "2002 Q3"
+    },
+    {
+      "Quarter": "2002 Q4",
+      "Wages and salaries": "130057",
+      "date": "2002-11-01T00:00:00.000Z",
+      "label": "2002 Q4"
+    },
+    {
+      "Quarter": "2003 Q1",
+      "Wages and salaries": "129307",
+      "date": "2003-02-01T00:00:00.000Z",
+      "label": "2003 Q1"
+    },
+    {
+      "Quarter": "2003 Q2",
+      "Wages and salaries": "132389",
+      "date": "2003-04-30T23:00:00.000Z",
+      "label": "2003 Q2"
+    },
+    {
+      "Quarter": "2003 Q3",
+      "Wages and salaries": "134016",
+      "date": "2003-07-31T23:00:00.000Z",
+      "label": "2003 Q3"
+    },
+    {
+      "Quarter": "2003 Q4",
+      "Wages and salaries": "134541",
+      "date": "2003-11-01T00:00:00.000Z",
+      "label": "2003 Q4"
+    },
+    {
+      "Quarter": "2004 Q1",
+      "Wages and salaries": "135283",
+      "date": "2004-02-01T00:00:00.000Z",
+      "label": "2004 Q1"
+    },
+    {
+      "Quarter": "2004 Q2",
+      "Wages and salaries": "138292",
+      "date": "2004-04-30T23:00:00.000Z",
+      "label": "2004 Q2"
+    },
+    {
+      "Quarter": "2004 Q3",
+      "Wages and salaries": "140109",
+      "date": "2004-07-31T23:00:00.000Z",
+      "label": "2004 Q3"
+    },
+    {
+      "Quarter": "2004 Q4",
+      "Wages and salaries": "141131",
+      "date": "2004-11-01T00:00:00.000Z",
+      "label": "2004 Q4"
+    },
+    {
+      "Quarter": "2005 Q1",
+      "Wages and salaries": "142335",
+      "date": "2005-02-01T00:00:00.000Z",
+      "label": "2005 Q1"
+    },
+    {
+      "Quarter": "2005 Q2",
+      "Wages and salaries": "143015",
+      "date": "2005-04-30T23:00:00.000Z",
+      "label": "2005 Q2"
+    },
+    {
+      "Quarter": "2005 Q3",
+      "Wages and salaries": "144170",
+      "date": "2005-07-31T23:00:00.000Z",
+      "label": "2005 Q3"
+    },
+    {
+      "Quarter": "2005 Q4",
+      "Wages and salaries": "145970",
+      "date": "2005-11-01T00:00:00.000Z",
+      "label": "2005 Q4"
+    },
+    {
+      "Quarter": "2006 Q1",
+      "Wages and salaries": "148802",
+      "date": "2006-02-01T00:00:00.000Z",
+      "label": "2006 Q1"
+    },
+    {
+      "Quarter": "2006 Q2",
+      "Wages and salaries": "151643",
+      "date": "2006-04-30T23:00:00.000Z",
+      "label": "2006 Q2"
+    },
+    {
+      "Quarter": "2006 Q3",
+      "Wages and salaries": "152750",
+      "date": "2006-07-31T23:00:00.000Z",
+      "label": "2006 Q3"
+    },
+    {
+      "Quarter": "2006 Q4",
+      "Wages and salaries": "155204",
+      "date": "2006-11-01T00:00:00.000Z",
+      "label": "2006 Q4"
+    },
+    {
+      "Quarter": "2007 Q1",
+      "Wages and salaries": "158037",
+      "date": "2007-02-01T00:00:00.000Z",
+      "label": "2007 Q1"
+    },
+    {
+      "Quarter": "2007 Q2",
+      "Wages and salaries": "159938",
+      "date": "2007-04-30T23:00:00.000Z",
+      "label": "2007 Q2"
+    },
+    {
+      "Quarter": "2007 Q3",
+      "Wages and salaries": "162071",
+      "date": "2007-07-31T23:00:00.000Z",
+      "label": "2007 Q3"
+    },
+    {
+      "Quarter": "2007 Q4",
+      "Wages and salaries": "164148",
+      "date": "2007-11-01T00:00:00.000Z",
+      "label": "2007 Q4"
+    },
+    {
+      "Quarter": "2008 Q1",
+      "Wages and salaries": "165654",
+      "date": "2008-02-01T00:00:00.000Z",
+      "label": "2008 Q1"
+    },
+    {
+      "Quarter": "2008 Q2",
+      "Wages and salaries": "165952",
+      "date": "2008-04-30T23:00:00.000Z",
+      "label": "2008 Q2"
+    },
+    {
+      "Quarter": "2008 Q3",
+      "Wages and salaries": "165535",
+      "date": "2008-07-31T23:00:00.000Z",
+      "label": "2008 Q3"
+    },
+    {
+      "Quarter": "2008 Q4",
+      "Wages and salaries": "164606",
+      "date": "2008-11-01T00:00:00.000Z",
+      "label": "2008 Q4"
+    },
+    {
+      "Quarter": "2009 Q1",
+      "Wages and salaries": "160673",
+      "date": "2009-02-01T00:00:00.000Z",
+      "label": "2009 Q1"
+    },
+    {
+      "Quarter": "2009 Q2",
+      "Wages and salaries": "166576",
+      "date": "2009-04-30T23:00:00.000Z",
+      "label": "2009 Q2"
+    },
+    {
+      "Quarter": "2009 Q3",
+      "Wages and salaries": "166006",
+      "date": "2009-07-31T23:00:00.000Z",
+      "label": "2009 Q3"
+    },
+    {
+      "Quarter": "2009 Q4",
+      "Wages and salaries": "165954",
+      "date": "2009-11-01T00:00:00.000Z",
+      "label": "2009 Q4"
+    },
+    {
+      "Quarter": "2010 Q1",
+      "Wages and salaries": "164413",
+      "date": "2010-02-01T00:00:00.000Z",
+      "label": "2010 Q1"
+    },
+    {
+      "Quarter": "2010 Q2",
+      "Wages and salaries": "167388",
+      "date": "2010-04-30T23:00:00.000Z",
+      "label": "2010 Q2"
+    },
+    {
+      "Quarter": "2010 Q3",
+      "Wages and salaries": "168890",
+      "date": "2010-07-31T23:00:00.000Z",
+      "label": "2010 Q3"
+    },
+    {
+      "Quarter": "2010 Q4",
+      "Wages and salaries": "168099",
+      "date": "2010-11-01T00:00:00.000Z",
+      "label": "2010 Q4"
+    },
+    {
+      "Quarter": "2011 Q1",
+      "Wages and salaries": "168215",
+      "date": "2011-02-01T00:00:00.000Z",
+      "label": "2011 Q1"
+    },
+    {
+      "Quarter": "2011 Q2",
+      "Wages and salaries": "169973",
+      "date": "2011-04-30T23:00:00.000Z",
+      "label": "2011 Q2"
+    },
+    {
+      "Quarter": "2011 Q3",
+      "Wages and salaries": "170154",
+      "date": "2011-07-31T23:00:00.000Z",
+      "label": "2011 Q3"
+    },
+    {
+      "Quarter": "2011 Q4",
+      "Wages and salaries": "169746",
+      "date": "2011-11-01T00:00:00.000Z",
+      "label": "2011 Q4"
+    },
+    {
+      "Quarter": "2012 Q1",
+      "Wages and salaries": "167410",
+      "date": "2012-02-01T00:00:00.000Z",
+      "label": "2012 Q1"
+    },
+    {
+      "Quarter": "2012 Q2",
+      "Wages and salaries": "173480",
+      "date": "2012-04-30T23:00:00.000Z",
+      "label": "2012 Q2"
+    },
+    {
+      "Quarter": "2012 Q3",
+      "Wages and salaries": "176878",
+      "date": "2012-07-31T23:00:00.000Z",
+      "label": "2012 Q3"
+    },
+    {
+      "Quarter": "2012 Q4",
+      "Wages and salaries": "176185",
+      "date": "2012-11-01T00:00:00.000Z",
+      "label": "2012 Q4"
+    },
+    {
+      "Quarter": "2013 Q1",
+      "Wages and salaries": "174264",
+      "date": "2013-02-01T00:00:00.000Z",
+      "label": "2013 Q1"
+    },
+    {
+      "Quarter": "2013 Q2",
+      "Wages and salaries": "179205",
+      "date": "2013-04-30T23:00:00.000Z",
+      "label": "2013 Q2"
+    },
+    {
+      "Quarter": "2013 Q3",
+      "Wages and salaries": "179679",
+      "date": "2013-07-31T23:00:00.000Z",
+      "label": "2013 Q3"
+    },
+    {
+      "Quarter": "2013 Q4",
+      "Wages and salaries": "180461",
+      "date": "2013-11-01T00:00:00.000Z",
+      "label": "2013 Q4"
+    },
+    {
+      "Quarter": "2014 Q1",
+      "Wages and salaries": "180414",
+      "date": "2014-02-01T00:00:00.000Z",
+      "label": "2014 Q1"
+    },
+    {
+      "Quarter": "2014 Q2",
+      "Wages and salaries": "185151",
+      "date": "2014-04-30T23:00:00.000Z",
+      "label": "2014 Q2"
+    },
+    {
+      "Quarter": "2014 Q3",
+      "Wages and salaries": "187327",
+      "date": "2014-07-31T23:00:00.000Z",
+      "label": "2014 Q3"
+    },
+    {
+      "Quarter": "2014 Q4",
+      "Wages and salaries": "190454",
+      "date": "2014-11-01T00:00:00.000Z",
+      "label": "2014 Q4"
+    },
+    {
+      "Quarter": "2015 Q1",
+      "Wages and salaries": "190249",
+      "date": "2015-02-01T00:00:00.000Z",
+      "label": "2015 Q1"
+    }
+  ],
+  "headers": [
+    "Quarter",
+    "Wages and salaries"
+  ],
+  "series": [
+    "Wages and salaries"
+  ],
+  "categories": [
+    "1997 Q1",
+    "1997 Q2",
+    "1997 Q3",
+    "1997 Q4",
+    "1998 Q1",
+    "1998 Q2",
+    "1998 Q3",
+    "1998 Q4",
+    "1999 Q1",
+    "1999 Q2",
+    "1999 Q3",
+    "1999 Q4",
+    "2000 Q1",
+    "2000 Q2",
+    "2000 Q3",
+    "2000 Q4",
+    "2001 Q1",
+    "2001 Q2",
+    "2001 Q3",
+    "2001 Q4",
+    "2002 Q1",
+    "2002 Q2",
+    "2002 Q3",
+    "2002 Q4",
+    "2003 Q1",
+    "2003 Q2",
+    "2003 Q3",
+    "2003 Q4",
+    "2004 Q1",
+    "2004 Q2",
+    "2004 Q3",
+    "2004 Q4",
+    "2005 Q1",
+    "2005 Q2",
+    "2005 Q3",
+    "2005 Q4",
+    "2006 Q1",
+    "2006 Q2",
+    "2006 Q3",
+    "2006 Q4",
+    "2007 Q1",
+    "2007 Q2",
+    "2007 Q3",
+    "2007 Q4",
+    "2008 Q1",
+    "2008 Q2",
+    "2008 Q3",
+    "2008 Q4",
+    "2009 Q1",
+    "2009 Q2",
+    "2009 Q3",
+    "2009 Q4",
+    "2010 Q1",
+    "2010 Q2",
+    "2010 Q3",
+    "2010 Q4",
+    "2011 Q1",
+    "2011 Q2",
+    "2011 Q3",
+    "2011 Q4",
+    "2012 Q1",
+    "2012 Q2",
+    "2012 Q3",
+    "2012 Q4",
+    "2013 Q1",
+    "2013 Q2",
+    "2013 Q3",
+    "2013 Q4",
+    "2014 Q1",
+    "2014 Q2",
+    "2014 Q3",
+    "2014 Q4",
+    "2015 Q1"
+  ],
+  "aspectRatio": "0.56",
+  "chartType": "line",
+  "files": [
+    {
+      "type": "download-png",
+      "filename": "43ccc330-download.png"
+    },
+    {
+      "type": "png",
+      "filename": "43ccc330.png"
+    }
+  ],
+  "isTimeSeries": true,
+  "timeSeries": [
+    {
+      "Quarter": "1997 Q1",
+      "Wages and salaries": "91684",
+      "date": "1997-02-01T00:00:00.000Z",
+      "label": "1997 Q1"
+    },
+    {
+      "Quarter": "1997 Q2",
+      "Wages and salaries": "92500",
+      "date": "1997-04-30T23:00:00.000Z",
+      "label": "1997 Q2"
+    },
+    {
+      "Quarter": "1997 Q3",
+      "Wages and salaries": "93685",
+      "date": "1997-07-31T23:00:00.000Z",
+      "label": "1997 Q3"
+    },
+    {
+      "Quarter": "1997 Q4",
+      "Wages and salaries": "96423",
+      "date": "1997-11-01T00:00:00.000Z",
+      "label": "1997 Q4"
+    },
+    {
+      "Quarter": "1998 Q1",
+      "Wages and salaries": "98832",
+      "date": "1998-02-01T00:00:00.000Z",
+      "label": "1998 Q1"
+    },
+    {
+      "Quarter": "1998 Q2",
+      "Wages and salaries": "101174",
+      "date": "1998-04-30T23:00:00.000Z",
+      "label": "1998 Q2"
+    },
+    {
+      "Quarter": "1998 Q3",
+      "Wages and salaries": "103336",
+      "date": "1998-07-31T23:00:00.000Z",
+      "label": "1998 Q3"
+    },
+    {
+      "Quarter": "1998 Q4",
+      "Wages and salaries": "103786",
+      "date": "1998-11-01T00:00:00.000Z",
+      "label": "1998 Q4"
+    },
+    {
+      "Quarter": "1999 Q1",
+      "Wages and salaries": "105407",
+      "date": "1999-02-01T00:00:00.000Z",
+      "label": "1999 Q1"
+    },
+    {
+      "Quarter": "1999 Q2",
+      "Wages and salaries": "107689",
+      "date": "1999-04-30T23:00:00.000Z",
+      "label": "1999 Q2"
+    },
+    {
+      "Quarter": "1999 Q3",
+      "Wages and salaries": "109080",
+      "date": "1999-07-31T23:00:00.000Z",
+      "label": "1999 Q3"
+    },
+    {
+      "Quarter": "1999 Q4",
+      "Wages and salaries": "110731",
+      "date": "1999-11-01T00:00:00.000Z",
+      "label": "1999 Q4"
+    },
+    {
+      "Quarter": "2000 Q1",
+      "Wages and salaries": "112072",
+      "date": "2000-02-01T00:00:00.000Z",
+      "label": "2000 Q1"
+    },
+    {
+      "Quarter": "2000 Q2",
+      "Wages and salaries": "114189",
+      "date": "2000-04-30T23:00:00.000Z",
+      "label": "2000 Q2"
+    },
+    {
+      "Quarter": "2000 Q3",
+      "Wages and salaries": "117548",
+      "date": "2000-07-31T23:00:00.000Z",
+      "label": "2000 Q3"
+    },
+    {
+      "Quarter": "2000 Q4",
+      "Wages and salaries": "119207",
+      "date": "2000-11-01T00:00:00.000Z",
+      "label": "2000 Q4"
+    },
+    {
+      "Quarter": "2001 Q1",
+      "Wages and salaries": "121983",
+      "date": "2001-02-01T00:00:00.000Z",
+      "label": "2001 Q1"
+    },
+    {
+      "Quarter": "2001 Q2",
+      "Wages and salaries": "123319",
+      "date": "2001-04-30T23:00:00.000Z",
+      "label": "2001 Q2"
+    },
+    {
+      "Quarter": "2001 Q3",
+      "Wages and salaries": "123964",
+      "date": "2001-07-31T23:00:00.000Z",
+      "label": "2001 Q3"
+    },
+    {
+      "Quarter": "2001 Q4",
+      "Wages and salaries": "124268",
+      "date": "2001-11-01T00:00:00.000Z",
+      "label": "2001 Q4"
+    },
+    {
+      "Quarter": "2002 Q1",
+      "Wages and salaries": "124432",
+      "date": "2002-02-01T00:00:00.000Z",
+      "label": "2002 Q1"
+    },
+    {
+      "Quarter": "2002 Q2",
+      "Wages and salaries": "126821",
+      "date": "2002-04-30T23:00:00.000Z",
+      "label": "2002 Q2"
+    },
+    {
+      "Quarter": "2002 Q3",
+      "Wages and salaries": "128295",
+      "date": "2002-07-31T23:00:00.000Z",
+      "label": "2002 Q3"
+    },
+    {
+      "Quarter": "2002 Q4",
+      "Wages and salaries": "130057",
+      "date": "2002-11-01T00:00:00.000Z",
+      "label": "2002 Q4"
+    },
+    {
+      "Quarter": "2003 Q1",
+      "Wages and salaries": "129307",
+      "date": "2003-02-01T00:00:00.000Z",
+      "label": "2003 Q1"
+    },
+    {
+      "Quarter": "2003 Q2",
+      "Wages and salaries": "132389",
+      "date": "2003-04-30T23:00:00.000Z",
+      "label": "2003 Q2"
+    },
+    {
+      "Quarter": "2003 Q3",
+      "Wages and salaries": "134016",
+      "date": "2003-07-31T23:00:00.000Z",
+      "label": "2003 Q3"
+    },
+    {
+      "Quarter": "2003 Q4",
+      "Wages and salaries": "134541",
+      "date": "2003-11-01T00:00:00.000Z",
+      "label": "2003 Q4"
+    },
+    {
+      "Quarter": "2004 Q1",
+      "Wages and salaries": "135283",
+      "date": "2004-02-01T00:00:00.000Z",
+      "label": "2004 Q1"
+    },
+    {
+      "Quarter": "2004 Q2",
+      "Wages and salaries": "138292",
+      "date": "2004-04-30T23:00:00.000Z",
+      "label": "2004 Q2"
+    },
+    {
+      "Quarter": "2004 Q3",
+      "Wages and salaries": "140109",
+      "date": "2004-07-31T23:00:00.000Z",
+      "label": "2004 Q3"
+    },
+    {
+      "Quarter": "2004 Q4",
+      "Wages and salaries": "141131",
+      "date": "2004-11-01T00:00:00.000Z",
+      "label": "2004 Q4"
+    },
+    {
+      "Quarter": "2005 Q1",
+      "Wages and salaries": "142335",
+      "date": "2005-02-01T00:00:00.000Z",
+      "label": "2005 Q1"
+    },
+    {
+      "Quarter": "2005 Q2",
+      "Wages and salaries": "143015",
+      "date": "2005-04-30T23:00:00.000Z",
+      "label": "2005 Q2"
+    },
+    {
+      "Quarter": "2005 Q3",
+      "Wages and salaries": "144170",
+      "date": "2005-07-31T23:00:00.000Z",
+      "label": "2005 Q3"
+    },
+    {
+      "Quarter": "2005 Q4",
+      "Wages and salaries": "145970",
+      "date": "2005-11-01T00:00:00.000Z",
+      "label": "2005 Q4"
+    },
+    {
+      "Quarter": "2006 Q1",
+      "Wages and salaries": "148802",
+      "date": "2006-02-01T00:00:00.000Z",
+      "label": "2006 Q1"
+    },
+    {
+      "Quarter": "2006 Q2",
+      "Wages and salaries": "151643",
+      "date": "2006-04-30T23:00:00.000Z",
+      "label": "2006 Q2"
+    },
+    {
+      "Quarter": "2006 Q3",
+      "Wages and salaries": "152750",
+      "date": "2006-07-31T23:00:00.000Z",
+      "label": "2006 Q3"
+    },
+    {
+      "Quarter": "2006 Q4",
+      "Wages and salaries": "155204",
+      "date": "2006-11-01T00:00:00.000Z",
+      "label": "2006 Q4"
+    },
+    {
+      "Quarter": "2007 Q1",
+      "Wages and salaries": "158037",
+      "date": "2007-02-01T00:00:00.000Z",
+      "label": "2007 Q1"
+    },
+    {
+      "Quarter": "2007 Q2",
+      "Wages and salaries": "159938",
+      "date": "2007-04-30T23:00:00.000Z",
+      "label": "2007 Q2"
+    },
+    {
+      "Quarter": "2007 Q3",
+      "Wages and salaries": "162071",
+      "date": "2007-07-31T23:00:00.000Z",
+      "label": "2007 Q3"
+    },
+    {
+      "Quarter": "2007 Q4",
+      "Wages and salaries": "164148",
+      "date": "2007-11-01T00:00:00.000Z",
+      "label": "2007 Q4"
+    },
+    {
+      "Quarter": "2008 Q1",
+      "Wages and salaries": "165654",
+      "date": "2008-02-01T00:00:00.000Z",
+      "label": "2008 Q1"
+    },
+    {
+      "Quarter": "2008 Q2",
+      "Wages and salaries": "165952",
+      "date": "2008-04-30T23:00:00.000Z",
+      "label": "2008 Q2"
+    },
+    {
+      "Quarter": "2008 Q3",
+      "Wages and salaries": "165535",
+      "date": "2008-07-31T23:00:00.000Z",
+      "label": "2008 Q3"
+    },
+    {
+      "Quarter": "2008 Q4",
+      "Wages and salaries": "164606",
+      "date": "2008-11-01T00:00:00.000Z",
+      "label": "2008 Q4"
+    },
+    {
+      "Quarter": "2009 Q1",
+      "Wages and salaries": "160673",
+      "date": "2009-02-01T00:00:00.000Z",
+      "label": "2009 Q1"
+    },
+    {
+      "Quarter": "2009 Q2",
+      "Wages and salaries": "166576",
+      "date": "2009-04-30T23:00:00.000Z",
+      "label": "2009 Q2"
+    },
+    {
+      "Quarter": "2009 Q3",
+      "Wages and salaries": "166006",
+      "date": "2009-07-31T23:00:00.000Z",
+      "label": "2009 Q3"
+    },
+    {
+      "Quarter": "2009 Q4",
+      "Wages and salaries": "165954",
+      "date": "2009-11-01T00:00:00.000Z",
+      "label": "2009 Q4"
+    },
+    {
+      "Quarter": "2010 Q1",
+      "Wages and salaries": "164413",
+      "date": "2010-02-01T00:00:00.000Z",
+      "label": "2010 Q1"
+    },
+    {
+      "Quarter": "2010 Q2",
+      "Wages and salaries": "167388",
+      "date": "2010-04-30T23:00:00.000Z",
+      "label": "2010 Q2"
+    },
+    {
+      "Quarter": "2010 Q3",
+      "Wages and salaries": "168890",
+      "date": "2010-07-31T23:00:00.000Z",
+      "label": "2010 Q3"
+    },
+    {
+      "Quarter": "2010 Q4",
+      "Wages and salaries": "168099",
+      "date": "2010-11-01T00:00:00.000Z",
+      "label": "2010 Q4"
+    },
+    {
+      "Quarter": "2011 Q1",
+      "Wages and salaries": "168215",
+      "date": "2011-02-01T00:00:00.000Z",
+      "label": "2011 Q1"
+    },
+    {
+      "Quarter": "2011 Q2",
+      "Wages and salaries": "169973",
+      "date": "2011-04-30T23:00:00.000Z",
+      "label": "2011 Q2"
+    },
+    {
+      "Quarter": "2011 Q3",
+      "Wages and salaries": "170154",
+      "date": "2011-07-31T23:00:00.000Z",
+      "label": "2011 Q3"
+    },
+    {
+      "Quarter": "2011 Q4",
+      "Wages and salaries": "169746",
+      "date": "2011-11-01T00:00:00.000Z",
+      "label": "2011 Q4"
+    },
+    {
+      "Quarter": "2012 Q1",
+      "Wages and salaries": "167410",
+      "date": "2012-02-01T00:00:00.000Z",
+      "label": "2012 Q1"
+    },
+    {
+      "Quarter": "2012 Q2",
+      "Wages and salaries": "173480",
+      "date": "2012-04-30T23:00:00.000Z",
+      "label": "2012 Q2"
+    },
+    {
+      "Quarter": "2012 Q3",
+      "Wages and salaries": "176878",
+      "date": "2012-07-31T23:00:00.000Z",
+      "label": "2012 Q3"
+    },
+    {
+      "Quarter": "2012 Q4",
+      "Wages and salaries": "176185",
+      "date": "2012-11-01T00:00:00.000Z",
+      "label": "2012 Q4"
+    },
+    {
+      "Quarter": "2013 Q1",
+      "Wages and salaries": "174264",
+      "date": "2013-02-01T00:00:00.000Z",
+      "label": "2013 Q1"
+    },
+    {
+      "Quarter": "2013 Q2",
+      "Wages and salaries": "179205",
+      "date": "2013-04-30T23:00:00.000Z",
+      "label": "2013 Q2"
+    },
+    {
+      "Quarter": "2013 Q3",
+      "Wages and salaries": "179679",
+      "date": "2013-07-31T23:00:00.000Z",
+      "label": "2013 Q3"
+    },
+    {
+      "Quarter": "2013 Q4",
+      "Wages and salaries": "180461",
+      "date": "2013-11-01T00:00:00.000Z",
+      "label": "2013 Q4"
+    },
+    {
+      "Quarter": "2014 Q1",
+      "Wages and salaries": "180414",
+      "date": "2014-02-01T00:00:00.000Z",
+      "label": "2014 Q1"
+    },
+    {
+      "Quarter": "2014 Q2",
+      "Wages and salaries": "185151",
+      "date": "2014-04-30T23:00:00.000Z",
+      "label": "2014 Q2"
+    },
+    {
+      "Quarter": "2014 Q3",
+      "Wages and salaries": "187327",
+      "date": "2014-07-31T23:00:00.000Z",
+      "label": "2014 Q3"
+    },
+    {
+      "Quarter": "2014 Q4",
+      "Wages and salaries": "190454",
+      "date": "2014-11-01T00:00:00.000Z",
+      "label": "2014 Q4"
+    },
+    {
+      "Quarter": "2015 Q1",
+      "Wages and salaries": "190249",
+      "date": "2015-02-01T00:00:00.000Z",
+      "label": "2015 Q1"
+    }
+  ]
+}

@@ -1,33 +1,28 @@
 package com.github.onsdigital.zebedee.data;
 
 import com.github.davidcarboni.ResourceUtils;
-import com.github.onsdigital.content.page.base.PageDescription;
-import com.github.onsdigital.content.page.base.PageType;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.content.partial.Contact;
 import com.github.onsdigital.content.partial.TimeseriesValue;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.Content;
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.util.IOUtils;
-import org.bouncycastle.util.Strings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -39,6 +34,19 @@ public class DataPublisherTest {
     Zebedee zebedee;
     Builder bob;
     Session publisher;
+    Collection collection;
+
+    String publishedTimeSeriesPath;
+    String publishedDatasetPath;
+
+    String unpublishedTimeSeriesPath;
+    String unpublishedDatasetPath;
+
+    TimeSerieses serieses = null;
+    TimeSeries publishedTimeSeries = null;
+    TimeSeries unpublishedTimeSeries = null;
+    Dataset publishedDataset = null;
+    Dataset unpublishedDataset = null;
 
     Map<String, String> envVariables;
 
@@ -62,6 +70,33 @@ public class DataPublisherTest {
         zebedee = new Zebedee(bob.zebedee);
         publisher = bob.createSession(bob.publisher1);
 
+        collection = zebedee.collections.list().getCollection("collection");
+
+        publishedTimeSeriesPath = "/themea/landinga/producta/timeseries/a4fk";
+        publishedDatasetPath = "/themea/landinga/producta/datasets/a4fk_dataset";
+
+        unpublishedTimeSeriesPath = "/themea/landinga/producta/timeseries/ju5c";
+        unpublishedDatasetPath = "/themea/landinga/producta/datasets/another_dataset";
+
+        String brianPath = "/csdb/csdb_no_extension/brian.json";
+        try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
+            serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
+        }
+        publishedTimeSeries = serieses.get(0); // AF4K
+        unpublishedTimeSeries = serieses.get(1); // JU5C
+
+        assertEquals("AF4K", publishedTimeSeries.getCdid());
+        assertEquals("JU5C", unpublishedTimeSeries.getCdid());
+
+        try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(publishedDatasetPath).resolve("data.json"))) {
+            publishedDataset = ContentUtil.deserialise(inputStream, Dataset.class);
+        }
+        try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(unpublishedDatasetPath).resolve("data.json"))) {
+            unpublishedDataset = ContentUtil.deserialise(inputStream, Dataset.class);
+        }
+
+        assertNotNull(publishedDataset);
+        assertNotNull(unpublishedDataset);
     }
     @After
     public void tearDown() throws Exception {
@@ -86,7 +121,7 @@ public class DataPublisherTest {
         assertEquals(1, zebedee.collections.list().size());
 
         // The collection exists
-        Collection collection = zebedee.collections.list().getCollection("collection");
+
         assertNotNull(collection);
         // It has four items
         assertEquals(4, collection.reviewedUris().size());
@@ -156,7 +191,6 @@ public class DataPublisherTest {
 
         // When
         // we deserialise it
-        TimeSerieses serieses = null;
         try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
             serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
         }
@@ -228,67 +262,275 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void startPage_GivenFreshTimeSeries_ShouldBeTheSame() throws IOException {
+    public void startPage_givenFreshTimeSeries_shouldBeMinimal() throws IOException {
+        // Given
+        // the time series that hadn't previously been published
 
+        // When
+        // we generate a start page
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+
+        // Then
+        // we expect the startPage to be identical to the unpublishedTimeSeries
+        assertEquals(0, startPage.years.size() + startPage.months.size() + startPage.quarters.size());
     }
+
+
     @Test
     public void startPage_givenExistingTimeSeries_shouldBePopulatedByExistingData() throws IOException {
-
-    }
-
-    @Test
-    public void populatePage_withoutExistingTimeSeries_shouldFillEmptySeries() throws IOException {
-
-    }
-    @Test
-    public void populatePage_overExistingTimeSeries_shouldAddNewPoints() {
         // Given
+        // the time series that hadn't previously been published
+        TimeSeries alreadyPublished = null;
+        try (InputStream inputStream = Files.newInputStream(zebedee.published.get(publishedTimeSeriesPath).resolve("data.json"))) {
+            alreadyPublished = ContentUtil.deserialise(inputStream, TimeSeries.class);
+        }
+        assertNotNull(alreadyPublished);
 
         // When
+        // we generate a start page to build
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
 
         // Then
-    }
-    @Test
-    public void populatePage_overExistingTimeSeries_shouldOverwriteExistingPoints() {
-
+        // we expect the startPage to be based on the alreadyPublished timeseries
+        assertEquals(alreadyPublished.toJson(), startPage.toJson());
     }
 
-    // Quick
+
     @Test
-    public void constructTimeseriesFromComponents_withDatasetValues_doesCopyToTimeseries() throws URISyntaxException {
+    public void populatePageValues_withoutExistingTimeSeries_shouldFillEmptySeries() throws IOException {
         // Given
-        // a test dataset
+        // the page we have started building that didn't previously exist
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+
+        // When
+        // we generate a start page
+        DataPublisher.populatePageFromSetOfValues(startPage, startPage.years, unpublishedTimeSeries.years, unpublishedDataset);
+
+        // Then
+        // we expect the startPage to be
+        assertEquals(unpublishedTimeSeries.years.size(), startPage.years.size());
+    }
+
+    @Test
+    public void populatePageValues_overExistingTimeSeries_shouldAddNewPoints() throws IOException {
+        // Given
+        // the page we have started building that didn't previously exist
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
+        simplifyTimeSeries(startPage, publishedTimeSeries);
+
+        int originalYears = startPage.years.size();
+        assertTrue(originalYears > 0);
+
+        // When
+        // we generate a start page
+        DataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishedTimeSeries.years, publishedDataset);
+
+        // Then
+        // we expect the startPage to be added to
+        assertTrue(originalYears < startPage.years.size());
+    }
+    @Test
+    public void populatePageValues_overExistingTimeSeries_shouldOverwriteExistingPoints() throws IOException {
+        // Given
+        // the time series we are using as examples cleared with some simple data
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
+        TimeSeries publishThisPage = publishedTimeSeries;
+        Dataset publishThisDataset = publishedDataset;
+
+        simplifyTimeSeries(startPage, publishThisPage);
+
+        // When
+        // we combine the two series
+        DataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishThisPage.years, publishThisDataset);
+
+        // Then
+        // we expect equal values for
+        assertEquals(4, startPage.years.size());
+        assertEquals("4", valueForTime("2002", startPage).value);
+    }
+    @Test
+    public void populatePageValues_overExistingTimeSeries_doesNotRemoveExistingPoints() throws IOException {
+        // Given
+        // the time series we are using as examples cleared with some simple data
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
+        TimeSeries publishThisPage = publishedTimeSeries;
+        Dataset publishThisDataset = publishedDataset;
+
+        simplifyTimeSeries(startPage, publishThisPage);
+
+        // When
+        // we combine the two series
+        DataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishThisPage.years, publishThisDataset);
+
+        // Then
+        // we expect the value for "2001" (not present in publishedTimeSeries)
+        assertEquals(4, startPage.years.size());
+        assertEquals("2", valueForTime("2001", startPage).value);
+    }
+
+    @Test
+    public void populatePageFromTimeSeries_givenFreshTimeSeries_shouldTransferDetails() throws IOException {
+        // Given
+        // the time series that hadn't previously been published (
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries publishThisPage = unpublishedTimeSeries;
+        Dataset publishThisDataset = unpublishedDataset;
+
+        // When
+        // we populate the page
+        TimeSeries newPage = DataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
+
+        // Then
+        // we expect the newPage to have copied details from the
+        assertEquals(newPage.getCdid(), publishThisPage.getCdid());
+        assertEquals(newPage.getDescription().getTitle(), publishThisPage.getDescription().getTitle());
+        assertEquals(newPage.getDescription().getSeasonalAdjustment(), publishThisPage.getDescription().getSeasonalAdjustment());
+    }
+    @Test
+    public void populatePageFromTimeseries_overExistingTimeSeries_shouldTransferNameFromTimeSeriesIfNameBlank() throws IOException {
+        // Given
+        // the time series that hadn't previously been published (
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries publishThisPage = publishedTimeSeries;
+        Dataset publishThisDataset = publishedDataset;
+
+        publishThisPage.getDescription().setTitle("Title");
+        startPage.getDescription().setTitle("");
+
+        // When
+        // we populate the page
+        TimeSeries newPage = DataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
+
+        // Then
+        // we expect the newPage to copy across the name
+        assertEquals("Title", newPage.getDescription().getTitle());
+    }
+    @Test
+    public void populatePageFromTimeseries_overExistingTimeSeries_shouldNotTransferNameIfNameExists() throws IOException {
+        // Given
+        // the time series that hadn't previously been published (
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries publishThisPage = publishedTimeSeries;
+        Dataset publishThisDataset = publishedDataset;
+
+        publishThisPage.getDescription().setTitle("New Title");
+        startPage.getDescription().setTitle("Existing Title");
+
+        // When
+        // we populate the page
+        TimeSeries newPage = DataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
+
+        // Then
+        // we expect the newPage to not copy over the name
+        assertEquals("Existing Title", newPage.getDescription().getTitle());
+    }
+    @Test
+    public void populatePageFromTimeseries_overExistingTimeSeries_shouldTransferDetails() throws IOException {
+        // Given
+        // the time series that hadn't previously been published (
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries publishThisPage = publishedTimeSeries;
+        Dataset publishThisDataset = publishedDataset;
+
+        publishThisPage.getDescription().setSeasonalAdjustment("SA to publish");
+        startPage.getDescription().setSeasonalAdjustment("SA existing");
+
+        // When
+        // we populate the page
+        TimeSeries newPage = DataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
+
+        // Then
+        // we expect the newPage to have copied limited details from the published page
+        assertEquals(publishThisPage.getDescription().getSeasonalAdjustment(), newPage.getDescription().getSeasonalAdjustment());
+        assertEquals(publishThisPage.getCdid(), newPage.getCdid());
+    }
+
+    private void simplifyTimeSeries(TimeSeries series1, TimeSeries series2) {
+        // Expected values for layering series2 over series1 are
+        //[{"2000": "1"}, {"2001": "2"}, {"2002": "4"}, {"2003": "5"}]
+
+        series1.years = new TreeSet<>();
+        series1.years.add(quickTimeSeriesValue("2000", "1"));
+        series1.years.add(quickTimeSeriesValue("2001", "2"));
+        series1.years.add(quickTimeSeriesValue("2002", "3"));
+        series1.getDescription().setSeasonalAdjustment("YES");
+        series1.getDescription().setTitle("Series1");
+
+        series2.years = new TreeSet<>();
+        series2.years.add(quickTimeSeriesValue("2000", "1"));
+        series2.years.add(quickTimeSeriesValue("2002", "4"));
+        series2.years.add(quickTimeSeriesValue("2003", "5"));
+        series2.getDescription().setSeasonalAdjustment("NO");
+        series2.getDescription().setTitle("Series2");
+
+    }
+    private TimeseriesValue quickTimeSeriesValue(String year, String value) {
+        TimeseriesValue timeseriesValue = new TimeseriesValue(); timeseriesValue.year = year; timeseriesValue.value = value;
+        timeseriesValue.date = year;
+        return timeseriesValue;
+    }
+    private TimeseriesValue valueForTime(String year, TimeSeries series) {
+        for (TimeseriesValue value: series.years) {
+            if (value.year.equals(year)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Test
+    public void populatePageFromDataset_withSampleDataset_doesCopyDatesAndContactToTimeseries() throws IOException, URISyntaxException, ParseException {
+        // Given
+        // a test dataset with some specified test values
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        Dataset publishThisDataset = publishedDataset;
+        String publishThisUri = publishedDatasetPath;
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+        publishThisDataset.getDescription().setReleaseDate(formatter.parse("7-Jun-2013"));
+        publishThisDataset.getDescription().setNextRelease("7-Jun-2014");
+        Contact contact = new Contact();
+        contact.setEmail("email@email.com");
+        contact.setName("user");
+        contact.setTelephone("(+44)20-8123-4567");
+        publishThisDataset.getDescription().setContact(contact);
 
         // When
         // we populate a series
+        TimeSeries newSeries = DataPublisher.populatePageFromDataSetPage(startPage, publishThisDataset, publishThisUri);
 
         // Then
         // we expect the data from the dataset to have transferred
-
+        assertEquals(publishThisDataset.getDescription().getReleaseDate(), newSeries.getDescription().getReleaseDate());
+        assertEquals(publishThisDataset.getDescription().getNextRelease(), newSeries.getDescription().getNextRelease());
+        assertEquals(publishThisDataset.getDescription().getContact().getName(), newSeries.getDescription().getContact().getName());
+        assertEquals(publishThisDataset.getDescription().getContact().getEmail(), newSeries.getDescription().getContact().getEmail());
+        assertEquals(publishThisDataset.getDescription().getContact().getTelephone(), newSeries.getDescription().getContact().getTelephone());
     }
+
     @Test
-    public void constructTimeseriesFromComponents_withTimeseriesValues_doesUpdateTimeseriesName() throws URISyntaxException {
+    public void populatePageFromDataset_withSampleDataset_doesCopyDatasetIdToTimeseries() throws IOException, URISyntaxException, ParseException {
         // Given
-        // a test dataset with an existing timeseries
+        // a test dataset with some specified test values
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        Dataset publishThisDataset = publishedDataset;
+        String publishThisUri = publishedDatasetPath;
+        publishThisDataset.getDescription().setDatasetId("Test DatasetID");
 
         // When
         // we populate a series
+        TimeSeries newSeries = DataPublisher.populatePageFromDataSetPage(startPage, publishThisDataset, publishThisUri);
 
         // Then
-        // we expect the data from the dataset to have transferred
-
-    }
-    @Test
-    public void constructTimeseriesFromComponents_withTimeseriesValues_doesNotOverwriteManualUpdates() throws URISyntaxException {
-        // Given
-        // a test dataset with an existing timeseries
-
-        // When
-        // we populate a series
-
-        // Then
-        // we expect the data from the dataset to have transferred
-
+        // we expect the id from the dataset to be contained in the timeseries source datasets
+        boolean datasetIdFound = false;
+        for (String datasetId: newSeries.sourceDatasets) {
+            if (datasetId.equalsIgnoreCase("Test DatasetID")) {
+                datasetIdFound = true;
+                break;
+            }
+        }
+        assertTrue(datasetIdFound);
     }
 
 }

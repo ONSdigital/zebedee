@@ -12,12 +12,8 @@ import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.*;
+import java.util.*;
 
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 
@@ -55,8 +51,7 @@ public class ContentReader {
      * @return Wrapper containing actual document data as text
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
-        Path content = resolvePath(getRootFolder(), path);
-        assertNotDirectory(content);
+        Path content = resolveDataFilePath(getRootFolder(), path);
         Resource resource = getResource(content);
         checkJsonMime(resource, path);
         return deserialize(resource);
@@ -77,28 +72,69 @@ public class ContentReader {
      * get child contents under given path, directories with no data.json are returned with no type and directory name as title
      *
      * @param path
-     * @return
+     * @return  uri - node mapping
      */
-    public Set<ContentNode> getChildren(String path) throws ZebedeeException, IOException {
+    public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(getRootFolder(), path);
         assertExists(node);
+        assertIsDirectory(node);
         return resolveChildren(node);
     }
 
-    protected Set<ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
-        Set<ContentNode> nodes = new HashSet<>();
+    /**
+     * get parent contents under of path, directories are skipped, only contents are returned
+     *
+     * @param path
+     * @return  uri - node mapping
+     */
+    public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
+        Path node = resolvePath(getRootFolder(), path);
+        assertExists(node);
+        assertIsDirectory(node);
+        return resolveParents(node);
+    }
+
+    private Map<URI,ContentNode> resolveParents(Path node) throws IOException, ZebedeeException {
+        Map<URI, ContentNode> nodes = new HashMap<>();
+        if (node.equals(getRootFolder())) {
+            return Collections.emptyMap();
+        }
+        ContentNode parent;
+        try {
+            parent = getParent(node);
+            nodes.putAll(resolveParents(node.getParent()));
+            nodes.put(parent.getUri(), parent);
+            return nodes;
+        } catch (NotFoundException e) {//If parent is just a folder with data.json skip it
+            nodes.putAll(resolveParents(node.getParent()));
+        }
+
+        return nodes;
+    }
+
+    private ContentNode getParent(Path node) throws ZebedeeException, IOException {
+        URI uri = toRelativeUri(node);
+        Page content = getContent(uri.toString());
+        return new ContentNode(uri, content.getDescription().getTitle(), content.getType());
+    }
+
+
+
+    private Map<URI,ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
+        Map<URI, ContentNode> nodes = new HashMap<>();
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(node)) {
             for (Path child : paths) {
                 if (Files.isDirectory(child)) {
                     Path dataFile = child.resolve(ReaderConfiguration.getConfiguration().getDataFileName());
+                    URI uri = toRelativeUri(child);
                     if (Files.exists(dataFile)) {//data.json
                         try (Resource resource = getResource(dataFile)) {
                             Page content = deserialize(resource);
-                            nodes.add(new ContentNode(toUri(child), content.getDescription().getTitle(), content.getType()));
+                            nodes.put(uri, new ContentNode(uri, content.getDescription().getTitle(), content.getType()));
                         }
                     } else {
                         //directory
-                        nodes.add(new ContentNode(toUri(child), child.getFileName().toString(), null));
+                        nodes.put(uri,new ContentNode(uri, child.getFileName().toString(), null));
                     }
                 } else {
                     continue;//skip data.json files in current directory
@@ -109,8 +145,8 @@ public class ContentReader {
     }
 
     //Returns uri of content calculating relative to root folder
-    private URI toUri(Path child) {
-        return URI.create("/" + getRootFolder().toUri().relativize(child.toUri()).getPath());
+    private URI toRelativeUri(Path node) {
+        return URI.create("/" + getRootFolder().toUri().relativize(node.toUri()).getPath());
     }
 
     protected Resource getResource(Path resource) throws ZebedeeException, IOException {
@@ -148,15 +184,25 @@ public class ContentReader {
 
     private void assertNotDirectory(Path path) throws BadRequestException {
         if (Files.isDirectory(path)) {
-            throw new BadRequestException("Requested path is a directory, not a content file");
+            throw new BadRequestException("Requested path is a not directory, not a content file");
         }
     }
 
-    private Path resolvePath(Path root, String path) throws BadRequestException {
+    private void assertIsDirectory(Path path) throws BadRequestException {
+        if (!Files.isDirectory(path)) {
+            throw new BadRequestException("Requested uri is not a content uri");
+        }
+    }
+
+    Path resolvePath(Path root, String path) throws BadRequestException {
         if (path == null) {
             throw new NullPointerException("Path can not be null");
         }
         return root.resolve(removeLeadingSlash(path));
+    }
+
+    Path resolveDataFilePath(Path root, String path) throws BadRequestException {
+        return resolvePath(root, path).resolve(ReaderConfiguration.getConfiguration().getDataFileName());
     }
 
     /*Getters * Setters */

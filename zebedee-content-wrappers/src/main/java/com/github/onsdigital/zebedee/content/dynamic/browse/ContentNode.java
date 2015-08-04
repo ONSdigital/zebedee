@@ -4,20 +4,24 @@ import com.github.onsdigital.zebedee.content.dynamic.TitleWrapper;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Created by bren on 03/08/15.
  * Represents a node in content hierarchy
+ *
+ * Default sorting is by title alphabetically
  */
-public class ContentNode {
+public class ContentNode implements Comparable<ContentNode> {
 
     private URI uri;
     private TitleWrapper description;
     private PageType type;
 
-    private Set<ContentNode> children;
+    private Collection<ContentNode> children;
 
     public ContentNode(URI uri, String title, PageType type) {
         this.uri = uri;
@@ -49,11 +53,11 @@ public class ContentNode {
         this.description = description;
     }
 
-    public Set<ContentNode> getChildren() {
+    public Collection<ContentNode> getChildren() {
         return children;
     }
 
-    public void setChildren(Set<ContentNode> children) {
+    public void setChildren(Collection<ContentNode> children) {
         this.children = children;
     }
 
@@ -72,4 +76,30 @@ public class ContentNode {
         }
         return this.uri.hashCode();
     }
+
+    @Override
+    public int compareTo(ContentNode o) {
+        if(isNull(getDescription()) || isNull(getDescription().getTitle())) {
+            return 1;//Empty titles are listed as last elements
+        }
+        if(isNull(o) || isNull(o.getDescription()) || isNull(o.getDescription().getTitle())){
+            return -1;
+        }
+
+        return getDescription().getTitle().compareTo(o.getDescription().getTitle());
+    }
+
+    private boolean isNull(Object o) {
+        return o == null;
+    }
+
+
+    public class ContentNodeComparator implements Comparator<ContentNode> {
+
+        @Override
+        public int compare(ContentNode o1, ContentNode o2) {
+            return 0;
+        }
+    }
+
 }

@@ -10,7 +10,8 @@ import com.github.onsdigital.zebedee.reader.util.CollectionContentReader;
 import com.github.onsdigital.zebedee.reader.util.ContentReader;
 
 import java.io.IOException;
-import java.util.List;
+import java.net.URI;
+import java.util.Map;
 import java.util.Set;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
@@ -134,12 +135,12 @@ public class ZebedeeReader {
         return collectionContentReader.getResource(collectionId, path);
     }
 
-    public Set<ContentNode> getPublishedChildren(String path) throws ZebedeeException, IOException {
+    public Map<URI, ContentNode> getPublishedChildren(String path) throws ZebedeeException, IOException {
         return publishedContentReader.getChildren(path);
     }
 
 
-    public Set<ContentNode> getCollectionChildren(String collectionId, String path) throws ZebedeeException, IOException {
+    public Map<URI, ContentNode> getCollectionChildren(String collectionId, String path) throws ZebedeeException, IOException {
         return collectionContentReader.getChildren(collectionId, path);
     }
 

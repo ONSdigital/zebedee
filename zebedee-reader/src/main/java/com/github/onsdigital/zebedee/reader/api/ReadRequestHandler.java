@@ -10,18 +10,19 @@ import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.util.AuthorisationHandler;
+import com.github.onsdigital.zebedee.util.ContentNodeComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
 
 /**
  * Created by bren on 31/07/15.
  * <p>
- * This class checks to see if Zebedee Cms is running to authorize collection views, if not serves published content
+ * This class checks to see if zebedee cms is running to authorize collection views via registered AuthorisationHandler, if not serves published content
  */
 public class ReadRequestHandler {
 
@@ -80,22 +81,46 @@ public class ReadRequestHandler {
 
     }
 
-    public Set<ContentNode> listChildren(HttpServletRequest request) throws ZebedeeException, IOException {
-        Set<ContentNode> children = new HashSet<>();
+    public Collection<ContentNode> listChildren(HttpServletRequest request, int depth) throws ZebedeeException, IOException {
         String uri = extractUri(request);
         String collectionId = getCollectionId(request);
         if (collectionId != null) {
             authorise(request, collectionId);
         }
 
-        try {
-            children.addAll(ZebedeeReader.getInstance().getPublishedChildren(uri));
-        } catch (NotFoundException n) {
-            System.out.println("No children to list under published content with uri:" + uri);
+        return resolveTree(collectionId, uri, depth);
+
+    }
+
+    private Collection<ContentNode> resolveTree(String collectionId, String uri, int depth) throws ZebedeeException, IOException {
+        if (depth == 0) {
+            return Collections.emptySet();
         }
-        //Collection uris overwrites published uris
-        children.addAll(ZebedeeReader.getInstance().getCollectionChildren(collectionId, uri));
-        return children;
+        Map<URI, ContentNode> nodes = ZebedeeReader.getInstance().getPublishedChildren(uri);
+        overlayCollections(nodes, collectionId, uri);
+        nodes = toSortedTreeMap(nodes);
+        depth--;
+        resolveChildren(nodes, collectionId, depth);
+        return nodes.values();
+    }
+
+    private void resolveChildren(Map<URI, ContentNode> nodes, String collectionId, int depth) throws ZebedeeException, IOException {
+        if (depth == 0) {
+            return;
+        }
+        Collection<ContentNode> nodeList = nodes.values();
+        for (Iterator<ContentNode> iterator = nodeList.iterator(); iterator.hasNext(); ) {
+            ContentNode next =  iterator.next();
+            next.setChildren(resolveTree(collectionId, next.getUri().toString(), depth));
+        }
+    }
+
+    private void overlayCollections(Map<URI, ContentNode> nodes, String collectionId, String uri) throws ZebedeeException, IOException {
+        if (collectionId == null) {
+            return;
+        }
+        Map<URI, ContentNode> collectionChildren = ZebedeeReader.getInstance().getCollectionChildren(collectionId, uri);
+        nodes.putAll(collectionChildren);//Overwrites published nodes
     }
 
     private void authorise(HttpServletRequest request, String collectionId) throws UnauthorizedException, IOException, NotFoundException {
@@ -111,13 +136,27 @@ public class ReadRequestHandler {
     }
 
 
-    public String extractUri(HttpServletRequest request) throws BadRequestException {
+    private String extractUri(HttpServletRequest request) throws BadRequestException {
         String uri = request.getParameter("uri");
         if (StringUtils.isEmpty(uri)) {
             throw new BadRequestException("Please specify uri");
         }
         return uri;
     }
+
+
+    /**
+     * Sorts given map by content node rather than map key
+     * @param nodes
+     * @return
+     */
+    private Map<URI, ContentNode> toSortedTreeMap(Map<URI, ContentNode> nodes) {
+        TreeMap<URI, ContentNode> sortedMap = new TreeMap<>(new ContentNodeComparator(nodes));
+        sortedMap.putAll(nodes);
+        return sortedMap;
+    }
+
+
 
     /**
      * set authorisation handler

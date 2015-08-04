@@ -21,10 +21,10 @@ import java.io.IOException;
 public class Resource {
 
     /**
-     * Retrieves resource files for  endpoint <code>/resource[CollectionName]/?uri=[uri]</code>
+     * Retrieves resource files for  endpoint <code>/resource[collectionId]/?uri=[uri]</code>
      * <p>
      * <p>
-     * This endpoint resource file from either a collection or published data.
+     * This endpoint serves resource file from either a collection or published data.
      *
      * @param request  This should contain a X-Florence-Token header for the current session and the collection id being worked on
      *                 If no collection id is given published contents will be served

@@ -27,10 +27,10 @@ import java.util.Set;
 public class Data {
 
     /**
-     * Retrieves content endpoint <code>/data[CollectionName]/?uri=[uri]</code>
+     * Retrieves content for endpoint <code>/data[collectionId]/?uri=[uri]</code>
      * <p>
      * <p>
-     * This endpoint retrieves json from either a collection or published data.
+     * This endpoint retrieves and serves json from either a collection or published data.
      *
      * It is possible to filter only certain bits of data using filters.
      *

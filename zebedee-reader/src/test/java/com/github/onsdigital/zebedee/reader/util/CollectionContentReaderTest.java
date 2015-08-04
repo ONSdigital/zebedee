@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.reader.util;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -11,7 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -34,15 +37,15 @@ public class CollectionContentReaderTest {
 
     @Test
     public void testGetAvailableContent() throws ZebedeeException, IOException {
-        Page content = collectionReader.getContent(collectionId,  "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
+        Page content = collectionReader.getContent(collectionId,  "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
         assertNotNull(content);
-        assertEquals(content.getType(), PageType.table);
-        assertTrue(content instanceof Table);
+        assertEquals(content.getType(), PageType.article);
+        assertTrue(content instanceof Article);
     }
 
     @Test(expected = NotFoundException.class)
     public void testGetNonexistingContent() throws ZebedeeException, IOException {
-        Page content = collectionReader.getContent(collectionId, "madeupfoldername/data.json");
+        Page content = collectionReader.getContent(collectionId, "madeupfoldername");
     }
 
     @Test
@@ -81,17 +84,17 @@ public class CollectionContentReaderTest {
 
     @Test
     public void testGetChildrenDirectories() throws ZebedeeException, IOException {
-        Set<ContentNode> children = collectionReader.getChildren(collectionId, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
+        Map<URI, ContentNode> children = collectionReader.getChildren(collectionId, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
         assertTrue(children.size() == 1);
-        ContentNode contentNode = children.iterator().next();
-        assertEquals("Labour disputes by sector: LABD02", contentNode.getDescription().getTitle());
-        assertEquals(PageType.dataset, contentNode.getType());//type is null for directories with no data.json
-        assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/", contentNode.getUri().toString());
+        Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
+        assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDescription().getTitle());
+        assertEquals(PageType.dataset, contentNode.getValue().getType());//type is null for directories with no data.json
+        assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/", contentNode.getKey().toString());
     }
 
     @Test
     public void testNonExistingNodeChilren() throws ZebedeeException, IOException {
-        Set<ContentNode> children = collectionReader.getChildren(collectionId, "/nonexistingpath/test");
+        Map<URI, ContentNode> children = collectionReader.getChildren(collectionId, "/nonexistingpath/test");
         assertTrue(children.isEmpty());
     }
 

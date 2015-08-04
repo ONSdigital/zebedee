@@ -8,10 +8,14 @@ import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +51,8 @@ public class CollectionContentReader {
      * @throws IOException
      */
     public Page getContent(String collectionId, String path) throws ZebedeeException, IOException {
-        Resource resource = findResource(collectionId, path);
+        URI dataFilePath = URI.create(URIUtils.removeTrailingSlash(path) + "/").resolve(getConfiguration().getDataFileName());
+        Resource resource = findResource(collectionId, dataFilePath.toString());
         return ContentUtil.deserialiseContent(resource.getData());
     }
 
@@ -56,16 +61,27 @@ public class CollectionContentReader {
         return findResource(collectionId, path);
     }
 
-    public Set<ContentNode> getChildren(String collectionId, String path) throws ZebedeeException, IOException {
+    /**
+     *
+     *
+     * @param collectionId
+     * @param path
+     * @return uri-node mapping
+     * @throws ZebedeeException
+     * @throws IOException
+     */
+    public Map<URI,ContentNode> getChildren(String collectionId, String path) throws ZebedeeException, IOException {
         Path collectionPath = findCollectionPath(collectionId);
         ContentReader inProgress = getContentReader(collectionPath, getConfiguration().getInProgressFolderName());
         ContentReader complete = getContentReader(collectionPath, getConfiguration().getCompleteFolderName());
         ContentReader reviewed = getContentReader(collectionPath, getConfiguration().getReviewedFolderName());
 
-        Set<ContentNode> children = new HashSet<>();
-        children.addAll(getChildrenQuite(path, reviewed));
-        children.addAll(getChildrenQuite(path, complete));
-        children.addAll(getChildrenQuite(path, inProgress));
+        Map<URI, ContentNode> children = new TreeMap<>();
+        //TODO: Same document should not be in two different state, it should be safe to overwrite if it appears in multiple places?.
+        // Is there a validation mechanism ? Might be needed
+        children.putAll(getChildrenQuite(path, reviewed));
+        children.putAll(getChildrenQuite(path, complete));
+        children.putAll(getChildrenQuite(path, inProgress));
         return children;
     }
 
@@ -97,11 +113,11 @@ public class CollectionContentReader {
     }
 
     //If content not found with given reader do not shout
-    private Set<ContentNode> getChildrenQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+    private Map<URI,ContentNode> getChildrenQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
             return contentReader.getChildren(path);
         } catch (NotFoundException e) {
-            return Collections.emptySet();
+            return Collections.emptyMap();
         }
     }
 

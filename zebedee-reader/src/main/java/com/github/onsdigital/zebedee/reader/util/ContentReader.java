@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.reader.util;
 
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -21,7 +22,7 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
  * Created by bren on 27/07/15.
  * <p>
  * ContentReader reads content and resource files from file system with given paths under a root content folder.
- *
+ * <p>
  * ContentReader will find file relative to root folder. Paths might start with forward slash or not.
  * <p>
  */
@@ -72,7 +73,7 @@ public class ContentReader {
      * get child contents under given path, directories with no data.json are returned with no type and directory name as title
      *
      * @param path
-     * @return  uri - node mapping
+     * @return uri - node mapping
      */
     public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(getRootFolder(), path);
@@ -85,7 +86,7 @@ public class ContentReader {
      * get parent contents under of path, directories are skipped, only contents are returned
      *
      * @param path
-     * @return  uri - node mapping
+     * @return uri - node mapping
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(getRootFolder(), path);
@@ -94,33 +95,40 @@ public class ContentReader {
         return resolveParents(node);
     }
 
-    private Map<URI,ContentNode> resolveParents(Path node) throws IOException, ZebedeeException {
+    private Map<URI, ContentNode> resolveParents(Path node) throws IOException, ZebedeeException {
         Map<URI, ContentNode> nodes = new HashMap<>();
         if (node.equals(getRootFolder())) {
             return Collections.emptyMap();
         }
-        ContentNode parent;
-        try {
-            parent = getParent(node);
-            nodes.putAll(resolveParents(node.getParent()));
-            nodes.put(parent.getUri(), parent);
-            return nodes;
-        } catch (NotFoundException e) {//If parent is just a folder with data.json skip it
-            nodes.putAll(resolveParents(node.getParent()));
-        }
 
+        nodes.putAll(resolveParents(node.getParent()));
+
+        Page parent = getParentContent(node);
+        if (parent == null) {
+            return Collections.emptyMap();
+        }
         return nodes;
     }
 
-    private ContentNode getParent(Path node) throws ZebedeeException, IOException {
-        URI uri = toRelativeUri(node);
-        Page content = getContent(uri.toString());
-        return new ContentNode(uri, content.getDescription().getTitle(), content.getType());
+    //Gets first parent content
+    private Page getParentContent(Path node) throws ZebedeeException, IOException {
+        Path parentNode = node.getParent();
+        if (parentNode == null) {
+            return null;
+        }
+        URI uri = toRelativeUri(parentNode);
+        Page content;
+        try {
+            content = getContent(uri.toString());
+        } catch (NotFoundException e) {//if parent is just a folder with data.json skips it
+            content = getParentContent(parentNode);
+        }
+
+        return content;
     }
 
 
-
-    private Map<URI,ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
+    private Map<URI, ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
         Map<URI, ContentNode> nodes = new HashMap<>();
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(node)) {
             for (Path child : paths) {
@@ -134,7 +142,7 @@ public class ContentReader {
                         }
                     } else {
                         //directory
-                        nodes.put(uri,new ContentNode(uri, child.getFileName().toString(), null));
+                        nodes.put(uri, new ContentNode(uri, child.getFileName().toString(), null));
                     }
                 } else {
                     continue;//skip data.json files in current directory
@@ -210,5 +218,8 @@ public class ContentReader {
         return ROOT_FOLDER;
     }
 
+    private boolean isRoot(Path path) {
+        return getRootFolder().equals(path);
+    }
 
 }

@@ -150,16 +150,16 @@ public class DataPublisher {
      * Combines sections of
      *
      * Updated upstream
-     * @param uri
+     * @param destinationUri
      * @param dataset
      * @param series
      * @return
      * @throws IOException
      */
-    static TimeSeries constructTimeSeriesPageFromComponents(String uri, Dataset dataset, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
+    static TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, Dataset dataset, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
 
         // Attempts to open an existing time series or creates a new one
-        TimeSeries page = startPageForSeriesWithPublishedPath(uri, series);
+        TimeSeries page = startPageForSeriesWithPublishedPath(destinationUri, series);
 
         // Add stats data from the time series (as returned by Brian)
         // NOTE: This will log any corrections as it goes
@@ -200,6 +200,7 @@ public class DataPublisher {
 
         return page;
     }
+
 
     /**
      * Detects datasets appropriate to csdb style publication
@@ -358,7 +359,11 @@ public class DataPublisher {
         }
         page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
         page.getDescription().setCdid(series.getDescription().getCdid());
+
+        // Copy across the title if it is currently blank (equates to equalling Cdid)
         if (page.getDescription().getTitle() == null || page.getDescription().getTitle().equalsIgnoreCase("")) {
+            page.getDescription().setTitle(series.getDescription().getTitle());
+        } else if (page.getDescription().getTitle().equalsIgnoreCase(page.getCdid())) {
             page.getDescription().setTitle(series.getDescription().getTitle());
         }
 

@@ -6,6 +6,7 @@ import com.github.onsdigital.content.page.base.Page;
 import com.github.onsdigital.content.service.ContentNotFoundException;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.DataReader;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -74,11 +76,11 @@ public class Collections {
             throw new BadRequestException("URI does not represent a file.");
         }
 
-        // Attempt to review:
+        // Attempt to complete:
         if (collection.complete(session.email, uri)) {
             collection.save();
         } else {
-            throw new BadRequestException("URI was not reviewed.");
+            throw new BadRequestException("URI was not completed.");
         }
     }
 
@@ -155,7 +157,11 @@ public class Collections {
         }
 
         // Do any processing of data files
-        DataPublisher.preprocessCollection(collection, session);
+        try {
+            DataPublisher.preprocessCollection(zebedee, collection, session);
+        } catch (URISyntaxException e) {
+            throw new BadRequestException("Brian could not process this collection");
+        }
 
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {

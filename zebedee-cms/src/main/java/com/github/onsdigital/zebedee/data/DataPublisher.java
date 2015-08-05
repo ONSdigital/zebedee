@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data;
 
+import com.github.onsdigital.content.link.PageReference;
 import com.github.onsdigital.content.page.base.PageDescription;
 import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.content.page.statistics.dataset.Dataset;
@@ -47,14 +48,15 @@ public class DataPublisher {
     public static int corrections = 0;
     public static Map<String, String> env = System.getenv();
 
-    public static void preprocessCollection(Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException {
+
+    public static void preprocessCollection(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
 
         if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
             return;
         }
 
-        preprocessCSDB(collection, session);
+        preprocessCSDB(zebedee, collection, session);
 
         System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
     }
@@ -72,7 +74,7 @@ public class DataPublisher {
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    static void preprocessCSDB(Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException {
+    static void preprocessCSDB(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
 
         // First find all csdb files in the collection
         List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
@@ -80,8 +82,10 @@ public class DataPublisher {
 
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
+
             // Download the dataset page (for metadata)
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
+            String datasetUri = zebedee.toUri(csdbDataset.get("json"));
 
             DownloadSection section = new DownloadSection();
             section.setTitle(dataset.getDescription().getTitle());
@@ -98,15 +102,15 @@ public class DataPublisher {
             for (TimeSeries series : serieses) {
 
                 // Work out the correct timeseries path by working back from the dataset uri
-                String uri = uriForSeriesInDataset(dataset, series);
-                Path path = collection.find("", uri);
+                String uri = uriForSeriesInDataset(datasetUri, series);
+                //Path path = collection.find("", uri);
 
                 // Construct the new page
-                TimeSeries newPage = constructTimeSeriesPageFromComponents(path, uri, dataset, series);
+                TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
                 section.getCdids().add(newPage.getDescription().getCdid());
 
                 // Save the new page to reviewed
-                Path savePath = collection.autocreateReviewedPath(newPage.getUri() + "/data.json");
+                Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
                 IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
 
                 // Write csv and other files:
@@ -118,12 +122,10 @@ public class DataPublisher {
             sections.add(section);
             dataset.setDownloads(sections);
 
-
-
-            Path savePath = collection.autocreateReviewedPath(dataset.getUri() + "/data.json");
+            Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
             IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
 
-            System.out.println("Published " + serieses.size() + " datasets for " + dataset.getUri().toString());
+            System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
         }
     }
 
@@ -133,37 +135,38 @@ public class DataPublisher {
         return sections[0];
     }
 
-    static String uriForSeriesInDataset(Dataset dataset, TimeSeries series) {
-        String[] split = StringUtils.split(dataset.getUri().toString(), "/");
+    static String uriForSeriesInDataset(String datasetUri, TimeSeries series) {
+        String[] split = StringUtils.split(datasetUri, "/");
         split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
 
         String uri = StringUtils.join(split, "/");
+
         uri = ("/" + uri + "/timeseries/" + series.getCdid()).toLowerCase();
 
         return uri;
     }
 
-
     /**
+     * Combines sections of
      *
-     * @param existingSeries
-     * @param uri
+     * Updated upstream
+     * @param destinationUri
      * @param dataset
      * @param series
      * @return
      * @throws IOException
      */
-    static TimeSeries constructTimeSeriesPageFromComponents(Path existingSeries, String uri, Dataset dataset, TimeSeries series) throws IOException {
+    static TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, Dataset dataset, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
 
-        // Begin with existing data
-        TimeSeries page = startPageForSeriesWithPublishedPath(uri, series);
+        // Attempts to open an existing time series or creates a new one
+        TimeSeries page = startPageForSeriesWithPublishedPath(destinationUri, series);
 
         // Add stats data from the time series (as returned by Brian)
         // NOTE: This will log any corrections as it goes
         populatePageFromTimeSeries(page, series, dataset);
 
         // Add metadata from the dataset
-        populatePageFromDataSetPage(page, dataset);
+        populatePageFromDataSetPage(page, dataset, datasetURI);
 
         return page;
     }
@@ -173,6 +176,15 @@ public class DataPublisher {
         return startPageForSeriesWithPublishedPath(Root.zebedee, uri, series);
     }
 
+    /**
+     * Attempts to open an existing time series page with uri otherwise creates a new one
+     *
+     * @param zebedee
+     * @param uri
+     * @param series
+     * @return
+     * @throws IOException
+     */
     static TimeSeries startPageForSeriesWithPublishedPath(Zebedee zebedee, String uri, TimeSeries series) throws IOException {
         TimeSeries page;
         Path path = zebedee.published.toPath(uri);
@@ -183,11 +195,12 @@ public class DataPublisher {
             page = new TimeSeries();
             page.setDescription(new PageDescription());
             page.setCdid(series.getCdid());
-            page.setUri(URI.create(uri));
+            // page.setUri(URI.create(uri));
         }
 
         return page;
     }
+
 
     /**
      * Detects datasets appropriate to csdb style publication
@@ -346,7 +359,13 @@ public class DataPublisher {
         }
         page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
         page.getDescription().setCdid(series.getDescription().getCdid());
-        page.getDescription().setTitle(series.getDescription().getTitle());
+
+        // Copy across the title if it is currently blank (equates to equalling Cdid)
+        if (page.getDescription().getTitle() == null || page.getDescription().getTitle().equalsIgnoreCase("")) {
+            page.getDescription().setTitle(series.getDescription().getTitle());
+        } else if (page.getDescription().getTitle().equalsIgnoreCase(page.getCdid())) {
+            page.getDescription().setTitle(series.getDescription().getTitle());
+        }
 
         page.getDescription().setDate(series.getDescription().getDate());
         page.getDescription().setNumber(series.getDescription().getNumber());
@@ -415,7 +434,7 @@ public class DataPublisher {
      * @param newValue
      */
     private static void logCorrection(TimeSeries series, TimeseriesValue oldValue, TimeseriesValue newValue) {
-        // TODO: Important point to pick up when corrections have been made to timeseries values
+
         corrections += 1;
     }
 
@@ -423,7 +442,7 @@ public class DataPublisher {
         insertions += 1;
     }
 
-    static TimeSeries populatePageFromDataSetPage(TimeSeries page, Dataset datasetPage) {
+    static TimeSeries populatePageFromDataSetPage(TimeSeries page, Dataset datasetPage, String datasetURI) throws URISyntaxException {
         PageDescription description = page.getDescription();
         if (description == null) {
             description = new PageDescription();
@@ -448,6 +467,25 @@ public class DataPublisher {
             page.getDescription().setContact(contact);
         }
 
+        // Ensure dataset is part of related datasets
+        List<PageReference> relatedDatasets = datasetPage.getRelatedDatasets();
+        if (relatedDatasets == null) { relatedDatasets = new ArrayList<>(); }
+        boolean datasetNotLinked = true;
+        for (PageReference relatedDataset: relatedDatasets) {
+            if (relatedDataset.getUri().toString().equalsIgnoreCase(datasetURI)) {
+                datasetNotLinked = false;
+                break;
+            }
+        }
+        if (datasetNotLinked) {
+            relatedDatasets.add(new PageReference(new URI(datasetURI)));
+            page.setRelatedDatasets(relatedDatasets);
+        }
+
+        // Add stats bulletins
+        if (datasetPage.getRelatedDocuments() != null) {
+            page.setRelatedDocuments(datasetPage.getRelatedDocuments());
+        }
 
         // Add the dataset id if relevant
         boolean datasetIsNew = true;
@@ -461,8 +499,8 @@ public class DataPublisher {
             page.sourceDatasets.add(datasetPage.getDescription().getDatasetId());
         }
 
-        // Fix the breadcrumb
-        page.setBreadcrumb(datasetPage.getBreadcrumb());
+//        // Fix the breadcrumb
+//        page.setBreadcrumb(datasetPage.getBreadcrumb());
 ;
         return page;
     }

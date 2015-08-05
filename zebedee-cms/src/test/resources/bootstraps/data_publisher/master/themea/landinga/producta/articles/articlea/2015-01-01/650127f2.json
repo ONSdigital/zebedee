@@ -1,0 +1,988 @@
+{
+  "type": "chart",
+  "title": "Figure 3: Net acquisition of loans by household and NPISH, quarter 1 (Jan to Mar) 1997 to 2015",
+  "filename": "650127f2",
+  "uri": "/themea/landinga/producta/articles/articlea/2015-01-01/650127f2",
+  "subtitle": "",
+  "unit": "£millions",
+  "source": "Source: Office for National Statistics",
+  "legend": "false",
+  "hideLegend": true,
+  "notes": "",
+  "altText": "",
+  "data": [
+    {
+      "Quarter": "1997 Q1",
+      "Net acquisition of loans": "1972",
+      "date": "1997-02-01T00:00:00.000Z",
+      "label": "1997 Q1"
+    },
+    {
+      "Quarter": "1997 Q2",
+      "Net acquisition of loans": "11263",
+      "date": "1997-04-30T23:00:00.000Z",
+      "label": "1997 Q2"
+    },
+    {
+      "Quarter": "1997 Q3",
+      "Net acquisition of loans": "11168",
+      "date": "1997-07-31T23:00:00.000Z",
+      "label": "1997 Q3"
+    },
+    {
+      "Quarter": "1997 Q4",
+      "Net acquisition of loans": "9806",
+      "date": "1997-11-01T00:00:00.000Z",
+      "label": "1997 Q4"
+    },
+    {
+      "Quarter": "1998 Q1",
+      "Net acquisition of loans": "9985",
+      "date": "1998-02-01T00:00:00.000Z",
+      "label": "1998 Q1"
+    },
+    {
+      "Quarter": "1998 Q2",
+      "Net acquisition of loans": "11434",
+      "date": "1998-04-30T23:00:00.000Z",
+      "label": "1998 Q2"
+    },
+    {
+      "Quarter": "1998 Q3",
+      "Net acquisition of loans": "13704",
+      "date": "1998-07-31T23:00:00.000Z",
+      "label": "1998 Q3"
+    },
+    {
+      "Quarter": "1998 Q4",
+      "Net acquisition of loans": "13339",
+      "date": "1998-11-01T00:00:00.000Z",
+      "label": "1998 Q4"
+    },
+    {
+      "Quarter": "1999 Q1",
+      "Net acquisition of loans": "15188",
+      "date": "1999-02-01T00:00:00.000Z",
+      "label": "1999 Q1"
+    },
+    {
+      "Quarter": "1999 Q2",
+      "Net acquisition of loans": "12774",
+      "date": "1999-04-30T23:00:00.000Z",
+      "label": "1999 Q2"
+    },
+    {
+      "Quarter": "1999 Q3",
+      "Net acquisition of loans": "16442",
+      "date": "1999-07-31T23:00:00.000Z",
+      "label": "1999 Q3"
+    },
+    {
+      "Quarter": "1999 Q4",
+      "Net acquisition of loans": "20255",
+      "date": "1999-11-01T00:00:00.000Z",
+      "label": "1999 Q4"
+    },
+    {
+      "Quarter": "2000 Q1",
+      "Net acquisition of loans": "12668",
+      "date": "2000-02-01T00:00:00.000Z",
+      "label": "2000 Q1"
+    },
+    {
+      "Quarter": "2000 Q2",
+      "Net acquisition of loans": "18759",
+      "date": "2000-04-30T23:00:00.000Z",
+      "label": "2000 Q2"
+    },
+    {
+      "Quarter": "2000 Q3",
+      "Net acquisition of loans": "17100",
+      "date": "2000-07-31T23:00:00.000Z",
+      "label": "2000 Q3"
+    },
+    {
+      "Quarter": "2000 Q4",
+      "Net acquisition of loans": "16802",
+      "date": "2000-11-01T00:00:00.000Z",
+      "label": "2000 Q4"
+    },
+    {
+      "Quarter": "2001 Q1",
+      "Net acquisition of loans": "14510",
+      "date": "2001-02-01T00:00:00.000Z",
+      "label": "2001 Q1"
+    },
+    {
+      "Quarter": "2001 Q2",
+      "Net acquisition of loans": "16828",
+      "date": "2001-04-30T23:00:00.000Z",
+      "label": "2001 Q2"
+    },
+    {
+      "Quarter": "2001 Q3",
+      "Net acquisition of loans": "21232",
+      "date": "2001-07-31T23:00:00.000Z",
+      "label": "2001 Q3"
+    },
+    {
+      "Quarter": "2001 Q4",
+      "Net acquisition of loans": "23882",
+      "date": "2001-11-01T00:00:00.000Z",
+      "label": "2001 Q4"
+    },
+    {
+      "Quarter": "2002 Q1",
+      "Net acquisition of loans": "21269",
+      "date": "2002-02-01T00:00:00.000Z",
+      "label": "2002 Q1"
+    },
+    {
+      "Quarter": "2002 Q2",
+      "Net acquisition of loans": "26813",
+      "date": "2002-04-30T23:00:00.000Z",
+      "label": "2002 Q2"
+    },
+    {
+      "Quarter": "2002 Q3",
+      "Net acquisition of loans": "36256",
+      "date": "2002-07-31T23:00:00.000Z",
+      "label": "2002 Q3"
+    },
+    {
+      "Quarter": "2002 Q4",
+      "Net acquisition of loans": "27385",
+      "date": "2002-11-01T00:00:00.000Z",
+      "label": "2002 Q4"
+    },
+    {
+      "Quarter": "2003 Q1",
+      "Net acquisition of loans": "26965",
+      "date": "2003-02-01T00:00:00.000Z",
+      "label": "2003 Q1"
+    },
+    {
+      "Quarter": "2003 Q2",
+      "Net acquisition of loans": "32020",
+      "date": "2003-04-30T23:00:00.000Z",
+      "label": "2003 Q2"
+    },
+    {
+      "Quarter": "2003 Q3",
+      "Net acquisition of loans": "37088",
+      "date": "2003-07-31T23:00:00.000Z",
+      "label": "2003 Q3"
+    },
+    {
+      "Quarter": "2003 Q4",
+      "Net acquisition of loans": "37067",
+      "date": "2003-11-01T00:00:00.000Z",
+      "label": "2003 Q4"
+    },
+    {
+      "Quarter": "2004 Q1",
+      "Net acquisition of loans": "30008",
+      "date": "2004-02-01T00:00:00.000Z",
+      "label": "2004 Q1"
+    },
+    {
+      "Quarter": "2004 Q2",
+      "Net acquisition of loans": "35373",
+      "date": "2004-04-30T23:00:00.000Z",
+      "label": "2004 Q2"
+    },
+    {
+      "Quarter": "2004 Q3",
+      "Net acquisition of loans": "38231",
+      "date": "2004-07-31T23:00:00.000Z",
+      "label": "2004 Q3"
+    },
+    {
+      "Quarter": "2004 Q4",
+      "Net acquisition of loans": "30758",
+      "date": "2004-11-01T00:00:00.000Z",
+      "label": "2004 Q4"
+    },
+    {
+      "Quarter": "2005 Q1",
+      "Net acquisition of loans": "23607",
+      "date": "2005-02-01T00:00:00.000Z",
+      "label": "2005 Q1"
+    },
+    {
+      "Quarter": "2005 Q2",
+      "Net acquisition of loans": "33335",
+      "date": "2005-04-30T23:00:00.000Z",
+      "label": "2005 Q2"
+    },
+    {
+      "Quarter": "2005 Q3",
+      "Net acquisition of loans": "29961",
+      "date": "2005-07-31T23:00:00.000Z",
+      "label": "2005 Q3"
+    },
+    {
+      "Quarter": "2005 Q4",
+      "Net acquisition of loans": "28090",
+      "date": "2005-11-01T00:00:00.000Z",
+      "label": "2005 Q4"
+    },
+    {
+      "Quarter": "2006 Q1",
+      "Net acquisition of loans": "22200",
+      "date": "2006-02-01T00:00:00.000Z",
+      "label": "2006 Q1"
+    },
+    {
+      "Quarter": "2006 Q2",
+      "Net acquisition of loans": "30392",
+      "date": "2006-04-30T23:00:00.000Z",
+      "label": "2006 Q2"
+    },
+    {
+      "Quarter": "2006 Q3",
+      "Net acquisition of loans": "39636",
+      "date": "2006-07-31T23:00:00.000Z",
+      "label": "2006 Q3"
+    },
+    {
+      "Quarter": "2006 Q4",
+      "Net acquisition of loans": "32826",
+      "date": "2006-11-01T00:00:00.000Z",
+      "label": "2006 Q4"
+    },
+    {
+      "Quarter": "2007 Q1",
+      "Net acquisition of loans": "27066",
+      "date": "2007-02-01T00:00:00.000Z",
+      "label": "2007 Q1"
+    },
+    {
+      "Quarter": "2007 Q2",
+      "Net acquisition of loans": "35518",
+      "date": "2007-04-30T23:00:00.000Z",
+      "label": "2007 Q2"
+    },
+    {
+      "Quarter": "2007 Q3",
+      "Net acquisition of loans": "41005",
+      "date": "2007-07-31T23:00:00.000Z",
+      "label": "2007 Q3"
+    },
+    {
+      "Quarter": "2007 Q4",
+      "Net acquisition of loans": "21774",
+      "date": "2007-11-01T00:00:00.000Z",
+      "label": "2007 Q4"
+    },
+    {
+      "Quarter": "2008 Q1",
+      "Net acquisition of loans": "21565",
+      "date": "2008-02-01T00:00:00.000Z",
+      "label": "2008 Q1"
+    },
+    {
+      "Quarter": "2008 Q2",
+      "Net acquisition of loans": "21398",
+      "date": "2008-04-30T23:00:00.000Z",
+      "label": "2008 Q2"
+    },
+    {
+      "Quarter": "2008 Q3",
+      "Net acquisition of loans": "8276",
+      "date": "2008-07-31T23:00:00.000Z",
+      "label": "2008 Q3"
+    },
+    {
+      "Quarter": "2008 Q4",
+      "Net acquisition of loans": "-984",
+      "date": "2008-11-01T00:00:00.000Z",
+      "label": "2008 Q4"
+    },
+    {
+      "Quarter": "2009 Q1",
+      "Net acquisition of loans": "-1462",
+      "date": "2009-02-01T00:00:00.000Z",
+      "label": "2009 Q1"
+    },
+    {
+      "Quarter": "2009 Q2",
+      "Net acquisition of loans": "919",
+      "date": "2009-04-30T23:00:00.000Z",
+      "label": "2009 Q2"
+    },
+    {
+      "Quarter": "2009 Q3",
+      "Net acquisition of loans": "1342",
+      "date": "2009-07-31T23:00:00.000Z",
+      "label": "2009 Q3"
+    },
+    {
+      "Quarter": "2009 Q4",
+      "Net acquisition of loans": "8298",
+      "date": "2009-11-01T00:00:00.000Z",
+      "label": "2009 Q4"
+    },
+    {
+      "Quarter": "2010 Q1",
+      "Net acquisition of loans": "-2791",
+      "date": "2010-02-01T00:00:00.000Z",
+      "label": "2010 Q1"
+    },
+    {
+      "Quarter": "2010 Q2",
+      "Net acquisition of loans": "320",
+      "date": "2010-04-30T23:00:00.000Z",
+      "label": "2010 Q2"
+    },
+    {
+      "Quarter": "2010 Q3",
+      "Net acquisition of loans": "4973",
+      "date": "2010-07-31T23:00:00.000Z",
+      "label": "2010 Q3"
+    },
+    {
+      "Quarter": "2010 Q4",
+      "Net acquisition of loans": "6609",
+      "date": "2010-11-01T00:00:00.000Z",
+      "label": "2010 Q4"
+    },
+    {
+      "Quarter": "2011 Q1",
+      "Net acquisition of loans": "5502",
+      "date": "2011-02-01T00:00:00.000Z",
+      "label": "2011 Q1"
+    },
+    {
+      "Quarter": "2011 Q2",
+      "Net acquisition of loans": "7411",
+      "date": "2011-04-30T23:00:00.000Z",
+      "label": "2011 Q2"
+    },
+    {
+      "Quarter": "2011 Q3",
+      "Net acquisition of loans": "6226",
+      "date": "2011-07-31T23:00:00.000Z",
+      "label": "2011 Q3"
+    },
+    {
+      "Quarter": "2011 Q4",
+      "Net acquisition of loans": "8193",
+      "date": "2011-11-01T00:00:00.000Z",
+      "label": "2011 Q4"
+    },
+    {
+      "Quarter": "2012 Q1",
+      "Net acquisition of loans": "5595",
+      "date": "2012-02-01T00:00:00.000Z",
+      "label": "2012 Q1"
+    },
+    {
+      "Quarter": "2012 Q2",
+      "Net acquisition of loans": "11076",
+      "date": "2012-04-30T23:00:00.000Z",
+      "label": "2012 Q2"
+    },
+    {
+      "Quarter": "2012 Q3",
+      "Net acquisition of loans": "5243",
+      "date": "2012-07-31T23:00:00.000Z",
+      "label": "2012 Q3"
+    },
+    {
+      "Quarter": "2012 Q4",
+      "Net acquisition of loans": "5730",
+      "date": "2012-11-01T00:00:00.000Z",
+      "label": "2012 Q4"
+    },
+    {
+      "Quarter": "2013 Q1",
+      "Net acquisition of loans": "7621",
+      "date": "2013-02-01T00:00:00.000Z",
+      "label": "2013 Q1"
+    },
+    {
+      "Quarter": "2013 Q2",
+      "Net acquisition of loans": "4603",
+      "date": "2013-04-30T23:00:00.000Z",
+      "label": "2013 Q2"
+    },
+    {
+      "Quarter": "2013 Q3",
+      "Net acquisition of loans": "8397",
+      "date": "2013-07-31T23:00:00.000Z",
+      "label": "2013 Q3"
+    },
+    {
+      "Quarter": "2013 Q4",
+      "Net acquisition of loans": "4512",
+      "date": "2013-11-01T00:00:00.000Z",
+      "label": "2013 Q4"
+    },
+    {
+      "Quarter": "2014 Q1",
+      "Net acquisition of loans": "9658",
+      "date": "2014-02-01T00:00:00.000Z",
+      "label": "2014 Q1"
+    },
+    {
+      "Quarter": "2014 Q2",
+      "Net acquisition of loans": "12460",
+      "date": "2014-04-30T23:00:00.000Z",
+      "label": "2014 Q2"
+    },
+    {
+      "Quarter": "2014 Q3",
+      "Net acquisition of loans": "12534",
+      "date": "2014-07-31T23:00:00.000Z",
+      "label": "2014 Q3"
+    },
+    {
+      "Quarter": "2014 Q4",
+      "Net acquisition of loans": "4997",
+      "date": "2014-11-01T00:00:00.000Z",
+      "label": "2014 Q4"
+    },
+    {
+      "Quarter": "2015 Q1",
+      "Net acquisition of loans": "8222",
+      "date": "2015-02-01T00:00:00.000Z",
+      "label": "2015 Q1"
+    }
+  ],
+  "headers": [
+    "Quarter",
+    "Net acquisition of loans"
+  ],
+  "series": [
+    "Net acquisition of loans"
+  ],
+  "categories": [
+    "1997 Q1",
+    "1997 Q2",
+    "1997 Q3",
+    "1997 Q4",
+    "1998 Q1",
+    "1998 Q2",
+    "1998 Q3",
+    "1998 Q4",
+    "1999 Q1",
+    "1999 Q2",
+    "1999 Q3",
+    "1999 Q4",
+    "2000 Q1",
+    "2000 Q2",
+    "2000 Q3",
+    "2000 Q4",
+    "2001 Q1",
+    "2001 Q2",
+    "2001 Q3",
+    "2001 Q4",
+    "2002 Q1",
+    "2002 Q2",
+    "2002 Q3",
+    "2002 Q4",
+    "2003 Q1",
+    "2003 Q2",
+    "2003 Q3",
+    "2003 Q4",
+    "2004 Q1",
+    "2004 Q2",
+    "2004 Q3",
+    "2004 Q4",
+    "2005 Q1",
+    "2005 Q2",
+    "2005 Q3",
+    "2005 Q4",
+    "2006 Q1",
+    "2006 Q2",
+    "2006 Q3",
+    "2006 Q4",
+    "2007 Q1",
+    "2007 Q2",
+    "2007 Q3",
+    "2007 Q4",
+    "2008 Q1",
+    "2008 Q2",
+    "2008 Q3",
+    "2008 Q4",
+    "2009 Q1",
+    "2009 Q2",
+    "2009 Q3",
+    "2009 Q4",
+    "2010 Q1",
+    "2010 Q2",
+    "2010 Q3",
+    "2010 Q4",
+    "2011 Q1",
+    "2011 Q2",
+    "2011 Q3",
+    "2011 Q4",
+    "2012 Q1",
+    "2012 Q2",
+    "2012 Q3",
+    "2012 Q4",
+    "2013 Q1",
+    "2013 Q2",
+    "2013 Q3",
+    "2013 Q4",
+    "2014 Q1",
+    "2014 Q2",
+    "2014 Q3",
+    "2014 Q4",
+    "2015 Q1"
+  ],
+  "aspectRatio": "0.56",
+  "chartType": "line",
+  "files": [
+    {
+      "type": "download-png",
+      "filename": "650127f2-download.png"
+    },
+    {
+      "type": "png",
+      "filename": "650127f2.png"
+    }
+  ],
+  "isTimeSeries": true,
+  "timeSeries": [
+    {
+      "Quarter": "1997 Q1",
+      "Net acquisition of loans": "1972",
+      "date": "1997-02-01T00:00:00.000Z",
+      "label": "1997 Q1"
+    },
+    {
+      "Quarter": "1997 Q2",
+      "Net acquisition of loans": "11263",
+      "date": "1997-04-30T23:00:00.000Z",
+      "label": "1997 Q2"
+    },
+    {
+      "Quarter": "1997 Q3",
+      "Net acquisition of loans": "11168",
+      "date": "1997-07-31T23:00:00.000Z",
+      "label": "1997 Q3"
+    },
+    {
+      "Quarter": "1997 Q4",
+      "Net acquisition of loans": "9806",
+      "date": "1997-11-01T00:00:00.000Z",
+      "label": "1997 Q4"
+    },
+    {
+      "Quarter": "1998 Q1",
+      "Net acquisition of loans": "9985",
+      "date": "1998-02-01T00:00:00.000Z",
+      "label": "1998 Q1"
+    },
+    {
+      "Quarter": "1998 Q2",
+      "Net acquisition of loans": "11434",
+      "date": "1998-04-30T23:00:00.000Z",
+      "label": "1998 Q2"
+    },
+    {
+      "Quarter": "1998 Q3",
+      "Net acquisition of loans": "13704",
+      "date": "1998-07-31T23:00:00.000Z",
+      "label": "1998 Q3"
+    },
+    {
+      "Quarter": "1998 Q4",
+      "Net acquisition of loans": "13339",
+      "date": "1998-11-01T00:00:00.000Z",
+      "label": "1998 Q4"
+    },
+    {
+      "Quarter": "1999 Q1",
+      "Net acquisition of loans": "15188",
+      "date": "1999-02-01T00:00:00.000Z",
+      "label": "1999 Q1"
+    },
+    {
+      "Quarter": "1999 Q2",
+      "Net acquisition of loans": "12774",
+      "date": "1999-04-30T23:00:00.000Z",
+      "label": "1999 Q2"
+    },
+    {
+      "Quarter": "1999 Q3",
+      "Net acquisition of loans": "16442",
+      "date": "1999-07-31T23:00:00.000Z",
+      "label": "1999 Q3"
+    },
+    {
+      "Quarter": "1999 Q4",
+      "Net acquisition of loans": "20255",
+      "date": "1999-11-01T00:00:00.000Z",
+      "label": "1999 Q4"
+    },
+    {
+      "Quarter": "2000 Q1",
+      "Net acquisition of loans": "12668",
+      "date": "2000-02-01T00:00:00.000Z",
+      "label": "2000 Q1"
+    },
+    {
+      "Quarter": "2000 Q2",
+      "Net acquisition of loans": "18759",
+      "date": "2000-04-30T23:00:00.000Z",
+      "label": "2000 Q2"
+    },
+    {
+      "Quarter": "2000 Q3",
+      "Net acquisition of loans": "17100",
+      "date": "2000-07-31T23:00:00.000Z",
+      "label": "2000 Q3"
+    },
+    {
+      "Quarter": "2000 Q4",
+      "Net acquisition of loans": "16802",
+      "date": "2000-11-01T00:00:00.000Z",
+      "label": "2000 Q4"
+    },
+    {
+      "Quarter": "2001 Q1",
+      "Net acquisition of loans": "14510",
+      "date": "2001-02-01T00:00:00.000Z",
+      "label": "2001 Q1"
+    },
+    {
+      "Quarter": "2001 Q2",
+      "Net acquisition of loans": "16828",
+      "date": "2001-04-30T23:00:00.000Z",
+      "label": "2001 Q2"
+    },
+    {
+      "Quarter": "2001 Q3",
+      "Net acquisition of loans": "21232",
+      "date": "2001-07-31T23:00:00.000Z",
+      "label": "2001 Q3"
+    },
+    {
+      "Quarter": "2001 Q4",
+      "Net acquisition of loans": "23882",
+      "date": "2001-11-01T00:00:00.000Z",
+      "label": "2001 Q4"
+    },
+    {
+      "Quarter": "2002 Q1",
+      "Net acquisition of loans": "21269",
+      "date": "2002-02-01T00:00:00.000Z",
+      "label": "2002 Q1"
+    },
+    {
+      "Quarter": "2002 Q2",
+      "Net acquisition of loans": "26813",
+      "date": "2002-04-30T23:00:00.000Z",
+      "label": "2002 Q2"
+    },
+    {
+      "Quarter": "2002 Q3",
+      "Net acquisition of loans": "36256",
+      "date": "2002-07-31T23:00:00.000Z",
+      "label": "2002 Q3"
+    },
+    {
+      "Quarter": "2002 Q4",
+      "Net acquisition of loans": "27385",
+      "date": "2002-11-01T00:00:00.000Z",
+      "label": "2002 Q4"
+    },
+    {
+      "Quarter": "2003 Q1",
+      "Net acquisition of loans": "26965",
+      "date": "2003-02-01T00:00:00.000Z",
+      "label": "2003 Q1"
+    },
+    {
+      "Quarter": "2003 Q2",
+      "Net acquisition of loans": "32020",
+      "date": "2003-04-30T23:00:00.000Z",
+      "label": "2003 Q2"
+    },
+    {
+      "Quarter": "2003 Q3",
+      "Net acquisition of loans": "37088",
+      "date": "2003-07-31T23:00:00.000Z",
+      "label": "2003 Q3"
+    },
+    {
+      "Quarter": "2003 Q4",
+      "Net acquisition of loans": "37067",
+      "date": "2003-11-01T00:00:00.000Z",
+      "label": "2003 Q4"
+    },
+    {
+      "Quarter": "2004 Q1",
+      "Net acquisition of loans": "30008",
+      "date": "2004-02-01T00:00:00.000Z",
+      "label": "2004 Q1"
+    },
+    {
+      "Quarter": "2004 Q2",
+      "Net acquisition of loans": "35373",
+      "date": "2004-04-30T23:00:00.000Z",
+      "label": "2004 Q2"
+    },
+    {
+      "Quarter": "2004 Q3",
+      "Net acquisition of loans": "38231",
+      "date": "2004-07-31T23:00:00.000Z",
+      "label": "2004 Q3"
+    },
+    {
+      "Quarter": "2004 Q4",
+      "Net acquisition of loans": "30758",
+      "date": "2004-11-01T00:00:00.000Z",
+      "label": "2004 Q4"
+    },
+    {
+      "Quarter": "2005 Q1",
+      "Net acquisition of loans": "23607",
+      "date": "2005-02-01T00:00:00.000Z",
+      "label": "2005 Q1"
+    },
+    {
+      "Quarter": "2005 Q2",
+      "Net acquisition of loans": "33335",
+      "date": "2005-04-30T23:00:00.000Z",
+      "label": "2005 Q2"
+    },
+    {
+      "Quarter": "2005 Q3",
+      "Net acquisition of loans": "29961",
+      "date": "2005-07-31T23:00:00.000Z",
+      "label": "2005 Q3"
+    },
+    {
+      "Quarter": "2005 Q4",
+      "Net acquisition of loans": "28090",
+      "date": "2005-11-01T00:00:00.000Z",
+      "label": "2005 Q4"
+    },
+    {
+      "Quarter": "2006 Q1",
+      "Net acquisition of loans": "22200",
+      "date": "2006-02-01T00:00:00.000Z",
+      "label": "2006 Q1"
+    },
+    {
+      "Quarter": "2006 Q2",
+      "Net acquisition of loans": "30392",
+      "date": "2006-04-30T23:00:00.000Z",
+      "label": "2006 Q2"
+    },
+    {
+      "Quarter": "2006 Q3",
+      "Net acquisition of loans": "39636",
+      "date": "2006-07-31T23:00:00.000Z",
+      "label": "2006 Q3"
+    },
+    {
+      "Quarter": "2006 Q4",
+      "Net acquisition of loans": "32826",
+      "date": "2006-11-01T00:00:00.000Z",
+      "label": "2006 Q4"
+    },
+    {
+      "Quarter": "2007 Q1",
+      "Net acquisition of loans": "27066",
+      "date": "2007-02-01T00:00:00.000Z",
+      "label": "2007 Q1"
+    },
+    {
+      "Quarter": "2007 Q2",
+      "Net acquisition of loans": "35518",
+      "date": "2007-04-30T23:00:00.000Z",
+      "label": "2007 Q2"
+    },
+    {
+      "Quarter": "2007 Q3",
+      "Net acquisition of loans": "41005",
+      "date": "2007-07-31T23:00:00.000Z",
+      "label": "2007 Q3"
+    },
+    {
+      "Quarter": "2007 Q4",
+      "Net acquisition of loans": "21774",
+      "date": "2007-11-01T00:00:00.000Z",
+      "label": "2007 Q4"
+    },
+    {
+      "Quarter": "2008 Q1",
+      "Net acquisition of loans": "21565",
+      "date": "2008-02-01T00:00:00.000Z",
+      "label": "2008 Q1"
+    },
+    {
+      "Quarter": "2008 Q2",
+      "Net acquisition of loans": "21398",
+      "date": "2008-04-30T23:00:00.000Z",
+      "label": "2008 Q2"
+    },
+    {
+      "Quarter": "2008 Q3",
+      "Net acquisition of loans": "8276",
+      "date": "2008-07-31T23:00:00.000Z",
+      "label": "2008 Q3"
+    },
+    {
+      "Quarter": "2008 Q4",
+      "Net acquisition of loans": "-984",
+      "date": "2008-11-01T00:00:00.000Z",
+      "label": "2008 Q4"
+    },
+    {
+      "Quarter": "2009 Q1",
+      "Net acquisition of loans": "-1462",
+      "date": "2009-02-01T00:00:00.000Z",
+      "label": "2009 Q1"
+    },
+    {
+      "Quarter": "2009 Q2",
+      "Net acquisition of loans": "919",
+      "date": "2009-04-30T23:00:00.000Z",
+      "label": "2009 Q2"
+    },
+    {
+      "Quarter": "2009 Q3",
+      "Net acquisition of loans": "1342",
+      "date": "2009-07-31T23:00:00.000Z",
+      "label": "2009 Q3"
+    },
+    {
+      "Quarter": "2009 Q4",
+      "Net acquisition of loans": "8298",
+      "date": "2009-11-01T00:00:00.000Z",
+      "label": "2009 Q4"
+    },
+    {
+      "Quarter": "2010 Q1",
+      "Net acquisition of loans": "-2791",
+      "date": "2010-02-01T00:00:00.000Z",
+      "label": "2010 Q1"
+    },
+    {
+      "Quarter": "2010 Q2",
+      "Net acquisition of loans": "320",
+      "date": "2010-04-30T23:00:00.000Z",
+      "label": "2010 Q2"
+    },
+    {
+      "Quarter": "2010 Q3",
+      "Net acquisition of loans": "4973",
+      "date": "2010-07-31T23:00:00.000Z",
+      "label": "2010 Q3"
+    },
+    {
+      "Quarter": "2010 Q4",
+      "Net acquisition of loans": "6609",
+      "date": "2010-11-01T00:00:00.000Z",
+      "label": "2010 Q4"
+    },
+    {
+      "Quarter": "2011 Q1",
+      "Net acquisition of loans": "5502",
+      "date": "2011-02-01T00:00:00.000Z",
+      "label": "2011 Q1"
+    },
+    {
+      "Quarter": "2011 Q2",
+      "Net acquisition of loans": "7411",
+      "date": "2011-04-30T23:00:00.000Z",
+      "label": "2011 Q2"
+    },
+    {
+      "Quarter": "2011 Q3",
+      "Net acquisition of loans": "6226",
+      "date": "2011-07-31T23:00:00.000Z",
+      "label": "2011 Q3"
+    },
+    {
+      "Quarter": "2011 Q4",
+      "Net acquisition of loans": "8193",
+      "date": "2011-11-01T00:00:00.000Z",
+      "label": "2011 Q4"
+    },
+    {
+      "Quarter": "2012 Q1",
+      "Net acquisition of loans": "5595",
+      "date": "2012-02-01T00:00:00.000Z",
+      "label": "2012 Q1"
+    },
+    {
+      "Quarter": "2012 Q2",
+      "Net acquisition of loans": "11076",
+      "date": "2012-04-30T23:00:00.000Z",
+      "label": "2012 Q2"
+    },
+    {
+      "Quarter": "2012 Q3",
+      "Net acquisition of loans": "5243",
+      "date": "2012-07-31T23:00:00.000Z",
+      "label": "2012 Q3"
+    },
+    {
+      "Quarter": "2012 Q4",
+      "Net acquisition of loans": "5730",
+      "date": "2012-11-01T00:00:00.000Z",
+      "label": "2012 Q4"
+    },
+    {
+      "Quarter": "2013 Q1",
+      "Net acquisition of loans": "7621",
+      "date": "2013-02-01T00:00:00.000Z",
+      "label": "2013 Q1"
+    },
+    {
+      "Quarter": "2013 Q2",
+      "Net acquisition of loans": "4603",
+      "date": "2013-04-30T23:00:00.000Z",
+      "label": "2013 Q2"
+    },
+    {
+      "Quarter": "2013 Q3",
+      "Net acquisition of loans": "8397",
+      "date": "2013-07-31T23:00:00.000Z",
+      "label": "2013 Q3"
+    },
+    {
+      "Quarter": "2013 Q4",
+      "Net acquisition of loans": "4512",
+      "date": "2013-11-01T00:00:00.000Z",
+      "label": "2013 Q4"
+    },
+    {
+      "Quarter": "2014 Q1",
+      "Net acquisition of loans": "9658",
+      "date": "2014-02-01T00:00:00.000Z",
+      "label": "2014 Q1"
+    },
+    {
+      "Quarter": "2014 Q2",
+      "Net acquisition of loans": "12460",
+      "date": "2014-04-30T23:00:00.000Z",
+      "label": "2014 Q2"
+    },
+    {
+      "Quarter": "2014 Q3",
+      "Net acquisition of loans": "12534",
+      "date": "2014-07-31T23:00:00.000Z",
+      "label": "2014 Q3"
+    },
+    {
+      "Quarter": "2014 Q4",
+      "Net acquisition of loans": "4997",
+      "date": "2014-11-01T00:00:00.000Z",
+      "label": "2014 Q4"
+    },
+    {
+      "Quarter": "2015 Q1",
+      "Net acquisition of loans": "8222",
+      "date": "2015-02-01T00:00:00.000Z",
+      "label": "2015 Q1"
+    }
+  ]
+}

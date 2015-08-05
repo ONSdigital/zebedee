@@ -178,12 +178,12 @@ public class GraphUtilsTest {
         // When
         // We identify the product page for
         String uri = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
-        ProductPage page = GraphUtils.productPageForPageWithURI(zebedee.launchpad, uri);
+        String pageUri = GraphUtils.productPageURIForPageWithURI(zebedee.launchpad, uri);
 
         // Then
         // we expect
-        String pageUri = "/themea/landinga/producta";
-        assertEquals(pageUri, page.getUri().toString());
+        String expected = "/themea/landinga/producta";
+        assertEquals(expected, pageUri);
 
     }
 }

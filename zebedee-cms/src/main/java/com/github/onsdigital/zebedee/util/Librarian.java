@@ -459,7 +459,7 @@ public class Librarian {
 
                 if (page.getType() == PageType.product_page) {
                     ProductPage productPage = ContentUtil.deserialise(json, ProductPage.class);
-                    System.out.println("Checking product: " + productPage.getUri().toString());
+                    System.out.println("Checking product: " + pageMap.get("Uri"));
                     for (String uri : GraphUtils.relatedUris(productPage)) {
                         if (zebedee.launchpad.get(uri) == null) {
                             HashMap<String, String> map = new HashMap<>();

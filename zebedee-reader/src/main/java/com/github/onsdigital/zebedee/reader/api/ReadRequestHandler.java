@@ -50,7 +50,7 @@ public class ReadRequestHandler {
             try {
                 return ZebedeeReader.getInstance().getCollectionContent(collectionId, uri, dataFilter);
             } catch (NotFoundException e) {
-                System.out.println("Could not found "+ uri +  " under collection "  + collectionId+  " , trying published content");
+                System.out.println("Could not found " + uri + " under collection " + collectionId + " , trying published content");
             }
         }
 
@@ -74,7 +74,7 @@ public class ReadRequestHandler {
             try {
                 return ZebedeeReader.getInstance().getCollectionResource(collectionId, uri);
             } catch (NotFoundException e) {
-                System.out.println("Could not found " + uri + " under collection "+ collectionId+  ", trying published content");
+                System.out.println("Could not found " + uri + " under collection " + collectionId + ", trying published content");
             }
         }
         return ZebedeeReader.getInstance().getPublishedResource(uri);
@@ -88,17 +88,34 @@ public class ReadRequestHandler {
             authorise(request, collectionId);
         }
 
-        return resolveTree(collectionId, uri, depth);
+        return resolveChildren(collectionId, uri, depth);
 
     }
 
-    private Collection<ContentNode> resolveTree(String collectionId, String uri, int depth) throws ZebedeeException, IOException {
+    public Collection<ContentNode> getParents(HttpServletRequest request) throws IOException, ZebedeeException {
+        String uri = extractUri(request);
+        String collectionId = getCollectionId(request);
+        if (collectionId != null) {
+            authorise(request, collectionId);
+        }
+
+        return resolveParents(collectionId, uri);
+    }
+
+    private Collection<ContentNode> resolveParents(String collectionId, String uri) throws ZebedeeException, IOException {
+        Map<URI, ContentNode> nodes = ZebedeeReader.getInstance().getPublishedContentParents(uri);
+        overlayCollectionParents(nodes, collectionId, uri);
+        nodes = new TreeMap<>(nodes);//sort by uri, sorts by uris, child uris naturally comes after parent uris
+        return nodes.values();
+    }
+
+    private Collection<ContentNode> resolveChildren(String collectionId, String uri, int depth) throws ZebedeeException, IOException {
         if (depth == 0) {
             return Collections.emptySet();
         }
-        Map<URI, ContentNode> nodes = ZebedeeReader.getInstance().getPublishedChildren(uri);
+        Map<URI, ContentNode> nodes = ZebedeeReader.getInstance().getPublishedContentChildren(uri);
         overlayCollections(nodes, collectionId, uri);
-        nodes = toSortedTreeMap(nodes);
+        nodes = sortMapByContentTitle(nodes);
         depth--;
         resolveChildren(nodes, collectionId, depth);
         return nodes.values();
@@ -110,8 +127,8 @@ public class ReadRequestHandler {
         }
         Collection<ContentNode> nodeList = nodes.values();
         for (Iterator<ContentNode> iterator = nodeList.iterator(); iterator.hasNext(); ) {
-            ContentNode next =  iterator.next();
-            next.setChildren(resolveTree(collectionId, next.getUri().toString(), depth));
+            ContentNode next = iterator.next();
+            next.setChildren(resolveChildren(collectionId, next.getUri().toString(), depth));
         }
     }
 
@@ -119,8 +136,16 @@ public class ReadRequestHandler {
         if (collectionId == null) {
             return;
         }
-        Map<URI, ContentNode> collectionChildren = ZebedeeReader.getInstance().getCollectionChildren(collectionId, uri);
+        Map<URI, ContentNode> collectionChildren = ZebedeeReader.getInstance().getCollectionContentChildren(collectionId, uri);
         nodes.putAll(collectionChildren);//Overwrites published nodes
+    }
+
+    private void overlayCollectionParents(Map<URI, ContentNode> nodes, String collectionId, String uri) throws ZebedeeException, IOException {
+        if (collectionId == null) {
+            return;
+        }
+        Map<URI, ContentNode> collectionContentParents = ZebedeeReader.getInstance().getCollectionContentParents(collectionId, uri);
+        nodes.putAll(collectionContentParents);
     }
 
     private void authorise(HttpServletRequest request, String collectionId) throws UnauthorizedException, IOException, NotFoundException {
@@ -147,15 +172,15 @@ public class ReadRequestHandler {
 
     /**
      * Sorts given map by content node rather than map key
+     *
      * @param nodes
      * @return
      */
-    private Map<URI, ContentNode> toSortedTreeMap(Map<URI, ContentNode> nodes) {
+    private Map<URI, ContentNode> sortMapByContentTitle(Map<URI, ContentNode> nodes) {
         TreeMap<URI, ContentNode> sortedMap = new TreeMap<>(new ContentNodeComparator(nodes));
         sortedMap.putAll(nodes);
         return sortedMap;
     }
-
 
 
     /**

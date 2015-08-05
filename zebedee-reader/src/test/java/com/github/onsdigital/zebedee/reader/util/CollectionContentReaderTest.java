@@ -96,4 +96,11 @@ public class CollectionContentReaderTest {
         assertTrue(children.isEmpty());
     }
 
+    @Test
+    public void testGetParents() throws ZebedeeException, IOException {
+        Map<URI, ContentNode> parents = collectionReader.getParents("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
+        assertTrue(parents.size() == 1);
+    }
+
+
 }

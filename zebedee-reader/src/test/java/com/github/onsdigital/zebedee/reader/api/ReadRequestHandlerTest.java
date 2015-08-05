@@ -4,16 +4,20 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.TitleWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
+import com.github.onsdigital.zebedee.reader.util.AuthorisationHandler;
 import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -32,7 +36,7 @@ public class ReadRequestHandlerTest {
     @Before
     public void initialize() {
         ReaderConfiguration.init("target/test-content");
-        readRequestHandler =  new ReadRequestHandler();
+        readRequestHandler = new ReadRequestHandler();
     }
 
     @Test
@@ -74,7 +78,7 @@ public class ReadRequestHandlerTest {
     }
 
     //Collection reads should be available without zebedee cms module running
-    private void shouldFailReadingCollection() throws  Exception{
+    private void shouldFailReadingCollection() throws Exception {
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
         when(request.getRequestURI()).thenReturn("/browsetree/testcollection-testid/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
         try {
@@ -110,6 +114,32 @@ public class ReadRequestHandlerTest {
         ContentNode grandChild = bulletins.getChildren().iterator().next();
         assertEquals("ukenvironmentalaccounts", grandChild.getDescription().getTitle());
         assertNotNull(grandChild.getChildren());
+    }
+
+
+    @Test
+    public void testGetParents() throws Exception {
+        shouldOverlayCollectionPaths();
+    }
+
+    private void shouldOverlayCollectionPaths() throws IOException, ZebedeeException {
+        when(request.getParameter("uri")).thenReturn("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
+        when(request.getRequestURI()).thenReturn("/breadcrumb/testcollection-testid/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
+        ReadRequestHandler.setAuthorisationHandler(new AuthorisationHandler() {
+            @Override
+            public void authorise(HttpServletRequest request, String collectionId) throws IOException, UnauthorizedException, NotFoundException {
+                return;
+            }
+        });
+        Collection<ContentNode> parents = readRequestHandler.getParents(request);
+        assertTrue(parents.size() == 2);
+        Iterator<ContentNode> iterator = parents.iterator();
+        ContentNode home = iterator.next();
+        ContentNode employmentLabourMarket = iterator.next();
+        assertEquals(URI.create("/"), home.getUri());
+        assertEquals(URI.create("/employmentandlabourmarket/"), employmentLabourMarket.getUri());
+        //Collection content should be overwriting published content
+        assertEquals("Employment and labour market-inprogress", employmentLabourMarket.getDescription().getTitle());
     }
 
     @Test

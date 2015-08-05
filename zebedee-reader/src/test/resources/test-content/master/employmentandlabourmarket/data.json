@@ -1,0 +1,28 @@
+{
+  "sections": [
+    {
+      "uri": "/employmentandlabourmarket/peopleinwork",
+      "index": 0
+    },
+    {
+      "uri": "/employmentandlabourmarket/peoplenotinwork",
+      "index": 1
+    },
+    {
+      "uri": "/employmentandlabourmarket/publicsectorpersonnel",
+      "index": 2
+    }
+  ],
+  "index": 2,
+  "type": "taxonomy_landing_page",
+  "uri": "/employmentandlabourmarket",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    }
+  ],
+  "description": {
+    "title": "Employment and labour market",
+    "summary": "Labour market statistics tell us about people in and out of work. They cover employment, unemployment, types of work, earnings, working patterns and workplace disputes."
+  }
+}

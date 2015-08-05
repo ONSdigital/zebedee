@@ -92,8 +92,6 @@ public class ContentReader {
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(getRootFolder(), path);
-        assertExists(node);
-        assertIsDirectory(node);
         return resolveParents(node);
     }
 
@@ -158,9 +156,10 @@ public class ContentReader {
         return URI.create("/" + getRootFolder().toUri().relativize(node.toUri()).getPath());
     }
 
-    protected Resource getResource(Path resource) throws ZebedeeException, IOException {
-        assertExists(resource);
-        return buildResource(resource);
+    protected Resource getResource(Path resourcePath) throws ZebedeeException, IOException {
+        assertExists(resourcePath);
+        assertNotDirectory(resourcePath);
+        return buildResource(resourcePath);
     }
 
     protected Resource buildResource(Path path) throws IOException {
@@ -217,10 +216,6 @@ public class ContentReader {
     /*Getters * Setters */
     private Path getRootFolder() {
         return ROOT_FOLDER;
-    }
-
-    private boolean isRoot(Path path) {
-        return getRootFolder().equals(path);
     }
 
 }

@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.staticpage.StaticPage;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
-import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -108,7 +107,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testGetChildren() throws ZebedeeException, IOException {
-            Map<URI, ContentNode> children = ZebedeeReader.getInstance().getPublishedChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
+            Map<URI, ContentNode> children = ZebedeeReader.getInstance().getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
             assertTrue(children.size() == 2);
             Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
             assertTrue(children.containsKey(URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/")));
@@ -121,7 +120,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testGetCollectionChildren() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = ZebedeeReader.getInstance().getCollectionChildren(TEST_COLLECTION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
+        Map<URI, ContentNode> children = ZebedeeReader.getInstance().getCollectionContentChildren(TEST_COLLECTION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         assertTrue(children.size() == 2);
         URI datasetsUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/");
         assertTrue(children.containsKey(datasetsUri));

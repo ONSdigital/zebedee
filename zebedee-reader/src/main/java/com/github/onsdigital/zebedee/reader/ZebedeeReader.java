@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.reader.util.ContentReader;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
@@ -114,7 +115,7 @@ public class ZebedeeReader {
     }
 
     /**
-     * Finds requested resource under given collection. If content not found under given collection it will not return published content, but will throw NotFoundException.
+     * Finds requested resource under given collection. If content not found under given collection it will not return published resource, but will throw NotFoundException.
      * Use getPublishedContent to get published content.
      * <p>
      * Zebedee reader does not make any authentication check, make sure requesting client is authorized to read from given collection
@@ -130,14 +131,29 @@ public class ZebedeeReader {
         return createCollectionReader(collectionId).getResource(path);
     }
 
-    public Map<URI, ContentNode> getPublishedChildren(String path) throws ZebedeeException, IOException {
-        return publishedContentReader.getChildren(path);
+    public Map<URI, ContentNode> getPublishedContentChildren(String path) throws ZebedeeException, IOException {
+        try {
+            return publishedContentReader.getChildren(path);
+        } catch (NotFoundException e) {
+            //If requested path is not available in published content return an empty list
+            return Collections.emptyMap();
+        }
     }
 
 
-    public Map<URI, ContentNode> getCollectionChildren(String collectionId, String path) throws ZebedeeException, IOException {
+    public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String path) throws ZebedeeException, IOException {
         return createCollectionReader(collectionId).getChildren(path);
     }
+
+    public Map<URI, ContentNode> getPublishedContentParents(String path) throws ZebedeeException, IOException {
+        return publishedContentReader.getParents(path);
+    }
+
+
+    public Map<URI, ContentNode> getCollectionContentParents(String collectionId, String path) throws IOException, ZebedeeException {
+        return createCollectionReader(collectionId).getParents(path);
+    }
+
 
     private void assertId(String collectionId) throws BadRequestException {
         if (collectionId == null) {

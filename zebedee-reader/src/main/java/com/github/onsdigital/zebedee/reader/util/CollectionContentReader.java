@@ -1,31 +1,52 @@
 package com.github.onsdigital.zebedee.reader.util;
 
-import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.collection.Collection;
+import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.util.URIUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 
 /**
  * Created by bren on 30/07/15.
  */
-public class CollectionContentReader extends ContentReader {
+public class CollectionContentReader {
 
-    private final Path inprogressPath;
-    private final Path completePath;
-    private final Path reviewedPath;
+    private Path collections;
+    private ContentReader inProgress;
+    private ContentReader complete;
+    private ContentReader reviewed;
 
     /**
-     * @param collectionRoot path of collection including collection name
+     * @param collectionsFolderPath path of the collections folder
      */
-    public CollectionContentReader(String collectionRoot) {
-        super(collectionRoot);
-        inprogressPath = getRootFolder().resolve(ReaderConfiguration.getInProgressFolderName());
-        completePath = getRootFolder().resolve(ReaderConfiguration.getCompleteFolderName());
-        reviewedPath = getRootFolder().resolve(ReaderConfiguration.getReviewedFolderName());
+    public CollectionContentReader(String collectionsFolderPath, String collectionId) throws NotFoundException, IOException, CollectionNotFoundException {
+        if (collectionsFolderPath == null) {
+            throw new NullPointerException("Collections folder can not be null");
+        }
+        this.collections = Paths.get(collectionsFolderPath);
+        Path collectionsPath = findCollectionPath(collectionId);
+        inProgress = getContentReader(collectionsPath, getConfiguration().getInProgressFolderName());
+        complete = getContentReader(collectionsPath, getConfiguration().getCompleteFolderName());
+        reviewed = getContentReader(collectionsPath, getConfiguration().getReviewedFolderName());
     }
 
     /**
@@ -37,39 +58,115 @@ public class CollectionContentReader extends ContentReader {
      * @throws NotFoundException
      * @throws IOException
      */
-    @Override
-    public Content getContent(String path) throws ZebedeeException, IOException {
-        Resource resource = findResource(path);
-        checkJsonMime(resource, path);
-        return deserialize(resource);
+    public Page getContent(String path) throws ZebedeeException, IOException {
+        URI dataFilePath = URI.create(URIUtils.removeTrailingSlash(path) + "/").resolve(getConfiguration().getDataFileName());
+        Resource resource = findResource(dataFilePath.toString());
+        Page page = ContentUtil.deserialiseContent(resource.getData());
+        page.setUri(URI.create(path)); //set on the fly, overwriting whatever is in the file
+        return page;
     }
 
 
-    @Override
     public Resource getResource(String path) throws ZebedeeException, IOException {
         return findResource(path);
     }
 
+    /**
+     * @param path
+     * @return uri-node mapping
+     * @throws ZebedeeException
+     * @throws IOException
+     */
+    public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
+        Map<URI, ContentNode> children = new HashMap<>();
+        //TODO: Same document should not be in two different state, it should be safe to overwrite if it appears in multiple places?.
+        // Is there a validation mechanism ? Might be needed
+        children.putAll(getChildrenQuite(path, reviewed));
+        children.putAll(getChildrenQuite(path, complete));//overwrites reviewed content if appears in both places
+        children.putAll(getChildrenQuite(path, inProgress));//overwrites complete and reviewed content if appears in both places
+        return children;
+    }
+
+
+    /**
+     * @param path
+     * @return uri-node mapping
+     * @throws ZebedeeException
+     * @throws IOException
+     */
+    public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
+        Map<URI, ContentNode> parents = new HashMap<>();
+        //TODO: Same document should not be in two different state, it should be safe to overwrite if it appears in multiple places?.
+        // Is there a validation mechanism ? Might be needed
+        parents.putAll(getParentsQuite(path, reviewed));
+        parents.putAll(getParentsQuite(path, complete));//overwrites reviewed content if appears in both places
+        parents.putAll(getParentsQuite(path, inProgress));//overwrites complete and reviewed content if appears in both places
+        return parents;
+    }
+
+
     private Resource findResource(String path) throws IOException, ZebedeeException {
-        Resource resource;
-        resource = findResourceQuite(inprogressPath, path);
+        Resource resource = getQuite(path, inProgress);
         if (resource == null) {
-            //try completePath contents in collection
-            resource = findResourceQuite(completePath, path);
+            resource = getQuite(path, complete);
             if (resource == null) {
-                //throw not found if not found after reviewed path
-                resource = super.getResource(reviewedPath, path);
+                resource = reviewed.getResource(path);
             }
         }
         return resource;
     }
 
-    // read content under given folder, if not found return null
-    private Resource findResourceQuite(Path root, String path) throws IOException, ZebedeeException {
+    //If content not found with given reader do not shout
+    private Resource getQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
-            return super.getResource(root, path);
+            return contentReader.getResource(path);
         } catch (NotFoundException e) {
             return null;
         }
+    }
+
+    //If content not found with given reader do not shout
+    private Map<URI, ContentNode> getChildrenQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+        try {
+            return contentReader.getChildren(path);
+        } catch (NotFoundException e) {
+            return Collections.emptyMap();
+        }
+    }
+
+    //If content not found with given reader do not shout
+    private Map<URI, ContentNode> getParentsQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+        try {
+            return contentReader.getParents(path);
+        } catch (NotFoundException e) {
+            return Collections.emptyMap();
+        }
+    }
+
+    //TODO: If collection folder names were ids or we saved cookie as collection's name we would not need to search collection, but just read the path
+
+    //Finds collection name with given id
+    private Path findCollectionPath(String collectionId) throws IOException, NotFoundException, CollectionNotFoundException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(collections)) {
+            for (Path path : stream) {
+                if (Files.isDirectory(path)) {
+                    continue;
+                } else {
+                    try (InputStream fileStream = Files.newInputStream(path)) {
+                        Collection collection = ContentUtil.deserialise(fileStream, Collection.class);
+                        if (StringUtils.equalsIgnoreCase(collection.getId(), collectionId)) {
+                            return collections.resolve(collection.getName());
+
+                        }
+                    }
+                }
+            }
+            throw new CollectionNotFoundException("Collection with given id not found, id:" + collectionId);
+        }
+    }
+
+
+    private ContentReader getContentReader(Path collectionPath, String folderName) {
+        return new ContentReader(collectionPath.resolve(folderName));
     }
 }

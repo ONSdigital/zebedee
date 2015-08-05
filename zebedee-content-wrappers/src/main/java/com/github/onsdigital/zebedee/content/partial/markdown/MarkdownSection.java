@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.content.partial.markdown;
 
+import com.github.onsdigital.zebedee.content.base.Content;
+
 /**
  * Represents a section in a markdown content - heading as text and body as
  * Markdown.
@@ -7,7 +9,7 @@ package com.github.onsdigital.zebedee.content.partial.markdown;
  * @author david
  */
 
-public class MarkdownSection {
+public class MarkdownSection extends Content {
     private String title;
     private String markdown;
 

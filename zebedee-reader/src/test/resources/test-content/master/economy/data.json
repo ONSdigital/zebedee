@@ -1,0 +1,52 @@
+{
+  "sections": [
+    {
+      "uri": "/economy/economicoutputandproductivity",
+      "index": 0
+    },
+    {
+      "uri": "/economy/environmentalaccounts",
+      "index": 1
+    },
+    {
+      "uri": "/economy/governmentpublicsectorandtaxes",
+      "index": 2
+    },
+    {
+      "uri": "/economy/grossdomesticproductgdp",
+      "index": 3
+    },
+    {
+      "uri": "/economy/grossvalueaddedgva",
+      "index": 4
+    },
+    {
+      "uri": "/economy/inflationandpriceindices",
+      "index": 5
+    },
+    {
+      "uri": "/economy/investmentspensionsandtrusts",
+      "index": 6
+    },
+    {
+      "uri": "/economy/nationalaccounts",
+      "index": 7
+    },
+    {
+      "uri": "/economy/regionalaccounts",
+      "index": 8
+    }
+  ],
+  "index": 1,
+  "type": "taxonomy_landing_page",
+  "uri": "/economy",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    }
+  ],
+  "description": {
+    "title": "Economy",
+    "summary": "The UK economy covers the production, distribution, consumption and trade of goods and services. Individuals, businesses, organisations and governments all affect the development of the economy."
+  }
+}

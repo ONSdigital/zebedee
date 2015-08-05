@@ -6,7 +6,7 @@ export PORT="8082"
 # Restolino configuration
 export RESTOLINO_STATIC="src/main/resources/files"
 export RESTOLINO_CLASSES="zebedee-cms/target/classes"
-export PACKAGE_PREFIX=com.github.onsdigital.zebedee.api
+export PACKAGE_PREFIX=com.github.onsdigital.zebedee
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies && \

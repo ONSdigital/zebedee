@@ -563,6 +563,28 @@ public class CollectionTest {
     }
 
     @Test
+    public void completeShouldMoveFilesWithNoExtension() throws IOException {
+
+        // Given
+        // The content exists, has been edited and complete:
+        String uri = "/economy/inflationandpriceindices/timeseries/fileWithNoExtension";
+        builder.createInProgressFile(uri);
+
+        // When
+        boolean complete = collection.complete(publisher1Email, uri);
+
+        // Then
+        assertTrue(complete);
+        Path inProgressPath = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        Path completedPath = builder.collections.get(1).resolve(Collection.COMPLETE);
+        assertFalse(Files.exists(inProgressPath.resolve(uri.substring(1))));
+        assertTrue(Files.exists(completedPath.resolve(uri.substring(1))));
+
+        // check an event has been created for the content being created.
+        collection.description.eventsByUri.get(uri).hasEventForType(EventType.COMPLETED);
+    }
+
+    @Test
     public void shouldNotCompleteIfReviewed() throws IOException {
 
         // Given

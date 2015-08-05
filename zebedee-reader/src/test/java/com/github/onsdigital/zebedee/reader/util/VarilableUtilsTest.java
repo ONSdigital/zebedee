@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.reader.util;
 
+import com.github.onsdigital.zebedee.util.VariableUtils;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

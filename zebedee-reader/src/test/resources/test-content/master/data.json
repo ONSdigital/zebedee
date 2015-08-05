@@ -1,0 +1,49 @@
+{
+	"intro": {
+		"title": "Welcome to the Office for National Statistics",
+		"markdown": "The UK's largest independent producer of official statistics and the recognised national statistical institute of the UK."
+	},
+	"sections": [{
+		"theme": {
+			"uri": "/economy"
+		},
+		"statistics": {
+			"uri": "/economy/inflationandpriceindices/timeseries/d7g7"
+		}
+	}, {
+		"theme": {
+			"uri": "/economy"
+		},
+		"statistics": {
+			"uri": "/economy/grossdomesticproductgdp/timeseries/ihyq"
+		}
+	}, {
+		"theme": {
+			"uri": "/economy"
+		},
+		"statistics": {
+			"uri": "/economy/grossdomesticproductgdp/timeseries/abml"
+		}
+	}, {
+		"theme": {
+			"uri": "/businessindustryandtrade"
+		},
+		"statistics": {
+			"uri": "/businessindustryandtrade/tourismindustry/timeseries/gmat"
+		}
+	}, {
+		"theme": {
+			"uri": "/businessindustryandtrade"
+		},
+		"statistics": {
+			"uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/cbas"
+		}
+	}],
+	"type": "home_page",
+	"uri": "/",
+	"breadcrumb": [],
+	"description": {
+		"title": "Home",
+		"summary": "The UK's largest independent producer of official statistics and the recognised national statistical institute of the UK."
+	}
+}

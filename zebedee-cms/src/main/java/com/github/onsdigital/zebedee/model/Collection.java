@@ -434,6 +434,9 @@ public class Collection {
 
     private boolean contentWasCompleted(String uri) {
 
+        if (!StringUtils.startsWith(uri, "/")) {
+            uri = "/" + uri;
+        }
         if (this.description.eventsByUri == null) { return false; }
 
         Events events = this.description.eventsByUri.get(uri);
@@ -446,6 +449,9 @@ public class Collection {
 
     private boolean didUserCompleteContent(String email, String uri) throws BadRequestException {
 
+        if (!StringUtils.startsWith(uri, "/")) {
+            uri = "/" + uri;
+        }
         if (this.description.eventsByUri == null) { return false; }
 
         Events events = this.description.eventsByUri.get(uri);

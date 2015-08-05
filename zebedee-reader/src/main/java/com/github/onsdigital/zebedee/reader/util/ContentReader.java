@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.reader.util;
 
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -97,11 +96,12 @@ public class ContentReader {
 
     private Map<URI, ContentNode> resolveParents(Path node) throws IOException, ZebedeeException {
         Map<URI, ContentNode> nodes = new HashMap<>();
-        if (node == null || node.equals(getRootFolder())) {
+
+        if (isRootFolder(node)) {
             return Collections.emptyMap();
         }
 
-        Page firstParent = getContent(node.getParent());
+        Page firstParent = getParentContent(node.getParent());
         if (firstParent == null) {
             return Collections.emptyMap();
         }
@@ -112,18 +112,26 @@ public class ContentReader {
     }
 
     //Gets first parent content
-    private Page getContent(Path path) throws ZebedeeException, IOException {
+    private Page getParentContent(Path path) throws ZebedeeException, IOException {
         if (path == null) {
             return null;
         }
+
         Page content;
         try {
             content = getContent(toRelativeUri(path).toString());
         } catch (NotFoundException e) {//if parent is just a folder with data.json skips it
-            content = getContent(path.getParent());
+            if (isRootFolder(path)) { //if already at root don't go further up
+                return null;
+            }
+            content = getParentContent(path.getParent());
         }
 
         return content;
+    }
+
+    private boolean isRootFolder(Path path) {
+        return path.equals(getRootFolder());
     }
 
 

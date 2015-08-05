@@ -55,7 +55,9 @@ public class ContentReader {
         Path content = resolveDataFilePath(getRootFolder(), path);
         Resource resource = getResource(content);
         checkJsonMime(resource, path);
-        return deserialize(resource);
+        Page page = deserialize(resource);
+        page.setUri(URI.create(path));//Setting uri on the fly, discarding whatever is in the file
+        return page;
     }
 
     /**
@@ -83,10 +85,10 @@ public class ContentReader {
     }
 
     /**
-     * get parent contents under of path, directories are skipped, only contents are returned
+     * get parent contents of given path, directories are skipped, only contents are returned
      *
      * @param path
-     * @return uri - node mapping
+     * @return uri - node mapping, not in any particular order
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(getRootFolder(), path);
@@ -97,31 +99,30 @@ public class ContentReader {
 
     private Map<URI, ContentNode> resolveParents(Path node) throws IOException, ZebedeeException {
         Map<URI, ContentNode> nodes = new HashMap<>();
-        if (node.equals(getRootFolder())) {
+        if (node == null || node.equals(getRootFolder())) {
             return Collections.emptyMap();
         }
 
-        nodes.putAll(resolveParents(node.getParent()));
-
-        Page parent = getParentContent(node);
-        if (parent == null) {
+        Page firstParent = getContent(node.getParent());
+        if (firstParent == null) {
             return Collections.emptyMap();
         }
+
+        nodes.putAll(resolveParents(resolvePath(getRootFolder(), firstParent.getUri().toString())));//resolve parent's parents first
+        nodes.put(firstParent.getUri(), new ContentNode(firstParent.getUri(), firstParent.getDescription().getTitle(), firstParent.getType()));
         return nodes;
     }
 
     //Gets first parent content
-    private Page getParentContent(Path node) throws ZebedeeException, IOException {
-        Path parentNode = node.getParent();
-        if (parentNode == null) {
+    private Page getContent(Path path) throws ZebedeeException, IOException {
+        if (path == null) {
             return null;
         }
-        URI uri = toRelativeUri(parentNode);
         Page content;
         try {
-            content = getContent(uri.toString());
+            content = getContent(toRelativeUri(path).toString());
         } catch (NotFoundException e) {//if parent is just a folder with data.json skips it
-            content = getParentContent(parentNode);
+            content = getContent(path.getParent());
         }
 
         return content;

@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee.content.page.compendium;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.PageReference;
 import com.github.onsdigital.zebedee.content.page.statistics.document.base.StatisticalDocument;
+import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import java.util.List;
  */
 public class CompendiumChapter extends StatisticalDocument {
 
-    private List<PageReference> relatedDocuments;
-    private PageReference parent;
+    private List<Link> relatedDocuments;
+    private Link parent;
 
     @Override
     public PageType getType() {
@@ -20,28 +20,28 @@ public class CompendiumChapter extends StatisticalDocument {
     }
 
     @Override
-    public List<PageReference> getRelatedData() {
+    public List<Link> getRelatedData() {
         return super.getRelatedData();
     }
 
     @Override
-    public void setRelatedData(List<PageReference> relatedData) {
+    public void setRelatedData(List<Link> relatedData) {
         super.setRelatedData(relatedData);
     }
 
-    public PageReference getParent() {
+    public Link getParent() {
         return parent;
     }
 
-    public void setParent(PageReference parent) {
+    public void setParent(Link parent) {
         this.parent = parent;
     }
 
-    public List<PageReference> getRelatedDocuments() {
+    public List<Link> getRelatedDocuments() {
         return relatedDocuments;
     }
 
-    public void setRelatedDocuments(List<PageReference> relatedDocuments) {
+    public void setRelatedDocuments(List<Link> relatedDocuments) {
         this.relatedDocuments = relatedDocuments;
     }
 }

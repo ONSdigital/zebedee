@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.content.page.statistics.data.base;
 
-import com.github.onsdigital.zebedee.content.partial.PageReference;
+import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
 
@@ -12,18 +12,18 @@ import java.util.List;
 public abstract class StatisticalData extends Statistics {
 
     /*Body*/
-    private List<PageReference> relatedDatasets;
+    private List<Link> relatedDatasets;
     private MarkdownSection section; //Explanatory section
     private List<String> notes;//Markdown
-    private List<PageReference> relatedDocuments;
-    private List<PageReference> relatedMethodology;
-    private List<PageReference> relatedData;
+    private List<Link> relatedDocuments;
+    private List<Link> relatedMethodology;
+    private List<Link> relatedData;
 
-    public List<PageReference> getRelatedDocuments() {
+    public List<Link> getRelatedDocuments() {
         return relatedDocuments;
     }
 
-    public void setRelatedDocuments(List<PageReference> relatedDocuments) {
+    public void setRelatedDocuments(List<Link> relatedDocuments) {
         this.relatedDocuments = relatedDocuments;
     }
 
@@ -43,27 +43,27 @@ public abstract class StatisticalData extends Statistics {
         this.section = section;
     }
 
-    public List<PageReference> getRelatedMethodology() {
+    public List<Link> getRelatedMethodology() {
         return relatedMethodology;
     }
 
-    public void setRelatedMethodology(List<PageReference> methodology) {
+    public void setRelatedMethodology(List<Link> methodology) {
         this.relatedMethodology = methodology;
     }
 
-    public List<PageReference> getRelatedData() {
+    public List<Link> getRelatedData() {
         return relatedData;
     }
 
-    public void setRelatedData(List<PageReference> relatedData) {
+    public void setRelatedData(List<Link> relatedData) {
         this.relatedData = relatedData;
     }
 
-    public List<PageReference> getRelatedDatasets() {
+    public List<Link> getRelatedDatasets() {
         return relatedDatasets;
     }
 
-    public void setRelatedDatasets(List<PageReference> relatedDatasets) {
+    public void setRelatedDatasets(List<Link> relatedDatasets) {
         this.relatedDatasets = relatedDatasets;
     }
 }

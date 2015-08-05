@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.content.page.base;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 
+import java.net.URI;
+
 /**
  * Created by bren on 10/06/15.
  * <p>
@@ -10,6 +12,8 @@ import com.github.onsdigital.zebedee.content.base.Content;
 public abstract class Page extends Content {
 
     private PageType type;
+
+    private URI uri;
 
     private PageDescription description;
 
@@ -27,4 +31,11 @@ public abstract class Page extends Content {
         this.description = description;
     }
 
+    public URI getUri() {
+        return uri;
+    }
+
+    public void setUri(URI uri) {
+        this.uri = uri;
+    }
 }

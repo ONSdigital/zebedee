@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.content.page.statistics.dataset;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.PageReference;
-import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
+import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +15,11 @@ public class Dataset extends Statistics {
 
     /*Body*/
     private List<DownloadSection> downloads = new ArrayList<DownloadSection>();
-    private List<PageReference> relatedMethodology;
+    private List<Link> relatedMethodology;
     private MarkdownSection section;
     private List<MarkdownSection> notes;
-    private List<PageReference> relatedDatasets;
-    private List<PageReference> relatedDocuments;
+    private List<Link> relatedDatasets;
+    private List<Link> relatedDocuments;
 
     @Override
     public PageType getType() {
@@ -50,27 +50,27 @@ public class Dataset extends Statistics {
         this.section = section;
     }
 
-    public List<PageReference> getRelatedMethodology() {
+    public List<Link> getRelatedMethodology() {
         return relatedMethodology;
     }
 
-    public void setRelatedMethodology(List<PageReference> relatedMethodology) {
+    public void setRelatedMethodology(List<Link> relatedMethodology) {
         this.relatedMethodology = relatedMethodology;
     }
 
-    public List<PageReference> getRelatedDatasets() {
+    public List<Link> getRelatedDatasets() {
         return relatedDatasets;
     }
 
-    public void setRelatedDatasets(List<PageReference> relatedDatasets) {
+    public void setRelatedDatasets(List<Link> relatedDatasets) {
         this.relatedDatasets = relatedDatasets;
     }
 
-    public List<PageReference> getRelatedDocuments() {
+    public List<Link> getRelatedDocuments() {
         return relatedDocuments;
     }
 
-    public void setRelatedDocuments(List<PageReference> relatedDocuments) {
+    public void setRelatedDocuments(List<Link> relatedDocuments) {
         this.relatedDocuments = relatedDocuments;
     }
 }

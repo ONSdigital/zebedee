@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.content.page.staticpage.base;
 
-import com.github.onsdigital.zebedee.content.partial.PageReference;
+import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.net.URI;
 
@@ -9,7 +9,7 @@ import java.net.URI;
  *
  * References to static pages, holds a short version of summary of referred page seperately.
  */
-public class StaticPageSection extends PageReference {
+public class StaticPageSection extends Link {
 
     private String summary;
 

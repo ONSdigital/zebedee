@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.content.page.staticpage;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.PageReference;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
@@ -14,8 +13,8 @@ import java.util.List;
  */
 public class StaticArticle extends Page {
 
-    private List<PageReference> relatedData;
-    private List<PageReference> relatedDocuments;
+    private List<Link> relatedData;
+    private List<Link> relatedDocuments;
     private List<Link> downloads;
 
     private List<MarkdownSection> sections = new ArrayList<>();
@@ -27,19 +26,19 @@ public class StaticArticle extends Page {
         return PageType.static_article;
     }
 
-    public List<PageReference> getRelatedData() {
+    public List<Link> getRelatedData() {
         return relatedData;
     }
 
-    public void setRelatedData(List<PageReference> relatedData) {
+    public void setRelatedData(List<Link> relatedData) {
         this.relatedData = relatedData;
     }
 
-    public List<PageReference> getRelatedDocuments() {
+    public List<Link> getRelatedDocuments() {
         return relatedDocuments;
     }
 
-    public void setRelatedDocuments(List<PageReference> relatedDocuments) {
+    public void setRelatedDocuments(List<Link> relatedDocuments) {
         this.relatedDocuments = relatedDocuments;
     }
 

@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.reader;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.filter.FilterUtil;
@@ -12,7 +14,6 @@ import com.github.onsdigital.zebedee.reader.util.ContentReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.Set;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 
@@ -24,17 +25,11 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
 public class ZebedeeReader {
     private static ZebedeeReader instance;
     private static ContentReader publishedContentReader;
-    private static CollectionContentReader collectionContentReader;
 
 
     //Singleton
     private ZebedeeReader() {
         publishedContentReader = new ContentReader(getConfiguration().getContentDir());
-        String collectionsFolder = getConfiguration().getCollectionsFolder();
-        if (collectionsFolder != null) {
-            collectionContentReader = new CollectionContentReader(collectionsFolder);
-        }
-
     }
 
     public static ZebedeeReader getInstance() {
@@ -86,7 +81,7 @@ public class ZebedeeReader {
      */
     public Content getCollectionContent(String collectionId, String path) throws ZebedeeException, IOException {
         assertId(collectionId);
-        return collectionContentReader.getContent(collectionId, path);
+        return createCollectionReader(collectionId).getContent(path);
     }
 
     /**
@@ -132,7 +127,7 @@ public class ZebedeeReader {
      */
     public Resource getCollectionResource(String collectionId, String path) throws ZebedeeException, IOException {
         assertId(collectionId);
-        return collectionContentReader.getResource(collectionId, path);
+        return createCollectionReader(collectionId).getResource(path);
     }
 
     public Map<URI, ContentNode> getPublishedChildren(String path) throws ZebedeeException, IOException {
@@ -141,12 +136,17 @@ public class ZebedeeReader {
 
 
     public Map<URI, ContentNode> getCollectionChildren(String collectionId, String path) throws ZebedeeException, IOException {
-        return collectionContentReader.getChildren(collectionId, path);
+        return createCollectionReader(collectionId).getChildren(path);
     }
 
     private void assertId(String collectionId) throws BadRequestException {
         if (collectionId == null) {
             throw new BadRequestException("Collection Id must be supplied");
         }
+    }
+
+
+    private CollectionContentReader createCollectionReader(String collectionId) throws NotFoundException, IOException, CollectionNotFoundException {
+        return new CollectionContentReader(getConfiguration().getCollectionsFolder(), collectionId);
     }
 }

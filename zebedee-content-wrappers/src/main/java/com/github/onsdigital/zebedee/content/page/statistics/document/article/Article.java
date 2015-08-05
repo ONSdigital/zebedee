@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.article;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.PageReference;
+import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.page.statistics.document.base.StatisticalDocument;
 
 import java.util.List;
@@ -12,18 +12,18 @@ import java.util.List;
 public class Article extends StatisticalDocument {
 
     /*Body*/
-    private List<PageReference> relatedArticles;
+    private List<Link> relatedArticles;
 
     @Override
     public PageType getType() {
         return PageType.article;
     }
 
-    public void setRelatedArticles(List<PageReference> relatedArticles) {
+    public void setRelatedArticles(List<Link> relatedArticles) {
         this.relatedArticles = relatedArticles;
     }
 
-    public List<PageReference> getRelatedArticles() {
+    public List<Link> getRelatedArticles() {
         return relatedArticles;
     }
 }

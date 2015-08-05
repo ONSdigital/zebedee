@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.home;
 
 import com.github.onsdigital.zebedee.content.base.Content;
-import com.github.onsdigital.zebedee.content.partial.PageReference;
+import com.github.onsdigital.zebedee.content.partial.Link;
 
 /**
  * Represents sections on homepage with references to a taxonomy browse page and a timeseries page
@@ -13,17 +13,17 @@ public class HomeSection extends Content implements Comparable<HomeSection> {
 
 
     private Integer index; //Used for ordering of sections on homepage
-    private PageReference theme;
-    private PageReference statistics;
+    private Link theme;
+    private Link statistics;
 
     public HomeSection() {
     }
 
-    public HomeSection(PageReference themeReference, PageReference statistics) {
+    public HomeSection(Link themeReference, Link statistics) {
         this(themeReference, statistics, null);
     }
 
-    public HomeSection(PageReference themeReference, PageReference statistics, Integer index) {
+    public HomeSection(Link themeReference, Link statistics, Integer index) {
         this.theme = themeReference;
         this.statistics = statistics;
         this.index = index;

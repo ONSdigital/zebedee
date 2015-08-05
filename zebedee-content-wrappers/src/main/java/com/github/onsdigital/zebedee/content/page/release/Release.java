@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.content.page.release;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.PageReference;
+import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class Release extends Page {
 
-    private List<PageReference> articles = new ArrayList<>();
-    private List<PageReference> bulletins = new ArrayList<>();
-    private List<PageReference> datasets = new ArrayList<>();
+    private List<Link> articles = new ArrayList<>();
+    private List<Link> bulletins = new ArrayList<>();
+    private List<Link> datasets = new ArrayList<>();
 
     @Override
     public PageType getType() {
@@ -22,27 +22,27 @@ public class Release extends Page {
     }
 
 
-    public List<PageReference> getArticles() {
+    public List<Link> getArticles() {
         return articles;
     }
 
-    public void setArticles(List<PageReference> articles) {
+    public void setArticles(List<Link> articles) {
         this.articles = articles;
     }
 
-    public List<PageReference> getBulletins() {
+    public List<Link> getBulletins() {
         return bulletins;
     }
 
-    public void setBulletins(List<PageReference> bulletins) {
+    public void setBulletins(List<Link> bulletins) {
         this.bulletins = bulletins;
     }
 
-    public List<PageReference> getDatasets() {
+    public List<Link> getDatasets() {
         return datasets;
     }
 
-    public void setDatasets(List<PageReference> datasets) {
+    public void setDatasets(List<Link> datasets) {
         this.datasets = datasets;
     }
 

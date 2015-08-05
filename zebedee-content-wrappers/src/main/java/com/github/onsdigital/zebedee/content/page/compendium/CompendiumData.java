@@ -1,7 +1,8 @@
 package com.github.onsdigital.zebedee.content.page.compendium;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.PageReference;
+import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 
 /**
@@ -9,18 +10,18 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
  */
 public class CompendiumData extends Dataset {
 
-    private PageReference parent;
+    private Link parent;
 
     @Override
     public PageType getType() {
         return PageType.compendium_data;
     }
 
-    public PageReference getParent() {
+    public Link getParent() {
         return parent;
     }
 
-    public void setParent(PageReference parent) {
+    public void setParent(Link parent) {
         this.parent = parent;
     }
 }

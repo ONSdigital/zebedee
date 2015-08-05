@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.content.page.compendium;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.PageReference;
+import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.List;
 
@@ -11,9 +11,9 @@ import java.util.List;
  */
 public class CompendiumLandingPage extends Page {
 
-    private List<PageReference> datasets;
-    private List<PageReference> chapters;
-    private List<PageReference> relatedMethodology;
+    private List<Link> datasets;
+    private List<Link> chapters;
+    private List<Link> relatedMethodology;
 
     @Override
     public PageType getType() {
@@ -21,27 +21,27 @@ public class CompendiumLandingPage extends Page {
     }
 
 
-    public List<PageReference> getDatasets() {
+    public List<Link> getDatasets() {
         return datasets;
     }
 
-    public void setDatasets(List<PageReference> datasets) {
+    public void setDatasets(List<Link> datasets) {
         this.datasets = datasets;
     }
 
-    public List<PageReference> getChapters() {
+    public List<Link> getChapters() {
         return chapters;
     }
 
-    public void setChapters(List<PageReference> chapters) {
+    public void setChapters(List<Link> chapters) {
         this.chapters = chapters;
     }
 
-    public List<PageReference> getRelatedMethodology() {
+    public List<Link> getRelatedMethodology() {
         return relatedMethodology;
     }
 
-    public void setRelatedMethodology(List<PageReference> relatedMethodology) {
+    public void setRelatedMethodology(List<Link> relatedMethodology) {
         this.relatedMethodology = relatedMethodology;
     }
 }

@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.base;
 
-import com.github.onsdigital.zebedee.content.partial.PageReference;
-import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
-import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
+import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public abstract class StatisticalDocument extends Statistics {
     /*Body*/
     private List<MarkdownSection> sections = new ArrayList<>();
     private List<MarkdownSection> accordion = new ArrayList<>();
-    private List<PageReference> relatedData = new ArrayList<>();//Link to data in the article
+    private List<Link> relatedData = new ArrayList<>();//Link to data in the article
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
 
@@ -36,11 +36,11 @@ public abstract class StatisticalDocument extends Statistics {
         this.accordion = accordion;
     }
 
-    public List<PageReference> getRelatedData() {
+    public List<Link> getRelatedData() {
         return relatedData;
     }
 
-    public void setRelatedData(List<PageReference> relatedData) {
+    public void setRelatedData(List<Link> relatedData) {
         this.relatedData = relatedData;
     }
 

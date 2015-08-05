@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Iterator;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -116,10 +117,13 @@ public class ContentReaderTest {
         Map<URI, ContentNode> children = contentReader.getChildren("/nonexistingpath/test");
     }
 
-//    @Test
+    @Test
     public void testGetParents() throws ZebedeeException, IOException {
+        //note that culturalidentity folder does not have data.json in test content, so it should be skipped
         Map<URI, ContentNode> parents = contentReader.getParents("peoplepopulationandcommunity/culturalidentity/ethnicity");
         assertTrue(parents.size() == 2);
+        assertTrue(parents.containsKey(URI.create("/")));
+        assertTrue(parents.containsKey(URI.create("/peoplepopulationandcommunity/")));
     }
 
     @Test

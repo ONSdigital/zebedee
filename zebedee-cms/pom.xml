@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
             <artifactId>content-library</artifactId>
-            <version>content-library-1.0.60</version>
+            <version>content-library-1.0.63</version>
         </dependency>
 
         <!-- Zebedee Reader-->

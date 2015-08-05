@@ -192,13 +192,13 @@ public class ContentReader {
 
     private void assertNotDirectory(Path path) throws BadRequestException {
         if (Files.isDirectory(path)) {
-            throw new BadRequestException("Requested path is a not directory, not a content file");
+            throw new BadRequestException("Requested path is a directory");
         }
     }
 
     private void assertIsDirectory(Path path) throws BadRequestException {
         if (!Files.isDirectory(path)) {
-            throw new BadRequestException("Requested uri is not a content uri");
+            throw new BadRequestException("Requested uri is a directory");
         }
     }
 

@@ -1,0 +1,1560 @@
+{
+  "years": [],
+  "quarters": [],
+  "months": [
+    {
+      "date": "2001 JAN",
+      "value": "1.8",
+      "year": "2001",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 FEB",
+      "value": "1.7",
+      "year": "2001",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 MAR",
+      "value": "1.7",
+      "year": "2001",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 APR",
+      "value": "1.6",
+      "year": "2001",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 MAY",
+      "value": "2.0",
+      "year": "2001",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 JUN",
+      "value": "2.0",
+      "year": "2001",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 JUL",
+      "value": "2.9",
+      "year": "2001",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 AUG",
+      "value": "2.9",
+      "year": "2001",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 SEP",
+      "value": "2.8",
+      "year": "2001",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 OCT",
+      "value": "1.9",
+      "year": "2001",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 NOV",
+      "value": "1.9",
+      "year": "2001",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2001 DEC",
+      "value": "1.8",
+      "year": "2001",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 JAN",
+      "value": "1.6",
+      "year": "2002",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 FEB",
+      "value": "1.8",
+      "year": "2002",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 MAR",
+      "value": "1.9",
+      "year": "2002",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 APR",
+      "value": "1.8",
+      "year": "2002",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 MAY",
+      "value": "1.6",
+      "year": "2002",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 JUN",
+      "value": "1.7",
+      "year": "2002",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 JUL",
+      "value": "1.7",
+      "year": "2002",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 AUG",
+      "value": "1.6",
+      "year": "2002",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 SEP",
+      "value": "1.5",
+      "year": "2002",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 OCT",
+      "value": "1.5",
+      "year": "2002",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 NOV",
+      "value": "1.5",
+      "year": "2002",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2002 DEC",
+      "value": "1.5",
+      "year": "2002",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 JAN",
+      "value": "1.6",
+      "year": "2003",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 FEB",
+      "value": "1.6",
+      "year": "2003",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 MAR",
+      "value": "1.8",
+      "year": "2003",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 APR",
+      "value": "1.8",
+      "year": "2003",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 MAY",
+      "value": "1.8",
+      "year": "2003",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 JUN",
+      "value": "1.7",
+      "year": "2003",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 JUL",
+      "value": "1.7",
+      "year": "2003",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 AUG",
+      "value": "1.8",
+      "year": "2003",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 SEP",
+      "value": "1.8",
+      "year": "2003",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 OCT",
+      "value": "1.8",
+      "year": "2003",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 NOV",
+      "value": "1.8",
+      "year": "2003",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2003 DEC",
+      "value": "1.7",
+      "year": "2003",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 JAN",
+      "value": "2.7",
+      "year": "2004",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 FEB",
+      "value": "2.5",
+      "year": "2004",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 MAR",
+      "value": "2.5",
+      "year": "2004",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 APR",
+      "value": "2.5",
+      "year": "2004",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 MAY",
+      "value": "1.9",
+      "year": "2004",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 JUN",
+      "value": "1.9",
+      "year": "2004",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 JUL",
+      "value": "2.0",
+      "year": "2004",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 AUG",
+      "value": "2.1",
+      "year": "2004",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 SEP",
+      "value": "2.3",
+      "year": "2004",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 OCT",
+      "value": "2.4",
+      "year": "2004",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 NOV",
+      "value": "2.4",
+      "year": "2004",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2004 DEC",
+      "value": "2.5",
+      "year": "2004",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 JAN",
+      "value": "2.2",
+      "year": "2005",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 FEB",
+      "value": "2.4",
+      "year": "2005",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 MAR",
+      "value": "2.6",
+      "year": "2005",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 APR",
+      "value": "2.9",
+      "year": "2005",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 MAY",
+      "value": "2.4",
+      "year": "2005",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 JUN",
+      "value": "2.1",
+      "year": "2005",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 JUL",
+      "value": "2.1",
+      "year": "2005",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 AUG",
+      "value": "2.1",
+      "year": "2005",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 SEP",
+      "value": "2.2",
+      "year": "2005",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 OCT",
+      "value": "2.2",
+      "year": "2005",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 NOV",
+      "value": "2.2",
+      "year": "2005",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2005 DEC",
+      "value": "2.4",
+      "year": "2005",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 JAN",
+      "value": "2.5",
+      "year": "2006",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 FEB",
+      "value": "2.7",
+      "year": "2006",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 MAR",
+      "value": "2.8",
+      "year": "2006",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 APR",
+      "value": "2.9",
+      "year": "2006",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 MAY",
+      "value": "3.0",
+      "year": "2006",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 JUN",
+      "value": "3.2",
+      "year": "2006",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 JUL",
+      "value": "3.0",
+      "year": "2006",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 AUG",
+      "value": "3.0",
+      "year": "2006",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 SEP",
+      "value": "3.0",
+      "year": "2006",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 OCT",
+      "value": "2.9",
+      "year": "2006",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 NOV",
+      "value": "2.9",
+      "year": "2006",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2006 DEC",
+      "value": "2.9",
+      "year": "2006",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 JAN",
+      "value": "3.7",
+      "year": "2007",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 FEB",
+      "value": "3.6",
+      "year": "2007",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 MAR",
+      "value": "3.7",
+      "year": "2007",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 APR",
+      "value": "3.4",
+      "year": "2007",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 MAY",
+      "value": "3.0",
+      "year": "2007",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 JUN",
+      "value": "3.0",
+      "year": "2007",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 JUL",
+      "value": "2.9",
+      "year": "2007",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 AUG",
+      "value": "2.8",
+      "year": "2007",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 SEP",
+      "value": "2.7",
+      "year": "2007",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 OCT",
+      "value": "2.9",
+      "year": "2007",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 NOV",
+      "value": "3.1",
+      "year": "2007",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2007 DEC",
+      "value": "3.5",
+      "year": "2007",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 JAN",
+      "value": "2.3",
+      "year": "2008",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 FEB",
+      "value": "2.3",
+      "year": "2008",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 MAR",
+      "value": "2.1",
+      "year": "2008",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 APR",
+      "value": "2.0",
+      "year": "2008",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 MAY",
+      "value": "3.5",
+      "year": "2008",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 JUN",
+      "value": "3.4",
+      "year": "2008",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 JUL",
+      "value": "3.6",
+      "year": "2008",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 AUG",
+      "value": "3.4",
+      "year": "2008",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 SEP",
+      "value": "3.2",
+      "year": "2008",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 OCT",
+      "value": "3.0",
+      "year": "2008",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 NOV",
+      "value": "2.9",
+      "year": "2008",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2008 DEC",
+      "value": "3.0",
+      "year": "2008",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 JAN",
+      "value": "2.5",
+      "year": "2009",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 FEB",
+      "value": "2.6",
+      "year": "2009",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 MAR",
+      "value": "2.5",
+      "year": "2009",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 APR",
+      "value": "2.5",
+      "year": "2009",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 MAY",
+      "value": "2.1",
+      "year": "2009",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 JUN",
+      "value": "2.3",
+      "year": "2009",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 JUL",
+      "value": "2.6",
+      "year": "2009",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 AUG",
+      "value": "2.5",
+      "year": "2009",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 SEP",
+      "value": "2.3",
+      "year": "2009",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 OCT",
+      "value": "2.2",
+      "year": "2009",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 NOV",
+      "value": "2.4",
+      "year": "2009",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2009 DEC",
+      "value": "2.6",
+      "year": "2009",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 JAN",
+      "value": "2.4",
+      "year": "2010",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 FEB",
+      "value": "2.5",
+      "year": "2010",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 MAR",
+      "value": "2.4",
+      "year": "2010",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 APR",
+      "value": "2.5",
+      "year": "2010",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 MAY",
+      "value": "2.5",
+      "year": "2010",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 JUN",
+      "value": "2.5",
+      "year": "2010",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 JUL",
+      "value": "2.5",
+      "year": "2010",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 AUG",
+      "value": "2.6",
+      "year": "2010",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 SEP",
+      "value": "2.6",
+      "year": "2010",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 OCT",
+      "value": "2.5",
+      "year": "2010",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 NOV",
+      "value": "2.3",
+      "year": "2010",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2010 DEC",
+      "value": "2.3",
+      "year": "2010",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 JAN",
+      "value": "2.2",
+      "year": "2011",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 FEB",
+      "value": "2.5",
+      "year": "2011",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 MAR",
+      "value": "2.6",
+      "year": "2011",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 APR",
+      "value": "2.8",
+      "year": "2011",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 MAY",
+      "value": "2.5",
+      "year": "2011",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 JUN",
+      "value": "2.4",
+      "year": "2011",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 JUL",
+      "value": "2.5",
+      "year": "2011",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 AUG",
+      "value": "2.6",
+      "year": "2011",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 SEP",
+      "value": "2.8",
+      "year": "2011",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 OCT",
+      "value": "2.9",
+      "year": "2011",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 NOV",
+      "value": "2.7",
+      "year": "2011",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2011 DEC",
+      "value": "2.4",
+      "year": "2011",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 JAN",
+      "value": "2.6",
+      "year": "2012",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 FEB",
+      "value": "2.8",
+      "year": "2012",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 MAR",
+      "value": "2.9",
+      "year": "2012",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 APR",
+      "value": "3.1",
+      "year": "2012",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 MAY",
+      "value": "2.8",
+      "year": "2012",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 JUN",
+      "value": "3.0",
+      "year": "2012",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 JUL",
+      "value": "2.9",
+      "year": "2012",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 AUG",
+      "value": "2.8",
+      "year": "2012",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 SEP",
+      "value": "2.7",
+      "year": "2012",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 OCT",
+      "value": "2.8",
+      "year": "2012",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 NOV",
+      "value": "2.7",
+      "year": "2012",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2012 DEC",
+      "value": "2.6",
+      "year": "2012",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2013 JAN",
+      "value": "3.4",
+      "year": "2013",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2013 FEB",
+      "value": "3.5",
+      "year": "2013",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2013 MAR",
+      "value": "3.7",
+      "year": "2013",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2013 APR",
+      "value": "3.8",
+      "year": "2013",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2013 MAY",
+      "value": "3.2",
+      "year": "2013",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2013 JUN",
+      "value": "3.2",
+      "year": "2013",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2013 JUL",
+      "value": "3.1",
+      "year": "2013",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.084Z"
+    },
+    {
+      "date": "2013 AUG",
+      "value": "3.0",
+      "year": "2013",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2013 SEP",
+      "value": "3.1",
+      "year": "2013",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2013 OCT",
+      "value": "3.4",
+      "year": "2013",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2013 NOV",
+      "value": "3.4",
+      "year": "2013",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2013 DEC",
+      "value": "3.5",
+      "year": "2013",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 JAN",
+      "value": "4.2",
+      "year": "2014",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 FEB",
+      "value": "4.1",
+      "year": "2014",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 MAR",
+      "value": "4.2",
+      "year": "2014",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 APR",
+      "value": "4.2",
+      "year": "2014",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 MAY",
+      "value": "3.9",
+      "year": "2014",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 JUN",
+      "value": "4.1",
+      "year": "2014",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 JUL",
+      "value": "4.2",
+      "year": "2014",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 AUG",
+      "value": "4.4",
+      "year": "2014",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 SEP",
+      "value": "4.3",
+      "year": "2014",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 OCT",
+      "value": "4.1",
+      "year": "2014",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 NOV",
+      "value": "3.9",
+      "year": "2014",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2014 DEC",
+      "value": "4.1",
+      "year": "2014",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-09T00:48:25.085Z"
+    },
+    {
+      "date": "2015 MAY",
+      "value": "4.1",
+      "year": "2015",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "UNEM",
+      "updateDate": "2015-07-15T18:34:54.420Z"
+    }
+  ],
+  "sourceDatasets": [
+    "UNEM"
+  ],
+  "type": "timeseries",
+  "uri": "/employmentandlabourmarket/peoplenotinwork/unemployment/timeseries/jpa4",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/employmentandlabourmarket"
+    },
+    {
+      "uri": "/employmentandlabourmarket/peoplenotinwork"
+    },
+    {
+      "uri": "/employmentandlabourmarket/peoplenotinwork/unemployment"
+    }
+  ],
+  "description": {
+    "title": "UK Job Vacancies ratio per 100 emp jobs - Electricity, Gas, Steam\u0026Air Con Supply",
+    "nationalStatistic": false,
+    "latestRelease": false,
+    "releaseDate": "2015-07-14T23:00:00.000Z",
+    "nextRelease": "12 August 2015",
+    "cdid": "JPA4",
+    "unit": "",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "seasonalAdjustment": "SA",
+    "number": "4.1",
+    "sampleSize": 0
+  }
+}

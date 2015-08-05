@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.ContentEventType;
+import com.github.onsdigital.zebedee.json.EventType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -55,7 +55,7 @@ public class CollectionTest {
         String filename = PathUtils.toFilename(name);
 
         // When
-        Collection.create(collectionDescription, zebedee);
+        Collection.create(collectionDescription, zebedee, publisher1Email);
 
         // Then
         Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
@@ -91,7 +91,7 @@ public class CollectionTest {
         String filename = PathUtils.toFilename(newName);
 
         // When
-        Collection.create(collectionDescription, zebedee);
+        Collection.create(collectionDescription, zebedee, publisher1Email);
         Collection.rename(collectionDescription, newName, zebedee);
 
         // Then
@@ -127,7 +127,7 @@ public class CollectionTest {
         // A folder that isn't a valid release:
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
-        Collection.create(collectionDescription, zebedee);
+        Collection.create(collectionDescription, zebedee, publisher1Email);
         Path releasePath = builder.zebedee.resolve(Zebedee.COLLECTIONS).resolve(
                 PathUtils.toFilename(name));
         FileUtils.cleanDirectory(releasePath.toFile());
@@ -155,7 +155,7 @@ public class CollectionTest {
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.CREATED);
+        collection.description.eventsByUri.get(uri).hasEventForType(EventType.CREATED);
     }
 
     @Test
@@ -244,7 +244,7 @@ public class CollectionTest {
         assertFalse(Files.exists(inProgress.resolve(jsonFile)));
         assertFalse(Files.exists(inProgress.resolve(csvFile)));
         // check an event has been created for the content being deleted.
-        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(ContentEventType.DELETED);
+        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(EventType.DELETED);
     }
 
     @Test
@@ -266,7 +266,7 @@ public class CollectionTest {
         assertTrue(result);
         assertFalse(Files.exists(root.resolve(jsonFile)));
         assertFalse(Files.exists(root.resolve(csvFile)));
-        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(ContentEventType.DELETED);
+        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(EventType.DELETED);
     }
 
     @Test
@@ -288,7 +288,7 @@ public class CollectionTest {
         assertTrue(result);
         assertFalse(Files.exists(root.resolve(jsonFile)));
         assertFalse(Files.exists(root.resolve(csvFile)));
-        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(ContentEventType.DELETED);
+        collection.description.eventsByUri.get("/" + jsonFile).hasEventForType(EventType.DELETED);
     }
 
     @Test
@@ -375,7 +375,7 @@ public class CollectionTest {
         assertTrue(Files.exists(content));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.EDITED);
+        collection.description.eventsByUri.get(uri).hasEventForType(EventType.EDITED);
     }
 
     @Test
@@ -490,7 +490,7 @@ public class CollectionTest {
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.REVIEWED);
+        collection.description.eventsByUri.get(uri).hasEventForType(EventType.REVIEWED);
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -559,7 +559,7 @@ public class CollectionTest {
         assertFalse(Files.exists(edited.resolve(uri.substring(1))));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(ContentEventType.COMPLETED);
+        collection.description.eventsByUri.get(uri).hasEventForType(EventType.COMPLETED);
     }
 
     @Test

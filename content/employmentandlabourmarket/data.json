@@ -5,7 +5,7 @@
       "index": 0
     },
     {
-      "uri": "/employmentandlabourmarket/unemployment",
+      "uri": "/employmentandlabourmarket/peoplenotinwork",
       "index": 1
     },
     {
@@ -22,7 +22,7 @@
     }
   ],
   "description": {
-    "title": "Employment and Labour market",
-    "summary": "Labour market statistics tell us about people in and out of work. They cover a wide range of areas, such as: employment, unemployment, participation in the labour force, types of work, earnings, benefits, working patterns and workplace disputes."
+    "title": "Employment and labour market",
+    "summary": "Labour market statistics tell us about people in and out of work. They cover employment, unemployment, types of work, earnings, working patterns and workplace disputes."
   }
 }

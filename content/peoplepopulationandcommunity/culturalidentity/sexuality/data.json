@@ -1,31 +1,8 @@
 {
-  "items": [
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid81"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid82"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid83"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid84"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid85"
-    },
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/timeseries/raid86"
-    }
-  ],
+  "items": [],
   "datasets": [],
-  "statsBulletins": [
-    {
-      "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurveyapril2011tomarch2012experimentalstatistics"
-    }
-  ],
-  "index": 1,
+  "statsBulletins": [],
+  "index": 3,
   "type": "product_page",
   "uri": "/peoplepopulationandcommunity/culturalidentity/sexuality",
   "breadcrumb": [
@@ -41,6 +18,6 @@
   ],
   "description": {
     "title": "Sexuality",
-    "summary": "Statistics on sexuality are obtained from large surveys which ask people to state their sexuality. Time series data on sexual identities is also available."
+    "summary": "How adults identify themselves in terms of their sexuality."
   }
 }

@@ -1,11 +1,11 @@
 {
   "sections": [
     {
-      "uri": "/economy/inflationandpriceindices",
+      "uri": "/economy/economicoutputandproductivity",
       "index": 0
     },
     {
-      "uri": "/economy/grossdomesticproductgdp",
+      "uri": "/economy/environmentalaccounts",
       "index": 1
     },
     {
@@ -13,27 +13,27 @@
       "index": 2
     },
     {
-      "uri": "/economy/economicoutputandproductivity",
+      "uri": "/economy/grossdomesticproductgdp",
       "index": 3
     },
     {
-      "uri": "/economy/regionalaccounts",
+      "uri": "/economy/grossvalueaddedgva",
       "index": 4
     },
     {
-      "uri": "/economy/grossvalueaddedgva",
+      "uri": "/economy/inflationandpriceindices",
       "index": 5
     },
     {
-      "uri": "/economy/nationalaccounts",
+      "uri": "/economy/investmentspensionsandtrusts",
       "index": 6
     },
     {
-      "uri": "/economy/environmentalaccounts",
+      "uri": "/economy/nationalaccounts",
       "index": 7
     },
     {
-      "uri": "/economy/investmentspensionsandtrusts",
+      "uri": "/economy/regionalaccounts",
       "index": 8
     }
   ],
@@ -47,6 +47,6 @@
   ],
   "description": {
     "title": "Economy",
-    "summary": "An economy or economic system consists of the production, distribution, consumption and trade of limited goods and services by different agents in a given geographical location. The economic agents can be individuals, businesses, organisations, or governments. "
+    "summary": "The UK economy covers the production, distribution, consumption and trade of goods and services. Individuals, businesses, organisations and governments all affect the development of the economy."
   }
 }

@@ -1,0 +1,318 @@
+{
+  "years": [
+    {
+      "date": "2006",
+      "value": "1",
+      "year": "2006",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2007",
+      "value": "0",
+      "year": "2007",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2008",
+      "value": "93",
+      "year": "2008",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2009",
+      "value": "0",
+      "year": "2009",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2010",
+      "value": "0",
+      "year": "2010",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2011",
+      "value": "0",
+      "year": "2011",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2012",
+      "value": "",
+      "year": "2012",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2013",
+      "value": "0",
+      "year": "2013",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "2008 Q1",
+      "value": "0",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "19",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "74",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "0",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "0",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "0",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "0",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "0",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "0",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "0",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "0",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "0",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "0",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "0",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "0",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "0",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "0",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "0",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "0",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "am",
+      "updateDate": "2015-07-08T23:41:11.558Z"
+    }
+  ],
+  "months": [],
+  "sourceDatasets": [
+    "am"
+  ],
+  "type": "timeseries",
+  "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/timeseries/hcp2",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/businessindustryandtrade"
+    },
+    {
+      "uri": "/businessindustryandtrade/changestobusiness"
+    },
+    {
+      "uri": "/businessindustryandtrade/changestobusiness/mergersandacquisitions"
+    }
+  ],
+  "description": {
+    "title": "Africa Inward Disposals Value :£m                                       ",
+    "nationalStatistic": false,
+    "releaseDate": "2015-06-02T00:00:00.000Z",
+    "nextRelease": "08-09-2015",
+    "cdid": "HCP2",
+    "unit": "",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "seasonalAdjustment": "NSA",
+    "number": "0",
+    "sampleSize": 0
+  }
+}

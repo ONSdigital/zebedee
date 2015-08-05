@@ -1,5 +1,4 @@
 package com.github.onsdigital.zebedee.model;
-import sun.org.mozilla.javascript.internal.ast.IfStatement;
 
 import java.util.HashMap;
 

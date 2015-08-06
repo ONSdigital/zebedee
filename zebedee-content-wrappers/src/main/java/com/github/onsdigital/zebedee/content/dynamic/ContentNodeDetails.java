@@ -7,13 +7,15 @@ import com.github.onsdigital.zebedee.content.base.Content;
  *
  * Simple wrapper containing only title. Used for data filtering
  */
-public class TitleWrapper extends Content {
+public class ContentNodeDetails extends Content {
     private String title;
+    private String edition; //Edition is only available for bulletins and articles
 
-    public TitleWrapper() {
+    public ContentNodeDetails() {
 
     }
-    public TitleWrapper(String title) {
+
+    public ContentNodeDetails(String title, String edition) {
         this.title = title;
     }
 
@@ -23,5 +25,13 @@ public class TitleWrapper extends Content {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getEdition() {
+        return edition;
+    }
+
+    public void setEdition(String edition) {
+        this.edition = edition;
     }
 }

@@ -40,7 +40,7 @@ public class ContentReaderTest {
         Page content = contentReader.getContent("about/accessibility///");
         assertNotNull(content);
         assertEquals(content.getType(), PageType.static_page);
-        assertEquals("Accessibility",  content.getDescription().getTitle());
+        assertEquals("Accessibility", content.getDescription().getTitle());
         assertTrue(content instanceof StaticPage);
         StaticPage staticPage = (StaticPage) content;
         assertNotNull(staticPage.getMarkdown());
@@ -51,7 +51,7 @@ public class ContentReaderTest {
         Page content = contentReader.getContent("/");
         assertNotNull(content);
         assertEquals(content.getType(), PageType.home_page);
-        assertEquals("Home",content.getDescription().getTitle());
+        assertEquals("Home", content.getDescription().getTitle());
     }
 
     @Test(expected = NotFoundException.class)
@@ -107,7 +107,7 @@ public class ContentReaderTest {
         String bulletinUri = "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/";
         assertTrue(children.containsKey(URI.create(bulletinUri)));
         assertNull(entry.getValue().getType());//type is null for directories with no data.json
-        assertEquals("articles", children.get(articleUri).getDescription().getTitle());
+        assertEquals("articles", children.get(articleUri).getDetails().getTitle());
     }
 
 
@@ -130,7 +130,7 @@ public class ContentReaderTest {
         Map<URI, ContentNode> children = contentReader.getChildren("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
         assertTrue(children.size() == 1);
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
-        assertEquals("UK Natural Capital Land Cover in the UK", contentNode.getValue().getDescription().getTitle());
+        assertEquals("UK Natural Capital Land Cover in the UK", contentNode.getValue().getDetails().getTitle());
 //        assertEquals(PageType.article, contentNode.getValue().getType());
         assertEquals("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/", contentNode.getKey().toString());
     }
@@ -140,6 +140,12 @@ public class ContentReaderTest {
         Map<URI, ContentNode> children = contentReader.getChildren("/");
         assertTrue(children.containsKey(URI.create("/economy/")));
         assertTrue(children.containsKey(URI.create("/about/")));
+    }
+
+    @Test
+    public void testGetLatestContent() throws ZebedeeException, IOException {
+        Page latestContent = contentReader.getLatestContent("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts");
+        assertEquals("2015", latestContent.getDescription().getEdition());
     }
 
 }

@@ -1,33 +1,25 @@
 package com.github.onsdigital.zebedee.content.dynamic.browse;
 
-import com.github.onsdigital.zebedee.content.dynamic.TitleWrapper;
+import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by bren on 03/08/15.
  * Represents a node in content hierarchy
- *
+ * <p>
  * Default sorting is by title alphabetically
  */
 public class ContentNode implements Comparable<ContentNode> {
 
     private URI uri;
-    private TitleWrapper description;
+    private ContentNodeDetails details;
     private PageType type;
 
     private Collection<ContentNode> children;
-
-    public ContentNode(URI uri, String title, PageType type) {
-        this.uri = uri;
-        this.description = new TitleWrapper(title);
-        this.type = type;
-    }
 
     public URI getUri() {
         return uri;
@@ -45,12 +37,12 @@ public class ContentNode implements Comparable<ContentNode> {
         this.type = type;
     }
 
-    public TitleWrapper getDescription() {
-        return description;
+    public ContentNodeDetails getDetails() {
+        return details;
     }
 
-    public void setDescription(TitleWrapper description) {
-        this.description = description;
+    public void setDetails(ContentNodeDetails details) {
+        this.details = details;
     }
 
     public Collection<ContentNode> getChildren() {
@@ -79,14 +71,30 @@ public class ContentNode implements Comparable<ContentNode> {
 
     @Override
     public int compareTo(ContentNode o) {
-        if(isNull(getDescription()) || isNull(getDescription().getTitle())) {
+        if (isNull(getDetails())) {
             return 1;//Empty titles are listed as last elements
         }
-        if(isNull(o) || isNull(o.getDescription()) || isNull(o.getDescription().getTitle())){
+        if (isNull(o) || isNull(o.getDetails())) {
             return -1;
         }
 
-        return getDescription().getTitle().compareTo(o.getDescription().getTitle());
+        int result = compare(getDetails().getTitle(), o.getDetails().getTitle());
+        //compare editions if titles are the same
+        if (result == 0) {
+            result = compare(getDetails().getEdition(), o.getDetails().getEdition());
+        }
+        return result;
+    }
+
+    private int compare(String s1, String s2) {
+        if (isNull(s1)) {
+            return 1;//nulls last
+        }
+        if (isNull(s2)) {
+            return -1;
+        }
+
+        return s1.compareTo(s2);
     }
 
     private boolean isNull(Object o) {

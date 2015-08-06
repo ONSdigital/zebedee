@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.reader.util;
 
+import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -116,7 +117,7 @@ public class ContentReader {
         }
 
         nodes.putAll(resolveParents(resolvePath(firstParent.getUri().toString())));//resolve parent's parents first
-        nodes.put(firstParent.getUri(), new ContentNode(firstParent.getUri(), firstParent.getDescription().getTitle(), firstParent.getType()));
+        nodes.put(firstParent.getUri(), createContentNode(firstParent));
         return nodes;
     }
 
@@ -157,11 +158,11 @@ public class ContentReader {
                             if (content == null) { //Contents without type is null when deserialised.
                                 continue;
                             }
-                            nodes.put(uri, new ContentNode(uri, content.getDescription().getTitle(), content.getType()));
+                            nodes.put(uri, createContentNode(content));
                         }
                     } else {
                         //directory
-                        nodes.put(uri, new ContentNode(uri, child.getFileName().toString(), null));
+                        nodes.put(uri,createContentNodeForFolder(uri, child.getFileName().toString()) );
                     }
                 } else {
                     continue;//skip data.json files in current directory
@@ -256,6 +257,21 @@ public class ContentReader {
     /*Getters * Setters */
     private Path getRootFolder() {
         return ROOT_FOLDER;
+    }
+
+    private ContentNode createContentNode(Page page) {
+        ContentNode contentNode = new ContentNode();
+        contentNode.setUri(page.getUri());
+        contentNode.setType(page.getType());
+        contentNode.setDetails(new ContentNodeDetails(page.getDescription().getTitle(), page.getDescription().getEdition()));
+        return contentNode;
+    }
+
+    private ContentNode createContentNodeForFolder(URI uri, String title) {
+        ContentNode contentNode = new ContentNode();
+        contentNode.setUri(uri);
+        contentNode.setDetails(new ContentNodeDetails(title,null));
+        return contentNode;
     }
 
 }

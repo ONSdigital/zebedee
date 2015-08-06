@@ -154,6 +154,9 @@ public class ContentReader {
                     if (Files.exists(dataFile)) {//data.json
                         try (Resource resource = getResource(dataFile)) {
                             Page content = deserialize(resource);
+                            if (content == null) { //Contents without type is null when deserialised.
+                                continue;
+                            }
                             nodes.put(uri, new ContentNode(uri, content.getDescription().getTitle(), content.getType()));
                         }
                     } else {

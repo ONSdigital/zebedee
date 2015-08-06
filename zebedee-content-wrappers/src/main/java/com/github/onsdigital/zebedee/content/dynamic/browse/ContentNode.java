@@ -79,14 +79,30 @@ public class ContentNode implements Comparable<ContentNode> {
 
     @Override
     public int compareTo(ContentNode o) {
-        if(isNull(getDescription()) || isNull(getDescription().getTitle())) {
+        if(isNull(getDescription())) {
             return 1;//Empty titles are listed as last elements
         }
-        if(isNull(o) || isNull(o.getDescription()) || isNull(o.getDescription().getTitle())){
+        if(isNull(o) || isNull(o.getDescription())){
             return -1;
         }
 
-        return getDescription().getTitle().compareTo(o.getDescription().getTitle());
+        int result = compare(getDescription().getTitle(), o.getDescription().getTitle());
+        //compare editions if titles are the same
+        if (result == 0) {
+            result  = compare(getDescription().getEdition(), o.getDescription().getEdition());
+        }
+        return result;
+    }
+
+    private int compare(String s1, String s2) {
+        if (isNull(s1)) {
+            return 1;//nulls last
+        }
+        if (isNull(s2)) {
+            return -1;
+        }
+
+        return s1.compareTo(s2);
     }
 
     private boolean isNull(Object o) {

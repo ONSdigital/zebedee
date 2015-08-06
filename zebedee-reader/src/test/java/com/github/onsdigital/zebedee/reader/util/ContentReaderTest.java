@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.reader.util;
 
+import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
@@ -40,7 +41,7 @@ public class ContentReaderTest {
         Page content = contentReader.getContent("about/accessibility///");
         assertNotNull(content);
         assertEquals(content.getType(), PageType.static_page);
-        assertEquals("Accessibility",  content.getDescription().getTitle());
+        assertEquals("Accessibility", content.getDescription().getTitle());
         assertTrue(content instanceof StaticPage);
         StaticPage staticPage = (StaticPage) content;
         assertNotNull(staticPage.getMarkdown());
@@ -51,7 +52,7 @@ public class ContentReaderTest {
         Page content = contentReader.getContent("/");
         assertNotNull(content);
         assertEquals(content.getType(), PageType.home_page);
-        assertEquals("Home",content.getDescription().getTitle());
+        assertEquals("Home", content.getDescription().getTitle());
     }
 
     @Test(expected = NotFoundException.class)
@@ -140,6 +141,12 @@ public class ContentReaderTest {
         Map<URI, ContentNode> children = contentReader.getChildren("/");
         assertTrue(children.containsKey(URI.create("/economy/")));
         assertTrue(children.containsKey(URI.create("/about/")));
+    }
+
+    @Test
+    public void testGetLatestContent() throws ZebedeeException, IOException {
+        Page latestContent = contentReader.getLatestContent("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts");
+        assertEquals("2015", latestContent.getDescription().getEdition());
     }
 
 }

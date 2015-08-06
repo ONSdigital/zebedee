@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.content.base.Content;
  */
 public class TitleWrapper extends Content {
     private String title;
+    private String edition; //Edition is only available for bulletins and articles
 
     public TitleWrapper() {
 
@@ -23,5 +24,13 @@ public class TitleWrapper extends Content {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getEdition() {
+        return edition;
+    }
+
+    public void setEdition(String edition) {
+        this.edition = edition;
     }
 }

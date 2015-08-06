@@ -89,6 +89,9 @@ public class Root {
             }
         }
 
+        //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
+        System.setProperty("zebedee_root", root.toString());
+
 
     }
 

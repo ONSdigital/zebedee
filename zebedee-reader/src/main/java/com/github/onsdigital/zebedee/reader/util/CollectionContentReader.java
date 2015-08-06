@@ -14,10 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -157,7 +154,7 @@ public class CollectionContentReader {
 
     //Finds collection name with given id
     private Path findCollectionPath(String collectionId) throws IOException, NotFoundException, CollectionNotFoundException {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(collections)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(collections,"*.{json}")) {
             for (Path path : stream) {
                 if (Files.isDirectory(path)) {
                     continue;

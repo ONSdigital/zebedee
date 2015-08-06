@@ -32,7 +32,7 @@ public class ContentReaderTest {
 
     @Before
     public void createContentReader() {
-        this.contentReader = new ContentReader("target/test-content/master");
+        this.contentReader = new ContentReader("target/test-content/zebedee/master");
     }
 
     @Test

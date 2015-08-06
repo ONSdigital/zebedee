@@ -66,7 +66,7 @@ public class ContentReader {
         Path contentPath = resolvePath(path);
         Path parent = contentPath.getParent();
         assertIsEditionsFolder(parent);
-        return resolveLatest(path);
+        return resolveLatest(contentPath);
     }
 
     /**
@@ -172,14 +172,28 @@ public class ContentReader {
         return nodes;
     }
 
-    private Page resolveLatest(String path) throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = getChildren(path);
-        if (children.isEmpty()) {
+    private Page resolveLatest(Path path) throws ZebedeeException, IOException {
+
+        //order by foldername, get the latest one
+
+        String latestFolderName = null;
+        Path latestFolderPath = null;
+
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(path)) {
+            for (Path child : paths) {
+                String name = child.getFileName().toString();
+                if (latestFolderName == null || (name.compareTo(latestFolderName) == 1)) {
+                    latestFolderName = name;
+                    latestFolderPath = child;
+                }
+            }
+        }
+
+        if (latestFolderPath == null) {
             throw new NotFoundException(NOT_FOUND);
         }
-        TreeMap<URI, Object> sortedMap = new TreeMap<>(new ContentNodeComparator(children, true));
-        sortedMap.putAll(children);
-        return getContent(sortedMap.keySet().iterator().next().toString());
+        return getContent(toRelativeUri(latestFolderPath).toString());
+
     }
 
     //Returns uri of content calculating relative to root folder

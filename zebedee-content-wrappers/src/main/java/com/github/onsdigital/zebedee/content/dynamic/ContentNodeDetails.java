@@ -17,6 +17,7 @@ public class ContentNodeDetails extends Content {
 
     public ContentNodeDetails(String title, String edition) {
         this.title = title;
+        this.edition = edition;
     }
 
     public String getTitle() {

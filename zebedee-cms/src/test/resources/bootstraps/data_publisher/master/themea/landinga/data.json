@@ -1,0 +1,27 @@
+{
+  "sections": [
+    {
+      "uri": "/themea/landinga/producta",
+      "index": 0
+    },
+    {
+      "uri": "/themea/landinga/productb",
+      "index": 1
+    }
+  ],
+  "index": 0,
+  "type": "taxonomy_landing_page",
+  "uri": "/themea/landinga",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/themea"
+    }
+  ],
+  "description": {
+    "title": "Landing page A",
+    "summary": "Page for second level taxonomy A in theme A"
+  }
+}

@@ -11,9 +11,6 @@ import java.io.IOException;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by thomasridd on 04/08/15.
- */
 public class RedirectTableTest {
     Zebedee zebedee;
     Builder bob;
@@ -309,7 +306,25 @@ public class RedirectTableTest {
         // we expect the chain to send us to linkTo
         assertNull(redirectTable.get(linkFrom));
     }
+    @Test
+    public void chainedRedirect_withCycle_shouldReturnNull() throws Exception {
+        // Given
+        // linkTo exists, other links chain
+        String one = "/one";
+        String two = "/two";
+        String three = "/three";
 
+        // When
+        // we use a populated redirect table
+        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        redirectTable.addRedirect(one, two);
+        redirectTable.addRedirect(two, three);
+        redirectTable.addRedirect(three, one);
+
+        // Then
+        // we expect the chain to send us to linkTo
+        assertNull(redirectTable.get(one));
+    }
     //------------------------------------------------------
     //
     // Child Redirect (6 tests)

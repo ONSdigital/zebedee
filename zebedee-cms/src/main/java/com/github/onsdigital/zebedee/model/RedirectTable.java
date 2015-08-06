@@ -2,13 +2,11 @@ package com.github.onsdigital.zebedee.model;
 
 import java.util.HashMap;
 
-/**
- * Created by thomasridd on 04/08/15.
- */
 public class RedirectTable {
     private HashMap<String, String> table = new HashMap<>();
     private RedirectTable child = null;
     private Content content = null;
+    private final int ITERATION_MAX = 100; // Simple method to avoid cycling
 
     public RedirectTable(Content content) {
         this.content = content;
@@ -46,11 +44,12 @@ public class RedirectTable {
     /**
      *
      * @param uri the requested uri
-
-     * @return
+     *
+     * @return the redirected uri
      */
     public String get(String uri) {
-        String finalUriAtThisLevel = endChain(uri);             // Follow redirect chain
+        String finalUriAtThisLevel = endChain(uri, ITERATION_MAX);        // Follow redirect chain
+        if (finalUriAtThisLevel == null) { return null; }       // Check for cyclical
 
         if (content.exists(finalUriAtThisLevel)) {              // Option 1) Uri exists - return it
             return finalUriAtThisLevel;
@@ -64,49 +63,16 @@ public class RedirectTable {
         } else {
             return null;
         }
-//        if (content.exists(uri)) {          // If content exists return the uri
-//            return uri;
-//        } else if (table.containsKey(uri)) {    // If a link exists follow the link
-//            String nextUri = table.get(uri);
-//            if (content.exists(nextUri)) {
-//                return child.get(uri);
-//            } else {
-//                return get(table.get(uri));
-//            }
-//        } else if (child != null) {
-//            // Alternatively check for a redirect link
-//
-//            if (nextUri != null) {
-//                return get(nextUri);            // Look for content at the redirect (recursive)
-//            } else {
-//                return null;                    // return null
-//            }
-//        }
     }
-    private String endChain(String uri) {
-        if (content.exists(uri) == false && table.containsKey(uri)) {
-           return endChain(table.get(uri));
+
+    private String endChain(String uri, int iterations) {
+        if (iterations == 0) { return null; } // checks we haven't cycled
+
+        if ( !content.exists(uri) && table.containsKey(uri) ) {
+            return endChain(table.get(uri), --iterations);
         }
         return uri;
     }
-
-
-
-
-//    String get(String uri) {
-//        if (table.containsKey(uri)) {   // Look for uri in own table
-//            String newUri = table.get(uri);
-//            if (newUri != null) {
-//                return newUri;
-//            } else if (child != null) { // If the parent link is invalid drop to the child
-//                return child.get(uri);
-//            }
-//        } else if (child != null) {     // Try children
-//            return child.get(uri);
-//        }
-//        return null;                    // return null
-//    }
-
 
     /**
      * Pull a chain of child 301 tables into the parent

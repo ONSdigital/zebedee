@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.util.ContentNodeComparator;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -15,6 +15,7 @@ import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
 
+import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 
 /**
@@ -28,6 +29,7 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 public class ContentReader {
 
     private final Path ROOT_FOLDER;
+    private final String NOT_FOUND = "404 - Not Found";
 
     public ContentReader(String rootFolder) {
         if (rootFolder == null) {
@@ -51,12 +53,19 @@ public class ContentReader {
      * @return Wrapper containing actual document data as text
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
-        Path content = resolveDataFilePath(getRootFolder(), path);
+        Path content = resolveDataFilePath(path);
         Resource resource = getResource(content);
         checkJsonMime(resource, path);
         Page page = deserialize(resource);
         page.setUri(URI.create(path));//Setting uri on the fly, discarding whatever is in the file
         return page;
+    }
+
+    public Page getLatestContent(String path) throws ZebedeeException, IOException {
+        Path contentPath = resolvePath(path);
+        Path parent = contentPath.getParent();
+        assertIsEditionsFolder(parent);
+        return resolveLatest(path);
     }
 
     /**
@@ -66,7 +75,7 @@ public class ContentReader {
      * @return Wrapper for resource stream
      */
     public Resource getResource(String path) throws ZebedeeException, IOException {
-        Path content = resolvePath(getRootFolder(), path);
+        Path content = resolvePath(path);
         return getResource(content);
     }
 
@@ -77,7 +86,7 @@ public class ContentReader {
      * @return uri - node mapping
      */
     public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
-        Path node = resolvePath(getRootFolder(), path);
+        Path node = resolvePath(path);
         assertExists(node);
         assertIsDirectory(node);
         return resolveChildren(node);
@@ -90,7 +99,7 @@ public class ContentReader {
      * @return uri - node mapping, not in any particular order
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
-        Path node = resolvePath(getRootFolder(), path);
+        Path node = resolvePath(path);
         return resolveParents(node);
     }
 
@@ -106,7 +115,7 @@ public class ContentReader {
             return Collections.emptyMap();
         }
 
-        nodes.putAll(resolveParents(resolvePath(getRootFolder(), firstParent.getUri().toString())));//resolve parent's parents first
+        nodes.putAll(resolveParents(resolvePath(firstParent.getUri().toString())));//resolve parent's parents first
         nodes.put(firstParent.getUri(), new ContentNode(firstParent.getUri(), firstParent.getDescription().getTitle(), firstParent.getType()));
         return nodes;
     }
@@ -140,7 +149,7 @@ public class ContentReader {
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(node)) {
             for (Path child : paths) {
                 if (Files.isDirectory(child)) {
-                    Path dataFile = child.resolve(ReaderConfiguration.getConfiguration().getDataFileName());
+                    Path dataFile = child.resolve(getConfiguration().getDataFileName());
                     URI uri = toRelativeUri(child);
                     if (Files.exists(dataFile)) {//data.json
                         try (Resource resource = getResource(dataFile)) {
@@ -157,6 +166,16 @@ public class ContentReader {
             }
         }
         return nodes;
+    }
+
+    private Page resolveLatest(String path) throws ZebedeeException, IOException {
+        Map<URI, ContentNode> children = getChildren(path);
+        if (children.isEmpty()) {
+            throw new NotFoundException(NOT_FOUND);
+        }
+        TreeMap<URI, Object> sortedMap = new TreeMap<>(new ContentNodeComparator(children, true));
+        sortedMap.putAll(children);
+        return getContent(sortedMap.keySet().iterator().next().toString());
     }
 
     //Returns uri of content calculating relative to root folder
@@ -194,7 +213,7 @@ public class ContentReader {
     private void assertExists(Path path) throws ZebedeeException {
         if (!Files.exists(path)) {
             System.err.println("Could not find requested content, path:" + path.toUri().toString());
-            throw new NotFoundException("404 - Not Found");
+            throw new NotFoundException(NOT_FOUND);
         }
     }
 
@@ -210,15 +229,25 @@ public class ContentReader {
         }
     }
 
-    Path resolvePath(Path root, String path) throws BadRequestException {
+    private void assertIsEditionsFolder(Path path) throws ZebedeeException {
+        assertExists(path);
+        assertIsDirectory(path);
+        String fileName = path.getFileName().toString();
+        if (getConfiguration().getBulletinsFolderName().equals(fileName) || getConfiguration().getArticlesFolderName().equals(fileName)) {
+            return;
+        }
+        throw new BadRequestException("Latest uri can not be resolve for this content type");
+    }
+
+    Path resolvePath(String path) throws BadRequestException {
         if (path == null) {
             throw new NullPointerException("Path can not be null");
         }
-        return root.resolve(removeLeadingSlash(path));
+        return getRootFolder().resolve(removeLeadingSlash(path));
     }
 
-    Path resolveDataFilePath(Path root, String path) throws BadRequestException {
-        return resolvePath(root, path).resolve(ReaderConfiguration.getConfiguration().getDataFileName());
+    Path resolveDataFilePath(String path) throws BadRequestException {
+        return resolvePath(path).resolve(getConfiguration().getDataFileName());
     }
 
     /*Getters * Setters */

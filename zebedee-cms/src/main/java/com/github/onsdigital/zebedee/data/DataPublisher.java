@@ -140,9 +140,9 @@ public class DataPublisher {
         split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
 
         String uri = StringUtils.join(split, "/");
-
         uri = ("/" + uri + "/timeseries/" + series.getCdid()).toLowerCase();
 
+        if (uri.startsWith("//")) { uri = uri.substring(1); } // edge case handler
         return uri;
     }
 

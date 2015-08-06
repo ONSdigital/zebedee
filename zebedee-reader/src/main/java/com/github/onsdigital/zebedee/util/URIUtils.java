@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
@@ -49,10 +50,34 @@ public class URIUtils {
         if (StringUtils.isEmpty(uri) || n < 0) {
             return null;
         }
-        String[] segments = URI.create(uri).toString().split("/");
+        String[] segments = getSegments(uri);
         if (n >= segments.length) {
             return null;
         }
         return segments[n];
+    }
+
+    public static String[] getSegments(String uri) {
+        return uri.split("/");
+    }
+
+
+    public static String getLastSegment(String uri) {
+        if (StringUtils.isEmpty(uri)) {
+            return null;
+        }
+        String[] segments = getSegments(uri);
+        if (ArrayUtils.isEmpty(segments)) {
+            return null;
+        }
+
+        return segments[segments.length - 1];
+    }
+
+    public static String removeLastSegment(String uri) {
+        if (StringUtils.isEmpty(uri)) {
+            return null;
+        }
+        return StringUtils.removeEnd(removeTrailingSlash(uri), getLastSegment(uri));
     }
 }

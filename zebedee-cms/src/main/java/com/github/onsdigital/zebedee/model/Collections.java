@@ -131,13 +131,13 @@ public class Collections {
      *
      * @param collection the collection to publish
      * @param session    a session with editor priviledges
-     * @return
+     * @return success
      * @throws IOException
      * @throws UnauthorizedException
      * @throws BadRequestException
      * @throws ConflictException     - If there
      */
-    public boolean publish(Collection collection, Session session)
+    public boolean publish(Collection collection, Session session, Boolean breakBeforeFileTransfer)
             throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
 
@@ -152,7 +152,7 @@ public class Collections {
         }
 
         // Go ahead
-        if (collection.description.approvedStatus == false) {
+        if (!collection.description.approvedStatus) {
             throw new ConflictException("This collection cannot be published because it is not approved");
         }
 
@@ -162,6 +162,9 @@ public class Collections {
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }
+
+        // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
+        if (breakBeforeFileTransfer) { return true; }
 
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
@@ -182,7 +185,7 @@ public class Collections {
         String filename = PathUtils.toFilename(collection.description.name);
         Path collectionDescriptionPath = this.path.resolve(filename + ".json");
         Path logPath = this.zebedee.path.resolve("publish-log");
-        if(Files.exists(logPath) == false) { Files.createDirectory(logPath); }
+        if(!Files.exists(logPath)) { Files.createDirectory(logPath); }
 
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
@@ -205,8 +208,8 @@ public class Collections {
         }
 
         // Check view permissions
-        if (zebedee.permissions.canView(session,
-                collection.description) == false) {
+        if (!zebedee.permissions.canView(session,
+                collection.description)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -229,10 +232,10 @@ public class Collections {
     /**
      * List the given directory of a collection including the files that have already been published.
      *
-     * @param collection
-     * @param uri
-     * @param session
-     * @return
+     * @param collection the collection to overlay on master content
+     * @param uri the uri of the directory
+     * @param session the session (used to determine user permissions)
+     * @return a DirectoryListing object with system content overlaying master content
      * @throws NotFoundException
      * @throws UnauthorizedException
      * @throws IOException

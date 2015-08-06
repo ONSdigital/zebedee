@@ -24,7 +24,6 @@ public class ReaderConfiguration {
     private static final String REVIEWED_FOLDER_NAME = "reviewed";
     private static final String COLLECTIONS_FOLDER_NAME = "collections";
     private static final String PUBLISHED_FOLDER_NAME = "master";
-
     private static final String BULLETINS_FOLDER_NAME = "bulletins";
     private static final String ARTICLES_FOLDER_NAME = "articles";
 
@@ -110,8 +109,8 @@ public class ReaderConfiguration {
         /*Zebedee Root takes precedence over content dir*/
         if (zebedeeRootDir != null) {
             zebedeeRootDir = URIUtils.removeTrailingSlash(zebedeeRootDir);
-            collectionsFolder = zebedeeRootDir + "/" + COLLECTIONS_FOLDER_NAME;
-            contentDir = zebedeeRootDir + "/" + PUBLISHED_FOLDER_NAME;
+            collectionsFolder = zebedeeRootDir + "/zebedee/" + COLLECTIONS_FOLDER_NAME;
+            contentDir = zebedeeRootDir + "/zebedee/" + PUBLISHED_FOLDER_NAME;
         } else if (contentDirValue != null) {
             contentDir = URIUtils.removeTrailingSlash(contentDirValue) + "/";
         } else {

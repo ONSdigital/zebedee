@@ -30,7 +30,7 @@ public class CollectionContentReaderTest {
 
     @Before
     public void createContentReader() throws IOException, NotFoundException, CollectionNotFoundException {
-        this.collectionReader = new CollectionContentReader("target/test-content/collections",COLLECTION_ID);
+        this.collectionReader = new CollectionContentReader("target/test-content/zebedee/collections",COLLECTION_ID);
     }
 
     @Test

@@ -72,7 +72,6 @@ public class Zebedee {
         Path path;
         if(!Files.exists(parent.resolve(ZEBEDEE))) {
             path = Files.createDirectory(parent.resolve(ZEBEDEE));
-            System.setProperty("zebedee_root", path.toString());
         } else {
             path = parent.resolve(ZEBEDEE);
         }

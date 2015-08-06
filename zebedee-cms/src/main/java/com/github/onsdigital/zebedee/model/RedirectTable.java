@@ -1,5 +1,10 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.onsdigital.content.page.base.Page;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 public class RedirectTable {
@@ -10,6 +15,11 @@ public class RedirectTable {
 
     public RedirectTable(Content content) {
         this.content = content;
+    }
+
+    public RedirectTable(Content content, Path path) throws IOException {
+        this(content);
+        loadFromPath(path);
     }
 
     /**
@@ -88,6 +98,30 @@ public class RedirectTable {
         for (String key: redirect.table.keySet()) {
             if (!table.containsKey(key)) {
                 table.put(key, redirect.table.get(key));
+            }
+        }
+    }
+
+    void saveToPath(Path path) throws IOException {
+        // TODO quite a considerable amount of threadsafe making
+        try (FileWriter stream = new FileWriter(path.toFile()); BufferedWriter out = new BufferedWriter(stream)) {
+            for (String fromUri : table.keySet()) {
+                String toUri = table.get(fromUri);
+                out.write(fromUri + '\t' + toUri);
+                out.newLine();
+            }
+        }
+    }
+
+    void loadFromPath(Path path) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // process the line.
+                String[] fromTo = line.split("\t");
+                if (fromTo.length > 1) {
+                    table.put(fromTo[0], fromTo[1]);
+                }
             }
         }
     }

@@ -3,11 +3,17 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import sun.misc.IOUtils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -490,13 +496,121 @@ public class RedirectTableTest {
 
     //------------------------------------------------------
     //
-    // Different content for in parent-child
+    // File saving and loading (4 tests)
     //
-    // Parent-child redirect can be used in Zebedee with a parent child
-    // chain of inProgress, Complete, Reviewed, Published
     //
-    // Given - child (the published
-    // When - we redirect
-    // Then - we expect the combination to process redirects with moves made in collections taking priority
+    // Given - simple redirects
+    // When - we save and load
+    // Then - we expect the table to load back up and still work
+    @Test
+    public void fileSave_withSimpleTable_savesExpectedData() throws IOException {
+        // Given
+        // a one line table
+        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        redirectTable.addRedirect("a", "b");
+
+        // When
+        // we save to a file
+        Path path = File.createTempFile("redirect", "txt").toPath();
+        redirectTable.saveToPath(path);
+
+        // Then
+        // we expect the
+        List<String> lines = lines(path);
+        assertEquals(1, lines.size());
+        assertEquals("a\tb", lines.get(0));
+    }
+
+    @Test
+    public void fileSave_withMultipleLines_savesExpectedData() throws IOException {
+        // Given
+        // a two line table
+        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        redirectTable.addRedirect("a", "b");
+        redirectTable.addRedirect("c", "d");
+
+        // When
+        // we save to a file
+        Path path = File.createTempFile("redirect", "txt").toPath();
+        redirectTable.saveToPath(path);
+
+        // Then
+        // we expect the file to contain the redirects
+        List<String> lines = lines(path);
+        java.util.Collections.sort(lines);
+
+        assertEquals(2, lines.size());
+        assertEquals("a\tb", lines.get(0));
+        assertEquals("c\td", lines.get(1));
+    }
+
+    @Test
+    public void fileSave_withRealData_savesExpected() throws IOException {
+        // Given
+        // a one line table
+        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        String linkFrom1 = "/from/one/data.json";
+        String linkTo1 = "/themea/data.json";
+        String linkFrom2 = "/from/two/data.json";
+        String linkTo2 = "/themeb/data.json";
+
+        redirectTable.addRedirect(linkFrom1, linkTo1);
+        redirectTable.addRedirect(linkFrom2, linkTo2);
+
+        // When
+        // we save to a file
+        Path path = File.createTempFile("redirect", "txt").toPath();
+        redirectTable.saveToPath(path);
+
+        // Then
+        // we expect the
+        List<String> lines = lines(path);
+        java.util.Collections.sort(lines);
+
+        assertEquals(2, lines.size());
+        assertEquals(linkFrom1 + '\t' + linkTo1, lines.get(0));
+        assertEquals(linkFrom2 + '\t' + linkTo2, lines.get(1));
+    }
+
+    @Test
+    public void fileLoad_withRealData_loadsWorkingTable() throws IOException {
+        // Given
+        // a simple table that we save
+        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        String linkFrom1 = "/from/one/data.json";
+        String linkTo1 = "/themea/data.json";
+        String linkFrom2 = "/from/two/data.json";
+        String linkTo2 = "/themeb/data.json";
+
+        redirectTable.addRedirect(linkFrom1, linkTo1);
+        redirectTable.addRedirect(linkFrom2, linkTo2);
+        Path path = File.createTempFile("redirect", "txt").toPath();
+        redirectTable.saveToPath(path);
+
+        // When
+        // we reload
+        RedirectTable loadedTable = new RedirectTable(zebedee.published, path);
+
+        // Then
+        // we expect the
+        assertEquals(linkTo1, loadedTable.get(linkFrom1));
+        assertEquals(linkTo2, loadedTable.get(linkFrom2));
+    }
+
+    /**
+     * Convenience method to pull all strings out of a file
+     *
+     * @param path
+     * @return
+     * @throws FileNotFoundException
+     */
+    private List<String> lines(Path path) throws FileNotFoundException {
+        Scanner sc = new Scanner(path.toFile());
+        List<String> lineList = new ArrayList<String>();
+        while (sc.hasNextLine()) {
+            lineList.add(sc.nextLine());
+        }
+        return lineList;
+    }
 
 }

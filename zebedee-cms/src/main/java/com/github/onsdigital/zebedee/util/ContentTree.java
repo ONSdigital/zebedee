@@ -45,4 +45,8 @@ public class ContentTree {
         publishedDetails.overlayDetails(collection.reviewed.details());
         return publishedDetails;
     }
+
+    public static void dropCache() {
+        publishedContentTree = null;
+    }
 }

@@ -35,7 +35,7 @@ public class Zebedee {
     public final Teams teams;
     public final Content launchpad;
 
-    public Zebedee(Path path) {
+    public Zebedee(Path path) throws IOException {
 
         // Validate the directory:
         this.path = path;
@@ -46,6 +46,7 @@ public class Zebedee {
         Path permissions = path.resolve(PERMISSIONS);
         Path teams = path.resolve(TEAMS);
         Path launchpad = path.resolve(LAUNCHPAD);
+
         if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
@@ -58,6 +59,7 @@ public class Zebedee {
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
         this.launchpad = new Content(launchpad);
+
     }
 
     /**

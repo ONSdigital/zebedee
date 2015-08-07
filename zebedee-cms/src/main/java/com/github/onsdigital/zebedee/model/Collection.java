@@ -27,6 +27,7 @@ public class Collection {
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
+
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     public final CollectionDescription description;
     public final Path path;
@@ -36,6 +37,7 @@ public class Collection {
     final Zebedee zebedee;
     final Collections collections;
 
+    public RedirectTable redirect = null;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -80,6 +82,13 @@ public class Collection {
         this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
+
+        // Set up redirect
+        // this compound redirect will retrieve
+        redirect = this.inProgress.redirect;
+        redirect.setChild(this.complete.redirect);
+        redirect.setChild(this.reviewed.redirect);
+        redirect.setChild(zebedee.published.redirect);
     }
 
     Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException {

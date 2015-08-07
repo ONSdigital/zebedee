@@ -19,13 +19,28 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Content {
-
+    static final String REDIRECT = "redirect.txt";
     public final Path path;
+
+    public final RedirectTable redirect;
 
     public Content(Path path) {
         this.path = path;
         if (!Files.exists(path)) {
             throw new IllegalArgumentException("Path does not exist: "
+                    + path.toAbsolutePath());
+        }
+
+        // Create a redirect table alongside the content
+        this.redirect = new RedirectTable(this);
+        try {
+            if (Files.exists(this.path.resolve(REDIRECT))) {
+                this.redirect.loadFromPath(this.path.resolve(REDIRECT));
+            } else {
+                this.redirect.saveToPath(this.path.resolve(REDIRECT));
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Redirect table could not be created"
                     + path.toAbsolutePath());
         }
     }

@@ -102,7 +102,7 @@ public class RedirectTable {
         }
     }
 
-    void saveToPath(Path path) throws IOException {
+    public void saveToPath(Path path) throws IOException {
         // TODO quite a considerable amount of threadsafe making
         try (FileWriter stream = new FileWriter(path.toFile()); BufferedWriter out = new BufferedWriter(stream)) {
             for (String fromUri : table.keySet()) {
@@ -113,7 +113,7 @@ public class RedirectTable {
         }
     }
 
-    void loadFromPath(Path path) throws IOException {
+    public void loadFromPath(Path path) throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
             String line;
             while ((line = br.readLine()) != null) {

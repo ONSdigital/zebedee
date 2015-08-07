@@ -24,30 +24,22 @@
             <groupId>com.github.onsdigital</groupId>
             <artifactId>zebedee-content-wrappers</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+
     </dependencies>
 
 
     <build>
         <resources>
-            <!-- Master content is used when zebedee reader is started as a standalone service on development environment.
-            In this case no collections and users will be available.
-            Only master content will be served. If zebedee is started with cms and reader zebedee reader will read from directories created by zebedee cms startup-->
-            <resource>
-                <directory>../content</directory>
-                <targetPath>${project.build.directory}/zebedee/master</targetPath>
-            </resource>
-
             <!--Collections to be used in unit tests-->
             <resource>
-                <directory>../content/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16</directory>
+                <directory>src/test/resources/test-content</directory>
                 <targetPath>
-                    ${project.build.directory}/zebedee/collections/testcollection/inprogress/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16
-                </targetPath>
-            </resource>
-            <resource>
-                <directory>../content/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/</directory>
-                <targetPath>
-                    ${project.build.directory}/zebedee/collections/testcollection/reviewed/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/
+                    ${project.build.directory}/test-content
                 </targetPath>
             </resource>
         </resources>

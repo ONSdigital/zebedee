@@ -1,15 +1,17 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.ResourceUtils;
-import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.reader.util.AuthorisationHandler;
 import org.apache.commons.io.IOUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,7 +24,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class Root implements Startup {
+import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+
+public class Root {
     static final String ZEBEDEE_ROOT = "zebedee_root";
     // Environment variables are stored as a static variable so if necessary we can hijack them for testing
     public static Map<String, String> env = System.getenv();
@@ -49,8 +53,7 @@ public class Root implements Startup {
         }
     }
 
-    @Override
-    public void init() {
+    public static void init() {
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
@@ -61,7 +64,7 @@ public class Root implements Startup {
         // If we have an environment variable and it is
         String rootDir = env.get(ZEBEDEE_ROOT);
         boolean zebedeeCreated = false;
-        if(rootDir != null && rootDir!= "" && Files.exists(Paths.get(rootDir))) {
+        if (rootDir != null && rootDir != "" && Files.exists(Paths.get(rootDir))) {
             root = Paths.get(rootDir);
             try {
                 zebedee = Zebedee.create(root);
@@ -71,7 +74,7 @@ public class Root implements Startup {
             }
 
         }
-        if(!zebedeeCreated) {
+        if (!zebedeeCreated) {
             try {
                 // Create a Zebedee folder:
                 root = Files.createTempDirectory("zebedee");
@@ -89,7 +92,7 @@ public class Root implements Startup {
 
     }
 
-    private List<Path> listContent(Path taxonomy) throws IOException {
+    private static List<Path> listContent(Path taxonomy) throws IOException {
         List<Path> content = new ArrayList<>();
 
         // List the taxonomy files:
@@ -98,7 +101,7 @@ public class Root implements Startup {
         return content;
     }
 
-    private void copyContent(List<Path> content, Path taxonomy)
+    private static void copyContent(List<Path> content, Path taxonomy)
             throws IOException {
 
         // Extract the content:

@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.content.util;
 
-import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.ObjectUtils;
@@ -97,8 +97,8 @@ public class ContentUtil {
      * @param stream json stream
      * @return
      */
-    public static Content deserialiseContent(InputStream stream) {
-        return createBuilder(ContentConstants.JSON_DATE_PATTERN).registerTypeAdapter(Content.class, new ContentTypeResolver()).create().fromJson(new InputStreamReader(stream), Content.class);
+    public static Page deserialiseContent(InputStream stream) {
+        return createBuilder(ContentConstants.JSON_DATE_PATTERN).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(new InputStreamReader(stream), Page.class);
     }
 
 
@@ -109,8 +109,8 @@ public class ContentUtil {
      * @param datePattern date pattern to be used when deserialising
      * @return
      */
-    public static Content deserialiseContent(InputStream stream, String datePattern) {
-        return createBuilder(datePattern).registerTypeAdapter(Content.class, new ContentTypeResolver()).create().fromJson(new InputStreamReader(stream), Content.class);
+    public static Page deserialiseContent(InputStream stream, String datePattern) {
+        return createBuilder(datePattern).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(new InputStreamReader(stream), Page.class);
     }
 
 
@@ -120,8 +120,8 @@ public class ContentUtil {
      * @param json
      * @return
      */
-    public static Content deserialiseContent(String json) {
-        return createBuilder(ContentConstants.JSON_DATE_PATTERN).registerTypeAdapter(Content.class, new ContentTypeResolver()).create().fromJson(json, Content.class);
+    public static Page deserialiseContent(String json) {
+        return createBuilder(ContentConstants.JSON_DATE_PATTERN).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(json, Page.class);
     }
 
     /**
@@ -131,8 +131,8 @@ public class ContentUtil {
      * @param datePattern
      * @return
      */
-    public static Content deserialiseContent(String json, String datePattern) {
-        return createBuilder(datePattern).registerTypeAdapter(Content.class, new ContentTypeResolver()).create().fromJson(json, Content.class);
+    public static Page deserialiseContent(String json, String datePattern) {
+        return createBuilder(datePattern).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(json, Page.class);
     }
 
 

@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee.content.partial;
 
 
-public class Contact {
+import com.github.onsdigital.zebedee.content.base.Content;
+
+public class Contact extends Content {
 
     private String email;
     private String name;

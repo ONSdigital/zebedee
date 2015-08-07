@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.dynamic.TimeSeriesValueSet;
-import com.github.onsdigital.zebedee.content.dynamic.TitleWrapper;
+import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 
@@ -39,7 +39,7 @@ public class FilterUtil {
 
         switch (filter) {
             case TITLE:
-                TitleWrapper titleWrapper = new TitleWrapper();
+                ContentNodeDetails titleWrapper = new ContentNodeDetails();
                 titleWrapper.setTitle(page.getDescription().getTitle());
                 return titleWrapper;
             case DESCRIPTION:

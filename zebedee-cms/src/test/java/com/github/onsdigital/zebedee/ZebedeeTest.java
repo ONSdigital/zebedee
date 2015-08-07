@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -183,4 +184,104 @@ public class ZebedeeTest {
         assertFalse(Files.exists(releaseFolder));
     }
 
+	@Test
+	public void toUri_givenPublishedFilePath_shouldReturnUri() {
+		// Given
+		// a zebedee implementation
+		Zebedee zebedee = new Zebedee(expectedPath);
+		String expectedURI = "/expected";
+		String suffix = "expected/data.json";
+
+		// When
+		// we convert these to URIs
+		String publishedURI = zebedee.toUri(zebedee.published.path.resolve(suffix));
+		String launchpadURI = zebedee.toUri(zebedee.launchpad.path.resolve(suffix));
+
+		// Then
+		// we expect the uri
+		assertEquals(expectedURI, publishedURI);
+		assertEquals(expectedURI, launchpadURI);
+	}
+
+	@Test
+	public void toUri_givenPublishedFilePathAsString_shouldReturnUri() {
+		// Given
+		// a zebedee implementation
+		Zebedee zebedee = new Zebedee(expectedPath);
+		String expectedURI = "/expected";
+		String suffix = "expected/data.json";
+
+		// When
+		// we convert these to URIs
+		String publishedURI = zebedee.toUri(zebedee.published.path.resolve(suffix).toString());
+		String launchpadURI = zebedee.toUri(zebedee.launchpad.path.resolve(suffix).toString());
+
+		// Then
+		// we expect the uri
+		assertEquals(expectedURI, publishedURI);
+		assertEquals(expectedURI, launchpadURI);
+	}
+
+	@Test
+	public void toUri_givenCollectionFilePath_shouldReturnUri() {
+		// Given
+		// a zebedee implementation
+		Zebedee zebedee = new Zebedee(expectedPath);
+		String expectedURI = "/expected";
+		String inprogress = "collections/mycollection/inprogress/expected/data.json";
+		String complete = "collections/mycollection/complete/expected/data.json";
+		String reviewed = "collections/mycollection/reviewed/expected/data.json";
+
+		// When
+		// we convert these to URIs
+		String inProgressURI = zebedee.toUri(zebedee.path.resolve(inprogress));
+		String completeURI = zebedee.toUri(zebedee.path.resolve(complete));
+		String reviewedURI = zebedee.toUri(zebedee.path.resolve(reviewed));
+
+		// Then
+		// we expect the uri
+		assertEquals(expectedURI, inProgressURI);
+		assertEquals(expectedURI, completeURI);
+		assertEquals(expectedURI, reviewedURI);
+	}
+
+	@Test
+	public void toUri_givenCollectionFilePathAsString_shouldReturnUri() {
+		// Given
+		// a zebedee implementation
+		Zebedee zebedee = new Zebedee(expectedPath);
+		String expectedURI = "/expected";
+		String inprogress = "collections/mycollection/inprogress/expected/data.json";
+		String complete = "collections/mycollection/complete/expected/data.json";
+		String reviewed = "collections/mycollection/reviewed/expected/data.json";
+
+		// When
+		// we convert these to URIs
+		String inProgressURI = zebedee.toUri(zebedee.path.resolve(inprogress).toString());
+		String completeURI = zebedee.toUri(zebedee.path.resolve(complete).toString());
+		String reviewedURI = zebedee.toUri(zebedee.path.resolve(reviewed).toString());
+
+		// Then
+		// we expect the uri
+		assertEquals(expectedURI, inProgressURI);
+		assertEquals(expectedURI, completeURI);
+		assertEquals(expectedURI, reviewedURI);
+	}
+
+	@Test
+	public void toUri_givenPathOutsideZebedee_shouldReturnNull() {
+		// Given
+		// a zebedee implementation
+		Zebedee zebedee = new Zebedee(expectedPath);
+		String notZebedee = "/NotZebedee/data.json"; // (non zebedee path)
+		Path notZebedeePath = Paths.get(notZebedee);
+
+		// When
+		// we convert these to URIs
+		String notZebedeeUri = zebedee.toUri(notZebedeePath);
+
+		// Then
+		// we expect the uri to be null
+		assertNull(notZebedeeUri);
+	}
 }

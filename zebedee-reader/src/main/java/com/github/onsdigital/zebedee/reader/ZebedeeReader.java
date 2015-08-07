@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -155,6 +156,24 @@ public class ZebedeeReader {
     }
 
 
+    public Content getLatestPublishedContent(String uri) throws ZebedeeException, IOException {
+        return getLatestPublishedContent(uri, null);
+    }
+
+    public Content getLatestPublishedContent(String uri, DataFilter dataFilter) throws ZebedeeException, IOException {
+        Page content = publishedContentReader.getLatestContent(uri);
+        return FilterUtil.filterPageData(content, dataFilter);
+    }
+
+    public Content getLatestCollectionContent(String collectionId, String uri) throws IOException, ZebedeeException {
+        return getLatestCollectionContent(collectionId, uri, null);
+    }
+
+    public Content getLatestCollectionContent(String collectionId, String uri, DataFilter dataFilter) throws IOException, ZebedeeException {
+        Page content = createCollectionReader(collectionId).getLatestContent(uri);
+        return FilterUtil.filterPageData(content, dataFilter);
+    }
+
     private void assertId(String collectionId) throws BadRequestException {
         if (collectionId == null) {
             throw new BadRequestException("Collection Id must be supplied");
@@ -165,4 +184,5 @@ public class ZebedeeReader {
     private CollectionContentReader createCollectionReader(String collectionId) throws NotFoundException, IOException, CollectionNotFoundException {
         return new CollectionContentReader(getConfiguration().getCollectionsFolder(), collectionId);
     }
+
 }

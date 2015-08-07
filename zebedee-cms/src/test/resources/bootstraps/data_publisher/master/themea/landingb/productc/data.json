@@ -1,0 +1,30 @@
+{
+  "items": [
+  ],
+  "datasets": [
+  ],
+  "statsBulletins": [
+  ],
+  "relatedArticles": [
+  ],
+  "index": 0,
+  "type": "product_page",
+  "uri": "/themea/landingb/productc",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/themea"
+    },
+    {
+      "uri": "/themea/landingb"
+    }
+  ],
+  "description": {
+    "title": "Product C",
+    "summary": "Product C"
+  },
+  "articles": [
+  ]
+}

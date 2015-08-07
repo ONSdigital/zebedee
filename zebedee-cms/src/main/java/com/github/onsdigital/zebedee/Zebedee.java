@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Zebedee {
 
@@ -72,7 +73,6 @@ public class Zebedee {
         Path path;
         if(!Files.exists(parent.resolve(ZEBEDEE))) {
             path = Files.createDirectory(parent.resolve(ZEBEDEE));
-            System.setProperty("zebedee_root", path.toString());
         } else {
             path = parent.resolve(ZEBEDEE);
         }
@@ -161,10 +161,38 @@ public class Zebedee {
     }
 
     public Path find(String uri) throws IOException {
-
         // There's currently only one place to look for content.
         // We may add one or more staging layers later.
         return published.get(uri);
+    }
+
+
+    public String toUri(Path path) {
+        if (path == null) { return null; }
+
+        // Remove zebedee section of path
+        Path uriPath =  this.path.relativize(path);
+
+        // Strip off either launchpad, master or collections/mycollection/inprogress etc
+        if (uriPath.startsWith("collections")) {
+            uriPath = uriPath.subpath(3, uriPath.getNameCount());
+        } else {
+            uriPath = uriPath.subpath(1, uriPath.getNameCount());
+        }
+
+        // Return URI
+        String s = uriPath.toString();
+        if (s.startsWith("..")) {
+            return null;
+        } else if( s.endsWith("data.json") ) {
+            return "/" + s.substring(0, s.length() - "/data.json".length());
+        } else {
+            return "/" + s;
+        }
+    }
+
+    public String toUri(String string) {
+        return toUri(Paths.get(string));
     }
 
     public boolean publish(Collection collection) throws IOException {

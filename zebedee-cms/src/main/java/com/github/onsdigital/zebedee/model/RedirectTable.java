@@ -61,7 +61,7 @@ public class RedirectTable {
         String finalUriAtThisLevel = endChain(uri, ITERATION_MAX);        // Follow redirect chain
         if (finalUriAtThisLevel == null) { return null; }       // Check for cyclical
 
-        if (content.exists(finalUriAtThisLevel)) {              // Option 1) Uri exists - return it
+        if (content.exists(finalUriAtThisLevel, false)) {              // Option 1) Uri exists - return it
             return finalUriAtThisLevel;
         } else if (child != null) {                             //
             String chained = child.get(finalUriAtThisLevel);
@@ -78,7 +78,7 @@ public class RedirectTable {
     private String endChain(String uri, int iterations) {
         if (iterations == 0) { return null; } // checks we haven't cycled
 
-        if ( !content.exists(uri) && table.containsKey(uri) ) {
+        if (!content.exists(uri, false) && table.containsKey(uri)) {
             return endChain(table.get(uri), --iterations);
         }
         return uri;

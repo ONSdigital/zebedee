@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Content {
-    static final String REDIRECT = "redirect.txt";
+    public static final String REDIRECT = "redirect.txt";
     public final Path path;
 
     public final RedirectTable redirect;
@@ -64,17 +64,66 @@ public class Content {
         return exists(uri.getPath());
     }
 
+    boolean exists(URI uri, boolean doRedirect) {
+        return exists(uri.getPath(), doRedirect);
+    }
     boolean exists(String uri) {
-        Path path = toPath(uri);
+        return exists(uri, true);
+    }
+
+    boolean exists(String uri, boolean doRedirect) {
+        String finalUri = uri;
+        if (doRedirect) {
+            finalUri = redirect.get(uri);
+        }
+        if (finalUri == null) {
+            return false;
+        }
+
+        Path path = toPath(finalUri);
         return Files.exists(path);
     }
 
     Path get(URI uri) {
-        return get(uri.getPath());
+        return get(uri.getPath(), true);
     }
 
+    Path get(URI uri, boolean doRedirect) {
+        return get(uri.getPath(), doRedirect);
+    }
+
+    /**
+     * Returns a path for the specified uri
+     * Uses redirect
+     *
+     * @param uri
+     * @return
+     */
     public Path get(String uri) {
-        Path path = toPath(uri);
+        return get(uri, true);
+    }
+
+    /**
+     * Returns a path for the specified uri
+     *
+     * @param uri        uri requested
+     * @param doRedirect redirect if the uri is not found
+     * @return
+     */
+    public Path get(String uri, boolean doRedirect) {
+
+        String finalUri = uri;
+        if (doRedirect) {
+            finalUri = redirect.get(uri);
+        }
+        ;
+
+        if (finalUri == null) {
+            return null;
+        }
+        ;
+
+        Path path = toPath(finalUri);
         Path result = null;
         if (Files.exists(path)) {
             result = path;
@@ -87,6 +136,8 @@ public class Content {
      * {@link Content}. The {@link Path} is generated whether or not a file
      * actually exists, so this method is suitable for use when creating new
      * content.
+     *
+     * toPath does not redirect uri's
      *
      * @param uri The URI of the item.
      * @return A {@link Path} to the [potential] location of the specified item.
@@ -125,7 +176,9 @@ public class Content {
         // Convert to URIs:
         List<String> uris = new ArrayList<>();
         for (Path path : files) {
-            uris.add(PathUtils.toUri(path));
+            if (!path.endsWith(REDIRECT)) { // Do not include redirect.txt in list of URIs
+                uris.add(PathUtils.toUri(path));
+            }
         }
 
         return uris;

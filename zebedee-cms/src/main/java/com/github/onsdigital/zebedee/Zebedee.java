@@ -35,7 +35,7 @@ public class Zebedee {
     public final Teams teams;
     public final Content launchpad;
 
-    public Zebedee(Path path) throws IOException {
+    public Zebedee(Path path) {
 
         // Validate the directory:
         this.path = path;
@@ -165,6 +165,7 @@ public class Zebedee {
     public Path find(String uri) throws IOException {
         // There's currently only one place to look for content.
         // We may add one or more staging layers later.
+
         return published.get(uri);
     }
 
@@ -229,11 +230,14 @@ public class Zebedee {
     public void delete(Path path) throws IOException {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path directory : stream) {
-                // Recursively delete directories only - added .DS_Store files:
+                // Recursively delete directories only
                 if (Files.isDirectory(directory)) {
                     delete(directory);
                 }
-                if (directory.endsWith(".DS_Store")) {
+                if (directory.endsWith(".DS_Store")) { // delete any .ds_store hidden files
+                    Files.delete(directory);
+                }
+                if (directory.endsWith(Content.REDIRECT)) { // also delete redirect table
                     Files.delete(directory);
                 }
             }

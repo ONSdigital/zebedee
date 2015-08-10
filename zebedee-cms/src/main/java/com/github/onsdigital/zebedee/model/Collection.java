@@ -222,12 +222,19 @@ public class Collection {
 
         // Only show edited material if the user has permission:
         if (permission) {
-            result = inProgress.get(uri);
+            String redirected = redirect.get(uri);
+            result = inProgress.get(redirected);
+
             if (result == null) {
-                result = complete.get(uri);
+                result = complete.get(redirected);
             }
+
             if (result == null) {
-                result = reviewed.get(uri);
+                result = reviewed.get(redirected);
+            }
+
+            if (result == null) {
+                result = zebedee.published.get(redirected);
             }
         }
 

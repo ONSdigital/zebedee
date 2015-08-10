@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.util.ContentTree;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,12 +42,6 @@ public class CollectionBrowseTree {
             return null;
         }
 
-        ContentDetail publishedDetails = Root.zebedee.published.nestedDetails();
-
-        publishedDetails.overlayDetails(collection.inProgress.details());
-        publishedDetails.overlayDetails(collection.complete.details());
-        publishedDetails.overlayDetails(collection.reviewed.details());
-
-        return publishedDetails;
+        return ContentTree.getOverlayed(collection);
     }
 }

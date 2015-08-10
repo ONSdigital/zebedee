@@ -14,7 +14,6 @@ import com.github.onsdigital.zebedee.util.ContentNodeComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
@@ -31,7 +30,7 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 public class ReadRequestHandler {
 
     private final static String LATEST = "latest";
-    private final static String COLLECTION_COOKIE = "collection";
+    private final static String COLLECTION_HEADER = "collection";
 
     /**
      * Authorisation handler is used to check permission on collection reads.
@@ -189,30 +188,15 @@ public class ReadRequestHandler {
 
     /*By default tries to read collection id from cookies named collection. If not found falls back to reading from uri.*/
     private String getCollectionId(HttpServletRequest request) {
-        String collectionId = getCookieValue(request,COLLECTION_COOKIE);
+        String collectionId = request.getHeader(COLLECTION_HEADER);
         //Fallback to reading from uri
         if (StringUtils.isEmpty(collectionId)) {
-            collectionId = URIUtils.getPathSegment(request.getRequestURI(), 2);
+            collectionId =  URIUtils.getPathSegment(request.getRequestURI(), 2);
         }
 
         return collectionId;
     }
 
-
-    private String getCookieValue(HttpServletRequest request, String name) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return null;
-        }
-        for (int i = 0; i < cookies.length; i++) {
-            Cookie cookie = cookies[i];
-            if (name.equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-
-        return null;
-    }
 
     private String extractUri(HttpServletRequest request) throws BadRequestException {
         String uri = request.getParameter("uri");

@@ -30,7 +30,6 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 public class ReadRequestHandler {
 
     private final static String LATEST = "latest";
-    private final static String COLLECTION_HEADER = "collection";
 
     /**
      * Authorisation handler is used to check permission on collection reads.
@@ -188,13 +187,7 @@ public class ReadRequestHandler {
 
     /*By default tries to read collection id from cookies named collection. If not found falls back to reading from uri.*/
     private String getCollectionId(HttpServletRequest request) {
-        String collectionId = request.getHeader(COLLECTION_HEADER);
-        //Fallback to reading from uri
-        if (StringUtils.isEmpty(collectionId)) {
-            collectionId =  URIUtils.getPathSegment(request.getRequestURI(), 2);
-        }
-
-        return collectionId;
+        return URIUtils.getPathSegment(request.getRequestURI(), 2);
     }
 
 

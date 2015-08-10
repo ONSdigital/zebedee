@@ -142,24 +142,6 @@ public class ReadRequestHandlerTest {
         assertEquals("Employment and labour market-inprogress", employmentLabourMarket.getDetails().getTitle());
     }
 
-
-    @Test
-    public void testReadWithCookie() throws IOException, ZebedeeException {
-        when(request.getParameter("uri")).thenReturn("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
-        when(request.getRequestURI()).thenReturn("/data");
-        when(request.getHeader("collection")).thenReturn("testcollection-testid");
-        Collection<ContentNode> parents = readRequestHandler.getParents(request);
-        assertTrue(parents.size() == 2);
-        Iterator<ContentNode> iterator = parents.iterator();
-        ContentNode home = iterator.next();
-        ContentNode employmentLabourMarket = iterator.next();
-        assertEquals(URI.create("/"), home.getUri());
-        assertEquals(URI.create("/employmentandlabourmarket/"), employmentLabourMarket.getUri());
-        //Collection content should be overwriting published content
-        assertEquals("Employment and labour market-inprogress", employmentLabourMarket.getDetails().getTitle());
-    }
-
-
     @Test
     public void testExtractUri() throws Exception {
 

@@ -14,6 +14,7 @@ import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
@@ -147,7 +148,8 @@ public class ReadRequestHandlerTest {
     public void testReadWithCookie() throws IOException, ZebedeeException {
         when(request.getParameter("uri")).thenReturn("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         when(request.getRequestURI()).thenReturn("/data");
-        when(request.getHeader("collection")).thenReturn("testcollection-testid");
+        Cookie[] cookies = {new Cookie("collection", "testcollection-testid")};
+        when(request.getCookies()).thenReturn(cookies);
         Collection<ContentNode> parents = readRequestHandler.getParents(request);
         assertTrue(parents.size() == 2);
         Iterator<ContentNode> iterator = parents.iterator();

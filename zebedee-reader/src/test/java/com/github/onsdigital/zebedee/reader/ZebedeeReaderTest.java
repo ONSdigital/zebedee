@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.base.Content;
-import com.github.onsdigital.zebedee.content.dynamic.TitleWrapper;
+import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
@@ -51,8 +51,8 @@ public class ZebedeeReaderTest {
     public void testTitleFilter() throws ZebedeeException, IOException {
         Content content = ZebedeeReader.getInstance().getPublishedContent("about/accessibility", DataFilter.TITLE);
         assertNotNull(content);
-        assertTrue(content instanceof TitleWrapper);
-        TitleWrapper titleWrapper = (TitleWrapper) content;
+        assertTrue(content instanceof ContentNodeDetails);
+        ContentNodeDetails titleWrapper = (ContentNodeDetails) content;
         assertNotNull(titleWrapper);
         assertEquals("Accessibility", titleWrapper.getTitle());
     }
@@ -115,7 +115,7 @@ public class ZebedeeReaderTest {
             assertTrue(children.containsKey(bulletinUri));
             assertNull(contentNode.getValue().getType());//type is null for directories with no data.json
             assertNull(contentNode.getValue().getChildren());// only immediate children should be read
-            assertEquals("bulletins", children.get(bulletinUri).getDescription().getTitle());
+            assertEquals("bulletins", children.get(bulletinUri).getDetails().getTitle());
     }
 
     @Test

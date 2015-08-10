@@ -570,6 +570,7 @@ public class Collection {
         }
 
         if (hasDeleted) AddEvent(uri, new Event(new Date(), EventType.DELETED, email));
+        save();
 
         return hasDeleted;
     }

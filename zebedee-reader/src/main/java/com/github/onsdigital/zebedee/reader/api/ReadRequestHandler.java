@@ -19,12 +19,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import static com.github.onsdigital.zebedee.util.URIUtils.getLastSegment;
+import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
+
 /**
  * Created by bren on 31/07/15.
  * <p>
  * This class checks to see if zebedee cms is running to authorize collection views via registered AuthorisationHandler, if not serves published content
  */
 public class ReadRequestHandler {
+
+    private final static String LATEST = "latest";
 
     /**
      * Authorisation handler is used to check permission on collection reads.
@@ -36,6 +41,9 @@ public class ReadRequestHandler {
     /**
      * Finds requested content , if a collection is required handles authorisation
      *
+     * If requested uri ends in "latest" it will return latest edition of bulletin or article content, throws BadRequestException given uri is not a bulletin or article content
+     *
+     *
      * @param request
      * @param dataFilter
      * @return Content
@@ -45,6 +53,30 @@ public class ReadRequestHandler {
     public Content findContent(HttpServletRequest request, DataFilter dataFilter) throws ZebedeeException, IOException {
         String uri = extractUri(request);
         String collectionId = getCollectionId(request);
+        String lastSegment = getLastSegment(uri);
+        if (LATEST.equalsIgnoreCase(lastSegment)) {
+            return getLatestContent(request, collectionId, dataFilter, removeLastSegment(uri));
+        } else {
+            return getContent(request, collectionId, dataFilter, uri);
+        }
+
+    }
+
+    private Content getLatestContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
+        if (collectionId != null) {
+            authorise(request, collectionId);
+            try {
+                //A content in a collection should be the latest one
+                return ZebedeeReader.getInstance().getLatestCollectionContent(collectionId, uri, dataFilter);
+            } catch (NotFoundException e) {
+                System.out.println("Could not found " + uri + " under collection " + collectionId + " , trying published content");
+            }
+        }
+
+        return ZebedeeReader.getInstance().getLatestPublishedContent(uri, dataFilter);
+    }
+
+    public Content getContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         if (collectionId != null) {
             authorise(request, collectionId);
             try {
@@ -55,7 +87,6 @@ public class ReadRequestHandler {
         }
 
         return ZebedeeReader.getInstance().getPublishedContent(uri, dataFilter);
-
     }
 
     /**
@@ -177,7 +208,7 @@ public class ReadRequestHandler {
      * @return
      */
     private Map<URI, ContentNode> sortMapByContentTitle(Map<URI, ContentNode> nodes) {
-        TreeMap<URI, ContentNode> sortedMap = new TreeMap<>(new ContentNodeComparator(nodes));
+        TreeMap<URI, ContentNode> sortedMap = new TreeMap<>(new ContentNodeComparator(nodes,false));
         sortedMap.putAll(nodes);
         return sortedMap;
     }

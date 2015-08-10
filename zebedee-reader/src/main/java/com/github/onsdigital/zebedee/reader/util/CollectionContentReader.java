@@ -14,10 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -125,6 +122,16 @@ public class CollectionContentReader {
         }
     }
 
+
+    //If content not found with given reader do not shout
+    private Page getLatestQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+        try {
+            return contentReader.getLatestContent(path);
+        } catch (NotFoundException e) {
+            return null;
+        }
+    }
+
     //If content not found with given reader do not shout
     private Map<URI, ContentNode> getChildrenQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
@@ -147,7 +154,7 @@ public class CollectionContentReader {
 
     //Finds collection name with given id
     private Path findCollectionPath(String collectionId) throws IOException, NotFoundException, CollectionNotFoundException {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(collections)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(collections,"*.{json}")) {
             for (Path path : stream) {
                 if (Files.isDirectory(path)) {
                     continue;
@@ -163,6 +170,18 @@ public class CollectionContentReader {
             }
             throw new CollectionNotFoundException("Collection with given id not found, id:" + collectionId);
         }
+    }
+
+
+    public Page getLatestContent(String path) throws ZebedeeException, IOException {
+        Page content = getLatestQuite(path, inProgress);
+        if (content == null) {
+            content = getLatestQuite(path, complete);
+            if (content == null) {
+                content = reviewed.getLatestContent(path);
+            }
+        }
+        return content;
     }
 
 

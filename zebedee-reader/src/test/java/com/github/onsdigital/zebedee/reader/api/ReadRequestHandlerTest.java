@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.reader.api;
 
 import com.github.onsdigital.zebedee.content.base.Content;
-import com.github.onsdigital.zebedee.content.dynamic.TitleWrapper;
+import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -50,8 +50,8 @@ public class ReadRequestHandlerTest {
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17");
         Content content = readRequestHandler.findContent(request, DataFilter.TITLE);
         assertNotNull(content);
-        assertTrue(content instanceof TitleWrapper);
-        TitleWrapper titleWrapper = (TitleWrapper) content;
+        assertTrue(content instanceof ContentNodeDetails);
+        ContentNodeDetails titleWrapper = (ContentNodeDetails) content;
         assertEquals("UK Natural Capital Land Cover in the UK", titleWrapper.getTitle());
     }
 
@@ -95,7 +95,7 @@ public class ReadRequestHandlerTest {
         assertTrue(children.size() == 1);
         ContentNode child = children.iterator().next();
         assertNull(child.getChildren());
-        assertEquals("UK Natural Capital Land Cover in the UK", child.getDescription().getTitle());
+        assertEquals("UK Natural Capital Land Cover in the UK", child.getDetails().getTitle());
     }
 
     private void shouldResolveChildrenInDepth() throws Exception {
@@ -105,14 +105,14 @@ public class ReadRequestHandlerTest {
         Iterator<ContentNode> iterator = children.iterator();
         ContentNode articles = iterator.next();
         ContentNode bulletins = iterator.next();
-        assertEquals("articles", articles.getDescription().getTitle());
-        assertEquals("bulletins", bulletins.getDescription().getTitle());
+        assertEquals("articles", articles.getDetails().getTitle());
+        assertEquals("bulletins", bulletins.getDetails().getTitle());
 
         assertNotNull(bulletins.getChildren());
         assertTrue(bulletins.getChildren().isEmpty() == false);
         assertTrue(articles.getChildren().size() == 1);
         ContentNode grandChild = bulletins.getChildren().iterator().next();
-        assertEquals("ukenvironmentalaccounts", grandChild.getDescription().getTitle());
+        assertEquals("ukenvironmentalaccounts", grandChild.getDetails().getTitle());
         assertNotNull(grandChild.getChildren());
     }
 
@@ -139,7 +139,7 @@ public class ReadRequestHandlerTest {
         assertEquals(URI.create("/"), home.getUri());
         assertEquals(URI.create("/employmentandlabourmarket/"), employmentLabourMarket.getUri());
         //Collection content should be overwriting published content
-        assertEquals("Employment and labour market-inprogress", employmentLabourMarket.getDescription().getTitle());
+        assertEquals("Employment and labour market-inprogress", employmentLabourMarket.getDetails().getTitle());
     }
 
     @Test

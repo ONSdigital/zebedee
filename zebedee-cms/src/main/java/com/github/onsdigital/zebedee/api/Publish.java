@@ -18,7 +18,7 @@ public class Publish {
 
 	/**
 	 *
-	 * @param request
+	 * @param request the file request
 	 * @param response <ul>
 	 *                 <li>If publish succeeds: {@link HttpStatus#OK_200}</li>
 	 *                 <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
@@ -26,7 +26,7 @@ public class Publish {
 	 *                 <li>If the collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
 	 *                 <li>If the collection is not approved:  {@link HttpStatus#CONFLICT_409}</li>
 	 *                 </ul>
-	 * @return
+	 * @return success value
 	 * @throws IOException
 	 * @throws NotFoundException
 	 * @throws BadRequestException
@@ -40,8 +40,10 @@ public class Publish {
 		com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 		Session session = Root.zebedee.sessions.get(request);
 
-		return Root.zebedee.collections.publish(collection, session);
+		String breakBeforeFileTransfer = request.getParameter("breakbeforefiletransfer");
+		boolean doBreakBeforeFileTransfer = ((breakBeforeFileTransfer != null) && (breakBeforeFileTransfer.equalsIgnoreCase("true") || breakBeforeFileTransfer.equalsIgnoreCase("yes")));
 
+		return Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer);
 	}
 
 }

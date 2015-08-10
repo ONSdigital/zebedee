@@ -4197,12 +4197,12 @@
     "type": "timeseries",
     "description": {
       "seasonalAdjustment": "NSA",
-      "cdid": "GMAK",
+      "cdid": "AF4K",
       "unit": "",
       "preUnit": "",
       "source": "Office for National Statistics",
       "nationalStatistic": false,
-      "title": "GMAK"
+      "title": "AF4K"
     }
   },
   {
@@ -8410,12 +8410,12 @@
     "type": "timeseries",
     "description": {
       "seasonalAdjustment": "NSA",
-      "cdid": "GMAM",
+      "cdid": "JU5C",
       "unit": "",
       "preUnit": "",
       "source": "Office for National Statistics",
       "nationalStatistic": false,
-      "title": "GMAM"
+      "title": "JU5C"
     }
   },
   {
@@ -16122,12 +16122,12 @@
     "type": "timeseries",
     "description": {
       "seasonalAdjustment": "NSA",
-      "cdid": "GMBB",
+      "cdid": "JU5D",
       "unit": "",
       "preUnit": "",
       "source": "Office for National Statistics",
       "nationalStatistic": false,
-      "title": "GMBB"
+      "title": "JU5D"
     }
   },
   {

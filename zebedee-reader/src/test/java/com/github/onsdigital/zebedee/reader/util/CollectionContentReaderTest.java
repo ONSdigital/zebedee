@@ -30,7 +30,7 @@ public class CollectionContentReaderTest {
 
     @Before
     public void createContentReader() throws IOException, NotFoundException, CollectionNotFoundException {
-        this.collectionReader = new CollectionContentReader("target/test-content/collections",COLLECTION_ID);
+        this.collectionReader = new CollectionContentReader("target/test-content/zebedee/collections",COLLECTION_ID);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class CollectionContentReaderTest {
         Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
         assertTrue(children.size() == 1);
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
-        assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDescription().getTitle());
+        assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDetails().getTitle());
         assertEquals(PageType.dataset, contentNode.getValue().getType());//type is null for directories with no data.json
         assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/", contentNode.getKey().toString());
     }

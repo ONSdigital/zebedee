@@ -9,15 +9,18 @@ import java.util.Map;
 /**
  * Created by bren on 04/08/15.
  *
- * Used to order content map alphabetically by title
+ * Used to order content map alphabetically by title. Can sort in reverse order
+ *
  *
  */
 public class ContentNodeComparator implements Comparator<URI> {
 
-    Map<URI, ContentNode> map;
+    private Map<URI, ContentNode> map;
+    private boolean reverse;
 
-    public ContentNodeComparator(Map<URI,ContentNode> nodes) {
+    public ContentNodeComparator(Map<URI,ContentNode> nodes, boolean reverse) {
         this.map = nodes;
+        this.reverse = reverse;
     }
 
     @Override
@@ -31,6 +34,6 @@ public class ContentNodeComparator implements Comparator<URI> {
             return -1;
         }
 
-        return node1.compareTo(node2);
+        return (reverse ? -1 : 1) * node1.compareTo(node2);
     }
 }

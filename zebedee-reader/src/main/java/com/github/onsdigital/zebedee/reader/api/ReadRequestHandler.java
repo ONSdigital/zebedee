@@ -30,6 +30,7 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 public class ReadRequestHandler {
 
     private final static String LATEST = "latest";
+    private final static String COLLECTION_HEADER = "collection";
 
     /**
      * Authorisation handler is used to check permission on collection reads.
@@ -37,12 +38,10 @@ public class ReadRequestHandler {
      */
     private static AuthorisationHandler authorisationHandler;
 
-
     /**
      * Finds requested content , if a collection is required handles authorisation
-     *
+     * <p>
      * If requested uri ends in "latest" it will return latest edition of bulletin or article content, throws BadRequestException given uri is not a bulletin or article content
-     *
      *
      * @param request
      * @param dataFilter
@@ -187,8 +186,15 @@ public class ReadRequestHandler {
     }
 
 
+    /*By default tries to read collection id from cookies named collection. If not found falls back to reading from uri.*/
     private String getCollectionId(HttpServletRequest request) {
-        return URIUtils.getPathSegment(request.getRequestURI(), 2);
+        String collectionId = request.getHeader(COLLECTION_HEADER);
+        //Fallback to reading from uri
+        if (StringUtils.isEmpty(collectionId)) {
+            collectionId =  URIUtils.getPathSegment(request.getRequestURI(), 2);
+        }
+
+        return collectionId;
     }
 
 
@@ -208,7 +214,7 @@ public class ReadRequestHandler {
      * @return
      */
     private Map<URI, ContentNode> sortMapByContentTitle(Map<URI, ContentNode> nodes) {
-        TreeMap<URI, ContentNode> sortedMap = new TreeMap<>(new ContentNodeComparator(nodes,false));
+        TreeMap<URI, ContentNode> sortedMap = new TreeMap<>(new ContentNodeComparator(nodes, false));
         sortedMap.putAll(nodes);
         return sortedMap;
     }

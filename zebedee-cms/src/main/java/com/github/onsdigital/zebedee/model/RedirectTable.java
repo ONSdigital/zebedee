@@ -7,6 +7,35 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+/**
+ * RedirectTable sits at the content level.
+ *
+ * <p>
+ * <code>Chains</code>
+ * <p>
+ * RedirectTable supports chains of redirects. These can chain
+ *
+ * <p>
+ *
+ *
+ * <code>Child</code><p>
+ * The property <code>child</code> is referenced if the parent cannot resolve a uri.
+ * <code>Child</code> may point at its own content or may have its own.
+ * <p>
+ *
+ * Zebedee implementation
+ *
+ * Zebedee.published.redirect is the master table
+ * Collections also have a cascaded redirect of <code>inProgress->complete->reviewed->published</code>
+ *
+ * This allows us to work with moves as something that can be published since inProgress.redirect is referenced before
+ * we drop to the actual files.
+ *
+ * TODO: Conceptual work regarding how a move collection can function
+ * TODO: I can't visualise it working as an extension of the current florence interface
+ *
+ * Scenarios to consider: We want to
+ */
 public class RedirectTable {
     private HashMap<String, String> table = new HashMap<>();
     private RedirectTable child = null;
@@ -59,18 +88,13 @@ public class RedirectTable {
      */
     public String get(String uri) {
         String finalUriAtThisLevel = endChain(uri, ITERATION_MAX);        // Follow redirect chain
-        if (finalUriAtThisLevel == null) { return null; }       // Check for cyclical
+        if (finalUriAtThisLevel == null) { return null; }       // Check for cyclicality
 
-        if (content.exists(finalUriAtThisLevel, false)) {              // Option 1) Uri exists - return it
+        if (content.exists(finalUriAtThisLevel, false)) {       // Option 1) Uri exists - return it
             return finalUriAtThisLevel;
-        } else if (child != null) {                             //
-            String chained = child.get(finalUriAtThisLevel);
-            if (chained != null) {                              // Option 2a) Child level - continue chain
-                return chained;
-            } else {
-                return child.get(uri);                          // Option 2b) Child level - try from scratch
-            }
-        } else {
+        } else if (child != null) {                             // Option 2) Child can continue the chain
+            return child.get(finalUriAtThisLevel);
+        } else {                                                // Option 3) Return null
             return null;
         }
     }
@@ -82,24 +106,6 @@ public class RedirectTable {
             return endChain(table.get(uri), --iterations);
         }
         return uri;
-    }
-
-    /**
-     * Pull a chain of child 301 tables into the parent
-     */
-    public void merge() {
-        if (child != null) {
-            child.merge();
-            merge(child);
-            child = null;
-        }
-    }
-    void merge(RedirectTable redirect) {
-        for (String key: redirect.table.keySet()) {
-            if (!table.containsKey(key)) {
-                table.put(key, redirect.table.get(key));
-            }
-        }
     }
 
     public void saveToPath(Path path) throws IOException {

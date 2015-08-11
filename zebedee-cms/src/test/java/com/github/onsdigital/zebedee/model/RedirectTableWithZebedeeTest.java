@@ -31,6 +31,7 @@ public class RedirectTableWithZebedeeTest {
         bob = new Builder(RedirectTableWithZebedeeTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         zebedee = new Zebedee(bob.zebedee);
     }
+
     @After
     public void ripdownTests() {
         bob = null;
@@ -116,23 +117,48 @@ public class RedirectTableWithZebedeeTest {
     }
 
     @Test
-    public void collectionRedirectTable_withZebedeeCollectionRedirect_doesRedirect() throws IOException {
+    public void collectionRedirectTable_withExistingPage_takesPriority() throws IOException {
         // Given
         // standard setup with a redirect in the published table plus a collection
-        String falseURI = "/themea/landinga/producta/bulletins/falsebulletin/2015-01-01";
+        String existingURI = trueURI;
+        String newURI = "/themeb";
 
 
         CollectionDescription collectionDescription = new CollectionDescription("my collection");
         Collection collection = Collection.create(collectionDescription, zebedee, bob.publisher1.email);
-        collection.inProgress.redirect.addRedirect(falseURI, trueURI);
+
+        collection.inProgress.redirect.addRedirect(existingURI, newURI);
 
         // When
         // we search for the false URI
-        Path path = collection.find(bob.publisher1.email, falseURI);
+        Path path = collection.find(bob.publisher1.email, existingURI);
         String uri = zebedee.toUri(path);
 
         // Then
         // the collection parent-child redirect ought to handle the redirect
-        assertEquals(trueURI, uri);
+        assertEquals(newURI, uri);
+    }
+
+    @Test
+    public void collectionRedirectTable_withExistingPage_takesPriorityEvenIfItLinksToNonValidUri() throws IOException {
+        // Given
+        // standard setup with a redirect in the published table plus a collection
+        String existingURI = trueURI;
+        String newURI = "/redirect/to/non/valid/uri";
+
+
+        CollectionDescription collectionDescription = new CollectionDescription("my collection");
+        Collection collection = Collection.create(collectionDescription, zebedee, bob.publisher1.email);
+
+        collection.inProgress.redirect.addRedirect(existingURI, newURI);
+
+        // When
+        // we search for the false URI
+        Path path = collection.find(bob.publisher1.email, existingURI);
+        String uri = zebedee.toUri(path);
+
+        // Then
+        // the collection parent-child redirect ought to return null
+        assertNull(uri);
     }
 }

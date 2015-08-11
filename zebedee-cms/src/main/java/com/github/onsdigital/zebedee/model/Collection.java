@@ -83,12 +83,13 @@ public class Collection {
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
 
+        this.inProgress.redirect.setChild(this.complete.redirect);
+        this.complete.redirect.setChild(this.reviewed.redirect);
+        this.reviewed.redirect.setChild(this.zebedee.published.redirect);
+
         // Set up redirect
         // this compound redirect will retrieve
         redirect = this.inProgress.redirect;
-        redirect.setChild(this.complete.redirect);
-        redirect.setChild(this.reviewed.redirect);
-        redirect.setChild(zebedee.published.redirect);
     }
 
     Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException {
@@ -223,6 +224,8 @@ public class Collection {
         // Only show edited material if the user has permission:
         if (permission) {
             String redirected = redirect.get(uri);
+            //if (redirected == null) { redirected = uri; }
+
             result = inProgress.get(redirected);
 
             if (result == null) {
@@ -236,6 +239,8 @@ public class Collection {
             if (result == null) {
                 result = zebedee.published.get(redirected);
             }
+
+            return result;
         }
 
         // Default is the published version:

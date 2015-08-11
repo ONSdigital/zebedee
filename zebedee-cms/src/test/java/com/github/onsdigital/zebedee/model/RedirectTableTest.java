@@ -384,29 +384,7 @@ public class RedirectTableTest {
         // the parent should inherit the child link
         assertEquals(linkTo, parent.get(linkFrom));
     }
-    @Test
-    public void parentChildRedirect_withInvalidParentRedirect_shouldTryRedirectWithChild() throws Exception {
-        // Given
-        // linkTo exists, other links chain
-        String linkFrom = "/link/data.json";
-        String linkTo = "/not/a/file.json";
-        String childFrom = "/link/data.json";
-        String childTo = "/themeb/data.json";
 
-        // When
-        // we set up a parent-child redirect table
-        RedirectTable parent = new RedirectTable(zebedee.published);
-        parent.addRedirect(linkFrom, linkTo);
-
-        RedirectTable child = new RedirectTable(zebedee.published);
-        child.addRedirect(childFrom, childTo);
-
-        parent.setChild(child);
-
-        // Then
-        // the parent should inherit the child link
-        assertEquals(childTo, parent.get(childFrom));
-    }
     @Test
     public void parentChildRedirect_withValidParentRedirectThatIsChained_shouldTryChainBeforeTryingChild() throws Exception {
         // Given
@@ -438,6 +416,7 @@ public class RedirectTableTest {
         // the parent should work through the chain before going to the child
         assertEquals(linkTo, parent.get(linkFrom));
     }
+
     @Test
     public void parentChildRedirect_withChainThatContinuesFromParentToChild_shouldCompleteChainWithChild() throws Exception {
         // Given
@@ -465,6 +444,7 @@ public class RedirectTableTest {
         // the chain should pass
         assertEquals(linkTo, parent.get(linkFrom));
     }
+
     @Test
     public void parentChildRedirect_withChildOfChild_shouldTryRedirectWithChildOfChild() throws Exception {
         // Given

@@ -38,14 +38,18 @@ public class URIUtils {
 
     /**
      * Resolves nth path segment, if n is bigger than number of segments or a negative value returns null.
-     * Segment numbers are 0 based
+     * Segment numbers are 1 based
      * <p>
-     * e.g. ("/data/economy/yadayada", 1) = "economy"
+     * e.g. ("/data/economy/yadayada", 2) = "economy"
+     *
+     * Note this method only works for absolute uris. Relative uris will not work as expected.
      *
      * @param uri
      * @param n
      * @return Returns nth path segment.
      */
+
+    /*Method splits uri by forward slash(/), thats why relative uris would need segment number based on 0. Only use for absolute uris   */
     public static String getPathSegment(String uri, int n) {
         if (StringUtils.isEmpty(uri) || n < 0) {
             return null;

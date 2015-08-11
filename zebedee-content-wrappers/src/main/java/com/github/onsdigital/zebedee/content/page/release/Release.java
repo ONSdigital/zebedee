@@ -1,49 +1,38 @@
 package com.github.onsdigital.zebedee.content.page.release;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.content.page.statistics.document.base.StatisticalDocument;
+import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by bren on 04/06/15.
  */
-public class Release extends Page {
+public class Release extends StatisticalDocument {
 
-    private List<Link> articles = new ArrayList<>();
-    private List<Link> bulletins = new ArrayList<>();
-    private List<Link> datasets = new ArrayList<>();
+    private MarkdownSection preRelease;
+
+    private List<ReleaseDateChange> dateChanges;
 
     @Override
     public PageType getType() {
         return PageType.release;
     }
 
-
-    public List<Link> getArticles() {
-        return articles;
+    public MarkdownSection getPreRelease() {
+        return preRelease;
     }
 
-    public void setArticles(List<Link> articles) {
-        this.articles = articles;
+    public void setPreRelease(MarkdownSection preRelease) {
+        this.preRelease = preRelease;
     }
 
-    public List<Link> getBulletins() {
-        return bulletins;
+    public List<ReleaseDateChange> getDateChanges() {
+        return dateChanges;
     }
 
-    public void setBulletins(List<Link> bulletins) {
-        this.bulletins = bulletins;
+    public void setDateChanges(List<ReleaseDateChange> dateChanges) {
+        this.dateChanges = dateChanges;
     }
-
-    public List<Link> getDatasets() {
-        return datasets;
-    }
-
-    public void setDatasets(List<Link> datasets) {
-        this.datasets = datasets;
-    }
-
 }

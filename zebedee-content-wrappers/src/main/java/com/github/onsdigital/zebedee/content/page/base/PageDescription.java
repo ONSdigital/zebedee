@@ -27,8 +27,8 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String metaDescription;
 
     /*Statistics Description*/
-    private boolean nationalStatistic;
-    private boolean latestRelease;
+    private Boolean nationalStatistic;
+    private Boolean latestRelease;
     private Contact contact;
     private Date releaseDate;
     private String nextRelease;
@@ -84,6 +84,12 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     /*Adhoc content reference*/
     private String reference;
 
+    /*Release fields*/
+    public Boolean finalised;
+    private Boolean cancelled;
+    private String cancellationNotice;
+
+
     /*Migration Data*/
     public transient String theme;
     public transient String level2;
@@ -136,14 +142,14 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
 
     public boolean isNationalStatistic() {
-        return nationalStatistic;
+        return nationalStatistic == null ? false : nationalStatistic;
     }
 
     public void setNationalStatistic(boolean nationalStatistic) {
         this.nationalStatistic = nationalStatistic;
     }
 
-    public boolean isLatestRelease() { return latestRelease; }
+    public boolean isLatestRelease() { return latestRelease == null ? false:latestRelease; }
 
     public void setLatestRelease(boolean latestRelease) { this.latestRelease = latestRelease; }
 
@@ -386,5 +392,29 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     public void setReference(String reference) {
         this.reference = reference;
+    }
+
+    public boolean isFinalised() {
+        return finalised == null ? false : finalised;
+    }
+
+    public void setFinalised(boolean finalised) {
+        this.finalised = finalised;
+    }
+
+    public boolean isCancelled() {
+        return cancelled == null ? false : true;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    public String getCancellationNotice() {
+        return cancellationNotice;
+    }
+
+    public void setCancellationNotice(String cancellationNotice) {
+        this.cancellationNotice = cancellationNotice;
     }
 }

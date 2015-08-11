@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -162,7 +163,7 @@ public class CollectionContentReader {
                     try (InputStream fileStream = Files.newInputStream(path)) {
                         Collection collection = ContentUtil.deserialise(fileStream, Collection.class);
                         if (StringUtils.equalsIgnoreCase(collection.getId(), collectionId)) {
-                            return collections.resolve(collection.getName());
+                            return collections.resolve(FilenameUtils.removeExtension(path.getFileName().toString())); //get directory with same name
 
                         }
                     }

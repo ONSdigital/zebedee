@@ -10,7 +10,6 @@
     <modules>
         <module>zebedee-cms</module>
         <module>zebedee-reader</module>
-        <module>zebedee-content-wrappers</module>
     </modules>
 
     <organization>
@@ -86,13 +85,6 @@
                 <artifactId>zebedee-reader</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>com.github.onsdigital</groupId>
-                <artifactId>zebedee-content-wrappers</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
 
             <dependency>
                 <groupId>org.reflections</groupId>

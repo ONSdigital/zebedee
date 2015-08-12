@@ -24,11 +24,23 @@
             <artifactId>reflections</artifactId>
         </dependency>
 
+        <!-- Elastic Search -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+
     </dependencies>
 
 
     <build>
         <resources>
+            <!-- Standard resources -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+
             <!--Collections to be used in unit tests-->
             <resource>
                 <directory>src/test/resources/test-content</directory>

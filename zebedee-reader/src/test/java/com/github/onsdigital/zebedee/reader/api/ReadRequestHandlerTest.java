@@ -95,7 +95,7 @@ public class ReadRequestHandlerTest {
         assertTrue(children.size() == 1);
         ContentNode child = children.iterator().next();
         assertNull(child.getChildren());
-        assertEquals("UK Natural Capital Land Cover in the UK", child.getDetails().getTitle());
+        assertEquals("UK Natural Capital Land Cover in the UK", child.getDescriptions().getTitle());
     }
 
     private void shouldResolveChildrenInDepth() throws Exception {
@@ -105,14 +105,14 @@ public class ReadRequestHandlerTest {
         Iterator<ContentNode> iterator = children.iterator();
         ContentNode articles = iterator.next();
         ContentNode bulletins = iterator.next();
-        assertEquals("articles", articles.getDetails().getTitle());
-        assertEquals("bulletins", bulletins.getDetails().getTitle());
+        assertEquals("articles", articles.getDescriptions().getTitle());
+        assertEquals("bulletins", bulletins.getDescriptions().getTitle());
 
         assertNotNull(bulletins.getChildren());
         assertTrue(bulletins.getChildren().isEmpty() == false);
         assertTrue(articles.getChildren().size() == 1);
         ContentNode grandChild = bulletins.getChildren().iterator().next();
-        assertEquals("ukenvironmentalaccounts", grandChild.getDetails().getTitle());
+        assertEquals("ukenvironmentalaccounts", grandChild.getDescriptions().getTitle());
         assertNotNull(grandChild.getChildren());
     }
 
@@ -139,7 +139,7 @@ public class ReadRequestHandlerTest {
         assertEquals(URI.create("/"), home.getUri());
         assertEquals(URI.create("/employmentandlabourmarket/"), employmentLabourMarket.getUri());
         //Collection content should be overwriting published content
-        assertEquals("Employment and labour market-inprogress", employmentLabourMarket.getDetails().getTitle());
+        assertEquals("Employment and labour market-inprogress", employmentLabourMarket.getDescriptions().getTitle());
     }
 
     @Test

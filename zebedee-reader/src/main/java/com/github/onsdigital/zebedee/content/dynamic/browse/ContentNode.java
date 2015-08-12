@@ -16,7 +16,7 @@ import java.util.Comparator;
 public class ContentNode implements Comparable<ContentNode> {
 
     private URI uri;
-    private ContentNodeDetails details;
+    private ContentNodeDetails descriptions;
     private PageType type;
 
     private Collection<ContentNode> children;
@@ -37,12 +37,12 @@ public class ContentNode implements Comparable<ContentNode> {
         this.type = type;
     }
 
-    public ContentNodeDetails getDetails() {
-        return details;
+    public ContentNodeDetails getDescriptions() {
+        return descriptions;
     }
 
-    public void setDetails(ContentNodeDetails details) {
-        this.details = details;
+    public void setDescriptions(ContentNodeDetails descriptions) {
+        this.descriptions = descriptions;
     }
 
     public Collection<ContentNode> getChildren() {
@@ -71,17 +71,17 @@ public class ContentNode implements Comparable<ContentNode> {
 
     @Override
     public int compareTo(ContentNode o) {
-        if (isNull(getDetails())) {
+        if (isNull(getDescriptions())) {
             return 1;//Empty titles are listed as last elements
         }
-        if (isNull(o) || isNull(o.getDetails())) {
+        if (isNull(o) || isNull(o.getDescriptions())) {
             return -1;
         }
 
-        int result = compare(getDetails().getTitle(), o.getDetails().getTitle());
+        int result = compare(getDescriptions().getTitle(), o.getDescriptions().getTitle());
         //compare editions if titles are the same
         if (result == 0) {
-            result = compare(getDetails().getEdition(), o.getDetails().getEdition());
+            result = compare(getDescriptions().getEdition(), o.getDescriptions().getEdition());
         }
         return result;
     }

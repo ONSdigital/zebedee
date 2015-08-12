@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.util.ContentNodeComparator;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -277,14 +276,14 @@ public class ContentReader {
         ContentNode contentNode = new ContentNode();
         contentNode.setUri(page.getUri());
         contentNode.setType(page.getType());
-        contentNode.setDetails(new ContentNodeDetails(page.getDescription().getTitle(), page.getDescription().getEdition()));
+        contentNode.setDescriptions(new ContentNodeDetails(page.getDescription().getTitle(), page.getDescription().getEdition()));
         return contentNode;
     }
 
     private ContentNode createContentNodeForFolder(URI uri, String title) {
         ContentNode contentNode = new ContentNode();
         contentNode.setUri(uri);
-        contentNode.setDetails(new ContentNodeDetails(title,null));
+        contentNode.setDescriptions(new ContentNodeDetails(title, null));
         return contentNode;
     }
 

@@ -30,11 +30,10 @@ public enum PageType {
     static_foi,
     static_adhoc,
     dataset,
-    reference_tables,
     release,
-    release_calendar,
+    release_list,
+    reference_tables,
     chart,
     table,
-    content_list,
     unknown;
 }

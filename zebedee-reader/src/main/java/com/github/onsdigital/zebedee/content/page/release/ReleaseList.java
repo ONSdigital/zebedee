@@ -8,15 +8,13 @@ import com.github.onsdigital.zebedee.content.util.ContentConstants;
 /**
  * Created by bren on 04/06/15.
  */
-public class ReleaseCalendar extends Page {
+public class ReleaseList extends Page {
 
-    public ReleaseCalendar() {
-        PageDescription description = new PageDescription();
-        description.setTitle(ContentConstants.RELEASE_CALENDAR_TITLE);
+    public ReleaseList() {
     }
 
     @Override
     public PageType getType() {
-        return PageType.release_calendar;
+        return PageType.release_list;
     }
 }

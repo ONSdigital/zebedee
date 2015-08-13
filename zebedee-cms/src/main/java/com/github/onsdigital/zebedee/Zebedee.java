@@ -46,6 +46,7 @@ public class Zebedee {
         Path permissions = path.resolve(PERMISSIONS);
         Path teams = path.resolve(TEAMS);
         Path launchpad = path.resolve(LAUNCHPAD);
+
         if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
@@ -58,6 +59,7 @@ public class Zebedee {
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
         this.launchpad = new Content(launchpad);
+
     }
 
     /**
@@ -163,6 +165,7 @@ public class Zebedee {
     public Path find(String uri) throws IOException {
         // There's currently only one place to look for content.
         // We may add one or more staging layers later.
+
         return published.get(uri);
     }
 
@@ -227,11 +230,14 @@ public class Zebedee {
     public void delete(Path path) throws IOException {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path directory : stream) {
-                // Recursively delete directories only - added .DS_Store files:
+                // Recursively delete directories only
                 if (Files.isDirectory(directory)) {
                     delete(directory);
                 }
-                if (directory.endsWith(".DS_Store")) {
+                if (directory.endsWith(".DS_Store")) { // delete any .ds_store hidden files
+                    Files.delete(directory);
+                }
+                if (directory.endsWith(Content.REDIRECT)) { // also delete redirect table
                     Files.delete(directory);
                 }
             }

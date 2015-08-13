@@ -56,12 +56,6 @@
             <artifactId>zebedee-reader</artifactId>
         </dependency>
 
-        <!-- Zebedee Content Wrappers-->
-        <dependency>
-            <groupId>com.github.onsdigital</groupId>
-            <artifactId>zebedee-content-wrappers</artifactId>
-        </dependency>
-
         <!-- File upload -->
         <dependency>
             <groupId>commons-fileupload</groupId>

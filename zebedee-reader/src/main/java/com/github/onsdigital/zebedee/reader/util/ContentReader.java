@@ -152,16 +152,14 @@ public class ContentReader {
                     Path dataFile = child.resolve(getConfiguration().getDataFileName());
                     URI uri = toRelativeUri(child);
                     if (Files.exists(dataFile)) {//data.json
-                        try (Resource resource = getResource(dataFile)) {
-                            Page content = deserialize(resource);
-                            if (content == null) { //Contents without type is null when deserialised.
-                                continue;
-                            }
-                            nodes.put(uri, createContentNode(content));
+                        Page content = getContent(uri.toString());
+                        if (content == null) { //Contents without type is null when deserialised.
+                            continue;
                         }
+                        nodes.put(uri, createContentNode(content));
                     } else {
                         //directory
-                        nodes.put(uri,createContentNodeForFolder(uri, child.getFileName().toString()) );
+                        nodes.put(uri, createContentNodeForFolder(uri, child.getFileName().toString()));
                     }
                 } else {
                     continue;//skip data.json files in current directory

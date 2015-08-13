@@ -14,7 +14,7 @@ import java.io.IOException;
  * Created by bren on 04/08/15.
  */
 @Api
-public class BreadCrumb {
+public class Parents {
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
         ResponseUtils.sendResponse(new ReadRequestHandler().getParents(request),response);

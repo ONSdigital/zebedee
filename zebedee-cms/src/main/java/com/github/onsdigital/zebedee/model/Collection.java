@@ -27,6 +27,7 @@ public class Collection {
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
+
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
     public final CollectionDescription description;
     public final Path path;
@@ -36,6 +37,7 @@ public class Collection {
     final Zebedee zebedee;
     final Collections collections;
 
+    public RedirectTable redirect = null;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -80,6 +82,14 @@ public class Collection {
         this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
+
+        this.inProgress.redirect.setChild(this.complete.redirect);
+        this.complete.redirect.setChild(this.reviewed.redirect);
+        this.reviewed.redirect.setChild(this.zebedee.published.redirect);
+
+        // Set up redirect
+        // this compound redirect will retrieve
+        redirect = this.inProgress.redirect;
     }
 
     Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException {
@@ -213,13 +223,24 @@ public class Collection {
 
         // Only show edited material if the user has permission:
         if (permission) {
-            result = inProgress.get(uri);
+            String redirected = redirect.get(uri);
+            //if (redirected == null) { redirected = uri; }
+
+            result = inProgress.get(redirected);
+
             if (result == null) {
-                result = complete.get(uri);
+                result = complete.get(redirected);
             }
+
             if (result == null) {
-                result = reviewed.get(uri);
+                result = reviewed.get(redirected);
             }
+
+            if (result == null) {
+                result = zebedee.published.get(redirected);
+            }
+
+            return result;
         }
 
         // Default is the published version:

@@ -16,10 +16,10 @@ import java.io.IOException;
  * Created by bren on 03/08/15.
  */
 @Api
-public class BrowseTree {
+public class Children {
 
     /**
-     * Retrieves content endpoint <code>/browsetree[collectionId]/?uri=[uri]</code>
+     * Retrieves content endpoint <code>/children[collectionId]/?uri=[uri]</code>
      * <p>
      * This endpoint serves child content list for given uri.
      * It is possible to get children of child elements using depth parameter.

@@ -1,17 +1,54 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.onsdigital.content.page.base.Page;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 /**
- * Created by thomasridd on 04/08/15.
+ * RedirectTable sits at the content level.
+ *
+ * <p>
+ * <code>Chains</code>
+ * <p>
+ * RedirectTable supports chains of redirects. These can chain
+ *
+ * <p>
+ *
+ *
+ * <code>Child</code><p>
+ * The property <code>child</code> is referenced if the parent cannot resolve a uri.
+ * <code>Child</code> may point at its own content or may have its own.
+ * <p>
+ *
+ * Zebedee implementation
+ *
+ * Zebedee.published.redirect is the master table
+ * Collections also have a cascaded redirect of <code>inProgress->complete->reviewed->published</code>
+ *
+ * This allows us to work with moves as something that can be published since inProgress.redirect is referenced before
+ * we drop to the actual files.
+ *
+ * TODO: Conceptual work regarding how a move collection can function
+ * TODO: I can't visualise it working as an extension of the current florence interface
+ *
+ * Scenarios to consider: We want to
  */
 public class RedirectTable {
     private HashMap<String, String> table = new HashMap<>();
     private RedirectTable child = null;
     private Content content = null;
+    private final int ITERATION_MAX = 100; // Simple method to avoid cycling
 
     public RedirectTable(Content content) {
         this.content = content;
+    }
+
+    public RedirectTable(Content content, Path path) throws IOException {
+        this(content);
+        loadFromPath(path);
     }
 
     /**
@@ -46,82 +83,51 @@ public class RedirectTable {
     /**
      *
      * @param uri the requested uri
-
-     * @return
+     *
+     * @return the redirected uri
      */
     public String get(String uri) {
-        String finalUriAtThisLevel = endChain(uri);             // Follow redirect chain
+        String finalUriAtThisLevel = endChain(uri, ITERATION_MAX);        // Follow redirect chain
+        if (finalUriAtThisLevel == null) { return null; }       // Check for cyclicality
 
-        if (content.exists(finalUriAtThisLevel)) {              // Option 1) Uri exists - return it
+        if (content.exists(finalUriAtThisLevel, false)) {       // Option 1) Uri exists - return it
             return finalUriAtThisLevel;
-        } else if (child != null) {                             //
-            String chained = child.get(finalUriAtThisLevel);
-            if (chained != null) {                              // Option 2a) Child level - continue chain
-                return chained;
-            } else {
-                return child.get(uri);                          // Option 2b) Child level - try from scratch
-            }
-        } else {
+        } else if (child != null) {                             // Option 2) Child can continue the chain
+            return child.get(finalUriAtThisLevel);
+        } else {                                                // Option 3) Return null
             return null;
         }
-//        if (content.exists(uri)) {          // If content exists return the uri
-//            return uri;
-//        } else if (table.containsKey(uri)) {    // If a link exists follow the link
-//            String nextUri = table.get(uri);
-//            if (content.exists(nextUri)) {
-//                return child.get(uri);
-//            } else {
-//                return get(table.get(uri));
-//            }
-//        } else if (child != null) {
-//            // Alternatively check for a redirect link
-//
-//            if (nextUri != null) {
-//                return get(nextUri);            // Look for content at the redirect (recursive)
-//            } else {
-//                return null;                    // return null
-//            }
-//        }
     }
-    private String endChain(String uri) {
-        if (content.exists(uri) == false && table.containsKey(uri)) {
-           return endChain(table.get(uri));
+
+    private String endChain(String uri, int iterations) {
+        if (iterations == 0) { return null; } // checks we haven't cycled
+
+        if (!content.exists(uri, false) && table.containsKey(uri)) {
+            return endChain(table.get(uri), --iterations);
         }
         return uri;
     }
 
-
-
-
-//    String get(String uri) {
-//        if (table.containsKey(uri)) {   // Look for uri in own table
-//            String newUri = table.get(uri);
-//            if (newUri != null) {
-//                return newUri;
-//            } else if (child != null) { // If the parent link is invalid drop to the child
-//                return child.get(uri);
-//            }
-//        } else if (child != null) {     // Try children
-//            return child.get(uri);
-//        }
-//        return null;                    // return null
-//    }
-
-
-    /**
-     * Pull a chain of child 301 tables into the parent
-     */
-    public void merge() {
-        if (child != null) {
-            child.merge();
-            merge(child);
-            child = null;
+    public void saveToPath(Path path) throws IOException {
+        // TODO quite a considerable amount of threadsafe making
+        try (FileWriter stream = new FileWriter(path.toFile()); BufferedWriter out = new BufferedWriter(stream)) {
+            for (String fromUri : table.keySet()) {
+                String toUri = table.get(fromUri);
+                out.write(fromUri + '\t' + toUri);
+                out.newLine();
+            }
         }
     }
-    void merge(RedirectTable redirect) {
-        for (String key: redirect.table.keySet()) {
-            if (!table.containsKey(key)) {
-                table.put(key, redirect.table.get(key));
+
+    public void loadFromPath(Path path) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // process the line.
+                String[] fromTo = line.split("\t");
+                if (fromTo.length > 1) {
+                    table.put(fromTo[0], fromTo[1]);
+                }
             }
         }
     }

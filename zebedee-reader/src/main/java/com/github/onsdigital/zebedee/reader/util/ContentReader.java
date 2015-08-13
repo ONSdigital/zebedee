@@ -57,7 +57,9 @@ public class ContentReader {
         Resource resource = getResource(content);
         checkJsonMime(resource, path);
         Page page = deserialize(resource);
-        page.setUri(URI.create(path));//Setting uri on the fly, discarding whatever is in the file
+        if (page != null) { //Contents without type is null when deserialised.
+            page.setUri(URI.create(path));//Setting uri on the fly, discarding whatever is in the file
+        }
         return page;
     }
 

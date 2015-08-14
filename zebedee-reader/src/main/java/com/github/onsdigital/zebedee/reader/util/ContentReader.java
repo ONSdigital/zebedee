@@ -219,6 +219,7 @@ public class ContentReader {
         resource.setName(path.getFileName().toString());
         resource.setMimeType(probeContentType(path));
         resource.setData(newInputStream(path));
+        resource.setSize(size(path));
         return resource;
     }
 

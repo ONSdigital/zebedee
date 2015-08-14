@@ -32,6 +32,8 @@ public class ResponseUtils {
     public static void sendResponse(Resource resource, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(resource.getMimeType());
+        response.setContentLengthLong(resource.getSize());
+        response.setHeader("Content-Disposition", "inline; filename=\"" + resource.getName() + "\"");
         IOUtils.copy(resource.getData(), response.getOutputStream());
     }
 

@@ -13,6 +13,7 @@ import java.io.InputStream;
 public class Resource implements Closeable {
     private String name;
     private String mimeType;
+    private long size;//bytes
     private InputStream data;
 
     public String getName() {
@@ -48,5 +49,15 @@ public class Resource implements Closeable {
         if (data != null) {
             getData().close();
         }
+    }
+
+    //Get size in bytes
+    public long getSize() {
+        return size;
+    }
+
+    //set size in bytes
+    public void setSize(long size) {
+        this.size = size;
     }
 }

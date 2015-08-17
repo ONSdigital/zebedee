@@ -39,7 +39,7 @@ public class Children {
 
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        ResponseUtils.sendResponse(new ReadRequestHandler().getChildren(request, getDepth(request)), response);
+        ResponseUtils.sendResponse(new ReadRequestHandler().listChildren(request,getDepth(request)), response);
     }
 
     private int getDepth(HttpServletRequest request) throws BadRequestException {

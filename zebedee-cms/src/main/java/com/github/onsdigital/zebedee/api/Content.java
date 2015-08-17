@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.UriToUriRedirectTable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +19,10 @@ import java.io.InputStream;
 
 @Api
 public class Content {
-
+private static long totalListTime = 0;
+private static long totalTaken = 0;
+    private static long totalRedirectTime = 0;
+private static long totalCollectionGetTaken = 0;
 
     /**
      * Retrieves file content for the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
@@ -69,11 +73,27 @@ public class Content {
         // otherwise the call to get a request parameter will actually consume the body:
         InputStream requestBody = request.getInputStream();
 
+        long startTime = System.currentTimeMillis();
+        long startListTime = com.github.onsdigital.zebedee.model.Collections.timeInList;
+        long startRedirectTime = UriToUriRedirectTable.timeInRedirect;
+
         Session session = Root.zebedee.sessions.get(request);
+
+        long startCollectionGet = System.currentTimeMillis();
+
         Collection collection = Collections.getCollection(request);
+
+        totalCollectionGetTaken += System.currentTimeMillis() - startCollectionGet;
+
         String uri = request.getParameter("uri");
 
         Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
+
+        totalListTime += com.github.onsdigital.zebedee.model.Collections.timeInList - startListTime;
+        totalTaken += System.currentTimeMillis() - startTime;
+        totalRedirectTime += UriToUriRedirectTable.timeInRedirect - startRedirectTime;
+
+        System.out.println("Collection get time: " + totalCollectionGetTaken + "ms. Redirect time: " + totalRedirectTime + "ms. Redirect gets: " + UriToUriRedirectTable.getCalls + " Total: " + totalTaken + "ms");
         return true;
     }
 
@@ -94,6 +114,7 @@ public class Content {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, NotFoundException, UnauthorizedException {
 
         Session session = Root.zebedee.sessions.get(request);
+
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 

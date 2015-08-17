@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.junit.After;
 import org.junit.Before;
@@ -20,7 +19,7 @@ import static org.junit.Assert.*;
  *
  * Motivation for the parent-child redirect is being able to
  */
-public class RedirectTableWithZebedeeTest {
+public class UriToUriRedirectTableWithZebedeeTest {
     Zebedee zebedee;
     Builder bob;
     String trueURI = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
@@ -28,7 +27,7 @@ public class RedirectTableWithZebedeeTest {
     @Before
     public void setupTests() throws IOException {
         // Create a setup from
-        bob = new Builder(RedirectTableWithZebedeeTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        bob = new Builder(UriToUriRedirectTableWithZebedeeTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         zebedee = new Zebedee(bob.zebedee);
     }
 
@@ -45,7 +44,7 @@ public class RedirectTableWithZebedeeTest {
 
         // When
         // we reference the redirect table
-        RedirectTable redirect = zebedee.published.redirect;
+        UriToUriRedirectTable redirect = zebedee.published.redirect;
         Path redirectPath = zebedee.published.path.resolve(Content.REDIRECT);
 
         // Then
@@ -63,14 +62,14 @@ public class RedirectTableWithZebedeeTest {
 
         // When
         // we reference the redirect tables
-        RedirectTable redirectTable = collection.redirect;
-        RedirectTable inProgressRedirect = collection.inProgress.redirect;
-        RedirectTable completeRedirect = collection.complete.redirect;
-        RedirectTable reviewedRedirect = collection.reviewed.redirect;
+        UriToUriRedirectTable uriToUriRedirectTable = collection.redirect;
+        UriToUriRedirectTable inProgressRedirect = collection.inProgress.redirect;
+        UriToUriRedirectTable completeRedirect = collection.complete.redirect;
+        UriToUriRedirectTable reviewedRedirect = collection.reviewed.redirect;
 
         // Then
         // we expect the tables to be created
-        assertNotNull(redirectTable);
+        assertNotNull(uriToUriRedirectTable);
         assertNotNull(inProgressRedirect);
         assertTrue(Files.exists(collection.inProgress.path.resolve(Content.REDIRECT)));
         assertNotNull(completeRedirect);

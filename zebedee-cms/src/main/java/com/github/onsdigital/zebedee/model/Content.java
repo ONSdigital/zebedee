@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.util.GraphUtils;
@@ -22,7 +21,7 @@ public class Content {
     public static final String REDIRECT = "redirect.txt";
     public final Path path;
 
-    public final RedirectTable redirect;
+    public final UriToUriRedirectTable redirect;
 
     public Content(Path path) {
         this.path = path;
@@ -32,12 +31,12 @@ public class Content {
         }
 
         // Create a redirect table alongside the content
-        this.redirect = new RedirectTable(this);
+        this.redirect = new UriToUriRedirectTable(this);
         try {
             if (Files.exists(this.path.resolve(REDIRECT))) {
-                this.redirect.loadFromPath(this.path.resolve(REDIRECT));
+                this.redirect.load(this.path.resolve(REDIRECT));
             } else {
-                this.redirect.saveToPath(this.path.resolve(REDIRECT));
+                this.redirect.save(this.path.resolve(REDIRECT));
             }
         } catch (IOException e) {
             throw new IllegalArgumentException("Redirect table could not be created"

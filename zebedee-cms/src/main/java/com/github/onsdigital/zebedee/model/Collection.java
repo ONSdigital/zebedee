@@ -37,7 +37,8 @@ public class Collection {
     final Zebedee zebedee;
     final Collections collections;
 
-    public RedirectTable redirect = null;
+    public UriToUriRedirectTable redirect = null;
+    private UriToUriRedirectTable collectionRedirect = null;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the

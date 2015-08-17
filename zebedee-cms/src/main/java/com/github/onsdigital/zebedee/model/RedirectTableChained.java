@@ -28,25 +28,27 @@ import java.util.HashMap;
  * This allows us to work with moves as something that can be published since inProgress.redirect is referenced before
  * we drop to the actual files.
  *
+ * NOTE: This is our original redirect table. The intention is to
+ *
  * TODO: Conceptual work regarding how a move collection can function
  * TODO: I can't visualise it working as an extension of the current florence interface
  *
  * Scenarios to consider: We want to
  */
-public class UriToUriRedirectTable {
+public class RedirectTableChained {
     public static long timeInRedirect = 0;
     public static long getCalls = 0;
 
     private HashMap<String, String> table = new HashMap<>();
-    private UriToUriRedirectTable child = null;
+    private RedirectTableChained child = null;
     protected Content content = null;
     private final int ITERATION_MAX = 100; // Simple method to avoid cycling
 
-    public UriToUriRedirectTable(Content content) {
+    public RedirectTableChained(Content content) {
         this.content = content;
     }
 
-    public UriToUriRedirectTable(Content content, Path path) throws IOException {
+    public RedirectTableChained(Content content, Path path) throws IOException {
         this(content);
         load(path);
     }
@@ -61,10 +63,10 @@ public class UriToUriRedirectTable {
      *
      * @param child a secondary
      */
-    public void setChild(UriToUriRedirectTable child) {
+    public void setChild(RedirectTableChained child) {
         this.child = child;
     }
-    public UriToUriRedirectTable getChild() {
+    public RedirectTableChained getChild() {
         return child;
     }
 

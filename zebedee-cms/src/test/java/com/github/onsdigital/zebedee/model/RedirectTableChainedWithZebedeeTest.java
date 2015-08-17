@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
  *
  * Motivation for the parent-child redirect is being able to
  */
-public class UriToUriRedirectTableWithZebedeeTest {
+public class RedirectTableChainedWithZebedeeTest {
     Zebedee zebedee;
     Builder bob;
     String trueURI = "/themea/landinga/producta/bulletins/bulletina/2015-01-01";
@@ -27,7 +27,7 @@ public class UriToUriRedirectTableWithZebedeeTest {
     @Before
     public void setupTests() throws IOException {
         // Create a setup from
-        bob = new Builder(UriToUriRedirectTableWithZebedeeTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        bob = new Builder(RedirectTableChainedWithZebedeeTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         zebedee = new Zebedee(bob.zebedee);
     }
 
@@ -44,7 +44,7 @@ public class UriToUriRedirectTableWithZebedeeTest {
 
         // When
         // we reference the redirect table
-        UriToUriRedirectTable redirect = zebedee.published.redirect;
+        RedirectTableChained redirect = zebedee.published.redirect;
         Path redirectPath = zebedee.published.path.resolve(Content.REDIRECT);
 
         // Then
@@ -62,14 +62,14 @@ public class UriToUriRedirectTableWithZebedeeTest {
 
         // When
         // we reference the redirect tables
-        UriToUriRedirectTable uriToUriRedirectTable = collection.redirect;
-        UriToUriRedirectTable inProgressRedirect = collection.inProgress.redirect;
-        UriToUriRedirectTable completeRedirect = collection.complete.redirect;
-        UriToUriRedirectTable reviewedRedirect = collection.reviewed.redirect;
+        RedirectTableChained redirectTableChained = collection.redirect;
+        RedirectTableChained inProgressRedirect = collection.inProgress.redirect;
+        RedirectTableChained completeRedirect = collection.complete.redirect;
+        RedirectTableChained reviewedRedirect = collection.reviewed.redirect;
 
         // Then
         // we expect the tables to be created
-        assertNotNull(uriToUriRedirectTable);
+        assertNotNull(redirectTableChained);
         assertNotNull(inProgressRedirect);
         assertTrue(Files.exists(collection.inProgress.path.resolve(Content.REDIRECT)));
         assertNotNull(completeRedirect);

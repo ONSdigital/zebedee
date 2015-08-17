@@ -21,7 +21,7 @@ public class Content {
     public static final String REDIRECT = "redirect.txt";
     public final Path path;
 
-    public final UriToUriRedirectTable redirect;
+    public final RedirectTableChained redirect;
 
     public Content(Path path) {
         this.path = path;
@@ -31,7 +31,7 @@ public class Content {
         }
 
         // Create a redirect table alongside the content
-        this.redirect = new UriToUriRedirectTable(this);
+        this.redirect = new RedirectTableChained(this);
         try {
             if (Files.exists(this.path.resolve(REDIRECT))) {
                 this.redirect.load(this.path.resolve(REDIRECT));

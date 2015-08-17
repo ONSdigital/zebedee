@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.UriToUriRedirectTable;
+import com.github.onsdigital.zebedee.model.RedirectTableChained;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -75,7 +75,7 @@ private static long totalCollectionGetTaken = 0;
 
         long startTime = System.currentTimeMillis();
         long startListTime = com.github.onsdigital.zebedee.model.Collections.timeInList;
-        long startRedirectTime = UriToUriRedirectTable.timeInRedirect;
+        long startRedirectTime = RedirectTableChained.timeInRedirect;
 
         Session session = Root.zebedee.sessions.get(request);
 
@@ -91,9 +91,9 @@ private static long totalCollectionGetTaken = 0;
 
         totalListTime += com.github.onsdigital.zebedee.model.Collections.timeInList - startListTime;
         totalTaken += System.currentTimeMillis() - startTime;
-        totalRedirectTime += UriToUriRedirectTable.timeInRedirect - startRedirectTime;
+        totalRedirectTime += RedirectTableChained.timeInRedirect - startRedirectTime;
 
-        System.out.println("Collection get time: " + totalCollectionGetTaken + "ms. Redirect time: " + totalRedirectTime + "ms. Redirect gets: " + UriToUriRedirectTable.getCalls + " Total: " + totalTaken + "ms");
+        System.out.println("Collection get time: " + totalCollectionGetTaken + "ms. Redirect time: " + totalRedirectTime + "ms. Redirect gets: " + RedirectTableChained.getCalls + " Total: " + totalTaken + "ms");
         return true;
     }
 

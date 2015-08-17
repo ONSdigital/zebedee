@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.reader.api;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
+import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -59,9 +60,9 @@ public class ReadRequestHandlerTest {
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17");
         Content content = readRequestHandler.findContent(request, DataFilter.DESCRIPTION);
         assertNotNull(content);
-        assertTrue(content instanceof PageDescription);
-        PageDescription description = (PageDescription) content;
-        assertFalse(description.isNationalStatistic());
+        assertTrue(content instanceof DescriptionWrapper);
+        DescriptionWrapper description = (DescriptionWrapper) content;
+        assertFalse(description.getDescription().isNationalStatistic());
     }
 
 

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
+import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
@@ -61,10 +62,10 @@ public class ZebedeeReaderTest {
     public void testDescriptionFilter() throws ZebedeeException, IOException {
         Content content = ZebedeeReader.getInstance().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", DataFilter.DESCRIPTION);
         assertNotNull(content);
-        assertTrue(content instanceof PageDescription);
-        PageDescription description = (PageDescription) content;
-        assertEquals("Labour disputes by sector: LABD02", description.getTitle());
-        assertEquals("Richard Clegg", description.getContact().getName());
+        assertTrue(content instanceof DescriptionWrapper);
+        DescriptionWrapper description = (DescriptionWrapper) content;
+        assertEquals("Labour disputes by sector: LABD02", description.getDescription().getTitle());
+        assertEquals("Richard Clegg", description.getDescription().getContact().getName());
     }
 
     @Test(expected = NotFoundException.class)

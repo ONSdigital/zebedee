@@ -4,11 +4,13 @@ import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.util.URIUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -55,8 +57,12 @@ public class ContentReader {
      * @return Wrapper containing actual document data as text
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
-        Path content = resolvePath(path);
-        return getContent(content);
+        String jsonPath = URIUtils.removeTrailingSlash(path) + ".json";
+        Path json = resolvePath(jsonPath);
+        if (!exists(json)) {
+            json = resolveDataFilePath(resolvePath(path));
+        }
+        return getPage(resolvePath(path),json);
     }
 
     /**
@@ -68,13 +74,18 @@ public class ContentReader {
     //For internal use, not exposed
     private Page getContent(Path path) throws ZebedeeException, IOException {
         Path dataFile = resolveDataFilePath(path);
-        Resource resource = getResource(dataFile);
-        checkJsonMime(resource, path);
-        Page page = deserialize(resource);
-        if (page != null) { //Contents without type is null when deserialised.
-            page.setUri(toRelativeUri(path));//Setting uri on the fly, discarding whatever is in the file
+        return getPage(path, dataFile);
+    }
+
+    private Page getPage(Path path, Path dataFile) throws IOException, ZebedeeException {
+        try (Resource resource = getResource(dataFile)) {
+            checkJsonMime(resource, path);
+            Page page = deserialize(resource);
+            if (page != null) { //Contents without type is null when deserialised.
+                page.setUri(toRelativeUri(path));//Setting uri on the fly, discarding whatever is in the file
+            }
+            return page;
         }
-        return page;
     }
 
     public Page getLatestContent(String path) throws ZebedeeException, IOException {
@@ -189,7 +200,7 @@ public class ContentReader {
         try (DirectoryStream<Path> paths = newDirectoryStream(path)) {
             for (Path child : paths) {
                 String name = child.getFileName().toString();
-                if (latestFolderName == null || (name.compareTo(latestFolderName) == 1)) {
+                if (latestFolderName == null || (name.compareTo(latestFolderName) > 0)) {
                     latestFolderName = name;
                     latestFolderPath = child;
                 }
@@ -294,6 +305,7 @@ public class ContentReader {
                 PageDescription description = content.getDescription();
                 if (description != null) {
                     contentNode.setDescription(new ContentNodeDetails(description.getTitle(), description.getEdition()));
+                    contentNode.getDescription().setReleaseDate(description.getReleaseDate());
                 }
             }
         } catch (NotFoundException e) {

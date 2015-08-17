@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.reader.data.filter;
 
 import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.timeseries.Point;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
@@ -43,9 +45,10 @@ public class FilterUtil {
                 ContentNodeDetails titleWrapper = new ContentNodeDetails();
                 titleWrapper.setTitle(page.getDescription().getTitle());
                 titleWrapper.setEdition(page.getDescription().getEdition());
+                titleWrapper.setUri(page.getUri());
                 return titleWrapper;
             case DESCRIPTION:
-                return page.getDescription();
+                return new DescriptionWrapper(page.getUri(),page.getDescription());
             case SERIES:
                 return filterTimseriesData(page);
             default:
@@ -74,6 +77,10 @@ public class FilterUtil {
         }
 
         Series series = new Series();
+        series.setUri(page.getUri());
+        series.setDescription(new PageDescription());// only setting title and cdid of description
+        series.getDescription().setCdid(page.getDescription().getCdid());
+        series.getDescription().setTitle(page.getDescription().getTitle());
         for (TimeSeriesValue timeSeriesValue : set) {
          series.add(new Point(timeSeriesValue.date, timeSeriesValue.value));
         }

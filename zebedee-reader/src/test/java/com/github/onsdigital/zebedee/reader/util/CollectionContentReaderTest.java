@@ -81,13 +81,21 @@ public class CollectionContentReaderTest {
     }
 
     @Test
-    public void testGetChildrenDirectories() throws ZebedeeException, IOException {
+    public void testGetChildrenContent() throws ZebedeeException, IOException {
         Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
-        assertTrue(children.size() == 1);
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
         assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDescription().getTitle());
         assertEquals(PageType.dataset, contentNode.getValue().getType());//type is null for directories with no data.json
         assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/", contentNode.getKey().toString());
+    }
+
+    @Test
+    public void testGetChildrenDirectories() throws ZebedeeException, IOException {
+        Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions",true);
+        URI articleUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/");
+        URI datasetsUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/");
+        assertTrue(children.containsKey(articleUri));
+        assertTrue(children.containsKey(datasetsUri));
     }
 
     @Test

@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
-import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -83,7 +82,7 @@ public class ReadRequestHandlerTest {
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
         when(request.getRequestURI()).thenReturn("/browsetree/testcollection-testid/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
         try {
-            readRequestHandler.listChildren(request, 1);
+            readRequestHandler.getChildren(request, 1);
             throw new AssertionFailedError("Collection read should have failed");
         } catch (UnauthorizedException e) {
             System.out.println(e.getMessage());
@@ -92,7 +91,7 @@ public class ReadRequestHandlerTest {
 
     private void shouldResolveChildren() throws Exception {
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
-        Collection<ContentNode> children = readRequestHandler.listChildren(request, 1);
+        Collection<ContentNode> children = readRequestHandler.getChildren(request, 1);
         assertTrue(children.size() == 1);
         ContentNode child = children.iterator().next();
         assertNull(child.getChildren());
@@ -101,7 +100,7 @@ public class ReadRequestHandlerTest {
 
     private void shouldResolveChildrenInDepth() throws Exception {
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts");
-        Collection<ContentNode> children = readRequestHandler.listChildren(request, 3);
+        Collection<ContentNode> children = readRequestHandler.getChildren(request, 3, true);
         assertTrue(children.size() == 2);
         Iterator<ContentNode> iterator = children.iterator();
         ContentNode articles = iterator.next();

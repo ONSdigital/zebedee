@@ -101,7 +101,7 @@ public class ContentReader {
     /**
      * get resource
      *
-     * @param path path of resource under root folder
+     * @param path path of resource under root folder, directories with no data.json are not included
      * @return Wrapper for resource stream
      */
     public Resource getResource(String path) throws ZebedeeException, IOException {
@@ -109,17 +109,23 @@ public class ContentReader {
         return getResource(content);
     }
 
+    public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
+        return getChildren(path, false);
+    }
+
     /**
-     * get child contents under given path, directories with no data.json are returned with no type and directory name as title
+     * get child contents under given path, directories with no data.json are returned with no type and directory name as title if included
      *
      * @param path
+     * @param includeDirectories if set will include directories with no data.json in the tree, if not
+     *                       children of the directory is connected to folder's parent content if available
      * @return uri - node mapping
      */
-    public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
+    public Map<URI, ContentNode> getChildren(String path, boolean includeDirectories) throws ZebedeeException, IOException {
         Path node = resolvePath(path);
         assertExists(node);
         assertIsDirectory(node);
-        return resolveChildren(node);
+        return resolveChildren(node, includeDirectories);
     }
 
     /**
@@ -147,7 +153,7 @@ public class ContentReader {
         }
 
         nodes.putAll(resolveParents(firstParent));//resolve parent's parents first
-        ContentNode contentNode = createContentNode(firstParent);
+        ContentNode contentNode = createContentNode(firstParent, false);
         nodes.put(contentNode.getUri(), contentNode);
 
         return nodes;
@@ -176,12 +182,12 @@ public class ContentReader {
     }
 
 
-    private Map<URI, ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
+    private Map<URI, ContentNode> resolveChildren(Path node, boolean includeDirectories) throws IOException, ZebedeeException {
         Map<URI, ContentNode> nodes = new HashMap<>();
         try (DirectoryStream<Path> paths = newDirectoryStream(node)) {
             for (Path child : paths) {
                 if (isDirectory(child)) {
-                    ContentNode contentNode = createContentNode(child);
+                    ContentNode contentNode = createContentNode(child, includeDirectories);
                     if (contentNode == null) {
                         continue;
                     }
@@ -298,7 +304,7 @@ public class ContentReader {
 
 
     //Creates content node from content if data file is available, otherwise creates content node using folder name
-    private ContentNode createContentNode(Path path) throws ZebedeeException, IOException {
+    private ContentNode createContentNode(Path path, boolean includeFolders) throws ZebedeeException, IOException {
         ContentNode contentNode = null;
         try {
             Page content = getContent(path);
@@ -313,7 +319,9 @@ public class ContentReader {
                 }
             }
         } catch (NotFoundException e) {
-            contentNode = createContentNodeForFolder(path);
+            if (includeFolders) {
+                contentNode = createContentNodeForFolder(path);
+            }
         }
 
         return contentNode;

@@ -108,7 +108,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testGetChildren() throws ZebedeeException, IOException {
-            Map<URI, ContentNode> children = ZebedeeReader.getInstance().getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
+            Map<URI, ContentNode> children = ZebedeeReader.getInstance().getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity",true);
             assertTrue(children.size() == 2);
             Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
             assertTrue(children.containsKey(URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/")));
@@ -121,7 +121,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testGetCollectionChildren() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = ZebedeeReader.getInstance().getCollectionContentChildren(TEST_COLLECTION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
+        Map<URI, ContentNode> children = ZebedeeReader.getInstance().getCollectionContentChildren(TEST_COLLECTION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions",true);
         assertTrue(children.size() == 2);
         URI datasetsUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/");
         assertTrue(children.containsKey(datasetsUri));

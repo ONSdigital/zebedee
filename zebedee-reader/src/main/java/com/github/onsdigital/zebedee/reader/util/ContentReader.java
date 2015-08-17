@@ -132,20 +132,19 @@ public class ContentReader {
         Map<URI, ContentNode> children = resolveChildren(node);
         depth--;
 
-        Map<URI, ContentNode> hoistUp = new HashMap<>();//child content under directories to be hoisted up if directories not wanted
         for (Iterator<Map.Entry<URI, ContentNode>> iterator = children.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<URI, ContentNode> childNode = iterator.next();
             Map<URI, ContentNode> grandChildren = getChildren(childNode.getValue().getUri().toString(), depth , includeDirectories);
             if (!includeDirectories && childNode.getValue().getType() == null) { //directory with no data.json
-                children.remove(childNode.getKey());
-                hoistUp.putAll(grandChildren);
+                children.remove(childNode);
+                children.putAll(grandChildren);//bring childs up
             } else {
                 if (!grandChildren.isEmpty()) {
                     childNode.getValue().setChildren(grandChildren.values());//keep it null, not empty
                 }
             }
         }
-        children.putAll(hoistUp);
+
         return children;
     }
 

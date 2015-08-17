@@ -113,7 +113,7 @@ public class ContentReaderTest {
 
     @Test
     public void testGetChildrenDirectories() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = contentReader.getChildren("peoplepopulationandcommunity/culturalidentity/ethnicity", true);
+        Map<URI, ContentNode> children = contentReader.getChildren("peoplepopulationandcommunity/culturalidentity/ethnicity", 1, true);
         assertTrue(children.size() == 2);
         Map.Entry<URI, ContentNode> entry = children.entrySet().iterator().next();
         URI articleUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/");
@@ -127,7 +127,7 @@ public class ContentReaderTest {
 
     @Test(expected = NotFoundException.class)
     public void testNonExistingNodeChilren() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = contentReader.getChildren("/nonexistingpath/test");
+        Map<URI, ContentNode> children = contentReader.getChildren("/nonexistingpath/test",1);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class ContentReaderTest {
 
     @Test
     public void testGetChildrenContent() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = contentReader.getChildren("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
+        Map<URI, ContentNode> children = contentReader.getChildren("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk",1 );
         assertTrue(children.size() == 1);
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
         assertEquals("UK Natural Capital Land Cover in the UK", contentNode.getValue().getDescription().getTitle());
@@ -151,7 +151,7 @@ public class ContentReaderTest {
 
     @Test
     public void testGetHomeChildren() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = contentReader.getChildren("/");
+        Map<URI, ContentNode> children = contentReader.getChildren("/",1);
         assertTrue(children.containsKey(URI.create("/economy/")));
         assertTrue(children.containsKey(URI.create("/about/")));
     }

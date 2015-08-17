@@ -147,8 +147,8 @@ public class ReadRequestHandler {
         if (depth == 0) {
             return Collections.emptySet();
         }
-        Map<URI, ContentNode> nodes = ZebedeeReader.getInstance().getPublishedContentChildren(uri, includeDirectories);
-        overlayCollections(nodes, collectionId, uri, includeDirectories);
+        Map<URI, ContentNode> nodes = ZebedeeReader.getInstance().getPublishedContentChildren(uri, depth, includeDirectories);
+        overlayCollections(nodes, collectionId, uri, depth, includeDirectories);
         nodes = sortMapByContentTitle(nodes);
         depth--;
         resolveChildren(nodes, collectionId, depth, includeDirectories);
@@ -166,11 +166,11 @@ public class ReadRequestHandler {
         }
     }
 
-    private void overlayCollections(Map<URI, ContentNode> nodes, String collectionId, String uri, boolean includeDirectories) throws ZebedeeException, IOException {
+    private void overlayCollections(Map<URI, ContentNode> nodes, String collectionId, String uri, int depth, boolean includeDirectories) throws ZebedeeException, IOException {
         if (collectionId == null) {
             return;
         }
-        Map<URI, ContentNode> collectionChildren = ZebedeeReader.getInstance().getCollectionContentChildren(collectionId, uri, includeDirectories);
+        Map<URI, ContentNode> collectionChildren = ZebedeeReader.getInstance().getCollectionContentChildren(collectionId, uri, depth, includeDirectories);
         nodes.putAll(collectionChildren);//Overwrites published nodes
     }
 

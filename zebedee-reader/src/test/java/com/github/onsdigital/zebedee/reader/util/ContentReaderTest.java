@@ -113,7 +113,7 @@ public class ContentReaderTest {
 
     @Test
     public void testGetChildrenDirectories() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = contentReader.getChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
+        Map<URI, ContentNode> children = contentReader.getChildren("peoplepopulationandcommunity/culturalidentity/ethnicity", true);
         assertTrue(children.size() == 2);
         Map.Entry<URI, ContentNode> entry = children.entrySet().iterator().next();
         URI articleUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/");

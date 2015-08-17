@@ -71,7 +71,9 @@ public class CollectionContentReader {
                 resource = findResource(jsonPath.toString());
             }
             Page page = ContentUtil.deserialiseContent(resource.getData());
-            page.setUri(URI.create(path)); //set on the fly, overwriting whatever is in the file
+            if (page != null) {
+                page.setUri(URI.create(URIUtils.removeLastSegment(resource.getUri().toString())));//Setting uri on the fly, discarding whatever is in the file
+            }
             return page;
         } finally {
             if (resource != null) {

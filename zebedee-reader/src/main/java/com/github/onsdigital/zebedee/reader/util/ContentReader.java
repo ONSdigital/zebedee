@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
-import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -15,8 +14,12 @@ import com.github.onsdigital.zebedee.util.URIUtils;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
@@ -82,7 +85,7 @@ public class ContentReader {
             checkJsonMime(resource, path);
             Page page = deserialize(resource);
             if (page != null) { //Contents without type is null when deserialised.
-                page.setUri(toRelativeUri(path));//Setting uri on the fly, discarding whatever is in the file
+                page.setUri(URI.create(URIUtils.removeLastSegment(resource.getUri().toString())));//Setting uri on the fly, discarding whatever is in the file
             }
             return page;
         }
@@ -229,6 +232,7 @@ public class ContentReader {
         Resource resource = new Resource();
         resource.setName(path.getFileName().toString());
         resource.setMimeType(probeContentType(path));
+        resource.setUri(toRelativeUri(path));
         resource.setData(newInputStream(path));
         resource.setSize(size(path));
         return resource;

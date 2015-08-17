@@ -82,7 +82,7 @@ public class CollectionContentReaderTest {
 
     @Test
     public void testGetChildrenContent() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets", 1);
+        Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
         assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDescription().getTitle());
         assertEquals(PageType.dataset, contentNode.getValue().getType());//type is null for directories with no data.json
@@ -91,7 +91,7 @@ public class CollectionContentReaderTest {
 
     @Test
     public void testGetChildrenDirectories() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions",1, true);
+        Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions",true);
         URI articleUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/");
         URI datasetsUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/");
         assertTrue(children.containsKey(articleUri));
@@ -100,7 +100,7 @@ public class CollectionContentReaderTest {
 
     @Test
     public void testNonExistingNodeChilren() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = collectionReader.getChildren("/nonexistingpath/test",1);
+        Map<URI, ContentNode> children = collectionReader.getChildren("/nonexistingpath/test");
         assertTrue(children.isEmpty());
     }
 

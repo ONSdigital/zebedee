@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
@@ -110,8 +109,8 @@ public class ContentReader {
         return getResource(content);
     }
 
-    public Map<URI, ContentNode> getChildren(String path, int depth) throws ZebedeeException, IOException {
-        return getChildren(path, depth, false);
+    public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
+        return getChildren(path, false);
     }
 
     /**
@@ -122,30 +121,11 @@ public class ContentReader {
      *                       children of the directory is connected to folder's parent content if available
      * @return uri - node mapping
      */
-    public Map<URI, ContentNode> getChildren(String path, int depth, boolean includeDirectories) throws ZebedeeException, IOException {
+    public Map<URI, ContentNode> getChildren(String path, boolean includeDirectories) throws ZebedeeException, IOException {
         Path node = resolvePath(path);
         assertExists(node);
         assertIsDirectory(node);
-        if (depth <= 0) {
-            return Collections.emptyMap();
-        }
-        Map<URI, ContentNode> children = resolveChildren(node);
-        depth--;
-
-        for (Iterator<Map.Entry<URI, ContentNode>> iterator = children.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<URI, ContentNode> childNode = iterator.next();
-            Map<URI, ContentNode> grandChildren = getChildren(childNode.getValue().getUri().toString(), depth , includeDirectories);
-            if (!includeDirectories && childNode.getValue().getType() == null) { //directory with no data.json
-                children.remove(childNode);
-                children.putAll(grandChildren);//bring childs up
-            } else {
-                if (!grandChildren.isEmpty()) {
-                    childNode.getValue().setChildren(grandChildren.values());//keep it null, not empty
-                }
-            }
-        }
-
-        return children;
+        return resolveChildren(node, includeDirectories);
     }
 
     /**
@@ -173,7 +153,7 @@ public class ContentReader {
         }
 
         nodes.putAll(resolveParents(firstParent));//resolve parent's parents first
-        ContentNode contentNode = createContentNode(firstParent);
+        ContentNode contentNode = createContentNode(firstParent, false);
         nodes.put(contentNode.getUri(), contentNode);
 
         return nodes;
@@ -202,12 +182,12 @@ public class ContentReader {
     }
 
 
-    private Map<URI, ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
+    private Map<URI, ContentNode> resolveChildren(Path node, boolean includeDirectories) throws IOException, ZebedeeException {
         Map<URI, ContentNode> nodes = new HashMap<>();
         try (DirectoryStream<Path> paths = newDirectoryStream(node)) {
             for (Path child : paths) {
                 if (isDirectory(child)) {
-                    ContentNode contentNode = createContentNode(child);
+                    ContentNode contentNode = createContentNode(child, includeDirectories);
                     if (contentNode == null) {
                         continue;
                     }
@@ -324,7 +304,7 @@ public class ContentReader {
 
 
     //Creates content node from content if data file is available, otherwise creates content node using folder name
-    private ContentNode createContentNode(Path path) throws ZebedeeException, IOException {
+    private ContentNode createContentNode(Path path, boolean includeFolders) throws ZebedeeException, IOException {
         ContentNode contentNode = null;
         try {
             Page content = getContent(path);
@@ -339,7 +319,9 @@ public class ContentReader {
                 }
             }
         } catch (NotFoundException e) {
+            if (includeFolders) {
                 contentNode = createContentNodeForFolder(path);
+            }
         }
 
         return contentNode;

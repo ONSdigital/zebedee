@@ -132,25 +132,25 @@ public class ZebedeeReader {
         return createCollectionReader(collectionId).getResource(path);
     }
 
-    public Map<URI, ContentNode> getPublishedContentChildren(String path, int depth) throws ZebedeeException, IOException {
-        return getPublishedContentChildren(path, depth, false);
+    public Map<URI, ContentNode> getPublishedContentChildren(String path) throws ZebedeeException, IOException {
+        return getPublishedContentChildren(path, false);
     }
 
-    public Map<URI, ContentNode> getPublishedContentChildren(String path, int depth, boolean includeDirectories) throws ZebedeeException, IOException {
+    public Map<URI, ContentNode> getPublishedContentChildren(String path, boolean includeDirectories) throws ZebedeeException, IOException {
         try {
-            return publishedContentReader.getChildren(path, depth, includeDirectories);
+            return publishedContentReader.getChildren(path, includeDirectories);
         } catch (NotFoundException e) {
             //If requested path is not available in published content return an empty list
             return Collections.emptyMap();
         }
     }
 
-    public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String path, int depth) throws ZebedeeException, IOException {
-        return createCollectionReader(collectionId).getChildren(path, depth, false);
+    public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String path) throws ZebedeeException, IOException {
+        return createCollectionReader(collectionId).getChildren(path);
     }
 
-    public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String path, int depth, boolean includeDirectories) throws ZebedeeException, IOException {
-        return createCollectionReader(collectionId).getChildren(path, depth, includeDirectories);
+    public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String path, boolean includeDirectories) throws ZebedeeException, IOException {
+        return createCollectionReader(collectionId).getChildren(path, includeDirectories);
     }
 
     public Map<URI, ContentNode> getPublishedContentParents(String path) throws ZebedeeException, IOException {

@@ -89,33 +89,19 @@ public class CollectionContentReader {
         return findResource(path);
     }
 
-
-    /**
-     * Does not include directories
-     *
-     * @param path
-     * @return
-     * @throws ZebedeeException
-     * @throws IOException
-     */
-    public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
-        return getChildren(path, false);
-    }
-
     /**
      * @param path
-     * @param includeDirectories whether directories with no data.json should be included or not
      * @return uri-node mapping
      * @throws ZebedeeException
      * @throws IOException
      */
-    public Map<URI, ContentNode> getChildren(String path, boolean includeDirectories) throws ZebedeeException, IOException {
+    public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
         Map<URI, ContentNode> children = new HashMap<>();
         //TODO: Same document should not be in two different state, it should be safe to overwrite if it appears in multiple places?.
         // Is there a validation mechanism ? Might be needed
-        children.putAll(getChildrenQuite(path, reviewed,includeDirectories));
-        children.putAll(getChildrenQuite(path, complete,includeDirectories));//overwrites reviewed content if appears in both places
-        children.putAll(getChildrenQuite(path, inProgress,includeDirectories));//overwrites complete and reviewed content if appears in both places
+        children.putAll(getChildrenQuite(path, reviewed));
+        children.putAll(getChildrenQuite(path, complete));//overwrites reviewed content if appears in both places
+        children.putAll(getChildrenQuite(path, inProgress));//overwrites complete and reviewed content if appears in both places
         return children;
     }
 
@@ -168,9 +154,9 @@ public class CollectionContentReader {
     }
 
     //If content not found with given reader do not shout
-    private Map<URI, ContentNode> getChildrenQuite(String path, ContentReader contentReader, boolean includeDirectories) throws ZebedeeException, IOException {
+    private Map<URI, ContentNode> getChildrenQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
-            return contentReader.getChildren(path, includeDirectories);
+            return contentReader.getChildren(path);
         } catch (NotFoundException e) {
             return Collections.emptyMap();
         }

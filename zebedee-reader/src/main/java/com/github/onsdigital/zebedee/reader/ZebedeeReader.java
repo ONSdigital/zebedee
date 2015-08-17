@@ -133,24 +133,17 @@ public class ZebedeeReader {
     }
 
     public Map<URI, ContentNode> getPublishedContentChildren(String path) throws ZebedeeException, IOException {
-        return getPublishedContentChildren(path, false);
-    }
-
-    public Map<URI, ContentNode> getPublishedContentChildren(String path, boolean includeDirectories) throws ZebedeeException, IOException {
         try {
-            return publishedContentReader.getChildren(path, includeDirectories);
+            return publishedContentReader.getChildren(path);
         } catch (NotFoundException e) {
             //If requested path is not available in published content return an empty list
             return Collections.emptyMap();
         }
     }
 
+
     public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String path) throws ZebedeeException, IOException {
         return createCollectionReader(collectionId).getChildren(path);
-    }
-
-    public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String path, boolean includeDirectories) throws ZebedeeException, IOException {
-        return createCollectionReader(collectionId).getChildren(path, includeDirectories);
     }
 
     public Map<URI, ContentNode> getPublishedContentParents(String path) throws ZebedeeException, IOException {

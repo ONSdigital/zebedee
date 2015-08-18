@@ -2,8 +2,12 @@ package com.github.onsdigital.zebedee.search.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.search.SearchHelper;
-import com.github.onsdigital.zebedee.search.response.AggregatedSearchResult;
+import com.github.onsdigital.zebedee.search.result.AggregatedSearchResult;
+import com.github.onsdigital.zebedee.search.result.SearchResultsPage;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +26,18 @@ public class Search {
     private final static String DATA_REQUEST = "data";
     private final static String SEARCH_REQUEST = "search";
 
+    private static final int MAX_VISIBLE_PAGINATOR_LINK = 10;
+
     @GET
     public Object get(@Context HttpServletRequest request, @Context HttpServletResponse response) throws Exception {
 
-        // String type = URIUtil.resolveRequestType(request.getRequestURI());
-
         String query = extractQuery(request);
-//            if (query == null) {
-//                IOUtils.copy(new StringReader(renderEmptySearchPage()), response.getOutputStream());
-//                return null;
-//            }
+
+        if (query == null) {
+            IOUtils.copy(new StringReader(ContentUtil.serialise(new SearchResultsPage())), response.getOutputStream());
+            return null;
+        }
+
         Object searchResult = null;
         int page = extractPage(request);
         String[] types = extractTypes(request);
@@ -58,33 +65,18 @@ public class Search {
             }*/
 
 
-        //handleResponse(type, searchResult, response, page, query, types, includeStatics, includeAllData);
+        AggregatedSearchResult result = (AggregatedSearchResult) searchResult;
+        long numberOfPages = (long) Math.ceil((double) result.statisticsSearchResult.getNumberOfResults() / 10);
+        numberOfPages = numberOfPages == 0 ? 1 : numberOfPages; //If no results number should be pages is 1 to show the page
+        if (page > numberOfPages) {
+            throw new NotFoundException("There are only " + numberOfPages + " available - page " + page + " does not exist.");
+        }
+
+        String data = ContentUtil.serialise(buildResultsPage(result, page, query, types, includeStatics, includeAllData));
+        IOUtils.copy(new StringReader(data), response.getOutputStream());
         return null;
     }
 
-    //Decide if json should be returned ( in case search/data requested) or page should be rendered
-//    private void handleResponse(String requestType, Object searchResult, HttpServletResponse response, int page, String query, String[] types, boolean includeStatics, boolean includeAllData) throws IOException {
-//        BabbageResponse babbageResponse;
-//
-//        AggregatedSearchResult result = (AggregatedSearchResult) searchResult;
-//        long numberOfPages = (long) Math.ceil((double) result.statisticsSearchResult.getNumberOfResults() / 10);
-//        numberOfPages = numberOfPages == 0 ? 1 : numberOfPages; //If no results number should be pages is 1 to show the page
-//        if (page > numberOfPages) {
-//            throw new ResourceNotFoundException();
-//        }
-//
-//        switch (requestType) {
-//            case DATA_REQUEST:
-//                babbageResponse = new BabbageStringResponse(ContentUtil.serialise(buildResultsPage(result, page, query, types, includeStatics, includeAllData)));
-//                break;
-//            case SEARCH_REQUEST:
-//                babbageResponse = new BabbageStringResponse(renderSearchPage(result, page, query, types, includeStatics, includeAllData), HTML_MIME);
-//                break;
-//            default:
-//                throw new ResourceNotFoundException();
-//        }
-//        babbageResponse.apply(response);
-//    }
 
     private String[] resolveTypes(String[] types, boolean includeStatics, boolean includeAllData) {
         String[] filterTypes = ArrayUtils.clone(types);
@@ -103,32 +95,33 @@ public class Search {
 
 
     //Resolve search headlines and build search page
-//    private SearchResultsPage buildResultsPage(AggregatedSearchResult results, int currentPage, String searchTerm, String[] types, boolean includeStatics, boolean includeAllData) {
-//        SearchResultsPage page = new SearchResultsPage();
-//        page.setStatisticsSearchResult(results.statisticsSearchResult);
-//        page.setTaxonomySearchResult(results.taxonomySearchResult);
-//        page.setCurrentPage(currentPage);
-//        page.setIncludeStatics(includeStatics);
-//        page.setIncludeAllData(includeAllData);
-//        page.setNumberOfResults(results.getNumberOfResults());
-//        page.setNumberOfPages((long) Math.ceil((double) results.statisticsSearchResult.getNumberOfResults() / 10));
-//        page.setEndPage((int) getEndPage(page.getNumberOfPages(), currentPage, Configuration.getMaxVisiblePaginatorLink()));
-//        page.setStartPage(getStartPage((int) page.getNumberOfPages(), Configuration.getMaxVisiblePaginatorLink(), page.getEndPage()));
-//        page.setPages(getPageList(page.getStartPage(), page.getEndPage()));
-//        page.setSearchTerm(searchTerm);
-//        page.setTypes(types);
-//        page.setSuggestionBased(results.isSuggestionBasedResult());
-//        if (results.isSuggestionBasedResult()) {
-//            page.setSuggestion(results.getSuggestion());
-//        }
-//
-//        if (page.getTaxonomySearchResult() != null) {
-//            resolveSearchHeadline(page);
-//        }
-//        return page;
-//    }
+    private SearchResultsPage buildResultsPage(AggregatedSearchResult results, int currentPage, String searchTerm, String[] types, boolean includeStatics, boolean includeAllData) {
+        SearchResultsPage page = new SearchResultsPage();
+        page.setStatisticsSearchResult(results.statisticsSearchResult);
+        page.setTaxonomySearchResult(results.taxonomySearchResult);
+        page.setCurrentPage(currentPage);
+        page.setIncludeStatics(includeStatics);
+        page.setIncludeAllData(includeAllData);
+        page.setNumberOfResults(results.getNumberOfResults());
+        page.setNumberOfPages((long) Math.ceil((double) results.statisticsSearchResult.getNumberOfResults() / 10));
+        page.setEndPage((int) getEndPage(page.getNumberOfPages(), currentPage, MAX_VISIBLE_PAGINATOR_LINK));
+        page.setStartPage(getStartPage((int) page.getNumberOfPages(), MAX_VISIBLE_PAGINATOR_LINK, page.getEndPage()));
+        page.setPages(getPageList(page.getStartPage(), page.getEndPage()));
+        page.setSearchTerm(searchTerm);
+        page.setTypes(types);
+        page.setSuggestionBased(results.isSuggestionBasedResult());
+        if (results.isSuggestionBasedResult()) {
+            page.setSuggestion(results.getSuggestion());
+        }
 
+        if (page.getTaxonomySearchResult() != null) {
+            // todo: resolve search headline in here or in babbage ?
+            //resolveSearchHeadline(page);
+        }
+        return page;
+    }
 
+    //
     //List of numbers for handlebars to loop through
     private List<Integer> getPageList(int start, int end) {
         ArrayList<Integer> pageList = new ArrayList<Integer>();
@@ -160,6 +153,7 @@ public class Search {
         return end;
     }
 
+    // todo: resolveSearchHeadline
 //    private void resolveSearchHeadline(SearchResultsPage page) {
 //        for (Iterator<PageReference> iterator = page.getTaxonomySearchResult().getResults().iterator(); iterator.hasNext(); ) {
 //            PageReference pageReference = iterator.next();

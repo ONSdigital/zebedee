@@ -1,9 +1,10 @@
 package com.github.onsdigital.zebedee.search;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.search.response.SearchResult;
+import com.github.onsdigital.zebedee.search.result.SearchResult;
+import com.github.onsdigital.zebedee.search.result.SearchResults;
 import com.github.onsdigital.zebedee.search.server.ElasticSearchServer;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.elasticsearch.action.count.CountRequestBuilder;
@@ -18,6 +19,7 @@ import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -36,10 +38,10 @@ public class SearchService {
      * key-value pairs
      *
      * @param queryBuilder
-     * @return {@link SearchResult}
+     * @return {@link SearchResults}
      * @throws Exception
      */
-    public static SearchResult search(ONSQueryBuilder queryBuilder) {
+    public static SearchResults search(ONSQueryBuilder queryBuilder) {
         System.out.println("Searcing For:" + ReflectionToStringBuilder.toString(queryBuilder));
         return buildSearchResult(execute(queryBuilder));
 
@@ -55,9 +57,9 @@ public class SearchService {
      *
      * @return
      */
-    public static List<SearchResult> multiSearch(ONSQueryBuilder... queryBuilders) {
+    public static List<SearchResults> multiSearch(ONSQueryBuilder... queryBuilders) {
         System.out.println("Multiple Searcing For:" + getQueries(queryBuilders));
-        List<SearchResult> results = new ArrayList<SearchResult>();
+        List<SearchResults> results = new ArrayList<SearchResults>();
 
         MultiSearchResponse response = execute(queryBuilders);
         Item[] responses = response.getResponses();
@@ -119,11 +121,11 @@ public class SearchService {
     }
 
 
-    public static SearchResult buildSearchResult(SearchResponse response) {
-        SearchResult searchResult = new SearchResult();
-        searchResult.setNumberOfResults(response.getHits().getTotalHits());
-        searchResult.setResults(resolveReferences(response));
-        return searchResult;
+    public static SearchResults buildSearchResult(SearchResponse response) {
+        SearchResults searchResults = new SearchResults();
+        searchResults.setNumberOfResults(response.getHits().getTotalHits());
+        searchResults.setResults(populateResults(response));
+        return searchResults;
     }
 
     private static List<Map<String, Object>> resolveHits(SearchResponse response) {
@@ -142,18 +144,21 @@ public class SearchService {
         return results;
     }
 
-    private static List<Page> resolveReferences(SearchResponse response) {
-        List<Map<String, Object>> results = resolveHits(response);
-        List<Page> references = new ArrayList<>();
-        for (Iterator<Map<String, Object>> iterator = results.iterator(); iterator.hasNext(); ) {
+    private static List<SearchResult> populateResults(SearchResponse response) {
+        List<Map<String, Object>> resultsMap = resolveHits(response);
+        List<SearchResult> results = new ArrayList<>();
+        for (Iterator<Map<String, Object>> iterator = resultsMap.iterator(); iterator.hasNext(); ) {
             Map<String, Object> next = iterator.next();
-//			Page reference = new Page(URI.create((String) next.get("uri")));
-//            reference.setType(PageType.valueOf((String) next.get("type")));
+
+            SearchResult result = new SearchResult(
+                    URI.create((String) next.get("uri")),
+                    PageType.valueOf((String) next.get("type")));
+
             PageDescription pageDescription = ContentUtil.deserialise(ContentUtil.serialise(next), PageDescription.class);
-//            reference.setDescription(pageDescription);
-//            references.add(reference);
+            result.setDescription(pageDescription);
+            results.add(result);
         }
-        return references;
+        return results;
     }
 
     private static Map<? extends String, ? extends Object> extractHihglightedFields(

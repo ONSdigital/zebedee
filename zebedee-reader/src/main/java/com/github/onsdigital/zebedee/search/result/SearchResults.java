@@ -1,13 +1,11 @@
-package com.github.onsdigital.zebedee.search.response;
-
-import com.github.onsdigital.zebedee.content.page.base.Page;
+package com.github.onsdigital.zebedee.search.result;
 
 import java.util.List;
 
-public class SearchResult {
+public class SearchResults {
 
     private long numberOfResults;
-    private List<Page> results;
+    private List<SearchResult> results;
 
     public long getNumberOfResults() {
         return numberOfResults;
@@ -17,11 +15,11 @@ public class SearchResult {
         this.numberOfResults = numberOfResults;
     }
 
-    public List<Page> getResults() {
+    public List<SearchResult> getResults() {
         return results;
     }
 
-    public void setResults(List<Page> results) {
+    public void setResults(List<SearchResult> results) {
         this.results = results;
     }
 

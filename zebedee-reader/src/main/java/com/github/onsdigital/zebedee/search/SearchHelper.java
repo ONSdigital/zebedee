@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.search;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.search.response.AggregatedSearchResult;
-import com.github.onsdigital.zebedee.search.response.SearchResult;
+import com.github.onsdigital.zebedee.search.result.AggregatedSearchResult;
+import com.github.onsdigital.zebedee.search.result.SearchResult;
+import com.github.onsdigital.zebedee.search.result.SearchResults;
 import com.github.onsdigital.zebedee.search.server.ElasticSearchServer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +43,7 @@ public class SearchHelper {
         }
     }
 
-    public static SearchResult autocomplete(String searchTerm) {
+    public static SearchResults autocomplete(String searchTerm) {
         ONSQueryBuilder builder = buildAutocompleteQuery(searchTerm);
         return SearchService.search(builder);
     }
@@ -60,13 +60,13 @@ public class SearchHelper {
 
         SearchRequestBuilder searchRequestBuilder = (ElasticSearchServer.getClient().prepareSearch("ons")).setQuery(termFilterBuilder.buildAsBytes());
 
-        SearchResult result = SearchService.buildSearchResult(searchRequestBuilder.get());
+        SearchResults result = SearchService.buildSearchResult(searchRequestBuilder.get());
 
         if (result.getNumberOfResults() == 0) {
             return null;
         }
 
-        Page timseriesReference = result.getResults().iterator().next();
+        SearchResult timseriesReference = result.getResults().iterator().next();
         return timseriesReference.getUri();
     }
 
@@ -103,11 +103,11 @@ public class SearchHelper {
     }
 
     private static AggregatedSearchResult doSearch(String searchTerm, int page, String... types) {
-        SearchResult searchResult = SearchService.search(buildContentQuery(searchTerm, page, types));
+        SearchResults searchResult = SearchService.search(buildContentQuery(searchTerm, page, types));
 
         // only do home search in order to determine whether we need to
         // increment the results count by 1
-        SearchResult homeResult = SearchService.search(buildHomeQuery(searchTerm, page));
+        SearchResults homeResult = SearchService.search(buildHomeQuery(searchTerm, page));
         if (types == null && homeResult != null && homeResult.getNumberOfResults() != 0) {
             long numberOfResults = searchResult.getNumberOfResults();
             searchResult.setNumberOfResults(numberOfResults);
@@ -121,9 +121,9 @@ public class SearchHelper {
 
     private static AggregatedSearchResult searchMultiple(String searchTerm, int page) {
         // If no filter and first page, include one home type result at the top
-        List<SearchResult> responses = SearchService.multiSearch(buildHomeQuery(searchTerm, page), buildContentQuery(searchTerm, page));
+        List<SearchResults> responses = SearchService.multiSearch(buildHomeQuery(searchTerm, page), buildContentQuery(searchTerm, page));
         long timeSeriesCount = SearchService.count(buildTimeSeriesCountQuery(searchTerm));
-        Iterator<SearchResult> resultsIterator = responses.iterator();
+        Iterator<SearchResults> resultsIterator = responses.iterator();
         AggregatedSearchResult result = new AggregatedSearchResult();
         result.taxonomySearchResult = resultsIterator.next();
         result.statisticsSearchResult = resultsIterator.next();

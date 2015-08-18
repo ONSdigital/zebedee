@@ -115,7 +115,7 @@ public class ZebedeeReaderTest {
             assertTrue(children.containsKey(bulletinUri));
             assertNull(contentNode.getValue().getType());//type is null for directories with no data.json
             assertNull(contentNode.getValue().getChildren());// only immediate children should be read
-            assertEquals("bulletins", children.get(bulletinUri).getDetails().getTitle());
+            assertEquals("bulletins", children.get(bulletinUri).getDescription().getTitle());
     }
 
     @Test

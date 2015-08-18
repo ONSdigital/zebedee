@@ -41,6 +41,7 @@ public class FilterUtil {
             case TITLE:
                 ContentNodeDetails titleWrapper = new ContentNodeDetails();
                 titleWrapper.setTitle(page.getDescription().getTitle());
+                titleWrapper.setEdition(page.getDescription().getEdition());
                 return titleWrapper;
             case DESCRIPTION:
                 return page.getDescription();

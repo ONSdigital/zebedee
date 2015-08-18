@@ -35,7 +35,7 @@ public class Zebedee {
     public final Teams teams;
     public final Content launchpad;
 
-    public Zebedee(Path path) {
+    public Zebedee(Path path)  {
 
         // Validate the directory:
         this.path = path;
@@ -52,7 +52,24 @@ public class Zebedee {
                     "This folder doesn't look like a zebedee folder: "
                             + path.toAbsolutePath());
         }
+
+
+        // Create published and ensure redirect
         this.published = new Content(published);
+
+        Path redirectPath = this.published.path.resolve(Content.REDIRECT);
+        if(!Files.exists(redirectPath)) {
+            this.published.redirect = new RedirectTableChained(this.published);
+            try {
+                Files.createFile(redirectPath);
+            } catch (IOException e) {
+                System.out.println("Could not save redirect to: " + redirectPath.toString());
+            }
+        } else {
+            this.published.redirect = new RedirectTableChained(this.published, redirectPath);
+        }
+
+
         this.collections = new Collections(collections, this) ;
         this.users = new Users(users, this);
         this.sessions = new Sessions(sessions);
@@ -85,6 +102,11 @@ public class Zebedee {
         if (!Files.exists(path.resolve(PERMISSIONS))) {Files.createDirectory(path.resolve(PERMISSIONS));}
         if (!Files.exists(path.resolve(TEAMS))) {Files.createDirectory(path.resolve(TEAMS));}
         if (!Files.exists(path.resolve(LAUNCHPAD))) {Files.createDirectory(path.resolve(LAUNCHPAD));}
+
+        Path redirectPath = path.resolve(PUBLISHED).resolve(Content.REDIRECT);
+        if(!Files.exists(redirectPath)) {
+            Files.createFile(redirectPath);
+        }
 
         Zebedee zebedee = new Zebedee(path);
 

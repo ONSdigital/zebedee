@@ -48,9 +48,13 @@ public class RedirectTableChained {
         this.content = content;
     }
 
-    public RedirectTableChained(Content content, Path path) throws IOException {
+    public RedirectTableChained(Content content, Path path) {
         this(content);
-        load(path);
+        try {
+            load(path);
+        } catch (IOException e) {
+            System.out.println("Could not load redirect from: " + path.toString());
+        }
     }
 
     /**

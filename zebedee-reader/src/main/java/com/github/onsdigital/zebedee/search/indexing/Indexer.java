@@ -107,12 +107,30 @@ public class Indexer {
 
         XContentBuilder builder = jsonBuilder().startObject().startObject(type).startObject("properties");
         try {
-            builder.startObject("releaseDate").field("type", "string").field("index", "no").endObject();
+            builder.startObject("releaseDate").field("type", "date").field("index", "analyzed").endObject();
             builder.startObject("summary").field("type", "string").field("index", "no").endObject();
             builder.startObject("title").field("type", "string").field("index", "analyzed").endObject();
             builder.startObject("tags").field("type", "string").field("index", "analyzed").endObject();
             builder.startObject("edition").field("type", "string").field("index", "analyzed").endObject();
-            builder.startObject("uri").field("type", "string").field("index", "analyzed").endObject();
+
+            //builder.startObject("uri").field("type", "string").field("index", "analyzed").endObject();
+
+            builder.startObject("uri")
+                    .field("type", "multi_field")
+                    .startObject("fields")
+                        .startObject("uri")
+                            .field("type", "string")
+                            .field("index", "analyzed")
+                        .endObject()
+                        .startObject("uri_segment")
+                            .field("type", "string")
+                            .field("index", "analyzed")
+                    .field("index_analyzer", "whitespace")
+                    .field("search_analyzer", "whitespace")
+                    .endObject()
+                    .endObject()
+            .endObject();
+
             builder.endObject().endObject().endObject();
             return builder;
         } finally {

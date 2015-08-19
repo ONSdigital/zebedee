@@ -16,7 +16,7 @@ import java.nio.file.Path;
 /**
  * Created by tom on 13/06/15.
  *
- * Used when resolving content references in simple
+ * Used when resolving content references in simple instances where we want to update
  */
 public class SimpleReader implements ContentService {
     Content content = null;

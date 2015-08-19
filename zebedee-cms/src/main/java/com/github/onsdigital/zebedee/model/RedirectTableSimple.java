@@ -91,6 +91,11 @@ public class RedirectTableSimple implements RedirectTable {
     }
 
     @Override
+    public boolean exists(String redirectFrom, String redirectTo) {
+        return table.containsKey(redirectFrom);
+    }
+
+    @Override
     public Iterator<String[]> iterator() {
         Iterator<String[]> it = new Iterator<String[]>() {
 

@@ -89,4 +89,6 @@ public class RedirectTableChainedWithZebedeeTest {
         // the collection parent-child redirect ought to handle the redirect
         assertEquals(trueURI, uri);
     }
+
+
 }

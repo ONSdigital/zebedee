@@ -69,7 +69,7 @@ public class RedirectTablePartialMatch implements RedirectTable {
             for (String partialTo: list) {
                 // If the new redirect affects the to value we change it
                 if (partialTo.startsWith(redirectFrom)) {
-                    String newLink = redirectTo + partialTo.substring(redirectTo.length());
+                    String newLink = redirectTo + partialTo.substring(redirectFrom.length());
                     newList.add(newLink);
                 } else { // or just copy the link
                     newList.add(partialTo);
@@ -142,6 +142,12 @@ public class RedirectTablePartialMatch implements RedirectTable {
     }
 
     @Override
+    public boolean exists(String redirectFrom, String redirectTo) {
+        if (table.containsKey(redirectFrom) && table.get(redirectFrom).contains(redirectTo)) { return true; }
+        return false;
+    }
+
+    @Override
     public Iterator<String[]> iterator() {
         Iterator<String[]> it = new Iterator<String[]>() {
 
@@ -178,4 +184,6 @@ public class RedirectTablePartialMatch implements RedirectTable {
         };
         return it;
     }
+
+
 }

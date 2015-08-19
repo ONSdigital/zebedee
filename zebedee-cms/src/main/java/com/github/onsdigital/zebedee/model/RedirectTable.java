@@ -18,4 +18,6 @@ public interface RedirectTable extends Iterable<String[]>{
     public void merge(RedirectTable redirectTable);
     public void save(Path path) throws IOException;
     public void load(Path path) throws IOException;
+
+    public boolean exists(String redirectFrom, String redirectTo);
 }

@@ -114,4 +114,26 @@ public class RedirectTablePartialMatchTest {
         assertNull(redirected);
     }
 
+    @Test
+    public void get_whereMultipleRedirectsExistFromPartialMatchOrigin_shouldRedirect() {
+        // Given
+        // a quite complicated situation...
+        RedirectTable table = new RedirectTablePartialMatch(zebedee.published);
+
+        // Take a top level node and move it
+        table.addRedirect("business", "themea");
+        // Recreate the top level node (not necessary in test) and move that
+        table.addRedirect("business", "themeb");
+
+        // When
+        // We get the redirects from two node that have moved
+        String pageThatBelongedToTheOriginalBusiness = table.get("business/landinga/data.json");
+        String pageThatBelongedToTheSecondBusiness = table.get("business/landingc/data.json");
+
+        // Then
+        // The appropriate links work even though they are to different places
+        assertEquals("themea/landinga/data.json", pageThatBelongedToTheOriginalBusiness);
+        assertEquals("themeb/landingc/data.json", pageThatBelongedToTheSecondBusiness);
+
+    }
 }

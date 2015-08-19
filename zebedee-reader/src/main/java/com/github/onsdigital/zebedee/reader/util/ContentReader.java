@@ -9,7 +9,9 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -22,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 import static java.nio.file.Files.*;
 
@@ -85,7 +88,11 @@ public class ContentReader {
             checkJsonMime(resource, path);
             Page page = deserialize(resource);
             if (page != null) { //Contents without type is null when deserialised.
-                page.setUri(URI.create(URIUtils.removeLastSegment(resource.getUri().toString())));//Setting uri on the fly, discarding whatever is in the file
+                if (StringUtils.endsWith(resource.getUri().toString(), ReaderConfiguration.getConfiguration().getDataFileName())) {
+                    page.setUri(URI.create(removeLastSegment(resource.getUri().toString())));//Setting uri on the fly, discarding whatever is in the file
+                } else {
+                    page.setUri(URI.create(StringUtils.removeEnd(resource.getUri().toString(), ".json")));//Setting uri on the fly, discarding whatever is in the file
+                }
             }
             return page;
         }
@@ -219,7 +226,7 @@ public class ContentReader {
 
     //Returns uri of content calculating relative to root folder
     private URI toRelativeUri(Path node) {
-        return URI.create("/" + getRootFolder().toUri().relativize(node.toUri()).getPath());
+        return URI.create("/" + URIUtils.removeTrailingSlash(getRootFolder().toUri().relativize(node.toUri()).getPath()));
     }
 
     protected Resource getResource(Path resourcePath) throws ZebedeeException, IOException {

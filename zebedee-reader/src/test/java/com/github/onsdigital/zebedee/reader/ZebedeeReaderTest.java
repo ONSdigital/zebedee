@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.staticpage.StaticPage;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
@@ -111,8 +110,8 @@ public class ZebedeeReaderTest {
             Map<URI, ContentNode> children = ZebedeeReader.getInstance().getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
             assertTrue(children.size() == 2);
             Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
-            assertTrue(children.containsKey(URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/")));
-            URI bulletinUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/");
+            assertTrue(children.containsKey(URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles")));
+            URI bulletinUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins");
             assertTrue(children.containsKey(bulletinUri));
             assertNull(contentNode.getValue().getType());//type is null for directories with no data.json
             assertNull(contentNode.getValue().getChildren());// only immediate children should be read
@@ -123,9 +122,9 @@ public class ZebedeeReaderTest {
     public void testGetCollectionChildren() throws ZebedeeException, IOException {
         Map<URI, ContentNode> children = ZebedeeReader.getInstance().getCollectionContentChildren(TEST_COLLECTION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         assertTrue(children.size() == 2);
-        URI datasetsUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/");
+        URI datasetsUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
         assertTrue(children.containsKey(datasetsUri));
-        URI articlesUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/");
+        URI articlesUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles");
         assertTrue(children.containsKey(articlesUri));
         assertNull(children.get(articlesUri).getChildren());
         assertNull(children.get(datasetsUri).getChildren());

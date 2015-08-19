@@ -138,7 +138,7 @@ public class ReadRequestHandlerTest {
         ContentNode home = iterator.next();
         ContentNode employmentLabourMarket = iterator.next();
         assertEquals(URI.create("/"), home.getUri());
-        assertEquals(URI.create("/employmentandlabourmarket/"), employmentLabourMarket.getUri());
+        assertEquals(URI.create("/employmentandlabourmarket"), employmentLabourMarket.getUri());
         //Collection content should be overwriting published content
         assertEquals("Employment and labour market-inprogress", employmentLabourMarket.getDescription().getTitle());
     }

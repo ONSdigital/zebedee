@@ -5,13 +5,11 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.reader.util.AuthorisationHandler;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import org.apache.commons.io.IOUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
 public class Root {
     static final String ZEBEDEE_ROOT = "zebedee_root";
@@ -79,6 +75,7 @@ public class Root {
                 // Create a Zebedee folder:
                 root = Files.createTempDirectory("zebedee");
                 zebedee = Zebedee.create(root);
+                ReaderConfiguration.init(root.toString());
 
                 // Initialise content folders from bundle
                 Path taxonomy = Paths.get(".").resolve(Configuration.getContentDirectory());

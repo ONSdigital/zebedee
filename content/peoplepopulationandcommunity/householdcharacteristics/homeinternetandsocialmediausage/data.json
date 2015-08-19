@@ -1,0 +1,28 @@
+{
+  "items": [],
+  "datasets": [],
+  "statsBulletins": [
+    {
+      "uri": "/peoplepopulationandcommunity/householdcharacteristics/homeinternetandsocialmediausage/bulletins/internetaccesshouseholdsandindividuals/2014-08-07"
+    },
+    {"uri":"/peoplepopulationandcommunity/householdcharacteristics/homeinternetandsocialmediausage/bulletins/internetaccessquarterlyupdate/2014-08-20"}
+  ],
+  "index": 0,
+  "type": "product_page",
+  "uri": "/peoplepopulationandcommunity/householdcharacteristics/homeinternetandsocialmediausage",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity"
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/householdcharacteristics"
+    }
+  ],
+  "description": {
+    "title": "Home internet and social media usage",
+    "summary": "We look at how many of us use the internet and social media and how long we use it for. This data include the number of people who have used the internet, those who use the internet frequently and those who have never used the internet. Most of these statistics are broken down by age and gender."
+  }
+}

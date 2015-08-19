@@ -4,6 +4,8 @@ import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.staticpage.StaticPage;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -37,7 +39,7 @@ public class ContentReaderTest {
 
     @Test
     public void testGetAvailableContent() throws ZebedeeException, IOException {
-        Page content = contentReader.getContent("about/accessibility///");
+        Page content = contentReader.getContent("about/accessibility");
         assertNotNull(content);
         assertEquals(content.getType(), PageType.static_page);
         assertEquals("Accessibility", content.getDescription().getTitle());
@@ -52,6 +54,18 @@ public class ContentReaderTest {
         assertNotNull(content);
         assertEquals(content.getType(), PageType.home_page);
         assertEquals("Home", content.getDescription().getTitle());
+    }
+
+    @Test
+    public void testGetChart() throws ZebedeeException, IOException {
+        Page content = contentReader.getContent("economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2015-07-09/0b6d65e2");
+        assertTrue(content instanceof Chart);
+    }
+
+    @Test
+    public void testGetTable() throws ZebedeeException, IOException {
+        Page content = contentReader.getContent("economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb");
+        assertTrue(content instanceof Table);
     }
 
     @Test(expected = NotFoundException.class)
@@ -102,9 +116,9 @@ public class ContentReaderTest {
         Map<URI, ContentNode> children = contentReader.getChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
         assertTrue(children.size() == 2);
         Map.Entry<URI, ContentNode> entry = children.entrySet().iterator().next();
-        URI articleUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/");
+        URI articleUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles");
         assertTrue(children.containsKey(articleUri));
-        String bulletinUri = "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins/";
+        String bulletinUri = "/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins";
         assertTrue(children.containsKey(URI.create(bulletinUri)));
         assertNull(entry.getValue().getType());//type is null for directories with no data.json
         assertEquals("articles", children.get(articleUri).getDescription().getTitle());
@@ -122,7 +136,7 @@ public class ContentReaderTest {
         Map<URI, ContentNode> parents = contentReader.getParents("peoplepopulationandcommunity/culturalidentity/ethnicity");
         assertTrue(parents.size() == 2);
         assertTrue(parents.containsKey(URI.create("/")));
-        assertTrue(parents.containsKey(URI.create("/peoplepopulationandcommunity/")));
+        assertTrue(parents.containsKey(URI.create("/peoplepopulationandcommunity")));
     }
 
     @Test
@@ -132,14 +146,14 @@ public class ContentReaderTest {
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
         assertEquals("UK Natural Capital Land Cover in the UK", contentNode.getValue().getDescription().getTitle());
 //        assertEquals(PageType.article, contentNode.getValue().getType());
-        assertEquals("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/", contentNode.getKey().toString());
+        assertEquals("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17", contentNode.getKey().toString());
     }
 
     @Test
     public void testGetHomeChildren() throws ZebedeeException, IOException {
         Map<URI, ContentNode> children = contentReader.getChildren("/");
-        assertTrue(children.containsKey(URI.create("/economy/")));
-        assertTrue(children.containsKey(URI.create("/about/")));
+        assertTrue(children.containsKey(URI.create("/economy")));
+        assertTrue(children.containsKey(URI.create("/about")));
     }
 
     @Test

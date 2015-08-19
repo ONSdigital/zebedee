@@ -194,6 +194,11 @@
 	  "name": "Rachel Meese",
 	  "email": "r.meese@ons.gov.uk",
 	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Jodie Tucker",
+	  "email": "j.tucker@ons.gov.uk",
+	  "password": "Magic5yf&Roundabout"
 	}
   ]
 }

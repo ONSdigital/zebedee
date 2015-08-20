@@ -1,9 +1,8 @@
 package com.github.onsdigital.zebedee.content.page.home;
 
-import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.page.taxonomy.base.TaxonomyNode;
+import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.util.ContentConstants;
 
 import java.util.List;

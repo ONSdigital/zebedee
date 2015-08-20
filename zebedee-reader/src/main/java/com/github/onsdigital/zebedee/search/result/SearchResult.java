@@ -7,8 +7,6 @@ import java.net.URI;
 
 public class SearchResult extends Page {
 
-    private PageType type;
-
     public SearchResult(URI uri, PageType type) {
         this.setUri(uri);
         this.type = type;

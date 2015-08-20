@@ -59,29 +59,7 @@ public class CollectionContentReader {
      * @throws IOException
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
-        Resource resource = null;
-        URI uri = URI.create(URIUtils.removeTrailingSlash(path) + "/");
-        URI jsonPath = URI.create(uri.toString() + ".json");
-
-        try {
-            try {
-                resource = findResource(jsonPath.toString());
-            } catch (NotFoundException e) {
-                jsonPath = uri.resolve(getConfiguration().getDataFileName());
-                resource = findResource(jsonPath.toString());
-            }
-            Page page = ContentUtil.deserialiseContent(resource.getData());
-            if (page != null) {
-                page.setUri(URI.create(URIUtils.removeLastSegment(resource.getUri().toString())));//Setting uri on the fly, discarding whatever is in the file
-            }
-            return page;
-        } finally {
-            if (resource != null) {
-                resource.close();
-            }
-        }
-
-
+        return findContent(path);
     }
 
 
@@ -122,6 +100,17 @@ public class CollectionContentReader {
         return parents;
     }
 
+    private Page findContent(String path) throws IOException, ZebedeeException {
+        Page page = getContentQuite(path, inProgress);
+        if (page == null) {
+            page = getContentQuite(path, complete);
+            if (page == null) {
+                page = reviewed.getContent(path);
+            }
+        }
+        return page;
+    }
+
 
     private Resource findResource(String path) throws IOException, ZebedeeException {
         Resource resource = getQuite(path, inProgress);
@@ -143,6 +132,14 @@ public class CollectionContentReader {
         }
     }
 
+
+    private Page getContentQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+        try {
+            return contentReader.getContent(path);
+        } catch (NotFoundException e) {
+            return null;
+        }
+    }
 
     //If content not found with given reader do not shout
     private Page getLatestQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {

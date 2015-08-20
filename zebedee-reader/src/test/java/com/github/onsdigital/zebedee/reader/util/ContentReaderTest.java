@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.tab
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -137,6 +138,17 @@ public class ContentReaderTest {
         assertTrue(parents.size() == 2);
         assertTrue(parents.containsKey(URI.create("/")));
         assertTrue(parents.containsKey(URI.create("/peoplepopulationandcommunity")));
+    }
+
+    @Test
+    public void testGetParentsInWelsh() throws ZebedeeException, IOException {
+        contentReader.setLanguage(ContentLanguage.cy);
+        //note that culturalidentity folder does not have data.json in test content, so it should be skipped
+        Map<URI, ContentNode> parents = contentReader.getParents("peoplepopulationandcommunity/culturalidentity/ethnicity");
+        assertTrue(parents.containsKey(URI.create("/")));
+        URI peoplePopulation = URI.create("/peoplepopulationandcommunity");
+        assertTrue(parents.containsKey(peoplePopulation));
+        assertEquals(parents.get(peoplePopulation).getDescription().getTitle(),"Pobl, poblogaeth a chymuned");
     }
 
     @Test

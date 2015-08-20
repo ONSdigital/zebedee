@@ -8,11 +8,13 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.staticpage.StaticPage;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
+import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,6 +44,24 @@ public class ZebedeeReaderTest {
         readAccessibilityData("about/accessibility///");
     }
 
+
+    @Test
+    public void testReadWelshContent() throws ZebedeeException, IOException {
+        Content content = createReader(ContentLanguage.cy).getPublishedContent("peoplepopulationandcommunity");
+        assertTrue(content instanceof TaxonomyLandingPage);
+        TaxonomyLandingPage landingPage = (TaxonomyLandingPage) content;
+        assertEquals("Pobl, poblogaeth a chymuned", landingPage.getDescription().getTitle());
+    }
+
+    @Test
+    public void testGetChildrenInWelsh() throws ZebedeeException, IOException {
+        Map<URI, ContentNode> children = createReader(ContentLanguage.cy).getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales");
+        URI articleUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles/ethnicityandthelabourmarket2011censusenglandandwales/2014-11-13");
+        assertTrue(children.containsKey(articleUri));
+        ContentNode article = children.get(articleUri);
+        assertEquals("Ethnigrwydd a'r Farchnad Lafur, Cyfrifiad 2011, Cymru a Lloegr", article.getDescription().getTitle());
+    }
+
     @Test
     public void testReadPublishedContentWithAbsoluteUri() throws ZebedeeException, IOException {
         readAccessibilityData("/about/accessibility///");
@@ -49,7 +69,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testTitleFilter() throws ZebedeeException, IOException {
-        Content content = ZebedeeReader.getInstance().getPublishedContent("about/accessibility", DataFilter.TITLE);
+        Content content = createReader().getPublishedContent("about/accessibility", DataFilter.TITLE);
         assertNotNull(content);
         assertTrue(content instanceof ContentNodeDetails);
         ContentNodeDetails titleWrapper = (ContentNodeDetails) content;
@@ -59,7 +79,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testDescriptionFilter() throws ZebedeeException, IOException {
-        Content content = ZebedeeReader.getInstance().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", DataFilter.DESCRIPTION);
+        Content content = createReader().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", DataFilter.DESCRIPTION);
         assertNotNull(content);
         assertTrue(content instanceof DescriptionWrapper);
         DescriptionWrapper description = (DescriptionWrapper) content;
@@ -69,12 +89,12 @@ public class ZebedeeReaderTest {
 
     @Test(expected = NotFoundException.class)
     public void testNonExistingContentRead() throws ZebedeeException, IOException {
-        ZebedeeReader.getInstance().getPublishedContent("non/existing/path/");
+        createReader().getPublishedContent("non/existing/path/");
     }
 
     @Test
     public void testReadPublishedResource() throws ZebedeeException, IOException {
-        try (Resource resource = ZebedeeReader.getInstance().getPublishedResource("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb.xls")) {
+        try (Resource resource = createReader().getPublishedResource("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb.xls")) {
             assertNotNull(resource != null);
 //            assertEquals("application/vnd.ms-excel", resource.getMimeType());
             assertTrue(resource.isNotEmpty());
@@ -83,7 +103,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testReadCollectionContent() throws ZebedeeException, IOException {
-        Content content = ZebedeeReader.getInstance().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
+        Content content = createReader().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
         assertNotNull(content);
         assertTrue(content instanceof Page);
         Page page = (Page) content;
@@ -93,12 +113,12 @@ public class ZebedeeReaderTest {
 
     @Test(expected = CollectionNotFoundException.class)
     public void testNonExistingCollectionRead() throws ZebedeeException, IOException {
-        Content content = ZebedeeReader.getInstance().getCollectionContent("nonexistingcollection", "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
+        Content content = createReader().getCollectionContent("nonexistingcollection", "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
     }
 
     @Test
     public void testXlsResource() throws ZebedeeException, IOException {
-        try (Resource resource = ZebedeeReader.getInstance().getCollectionResource(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
+        try (Resource resource = createReader().getCollectionResource(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
             assertNotNull(resource != null);
 //            assertEquals("application/vnd.ms-excel", resource.getMimeType());
             assertTrue(resource.isNotEmpty());
@@ -107,21 +127,19 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testGetChildren() throws ZebedeeException, IOException {
-            Map<URI, ContentNode> children = ZebedeeReader.getInstance().getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
-            assertTrue(children.size() == 2);
-            Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
-            assertTrue(children.containsKey(URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles")));
-            URI bulletinUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins");
-            assertTrue(children.containsKey(bulletinUri));
-            assertNull(contentNode.getValue().getType());//type is null for directories with no data.json
-            assertNull(contentNode.getValue().getChildren());// only immediate children should be read
-            assertEquals("bulletins", children.get(bulletinUri).getDescription().getTitle());
+        Map<URI, ContentNode> children = createReader().getPublishedContentChildren("peoplepopulationandcommunity/culturalidentity/ethnicity");
+        Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
+        assertTrue(children.containsKey(URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/articles")));
+        URI bulletinUri = URI.create("/peoplepopulationandcommunity/culturalidentity/ethnicity/bulletins");
+        assertTrue(children.containsKey(bulletinUri));
+        assertNull(contentNode.getValue().getType());//type is null for directories with no data.json
+        assertNull(contentNode.getValue().getChildren());// only immediate children should be read
+        assertEquals("bulletins", children.get(bulletinUri).getDescription().getTitle());
     }
 
     @Test
     public void testGetCollectionChildren() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = ZebedeeReader.getInstance().getCollectionContentChildren(TEST_COLLECTION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
-        assertTrue(children.size() == 2);
+        Map<URI, ContentNode> children = createReader().getCollectionContentChildren(TEST_COLLECTION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         URI datasetsUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
         assertTrue(children.containsKey(datasetsUri));
         URI articlesUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles");
@@ -143,9 +161,16 @@ public class ZebedeeReaderTest {
     }
 
     private Content readPublishedContent(String path) throws ZebedeeException, IOException {
-        Content content = ZebedeeReader.getInstance().getPublishedContent(path);
+        Content content = createReader().getPublishedContent(path);
         assertNotNull(content);
         return content;
     }
 
+    private ZebedeeReader createReader() {
+        return createReader(null);
+    }
+
+    private ZebedeeReader createReader(ContentLanguage language) {
+        return new ZebedeeReader(language);
+    }
 }

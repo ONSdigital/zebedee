@@ -1,0 +1,68 @@
+{
+  "sections": [
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+      "index": 0
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/community",
+      "index": 1
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/crimeandjustice",
+      "index": 2
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity",
+      "index": 3
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/educationandchildcare",
+      "index": 4
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/elections",
+      "index": 5
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
+      "index": 6
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/householdcharacteristics",
+      "index": 7
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/housing",
+      "index": 8
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/leisureandtourism",
+      "index": 9
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
+      "index": 10
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/populationandmigration",
+      "index": 11
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/wellbeing",
+      "index": 12
+    }
+  ],
+  "index": 3,
+  "type": "taxonomy_landing_page",
+  "uri": "/peoplepopulationandcommunity",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    }
+  ],
+  "description": {
+    "title": "Pobl, poblogaeth a chymuned",
+    "summary": "Rydym yn edrych ar ethnigrwydd yn y farchnad lafur gan ddefnyddio data o Gyfrifiad 2011 a'r Arolwg o'r Llafurlu (LFS). Mae'r dadansoddiad yn cynnwys gweithgarwch economaidd, nodweddion cyflogaeth, gwahaniaethau rhyw a phobl ifanc yn y farchnad lafur. Mae tystiolaeth wedi dangos bod patrymau gweithgarwch economaidd yn amrywio'n fawr ar draws gwahanol grwpiau lleiafrifoedd ethnig gyda rhai grwpiau sy'n profi cyflogaeth is nag eraill. Yn Cyfrifiad 2011, roedd gan y 'Arall Gwyn' grŵp ethnig y gyfradd gyflogaeth uchaf o bob grŵp ethnig ar 77%. Roedd hyn yn wir ar gyfer dynion a menywod."
+  }
+}

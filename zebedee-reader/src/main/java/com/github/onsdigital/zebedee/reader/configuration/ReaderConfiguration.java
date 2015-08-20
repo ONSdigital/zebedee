@@ -13,8 +13,6 @@ public class ReaderConfiguration {
 
     private static ReaderConfiguration instance;
 
-    private final static String DATA_FILE_NAME = "data.json";
-
     private final static String ZEBEDEE_ROOT_ENV = "zebedee_root";
     private final static String CONTENT_DIR_ENV = "content_dir";
 
@@ -120,10 +118,6 @@ public class ReaderConfiguration {
 
         dumpConfiguration();
 
-    }
-
-    public String getDataFileName() {
-        return DATA_FILE_NAME;
     }
 
     /**

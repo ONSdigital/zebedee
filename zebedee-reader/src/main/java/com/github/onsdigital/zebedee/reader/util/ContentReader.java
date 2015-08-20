@@ -4,12 +4,14 @@ import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,6 +29,7 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 import static java.nio.file.Files.*;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
  * Created by bren on 27/07/15.
@@ -40,6 +43,8 @@ public class ContentReader {
 
     private final Path ROOT_FOLDER;
     private final String NOT_FOUND = "404 - Not Found";
+
+    private ContentLanguage language = ContentLanguage.en;
 
     public ContentReader(String rootFolder) {
         this(StringUtils.isEmpty(rootFolder) ? null : Paths.get(rootFolder));
@@ -79,12 +84,15 @@ public class ContentReader {
         try (Resource resource = getResource(dataFile)) {
             checkJsonMime(resource, path);
             Page page = deserialize(resource);
-            if (page != null) { //Contents without type is null when deserialised.
-                if (StringUtils.endsWith(resource.getUri().toString(), ReaderConfiguration.getConfiguration().getDataFileName())) {
-                    page.setUri(URI.create(removeLastSegment(resource.getUri().toString())));//Setting uri on the fly, discarding whatever is in the file
+            if (page != null) { //Contents without type is null when deserialised. There should not be no such data
+                URI uri = null;
+                String resourceUri = resource.getUri().toString();
+                if (page instanceof Table || page instanceof Chart) {
+                    uri = URI.create(removeEnd(resourceUri, ".json"));
                 } else {
-                    page.setUri(URI.create(StringUtils.removeEnd(resource.getUri().toString(), ".json")));//Setting uri on the fly, discarding whatever is in the file
+                    uri = URI.create(removeLastSegment(resourceUri));
                 }
+                page.setUri(uri);
             }
             return page;
         }
@@ -159,7 +167,7 @@ public class ContentReader {
         }
 
         Path parent = path.getParent();
-        Path dataFile = parent.resolve(getConfiguration().getDataFileName());
+        Path dataFile = resolveDataFilePath(parent);
         if (exists(dataFile)) {
             return parent;
         } else {
@@ -296,7 +304,11 @@ public class ContentReader {
     }
 
     private Path resolveDataFilePath(Path path) throws BadRequestException {
-        return path.resolve(getConfiguration().getDataFileName());
+        Path dataFilePath = path.resolve(language.getDataFileName());
+        if (!exists(dataFilePath)) {
+            dataFilePath = path.resolve(ContentLanguage.en.getDataFileName());
+        }
+        return dataFilePath;
     }
 
     /*Getters * Setters */
@@ -334,4 +346,13 @@ public class ContentReader {
         return contentNode;
     }
 
+    public ContentLanguage getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(ContentLanguage language) {
+        if (language != null) {
+            this.language = language;
+        }
+    }
 }

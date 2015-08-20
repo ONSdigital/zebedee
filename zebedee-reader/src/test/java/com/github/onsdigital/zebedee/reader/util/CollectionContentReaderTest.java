@@ -3,11 +3,13 @@ package com.github.onsdigital.zebedee.reader.util;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,8 +43,34 @@ public class CollectionContentReaderTest {
         assertTrue(content instanceof Article);
     }
 
+
+    @Test
+    public void testGetAvailableContentInWelsh() throws ZebedeeException, IOException {
+        collectionReader.setLanguage(ContentLanguage.cy);
+        Page content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
+        assertNotNull(content);
+        assertEquals(content.getType(), PageType.article);
+        assertTrue(content instanceof Article);
+        assertEquals("prif bwyntiau", content.getDescription().getTitle());
+    }
+
+    @Test
+    public void testFallbackToEnglish() throws ZebedeeException, IOException {
+        collectionReader.setLanguage(ContentLanguage.cy);
+        Page content = collectionReader.getContent("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/");
+        assertNotNull(content);
+        assertEquals(content.getType(), PageType.dataset);
+        assertTrue(content instanceof Dataset);
+    }
+
     @Test(expected = NotFoundException.class)
     public void testGetNonexistingContent() throws ZebedeeException, IOException {
+        Page content = collectionReader.getContent("madeupfoldername");
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testGetNonexistingContentInWelsh() throws ZebedeeException, IOException {
+        collectionReader.setLanguage(ContentLanguage.cy);
         Page content = collectionReader.getContent("madeupfoldername");
     }
 
@@ -55,6 +83,17 @@ public class CollectionContentReaderTest {
 
     @Test
     public void testXlsResource() throws ZebedeeException, IOException {
+        try (Resource resource = collectionReader.getResource("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
+            assertNotNull(resource != null);
+//            assertEquals("application/vnd.ms-excel", resource.getMimeType());
+            assertTrue(resource.isNotEmpty());
+        }
+    }
+
+    @Test
+    public void testXlsResourceInWelsh() throws ZebedeeException, IOException {
+        //welsh language should not affect resource reads
+        collectionReader.setLanguage(ContentLanguage.cy);
         try (Resource resource = collectionReader.getResource("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
             assertNotNull(resource != null);
 //            assertEquals("application/vnd.ms-excel", resource.getMimeType());
@@ -88,6 +127,26 @@ public class CollectionContentReaderTest {
         assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDescription().getTitle());
         assertEquals(PageType.dataset, contentNode.getValue().getType());//type is null for directories with no data.json
         assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", contentNode.getKey().toString());
+    }
+
+
+    @Test
+    public void testGetChildrenInWelsh() throws ZebedeeException, IOException {
+        collectionReader.setLanguage(ContentLanguage.cy);
+        Map<URI, ContentNode> children = collectionReader.getChildren("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes");
+        URI labourDisputes = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2014-07-16");
+        URI prifBwyntiau = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
+
+        assertTrue(children.containsKey(labourDisputes));
+        assertTrue(children.containsKey(prifBwyntiau));
+        ContentNode englishContent = children.get(labourDisputes);// no welsh available for this one
+        ContentNode welshContent = children.get(prifBwyntiau);// no welsh available for this one
+
+        assertEquals("Labour disputes", englishContent.getDescription().getTitle());
+        assertEquals("annual article 2014",englishContent.getDescription().getEdition());
+
+        assertEquals("prif bwyntiau", welshContent.getDescription().getTitle());
+        assertEquals("erthygl blynyddol 2015",welshContent.getDescription().getEdition());
     }
 
     @Test

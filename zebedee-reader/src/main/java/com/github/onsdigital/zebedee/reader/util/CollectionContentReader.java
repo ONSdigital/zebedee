@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,7 +38,7 @@ public class CollectionContentReader {
     /**
      * @param collectionsFolderPath path of the collections folder
      */
-    public CollectionContentReader(String collectionsFolderPath, String collectionId) throws NotFoundException, IOException, CollectionNotFoundException {
+    public CollectionContentReader(String collectionsFolderPath, String collectionId) throws NotFoundException, IOException {
         if (collectionsFolderPath == null) {
             throw new NullPointerException("Collections folder can not be null");
         }
@@ -206,4 +206,11 @@ public class CollectionContentReader {
     private ContentReader getContentReader(Path collectionPath, String folderName) {
         return new ContentReader(collectionPath.resolve(folderName));
     }
+
+    public void setLanguage(ContentLanguage language) {
+        inProgress.setLanguage(language);
+        reviewed.setLanguage(language);
+        complete.setLanguage(language);
+    }
+
 }

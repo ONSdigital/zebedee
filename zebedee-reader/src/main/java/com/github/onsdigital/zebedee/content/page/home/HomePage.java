@@ -22,13 +22,8 @@ public class HomePage extends TaxonomyNode {
     private List<HomeSection> sections;
 
     public HomePage() {
-        PageDescription description = new PageDescription();
-        description.setTitle(ContentConstants.HOME_TITLE);
         intro = new MarkdownSection();
         intro.setTitle(ContentConstants.HOMEPAGE_INTRO_TITLE);
-        intro.setMarkdown(ContentConstants.HOME_PAGE_INTRO_BODY);
-        description.setSummary(ContentConstants.HOME_PAGE_INTRO_BODY);
-        setDescription(description);
     }
 
     @Override

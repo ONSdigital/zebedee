@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.search.api.util;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,5 +28,10 @@ public class RequestUtil {
         } else {
             return 1;
         }
+    }
+
+    public static String[] extractTypes(HttpServletRequest request) {
+        String[] types = request.getParameterValues("type");
+        return ArrayUtils.isNotEmpty(types) ? types : null;
     }
 }

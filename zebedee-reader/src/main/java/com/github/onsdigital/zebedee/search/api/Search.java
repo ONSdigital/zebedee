@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.search.SearchHelper;
+import com.github.onsdigital.zebedee.search.api.util.RequestUtil;
 import com.github.onsdigital.zebedee.search.result.AggregatedSearchResult;
 import com.github.onsdigital.zebedee.search.result.SearchResultsPage;
 import org.apache.commons.io.IOUtils;
@@ -39,7 +40,7 @@ public class Search {
         }
 
         Object searchResult = null;
-        int page = extractPage(request);
+        int page = RequestUtil.extractPage(request);
         String[] types = extractTypes(request);
         boolean includeStatics = "1".equals(request.getParameter("includeStatics"));
         boolean includeAllData = "1".equals(request.getParameter("includeAllData"));
@@ -201,23 +202,6 @@ public class Search {
 
     public Object autoComplete(String query) {
         return SearchHelper.autocomplete(query);
-    }
-
-    private int extractPage(HttpServletRequest request) {
-        String page = request.getParameter("page");
-
-        if (StringUtils.isEmpty(page)) {
-            return 1;
-        }
-        if (StringUtils.isNumeric(page)) {
-            int pageNumber = Integer.parseInt(page);
-            if (pageNumber < 1) {
-                return 1;
-            }
-            return pageNumber;
-        } else {
-            return 1;
-        }
     }
 
     private String[] extractTypes(HttpServletRequest request) {

@@ -18,9 +18,13 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 
 import java.net.URI;
 import java.util.*;
+
+import static org.elasticsearch.index.query.FilterBuilders.prefixFilter;
 
 /**
  * Centralized service to search
@@ -29,8 +33,36 @@ import java.util.*;
  */
 public class SearchService {
 
+    private static final String publishedIndex = "ons";
+
     private SearchService() {
 
+    }
+
+    /**
+     * List the pages under the given uri, for the given types.
+     *
+     * @param uri
+     * @param types
+     * @return
+     */
+    public static SearchResults list(String uri, int resultsPerPage, int page, String... types) {
+
+        SearchResponse response = getClient().prepareSearch(publishedIndex)
+                .setTypes(types)
+                .setPostFilter(prefixFilter("uri.uri_segment", uri))
+                .setFrom(resultsPerPage * (page - 1))
+                .setSize(resultsPerPage)
+                .addSort(new FieldSortBuilder("releaseDate").order(SortOrder.DESC))
+                .setExplain(true)
+                .execute()
+                .actionGet();
+
+        //.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+        //.setQuery(QueryBuilders.termQuery("multi", "test"))             // Query
+        // .setPostFilter(FilterBuilders.rangeFilter("age").from(12).to(18))   // Filter
+
+        return buildSearchResult(response);
     }
 
     /**

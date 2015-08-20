@@ -51,6 +51,8 @@ public class Root {
 
     public static void init() {
 
+        System.out.println("zebedee init: ");
+
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
@@ -75,6 +77,7 @@ public class Root {
                 // Create a Zebedee folder:
                 root = Files.createTempDirectory("zebedee");
                 zebedee = Zebedee.create(root);
+                System.out.println("zebedee root: " + root.toString());
                 ReaderConfiguration.init(root.toString());
 
                 // Initialise content folders from bundle

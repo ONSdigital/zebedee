@@ -42,10 +42,7 @@ public class ContentReader {
     private final String NOT_FOUND = "404 - Not Found";
 
     public ContentReader(String rootFolder) {
-        if (rootFolder == null) {
-            throw new NullPointerException("Root folder can not be null");
-        }
-        this.ROOT_FOLDER = Paths.get(rootFolder);
+        this(StringUtils.isEmpty(rootFolder) ? null : Paths.get(rootFolder));
     }
 
 
@@ -63,12 +60,8 @@ public class ContentReader {
      * @return Wrapper containing actual document data as text
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
-        String jsonPath = URIUtils.removeTrailingSlash(path) + ".json";
-        Path json = resolvePath(jsonPath);
-        if (!exists(json)) {
-            json = resolveDataFilePath(resolvePath(path));
-        }
-        return getPage(resolvePath(path),json);
+        Path contentPath = resolveContentPath(path);
+        return getPage(resolvePath(path), contentPath);
     }
 
     /**
@@ -77,7 +70,6 @@ public class ContentReader {
      * @throws ZebedeeException
      * @throws IOException
      */
-    //For internal use, not exposed
     private Page getContent(Path path) throws ZebedeeException, IOException {
         Path dataFile = resolveDataFilePath(path);
         return getPage(path, dataFile);
@@ -287,14 +279,23 @@ public class ContentReader {
         throw new BadRequestException("Latest uri can not be resolve for this content type");
     }
 
-    Path resolvePath(String path) throws BadRequestException {
+    private Path resolvePath(String path) throws BadRequestException {
         if (path == null) {
             throw new NullPointerException("Path can not be null");
         }
         return getRootFolder().resolve(removeLeadingSlash(path));
     }
 
-    Path resolveDataFilePath(Path path) throws BadRequestException {
+    Path resolveContentPath(String path) throws BadRequestException {
+        String jsonPath = URIUtils.removeTrailingSlash(path) + ".json";
+        Path json = resolvePath(jsonPath);
+        if (!exists(json)) {
+            json = resolveDataFilePath(resolvePath(path));
+        }
+        return json;
+    }
+
+    private Path resolveDataFilePath(Path path) throws BadRequestException {
         return path.resolve(getConfiguration().getDataFileName());
     }
 

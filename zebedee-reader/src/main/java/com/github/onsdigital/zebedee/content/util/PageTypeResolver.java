@@ -51,7 +51,6 @@ class PageTypeResolver implements JsonDeserializer<Page> {
             System.err.println("Failed initializing content types");
             throw new RuntimeException("Failed initializing request handlers", e);
         }
-
     }
 
     @Override
@@ -77,5 +76,4 @@ class PageTypeResolver implements JsonDeserializer<Page> {
             throw new RuntimeException(e);
         }
     }
-
 }

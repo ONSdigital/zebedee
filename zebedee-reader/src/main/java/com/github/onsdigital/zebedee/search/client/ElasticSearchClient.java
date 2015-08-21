@@ -91,9 +91,7 @@ public class ElasticSearchClient implements Startup {
             client = pool.submit(new Callable<Client>() {
                 @Override
                 public Client call() throws Exception {
-                    Settings settings = ImmutableSettings.settingsBuilder()
-                            .put("node.name", "ONSNode").build();
-                    Client client = new TransportClient(settings)
+                    Client client = new TransportClient()
                             .addTransportAddress(new InetSocketTransportAddress(getConfiguration().getElasticSearchServer(), getConfiguration().getElasticSearchPort()));
 
                     indexDocuments(client);

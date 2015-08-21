@@ -2,14 +2,10 @@ package com.github.onsdigital.zebedee.api;
 
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.util.Librarian;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
-import org.bouncycastle.util.Strings;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by thomasridd on 15/07/15.

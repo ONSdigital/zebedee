@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.data.json;
 
 
-import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 
 import java.util.ArrayList;
 

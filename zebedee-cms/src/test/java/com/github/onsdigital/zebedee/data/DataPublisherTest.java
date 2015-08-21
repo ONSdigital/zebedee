@@ -1,13 +1,13 @@
 package com.github.onsdigital.zebedee.data;
 
 import com.github.davidcarboni.ResourceUtils;
-import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.content.page.statistics.dataset.Dataset;
-import com.github.onsdigital.content.partial.Contact;
-import com.github.onsdigital.content.partial.TimeseriesValue;
-import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.partial.Contact;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -23,7 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 import static org.junit.Assert.*;
 
@@ -292,7 +295,7 @@ public class DataPublisherTest {
 
         // Then
         // we expect the startPage to be based on the alreadyPublished timeseries
-        assertEquals(alreadyPublished.toJson(), startPage.toJson());
+        assertEquals(ContentUtil.serialise(alreadyPublished), ContentUtil.serialise(startPage));
     }
 
 
@@ -464,13 +467,13 @@ public class DataPublisherTest {
         series2.getDescription().setTitle("Series2");
 
     }
-    private TimeseriesValue quickTimeSeriesValue(String year, String value) {
-        TimeseriesValue timeseriesValue = new TimeseriesValue(); timeseriesValue.year = year; timeseriesValue.value = value;
+    private TimeSeriesValue quickTimeSeriesValue(String year, String value) {
+        TimeSeriesValue timeseriesValue = new TimeSeriesValue(); timeseriesValue.year = year; timeseriesValue.value = value;
         timeseriesValue.date = year;
         return timeseriesValue;
     }
-    private TimeseriesValue valueForTime(String year, TimeSeries series) {
-        for (TimeseriesValue value: series.years) {
+    private TimeSeriesValue valueForTime(String year, TimeSeries series) {
+        for (TimeSeriesValue value: series.years) {
             if (value.year.equals(year)) {
                 return value;
             }

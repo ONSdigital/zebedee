@@ -1,15 +1,15 @@
 package com.github.onsdigital.zebedee.data;
 
-import com.github.onsdigital.content.link.PageReference;
-import com.github.onsdigital.content.page.base.PageDescription;
-import com.github.onsdigital.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.content.page.statistics.dataset.Dataset;
-import com.github.onsdigital.content.partial.Contact;
-import com.github.onsdigital.content.partial.DownloadSection;
-import com.github.onsdigital.content.partial.TimeseriesValue;
-import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
+import com.github.onsdigital.zebedee.content.partial.Contact;
+import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -339,7 +339,7 @@ public class DataPublisher {
     }
 
     /**
-     * Takes a part-built TimeSeries page and populates the {@link TimeseriesValue} list using data gathered from a csdb file
+     * Takes a part-built TimeSeries page and populates the {@link com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue} list using data gathered from a csdb file
      *
      * @param page    a part-built time series page
      * @param series  a time series returned by Brian by parsing a csdb file
@@ -374,18 +374,18 @@ public class DataPublisher {
     }
 
     // Support function for above
-    static void populatePageFromSetOfValues(TimeSeries page, Set<TimeseriesValue> currentValues, Set<TimeseriesValue> updateValues, Dataset dataset) {
+    static void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, Dataset dataset) {
 
         // Iterate through values
-        for (TimeseriesValue value : updateValues) {
+        for (TimeSeriesValue value : updateValues) {
             // Find the current value of the data point
-            TimeseriesValue current = getCurrentValue(currentValues, value);
+            TimeSeriesValue current = getCurrentValue(currentValues, value);
 
             if (current != null) { // A point already exists for this data
 
                 if (!current.value.equalsIgnoreCase(value.value)) { // A point already exists for this data
                     // Take a copy
-                    TimeseriesValue old = ContentUtil.deserialise(ContentUtil.serialise(current), TimeseriesValue.class);
+                    TimeSeriesValue old = ContentUtil.deserialise(ContentUtil.serialise(current), TimeSeriesValue.class);
 
                     // Update the point
                     current.value = value.value;
@@ -408,19 +408,19 @@ public class DataPublisher {
     }
 
     /**
-     * If a {@link TimeseriesValue} for value.time exists in currentValues returns that.
+     * If a {@link TimeSeriesValue} for value.time exists in currentValues returns that.
      * Otherwise null
      *
-     * @param currentValues a set of {@link TimeseriesValue}
-     * @param value         a {@link TimeseriesValue}
-     * @return a {@link TimeseriesValue} from currentValues
+     * @param currentValues a set of {@link TimeSeriesValue}
+     * @param value         a {@link TimeSeriesValue}
+     * @return a {@link TimeSeriesValue} from currentValues
      */
-    static TimeseriesValue getCurrentValue(Set<TimeseriesValue> currentValues, TimeseriesValue value) {
+    static TimeSeriesValue getCurrentValue(Set<TimeSeriesValue> currentValues, TimeSeriesValue value) {
         if (currentValues == null) {
             return null;
         }
 
-        for (TimeseriesValue current : currentValues) {
+        for (TimeSeriesValue current : currentValues) {
             if (current.compareTo(value) == 0) {
                 return current;
             }
@@ -433,12 +433,12 @@ public class DataPublisher {
      * @param oldValue
      * @param newValue
      */
-    private static void logCorrection(TimeSeries series, TimeseriesValue oldValue, TimeseriesValue newValue) {
+    private static void logCorrection(TimeSeries series, TimeSeriesValue oldValue, TimeSeriesValue newValue) {
 
         corrections += 1;
     }
 
-    private static void logInsertion(TimeSeries series, TimeseriesValue newValue) {
+    private static void logInsertion(TimeSeries series, TimeSeriesValue newValue) {
         insertions += 1;
     }
 
@@ -468,17 +468,17 @@ public class DataPublisher {
         }
 
         // Ensure dataset is part of related datasets
-        List<PageReference> relatedDatasets = datasetPage.getRelatedDatasets();
+        List<Link> relatedDatasets = datasetPage.getRelatedDatasets();
         if (relatedDatasets == null) { relatedDatasets = new ArrayList<>(); }
         boolean datasetNotLinked = true;
-        for (PageReference relatedDataset: relatedDatasets) {
+        for (Link relatedDataset: relatedDatasets) {
             if (relatedDataset.getUri().toString().equalsIgnoreCase(datasetURI)) {
                 datasetNotLinked = false;
                 break;
             }
         }
         if (datasetNotLinked) {
-            relatedDatasets.add(new PageReference(new URI(datasetURI)));
+            relatedDatasets.add(new Link(new URI(datasetURI)));
             page.setRelatedDatasets(relatedDatasets);
         }
 

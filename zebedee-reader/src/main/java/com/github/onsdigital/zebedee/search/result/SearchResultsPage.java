@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.search.result;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyProductNode;
+import com.github.onsdigital.zebedee.content.page.taxonomy.ProductPage;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class SearchResultsPage extends Page {
     private int endPage;
     private List<Integer> pages;
     private long numberOfResults;
-    private TaxonomyProductNode headlinePage;
+    private ProductPage headlinePage;
     private long numberOfPages;
     private String[] types;
     private boolean includeAllData;
@@ -91,11 +91,11 @@ public class SearchResultsPage extends Page {
         this.numberOfResults = numberOfResults;
     }
 
-    public TaxonomyProductNode getHeadlinePage() {
+    public ProductPage getHeadlinePage() {
         return headlinePage;
     }
 
-    public void setHeadlinePage(TaxonomyProductNode headlinePage) {
+    public void setHeadlinePage(ProductPage headlinePage) {
         this.headlinePage = headlinePage;
     }
 

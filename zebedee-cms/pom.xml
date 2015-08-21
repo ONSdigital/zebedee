@@ -43,13 +43,6 @@
             <version>1.2.5</version>
         </dependency>
 
-        <!-- ONS Content Library, fetched through jitpack.io -->
-        <dependency>
-            <groupId>com.github.ONSdigital</groupId>
-            <artifactId>content-library</artifactId>
-            <version>content-library-1.0.67</version>
-        </dependency>
-
         <!-- Zebedee Reader-->
         <dependency>
             <groupId>com.github.onsdigital</groupId>

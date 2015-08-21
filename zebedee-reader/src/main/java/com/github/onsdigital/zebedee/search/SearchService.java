@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.search.result.SearchResult;
 import com.github.onsdigital.zebedee.search.result.SearchResults;
-import com.github.onsdigital.zebedee.search.server.ElasticSearchServer;
+import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.count.CountResponse;
@@ -211,7 +211,7 @@ public class SearchService {
 
 
     private static Client getClient() {
-        return ElasticSearchServer.getClient();
+        return ElasticSearchClient.getClient();
     }
 
 }

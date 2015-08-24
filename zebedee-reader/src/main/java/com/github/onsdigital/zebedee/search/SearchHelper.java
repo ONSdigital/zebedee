@@ -4,7 +4,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.search.result.AggregatedSearchResult;
 import com.github.onsdigital.zebedee.search.result.SearchResult;
 import com.github.onsdigital.zebedee.search.result.SearchResults;
-import com.github.onsdigital.zebedee.search.server.ElasticSearchServer;
+import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -58,7 +58,7 @@ public class SearchHelper {
 
         TermFilterBuilder termFilterBuilder = new TermFilterBuilder(CDID, cdid);
 
-        SearchRequestBuilder searchRequestBuilder = (ElasticSearchServer.getClient().prepareSearch("ons")).setQuery(termFilterBuilder.buildAsBytes());
+        SearchRequestBuilder searchRequestBuilder = (ElasticSearchClient.getClient().prepareSearch("ons")).setQuery(termFilterBuilder.buildAsBytes());
 
         SearchResults result = SearchService.buildSearchResult(searchRequestBuilder.get());
 
@@ -72,7 +72,7 @@ public class SearchHelper {
 
     public static AggregatedSearchResult searchSuggestions(String query, int page, String[] types) throws IOException, Exception {
         TermSuggestionBuilder termSuggestionBuilder = new TermSuggestionBuilder("autocorrect").field(TITLE).text(query).size(2);
-        SuggestResponse suggestResponse = ElasticSearchServer.getClient().prepareSuggest("ons").addSuggestion(termSuggestionBuilder).execute().actionGet();
+        SuggestResponse suggestResponse = ElasticSearchClient.getClient().prepareSuggest("ons").addSuggestion(termSuggestionBuilder).execute().actionGet();
         AggregatedSearchResult result = null;
 
         StringBuffer suggestionsBuffer = new StringBuffer();

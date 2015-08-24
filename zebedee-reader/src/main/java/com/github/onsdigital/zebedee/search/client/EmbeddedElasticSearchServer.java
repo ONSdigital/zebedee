@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.search.server;
+package com.github.onsdigital.zebedee.search.client;
 
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.client.Client;

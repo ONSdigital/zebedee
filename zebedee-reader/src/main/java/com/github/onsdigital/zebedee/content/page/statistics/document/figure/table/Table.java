@@ -7,6 +7,7 @@ public class Table extends Page {
 
     private String title;
     private String html;
+    private String filename;
 
     @Override
     public PageType getType() {
@@ -27,5 +28,13 @@ public class Table extends Page {
 
     public void setHtml(String html) {
         this.html = html;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }

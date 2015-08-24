@@ -4,6 +4,9 @@ import com.github.onsdigital.zebedee.util.URIUtils;
 import com.github.onsdigital.zebedee.util.VariableUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import static com.github.onsdigital.zebedee.util.VariableUtils.getVariableValue;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+
 /**
  * Created by bren on 29/07/15.
  * <p>
@@ -27,6 +30,10 @@ public class ReaderConfiguration {
 
     private static String collectionsFolder;
     private static String contentDir;
+
+    private static String elasticSearchServer = defaultIfBlank(getVariableValue("ELASTIC_SEARCH_SERVER"), "localhost");
+    private static Integer elasticSearchPort = Integer.parseInt(defaultIfBlank(getVariableValue("ELASTIC_SEARCH_PORT"), "9300"));
+    private static boolean startEmbeddedSearch = "Y".equals(defaultIfBlank(getVariableValue("START_EMBEDDED_SERVER"), "N"));
 
     private ReaderConfiguration() {
 
@@ -77,6 +84,18 @@ public class ReaderConfiguration {
         return ARTICLES_FOLDER_NAME;
     }
 
+    public String getElasticSearchServer() {
+        return elasticSearchServer;
+    }
+
+    public Integer getElasticSearchPort() {
+        return elasticSearchPort;
+    }
+
+    public static boolean isStartEmbeddedSearch() {
+        return startEmbeddedSearch;
+    }
+
     /**
      * Initialize configuration with environment variables
      */
@@ -101,8 +120,8 @@ public class ReaderConfiguration {
     }
 
     private static void doInit(String zebedeeRoot) {
-        String zebedeeRootDir = StringUtils.defaultIfBlank(zebedeeRoot, VariableUtils.getVariableValue(ZEBEDEE_ROOT_ENV));
-        String contentDirValue = VariableUtils.getVariableValue(CONTENT_DIR_ENV);
+        String zebedeeRootDir = defaultIfBlank(zebedeeRoot, getVariableValue(ZEBEDEE_ROOT_ENV));
+        String contentDirValue = getVariableValue(CONTENT_DIR_ENV);
 
         /*Zebedee Root takes precedence over content dir*/
         if (zebedeeRootDir != null) {

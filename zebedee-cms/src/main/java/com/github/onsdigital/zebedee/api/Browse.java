@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.content.DirectoryListing;
+import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -24,7 +24,7 @@ public class Browse {
      * Retrieves a list of content at the endpoint /Browse/[CollectionName]?uri=[uri]
      *
      * @param request  This should contain a X-Florence-Token header for the current session and a {@code uri} GET parameter.
-     * @param response A {@link DirectoryListing} of the specified directory.
+     * @param response A {@link com.github.onsdigital.zebedee.data.json.DirectoryListing} of the specified directory.
      * @return DirectoryListing object for the requested uri.
      * @throws IOException
      * @throws UnauthorizedException If the user doesn't have view permissions.

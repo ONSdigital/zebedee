@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.content.util;
 
-import java.net.URI;
-
 /**
  * Created by bren on 10/06/15.
  */

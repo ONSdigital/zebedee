@@ -1,22 +1,17 @@
 package com.github.onsdigital.zebedee.util;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import com.github.onsdigital.content.link.PageReference;
-import com.github.onsdigital.content.page.base.Page;
-import com.github.onsdigital.content.page.base.PageDescription;
-import com.github.onsdigital.content.page.base.PageType;
-import com.github.onsdigital.content.page.home.HomePage;
-import com.github.onsdigital.content.page.statistics.dataset.Dataset;
-import com.github.onsdigital.content.page.statistics.document.article.Article;
-import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
-
-import com.github.onsdigital.content.page.taxonomy.ProductPage;
-import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
-import com.github.onsdigital.content.service.ContentNotFoundException;
-import com.github.onsdigital.content.service.ContentService;
-import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.data.SimpleReader;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.home.HomePage;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
+import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
+import com.github.onsdigital.zebedee.content.page.taxonomy.ProductPage;
+import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyLandingPage;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 
@@ -27,7 +22,9 @@ import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by thomasridd on 06/07/15.
@@ -255,7 +252,7 @@ public class Librarian {
 
                 Page page = null;
                 try(InputStream inputStream = Files.newInputStream(zebedee.path.resolve(pagePath))) {
-                    page = ContentUtil.deserialisePage(inputStream);
+                    page = ContentUtil.deserialiseContent(inputStream);
                 }
 
                 if (page != null) {
@@ -306,7 +303,7 @@ public class Librarian {
      */
     public void checkResolvable() throws IOException {
         List<Path> paths = launchpadMatching(dataDotJsonMatcher());
-        SimpleReader launchpadService = SimpleReader.launchpadReader(zebedee);
+//        SimpleReader launchpadService = SimpleReader.launchpadReader(zebedee);
 
         unresolvableContent = new ArrayList<>();
         for (Path path: paths) {
@@ -314,31 +311,29 @@ public class Librarian {
             Path file = zebedee.path.resolve(path);
             try(InputStream inputStream = Files.newInputStream(file)) {
 
-                Page page = ContentUtil.deserialisePage(inputStream);
-                page.loadReferences(launchpadService);
+                Page page = ContentUtil.deserialiseContent(inputStream);
+//                page.loadReferences(launchpadService);
 
                 if(page.getType() == PageType.bulletin) {
                     Bulletin bulletin = (Bulletin) page;
-                    bulletin.loadReferences(launchpadService);
+//                    bulletin.loadReferences(launchpadService);
                 } else if (page.getType() == PageType.article) {
                     Article article = (Article) page;
-                    article.loadReferences(launchpadService);
+//                    article.loadReferences(launchpadService);
                 } else if (page.getType() == PageType.home_page) {
                     HomePage typedPage = (HomePage) page;
-                    typedPage.loadReferences(launchpadService);
+//                    typedPage.loadReferences(launchpadService);
                 } else if (page.getType() == PageType.taxonomy_landing_page) {
                     TaxonomyLandingPage typedPage = (TaxonomyLandingPage) page;
-                    typedPage.loadReferences(launchpadService);
+//                    typedPage.loadReferences(launchpadService);
                 } else if (page.getType() == PageType.dataset) {
                     Dataset typedPage = (Dataset) page;
-                    typedPage.loadReferences(launchpadService);
+//                    typedPage.loadReferences(launchpadService);
                 } else if (page.getType() == PageType.product_page) {
                     ProductPage typedPage = (ProductPage) page;
-                    typedPage.loadReferences(launchpadService);
+//                    typedPage.loadReferences(launchpadService);
                 }
 
-            } catch (ContentNotFoundException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -454,7 +449,7 @@ public class Librarian {
         for (HashMap<String, String> pageMap : pages) {
             try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(pageMap.get("Uri")).resolve("data.json"))) {
                 String json = IOUtils.toString(stream);
-                Page page = ContentUtil.deserialisePage(json);
+                Page page = ContentUtil.deserialiseContent(json);
                 System.out.println(pageMap.get("Uri"));
 
                 if (page.getType() == PageType.product_page) {

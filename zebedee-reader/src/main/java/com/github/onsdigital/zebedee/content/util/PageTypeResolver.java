@@ -23,6 +23,36 @@ class PageTypeResolver implements JsonDeserializer<Page> {
         registerContentTypes();
     }
 
+    private static void registerContentTypes() {
+        System.out.println("Resolving page types");
+        try {
+
+            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(PageTypeResolver.class.getProtectionDomain().getCodeSource().getLocation());
+            configurationBuilder.addClassLoader(PageTypeResolver.class.getClassLoader());
+            Set<Class<? extends Page>> classes = new Reflections(configurationBuilder).getSubTypesOf(Page.class);
+
+            for (Class<? extends Page> contentClass : classes) {
+                String className = contentClass.getSimpleName();
+                boolean _abstract = Modifier.isAbstract(contentClass.getModifiers());
+                if (_abstract) {
+                    System.out.println("Skipping registering abstract content type " + className);
+                    continue;
+                }
+
+                try {
+                    Page contentInstance = contentClass.newInstance();
+                    System.out.println("Registering content type, Page type : " + contentInstance.getType() + ":" + className);
+                    contentClasses.put(contentInstance.getType(), contentClass);
+                } catch (InstantiationException e) {
+                    System.out.println("Failed to instantiate content type, Page type : " + className);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed initializing content types");
+            throw new RuntimeException("Failed initializing request handlers", e);
+        }
+    }
+
     @Override
     public Page deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
@@ -46,32 +76,4 @@ class PageTypeResolver implements JsonDeserializer<Page> {
             throw new RuntimeException(e);
         }
     }
-
-
-    private static void registerContentTypes() {
-        System.out.println("Resolving page types");
-        try {
-
-            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(PageTypeResolver.class.getProtectionDomain().getCodeSource().getLocation());
-            configurationBuilder.addClassLoader(PageTypeResolver.class.getClassLoader());
-            Set<Class<? extends Page>> classes = new Reflections(configurationBuilder).getSubTypesOf(Page.class);
-
-            for (Class<? extends Page> contentClass : classes) {
-                String className = contentClass.getSimpleName();
-                boolean _abstract = Modifier.isAbstract(contentClass.getModifiers());
-                if (_abstract) {
-                    System.out.println("Skipping registering abstract content type " + className);
-                    continue;
-                }
-                Page contentInstance = contentClass.newInstance();
-                System.out.println("Registering content type, Page type : " +  contentInstance.getType()  + ":" +  className);
-                contentClasses.put(contentInstance.getType(), contentClass);
-            }
-        } catch (Exception e) {
-            System.err.println("Failed initializing content types");
-            throw new RuntimeException("Failed initializing request handlers", e);
-        }
-
-    }
-
 }

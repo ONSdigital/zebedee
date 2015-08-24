@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by bren on 04/06/15.
  * <p>
- * Represents taxonomy browse node that holds links to sub taxonomy levels
+ * Represents taxonomy landing page that holds links to sub taxonomy levels
  */
 public class TaxonomyLandingPage extends TaxonomyNode {
 

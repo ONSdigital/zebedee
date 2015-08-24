@@ -1,9 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.content.page.base.Page;
-
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 

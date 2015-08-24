@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.home.HomePage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
@@ -300,44 +301,42 @@ public class Librarian {
      *
      * @throws IOException
      */
-//    public void checkResolvable() throws IOException {
-//        List<Path> paths = launchpadMatching(dataDotJsonMatcher());
+    public void checkResolvable() throws IOException {
+        List<Path> paths = launchpadMatching(dataDotJsonMatcher());
 //        SimpleReader launchpadService = SimpleReader.launchpadReader(zebedee);
-//
-//        unresolvableContent = new ArrayList<>();
-//        for (Path path: paths) {
-//
-//            Path file = zebedee.path.resolve(path);
-//            try(InputStream inputStream = Files.newInputStream(file)) {
-//
-//                Page page = ContentUtil.deserialiseContent(inputStream);
+
+        unresolvableContent = new ArrayList<>();
+        for (Path path: paths) {
+
+            Path file = zebedee.path.resolve(path);
+            try(InputStream inputStream = Files.newInputStream(file)) {
+
+                Page page = ContentUtil.deserialiseContent(inputStream);
 //                page.loadReferences(launchpadService);
-//
-//                if(page.getType() == PageType.bulletin) {
-//                    Bulletin bulletin = (Bulletin) page;
+
+                if(page.getType() == PageType.bulletin) {
+                    Bulletin bulletin = (Bulletin) page;
 //                    bulletin.loadReferences(launchpadService);
-//                } else if (page.getType() == PageType.article) {
-//                    Article article = (Article) page;
+                } else if (page.getType() == PageType.article) {
+                    Article article = (Article) page;
 //                    article.loadReferences(launchpadService);
-//                } else if (page.getType() == PageType.home_page) {
-//                    HomePage typedPage = (HomePage) page;
+                } else if (page.getType() == PageType.home_page) {
+                    HomePage typedPage = (HomePage) page;
 //                    typedPage.loadReferences(launchpadService);
-//                } else if (page.getType() == PageType.taxonomy_landing_page) {
-//                    TaxonomyLandingPage typedPage = (TaxonomyLandingPage) page;
+                } else if (page.getType() == PageType.taxonomy_landing_page) {
+                    TaxonomyLandingPage typedPage = (TaxonomyLandingPage) page;
 //                    typedPage.loadReferences(launchpadService);
-//                } else if (page.getType() == PageType.dataset) {
-//                    Dataset typedPage = (Dataset) page;
+                } else if (page.getType() == PageType.dataset) {
+                    Dataset typedPage = (Dataset) page;
 //                    typedPage.loadReferences(launchpadService);
-//                } else if (page.getType() == PageType.product_page) {
-//                    ProductPage typedPage = (ProductPage) page;
+                } else if (page.getType() == PageType.product_page) {
+                    ProductPage typedPage = (ProductPage) page;
 //                    typedPage.loadReferences(launchpadService);
-//                }
-//
-//            } catch (ContentNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+                }
+
+            }
+        }
+    }
 
     //----------------------------------------------------------------------------------------------
 

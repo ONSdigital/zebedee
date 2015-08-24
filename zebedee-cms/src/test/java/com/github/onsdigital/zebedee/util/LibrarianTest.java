@@ -1,16 +1,14 @@
 package com.github.onsdigital.zebedee.util;
 
 import com.github.davidcarboni.ResourceUtils;
-import com.github.onsdigital.content.page.base.Page;
-import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.data.DataReader;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by thomasridd on 14/07/15.

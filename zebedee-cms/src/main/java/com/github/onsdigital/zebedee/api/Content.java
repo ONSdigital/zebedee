@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.RedirectTableChained;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +19,6 @@ import java.io.InputStream;
 
 @Api
 public class Content {
-
 
     /**
      * Retrieves file content for the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
@@ -70,10 +70,13 @@ public class Content {
         InputStream requestBody = request.getInputStream();
 
         Session session = Root.zebedee.sessions.get(request);
+
         Collection collection = Collections.getCollection(request);
+
         String uri = request.getParameter("uri");
 
         Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
+
         return true;
     }
 
@@ -94,6 +97,7 @@ public class Content {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, NotFoundException, UnauthorizedException {
 
         Session session = Root.zebedee.sessions.get(request);
+
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 

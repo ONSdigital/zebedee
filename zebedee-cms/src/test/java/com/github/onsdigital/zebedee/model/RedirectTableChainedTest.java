@@ -3,11 +3,9 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import sun.misc.IOUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,14 +15,14 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class RedirectTableTest {
+public class RedirectTableChainedTest {
     Zebedee zebedee;
     Builder bob;
 
     @Before
     public void setupTests() throws IOException {
         // Create a setup from
-        bob = new Builder(RedirectTableTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        bob = new Builder(RedirectTableChainedTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         zebedee = new Zebedee(bob.zebedee);
     }
     @After
@@ -48,11 +46,11 @@ public class RedirectTableTest {
 
         // When
         // we use a basic 301 table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
 
         // Then
         // we expect the original
-        assertEquals(basicUri, redirectTable.get(basicUri));
+        assertEquals(basicUri, redirectTableChained.get(basicUri));
     }
     @Test
     public void get_emptyRedirectWithExistingFolderURI_shouldReturnURI() throws Exception {
@@ -62,11 +60,11 @@ public class RedirectTableTest {
 
         // When
         // we use a basic 301 table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
 
         // Then
         // we expect the original
-        assertEquals(basicUri, redirectTable.get(basicUri));
+        assertEquals(basicUri, redirectTableChained.get(basicUri));
     }
     @Test
     public void get_emptyRedirectWithMissingFile_shouldReturnNull() throws Exception {
@@ -76,11 +74,11 @@ public class RedirectTableTest {
 
         // When
         // we use a basic 301 table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
 
         // Then
         // we expect the original
-        assertNull(redirectTable.get(basicUri));
+        assertNull(redirectTableChained.get(basicUri));
     }
     @Test
     public void get_emptyRedirectWithMissingFolder_shouldReturnNull() throws Exception {
@@ -90,11 +88,11 @@ public class RedirectTableTest {
 
         // When
         // we use a basic 301 table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
 
         // Then
         // we expect the original
-        assertNull(redirectTable.get(basicUri));
+        assertNull(redirectTableChained.get(basicUri));
     }
 
     //------------------------------------------------------
@@ -114,13 +112,13 @@ public class RedirectTableTest {
 
         // When
         // we use a basic 301 table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
         // we expect the original
-        assertEquals(linkTo, redirectTable.get(linkTo));
-        assertEquals(otherFile, redirectTable.get(otherFile));
+        assertEquals(linkTo, redirectTableChained.get(linkTo));
+        assertEquals(otherFile, redirectTableChained.get(otherFile));
     }
     @Test
     public void get_populatedRedirectWithExistingFolderURI_shouldReturnURI() throws Exception {
@@ -132,13 +130,13 @@ public class RedirectTableTest {
 
         // When
         // we use a basic 301 table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
         // we expect the original
-        assertEquals(linkTo, redirectTable.get(linkTo));
-        assertEquals(otherFolder, redirectTable.get(otherFolder));
+        assertEquals(linkTo, redirectTableChained.get(linkTo));
+        assertEquals(otherFolder, redirectTableChained.get(otherFolder));
     }
     @Test
     public void get_populatedRedirectWithMissingFileURI_shouldReturnNull() throws Exception {
@@ -150,12 +148,12 @@ public class RedirectTableTest {
 
         // When
         // we use a basic redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
         // we expect null
-        assertNull(redirectTable.get(otherFile));
+        assertNull(redirectTableChained.get(otherFile));
     }
     @Test
     public void get_populatedRedirectWithMissingFolderURI_shouldReturnNull() throws Exception {
@@ -167,12 +165,12 @@ public class RedirectTableTest {
 
         // When
         // we use a basic redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
         // we expect null
-        assertNull(redirectTable.get(otherFolder));
+        assertNull(redirectTableChained.get(otherFolder));
     }
     @Test
     public void get_populatedRedirectWithRedirectedFileURI_shouldReturnLinkedURI() throws Exception {
@@ -183,12 +181,12 @@ public class RedirectTableTest {
 
         // When
         // we use a basic redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
         // we expect the linked URI
-        assertEquals(linkTo, redirectTable.get(linkFrom));
+        assertEquals(linkTo, redirectTableChained.get(linkFrom));
     }
     @Test
     public void get_populatedRedirectWithRedirectedFolderURI_shouldReturnLinkedURI() throws Exception {
@@ -199,12 +197,12 @@ public class RedirectTableTest {
 
         // When
         // we use a basic redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
         // we expect the linked URI
-        assertEquals(linkTo, redirectTable.get(linkFrom));
+        assertEquals(linkTo, redirectTableChained.get(linkFrom));
     }
     @Test
     public void get_populatedRedirectWithRedirectFromExistingFolderURI_shouldNotReturnRedirect() throws Exception {
@@ -215,12 +213,12 @@ public class RedirectTableTest {
 
         // When
         // we use a populated redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
         // we expect the original URI
-        assertEquals(linkFrom, redirectTable.get(linkFrom));
+        assertEquals(linkFrom, redirectTableChained.get(linkFrom));
     }
     @Test
     public void get_populatedRedirectWithRedirectFromExistingFileURI_shouldNotReturnRedirect() throws Exception {
@@ -231,12 +229,12 @@ public class RedirectTableTest {
 
         // When
         // we use a populated redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
         // we expect the original URI
-        assertEquals(linkFrom, redirectTable.get(linkFrom));
+        assertEquals(linkFrom, redirectTableChained.get(linkFrom));
     }
 
     //------------------------------------------------------
@@ -258,15 +256,15 @@ public class RedirectTableTest {
 
         // When
         // we use a populated redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, chainOne);
-        redirectTable.addRedirect(chainOne, chainTwo);
-        redirectTable.addRedirect(chainTwo, chainThree);
-        redirectTable.addRedirect(chainThree, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, chainOne);
+        redirectTableChained.addRedirect(chainOne, chainTwo);
+        redirectTableChained.addRedirect(chainTwo, chainThree);
+        redirectTableChained.addRedirect(chainThree, linkTo);
 
         // Then
         // we expect the chain to send us to linkTo
-        assertEquals(linkTo, redirectTable.get(linkFrom));
+        assertEquals(linkTo, redirectTableChained.get(linkFrom));
     }
     @Test
     public void chainedRedirect_WithMultipleRedirects_shouldReturnFinalFolderURI() throws Exception {
@@ -280,15 +278,15 @@ public class RedirectTableTest {
 
         // When
         // we use a populated redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, chainOne);
-        redirectTable.addRedirect(chainOne, chainTwo);
-        redirectTable.addRedirect(chainTwo, chainThree);
-        redirectTable.addRedirect(chainThree, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, chainOne);
+        redirectTableChained.addRedirect(chainOne, chainTwo);
+        redirectTableChained.addRedirect(chainTwo, chainThree);
+        redirectTableChained.addRedirect(chainThree, linkTo);
 
         // Then
         // we expect the chain to send us to linkTo
-        assertEquals(linkTo, redirectTable.get(linkFrom));
+        assertEquals(linkTo, redirectTableChained.get(linkFrom));
     }
     @Test
     public void chainedRedirect_WithChainEndingInInvalidURI_shouldReturnNull() throws Exception {
@@ -302,15 +300,15 @@ public class RedirectTableTest {
 
         // When
         // we use a populated redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(linkFrom, chainOne);
-        redirectTable.addRedirect(chainOne, chainTwo);
-        redirectTable.addRedirect(chainTwo, chainThree);
-        redirectTable.addRedirect(chainThree, linkTo);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(linkFrom, chainOne);
+        redirectTableChained.addRedirect(chainOne, chainTwo);
+        redirectTableChained.addRedirect(chainTwo, chainThree);
+        redirectTableChained.addRedirect(chainThree, linkTo);
 
         // Then
         // we expect the chain to send us to linkTo
-        assertNull(redirectTable.get(linkFrom));
+        assertNull(redirectTableChained.get(linkFrom));
     }
     @Test
     public void chainedRedirect_withCycle_shouldReturnNull() throws Exception {
@@ -322,14 +320,14 @@ public class RedirectTableTest {
 
         // When
         // we use a populated redirect table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect(one, two);
-        redirectTable.addRedirect(two, three);
-        redirectTable.addRedirect(three, one);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect(one, two);
+        redirectTableChained.addRedirect(two, three);
+        redirectTableChained.addRedirect(three, one);
 
         // Then
         // we expect the chain to send us to linkTo
-        assertNull(redirectTable.get(one));
+        assertNull(redirectTableChained.get(one));
     }
     //------------------------------------------------------
     //
@@ -349,10 +347,10 @@ public class RedirectTableTest {
 
         // When
         // we set up a parent-child redirect table
-        RedirectTable parent = new RedirectTable(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
         parent.addRedirect(linkFrom, linkTo);
 
-        RedirectTable child = new RedirectTable(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.published);
         child.addRedirect(childFrom, childTo);
 
         parent.setChild(child);
@@ -372,10 +370,10 @@ public class RedirectTableTest {
 
         // When
         // we set up a parent-child redirect table
-        RedirectTable parent = new RedirectTable(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
         parent.addRedirect(linkFrom, linkTo);
 
-        RedirectTable child = new RedirectTable(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.published);
         child.addRedirect(childFrom, childTo);
 
         parent.setChild(child);
@@ -401,13 +399,13 @@ public class RedirectTableTest {
 
         // When
         // we set up a parent-child redirect table
-        RedirectTable parent = new RedirectTable(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
         parent.addRedirect(linkFrom, chainOne);
         parent.addRedirect(chainOne, chainTwo);
         parent.addRedirect(chainTwo, chainThree);
         parent.addRedirect(chainThree, linkTo);
 
-        RedirectTable child = new RedirectTable(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.published);
         child.addRedirect(childFrom, childTo);
 
         parent.setChild(child);
@@ -430,10 +428,10 @@ public class RedirectTableTest {
 
         // When
         // we set up a parent-child redirect table with a long chain
-        RedirectTable parent = new RedirectTable(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
         parent.addRedirect(linkFrom, chainOne);
 
-        RedirectTable child = new RedirectTable(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.published);
         child.addRedirect(chainOne, chainTwo);
         child.addRedirect(chainTwo, chainThree);
         child.addRedirect(chainThree, linkTo);
@@ -457,13 +455,13 @@ public class RedirectTableTest {
 
         // When
         // we set up a parent-child-grandchild
-        RedirectTable parent = new RedirectTable(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
         parent.addRedirect(parentRedirect, "X");
 
-        RedirectTable child = new RedirectTable(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.published);
         child.addRedirect(childOneRedirect, "X");
 
-        RedirectTable grandchild = new RedirectTable(zebedee.published);
+        RedirectTableChained grandchild = new RedirectTableChained(zebedee.published);
         grandchild.addRedirect(linkFrom, linkTo);
 
         child.setChild(grandchild);
@@ -486,13 +484,13 @@ public class RedirectTableTest {
     public void fileSave_withSimpleTable_savesExpectedData() throws IOException {
         // Given
         // a one line table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect("a", "b");
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect("a", "b");
 
         // When
         // we save to a file
         Path path = File.createTempFile("redirect", "txt").toPath();
-        redirectTable.saveToPath(path);
+        redirectTableChained.save(path);
 
         // Then
         // we expect the
@@ -505,14 +503,14 @@ public class RedirectTableTest {
     public void fileSave_withMultipleLines_savesExpectedData() throws IOException {
         // Given
         // a two line table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
-        redirectTable.addRedirect("a", "b");
-        redirectTable.addRedirect("c", "d");
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        redirectTableChained.addRedirect("a", "b");
+        redirectTableChained.addRedirect("c", "d");
 
         // When
         // we save to a file
         Path path = File.createTempFile("redirect", "txt").toPath();
-        redirectTable.saveToPath(path);
+        redirectTableChained.save(path);
 
         // Then
         // we expect the file to contain the redirects
@@ -528,19 +526,19 @@ public class RedirectTableTest {
     public void fileSave_withRealData_savesExpected() throws IOException {
         // Given
         // a one line table
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
         String linkFrom1 = "/from/one/data.json";
         String linkTo1 = "/themea/data.json";
         String linkFrom2 = "/from/two/data.json";
         String linkTo2 = "/themeb/data.json";
 
-        redirectTable.addRedirect(linkFrom1, linkTo1);
-        redirectTable.addRedirect(linkFrom2, linkTo2);
+        redirectTableChained.addRedirect(linkFrom1, linkTo1);
+        redirectTableChained.addRedirect(linkFrom2, linkTo2);
 
         // When
         // we save to a file
         Path path = File.createTempFile("redirect", "txt").toPath();
-        redirectTable.saveToPath(path);
+        redirectTableChained.save(path);
 
         // Then
         // we expect the
@@ -556,20 +554,20 @@ public class RedirectTableTest {
     public void fileLoad_withRealData_loadsWorkingTable() throws IOException {
         // Given
         // a simple table that we save
-        RedirectTable redirectTable = new RedirectTable(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
         String linkFrom1 = "/from/one/data.json";
         String linkTo1 = "/themea/data.json";
         String linkFrom2 = "/from/two/data.json";
         String linkTo2 = "/themeb/data.json";
 
-        redirectTable.addRedirect(linkFrom1, linkTo1);
-        redirectTable.addRedirect(linkFrom2, linkTo2);
+        redirectTableChained.addRedirect(linkFrom1, linkTo1);
+        redirectTableChained.addRedirect(linkFrom2, linkTo2);
         Path path = File.createTempFile("redirect", "txt").toPath();
-        redirectTable.saveToPath(path);
+        redirectTableChained.save(path);
 
         // When
         // we reload
-        RedirectTable loadedTable = new RedirectTable(zebedee.published, path);
+        RedirectTableChained loadedTable = new RedirectTableChained(zebedee.published, path);
 
         // Then
         // we expect the

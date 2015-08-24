@@ -37,7 +37,8 @@ public class Collection {
     final Zebedee zebedee;
     final Collections collections;
 
-    public RedirectTable redirect = null;
+    //public RedirectTableChained redirect = null;
+    //private RedirectTableChained collectionRedirect = null;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -83,13 +84,13 @@ public class Collection {
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
 
-        this.inProgress.redirect.setChild(this.complete.redirect);
-        this.complete.redirect.setChild(this.reviewed.redirect);
-        this.reviewed.redirect.setChild(this.zebedee.published.redirect);
+//        this.inProgress.redirect.setChild(this.complete.redirect);
+//        this.complete.redirect.setChild(this.reviewed.redirect);
+//        this.reviewed.redirect.setChild(this.zebedee.published.redirect);
 
         // Set up redirect
         // this compound redirect will retrieve
-        redirect = this.inProgress.redirect;
+//        redirect = this.inProgress.redirect;
     }
 
     Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException {
@@ -223,21 +224,21 @@ public class Collection {
 
         // Only show edited material if the user has permission:
         if (permission) {
-            String redirected = redirect.get(uri);
+            //String redirected = redirect.get(uri);
             //if (redirected == null) { redirected = uri; }
 
-            result = inProgress.get(redirected);
+            result = inProgress.get(uri);
 
             if (result == null) {
-                result = complete.get(redirected);
+                result = complete.get(uri);
             }
 
             if (result == null) {
-                result = reviewed.get(redirected);
+                result = reviewed.get(uri);
             }
 
             if (result == null) {
-                result = zebedee.published.get(redirected);
+                result = zebedee.published.get(uri);
             }
 
             return result;

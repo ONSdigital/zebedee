@@ -41,7 +41,6 @@ import java.util.Date;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
 public class Collections {
-    public static long timeInList = 0;
     public final Path path;
     Zebedee zebedee;
 
@@ -89,7 +88,6 @@ public class Collections {
      * @throws IOException If a filesystem error occurs.
      */
     public CollectionList list() throws IOException {
-        long startTime = System.currentTimeMillis();
 
         CollectionList result = new CollectionList();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
@@ -99,8 +97,6 @@ public class Collections {
                 }
             }
         }
-
-        timeInList += System.currentTimeMillis() - startTime;
 
         return result;
     }

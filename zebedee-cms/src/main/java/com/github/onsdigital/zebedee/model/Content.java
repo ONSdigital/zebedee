@@ -21,7 +21,7 @@ public class Content {
     public static final String REDIRECT = "redirect.txt";
     public final Path path;
 
-    public RedirectTableChained redirect = null;
+    public RedirectTablePartialMatch redirect = null;
 
     public Content(Path path) {
         this.path = path;

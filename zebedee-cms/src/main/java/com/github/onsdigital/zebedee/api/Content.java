@@ -19,10 +19,6 @@ import java.io.InputStream;
 
 @Api
 public class Content {
-private static long totalListTime = 0;
-private static long totalTaken = 0;
-    private static long totalRedirectTime = 0;
-private static long totalCollectionGetTaken = 0;
 
     /**
      * Retrieves file content for the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
@@ -73,27 +69,14 @@ private static long totalCollectionGetTaken = 0;
         // otherwise the call to get a request parameter will actually consume the body:
         InputStream requestBody = request.getInputStream();
 
-        long startTime = System.currentTimeMillis();
-        long startListTime = com.github.onsdigital.zebedee.model.Collections.timeInList;
-        long startRedirectTime = RedirectTableChained.timeInRedirect;
-
         Session session = Root.zebedee.sessions.get(request);
 
-        long startCollectionGet = System.currentTimeMillis();
-
         Collection collection = Collections.getCollection(request);
-
-        totalCollectionGetTaken += System.currentTimeMillis() - startCollectionGet;
 
         String uri = request.getParameter("uri");
 
         Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
 
-        totalListTime += com.github.onsdigital.zebedee.model.Collections.timeInList - startListTime;
-        totalTaken += System.currentTimeMillis() - startTime;
-        totalRedirectTime += RedirectTableChained.timeInRedirect - startRedirectTime;
-
-        System.out.println("Collection get time: " + totalCollectionGetTaken + "ms. Redirect time: " + totalRedirectTime + "ms. Redirect gets: " + RedirectTableChained.getCalls + " Total: " + totalTaken + "ms");
         return true;
     }
 

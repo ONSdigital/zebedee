@@ -22,6 +22,10 @@ public class RedirectTablePartialMatch implements RedirectTable {
         this.content = content;
     }
 
+    public RedirectTablePartialMatch(Content content, Path path) {
+        this.content = content;
+    }
+
     @Override
     public String get(String uri) {
         if (content.exists(uri, false)) { return uri; } // most times the URI will exist

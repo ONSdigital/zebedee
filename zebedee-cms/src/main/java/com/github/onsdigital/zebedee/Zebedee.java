@@ -59,14 +59,14 @@ public class Zebedee {
 
         Path redirectPath = this.published.path.resolve(Content.REDIRECT);
         if(!Files.exists(redirectPath)) {
-            this.published.redirect = new RedirectTableChained(this.published);
+            this.published.redirect = new RedirectTablePartialMatch(this.published);
             try {
                 Files.createFile(redirectPath);
             } catch (IOException e) {
                 System.out.println("Could not save redirect to: " + redirectPath.toString());
             }
         } else {
-            this.published.redirect = new RedirectTableChained(this.published, redirectPath);
+            this.published.redirect = new RedirectTablePartialMatch(this.published, redirectPath);
         }
 
 

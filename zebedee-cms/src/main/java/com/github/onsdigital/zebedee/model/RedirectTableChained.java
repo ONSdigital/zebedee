@@ -93,21 +93,18 @@ public class RedirectTableChained {
      * @return the redirected uri
      */
     public String get(String uri) {
-        getCalls  += 1;
-//        return uri;
-        long start = System.currentTimeMillis();
 
         String finalUriAtThisLevel = endChain(uri, ITERATION_MAX);        // Follow redirect chain
         if (finalUriAtThisLevel == null) { return null; }       // Check for cyclicality
 
         if (content.exists(finalUriAtThisLevel, false)) {       // Option 1) Uri exists - return it
-            timeInRedirect += System.currentTimeMillis() - start;
+
             return finalUriAtThisLevel;
         } else if (child != null) {                             // Option 2) Child can continue the chain
-            timeInRedirect += System.currentTimeMillis() - start;
+
             return child.get(finalUriAtThisLevel);
         } else {                                                // Option 3) Return null
-            timeInRedirect += System.currentTimeMillis() - start;
+
             return null;
         }
     }

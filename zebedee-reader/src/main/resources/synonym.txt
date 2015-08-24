@@ -2,10 +2,6 @@
 # there are 2 possible formats
 # 1. term => another term = items on lhs are mapped to items on rhs
 # 2. term,another term,and another term = all terms are synonymous with each other, no spaces between commas
-cpi,inflation,consumer price index,consumer price indices,mm23 => inflation
-rpi,retail price index,retail price indices => retail prices index
-men,males,male
-women,females,female
 abi => annual business inquiry
 aei => average earnings index
 ashe => annual survey of hours and earnings
@@ -30,5 +26,9 @@ sppi => service producer price index
 tpi => tax and price index
 ukea => united kingdom economic accounts
 #employment,earnings,labour market
-vat => value added tax,vat
-youth unemployment,neet
+#vat => value added tax,vat
+#youth unemployment,neet
+#cpi,inflation,consumer price index,consumer price indices,mm23 => inflation
+#rpi,retail price index,retail price indices => retail prices index
+#men,males,male
+#women,females,female

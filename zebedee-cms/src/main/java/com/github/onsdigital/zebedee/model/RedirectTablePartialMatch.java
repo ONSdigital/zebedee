@@ -113,7 +113,11 @@ public class RedirectTablePartialMatch implements RedirectTable {
 
     @Override
     public void merge(RedirectTable redirectTable) {
-        for(String[] fromTo: redirectTable) {
+        Iterator<String[]> pairs = redirectTable.iterator();
+
+        while( pairs.hasNext() ) {
+
+            String[] fromTo = pairs.next();
             addRedirect(fromTo[0], fromTo[1]);
         }
     }
@@ -170,7 +174,7 @@ public class RedirectTablePartialMatch implements RedirectTable {
 
                 // return next on the 'to' list
 
-                String[] fromTo = new String[1];
+                String[] fromTo = new String[2];
 
                 fromTo[0] = key;
                 fromTo[1] = toSet.next();

@@ -11,7 +11,7 @@ import java.net.URI;
  */
 public abstract class Page extends Content {
 
-    private PageType type;
+    protected PageType type;
 
     private URI uri;
 

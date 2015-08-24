@@ -9,14 +9,22 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.util.URIUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 import static java.nio.file.Files.*;
 
@@ -34,10 +42,7 @@ public class ContentReader {
     private final String NOT_FOUND = "404 - Not Found";
 
     public ContentReader(String rootFolder) {
-        if (rootFolder == null) {
-            throw new NullPointerException("Root folder can not be null");
-        }
-        this.ROOT_FOLDER = Paths.get(rootFolder);
+        this(StringUtils.isEmpty(rootFolder) ? null : Paths.get(rootFolder));
     }
 
 
@@ -55,8 +60,8 @@ public class ContentReader {
      * @return Wrapper containing actual document data as text
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
-        Path content = resolvePath(path);
-        return getContent(content);
+        Path contentPath = resolveContentPath(path);
+        return getPage(resolvePath(path), contentPath);
     }
 
     /**
@@ -65,16 +70,24 @@ public class ContentReader {
      * @throws ZebedeeException
      * @throws IOException
      */
-    //For internal use, not exposed
     private Page getContent(Path path) throws ZebedeeException, IOException {
         Path dataFile = resolveDataFilePath(path);
-        Resource resource = getResource(dataFile);
-        checkJsonMime(resource, path);
-        Page page = deserialize(resource);
-        if (page != null) { //Contents without type is null when deserialised.
-            page.setUri(toRelativeUri(path));//Setting uri on the fly, discarding whatever is in the file
+        return getPage(path, dataFile);
+    }
+
+    private Page getPage(Path path, Path dataFile) throws IOException, ZebedeeException {
+        try (Resource resource = getResource(dataFile)) {
+            checkJsonMime(resource, path);
+            Page page = deserialize(resource);
+            if (page != null) { //Contents without type is null when deserialised.
+                if (StringUtils.endsWith(resource.getUri().toString(), ReaderConfiguration.getConfiguration().getDataFileName())) {
+                    page.setUri(URI.create(removeLastSegment(resource.getUri().toString())));//Setting uri on the fly, discarding whatever is in the file
+                } else {
+                    page.setUri(URI.create(StringUtils.removeEnd(resource.getUri().toString(), ".json")));//Setting uri on the fly, discarding whatever is in the file
+                }
+            }
+            return page;
         }
-        return page;
     }
 
     public Page getLatestContent(String path) throws ZebedeeException, IOException {
@@ -189,7 +202,7 @@ public class ContentReader {
         try (DirectoryStream<Path> paths = newDirectoryStream(path)) {
             for (Path child : paths) {
                 String name = child.getFileName().toString();
-                if (latestFolderName == null || (name.compareTo(latestFolderName) == 1)) {
+                if (latestFolderName == null || (name.compareTo(latestFolderName) > 0)) {
                     latestFolderName = name;
                     latestFolderPath = child;
                 }
@@ -205,7 +218,7 @@ public class ContentReader {
 
     //Returns uri of content calculating relative to root folder
     private URI toRelativeUri(Path node) {
-        return URI.create("/" + getRootFolder().toUri().relativize(node.toUri()).getPath());
+        return URI.create("/" + URIUtils.removeTrailingSlash(getRootFolder().toUri().relativize(node.toUri()).getPath()));
     }
 
     protected Resource getResource(Path resourcePath) throws ZebedeeException, IOException {
@@ -218,6 +231,7 @@ public class ContentReader {
         Resource resource = new Resource();
         resource.setName(path.getFileName().toString());
         resource.setMimeType(probeContentType(path));
+        resource.setUri(toRelativeUri(path));
         resource.setData(newInputStream(path));
         resource.setSize(size(path));
         return resource;
@@ -265,14 +279,23 @@ public class ContentReader {
         throw new BadRequestException("Latest uri can not be resolve for this content type");
     }
 
-    Path resolvePath(String path) throws BadRequestException {
+    private Path resolvePath(String path) throws BadRequestException {
         if (path == null) {
             throw new NullPointerException("Path can not be null");
         }
         return getRootFolder().resolve(removeLeadingSlash(path));
     }
 
-    Path resolveDataFilePath(Path path) throws BadRequestException {
+    Path resolveContentPath(String path) throws BadRequestException {
+        String jsonPath = URIUtils.removeTrailingSlash(path) + ".json";
+        Path json = resolvePath(jsonPath);
+        if (!exists(json)) {
+            json = resolveDataFilePath(resolvePath(path));
+        }
+        return json;
+    }
+
+    private Path resolveDataFilePath(Path path) throws BadRequestException {
         return path.resolve(getConfiguration().getDataFileName());
     }
 
@@ -294,6 +317,7 @@ public class ContentReader {
                 PageDescription description = content.getDescription();
                 if (description != null) {
                     contentNode.setDescription(new ContentNodeDetails(description.getTitle(), description.getEdition()));
+                    contentNode.getDescription().setReleaseDate(description.getReleaseDate());
                 }
             }
         } catch (NotFoundException e) {

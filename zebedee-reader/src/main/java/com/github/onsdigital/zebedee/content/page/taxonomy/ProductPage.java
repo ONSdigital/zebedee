@@ -11,7 +11,7 @@ import java.util.List;
  *
  * Represents a product node that holds links to related statistics under the product ( e.g. cpi )
  */
-public class TaxonomyProductNode extends TaxonomyNode {
+public class ProductPage extends TaxonomyNode {
 
     private List<Link> items;
     private List<Link> datasets;

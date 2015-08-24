@@ -1,14 +1,14 @@
 package com.github.onsdigital.zebedee.util;
 
 import com.github.davidcarboni.ResourceUtils;
-import com.github.onsdigital.content.link.PageReference;
-import com.github.onsdigital.content.page.statistics.dataset.Dataset;
-import com.github.onsdigital.content.page.statistics.document.article.Article;
-import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
-import com.github.onsdigital.content.page.taxonomy.ProductPage;
-import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
+import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
+import com.github.onsdigital.zebedee.content.page.taxonomy.ProductPage;
+import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyLandingPage;
+import com.github.onsdigital.zebedee.content.partial.Link;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -18,7 +18,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by thomasridd on 16/07/15.
@@ -31,14 +32,14 @@ public class GraphUtilsTest {
         // a bulletin with a bunch of links to various media
         Bulletin bulletin = new Bulletin();
 
-        List<PageReference> references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relatedbulletin1")));
-        references.add(new PageReference(URI.create("relatedbulletin2")));
+        List<Link> references = new ArrayList<>();
+        references.add(new Link(URI.create("relatedbulletin1")));
+        references.add(new Link(URI.create("relatedbulletin2")));
         bulletin.setRelatedBulletins(references);
 
         references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relateddataset1")));
-        references.add(new PageReference(URI.create("relateddataset2")));
+        references.add(new Link(URI.create("relateddataset1")));
+        references.add(new Link(URI.create("relateddataset2")));
         bulletin.setRelatedData(references);
 
         // When
@@ -58,14 +59,14 @@ public class GraphUtilsTest {
         // a dataset with a bunch of links to various media
         Dataset dataset = new Dataset();
 
-        List<PageReference> references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relatedarticle1")));
-        references.add(new PageReference(URI.create("relatedbulletin1")));
+        List<Link> references = new ArrayList<>();
+        references.add(new Link(URI.create("relatedarticle1")));
+        references.add(new Link(URI.create("relatedbulletin1")));
         dataset.setRelatedDocuments(references);
 
         references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relateddataset1")));
-        references.add(new PageReference(URI.create("relateddataset2")));
+        references.add(new Link(URI.create("relateddataset1")));
+        references.add(new Link(URI.create("relateddataset2")));
         dataset.setRelatedDatasets(references);
 
         // When
@@ -85,14 +86,14 @@ public class GraphUtilsTest {
         // a dataset with a bunch of links to various media
         Article article = new Article();
 
-        List<PageReference> references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relatedarticle1")));
-        references.add(new PageReference(URI.create("relatedarticle2")));
+        List<Link> references = new ArrayList<>();
+        references.add(new Link(URI.create("relatedarticle1")));
+        references.add(new Link(URI.create("relatedarticle2")));
         article.setRelatedArticles(references);
 
         references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relateddataset1")));
-        references.add(new PageReference(URI.create("relateddataset2")));
+        references.add(new Link(URI.create("relateddataset1")));
+        references.add(new Link(URI.create("relateddataset2")));
         article.setRelatedData(references);
 
         // When
@@ -112,24 +113,24 @@ public class GraphUtilsTest {
         // a dataset with a bunch of links to various media
         ProductPage productPage = new ProductPage();
 
-        List<PageReference> references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relatedarticle1")));
-        references.add(new PageReference(URI.create("relatedarticle2")));
+        List<Link> references = new ArrayList<>();
+        references.add(new Link(URI.create("relatedarticle1")));
+        references.add(new Link(URI.create("relatedarticle2")));
         productPage.setRelatedArticles(references);
 
         references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relatedbulletin1")));
-        references.add(new PageReference(URI.create("relatedbulletin2")));
+        references.add(new Link(URI.create("relatedbulletin1")));
+        references.add(new Link(URI.create("relatedbulletin2")));
         productPage.setStatsBulletins(references);
 
         references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relateddataset1")));
-        references.add(new PageReference(URI.create("relateddataset2")));
+        references.add(new Link(URI.create("relateddataset1")));
+        references.add(new Link(URI.create("relateddataset2")));
         productPage.setDatasets(references);
 
         references = new ArrayList<>();
-        references.add(new PageReference(URI.create("relatedtimeseries1")));
-        references.add(new PageReference(URI.create("relatedtimeseries2")));
+        references.add(new Link(URI.create("relatedtimeseries1")));
+        references.add(new Link(URI.create("relatedtimeseries2")));
         productPage.setItems(references);
 
         // When
@@ -151,9 +152,9 @@ public class GraphUtilsTest {
         // a dataset with a bunch of links to various media
         TaxonomyLandingPage landingPage = new TaxonomyLandingPage();
 
-        List<PageReference> references = new ArrayList<>();
-        references.add(new PageReference(URI.create("section1")));
-        references.add(new PageReference(URI.create("section2")));
+        List<Link> references = new ArrayList<>();
+        references.add(new Link(URI.create("section1")));
+        references.add(new Link(URI.create("section2")));
         landingPage.setSections(references);
 
         // When

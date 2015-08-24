@@ -1,14 +1,8 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.content.DirectoryListing;
-import com.github.onsdigital.content.page.base.Page;
-import com.github.onsdigital.content.service.ContentNotFoundException;
-import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.DataPublisher;
-import com.github.onsdigital.zebedee.data.DataReader;
+import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -29,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -226,8 +219,7 @@ public class Collections {
                     "Please provide a URI to a directory: " + uri);
         }
 
-        Serialiser.getBuilder().setPrettyPrinting();
-        return ContentUtil.listDirectory(path);
+        return listDirectory(path);
     }
 
     /**
@@ -249,7 +241,7 @@ public class Collections {
         DirectoryListing listing = listDirectory(collection, uri, session);
 
         Path publishedPath = zebedee.published.get(uri);
-        DirectoryListing publishedListing = ContentUtil.listDirectory(publishedPath);
+        DirectoryListing publishedListing = listDirectory(publishedPath);
 
         listing.files.putAll(publishedListing.files);
         listing.folders.putAll(publishedListing.folders);
@@ -278,6 +270,30 @@ public class Collections {
 
         // Go ahead
         collection.delete();
+    }
+
+    /**
+     * Populate a list of files / folders for a given path.
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    public static DirectoryListing listDirectory(Path path) throws IOException {
+        DirectoryListing listing = new DirectoryListing();
+        try (DirectoryStream<Path> stream = Files
+                .newDirectoryStream(path)) {
+            for (Path directory : stream) {
+                if (Files.isDirectory(directory)) {
+                    listing.folders.put(directory.getFileName().toString(),
+                            directory.toString());
+                } else {
+                    listing.files.put(directory.getFileName().toString(),
+                            directory.toString());
+                }
+            }
+        }
+        return listing;
     }
 
     public void readContent(Collection collection, String uri, boolean resolveReferences, Session session,
@@ -321,20 +337,20 @@ public class Collections {
         }
 
         try (InputStream input = Files.newInputStream(path)) {
-            if (resolveReferences) {
-                Page page = ContentUtil.deserialisePage(input);
-                page.loadReferences(new DataReader(session, collection));
-                // Write the file to the response
-                org.apache.commons.io.IOUtils.copy(new StringReader(page.toJson()),
-                        response.getOutputStream());
-            } else {
+//            if (resolveReferences) {
+//                Page page = ContentUtil.deserialisePage(input);
+//                page.loadReferences(new DataReader(session, collection));
+//                // Write the file to the response
+//                org.apache.commons.io.IOUtils.copy(new StringReader(page.toJson()),
+//                        response.getOutputStream());
+//            } else {
                 // Write the file to the response
                 org.apache.commons.io.IOUtils.copy(input,
                         response.getOutputStream());
             }
-        } catch (ContentNotFoundException e) {
-            throw new NotFoundException(e.getMessage());
-        }
+//        } catch (ContentNotFoundException e) {
+//            throw new NotFoundException(e.getMessage());
+//        }
 
     }
 

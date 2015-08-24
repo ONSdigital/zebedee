@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.reader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * Created by bren on 30/07/15.
@@ -15,6 +16,7 @@ public class Resource implements Closeable {
     private String mimeType;
     private long size;//bytes
     private InputStream data;
+    private URI uri;
 
     public String getName() {
         return name;
@@ -59,5 +61,13 @@ public class Resource implements Closeable {
     //set size in bytes
     public void setSize(long size) {
         this.size = size;
+    }
+
+    public URI getUri() {
+        return uri;
+    }
+
+    public void setUri(URI uri) {
+        this.uri = uri;
     }
 }

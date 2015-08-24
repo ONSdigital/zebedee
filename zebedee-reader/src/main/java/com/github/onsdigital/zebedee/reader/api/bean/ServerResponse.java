@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.reader.api;
+package com.github.onsdigital.zebedee.reader.api.bean;
 
 /**
  * Created by bren on 31/07/15.

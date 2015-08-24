@@ -1,29 +1,22 @@
 package com.github.onsdigital.zebedee.util;
 
-import com.github.onsdigital.content.link.PageReference;
-import com.github.onsdigital.content.page.base.Page;
-import com.github.onsdigital.content.page.base.PageType;
-import com.github.onsdigital.content.page.staticpage.Methodology;
-import com.github.onsdigital.content.page.statistics.dataset.Dataset;
-import com.github.onsdigital.content.page.statistics.document.article.Article;
-import com.github.onsdigital.content.page.statistics.document.base.StatisticalDocument;
-import com.github.onsdigital.content.page.statistics.document.bulletin.Bulletin;
-import com.github.onsdigital.content.page.taxonomy.ProductPage;
-import com.github.onsdigital.content.page.taxonomy.TaxonomyLandingPage;
-import com.github.onsdigital.content.page.taxonomy.base.TaxonomyPage;
-import com.github.onsdigital.content.partial.DownloadSection;
-import com.github.onsdigital.content.partial.FigureSection;
-import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.File;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
+import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
+import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
+import com.github.onsdigital.zebedee.content.page.taxonomy.ProductPage;
+import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyLandingPage;
+import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.model.Content;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -81,7 +74,7 @@ public class GraphUtils {
             String uri = bulletinDict.get("Uri");
             try (InputStream stream = Files.newInputStream(zebedee.launchpad.get(uri))) {
                 Bulletin bulletin = ContentUtil.deserialise(stream, Bulletin.class);
-                List<PageReference> relatedData = bulletin.getRelatedData();
+                List<Link> relatedData = bulletin.getRelatedData();
 
                 // For every pair of datasets referenced
                 for(int i = 0; i < relatedData.size() - 1; i++) {
@@ -121,7 +114,7 @@ public class GraphUtils {
             // Insert file into appropriate set of links
             ProductPage productPage = null;
             try(InputStream stream = Files.newInputStream(content.toPath(uri).resolve("data.json"))) {
-                Page page = ContentUtil.deserialisePage(stream);
+                Page page = ContentUtil.deserialiseContent(stream);
                 if (page.getType() == PageType.bulletin) {
                     productPage = productPageForPageWithURI(content, uri);
                     ensureLink(productPage.getStatsBulletins(), uri);
@@ -155,7 +148,7 @@ public class GraphUtils {
 
             try(InputStream stream = Files.newInputStream(content.toPath(uri).resolve("data.json"))) {
                 // Open the file
-                Page page = ContentUtil.deserialisePage(stream);
+                Page page = ContentUtil.deserialiseContent(stream);
                 ProductPage productPage = null;
 
                 // Find the parent product page
@@ -236,7 +229,7 @@ public class GraphUtils {
             current = current.substring(0, current.lastIndexOf("/"));
             if (content.get(current + "/data.json") != null) {
                 try (InputStream stream = Files.newInputStream(content.toPath(current).resolve("data.json"))) {
-                    Page page = ContentUtil.deserialisePage(stream);
+                    Page page = ContentUtil.deserialiseContent(stream);
                     if (page.getType() == PageType.product_page) {
                         return (ProductPage) page;
                     }
@@ -252,7 +245,7 @@ public class GraphUtils {
             current = current.substring(0, current.lastIndexOf("/"));
             if (content.get(current + "/data.json") != null) {
                 try (InputStream stream = Files.newInputStream(content.toPath(current).resolve("data.json"))) {
-                    Page page = ContentUtil.deserialisePage(stream);
+                    Page page = ContentUtil.deserialiseContent(stream);
                     if (page.getType() == PageType.product_page) {
                         return current;
                     }
@@ -262,15 +255,15 @@ public class GraphUtils {
         return null;
     }
 
-    private static void ensureLink(List<PageReference> links, String uri) {
-        for (PageReference ref: links) {
+    private static void ensureLink(List<Link> links, String uri) {
+        for (Link ref: links) {
             if (ref.getUri().toString().equalsIgnoreCase(uri)) { return; }
         }
-        links.add(new PageReference(URI.create(uri)));
+        links.add(new Link(URI.create(uri)));
     }
-    private static void stripAnyLink(List<PageReference> links, String uri) {
-        PageReference strip = null;
-        for (PageReference ref: links) {
+    private static void stripAnyLink(List<Link> links, String uri) {
+        Link strip = null;
+        for (Link ref: links) {
             if (ref.getUri().toString().equalsIgnoreCase(uri)) {
                 strip = ref;
                 break;
@@ -288,10 +281,10 @@ public class GraphUtils {
      */
     public static List<String> relatedUris(Bulletin bulletin) {
         List<String > results = new ArrayList<>();
-        for (PageReference ref: bulletin.getRelatedBulletins()) {
+        for (Link ref: bulletin.getRelatedBulletins()) {
             results.add(ref.getUri().toString());
         }
-        for (PageReference ref: bulletin.getRelatedData()) {
+        for (Link ref: bulletin.getRelatedData()) {
             results.add(ref.getUri().toString());
         }
         for (FigureSection ref: bulletin.getCharts()) {
@@ -313,12 +306,12 @@ public class GraphUtils {
 
         if (article.getRelatedArticles() != null) {
 
-            for (PageReference ref : article.getRelatedArticles()) {
+            for (Link ref : article.getRelatedArticles()) {
                 results.add(ref.getUri().toString());
             }
         }
         if (article.getRelatedData() != null) {
-            for (PageReference ref : article.getRelatedData()) {
+            for (Link ref : article.getRelatedData()) {
                 results.add(ref.getUri().toString());
             }
         }
@@ -341,7 +334,7 @@ public class GraphUtils {
     public static List<String> relatedUris(Dataset dataset) {
         List<String > results = new ArrayList<>();
         if (dataset.getRelatedDocuments() != null) {
-            for (PageReference ref : dataset.getRelatedDocuments()) {
+            for (Link ref : dataset.getRelatedDocuments()) {
                 results.add(ref.getUri().toString());
             }
         }
@@ -351,12 +344,12 @@ public class GraphUtils {
             }
         }
         if (dataset.getRelatedDatasets() != null) {
-            for (PageReference ref : dataset.getRelatedDatasets()) {
+            for (Link ref : dataset.getRelatedDatasets()) {
                 results.add(ref.getUri().toString());
             }
         }
         if (dataset.getRelatedMethodology() != null) {
-            for (PageReference ref : dataset.getRelatedMethodology()) {
+            for (Link ref : dataset.getRelatedMethodology()) {
                 if (ref.getUri() != null) {
                     results.add(ref.getUri().toString());
                 }
@@ -367,7 +360,7 @@ public class GraphUtils {
     public static List<String> relatedUris(ProductPage productPage) {
         List<String > results = new ArrayList<>();
         if (productPage.getStatsBulletins() != null) {
-            for (PageReference ref : productPage.getStatsBulletins()) {
+            for (Link ref : productPage.getStatsBulletins()) {
                 if (ref != null && ref.getUri() != null) {
                     results.add(ref.getUri().toString());
                 } else {
@@ -376,17 +369,17 @@ public class GraphUtils {
             }
         }
         if (productPage.getItems() != null) {
-            for (PageReference ref : productPage.getItems()) {
+            for (Link ref : productPage.getItems()) {
                 results.add(ref.getUri().toString());
             }
         }
         if (productPage.getDatasets() != null) {
-            for (PageReference ref : productPage.getDatasets()) {
+            for (Link ref : productPage.getDatasets()) {
                 results.add(ref.getUri().toString());
             }
         }
         if (productPage.getRelatedArticles() != null) {
-            for (PageReference ref : productPage.getRelatedArticles()) {
+            for (Link ref : productPage.getRelatedArticles()) {
                 results.add(ref.getUri().toString());
             }
         }
@@ -397,7 +390,7 @@ public class GraphUtils {
         List<String > results = new ArrayList<>();
 
         if (landingPage.getSections() != null) {
-            for (PageReference ref : landingPage.getSections()) {
+            for (Link ref : landingPage.getSections()) {
                 if (ref.getUri() != null) {
                     results.add(ref.getUri().toString());
                 }
@@ -437,7 +430,7 @@ public class GraphUtils {
                         throws IOException {
                     if (matcher.matches(file)) {
                         try(InputStream stream = Files.newInputStream(file)) {
-                            Page page = ContentUtil.deserialisePage(stream);
+                            Page page = ContentUtil.deserialiseContent(stream);
                             List<String> relatedUrisForPage = relatedUrisForPage(page);
                             for(String relatedUri: relatedUrisForPage) {
                                 relations.add(relatedUri);

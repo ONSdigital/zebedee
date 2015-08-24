@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
-import java.io.IOException;
+
+import java.io.*;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;

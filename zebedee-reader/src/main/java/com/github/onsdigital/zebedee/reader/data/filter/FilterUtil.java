@@ -1,10 +1,13 @@
 package com.github.onsdigital.zebedee.reader.data.filter;
 
 import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
+import com.github.onsdigital.zebedee.content.dynamic.timeseries.Point;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.dynamic.TimeSeriesValueSet;
+import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -42,9 +45,10 @@ public class FilterUtil {
                 ContentNodeDetails titleWrapper = new ContentNodeDetails();
                 titleWrapper.setTitle(page.getDescription().getTitle());
                 titleWrapper.setEdition(page.getDescription().getEdition());
+                titleWrapper.setUri(page.getUri());
                 return titleWrapper;
             case DESCRIPTION:
-                return page.getDescription();
+                return new DescriptionWrapper(page.getUri(),page.getDescription());
             case SERIES:
                 return filterTimseriesData(page);
             default:
@@ -57,24 +61,30 @@ public class FilterUtil {
             throw new BadRequestException("Requested content is not a time series, can not apply series filter");
         }
 
-        Set<TimeSeriesValue> series = null;
+        Set<TimeSeriesValue> set = null;
 
         TimeSeries timeSeries = (TimeSeries) page;
         if (timeSeries.years.size() > 0) {
-            series = timeSeries.years;
+            set = timeSeries.years;
         } else if (timeSeries.quarters.size() > 0) {
-            series = timeSeries.quarters;
+            set = timeSeries.quarters;
         } else if (timeSeries.months.size() > 0) {
-            series = timeSeries.months;
+            set = timeSeries.months;
         }
 
-        if (series == null) {
+        if (set == null) {
             throw new NotFoundException("Time series does not contain any series data");
         }
 
-        TimeSeriesValueSet set = new TimeSeriesValueSet();
-        set.setSeries(series);
-        return set;
+        Series series = new Series();
+        series.setUri(page.getUri());
+        series.setDescription(new PageDescription());// only setting title and cdid of description
+        series.getDescription().setCdid(page.getDescription().getCdid());
+        series.getDescription().setTitle(page.getDescription().getTitle());
+        for (TimeSeriesValue timeSeriesValue : set) {
+         series.add(new Point(timeSeriesValue.date, timeSeriesValue.value));
+        }
+        return series;
     }
 
 

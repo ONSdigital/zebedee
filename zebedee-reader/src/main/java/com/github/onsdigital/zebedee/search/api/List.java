@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
 
 @Api
@@ -40,6 +41,7 @@ public class List {
         }
 
         SearchResultsPage page = buildResultsPage(results, pageNumber, "", types);
+        page.setUri(new URI(uri));
 
         String data = ContentUtil.serialise(page);
         IOUtils.copy(new StringReader(data), response.getOutputStream());

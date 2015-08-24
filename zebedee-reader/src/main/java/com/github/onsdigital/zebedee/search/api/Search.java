@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.search.SearchHelper;
 import com.github.onsdigital.zebedee.search.api.util.RequestUtil;
 import com.github.onsdigital.zebedee.search.result.AggregatedSearchResult;
 import com.github.onsdigital.zebedee.search.result.SearchResultsPage;
+import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +54,7 @@ public class Search {
                 System.out.println("No results found from timeseries so using suggestions for: " + query);
                 searchResult = searchAutocorrect(query, page, filterTypes);
             } else {
-                response.sendRedirect(timeseriesUri.toString());
+                response.sendRedirect(URIUtils.removeLeadingSlash(timeseriesUri.getPath().toString()));
                 return null;
             }
         }

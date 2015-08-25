@@ -47,6 +47,7 @@ public class CollectionDetails {
         CollectionDetail result = new CollectionDetail();
         result.id = collection.description.id;
         result.name = collection.description.name;
+        result.type = collection.description.type;
         result.publishDate = collection.description.publishDate;
         result.inProgress = collection.inProgress.details();
         result.complete = collection.complete.details();

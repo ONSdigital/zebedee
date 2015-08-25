@@ -15,6 +15,10 @@ public class CollectionDetail {
      */
     public String name;
     /**
+     * The type of the collection to determine the publish behaviour.
+     */
+    public CollectionType type;
+    /**
      * The date-time when this {@link Collection} should be published (if it has
      * a publish date).
      */

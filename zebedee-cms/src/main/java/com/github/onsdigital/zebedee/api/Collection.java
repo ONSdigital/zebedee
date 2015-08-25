@@ -59,6 +59,7 @@ public class Collection {
         result.reviewedUris = collection.reviewedUris();
         result.eventsByUri = collection.description.eventsByUri;
         result.approvedStatus = collection.description.approvedStatus;
+        result.type = collection.description.type;
         return result;
     }
 

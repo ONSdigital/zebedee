@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -207,6 +208,8 @@ public class ContentReader {
                     latestFolderPath = child;
                 }
             }
+        } catch (NoSuchFileException exception) {
+            throw new NotFoundException(NOT_FOUND);
         }
 
         if (latestFolderPath == null) {

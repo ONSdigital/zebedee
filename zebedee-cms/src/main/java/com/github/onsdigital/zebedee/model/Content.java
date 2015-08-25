@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.util.GraphUtils;
@@ -22,25 +21,12 @@ public class Content {
     public static final String REDIRECT = "redirect.txt";
     public final Path path;
 
-    public final RedirectTable redirect;
+    public RedirectTablePartialMatch redirect = null;
 
     public Content(Path path) {
         this.path = path;
         if (!Files.exists(path)) {
             throw new IllegalArgumentException("Path does not exist: "
-                    + path.toAbsolutePath());
-        }
-
-        // Create a redirect table alongside the content
-        this.redirect = new RedirectTable(this);
-        try {
-            if (Files.exists(this.path.resolve(REDIRECT))) {
-                this.redirect.loadFromPath(this.path.resolve(REDIRECT));
-            } else {
-                this.redirect.saveToPath(this.path.resolve(REDIRECT));
-            }
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Redirect table could not be created"
                     + path.toAbsolutePath());
         }
     }
@@ -72,14 +58,17 @@ public class Content {
     }
 
     boolean exists(String uri, boolean doRedirect) {
+
+        // Redirect if required
         String finalUri = uri;
-        if (doRedirect) {
+        if (doRedirect && redirect != null) {
             finalUri = redirect.get(uri);
         }
         if (finalUri == null) {
             return false;
         }
 
+        // Find whether exists
         Path path = toPath(finalUri);
         return Files.exists(path);
     }
@@ -112,8 +101,9 @@ public class Content {
      */
     public Path get(String uri, boolean doRedirect) {
 
+        // Redirect if necessary and possible
         String finalUri = uri;
-        if (doRedirect) {
+        if (doRedirect && (redirect != null)) {
             finalUri = redirect.get(uri);
         }
         ;

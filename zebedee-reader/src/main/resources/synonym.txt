@@ -1,0 +1,34 @@
+# stores synonyms for search engine
+# there are 2 possible formats
+# 1. term => another term = items on lhs are mapped to items on rhs
+# 2. term,another term,and another term = all terms are synonymous with each other, no spaces between commas
+abi => annual business inquiry
+aei => average earnings index
+ashe => annual survey of hours and earnings
+awe => average weekly earnings
+bres => business register employment survey
+elmr => economic and labour market review
+fdi => foreign direct investment
+gdhi => gross disposable household income
+gfcf => gross fixed capital formation
+gdp => gross domestic product,gdp
+gva => gross value added,gva
+imd => index of multiple deprivation
+ips => international passenger survey
+lfs => labour force survey
+ppi => producer price index
+rpix => retail prices index excluding mortgage interest payment
+rpiy => retail prices index excluding mortgage interest payments and indirect taxes
+sic => standard industrial classification
+sme => small and medium size enterprises
+soc => standard occupational classification
+sppi => service producer price index
+tpi => tax and price index
+ukea => united kingdom economic accounts
+#employment,earnings,labour market
+#vat => value added tax,vat
+#youth unemployment,neet
+#cpi,inflation,consumer price index,consumer price indices,mm23 => inflation
+#rpi,retail price index,retail price indices => retail prices index
+#men,males,male
+#women,females,female

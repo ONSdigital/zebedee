@@ -87,7 +87,7 @@ public class CollectionContentReaderTest {
         Map.Entry<URI, ContentNode> contentNode = children.entrySet().iterator().next();
         assertEquals("Labour disputes by sector: LABD02", contentNode.getValue().getDescription().getTitle());
         assertEquals(PageType.dataset, contentNode.getValue().getType());//type is null for directories with no data.json
-        assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/", contentNode.getKey().toString());
+        assertEquals("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", contentNode.getKey().toString());
     }
 
     @Test

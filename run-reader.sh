@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8003,server=y,suspend=n"
-export PORT="8083"
+export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
+export PORT="8082"
 
 # Restolino configuration
 export RESTOLINO_CLASSES="zebedee-reader/target/classes"
@@ -13,6 +13,7 @@ mvn clean package dependency:copy-dependencies && \
 java $JAVA_OPTS \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Dcontent_dir=$CONTENT_DIR \
+ -DSTART_EMBEDDED_SERVER=Y \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \
  -cp "zebedee-reader/target/dependency/*" \
  com.github.davidcarboni.restolino.Main

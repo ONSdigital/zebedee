@@ -166,7 +166,14 @@ public class ReadRequestHandler {
             return;
         }
         Map<URI, ContentNode> collectionChildren = ZebedeeReader.getInstance().getCollectionContentChildren(collectionId, uri);
-        nodes.putAll(collectionChildren);//Overwrites published nodes
+        for (Map.Entry<URI, ContentNode> collectionEntry : collectionChildren.entrySet()) {
+            ContentNode publishedNode = nodes.get(collectionEntry.getKey());
+            ContentNode collectionNode = collectionEntry.getValue();
+            //do not overlay non-content directory to published content
+            if (publishedNode == null || collectionNode.getType() != null) {
+                nodes.put(collectionNode.getUri(), collectionNode);
+            }
+        }
     }
 
     private void overlayCollectionParents(Map<URI, ContentNode> nodes, String collectionId, String uri) throws ZebedeeException, IOException {

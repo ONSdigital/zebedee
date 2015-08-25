@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.reader.util.ContentReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
@@ -137,7 +138,7 @@ public class ZebedeeReader {
             return publishedContentReader.getChildren(path);
         } catch (NotFoundException e) {
             //If requested path is not available in published content return an empty list
-            return Collections.emptyMap();
+            return new HashMap<>();
         }
     }
 

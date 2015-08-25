@@ -5,6 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+
 /**
  * Created by bren on 31/07/15.
  */
@@ -30,7 +33,7 @@ public class URIUtils {
      */
     public static String removeTrailingSlash(String uri) {
         if (StringUtils.endsWith(uri, FORWARD_SLASH)) {
-            return StringUtils.removeEnd(uri, FORWARD_SLASH);
+            return removeEnd(uri, FORWARD_SLASH);
         }
         return uri;
     }
@@ -51,7 +54,7 @@ public class URIUtils {
 
     /*Method splits uri by forward slash(/), thats why relative uris would need segment number based on 0. Only use for absolute uris   */
     public static String getPathSegment(String uri, int n) {
-        if (StringUtils.isEmpty(uri) || n < 0) {
+        if (isEmpty(uri) || n < 0) {
             return null;
         }
         String[] segments = getSegments(uri);
@@ -67,7 +70,7 @@ public class URIUtils {
 
 
     public static String getLastSegment(String uri) {
-        if (StringUtils.isEmpty(uri)) {
+        if (isEmpty(uri)) {
             return null;
         }
         String[] segments = getSegments(uri);
@@ -79,9 +82,10 @@ public class URIUtils {
     }
 
     public static String removeLastSegment(String uri) {
-        if (StringUtils.isEmpty(uri)) {
+        if (isEmpty(uri)) {
             return null;
         }
-        return StringUtils.removeEnd(removeTrailingSlash(uri), getLastSegment(uri));
+        String result =  removeEnd(removeTrailingSlash(uri), FORWARD_SLASH + getLastSegment(uri));
+        return isEmpty(result) ? "/" : result;
     }
 }

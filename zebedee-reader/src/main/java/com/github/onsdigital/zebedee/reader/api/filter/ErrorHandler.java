@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.reader.api.filter;
 import com.github.davidcarboni.restolino.api.RequestHandler;
 import com.github.davidcarboni.restolino.framework.ServerError;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.api.ServerResponse;
+import com.github.onsdigital.zebedee.reader.api.bean.ServerResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

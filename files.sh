@@ -14,6 +14,7 @@ java $JAVA_OPTS \
  -Drestolino.files=$RESTOLINO_STATIC \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \
+ -DSTART_EMBEDDED_SERVER=Y \
  -cp "zebedee-cms/target/dependency/*" \
  com.github.davidcarboni.restolino.Main
 

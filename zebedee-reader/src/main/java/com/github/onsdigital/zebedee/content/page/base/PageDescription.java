@@ -78,7 +78,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String frequency;
     private String compilation;
     private String geographicCoverage;
-    private int sampleSize;
+    private String sampleSize;
     private Date lastRevised;
 
     /*Adhoc content reference*/
@@ -370,11 +370,11 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.geographicCoverage = geographicCoverage;
     }
 
-    public int getSampleSize() {
+    public String getSampleSize() {
         return sampleSize;
     }
 
-    public void setSampleSize(int sampleSize) {
+    public void setSampleSize(String sampleSize) {
         this.sampleSize = sampleSize;
     }
 

@@ -8,9 +8,19 @@ RUN echo '{"service": {"name": "zebedee-cms", "tags": ["blue"], "port": 8080, "c
 # Add the repo source
 WORKDIR /usr/src
 ADD git_commit_id /usr/src/
-ADD ./zebedee-cms/target/*-jar-with-dependencies.jar /usr/src/target/
+ADD ./target/dependency /usr/src/target/dependency
+ADD ./target/classes /usr/src/target/classes
+ADD ./src/main/web /usr/src/src/main/web
+#ADD ./zebedee-cms/target/*-jar-with-dependencies.jar /usr/src/target/
+
+# Temporary: expose Elasticsearch
+EXPOSE 9200
 
 # Update the entry point script
 RUN mv /usr/entrypoint/container.sh /usr/src/
-ENV PACKAGE_PREFIX com.github.onsdigital.zebedee.api
-RUN echo "java -Drestolino.packageprefix=$PACKAGE_PREFIX -jar target/*-jar-with-dependencies.jar" >> container.sh
+RUN echo "java -Xmx2048m \
+          -Drestolino.files=src/main/web \
+          -Drestolino.classes=target/classes \
+          -Drestolino.packageprefix=com.github.onsdigital.zebedee.api \
+          -cp \"target/dependency/*:target/classes/\" \
+          com.github.davidcarboni.restolino.Main" >> container.sh

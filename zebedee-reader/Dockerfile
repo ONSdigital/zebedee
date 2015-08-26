@@ -8,8 +8,8 @@ RUN echo '{"service": {"name": "zebedee-reader", "tags": ["blue"], "port": 8080,
 # Add the repo source
 WORKDIR /usr/src
 ADD git_commit_id /usr/src/
-ADD ./target/dependency /usr/src/target/dependency
-ADD ./target/classes /usr/src/target/classes
+ADD ./zebedee-reader/target/dependency /usr/src/target/dependency
+ADD ./zebedee-reader/target/classes /usr/src/target/classes
 ADD ./src/main/web /usr/src/src/main/web
 #ADD ./target/*-jar-with-dependencies.jar /usr/src/target/
 

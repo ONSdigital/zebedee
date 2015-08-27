@@ -30,6 +30,13 @@
             <artifactId>elasticsearch</artifactId>
             <version>1.3.9</version>
         </dependency>
+
+        <!-- Encryption -->
+        <dependency>
+            <groupId>com.github.davidcarboni</groupId>
+            <artifactId>cryptolite</artifactId>
+            <version>1.2.5</version>
+        </dependency>
     </dependencies>
 
 

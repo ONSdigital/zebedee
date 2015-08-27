@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+import com.github.onsdigital.zebedee.util.ReleaseDateComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,9 +22,7 @@ import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
@@ -203,25 +202,23 @@ public class ContentReader {
 
     private Page resolveLatest(Path path) throws ZebedeeException, IOException {
 
-        //order by foldername, get the latest one
-        String latestFolderName = null;
-        Path latestFolderPath = null;
 
-        try (DirectoryStream<Path> paths = newDirectoryStream(path)) {
-            for (Path child : paths) {
-                String name = child.getFileName().toString();
-                if (latestFolderName == null || (name.compareTo(latestFolderName) > 0)) {
-                    latestFolderName = name;
-                    latestFolderPath = child;
-                }
-            }
+
+
+        Map<URI, ContentNode> children = resolveChildren(path);
+        if (children == null || children.isEmpty()) {
+            return null;
         }
 
-        if (latestFolderPath == null) {
-            throw new NotFoundException(NOT_FOUND);
-        }
-        return getContent(latestFolderPath);
 
+        TreeSet<ContentNode> sortedSet = sortByDate(children.values());
+        return getContent(sortedSet.iterator().next().getUri().toString());
+    }
+
+    private TreeSet sortByDate(Collection set) {
+        TreeSet valueSet = new TreeSet(new ReleaseDateComparator());
+        valueSet.addAll(set);
+        return valueSet;
     }
 
     //Returns uri of content calculating relative to root folder

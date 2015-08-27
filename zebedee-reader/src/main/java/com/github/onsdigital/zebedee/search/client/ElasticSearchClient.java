@@ -11,7 +11,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.concurrent.*;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
@@ -75,6 +74,22 @@ public class ElasticSearchClient implements Startup {
         }
     }
 
+    private static void indexDocuments(Client client) throws IOException {
+        long start;
+
+        // Index
+        start = System.currentTimeMillis();
+        System.out.println("Elasticsearch: indexing..");
+        try {
+            Indexer.loadIndex(client);
+        } catch (Exception e) {
+            System.out.println("Indexing error");
+            System.out.println(ExceptionUtils.getStackTrace(e));
+            throw e;
+        }
+        System.out.println("Elasticsearch: indexing complete (" + (System.currentTimeMillis() - start) + "ms)");
+    }
+
     @Override
     public void init() {
         if (ReaderConfiguration.isStartEmbeddedSearch()) {
@@ -91,7 +106,11 @@ public class ElasticSearchClient implements Startup {
             client = pool.submit(new Callable<Client>() {
                 @Override
                 public Client call() throws Exception {
-                    Client client = new TransportClient()
+
+                    Settings settings = ImmutableSettings.settingsBuilder()
+                            .put("cluster.name", getConfiguration().getElasticSearchCluster()).build();
+
+                    Client client = new TransportClient(settings)
                             .addTransportAddress(new InetSocketTransportAddress(getConfiguration().getElasticSearchServer(), getConfiguration().getElasticSearchPort()));
 
                     indexDocuments(client);
@@ -103,23 +122,6 @@ public class ElasticSearchClient implements Startup {
         }
 
 
-    }
-
-
-    private static void indexDocuments(Client client) throws IOException {
-        long start;
-
-        // Index
-        start = System.currentTimeMillis();
-        System.out.println("Elasticsearch: indexing..");
-        try {
-            Indexer.loadIndex(client);
-        } catch (Exception e) {
-            System.out.println("Indexing error");
-            System.out.println(ExceptionUtils.getStackTrace(e));
-            throw e;
-        }
-        System.out.println("Elasticsearch: indexing complete (" + (System.currentTimeMillis() - start) + "ms)");
     }
 
     static class ShutDownNodeThread extends Thread {

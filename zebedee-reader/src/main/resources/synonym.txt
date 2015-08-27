@@ -29,6 +29,6 @@ ukea => united kingdom economic accounts
 #vat => value added tax,vat
 #youth unemployment,neet
 #cpi,inflation,consumer price index,consumer price indices,mm23 => inflation
-#rpi,retail price index,retail price indices => retail prices index
+rpi,retail price index,retail price indices => retail prices index
 #men,males,male
 #women,females,female

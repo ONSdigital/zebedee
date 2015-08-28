@@ -182,7 +182,7 @@ public class Content {
      */
     public List<ContentDetail> details() throws IOException {
         List<ContentDetail> details = new ArrayList<>();
-        for (String uri : this.uris("*data.json")) {
+        for (String uri : this.uris("*data*.json")) {
             details.add(details(path.resolve(uri.replaceFirst("/", ""))));
         }
         return details;

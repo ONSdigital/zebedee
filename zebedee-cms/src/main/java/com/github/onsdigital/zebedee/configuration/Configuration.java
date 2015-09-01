@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class Configuration {
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
+    private static final String DEFAULT_TRAIN_URL = "http://localhost:8083";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
 
     public static boolean isSchedulingEnabled() {
@@ -26,6 +27,10 @@ public class Configuration {
 
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
+    }
+
+    public static String getTheTrainUrl() {
+        return StringUtils.defaultIfBlank(getValue("TRAIN_URL"), DEFAULT_TRAIN_URL);
     }
 
     /**

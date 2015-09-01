@@ -126,7 +126,7 @@ public class Root {
         try {
             System.out.println("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
             if (collection.description.type == CollectionType.scheduled) {
-                scheduler.schedule(collection, new PublishTask(collection));
+                scheduler.schedule(collection, new PublishTask(zebedee, collection));
             }
         } catch (Exception e) {
             System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());

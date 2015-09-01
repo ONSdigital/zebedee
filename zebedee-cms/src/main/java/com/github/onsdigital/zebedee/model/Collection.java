@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -181,7 +182,8 @@ public class Collection {
             throws IOException {
 
         // Delete folders:
-        this.zebedee.delete(path);
+        //this.zebedee.delete(path);
+        FileUtils.deleteDirectory(path.toFile());
 
         // Delete the description file
         String filename = PathUtils.toFilename(this.description.name);
@@ -538,7 +540,7 @@ public class Collection {
      * @param uri   The uri the event belongs to.
      * @param event The event to add.
      */
-    void AddEvent(String uri, Event event) {
+    public void AddEvent(String uri, Event event) {
 
         if (!StringUtils.startsWith(uri, "/")) { uri = "/" + uri; }
 

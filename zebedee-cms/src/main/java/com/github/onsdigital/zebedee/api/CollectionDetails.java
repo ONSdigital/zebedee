@@ -69,7 +69,13 @@ public class CollectionDetails {
             com.github.onsdigital.zebedee.model.Collection collection) {
 
         for (ContentDetail contentDetail : detailsToAddEventsFor) {
-            Events eventsForFile = collection.description.eventsByUri.get(contentDetail.uri + "/data.json");
+            String language = contentDetail.description.language;
+            if (language == null) {
+                language = "";
+            } else {
+                language =  "_" +contentDetail.description.language;
+            }
+            Events eventsForFile = collection.description.eventsByUri.get(contentDetail.uri + "/data" +  language  + ".json");
             contentDetail.events = eventsForFile;
         }
     }

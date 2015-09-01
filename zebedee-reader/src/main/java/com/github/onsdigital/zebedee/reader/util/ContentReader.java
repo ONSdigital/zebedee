@@ -136,9 +136,9 @@ public class ContentReader {
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(path);
-        if (!isDirectory(node)) { //resolve parents for resource files as well
-            node = node.getParent();
-        }
+//        if (!isDirectory(node)) { //resolve parents for resource files as well
+//            node = node.getParent();
+//        }
         return resolveParents(node);
     }
 

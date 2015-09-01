@@ -9,4 +9,9 @@ public class ConfigurationTest {
     public void shouldReturnDefaultFlorenceUrl() {
         assertEquals("http://localhost:8081", Configuration.getFlorenceUrl());
     }
+
+    @Test
+    public void shouldReturnTrueForDefaultIsSchedulingEnabled() {
+        assertEquals("http://localhost:8081", Configuration.getFlorenceUrl());
+    }
 }

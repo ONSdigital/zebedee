@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
+import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,9 +41,9 @@ public class Publish {
 		com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 		Session session = Root.zebedee.sessions.get(request);
 
-		String breakBeforeFileTransfer = request.getParameter("breakbeforefiletransfer");
-		boolean doBreakBeforeFileTransfer = ((breakBeforeFileTransfer != null) && (breakBeforeFileTransfer.equalsIgnoreCase("true") || breakBeforeFileTransfer.equalsIgnoreCase("yes")));
-
+		String breakBeforePublish = request.getParameter("breakbeforefiletransfer");
+		System.out.println("breakBeforeFileTransfer = " + breakBeforePublish);
+		boolean doBreakBeforeFileTransfer = BooleanUtils.toBoolean(breakBeforePublish);
 		return Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer);
 	}
 

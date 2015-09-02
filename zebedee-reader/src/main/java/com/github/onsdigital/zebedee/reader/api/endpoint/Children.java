@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
+import com.github.onsdigital.zebedee.util.RequestUtils;
 import com.github.onsdigital.zebedee.util.ResponseUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
+
+import static com.github.onsdigital.zebedee.util.RequestUtils.getRequestedLanguage;
 
 /**
  * Created by bren on 03/08/15.
@@ -39,7 +42,7 @@ public class Children {
 
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        ResponseUtils.sendResponse(new ReadRequestHandler().listChildren(request,getDepth(request)), response);
+        ResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).listChildren(request,getDepth(request)), response);
     }
 
     private int getDepth(HttpServletRequest request) throws BadRequestException {

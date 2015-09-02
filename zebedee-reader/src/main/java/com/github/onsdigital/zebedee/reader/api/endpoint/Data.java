@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.util.RequestUtils.getRequestedLanguage;
+
 /**
  * Created by bren on 29/07/15.
  * <p>
@@ -31,9 +33,9 @@ public class Data {
      * <p>
      * <p>
      * This endpoint retrieves and serves json from either a collection or published data.
-     *
+     * <p>
      * It is possible to filter only certain bits of data using filters.
-     *
+     * <p>
      * e.g. ?uri=/economy/environmentalaccounts/articles/greenhousegasemissions/2015-06-02&title will only return title of the requested content
      *
      * @param request  This should contain a X-Florence-Token header for the current session and the collection id being worked on
@@ -49,17 +51,17 @@ public class Data {
 
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        ResponseUtils.sendResponse(new ReadRequestHandler().findContent(request, resolveFilter(request)), response);
+        ResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findContent(request, extractFilter(request)), response);
     }
 
 
     /**
-     * Resolves what type of filter requested to be applied to requested content. Each request should have at most one filter, otherwise first found filter will be applied
+     * Extracts the filter requested to be applied to content. Each request should have at most one filter, otherwise first filter found will be applied
      *
      * @param request
      * @return null if no filter requested
      */
-    private DataFilter resolveFilter(HttpServletRequest request) {
+    private DataFilter extractFilter(HttpServletRequest request) {
         Set<Map.Entry<String, String[]>> entries = request.getParameterMap().entrySet();
         for (Iterator<Map.Entry<String, String[]>> iterator = entries.iterator(); iterator.hasNext(); ) {
             Map.Entry<String, String[]> param = iterator.next();
@@ -73,6 +75,4 @@ public class Data {
         }
         return null;
     }
-
-
 }

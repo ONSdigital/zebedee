@@ -1,0 +1,68 @@
+{
+  "sections": [
+    {
+      "uri": "/peoplepopulationandcommunity/birthsdeathsandmarriages",
+      "index": 0
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/community",
+      "index": 1
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/crimeandjustice",
+      "index": 2
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/culturalidentity",
+      "index": 3
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/educationandchildcare",
+      "index": 4
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/elections",
+      "index": 5
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/healthandsocialcare",
+      "index": 6
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/householdcharacteristics",
+      "index": 7
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/housing",
+      "index": 8
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/leisureandtourism",
+      "index": 9
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/personalandhouseholdfinances",
+      "index": 10
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/populationandmigration",
+      "index": 11
+    },
+    {
+      "uri": "/peoplepopulationandcommunity/wellbeing",
+      "index": 12
+    }
+  ],
+  "index": 3,
+  "type": "taxonomy_landing_page",
+  "uri": "/peoplepopulationandcommunity",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    }
+  ],
+  "description": {
+    "title": "Pobl, poblogaeth a chymuned",
+    "summary": "We look at how many people live in the UK, changes in the population and how we spend our money. We also publish data on crime, relationships, health and religion. These statistics help us build a detailed picture of how we live."
+  }
+}

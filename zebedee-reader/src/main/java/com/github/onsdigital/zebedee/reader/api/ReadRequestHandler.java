@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.util.AuthorisationHandler;
 import com.github.onsdigital.zebedee.util.ContentNodeComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -36,6 +37,19 @@ public class ReadRequestHandler {
      * If Zebedee Reader is running standalone, no authorisation handler registered, thus no collection reads are allowed
      */
     private static AuthorisationHandler authorisationHandler;
+
+
+    private ZebedeeReader reader;
+
+
+    public ReadRequestHandler() {
+        this(null);
+    }
+
+    public ReadRequestHandler(ContentLanguage language) {
+        this.reader = new ZebedeeReader(language);
+    }
+
 
     /**
      * Finds requested content , if a collection is required handles authorisation
@@ -65,26 +79,26 @@ public class ReadRequestHandler {
             authorise(request, collectionId);
             try {
                 //A content in a collection should be the latest one
-                return ZebedeeReader.getInstance().getLatestCollectionContent(collectionId, uri, dataFilter);
+                return reader.getLatestCollectionContent(collectionId, uri, dataFilter);
             } catch (NotFoundException e) {
                 System.out.println("Could not found " + uri + " under collection " + collectionId + " , trying published content");
             }
         }
 
-        return ZebedeeReader.getInstance().getLatestPublishedContent(uri, dataFilter);
+        return reader.getLatestPublishedContent(uri, dataFilter);
     }
 
     public Content getContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         if (collectionId != null) {
             authorise(request, collectionId);
             try {
-                return ZebedeeReader.getInstance().getCollectionContent(collectionId, uri, dataFilter);
+                return reader.getCollectionContent(collectionId, uri, dataFilter);
             } catch (NotFoundException e) {
                 System.out.println("Could not found " + uri + " under collection " + collectionId + " , trying published content");
             }
         }
 
-        return ZebedeeReader.getInstance().getPublishedContent(uri, dataFilter);
+        return reader.getPublishedContent(uri, dataFilter);
     }
 
     /**
@@ -101,12 +115,12 @@ public class ReadRequestHandler {
         if (collectionId != null) {
             authorise(request, collectionId);
             try {
-                return ZebedeeReader.getInstance().getCollectionResource(collectionId, uri);
+                return reader.getCollectionResource(collectionId, uri);
             } catch (NotFoundException e) {
                 System.out.println("Could not found " + uri + " under collection " + collectionId + ", trying published content");
             }
         }
-        return ZebedeeReader.getInstance().getPublishedResource(uri);
+        return reader.getPublishedResource(uri);
 
     }
 
@@ -132,7 +146,7 @@ public class ReadRequestHandler {
     }
 
     private Collection<ContentNode> resolveParents(String collectionId, String uri) throws ZebedeeException, IOException {
-        Map<URI, ContentNode> nodes = ZebedeeReader.getInstance().getPublishedContentParents(uri);
+        Map<URI, ContentNode> nodes = reader.getPublishedContentParents(uri);
         overlayCollectionParents(nodes, collectionId, uri);
         nodes = new TreeMap<>(nodes);//sort by uri, sorts by uris, child uris naturally comes after parent uris
         return nodes.values();
@@ -142,7 +156,7 @@ public class ReadRequestHandler {
         if (depth == 0) {
             return Collections.emptySet();
         }
-        Map<URI, ContentNode> nodes = ZebedeeReader.getInstance().getPublishedContentChildren(uri);
+        Map<URI, ContentNode> nodes = reader.getPublishedContentChildren(uri);
         overlayCollections(nodes, collectionId, uri);
         nodes = sortMapByContentTitle(nodes);
         depth--;
@@ -165,7 +179,7 @@ public class ReadRequestHandler {
         if (collectionId == null) {
             return;
         }
-        Map<URI, ContentNode> collectionChildren = ZebedeeReader.getInstance().getCollectionContentChildren(collectionId, uri);
+        Map<URI, ContentNode> collectionChildren = reader.getCollectionContentChildren(collectionId, uri);
         for (Map.Entry<URI, ContentNode> collectionEntry : collectionChildren.entrySet()) {
             ContentNode publishedNode = nodes.get(collectionEntry.getKey());
             ContentNode collectionNode = collectionEntry.getValue();
@@ -180,7 +194,7 @@ public class ReadRequestHandler {
         if (collectionId == null) {
             return;
         }
-        Map<URI, ContentNode> collectionContentParents = ZebedeeReader.getInstance().getCollectionContentParents(collectionId, uri);
+        Map<URI, ContentNode> collectionContentParents = reader.getCollectionContentParents(collectionId, uri);
         nodes.putAll(collectionContentParents);
     }
 
@@ -226,6 +240,4 @@ public class ReadRequestHandler {
     public static void setAuthorisationHandler(AuthorisationHandler handler) {
         authorisationHandler = handler;
     }
-
-
 }

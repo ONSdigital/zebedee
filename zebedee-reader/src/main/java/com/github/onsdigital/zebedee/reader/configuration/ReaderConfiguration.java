@@ -12,7 +12,6 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
  */
 public class ReaderConfiguration {
 
-    private final static String DATA_FILE_NAME = "data.json";
     private final static String ZEBEDEE_ROOT_ENV = "zebedee_root";
     private final static String CONTENT_DIR_ENV = "content_dir";
     /*Zebedee folder layout*/
@@ -146,7 +145,4 @@ public class ReaderConfiguration {
         return elasticSearchCluster;
     }
 
-    public String getDataFileName() {
-        return DATA_FILE_NAME;
-    }
 }

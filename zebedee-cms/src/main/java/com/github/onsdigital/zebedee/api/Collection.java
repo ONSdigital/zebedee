@@ -101,8 +101,12 @@ public class Collection {
             return null;
         }
 
-        return com.github.onsdigital.zebedee.model.Collection.create(
-                collectionDescription, Root.zebedee, session.email).description;
+        com.github.onsdigital.zebedee.model.Collection collection = com.github.onsdigital.zebedee.model.Collection.create(
+                collectionDescription, Root.zebedee, session.email);
+
+        Root.schedulePublish(collection);
+
+        return collection.description;
     }
 
     /**
@@ -124,6 +128,9 @@ public class Collection {
         Session session = Root.zebedee.sessions.get(request);
 
         Root.zebedee.collections.delete(collection, session);
+
+        Root.cancelPublish(collection);
+
         return true;
     }
 }

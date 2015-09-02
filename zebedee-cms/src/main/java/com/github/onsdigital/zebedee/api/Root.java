@@ -5,8 +5,13 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
+import com.github.onsdigital.zebedee.model.publishing.PublishTask;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import org.apache.commons.io.IOUtils;
 
@@ -27,6 +32,8 @@ public class Root {
     // Environment variables are stored as a static variable so if necessary we can hijack them for testing
     public static Map<String, String> env = System.getenv();
     public static Zebedee zebedee;
+    public static CollectionScheduler scheduler = new CollectionScheduler();
+
     static Path root;
 
     /**
@@ -92,7 +99,49 @@ public class Root {
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty("zebedee_root", root.toString());
 
+        LoadExistingCollectionsIntoScheduler();
+    }
 
+    private static void LoadExistingCollectionsIntoScheduler() {
+        if (Configuration.isSchedulingEnabled()) {
+
+            System.out.println("Adding existing collections to the scheduler.");
+
+            Collections.CollectionList collections;
+            try {
+                collections = zebedee.collections.list();
+            } catch (IOException e) {
+                System.out.println("*** Failed to load collections list to schedule publishes ***");
+                return;
+            }
+
+            for (Collection collection : collections) {
+
+                schedulePublish(collection);
+            }
+        }
+    }
+
+    public static void schedulePublish(Collection collection) {
+        try {
+            System.out.println("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
+            if (collection.description.type == CollectionType.scheduled) {
+                scheduler.schedule(collection, new PublishTask(zebedee, collection));
+            }
+        } catch (Exception e) {
+            System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());
+        }
+    }
+
+    public static void cancelPublish(Collection collection) {
+        try {
+            System.out.println("Attempting to cancel publish for collection " + collection.description.name + " type=" + collection.description.type);
+            if (collection.description.type == CollectionType.scheduled) {
+                scheduler.cancel(collection);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception caught trying to cancel scheduled publish of collection: " + e.getMessage());
+        }
     }
 
     private static List<Path> listContent(Path taxonomy) throws IOException {

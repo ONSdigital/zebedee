@@ -7,9 +7,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -42,6 +41,59 @@ public class Collections {
         this.zebedee = zebedee;
     }
 
+    public static void MoveFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {
+
+        System.out.println("Moving files from collection into master for collection: " + collection.description.name);
+        // Move each item of content:
+        for (String uri : collection.reviewed.uris()) {
+
+            Path source = collection.reviewed.get(uri);
+            if (source != null) {
+                Path destination = zebedee.published.toPath(uri);
+                PathUtils.moveFilesInDirectory(source, destination);
+            }
+        }
+    }
+
+    public static void MoveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
+        System.out.println("Moving collection json to archive for collection: " + collection.description.name);
+        String filename = PathUtils.toFilename(collection.description.name);
+        Path collectionDescriptionPath = zebedee.collections.path.resolve(filename + ".json");
+        Path logPath = zebedee.path.resolve("publish-log");
+        if (!Files.exists(logPath)) {
+            Files.createDirectory(logPath);
+        }
+
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
+        logPath = logPath.resolve(format.format(date) + " " + filename + ".json");
+
+        Files.copy(collectionDescriptionPath, logPath);
+    }
+
+    /**
+     * Populate a list of files / folders for a given path.
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    public static DirectoryListing listDirectory(Path path) throws IOException {
+        DirectoryListing listing = new DirectoryListing();
+        try (DirectoryStream<Path> stream = Files
+                .newDirectoryStream(path)) {
+            for (Path directory : stream) {
+                if (Files.isDirectory(directory)) {
+                    listing.folders.put(directory.getFileName().toString(),
+                            directory.toString());
+                } else {
+                    listing.files.put(directory.getFileName().toString(),
+                            directory.toString());
+                }
+            }
+        }
+        return listing;
+    }
 
     public void complete(Collection collection, String uri,
                          Session session) throws IOException, NotFoundException,
@@ -131,7 +183,7 @@ public class Collections {
      * @throws BadRequestException
      * @throws ConflictException     - If there
      */
-    public boolean publish(Collection collection, Session session, Boolean breakBeforeFileTransfer)
+    public boolean publish(Collection collection, Session session, Boolean breakBeforePublish)
             throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
 
@@ -145,7 +197,7 @@ public class Collections {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        // Go ahead
+        // Check approved status
         if (!collection.description.approvedStatus) {
             throw new ConflictException("This collection cannot be published because it is not approved");
         }
@@ -158,39 +210,23 @@ public class Collections {
         }
 
         // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
-        if (breakBeforeFileTransfer) { return true; }
+        if (breakBeforePublish) {
+            System.out.println("Breaking before publish");
+            return true;
+        }
+        System.out.println("Going ahead with publish");
 
-        // Move each item of content:
-        for (String uri : collection.reviewed.uris()) {
+        boolean publishComplete = Publisher.Publish(collection, session.email);
 
-            Path source = collection.reviewed.get(uri);
-            if (source != null) {
-                Path destination = zebedee.launchpad.toPath(uri);
-                PathUtils.moveFilesInDirectory(source, destination);
-            }
+        if (publishComplete) {
+            MoveFilesToMaster(zebedee, collection);
+            MoveCollectionToArchive(zebedee, collection);
 
-            // Add an event to the event log
-            collection.AddEvent(uri, new Event(new Date(), EventType.PUBLISHED, session.email));
+            // Delete the folders:
+            collection.delete();
         }
 
-
-        // Save a published collections log
-        collection.save();
-        String filename = PathUtils.toFilename(collection.description.name);
-        Path collectionDescriptionPath = this.path.resolve(filename + ".json");
-        Path logPath = this.zebedee.path.resolve("publish-log");
-        if(!Files.exists(logPath)) { Files.createDirectory(logPath); }
-
-        Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
-        logPath = logPath.resolve(format.format(date) + " " + filename + ".json");
-
-        Files.copy(collectionDescriptionPath, logPath);
-
-        // Delete the folders:
-        delete(collection, session);
-
-        return true;
+        return publishComplete;
     }
 
     public DirectoryListing listDirectory(Collection collection, String uri,
@@ -226,8 +262,8 @@ public class Collections {
      * List the given directory of a collection including the files that have already been published.
      *
      * @param collection the collection to overlay on master content
-     * @param uri the uri of the directory
-     * @param session the session (used to determine user permissions)
+     * @param uri        the uri of the directory
+     * @param session    the session (used to determine user permissions)
      * @return a DirectoryListing object with system content overlaying master content
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -270,30 +306,6 @@ public class Collections {
 
         // Go ahead
         collection.delete();
-    }
-
-    /**
-     * Populate a list of files / folders for a given path.
-     *
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    public static DirectoryListing listDirectory(Path path) throws IOException {
-        DirectoryListing listing = new DirectoryListing();
-        try (DirectoryStream<Path> stream = Files
-                .newDirectoryStream(path)) {
-            for (Path directory : stream) {
-                if (Files.isDirectory(directory)) {
-                    listing.folders.put(directory.getFileName().toString(),
-                            directory.toString());
-                } else {
-                    listing.files.put(directory.getFileName().toString(),
-                            directory.toString());
-                }
-            }
-        }
-        return listing;
     }
 
     public void readContent(Collection collection, String uri, boolean resolveReferences, Session session,
@@ -344,10 +356,10 @@ public class Collections {
 //                org.apache.commons.io.IOUtils.copy(new StringReader(page.toJson()),
 //                        response.getOutputStream());
 //            } else {
-                // Write the file to the response
-                org.apache.commons.io.IOUtils.copy(input,
-                        response.getOutputStream());
-            }
+            // Write the file to the response
+            org.apache.commons.io.IOUtils.copy(input,
+                    response.getOutputStream());
+        }
 //        } catch (ContentNotFoundException e) {
 //            throw new NotFoundException(e.getMessage());
 //        }

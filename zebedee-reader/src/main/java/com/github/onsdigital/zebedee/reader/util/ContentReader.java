@@ -4,30 +4,32 @@ import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
+import com.github.onsdigital.zebedee.util.ReleaseDateComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 import static java.nio.file.Files.*;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
  * Created by bren on 27/07/15.
@@ -41,6 +43,8 @@ public class ContentReader {
 
     private final Path ROOT_FOLDER;
     private final String NOT_FOUND = "404 - Not Found";
+
+    private ContentLanguage language = ContentLanguage.en;
 
     public ContentReader(String rootFolder) {
         this(StringUtils.isEmpty(rootFolder) ? null : Paths.get(rootFolder));
@@ -80,12 +84,15 @@ public class ContentReader {
         try (Resource resource = getResource(dataFile)) {
             checkJsonMime(resource, path);
             Page page = deserialize(resource);
-            if (page != null) { //Contents without type is null when deserialised.
-                if (StringUtils.endsWith(resource.getUri().toString(), ReaderConfiguration.getConfiguration().getDataFileName())) {
-                    page.setUri(URI.create(removeLastSegment(resource.getUri().toString())));//Setting uri on the fly, discarding whatever is in the file
+            if (page != null) { //Contents without type is null when deserialised. There should not be no such data
+                URI uri = null;
+                String resourceUri = resource.getUri().toString();
+                if (page instanceof Table || page instanceof Chart) {
+                    uri = URI.create(removeEnd(resourceUri, ".json"));
                 } else {
-                    page.setUri(URI.create(StringUtils.removeEnd(resource.getUri().toString(), ".json")));//Setting uri on the fly, discarding whatever is in the file
+                    uri = URI.create(removeLastSegment(resourceUri));
                 }
+                page.setUri(uri);
             }
             return page;
         }
@@ -123,16 +130,16 @@ public class ContentReader {
     }
 
     /**
-     * get parent contents of given path, directories are skipped, only contents upper in the hieararch are returned
+     * get parent contents of given path, directories are skipped, only contents upper in the hierarchy are returned
      *
      * @param path path of the content or resource file
      * @return uri - node mapping, not in any particular order
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(path);
-        if (!isDirectory(node)) { //resolve parents for resource files as well
-            node = node.getParent();
-        }
+//        if (!isDirectory(node)) { //resolve parents for resource files as well
+//            node = node.getParent();
+//        }
         return resolveParents(node);
     }
 
@@ -160,7 +167,7 @@ public class ContentReader {
         }
 
         Path parent = path.getParent();
-        Path dataFile = parent.resolve(getConfiguration().getDataFileName());
+        Path dataFile = resolveDataFilePath(parent);
         if (exists(dataFile)) {
             return parent;
         } else {
@@ -196,27 +203,23 @@ public class ContentReader {
 
     private Page resolveLatest(Path path) throws ZebedeeException, IOException {
 
-        //order by foldername, get the latest one
-        String latestFolderName = null;
-        Path latestFolderPath = null;
 
-        try (DirectoryStream<Path> paths = newDirectoryStream(path)) {
-            for (Path child : paths) {
-                String name = child.getFileName().toString();
-                if (latestFolderName == null || (name.compareTo(latestFolderName) > 0)) {
-                    latestFolderName = name;
-                    latestFolderPath = child;
-                }
-            }
-        } catch (NoSuchFileException exception) {
-            throw new NotFoundException(NOT_FOUND);
+
+
+        Map<URI, ContentNode> children = resolveChildren(path);
+        if (children == null || children.isEmpty()) {
+            return null;
         }
 
-        if (latestFolderPath == null) {
-            throw new NotFoundException(NOT_FOUND);
-        }
-        return getContent(latestFolderPath);
 
+        TreeSet<ContentNode> sortedSet = sortByDate(children.values());
+        return getContent(sortedSet.iterator().next().getUri().toString());
+    }
+
+    private TreeSet sortByDate(Collection set) {
+        TreeSet valueSet = new TreeSet(new ReleaseDateComparator());
+        valueSet.addAll(set);
+        return valueSet;
     }
 
     //Returns uri of content calculating relative to root folder
@@ -299,7 +302,11 @@ public class ContentReader {
     }
 
     private Path resolveDataFilePath(Path path) throws BadRequestException {
-        return path.resolve(getConfiguration().getDataFileName());
+        Path dataFilePath = path.resolve(language.getDataFileName());
+        if (!exists(dataFilePath)) {
+            dataFilePath = path.resolve(ContentLanguage.en.getDataFileName());
+        }
+        return dataFilePath;
     }
 
     /*Getters * Setters */
@@ -325,6 +332,8 @@ public class ContentReader {
             }
         } catch (NotFoundException e) {
             contentNode = createContentNodeForFolder(path);
+        } catch (JsonSyntaxException e) {
+            System.out.println("Warning!!! Invalid json file encountered, path: " + path.toString());
         }
 
         return contentNode;
@@ -337,4 +346,13 @@ public class ContentReader {
         return contentNode;
     }
 
+    public ContentLanguage getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(ContentLanguage language) {
+        if (language != null) {
+            this.language = language;
+        }
+    }
 }

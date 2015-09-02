@@ -3,12 +3,15 @@ package com.github.onsdigital.zebedee.reader.api.endpoint;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
+import com.github.onsdigital.zebedee.util.RequestUtils;
 import com.github.onsdigital.zebedee.util.ResponseUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
+
+import static com.github.onsdigital.zebedee.util.RequestUtils.getRequestedLanguage;
 
 /**
  * Created by bren on 19/08/15.
@@ -26,7 +29,7 @@ public class FileSize {
      */
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        try (com.github.onsdigital.zebedee.reader.Resource resource = new ReadRequestHandler().findResource(request)) {
+        try (com.github.onsdigital.zebedee.reader.Resource resource = new ReadRequestHandler(getRequestedLanguage(request)).findResource(request)) {
             ResponseUtils.sendResponse(new com.github.onsdigital.zebedee.reader.api.bean.FileSize(resource.getSize()), response);
         }
     }

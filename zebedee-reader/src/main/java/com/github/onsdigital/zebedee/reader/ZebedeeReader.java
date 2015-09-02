@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.filter.FilterUtil;
+import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.util.CollectionContentReader;
 import com.github.onsdigital.zebedee.reader.util.ContentReader;
 
@@ -26,26 +27,18 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
  * Service to read published content and contents going through process in collections
  */
 public class ZebedeeReader {
-    private static ZebedeeReader instance;
     private static ContentReader publishedContentReader;
+    private ContentLanguage language;
 
+    public ZebedeeReader() {
+        this(null);
+    }
 
-    //Singleton
-    private ZebedeeReader() {
+    public ZebedeeReader(ContentLanguage language) {
         publishedContentReader = new ContentReader(getConfiguration().getContentDir());
+        publishedContentReader.setLanguage(language);
+        this.language = language;
     }
-
-    public static ZebedeeReader getInstance() {
-        if (instance == null) {
-            synchronized (ZebedeeReader.class) {
-                if (instance == null) {
-                    instance = new ZebedeeReader();
-                }
-            }
-        }
-        return instance;
-    }
-
 
     /**
      * @param path path can start with / or not, Zebedee reader will evaluate the path relative to published contents root
@@ -183,7 +176,9 @@ public class ZebedeeReader {
 
 
     private CollectionContentReader createCollectionReader(String collectionId) throws NotFoundException, IOException, CollectionNotFoundException {
-        return new CollectionContentReader(getConfiguration().getCollectionsFolder(), collectionId);
+        CollectionContentReader collectionContentReader = new CollectionContentReader(getConfiguration().getCollectionsFolder(), collectionId);
+        collectionContentReader.setLanguage(language);
+        return collectionContentReader;
     }
 
 }

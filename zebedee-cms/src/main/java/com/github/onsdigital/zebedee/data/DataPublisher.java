@@ -530,9 +530,25 @@ public class DataPublisher {
         return false;
     }
 
+    /**
+     * Load an array of TimeSeries objects from an array of paths
+     *
+     * @param pathsToTimeSeries
+     * @return
+     */
     static List<TimeSeries> timeSeriesesFromPathList(List<Path> pathsToTimeSeries) {
+        List<TimeSeries> serieses = new ArrayList<>();
 
-        return null;
+        for (Path path : pathsToTimeSeries) {
+            try (InputStream stream = Files.newInputStream(path)) {
+                TimeSeries series = (TimeSeries) ContentUtil.deserialiseContent(stream);
+                serieses.add(series);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return serieses;
     }
 
 }

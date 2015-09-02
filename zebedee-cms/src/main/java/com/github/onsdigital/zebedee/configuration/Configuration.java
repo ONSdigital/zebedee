@@ -30,7 +30,7 @@ public class Configuration {
     }
 
     public static String getTheTrainUrl() {
-        return StringUtils.defaultIfBlank(getValue("TRAIN_URL"), DEFAULT_TRAIN_URL);
+        return StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL);
     }
 
     /**

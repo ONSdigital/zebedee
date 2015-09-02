@@ -25,13 +25,14 @@ public class PublishTask implements Runnable {
             boolean publishComplete = Publisher.Publish(collection, "System");
 
             if (publishComplete) {
+                Collections.MoveFilesToMaster(zebedee, collection);
                 Collections.MoveCollectionToArchive(zebedee, collection);
 
                 // Delete the folders:
                 collection.delete();
             }
         } catch (IOException e) {
-            System.out.println("Publish Failed - Failed to load collection for ID" + collectionId);
+            System.out.println("Exception publishing collection for ID" + collectionId + " exception:" + e.getMessage());
         }
 
     }

@@ -7,8 +7,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import org.apache.commons.fileupload.FileItem;
@@ -43,6 +41,59 @@ public class Collections {
         this.zebedee = zebedee;
     }
 
+    public static void MoveFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {
+
+        System.out.println("Moving files from collection into master for collection: " + collection.description.name);
+        // Move each item of content:
+        for (String uri : collection.reviewed.uris()) {
+
+            Path source = collection.reviewed.get(uri);
+            if (source != null) {
+                Path destination = zebedee.published.toPath(uri);
+                PathUtils.moveFilesInDirectory(source, destination);
+            }
+        }
+    }
+
+    public static void MoveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
+        System.out.println("Moving collection json to archive for collection: " + collection.description.name);
+        String filename = PathUtils.toFilename(collection.description.name);
+        Path collectionDescriptionPath = zebedee.collections.path.resolve(filename + ".json");
+        Path logPath = zebedee.path.resolve("publish-log");
+        if (!Files.exists(logPath)) {
+            Files.createDirectory(logPath);
+        }
+
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
+        logPath = logPath.resolve(format.format(date) + " " + filename + ".json");
+
+        Files.copy(collectionDescriptionPath, logPath);
+    }
+
+    /**
+     * Populate a list of files / folders for a given path.
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    public static DirectoryListing listDirectory(Path path) throws IOException {
+        DirectoryListing listing = new DirectoryListing();
+        try (DirectoryStream<Path> stream = Files
+                .newDirectoryStream(path)) {
+            for (Path directory : stream) {
+                if (Files.isDirectory(directory)) {
+                    listing.folders.put(directory.getFileName().toString(),
+                            directory.toString());
+                } else {
+                    listing.files.put(directory.getFileName().toString(),
+                            directory.toString());
+                }
+            }
+        }
+        return listing;
+    }
 
     public void complete(Collection collection, String uri,
                          Session session) throws IOException, NotFoundException,
@@ -166,7 +217,7 @@ public class Collections {
         boolean publishComplete = Publisher.Publish(collection, session.email);
 
         if (publishComplete) {
-            MoveFilesToMaster(collection);
+            MoveFilesToMaster(zebedee, collection);
             MoveCollectionToArchive(zebedee, collection);
 
             // Delete the folders:
@@ -174,33 +225,6 @@ public class Collections {
         }
 
         return publishComplete;
-    }
-
-    private void MoveFilesToMaster(Collection collection) throws IOException {
-        // Move each item of content:
-        for (String uri : collection.reviewed.uris()) {
-
-            Path source = collection.reviewed.get(uri);
-            if (source != null) {
-                Path destination = zebedee.published.toPath(uri);
-                PathUtils.moveFilesInDirectory(source, destination);
-            }
-        }
-    }
-
-    public static void MoveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
-        String filename = PathUtils.toFilename(collection.description.name);
-        Path collectionDescriptionPath = zebedee.collections.path.resolve(filename + ".json");
-        Path logPath = zebedee.path.resolve("publish-log");
-        if (!Files.exists(logPath)) {
-            Files.createDirectory(logPath);
-        }
-
-        Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
-        logPath = logPath.resolve(format.format(date) + " " + filename + ".json");
-
-        Files.copy(collectionDescriptionPath, logPath);
     }
 
     public DirectoryListing listDirectory(Collection collection, String uri,
@@ -280,30 +304,6 @@ public class Collections {
 
         // Go ahead
         collection.delete();
-    }
-
-    /**
-     * Populate a list of files / folders for a given path.
-     *
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    public static DirectoryListing listDirectory(Path path) throws IOException {
-        DirectoryListing listing = new DirectoryListing();
-        try (DirectoryStream<Path> stream = Files
-                .newDirectoryStream(path)) {
-            for (Path directory : stream) {
-                if (Files.isDirectory(directory)) {
-                    listing.folders.put(directory.getFileName().toString(),
-                            directory.toString());
-                } else {
-                    listing.files.put(directory.getFileName().toString(),
-                            directory.toString());
-                }
-            }
-        }
-        return listing;
     }
 
     public void readContent(Collection collection, String uri, boolean resolveReferences, Session session,

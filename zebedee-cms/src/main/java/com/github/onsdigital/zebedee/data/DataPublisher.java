@@ -79,6 +79,7 @@ public class DataPublisher {
         // First find all csdb files in the collection
         List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
 
+        List<Path> pathsToTimeSeries = new ArrayList<>();
 
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
@@ -114,7 +115,7 @@ public class DataPublisher {
                 IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
 
                 // Write csv and other files:
-                // ...
+                pathsToTimeSeries.add(savePath);
             }
 
             // Save the new dataset to be reviewed
@@ -124,6 +125,14 @@ public class DataPublisher {
 
             Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
             IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
+
+            // Save the
+            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
+            pregenerateXLS(pathsToTimeSeries, xlsPath);
+
+            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
+            pregenerateCSV(pathsToTimeSeries, csvPath);
+
 
             System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
         }
@@ -503,6 +512,27 @@ public class DataPublisher {
 //        page.setBreadcrumb(datasetPage.getBreadcrumb());
 ;
         return page;
+    }
+
+    static boolean pregenerateXLS(List<Path> pathsToTimeSeries, Path xlsPath) {
+
+        for (Path path : pathsToTimeSeries) {
+            if ((path != null) && Files.exists(path.resolve("data.json"))) {
+
+            }
+        }
+
+        return false;
+    }
+
+    static boolean pregenerateCSV(List<Path> pathsToTimeSeries, Path xlsPath) {
+
+        return false;
+    }
+
+    static List<TimeSeries> timeSeriesesFromPathList(List<Path> pathsToTimeSeries) {
+
+        return null;
     }
 
 }

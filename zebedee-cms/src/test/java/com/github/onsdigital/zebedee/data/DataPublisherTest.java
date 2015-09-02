@@ -23,10 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -536,4 +533,25 @@ public class DataPublisherTest {
         assertTrue(datasetIdFound);
     }
 
+
+    @Test
+    public void generateDataFiles_givenPaths_generatesListOfTimeSeries() {
+        // Given
+        // some time series
+        List<Path> serieses = new ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            serieses.add(bob.randomWalkTimeSeries("Series " + i));
+        }
+
+        // When
+        // we get the time series
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // Then
+        // We expect the timeSerieses to be populated
+        assertNotNull(timeSerieses);
+        for (TimeSeries timeSeries : timeSerieses) {
+            assertNotNull(timeSeries);
+        }
+    }
 }

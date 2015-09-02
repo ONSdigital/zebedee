@@ -6,11 +6,18 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.poi.util.IOUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -378,8 +385,8 @@ public class Builder {
     /**
      * This method creates the expected set of folders for a Zebedee structure.
      * This code is intentionally copied from
-     * {@link com.github.onsdigital.zebedee.model.Collection#create(com.github.onsdigital.zebedee.json.CollectionDescription, Zebedee)}. This ensures there's a fixed
-     * expectation, rather than relying on a method that will be tested as part
+     *
+     * This ensures there's a fixed expectation, rather than relying on a method that will be tested as part
      * of the test suite.
      *
      * @param root The root of the {@link Zebedee} structure
@@ -411,4 +418,73 @@ public class Builder {
         return collection;
     }
 
+    /**
+     * Builds simple random walk timeseries to
+     *
+     * @param name
+     * @return
+     */
+    public Path randomWalkTimeSeries(String name) {
+        return randomWalkTimeSeries(name, true, true, true, 10);
+    }
+
+    public Path randomWalkTimeSeries(String name, boolean withYears, boolean withQuarters, boolean withMonths, int yearsToGenerate) {
+        TimeSeries timeSeries = new TimeSeries();
+        timeSeries.setDescription(new PageDescription());
+
+        timeSeries.getDescription().setDatasetId(name);
+        timeSeries.getDescription().setTitle("Title " + name);
+
+        String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
+        String[] quarters = "Q1,Q2,Q3,Q4".split(",");
+
+        double val = 100.0;
+        NormalDistribution distribution = new NormalDistribution(0, 10);
+        for (int y = 2015 - yearsToGenerate; y < 2015; y++) {
+            if (withYears) {
+                TimeSeriesValue value = new TimeSeriesValue();
+
+                value.date = y + "";
+                value.year = y + "";
+                value.value = String.format("%.1f", val);
+                timeSeries.years.add(value);
+            }
+            for (int q = 0; q < 4; q++) {
+                if (withQuarters) {
+                    TimeSeriesValue value = new TimeSeriesValue();
+                    value.year = y + "";
+                    value.quarter = quarters[q];
+
+                    value.date = y + " " + quarters[q];
+                    value.value = String.format("%.1f", val);
+                    timeSeries.quarters.add(value);
+                }
+                for (int mInQ = 0; mInQ < 3; mInQ++) {
+                    if (withMonths) {
+                        TimeSeriesValue value = new TimeSeriesValue();
+                        value.month = months[3 * q + mInQ];
+                        value.year = y + "";
+
+                        value.date = y + " " + months[3 * q + mInQ];
+                        value.value = String.format("%.1f", val);
+                        timeSeries.months.add(value);
+                    }
+                    val = val + distribution.sample();
+                }
+            }
+        }
+
+
+        // Save the timeseries
+        Path path = null;
+        try {
+            path = Files.createTempFile(name, ".json");
+            try (OutputStream output = Files.newOutputStream(path)) {
+                Serialiser.serialise(output, timeSeries);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return path;
+    }
 }

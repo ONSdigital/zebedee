@@ -182,8 +182,8 @@ public class Collection {
             throws IOException {
 
         // Delete folders:
-        //this.zebedee.delete(path);
-        FileUtils.deleteDirectory(path.toFile());
+        this.zebedee.delete(path); // delete the directory only if its empty
+        //FileUtils.deleteDirectory(path.toFile()); // delete the directory including any files.
 
         // Delete the description file
         String filename = PathUtils.toFilename(this.description.name);

@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import org.apache.commons.fileupload.FileItem;
@@ -164,6 +166,7 @@ public class Collections {
         boolean publishComplete = Publisher.Publish(collection, session.email);
 
         if (publishComplete) {
+            MoveFilesToMaster(collection);
             MoveCollectionToArchive(zebedee, collection);
 
             // Delete the folders:
@@ -171,6 +174,18 @@ public class Collections {
         }
 
         return publishComplete;
+    }
+
+    private void MoveFilesToMaster(Collection collection) throws IOException {
+        // Move each item of content:
+        for (String uri : collection.reviewed.uris()) {
+
+            Path source = collection.reviewed.get(uri);
+            if (source != null) {
+                Path destination = zebedee.published.toPath(uri);
+                PathUtils.moveFilesInDirectory(source, destination);
+            }
+        }
     }
 
     public static void MoveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {

@@ -183,7 +183,7 @@ public class Collections {
      * @throws BadRequestException
      * @throws ConflictException     - If there
      */
-    public boolean publish(Collection collection, Session session, Boolean breakBeforeFileTransfer)
+    public boolean publish(Collection collection, Session session, Boolean breakBeforePublish)
             throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
 
@@ -210,9 +210,11 @@ public class Collections {
         }
 
         // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
-        if (breakBeforeFileTransfer) {
+        if (breakBeforePublish) {
+            System.out.println("Breaking before publish");
             return true;
         }
+        System.out.println("Going ahead with publish");
 
         boolean publishComplete = Publisher.Publish(collection, session.email);
 

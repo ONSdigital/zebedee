@@ -41,8 +41,9 @@ public class Publish {
 		com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 		Session session = Root.zebedee.sessions.get(request);
 
-		String breakBeforeFileTransfer = request.getParameter("breakbeforefiletransfer");
-		boolean doBreakBeforeFileTransfer = BooleanUtils.toBoolean(breakBeforeFileTransfer);
+		String breakBeforePublish = request.getParameter("breakbeforefiletransfer");
+		System.out.println("breakBeforeFileTransfer = " + breakBeforePublish);
+		boolean doBreakBeforeFileTransfer = BooleanUtils.toBoolean(breakBeforePublish);
 		return Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer);
 	}
 

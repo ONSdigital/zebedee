@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.util.ReleaseDateComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.MediaType;
@@ -129,7 +130,7 @@ public class ContentReader {
     }
 
     /**
-     * get parent contents of given path, directories are skipped, only contents upper in the hieararch are returned
+     * get parent contents of given path, directories are skipped, only contents upper in the hierarchy are returned
      *
      * @param path path of the content or resource file
      * @return uri - node mapping, not in any particular order
@@ -331,6 +332,8 @@ public class ContentReader {
             }
         } catch (NotFoundException e) {
             contentNode = createContentNodeForFolder(path);
+        } catch (JsonSyntaxException e) {
+            System.out.println("Warning!!! Invalid json file encountered, path: " + path.toString());
         }
 
         return contentNode;

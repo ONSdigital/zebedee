@@ -13,7 +13,7 @@
   },
   "relatedDatasets": [],
   "relatedDocuments": [],
-  "type": "dataset",
+  "type": "timeseries_dataset",
   "description": {
     "title": "United Kingdom National Accounts - The Blue Book",
     "summary": "Records and describes economic activity in the United Kingdom and as such is used by government, banks, academics and industries to formulate the economic and social policies and monitor the economic progress of the United Kingdom.",

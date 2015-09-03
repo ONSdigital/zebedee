@@ -551,4 +551,38 @@ public class DataPublisher {
         return serieses;
     }
 
+    static List<String> timeSeriesIdList(List<TimeSeries> serieses) {
+        List<String> ids = new ArrayList<>();
+        for (TimeSeries series: serieses) { ids.add(series.getCdid()); }
+        return ids;
+    }
+
+    static Map<String, HashMap<String, String>> rowMap(List<TimeSeries> serieses) {
+        HashMap<String, HashMap<String, String>> map = new HashMap<>();
+
+        for (TimeSeries series: serieses) {
+            putCombination(series.getCdid(), "Title", series.getDescription().getTitle(), map);
+            //TODO add further detail rows
+
+            if (series.years != null) {
+                for (TimeSeriesValue value: series.years) { putCombination(series.getCdid(), value.date, value.value, map);};
+            }
+            if (series.months != null) {
+                for (TimeSeriesValue value: series.months) { putCombination(series.getCdid(), value.date, value.value, map);};
+            }
+            if (series.quarters != null) {
+                for (TimeSeriesValue value: series.quarters) { putCombination(series.getCdid(), value.date, value.value, map);};
+            }
+        }
+
+        return map;
+    }
+
+    private static void putCombination(String cdid, String row, String value, HashMap<String, HashMap<String, String>> map) {
+        HashMap<String, String> submap = new HashMap<>();
+        if (map.containsKey(row)) { submap = map.get(row); }
+
+        submap.put(cdid, value);
+        map.put(row, submap);
+    }
 }

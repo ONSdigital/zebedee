@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.hamcrest.core.StringContains;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
 
 /**
@@ -539,7 +541,7 @@ public class DataPublisherTest {
         // Given
         // some time series
         List<Path> serieses = new ArrayList<>();
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= 5; i++) {
             serieses.add(bob.randomWalkTimeSeries("Series " + i));
         }
 
@@ -554,4 +556,47 @@ public class DataPublisherTest {
             assertNotNull(timeSeries);
         }
     }
+
+    @Test
+    public void generateDataFiles_givenPaths_generatesPopulatedTimeseries() {
+        // Given
+        // some time series
+        List<Path> serieses = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            serieses.add(bob.randomWalkTimeSeries("Series " + i));
+        }
+
+        // When
+        // we get the time series
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // Then
+        // we expect time series values
+        for (TimeSeries timeSeries: timeSerieses) {
+            assertNotEquals(0, timeSeries.years.size());
+            assertNotEquals(0, timeSeries.quarters.size());
+            assertNotEquals(0, timeSeries.months.size());
+        }
+    }
+
+    @Test
+    public void generateDataFiles_givenPaths_retrievesCorrectSeriesNames() {
+        // Given
+        // some time series
+        List<Path> serieses = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            serieses.add(bob.randomWalkTimeSeries("Series " + i));
+        }
+
+        // When
+        // we get the time series
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // Then
+        // we expect time series values
+        for (TimeSeries series: timeSerieses) {
+            assertThat(series.getDescription().getTitle(),  containsString("Series"));
+        }
+    }
+
 }

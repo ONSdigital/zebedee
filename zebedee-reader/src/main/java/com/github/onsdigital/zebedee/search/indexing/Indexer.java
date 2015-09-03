@@ -163,13 +163,19 @@ public class Indexer {
         AtomicInteger idCounter = new AtomicInteger();
         for (String absoluteFilePath : absoluteFilePaths) {
 
-            Map<String, String> documentMap = LoadIndexHelper.getDocumentMap(absoluteFilePath);
-            if (documentMap != null && StringUtils.isNotEmpty(documentMap.get("title"))) {
-                if (documentMap.get("type").equals(PageType.timeseries.toString())) {
-                    buildTimeseries(client, indexName, documentMap, idCounter.getAndIncrement());
-                } else {
-                    buildDocument(client, indexName, documentMap, idCounter.getAndIncrement());
+            try {
+                Map<String, String> documentMap = LoadIndexHelper.getDocumentMap(absoluteFilePath);
+                if (documentMap != null && StringUtils.isNotEmpty(documentMap.get("title"))) {
+                    if (documentMap.get("type").equals(PageType.timeseries.toString())) {
+                        buildTimeseries(client, indexName, documentMap, idCounter.getAndIncrement());
+                    } else {
+                        buildDocument(client, indexName, documentMap, idCounter.getAndIncrement());
+                    }
                 }
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+                System.err.printf("Failed reading document map at %s. skipping...", absoluteFilePath);
+                continue;
             }
         }
     }

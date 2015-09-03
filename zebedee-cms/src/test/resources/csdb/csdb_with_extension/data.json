@@ -25,7 +25,7 @@
   "description": "Comprehensive dataset covering Foreign Direct Investment (FDI) Involving UK Companies.",
   "title": "Data collection of FDI flows",
   "releaseDate": "19 February 2014",
-  "type": "dataset",
+  "type": "timeseries_dataset",
   "name": "Data collection of FDI flows",
   "uri": "/economy/investmentspensionsandtrusts/datasets/datacollectionoffdiflows",
   "fileName": "datacollectionoffdiflows",

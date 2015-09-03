@@ -17,7 +17,7 @@
   "section": {
     "markdown": "Visits and Spending by UK residents abroad and overseas residents in the UK."
   },
-  "type": "dataset",
+  "type": "timeseries_dataset",
   "uri": "/businessindustryandtrade/tourismindustry/datasets/overseastravelandtourism",
   "breadcrumb": [
     {

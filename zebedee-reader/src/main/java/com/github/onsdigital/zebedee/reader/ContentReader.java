@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.reader.util;
+package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
@@ -10,9 +10,8 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
-import com.github.onsdigital.zebedee.util.ReleaseDateComparator;
+import com.github.onsdigital.zebedee.reader.util.ReleaseDateComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +38,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * ContentReader will find file relative to root folder. Paths might start with forward slash or not.
  * <p>
  */
-public class ContentReader {
+class ContentReader {
 
     private final Path ROOT_FOLDER;
     private final String NOT_FOUND = "404 - Not Found";
@@ -82,7 +81,7 @@ public class ContentReader {
 
     private Page getPage(Path path, Path dataFile) throws IOException, ZebedeeException {
         try (Resource resource = getResource(dataFile)) {
-            checkJsonMime(resource, path);
+//            checkJsonMime(resource, path);
             Page page = deserialize(resource);
             if (page != null) { //Contents without type is null when deserialised. There should not be no such data
                 URI uri = null;
@@ -137,9 +136,6 @@ public class ContentReader {
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(path);
-//        if (!isDirectory(node)) { //resolve parents for resource files as well
-//            node = node.getParent();
-//        }
         return resolveParents(node);
     }
 
@@ -202,9 +198,6 @@ public class ContentReader {
     }
 
     private Page resolveLatest(Path path) throws ZebedeeException, IOException {
-
-
-
 
         Map<URI, ContentNode> children = resolveChildren(path);
         if (children == null || children.isEmpty()) {

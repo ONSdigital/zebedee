@@ -132,7 +132,9 @@ public class SearchService {
         SearchRequestBuilder searchBuilder = getClient().prepareSearch(queryBuilder.getIndex());
         String[] types = queryBuilder.getTypes();
         searchBuilder.setTypes(types);
-        searchBuilder.setExtraSource(queryBuilder.buildQuery());
+        String source = queryBuilder.buildQuery();
+        searchBuilder.setExtraSource(source);
+        System.out.printf("Search Request: %s%n", source);
         return searchBuilder;
     }
 

@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.util;
+package com.github.onsdigital.zebedee.reader.util;
 
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 
@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Created by bren on 20/08/15.
  */
-public class RequestUtils {
+public class ReaderRequestUtils {
 
     /**
      * Gets lang parameter passed with request

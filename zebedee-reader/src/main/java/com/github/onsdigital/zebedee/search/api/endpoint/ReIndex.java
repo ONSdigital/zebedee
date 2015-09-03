@@ -1,11 +1,13 @@
-package com.github.onsdigital.zebedee.search.api;
+package com.github.onsdigital.zebedee.search.api.endpoint;
 
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
+import com.github.onsdigital.zebedee.search.indexing.IndexInProgressException;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
-import com.github.onsdigital.zebedee.search.indexing.IndexingInProgressException;
+import com.github.onsdigital.zebedee.search.indexing.IndexingException;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,16 +31,20 @@ public class ReIndex {
             String key = request.getParameter("key");
             if (Password.verify(key, REINDEX_KEY_HASH)) {
                 System.out.println("Triggering reindex");
-                Indexer.loadIndex(ElasticSearchClient.getClient());
+                Indexer.getInstance().loadIndex();
                 response.setStatus(HttpStatus.OK_200);
                 return "Elasticsearch: indexing complete";
             } else {
                 response.setStatus(HttpStatus.UNAUTHORIZED_401);
                 return "Wrong key, make sure you pass in the right key";
             }
-        } catch (IndexingInProgressException ex) {
+        } catch (IndexInProgressException e) {
             response.setStatus(HttpStatus.CONFLICT_409);
             return "Indexing already in progress.";
+        } catch (IndexingException e) {
+            e.printStackTrace();
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+            return "Indexing failed! %s" + e.getMessage();
         }
     }
 

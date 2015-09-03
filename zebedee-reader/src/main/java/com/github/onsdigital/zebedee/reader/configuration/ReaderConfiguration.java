@@ -26,11 +26,6 @@ public class ReaderConfiguration {
     private static String collectionsFolder;
     private static String contentDir;
 
-    private static String elasticSearchServer = defaultIfBlank(getVariableValue("ELASTIC_SEARCH_SERVER"), "localhost");
-    private static Integer elasticSearchPort = Integer.parseInt(defaultIfBlank(getVariableValue("ELASTIC_SEARCH_PORT"), "9300"));
-    private static String elasticSearchCluster = defaultIfBlank(getVariableValue("ELASTIC_SEARCH_CLUSTER"), "ONSCluster");
-    private static boolean startEmbeddedSearch = "Y".equals(defaultIfBlank(getVariableValue("START_EMBEDDED_SERVER"), "N"));
-
     private ReaderConfiguration() {
 
     }
@@ -44,10 +39,6 @@ public class ReaderConfiguration {
             }
         }
         return instance;
-    }
-
-    public static boolean isStartEmbeddedSearch() {
-        return startEmbeddedSearch;
     }
 
     /**
@@ -131,18 +122,6 @@ public class ReaderConfiguration {
 
     public String getArticlesFolderName() {
         return ARTICLES_FOLDER_NAME;
-    }
-
-    public String getElasticSearchServer() {
-        return elasticSearchServer;
-    }
-
-    public Integer getElasticSearchPort() {
-        return elasticSearchPort;
-    }
-
-    public String getElasticSearchCluster() {
-        return elasticSearchCluster;
     }
 
 }

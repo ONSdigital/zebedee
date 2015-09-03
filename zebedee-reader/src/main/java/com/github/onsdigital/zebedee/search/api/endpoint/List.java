@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.search.api;
+package com.github.onsdigital.zebedee.search.api.endpoint;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;

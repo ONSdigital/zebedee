@@ -26,9 +26,7 @@ import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
@@ -39,36 +37,6 @@ public class Collections {
     public Collections(Path path, Zebedee zebedee) {
         this.path = path;
         this.zebedee = zebedee;
-    }
-
-    public static void MoveFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {
-
-        System.out.println("Moving files from collection into master for collection: " + collection.description.name);
-        // Move each item of content:
-        for (String uri : collection.reviewed.uris()) {
-
-            Path source = collection.reviewed.get(uri);
-            if (source != null) {
-                Path destination = zebedee.published.toPath(uri);
-                PathUtils.moveFilesInDirectory(source, destination);
-            }
-        }
-    }
-
-    public static void MoveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
-        System.out.println("Moving collection json to archive for collection: " + collection.description.name);
-        String filename = PathUtils.toFilename(collection.description.name);
-        Path collectionDescriptionPath = zebedee.collections.path.resolve(filename + ".json");
-        Path logPath = zebedee.path.resolve("publish-log");
-        if (!Files.exists(logPath)) {
-            Files.createDirectory(logPath);
-        }
-
-        Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
-        logPath = logPath.resolve(format.format(date) + " " + filename + ".json");
-
-        Files.copy(collectionDescriptionPath, logPath);
     }
 
     /**
@@ -216,15 +184,7 @@ public class Collections {
         }
         System.out.println("Going ahead with publish");
 
-        boolean publishComplete = Publisher.Publish(collection, session.email);
-
-        if (publishComplete) {
-            MoveFilesToMaster(zebedee, collection);
-            MoveCollectionToArchive(zebedee, collection);
-
-            // Delete the folders:
-            collection.delete();
-        }
+        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email);
 
         return publishComplete;
     }

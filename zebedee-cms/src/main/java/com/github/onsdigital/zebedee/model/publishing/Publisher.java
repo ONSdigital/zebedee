@@ -5,17 +5,23 @@ import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.util.ContentTree;
+import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,16 +29,42 @@ import java.util.concurrent.*;
 
 public class Publisher {
 
-    public static boolean Publish(Collection collection, String email) throws IOException {
+    public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
 
-        boolean publishComplete = false;
-        System.out.println("Starting publish process for collection " + collection.description.name);
-
+        Log.print("Starting publish process for collection %s", collection.description.name);
         long publishStart = System.currentTimeMillis();
 
         if (!collection.description.approvedStatus) {
+            Log.print("The collection %s cannot be published as it has not been approved", collection.description.name);
             return false;
         }
+
+        boolean publishComplete = PublishFilesToWebsite(collection, email);
+
+        long msTaken = (System.currentTimeMillis() - publishStart) / 1000;
+        Log.print("Publish process finished for collection %s complete: %s time taken: %dms",
+                collection.description.name,
+                publishComplete,
+                msTaken);
+
+        if (publishComplete) {
+            onPublishComplete(zebedee, collection);
+        }
+
+        return publishComplete;
+    }
+
+    /**
+     * Submit all files in the collection to the train destination - the website.
+     *
+     * @param collection
+     * @param email
+     * @return
+     * @throws IOException
+     */
+    private static boolean PublishFilesToWebsite(Collection collection, String email) throws IOException {
+
+        boolean publishComplete = false;
 
         Host host = new Host(Configuration.getTheTrainUrl());
         String encryptionPassword = Random.password(100);
@@ -75,10 +107,11 @@ public class Publisher {
 
         } catch (IOException e) {
 
-            System.out.println("Exception publishing collection " + collection.description.name + ": " + e.getMessage());
+            Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
+            System.out.println(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
             if (transactionId != null) {
-                System.out.println("Attempting rollback of publishing transaction for collection " + collection.description.name);
+                Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
                 rollbackPublish(host, transactionId, encryptionPassword);
             }
         }
@@ -86,14 +119,54 @@ public class Publisher {
         // Save a published collections log
         collection.save();
 
-        long secondsTaken = (System.currentTimeMillis() - publishStart) / 1000;
-        System.out.println("Publish process finished for collection " + collection.description.name
-                + " complete=" + publishComplete
-                + " time taken=" + secondsTaken + " seconds");
-
         return publishComplete;
     }
 
+    /**
+     * Do tasks required after a publish takes place.
+     *
+     * @param zebedee
+     * @param collection
+     * @return
+     * @throws IOException
+     */
+    private static boolean onPublishComplete(Zebedee zebedee, Collection collection) throws IOException {
+        MoveFilesToMaster(zebedee, collection);
+        MoveCollectionToArchive(zebedee, collection);
+        collection.delete();
+        ContentTree.dropCache();
+        return true;
+    }
+
+    public static void MoveFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {
+
+        Log.print("Moving files from collection into master for collection: " + collection.description.name);
+        // Move each item of content:
+        for (String uri : collection.reviewed.uris()) {
+
+            Path source = collection.reviewed.get(uri);
+            if (source != null) {
+                Path destination = zebedee.published.toPath(uri);
+                PathUtils.moveFilesInDirectory(source, destination);
+            }
+        }
+    }
+
+    public static void MoveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
+        Log.print("Moving collection json to archive for collection: " + collection.description.name);
+        String filename = PathUtils.toFilename(collection.description.name);
+        Path collectionDescriptionPath = zebedee.collections.path.resolve(filename + ".json");
+        Path logPath = zebedee.path.resolve("publish-log");
+        if (!Files.exists(logPath)) {
+            Files.createDirectory(logPath);
+        }
+
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
+        logPath = logPath.resolve(format.format(date) + " " + filename + ".json");
+
+        Files.copy(collectionDescriptionPath, logPath);
+    }
 
     /**
      * Starts a publishing transaction.

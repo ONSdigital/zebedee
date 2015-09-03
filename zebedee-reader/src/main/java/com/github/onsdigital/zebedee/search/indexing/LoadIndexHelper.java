@@ -130,8 +130,8 @@ public class LoadIndexHelper {
         JsonObject jsonObject;
         try {
             jsonObject = new JsonParser().parse(FileUtils.readFileToString(new File(absoluteFilePath), Charset.forName("UTF-8"))).getAsJsonObject();
-        } catch (JsonParseException |  IllegalStateException | IOException e) {
-            throw new RuntimeException("Failed to parse json: " + absoluteFilePath, e);
+        } catch (JsonParseException | IOException e) {
+            throw new IllegalStateException("Failed to parse json: " + absoluteFilePath, e);
         }
         return jsonObject;
     }

@@ -1,14 +1,20 @@
 index :
+  mappings :
+    _default_ :
+      properties :
+        title :
+          index : analyzed
+          analyzer : ons_searcable
   analysis :
-      analyzer :
-          #Overwriting default index analyzer
-          #Makes all fields filterable with exact word matching, used to make filtering available on all fields by default
-          #Searchable fields uses ons_searchable analyzer
-          default_index :
-              type : custom
-              #Setting default index tokenizer to disable tokenizing (not analyzed) on all fields by default
-              #which allows all fields to be filtereable using exact matches
-              tokenizer : keyword
-          ons_searchable :
-              tokenizer : standard
-              filter : [standard, lowercase, stop]
+    analyzer :
+      #Overwriting default index analyzer
+      #Makes all fields filterable with exact word matching, used to make filtering available on all fields by default
+      #Searchable fields uses ons_searchable analyzer
+      default_index :
+        type : custom
+        #Setting default index tokenizer to disable tokenizing (not analyzed) on all fields by default
+        #which allows all fields to be filtereable using exact matches
+        tokenizer : keyword
+      ons_searchable :
+        tokenizer : standard
+        filter : [standard, lowercase, stop]

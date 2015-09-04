@@ -4,7 +4,7 @@ index :
           #Overwriting default index analyzer
           #Makes all fields filterable with exact word matching, used to make filtering available on all fields by default
           #Searchable fields uses ons_searchable analyzer
-          deafult_index :
+          default_index :
               type : custom
               #Setting default index tokenizer to disable tokenizing (not analyzed) on all fields by default
               #which allows all fields to be filtereable using exact matches

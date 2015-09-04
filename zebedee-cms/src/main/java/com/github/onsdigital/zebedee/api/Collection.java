@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -104,7 +105,9 @@ public class Collection {
         com.github.onsdigital.zebedee.model.Collection collection = com.github.onsdigital.zebedee.model.Collection.create(
                 collectionDescription, Root.zebedee, session.email);
 
-        Root.schedulePublish(collection);
+        if (collection.description.type.equals(CollectionType.scheduled)) {
+            Root.schedulePublish(collection);
+        }
 
         return collection.description;
     }

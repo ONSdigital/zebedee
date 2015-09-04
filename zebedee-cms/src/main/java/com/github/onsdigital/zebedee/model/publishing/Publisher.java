@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -131,14 +132,18 @@ public class Publisher {
      * @throws IOException
      */
     private static boolean onPublishComplete(Zebedee zebedee, Collection collection) throws IOException {
-        MoveFilesToMaster(zebedee, collection);
-        MoveCollectionToArchive(zebedee, collection);
+
+        copyFilesToMaster(zebedee, collection);
+
+        // move collection files to archive
+        moveCollectionToArchive(zebedee, collection);
+
         collection.delete();
         ContentTree.dropCache();
         return true;
     }
 
-    public static void MoveFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {
+    public static void copyFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {
 
         Log.print("Moving files from collection into master for collection: " + collection.description.name);
         // Move each item of content:
@@ -147,25 +152,35 @@ public class Publisher {
             Path source = collection.reviewed.get(uri);
             if (source != null) {
                 Path destination = zebedee.published.toPath(uri);
-                PathUtils.moveFilesInDirectory(source, destination);
+                PathUtils.copyFilesInDirectory(source, destination);
             }
         }
     }
 
-    public static void MoveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
-        Log.print("Moving collection json to archive for collection: " + collection.description.name);
+    public static void moveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
+
+        Log.print("Moving collection files to archive for collection: " + collection.description.name);
         String filename = PathUtils.toFilename(collection.description.name);
-        Path collectionDescriptionPath = zebedee.collections.path.resolve(filename + ".json");
+        Path collectionJsonSource = zebedee.collections.path.resolve(filename + ".json");
+        Path collectionFilesSource = collection.reviewed.path;
         Path logPath = zebedee.path.resolve("publish-log");
+
         if (!Files.exists(logPath)) {
             Files.createDirectory(logPath);
         }
 
         Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm");
-        logPath = logPath.resolve(format.format(date) + " " + filename + ".json");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+        String directoryName = format.format(date) + "-" + filename;
+        Path collectionFilesDestination = logPath.resolve(directoryName);
+        Path collectionJsonDestination = logPath.resolve(directoryName + ".json");
 
-        Files.copy(collectionDescriptionPath, logPath);
+        Log.print("Moving collection json from %s to %s", collectionJsonSource, collectionJsonDestination);
+        Files.copy(collectionJsonSource, collectionJsonDestination);
+
+        Log.print("Moving collection files from %s to %s", collectionFilesSource, collectionFilesDestination);
+
+        FileUtils.moveDirectoryToDirectory(collectionFilesSource.toFile(), collectionFilesDestination.toFile(), true);
     }
 
     /**

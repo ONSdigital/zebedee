@@ -6,6 +6,8 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.model.SearchDocument;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,6 +31,10 @@ public class Indexer {
     private Indexer() {
     }
 
+    public static Indexer getInstance() {
+        return instance;
+    }
+
 
     /**
      * Loads documents to a new index, switches default index alias to new index and deletes old index if available  to ensure zero down time.
@@ -49,7 +55,7 @@ public class Indexer {
 
     public void reload() throws IOException {
         String newIndex = generateIndexName();
-        elasticSearchWriter.createIndex(newIndex);
+        elasticSearchWriter.createIndex(newIndex, buildSettings());
         indexDocuments(newIndex);
         elasticSearchWriter.swapIndex(currentIndex, newIndex, getElasticSearchIndexAlias());
         if (currentIndex != null) {
@@ -59,8 +65,7 @@ public class Indexer {
     }
 
     /**
-     *
-     *Reads content with given uri and indexes for search
+     * Reads content with given uri and indexes for search
      *
      * @param uri
      */
@@ -119,12 +124,14 @@ public class Indexer {
         return indexDocument;
     }
 
-    public static Indexer getInstance() {
-        return instance;
+    private static Settings buildSettings() throws IOException {
+        ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder().loadFromUrl(Indexer.class.getResource("/search/index-config.yml"));
+        System.out.println("Search configuration:\n" + settingsBuilder.internalMap());
+        return settingsBuilder.build();
     }
 
 
-    //    // Mapping for field properties. To decide which field will be indexed
+    // Mapping for field properties. To decide which field will be indexed
 //    private static XContentBuilder getMappingProperties(String type) throws IOException {
 //
 //        XContentBuilder builder = jsonBuilder().startObject().startObject(type).startObject("properties");
@@ -159,57 +166,6 @@ public class Indexer {
 //            if (builder != null) {
 //                builder.close();
 //            }
-//        }
-//    }
-
-
-//    private static Map<String, String> buildSettings() throws IOException {
-//        ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder();
-//
-//        List<String> synonymList = getSynonyms(settingsBuilder);
-//        getSettingsBuilder(settingsBuilder, synonymList);
-//
-//        return settingsBuilder.build().getAsMap();
-//    }
-
-//    private static void getSettingsBuilder(ImmutableSettings.Builder settingsBuilder, List<String> synonymList) {
-//        String[] synonyms = new String[synonymList.size()];
-//        synonymList.toArray(synonyms);
-//
-//        settingsBuilder.putArray("analysis.filter.ons_synonym_filter.synonyms", synonyms);
-//
-//        Map<String, String> settings = new HashMap<>();
-//        // default analyzer
-//        settings.put("analysis.analyzer.default_index.tokenizer", "ons_search_tokenizer");
-//        settings.put("analysis.analyzer.default_index.filter", "lowercase");
-//        settings.put("analysis.analyzer.ons_synonyms.tokenizer", "standard");
-//        settings.put("analysis.filter.ons_synonym_filter.type", "synonym");
-//
-//        // edgeNGram tokenizer
-//        settings.put("analysis.tokenizer.ons_search_tokenizer.type", "edgeNGram");
-//        settings.put("analysis.tokenizer.ons_search_tokenizer.max_gram", "15");
-//        settings.put("analysis.tokenizer.ons_search_tokenizer.min_gram", "2");
-//        String[] tokenChars = {"letter", "digit"};
-//        settingsBuilder.putArray("analysis.tokenizer.ons_search_tokenizer.token_chars", tokenChars);
-//
-//        settingsBuilder.put(settings);
-//    }
-
-//    private static List<String> getSynonyms(ImmutableSettings.Builder settingsBuilder) throws IOException {
-//        String[] filters = {"lowercase", "ons_synonym_filter"};
-//        settingsBuilder.putArray("analysis.analyzer.ons_synonyms.filter", filters);
-//
-//        // java 7 try-with-resources automatically closes streams after use
-//        try (InputStream inputStream = Indexer.class.getResourceAsStream("/synonym.txt"); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-//
-//            List<String> synonymList = new ArrayList<String>();
-//            String contents = null;
-//            while ((contents = reader.readLine()) != null) {
-//                if (!contents.startsWith("#")) {
-//                    synonymList.add(contents);
-//                }
-//            }
-//            return synonymList;
 //        }
 //    }
 

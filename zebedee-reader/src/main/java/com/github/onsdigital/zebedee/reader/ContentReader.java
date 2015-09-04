@@ -41,8 +41,6 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 class ContentReader {
 
     private final Path ROOT_FOLDER;
-    private final String NOT_FOUND = "404 - Not Found";
-
     private ContentLanguage language = ContentLanguage.en;
 
     public ContentReader(String rootFolder) {
@@ -251,8 +249,7 @@ class ContentReader {
 
     private void assertExists(Path path) throws ZebedeeException {
         if (!exists(path)) {
-            System.err.println("Could not find requested content, path:" + path.toUri().toString());
-            throw new NotFoundException(NOT_FOUND);
+            throw new NotFoundException("Could not find requested content, path:" + path.toUri().toString());
         }
     }
 

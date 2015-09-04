@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -190,7 +189,9 @@ public class Collection {
         Path collectionDescriptionPath = collections.path.resolve(filename + ".json");
 
         // delete
-        Files.delete(collectionDescriptionPath);
+        if (Files.exists(collectionDescriptionPath)) {
+            Files.delete(collectionDescriptionPath);
+        }
 
         // remove the lock for the collection
         collectionLocks.remove(path);

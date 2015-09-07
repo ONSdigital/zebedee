@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee.json;
 
+import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.model.Collection;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,12 @@ public class CollectionDescription extends CollectionBase {
      * A List of {@link Event} for each uri in the collection.
      */
     public Map<String, Events> eventsByUri;
+
+    /**
+     * A list of {@link com.github.onsdigital.zebedee.json.publishing.Result} for
+     * each attempt at publishing this collection.
+     */
+    public List<Result> publishResults;
 
     /**
      * Default constuructor for serialisation.
@@ -70,4 +78,16 @@ public class CollectionDescription extends CollectionBase {
         events.add(event);
     }
 
+    /**
+     * Add a {@link Result} to this
+     * {@link CollectionDescription}.
+     * @param result
+     */
+    public void AddPublishResult(Result result) {
+        if (publishResults == null) {
+            publishResults = new ArrayList<>();
+        }
+
+        publishResults.add(result);
+    }
 }

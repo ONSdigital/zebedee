@@ -149,9 +149,10 @@ public class Publisher {
 
             if (!result.error) {
                 collection.description.AddEvent(new Event(new Date(), EventType.PUBLISHED, email));
+                publishComplete = true;
             }
 
-            publishComplete = true;
+            collection.description.AddPublishResult(result);
 
         } catch (IOException e) {
 

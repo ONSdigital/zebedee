@@ -6,10 +6,12 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.model.SearchDocument;
+import org.apache.commons.io.IOUtils;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -55,7 +57,7 @@ public class Indexer {
 
     public void reload() throws IOException {
         String newIndex = generateIndexName();
-        elasticSearchWriter.createIndex(newIndex, buildSettings());
+        elasticSearchWriter.createIndex(newIndex, getSettings(),getDefaultMapping());
         indexDocuments(newIndex);
         elasticSearchWriter.swapIndex(currentIndex, newIndex, getElasticSearchIndexAlias());
         if (currentIndex != null) {
@@ -124,10 +126,18 @@ public class Indexer {
         return indexDocument;
     }
 
-    private static Settings buildSettings() throws IOException {
+    private Settings getSettings() throws IOException {
         ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder().loadFromUrl(Indexer.class.getResource("/search/index-config.yml"));
-        System.out.println("Search configuration:\n" + settingsBuilder.internalMap());
+        System.out.println("Index settings:\n" + settingsBuilder.internalMap());
         return settingsBuilder.build();
+    }
+
+    private String getDefaultMapping() throws IOException {
+        InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json");
+        String mappingSource = IOUtils.toString(mappingSourceStream);
+        System.out.println(mappingSource);
+        return mappingSource;
+
     }
 
 

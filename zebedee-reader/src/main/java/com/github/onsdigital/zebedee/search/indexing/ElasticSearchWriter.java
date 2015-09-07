@@ -8,15 +8,15 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndexAlias;
 
@@ -25,15 +25,18 @@ import static com.github.onsdigital.zebedee.search.configuration.SearchConfigura
  */
 class ElasticSearchWriter {
     private Client client;
+    private String DEFAULT_TYPE = "_default_";
 
     public ElasticSearchWriter(Client client) {
         this.client = client;
     }
 
-    public CreateIndexResponse createIndex(String index, Settings settings) throws IOException {
+
+    public CreateIndexResponse createIndex(String index, Settings settings, String defaultMappingSource) throws IOException {
         System.out.println("Creating index " + index);
         CreateIndexRequestBuilder createIndexRequest = getIndicesClient().prepareCreate(index);
         createIndexRequest.setSettings(settings);
+        createIndexRequest.addMapping(DEFAULT_TYPE, defaultMappingSource);
         return createIndexRequest.get();
     }
 

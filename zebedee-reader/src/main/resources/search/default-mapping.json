@@ -1,0 +1,29 @@
+{
+	"_default_": {
+        "_all" : {"enabled" : false},
+		"properties": {
+			"description": {
+				"properties": {
+					"title": {
+                      "type" : "string",
+                      "index": "analyzed",
+                      "index_analyzer": "ons_index_analyzer",
+                      "include_in_all" : true
+					},
+				    "edition": {
+                      "type" : "string",
+                      "index": "analyzed",
+                      "index_analyzer": "ons_index_analyzer",
+                      "include_in_all" : true
+				  },
+				    "summary": {
+                      "type" : "string",
+                      "index": "analyzed",
+                      "index_analyzer": "ons_index_analyzer",
+                      "include_in_all" : true
+				  }
+				}
+			}
+		}
+	}
+}

@@ -1,20 +1,26 @@
-index :
-  mappings :
-    _default_ :
-      properties :
-        title :
-          index : analyzed
-          analyzer : ons_searcable
-  analysis :
-    analyzer :
-      #Overwriting default index analyzer
-      #Makes all fields filterable with exact word matching, used to make filtering available on all fields by default
-      #Searchable fields uses ons_searchable analyzer
-      default_index :
-        type : custom
-        #Setting default index tokenizer to disable tokenizing (not analyzed) on all fields by default
-        #which allows all fields to be filtereable using exact matches
-        tokenizer : keyword
-      ons_searchable :
-        tokenizer : standard
-        filter : [standard, lowercase, stop]
+analysis :
+  analyzer :
+    #Overwriting default index analyzer
+    #Makes all fields filterable with exact word matching, used to make filtering available on all fields by default
+    #Searchable fields uses ons_searchable analyzer
+    default_index :
+      type : custom
+      #Setting default index tokenizer to disable tokenizing (not analyzed) on all fields by default
+      #which allows all fields to be filterable using exact matches
+      tokenizer : keyword
+      filter : [lowercase]
+    ons_search_analyzer :
+          type : custom
+          #Setting default index tokenizer to disable tokenizing (not analyzed) on all fields by default
+          #which allows all fields to be filterable using exact matches
+          tokenizer : keyword
+          filter : [lowercase]
+    #ONS index analyzer is used when indexing fields that are wanted to be searchable, set mappings for these fields in default-mapping.json file
+    ons_index_analyzer :
+      tokenizer : index_tokenizer
+      filter : [lowercase, stop]
+  tokenizer :
+    index_tokenizer :
+      type : edgeNGram
+      min_gram : 2
+      max_gram : 5

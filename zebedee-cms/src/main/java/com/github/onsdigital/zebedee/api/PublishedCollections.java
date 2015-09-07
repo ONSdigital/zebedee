@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
+import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ public class PublishedCollections {
     public List<PublishedCollection> get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        return Root.zebedee.publishedCollections.readFromFile();
+        //return Root.zebedee.publishedCollections.readFromFile();
+        return Root.zebedee.publishedCollections.search(ElasticSearchClient.getClient());
     }
 }

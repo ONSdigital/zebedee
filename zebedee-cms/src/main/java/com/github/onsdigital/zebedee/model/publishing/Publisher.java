@@ -148,7 +148,9 @@ public class Publisher {
             Result result = commitPublish(host, transactionId, encryptionPassword);
 
             if (!result.error) {
-                collection.description.AddEvent(new Event(new Date(), EventType.PUBLISHED, email));
+                Date publishedDate = new Date();
+                collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
+                collection.description.publishDate = publishedDate;
                 publishComplete = true;
             }
 
@@ -185,7 +187,9 @@ public class Publisher {
         copyFilesToMaster(zebedee, collection);
 
         // move collection files to archive
-        moveCollectionToArchive(zebedee, collection);
+        Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
+
+        zebedee.publishedCollections.add(collectionJsonPath);
 
         collection.delete();
         ContentTree.dropCache();
@@ -206,7 +210,7 @@ public class Publisher {
         }
     }
 
-    public static void moveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
+    public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
 
         Log.print("Moving collection files to archive for collection: " + collection.description.name);
         String filename = PathUtils.toFilename(collection.description.name);
@@ -228,8 +232,9 @@ public class Publisher {
         Files.copy(collectionJsonSource, collectionJsonDestination);
 
         Log.print("Moving collection files from %s to %s", collectionFilesSource, collectionFilesDestination);
-
         FileUtils.moveDirectoryToDirectory(collectionFilesSource.toFile(), collectionFilesDestination.toFile(), true);
+
+        return collectionJsonDestination;
     }
 
     /**

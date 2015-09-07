@@ -35,6 +35,7 @@ public class CollectionDescription {
     public List<String> completeUris;
     public List<String> reviewedUris;
     public boolean approvedStatus;
+    public boolean published;
 
     /**
      * events related to this collection

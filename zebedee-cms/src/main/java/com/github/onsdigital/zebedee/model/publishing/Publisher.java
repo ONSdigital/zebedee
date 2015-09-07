@@ -20,36 +20,83 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
 
 public class Publisher {
 
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
+        boolean publishComplete = false;
 
-        Log.print("Starting publish process for collection %s", collection.description.name);
-        long publishStart = System.currentTimeMillis();
+        // First get the in-memory (within-JVM) lock.
+        // This will block attempts to write to the collection during the publishing process
+        Log.print("Attempting to lock collection before publish: " + collection.description.id);
+        Lock writeLock = collection.getWriteLock();
+        writeLock.lock();
 
-        if (!collection.description.approvedStatus) {
-            Log.print("The collection %s cannot be published as it has not been approved", collection.description.name);
-            return false;
-        }
+        try {
+            // First check the state of the collection
+            if (collection.description.published) {
+                System.out.println("Collection has already been published. Halting publish: " + collection.description.id);
+                return publishComplete;
+            }
 
-        boolean publishComplete = PublishFilesToWebsite(collection, email);
+            // Now attempt to get a file (inter-JVM) lock
+            // This prevents Staging and Live attempting to
+            // publish the same collection at the same time.
+            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
 
-        long msTaken = (System.currentTimeMillis() - publishStart) / 1000;
-        Log.print("Publish process finished for collection %s complete: %s time taken: %dms",
-                collection.description.name,
-                publishComplete,
-                msTaken);
+                // If the lock can't be acquired, we'll get null:
+                FileLock lock = channel.tryLock();
+                if (lock != null) {
+                    Log.print("Collection lock acquired: " + collection.description.id);
 
-        if (publishComplete) {
-            onPublishComplete(zebedee, collection);
+                    collection.path.resolve("publish.lock");
+
+                    Log.print("Starting publish process for collection %s", collection.description.name);
+                    long publishStart = System.currentTimeMillis();
+
+                    if (!collection.description.approvedStatus) {
+                        Log.print("The collection %s cannot be published as it has not been approved", collection.description.name);
+                        return false;
+                    }
+
+                    publishComplete = PublishFilesToWebsite(collection, email);
+
+                    long msTaken = (System.currentTimeMillis() - publishStart) / 1000;
+                    Log.print("Publish process finished for collection %s complete: %s time taken: %dms",
+                            collection.description.name,
+                            publishComplete,
+                            msTaken);
+
+                    if (publishComplete) {
+                        onPublishComplete(zebedee, collection);
+                    }
+
+                    // Save collection updates:
+                    collection.description.published = true;
+
+                } else {
+                    Log.print("Collection is already locked for publishing. Halting publish attempt on: " + collection.description.id);
+                }
+
+            } finally {
+                // Save any updates to the collection
+                collection.save();
+            }
+
+        } finally {
+            writeLock.unlock();
+            Log.print("Collection lock released: " + collection.description.id);
         }
 
         return publishComplete;
@@ -115,10 +162,11 @@ public class Publisher {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
                 rollbackPublish(host, transactionId, encryptionPassword);
             }
-        }
 
-        // Save a published collections log
-        collection.save();
+        } finally {
+            // Save any updates to the collection
+            collection.save();
+        }
 
         return publishComplete;
     }

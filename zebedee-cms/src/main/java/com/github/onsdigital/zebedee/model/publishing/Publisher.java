@@ -72,7 +72,7 @@ public class Publisher {
 
                     publishComplete = PublishFilesToWebsite(collection, email);
 
-                    long msTaken = (System.currentTimeMillis() - publishStart) / 1000;
+                    long msTaken = (System.currentTimeMillis() - publishStart);
                     Log.print("Publish process finished for collection %s complete: %s time taken: %dms",
                             collection.description.name,
                             publishComplete,

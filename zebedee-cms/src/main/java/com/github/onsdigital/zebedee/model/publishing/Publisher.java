@@ -212,7 +212,7 @@ public class Publisher {
         String filename = PathUtils.toFilename(collection.description.name);
         Path collectionJsonSource = zebedee.collections.path.resolve(filename + ".json");
         Path collectionFilesSource = collection.reviewed.path;
-        Path logPath = zebedee.path.resolve("publish-log");
+        Path logPath = zebedee.publishedCollections.path;
 
         if (!Files.exists(logPath)) {
             Files.createDirectory(logPath);

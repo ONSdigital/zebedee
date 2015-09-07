@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -19,6 +20,7 @@ public class Zebedee {
 
     public static final String PUBLISHED = "master";
     public static final String COLLECTIONS = "collections";
+    static final String PUBLISHED_COLLECTIONS = "publish-log";
     static final String ZEBEDEE = "zebedee";
     static final String USERS = "users";
     static final String SESSIONS = "sessions";
@@ -29,6 +31,7 @@ public class Zebedee {
     public final Path path;
     public final Content published;
     public final Collections collections;
+    public final PublishedCollections publishedCollections;
     public final Users users;
     public final Sessions sessions;
     public final Permissions permissions;
@@ -41,6 +44,7 @@ public class Zebedee {
         this.path = path;
         Path published = path.resolve(PUBLISHED);
         Path collections = path.resolve(COLLECTIONS);
+        Path publishedCollections = path.resolve(PUBLISHED_COLLECTIONS);
         Path users = path.resolve(USERS);
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
@@ -71,12 +75,12 @@ public class Zebedee {
 
 
         this.collections = new Collections(collections, this) ;
+        this.publishedCollections = new PublishedCollections(publishedCollections, this);
         this.users = new Users(users, this);
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
         this.launchpad = new Content(launchpad);
-
     }
 
     /**

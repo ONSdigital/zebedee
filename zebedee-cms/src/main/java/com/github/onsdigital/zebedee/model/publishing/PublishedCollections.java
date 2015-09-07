@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.util.Log;
 
@@ -13,17 +14,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Read published collections from file.
+ *
  */
-public class FileBasedPublishingReport {
+public class PublishedCollections {
 
-    private Path path;
+    public final Path path;
+    private final Zebedee zebedee;
 
-    public FileBasedPublishingReport(Path path) {
+    public PublishedCollections(Path path, Zebedee zebedee) {
         this.path = path;
+        this.zebedee = zebedee;
     }
 
-    public List<PublishedCollection> get() throws IOException {
+    /**
+     * Read all existing published collections from file.
+     * @return
+     * @throws IOException
+     */
+    public List<PublishedCollection> readFromFile() throws IOException {
         List<PublishedCollection> publishedCollections = new ArrayList<>();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {

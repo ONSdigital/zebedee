@@ -11,25 +11,7 @@ import java.util.Map;
  *
  * @author david
  */
-public class CollectionDescription {
-
-    /**
-     * The unique identifier of this {@link Collection}.
-     */
-    public String id;
-    /**
-     * The readable name of this {@link Collection}.
-     */
-    public String name;
-    /**
-     * The type of the collection to determine the publish behaviour.
-     */
-    public CollectionType type;
-    /**
-     * The date-time when this {@link Collection} should be published (if it has
-     * a publish date).
-     */
-    public Date publishDate;
+public class CollectionDescription extends CollectionBase {
 
     public List<String> inProgressUris;
     public List<String> completeUris;

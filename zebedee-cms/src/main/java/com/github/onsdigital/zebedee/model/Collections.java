@@ -219,7 +219,7 @@ public class Collections {
     }
 
     /**
-     * List the given directory of a collection including the files that have already been published.
+                                             * List the given directory of a collection including the files that have already been published.
      *
      * @param collection the collection to overlay on master content
      * @param uri        the uri of the directory

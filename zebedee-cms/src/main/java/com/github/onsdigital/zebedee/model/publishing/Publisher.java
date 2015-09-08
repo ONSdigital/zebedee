@@ -45,14 +45,17 @@ public class Publisher {
 
         try {
             // First check the state of the collection
-            if (collection.description.published) {
-                System.out.println("Collection has already been published. Halting publish: " + collection.description.id);
+            if (collection.description.publishComplete) {
+                Log.print("Collection has already been published. Halting publish: " + collection.description.id);
                 return publishComplete;
             }
 
             // Now attempt to get a file (inter-JVM) lock
             // This prevents Staging and Live attempting to
             // publish the same collection at the same time.
+            // We specify WRITE so we can get a lock and
+            // CREATE to ensure the file is created if it
+            // doesn't exist.
             try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
 
                 // If the lock can't be acquired, we'll get null:
@@ -113,9 +116,9 @@ public class Publisher {
 
         Host host = new Host(Configuration.getTheTrainUrl());
         String encryptionPassword = Random.password(100);
-        String transactionId = null;
         try {
-            transactionId = beginPublish(host, encryptionPassword);
+            collection.description.publishTransactionId = beginPublish(host, encryptionPassword);
+            collection.save();
             ExecutorService pool = Executors.newCachedThreadPool();
             List<Future<IOException>> results = new ArrayList<>();
 
@@ -124,7 +127,7 @@ public class Publisher {
 
                 Path source = collection.reviewed.get(uri);
                 if (source != null) {
-                    results.add(publishFile(host, transactionId, encryptionPassword, uri, source, pool));
+                    results.add(publishFile(host, collection.description.publishTransactionId, encryptionPassword, uri, source, pool));
                 }
 
                 // Add an event to the event log
@@ -142,7 +145,7 @@ public class Publisher {
             }
 
             // If all has gone well so far, commit the publishing transaction:
-            Result result = commitPublish(host, transactionId, encryptionPassword);
+            Result result = commitPublish(host, collection.description.publishTransactionId, encryptionPassword);
 
             if (!result.error) {
                 Date publishedDate = new Date();
@@ -159,9 +162,9 @@ public class Publisher {
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
             System.out.println(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
-            if (transactionId != null) {
+            if (collection.description.publishTransactionId != null) {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
-                rollbackPublish(host, transactionId, encryptionPassword);
+                rollbackPublish(host, collection.description.publishTransactionId, encryptionPassword);
             }
 
         } finally {

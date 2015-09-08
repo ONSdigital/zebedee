@@ -11,6 +11,10 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.apache.commons.io.FileUtils;
+import org.hamcrest.Matchers;
+
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,11 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
 
 /**
@@ -536,4 +538,376 @@ public class DataPublisherTest {
         assertTrue(datasetIdFound);
     }
 
+
+    @Test
+    public void generateDataFiles_givenPaths_generatesListOfTimeSeries() {
+        // Given
+        // some time series
+        List<Path> serieses = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            serieses.add(bob.randomWalkTimeSeries("Series " + i));
+        }
+
+        // When
+        // we get the time series
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // Then
+        // We expect the timeSerieses to be populated
+        assertNotNull(timeSerieses);
+        for (TimeSeries timeSeries : timeSerieses) {
+            assertNotNull(timeSeries);
+        }
+    }
+
+    @Test
+    public void generateDataFiles_givenPaths_generatesPopulatedTimeseries() {
+        // Given
+        // some time series
+        List<Path> serieses = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            serieses.add(bob.randomWalkTimeSeries("Series " + i));
+        }
+
+        // When
+        // we get the time series
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // Then
+        // we expect time series values
+        for (TimeSeries timeSeries: timeSerieses) {
+            assertNotEquals(0, timeSeries.years.size());
+            assertNotEquals(0, timeSeries.quarters.size());
+            assertNotEquals(0, timeSeries.months.size());
+        }
+    }
+
+    @Test
+    public void timeSeriesFromPathList_givenPaths_retrievesCorrectSeries() {
+        // Given
+        // some time series
+        List<Path> serieses = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            serieses.add(bob.randomWalkTimeSeries("Series " + i));
+        }
+
+        // When
+        // we get the time series
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // Then
+        // we expect time series values
+        for (TimeSeries series: timeSerieses) {
+            assertThat(series.getDescription().getTitle(), containsString("Series"));
+        }
+    }
+
+    @Test
+    public void timeSeriesIdList_givenMixedListOfPaths_returnsInOriginalOrder() {
+        // Given
+        // some time series we create and then retrieve
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("3"));
+        serieses.add(bob.randomWalkTimeSeries("2"));
+        serieses.add(bob.randomWalkTimeSeries("7"));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we use timeSeriesIdList to pull out Ids
+        List<String> ids = DataPublisher.timeSeriesIdList(timeSerieses);
+
+        // Then
+        // we expect the ids we got originally in original order
+        assertThat(ids, Matchers.contains("3", "2", "7"));
+    }
+
+    @Test
+    public void mapOfAllDataInTimeSeries_givenListOfPaths_returnsExpectedResults() {
+        // Given
+        // some time series we create and then retrieve
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("3"));
+        serieses.add(bob.randomWalkTimeSeries("2"));
+        serieses.add(bob.randomWalkTimeSeries("7"));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we use timeSeriesIdList to pull out Ids
+        Map<String, Map<String, String>> data = DataPublisher.mapOfAllDataInTimeSeriesList(timeSerieses);
+
+        // Then
+        // we expect the map to contain all information
+        for (TimeSeries series : timeSerieses) {
+            for (TimeSeriesValue value : series.years) {
+                assertEquals(value.value, data.get(value.date).get(series.getCdid()));
+            }
+            for (TimeSeriesValue value : series.quarters) {
+                assertEquals(value.value, data.get(value.date).get(series.getCdid()));
+            }
+            for (TimeSeriesValue value : series.months) {
+                assertEquals(value.value, data.get(value.date).get(series.getCdid()));
+            }
+        }
+    }
+
+    @Test
+    public void yearRange_givenSingleTimeSeries_doesReturnStartAndEndYears() {
+        // Given
+        // a timeseries
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("Random", true, false, false, 3, 2015));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the year range
+        List<String> yearRange = DataPublisher.yearRange(timeSerieses);
+
+        // Then
+        // we expect a three year range
+        assertThat(yearRange, Matchers.contains("2013", "2014", "2015"));
+    }
+
+
+    @Test
+    public void yearRange_givenOverlappingTimeSeries_givesUnionRange() {
+        // Given
+        // two timeseries that overlap
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("Random", true, false, false, 3, 2015));
+        serieses.add(bob.randomWalkTimeSeries("Random", true, false, false, 3, 2014));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the year range
+        List<String> yearRange = DataPublisher.yearRange(timeSerieses);
+
+        // Then
+        // we expect a four year range
+        assertThat(yearRange, Matchers.contains("2012", "2013", "2014", "2015"));
+    }
+
+    @Test
+    public void yearRange_givenDisjointTimeSeries_fillsInTheGaps() {
+        // Given
+        // two timeseries that overlap
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("Random", true, false, false, 3, 2015));
+        serieses.add(bob.randomWalkTimeSeries("Random", true, false, false, 3, 2011));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the year range
+        List<String> yearRange = DataPublisher.yearRange(timeSerieses);
+
+        // Then
+        // we expect a four year range
+        assertThat(yearRange, Matchers.contains("2009", "2010", "2011", "2012", "2013", "2014", "2015"));
+    }
+
+    @Test
+    public void quarterRange_givenSingleTimeSeries_doesReturnFullQuarters() {
+        // Given
+        // a timeseries
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkQuarters("quarters", 2014, 3, 3));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the quarter range
+        List<String> quarterRange = DataPublisher.quarterRange(timeSerieses);
+
+        // Then
+        // we expect a three quarter range
+        assertThat(quarterRange, Matchers.containsInAnyOrder("2014 Q4", "2015 Q1", "2015 Q2"));
+    }
+
+
+    @Test
+    public void quarterRange_givenOverlappingTimeSeries_givesUnionRange() {
+        // Given
+        // two timeseries that overlap
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkQuarters("quarters", 2014, 2, 3));
+        serieses.add(bob.randomWalkQuarters("quarters", 2014, 3, 3));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the quarter range
+        List<String> quarterRange = DataPublisher.quarterRange(timeSerieses);
+
+        // Then
+        // we expect a four quarter range
+        assertThat(quarterRange, Matchers.contains("2014 Q3", "2014 Q4", "2015 Q1", "2015 Q2"));
+    }
+
+    @Test
+    public void quarterRange_givenDisjointTimeSeries_fillsInTheGaps() {
+        // Given
+        // two timeseries that overlap
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkQuarters("quarters", 2014, 3, 3));
+        serieses.add(bob.randomWalkQuarters("quarters", 2013, 3, 3));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the quarter range
+        List<String> quarterRange = DataPublisher.quarterRange(timeSerieses);
+
+        // Then
+        // we expect a four quarter range
+        assertThat(quarterRange, Matchers.contains("2013 Q4", "2014 Q1", "2014 Q2", "2014 Q3", "2014 Q4", "2015 Q1", "2015 Q2"));
+    }
+
+    @Test
+    public void monthRange_givenSingleTimeSeries_doesReturnFullMonths() {
+        // Given
+        // a timeseries
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkMonths("months", 2014, 10, 3));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the quarter range
+        List<String> monthRange = DataPublisher.monthRange(timeSerieses);
+
+        // Then
+        // we expect a three quarter range
+        assertThat(monthRange, Matchers.containsInAnyOrder("2014 NOV", "2014 DEC", "2015 JAN"));
+    }
+
+
+    @Test
+    public void monthRange_givenOverlappingTimeSeries_givesUnionRange() {
+        // Given
+        // two timeseries that overlap
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkMonths("months", 2014, 10, 3));
+        serieses.add(bob.randomWalkMonths("months", 2014, 9, 3));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the month range
+        List<String> monthRange = DataPublisher.monthRange(timeSerieses);
+
+        // Then
+        // we expect a four month range
+        assertThat(monthRange, Matchers.contains("2014 OCT", "2014 NOV", "2014 DEC", "2015 JAN"));
+    }
+
+    @Test
+    public void monthRange_givenDisjointTimeSeries_fillsInTheGaps() {
+        // Given
+        // two timeseries that overlap
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkMonths("months", 2014, 10, 3));
+        serieses.add(bob.randomWalkMonths("months", 2014, 6, 3));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we get the month range
+        List<String> monthRange = DataPublisher.monthRange(timeSerieses);
+
+        // Then
+        // we expect a four month range
+        assertThat(monthRange, Matchers.contains("2014 JUL", "2014 AUG", "2014 SEP", "2014 OCT", "2014 NOV", "2014 DEC", "2015 JAN"));
+    }
+
+    @Test
+    public void gridOfData_givenSetOfTimeSeries_returnsExpectedGrid() {
+        // Given
+        // some time series we create and then retrieve
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("a"));
+        serieses.add(bob.randomWalkTimeSeries("b"));
+        serieses.add(bob.randomWalkTimeSeries("c"));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+
+        // When
+        // we use timeSeriesIdList to pull out Ids
+        List<List<String>> grid = DataPublisher.gridOfAllDataInTimeSeriesList(timeSerieses);
+
+        // Then
+        // we expect the map to contain all information
+        for (int i = 0; i < timeSerieses.size(); i++) {
+            TimeSeries series = timeSerieses.get(i);
+            assertEquals(series.getDescription().getTitle(), grid.get(0).get(i + 1));
+            assertEquals(series.getDescription().getCdid(), grid.get(1).get(i + 1));
+
+            for (TimeSeriesValue value : series.years) {
+                assertEquals(value.value, gridCell(grid, series.getCdid(), value.date));
+            }
+
+            for (TimeSeriesValue value : series.quarters) {
+                assertEquals(value.value, gridCell(grid, series.getCdid(), value.date));
+            }
+
+            for (TimeSeriesValue value : series.months) {
+                assertEquals(value.value, gridCell(grid, series.getCdid(), value.date));
+            }
+        }
+    }
+
+    private String gridCell(List<List<String>> grid, String colHeader, String rowHeader) {
+        int colNumber = -1;
+        int rowNumber = -1;
+        for (int i = 0; i < grid.get(0).size(); i++) {
+            if (colHeader.equalsIgnoreCase(grid.get(0).get(i))) {
+                colNumber = i;
+                break;
+            }
+        }
+
+        for (int i = 0; i < grid.size(); i++) {
+            if (rowHeader.equalsIgnoreCase(grid.get(i).get(0))) {
+                rowNumber = i;
+                break;
+            }
+        }
+
+        return grid.get(rowNumber).get(colNumber);
+    }
+
+    @Test
+    public void writeXLSX_givenGridOfData_willCreateFile() throws IOException {
+        // Given
+        // random data
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("a"));
+        serieses.add(bob.randomWalkTimeSeries("b"));
+        serieses.add(bob.randomWalkTimeSeries("c"));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+        List<List<String>> grid = DataPublisher.gridOfAllDataInTimeSeriesList(timeSerieses);
+
+
+        // When
+        // we generate an XLSX as a temp file
+        Path path = Files.createTempFile("temporary", ".xlsx");
+        DataPublisher.writeDataGridToXlsx(path, grid);
+
+        // Then
+        // It will save a file
+        assertTrue(path.toFile().length() > 12);
+    }
+
+    @Test
+    public void writeCSV_givenGridOfData_willCreateFile() throws IOException {
+        // Given
+        // random data
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("a"));
+        serieses.add(bob.randomWalkTimeSeries("b"));
+        serieses.add(bob.randomWalkTimeSeries("c"));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+        List<List<String>> grid = DataPublisher.gridOfAllDataInTimeSeriesList(timeSerieses);
+
+
+        // When
+        // we generate an XLSX as a temp file
+        Path path = Files.createTempFile("temporary", ".csv");
+        DataPublisher.writeDataGridToCsv(path, grid);
+
+        // Then
+        // It will save a file
+        assertTrue(path.toFile().length() > 12);
+    }
 }

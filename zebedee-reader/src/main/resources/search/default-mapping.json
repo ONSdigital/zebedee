@@ -12,8 +12,7 @@
                       "index_analyzer": "ons_index_analyzer",
                       "fields": {
                         "raw":   {
-                          "type":     "string",
-                          "analyzer": "standard"
+                          "type":     "string"
                         }
                       }
 					},

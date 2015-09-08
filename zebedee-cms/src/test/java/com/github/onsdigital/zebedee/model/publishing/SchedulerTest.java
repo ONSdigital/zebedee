@@ -135,7 +135,20 @@ public class SchedulerTest {
         scheduler.shutdown();
     }
 
+    @Test
+    public void scheduleShouldTakeMillisecondsIntoAccount() throws InterruptedException {
 
+        // Given a scheduled task that fails with an exception.
+        Scheduler scheduler = new Scheduler();
+
+        DummyTask task = new DummyTask();
+        ScheduledFuture<?> future = scheduler.schedule(task, DateTime.now().plusMillis(1333).toDate());
+
+        // When the time for the task passes.
+        long delayInMs = future.getDelay(TimeUnit.MILLISECONDS);
+        assertTrue(delayInMs > 1200);
+        scheduler.shutdown();
+    }
 }
 
 

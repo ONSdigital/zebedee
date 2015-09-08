@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
 
 
@@ -815,7 +816,6 @@ public class DataPublisherTest {
     public void gridOfData_givenSetOfTimeSeries_returnsExpectedGrid() {
         // Given
         // some time series we create and then retrieve
-        int checked = 0;
         List<Path> serieses = new ArrayList<>();
         serieses.add(bob.randomWalkTimeSeries("a"));
         serieses.add(bob.randomWalkTimeSeries("b"));
@@ -865,5 +865,49 @@ public class DataPublisherTest {
         }
 
         return grid.get(rowNumber).get(colNumber);
+    }
+
+    @Test
+    public void writeXLSX_givenGridOfData_willCreateFile() throws IOException {
+        // Given
+        // random data
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("a"));
+        serieses.add(bob.randomWalkTimeSeries("b"));
+        serieses.add(bob.randomWalkTimeSeries("c"));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+        List<List<String>> grid = DataPublisher.gridOfAllDataInTimeSeriesList(timeSerieses);
+
+
+        // When
+        // we generate an XLSX as a temp file
+        Path path = Files.createTempFile("temporary", ".xlsx");
+        DataPublisher.writeDataGridToXlsx(path, grid);
+
+        // Then
+        // It will save a file
+        assertTrue(path.toFile().length() > 12);
+    }
+
+    @Test
+    public void writeCSV_givenGridOfData_willCreateFile() throws IOException {
+        // Given
+        // random data
+        List<Path> serieses = new ArrayList<>();
+        serieses.add(bob.randomWalkTimeSeries("a"));
+        serieses.add(bob.randomWalkTimeSeries("b"));
+        serieses.add(bob.randomWalkTimeSeries("c"));
+        List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
+        List<List<String>> grid = DataPublisher.gridOfAllDataInTimeSeriesList(timeSerieses);
+
+
+        // When
+        // we generate an XLSX as a temp file
+        Path path = Files.createTempFile("temporary", ".csv");
+        DataPublisher.writeDataGridToCsv(path, grid);
+
+        // Then
+        // It will save a file
+        assertTrue(path.toFile().length() > 12);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
@@ -28,13 +29,15 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -130,19 +133,54 @@ public class DataPublisher {
             Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
             Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".csv");
             List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
-
+            writeDataGridToXlsx(xlsPath, dataGrid);
 
 
             System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
         }
     }
 
-    static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) {
+    /**
+     * Output a grid of strings to XLSX
+     *
+     * @param xlsPath
+     * @param grid
+     * @throws IOException
+     */
+    static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) throws IOException {
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet("data");
 
+        int rownum = 0;
+        for (List<String> gridRow : grid) {
+            Row row = sheet.createRow(rownum++);
+
+            int colnum = 0;
+            for (String gridCell : gridRow) {
+                row.createCell(colnum++).setCellValue(gridCell);
+            }
+        }
+
+        try (OutputStream stream = Files.newOutputStream(xlsPath)) {
+            wb.write(stream);
+        }
     }
 
-    static void writeDataGridToCsv(Path csvPath, List<List<String>> grid) {
-
+    /**
+     * Output a grid of strings to CSV
+     *
+     * @param csvPath path to write to
+     * @param grid    grid to output to
+     * @throws IOException
+     */
+    static void writeDataGridToCsv(Path csvPath, List<List<String>> grid) throws IOException {
+        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(csvPath), Charset.forName("UTF8")), ',')) {
+            for (List<String> gridRow : grid) {
+                String[] row = new String[gridRow.size()];
+                row = gridRow.toArray(row);
+                writer.writeNext(row);
+            }
+        }
     }
 
     static String datasetIdFromDatafilePath(Path path) {

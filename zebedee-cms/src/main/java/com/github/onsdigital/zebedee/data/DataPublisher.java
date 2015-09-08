@@ -134,6 +134,7 @@ public class DataPublisher {
             Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".csv");
             List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
             writeDataGridToXlsx(xlsPath, dataGrid);
+            writeDataGridToCsv(csvPath, dataGrid);
 
 
             System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);

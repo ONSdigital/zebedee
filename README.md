@@ -8,5 +8,5 @@ It provides the ability to create and approve change-sets and preview these, ove
 David
 
 #### Example environment variables
-zebedee_root = /Users/thomasridd/Documents/onswebsite
-brian_url = http://localhost:8083/
+zebedee_root    /Users/thomasridd/Documents/onswebsite
+brian_url   http://localhost:8083/

@@ -1,48 +1,33 @@
 {
 	"_default_": {
-        "_all" : {"enabled" : true},
-	  	"dynamic_templates" : [
-		  {
-			"disable_include_template": {
-			  "match": "*",
-			  "mapping" : {
-				"include_in_all" : false
-			  }
-			}
-		  }
-		],
 		"properties": {
             "type" : {
               "type" : "string",
-              "index": "analyzed",
-              "index_analyzer": "ons_index_analyzer",
-              "include_in_all" : true
+              "index_analyzer": "ons_index_analyzer"
             },
 			"description": {
 				"properties": {
 					"title": {
                       "type" : "string",
-                      "index": "analyzed",
                       "index_analyzer": "ons_index_analyzer",
-                      "include_in_all" : true
+                      "fields": {
+                        "raw":   {
+                          "type":     "string",
+                          "analyzer": "standard"
+                        }
+                      }
 					},
 				    "edition": {
                       "type" : "string",
-                      "index": "analyzed",
-                      "index_analyzer": "ons_index_analyzer",
-                      "include_in_all" : true
+                      "index_analyzer": "ons_index_analyzer"
 				  },
 				    "summary": {
                       "type" : "string",
-                      "index": "analyzed",
-                      "index_analyzer": "ons_index_analyzer",
-                      "include_in_all" : true
+                      "index_analyzer": "ons_index_analyzer"
 				  },
                   "keywords": {
                     "type" : "string",
-                    "index": "analyzed",
-                    "index_analyzer": "ons_index_analyzer",
-                    "include_in_all" : true
+                    "index_analyzer": "ons_index_analyzer"
                   }
 				}
 			}

@@ -425,22 +425,26 @@ public class Builder {
      * @return
      */
     public Path randomWalkTimeSeries(String name) {
-        return randomWalkTimeSeries(name, true, true, true, 10);
+        return randomWalkTimeSeries(name, true, true, true, 10, 2015);
     }
 
     public Path randomWalkTimeSeries(String name, boolean withYears, boolean withQuarters, boolean withMonths, int yearsToGenerate) {
+        return randomWalkTimeSeries(name, withYears, withQuarters, withMonths, yearsToGenerate, 2015);
+    }
+
+    public Path randomWalkTimeSeries(String name, boolean withYears, boolean withQuarters, boolean withMonths, int yearsToGenerate, int finalYear) {
         TimeSeries timeSeries = new TimeSeries();
         timeSeries.setDescription(new PageDescription());
 
-        timeSeries.getDescription().setDatasetId(name);
-        timeSeries.getDescription().setTitle("Title " + name);
+        timeSeries.getDescription().setCdid(name);
+        timeSeries.getDescription().setTitle(name);
 
         String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
         String[] quarters = "Q1,Q2,Q3,Q4".split(",");
 
         double val = 100.0;
         NormalDistribution distribution = new NormalDistribution(0, 10);
-        for (int y = 2015 - yearsToGenerate; y < 2015; y++) {
+        for (int y = finalYear - yearsToGenerate + 1; y <= finalYear; y++) {
             if (withYears) {
                 TimeSeriesValue value = new TimeSeriesValue();
 
@@ -474,6 +478,83 @@ public class Builder {
             }
         }
 
+
+        // Save the timeseries
+        Path path = null;
+        try {
+            path = Files.createTempFile(name, ".json");
+            try (OutputStream output = Files.newOutputStream(path)) {
+                Serialiser.serialise(output, timeSeries);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return path;
+    }
+
+    public Path randomWalkQuarters(String name, int startYear, int startQuarter, int datapoints) {
+        TimeSeries timeSeries = new TimeSeries();
+        timeSeries.setDescription(new PageDescription());
+
+        timeSeries.getDescription().setCdid(name);
+        timeSeries.getDescription().setTitle(name);
+
+        String[] quarters = "Q1,Q2,Q3,Q4".split(",");
+
+        double val = 100.0;
+        NormalDistribution distribution = new NormalDistribution(0, 10);
+        for (int pt = 0; pt < datapoints; pt++) {
+            val = val + distribution.sample();
+
+            TimeSeriesValue value = new TimeSeriesValue();
+            int quarter = (startQuarter + pt) % 4;
+            int year = startYear + ((pt + startQuarter) / 4);
+
+            value.date = year + " " + quarters[quarter];
+            value.value = String.format("%.1f", val);
+
+            timeSeries.quarters.add(value);
+
+        }
+
+        // Save the timeseries
+        Path path = null;
+        try {
+            path = Files.createTempFile(name, ".json");
+            try (OutputStream output = Files.newOutputStream(path)) {
+                Serialiser.serialise(output, timeSeries);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return path;
+    }
+
+
+    public Path randomWalkMonths(String name, int startYear, int startMonth, int datapoints) {
+        TimeSeries timeSeries = new TimeSeries();
+        timeSeries.setDescription(new PageDescription());
+
+        timeSeries.getDescription().setCdid(name);
+        timeSeries.getDescription().setTitle(name);
+
+        String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
+
+        double val = 100.0;
+        NormalDistribution distribution = new NormalDistribution(0, 10);
+        for (int pt = 0; pt < datapoints; pt++) {
+            val = val + distribution.sample();
+
+            TimeSeriesValue value = new TimeSeriesValue();
+            int month = (startMonth + pt) % 12;
+            int year = startYear + ((pt + startMonth) / 12);
+
+            value.date = year + " " + months[month];
+            value.value = String.format("%.1f", val);
+
+            timeSeries.months.add(value);
+
+        }
 
         // Save the timeseries
         Path path = null;

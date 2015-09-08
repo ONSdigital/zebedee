@@ -126,16 +126,23 @@ public class DataPublisher {
             Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
             IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
 
-            // Save the
+            // Save the files
             Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
-            pregenerateXLS(pathsToTimeSeries, xlsPath);
+            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".csv");
+            List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
 
-            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
-            pregenerateCSV(pathsToTimeSeries, csvPath);
 
 
             System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
         }
+    }
+
+    static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) {
+
+    }
+
+    static void writeDataGridToCsv(Path csvPath, List<List<String>> grid) {
+
     }
 
     static String datasetIdFromDatafilePath(Path path) {
@@ -514,22 +521,6 @@ public class DataPublisher {
         return page;
     }
 
-    static boolean pregenerateXLS(List<Path> pathsToTimeSeries, Path xlsPath) {
-
-        for (Path path : pathsToTimeSeries) {
-            if ((path != null) && Files.exists(path.resolve("data.json"))) {
-
-            }
-        }
-
-        return false;
-    }
-
-    static boolean pregenerateCSV(List<Path> pathsToTimeSeries, Path xlsPath) {
-
-        return false;
-    }
-
     /**
      * Load an array of TimeSeries objects from an array of paths
      *
@@ -557,12 +548,21 @@ public class DataPublisher {
         return ids;
     }
 
-    static Map<String, HashMap<String, String>> rowMap(List<TimeSeries> serieses) {
-        HashMap<String, HashMap<String, String>> map = new HashMap<>();
+
+    /**
+     * A map of maps containing all data so that map.get(CDID).get(TIME) gives
+     * the value
+     *
+     * @param serieses
+     * @return a Map of Maps as described above
+     */
+    static Map<String, Map<String, String>> mapOfAllDataInTimeSeriesList(List<TimeSeries> serieses) {
+        HashMap<String, Map<String, String>> map = new HashMap<>();
 
         for (TimeSeries series: serieses) {
             putCombination(series.getCdid(), "Title", series.getDescription().getTitle(), map);
-            //TODO add further detail rows
+            putCombination(series.getCdid(), "CDID", series.getDescription().getTitle(), map);
+            //TODO add further rows to give more details
 
             if (series.years != null) {
                 for (TimeSeriesValue value: series.years) { putCombination(series.getCdid(), value.date, value.value, map);};
@@ -578,8 +578,200 @@ public class DataPublisher {
         return map;
     }
 
-    private static void putCombination(String cdid, String row, String value, HashMap<String, HashMap<String, String>> map) {
-        HashMap<String, String> submap = new HashMap<>();
+    static List<String> yearRange(List<TimeSeries> seriesList) {
+        TimeSeriesValue min = null;
+        TimeSeriesValue max = null;
+        for (TimeSeries series : seriesList) {
+            for (TimeSeriesValue value : series.years) {
+                if (min == null || min.compareTo(value) > 0) {
+                    min = value;
+                }
+                if (max == null || max.compareTo(value) < 0) {
+                    max = value;
+                }
+            }
+        }
+
+        if (min == null) {
+            return null;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(min.toDate());
+        int minYear = cal.get(Calendar.YEAR);
+        cal.setTime(max.toDate());
+        int maxYear = cal.get(Calendar.YEAR);
+
+        List<String> yearLabels = new ArrayList<>();
+        for (int i = minYear; i <= maxYear; i++) {
+            yearLabels.add(i + "");
+        }
+
+        return yearLabels;
+    }
+
+    static List<String> quarterRange(List<TimeSeries> seriesList) {
+        TimeSeriesValue min = null;
+        TimeSeriesValue max = null;
+        for (TimeSeries series : seriesList) {
+            for (TimeSeriesValue value : series.quarters) {
+                if (min == null || min.compareTo(value) > 0) {
+                    min = value;
+                }
+                if (max == null || max.compareTo(value) < 0) {
+                    max = value;
+                }
+            }
+        }
+
+        if (min == null) {
+            return null;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(min.toDate());
+        int minYear = cal.get(Calendar.YEAR);
+        int minQuarter = cal.get(Calendar.MONTH) / 3;
+
+        cal.setTime(max.toDate());
+        int maxYear = cal.get(Calendar.YEAR);
+        int maxQuarter = cal.get(Calendar.MONTH) / 3;
+
+        String[] quarters = "Q1,Q2,Q3,Q4".split(",");
+
+        List<String> quarterLabels = new ArrayList<>();
+
+        for (int i = minYear; i <= maxYear; i++) {
+            for (int q = 0; q < 4; q++) {
+                if (i == minYear) {
+                    if (q >= minQuarter) {
+                        quarterLabels.add(i + " " + quarters[q]);
+                    }
+                } else if (i == maxYear) {
+                    if (q <= maxQuarter) {
+                        quarterLabels.add(i + " " + quarters[q]);
+                    }
+                } else {
+                    quarterLabels.add(i + " " + quarters[q]);
+                }
+            }
+        }
+
+        return quarterLabels;
+    }
+
+    static List<String> monthRange(List<TimeSeries> seriesList) {
+        TimeSeriesValue min = null;
+        TimeSeriesValue max = null;
+        for (TimeSeries series : seriesList) {
+            for (TimeSeriesValue value : series.months) {
+                if (min == null || min.compareTo(value) > 0) {
+                    min = value;
+                }
+                if (max == null || max.compareTo(value) < 0) {
+                    max = value;
+                }
+            }
+        }
+
+        if (min == null) {
+            return null;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(min.toDate());
+        int minYear = cal.get(Calendar.YEAR);
+        int minMonth = cal.get(Calendar.MONTH);
+
+        cal.setTime(max.toDate());
+        int maxYear = cal.get(Calendar.YEAR);
+        int maxMonth = cal.get(Calendar.MONTH);
+
+        String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
+
+        List<String> monthLabels = new ArrayList<>();
+
+        for (int i = minYear; i <= maxYear; i++) {
+            for (int q = 0; q < 12; q++) {
+                if (i == minYear) {
+                    if (q >= minMonth) {
+                        monthLabels.add(i + " " + months[q]);
+                    }
+                } else if (i == maxYear) {
+                    if (q <= maxMonth) {
+                        monthLabels.add(i + " " + months[q]);
+                    }
+                } else {
+                    monthLabels.add(i + " " + months[q]);
+                }
+            }
+        }
+
+        return monthLabels;
+    }
+
+    static List<List<String>> gridOfAllDataInTimeSeriesList(List<TimeSeries> serieses) {
+        List<List<String>> rows = new ArrayList<>();
+
+        List<String> orderedCDIDs = timeSeriesIdList(serieses);
+        Map<String, Map<String, String>> mapOfData = mapOfAllDataInTimeSeriesList(serieses);
+
+        // Add detail rows
+        List<String> titleRow = new ArrayList<>();
+        titleRow.add("Title");
+        List<String> cdidRow = new ArrayList<>();
+        cdidRow.add("CDID");
+        for (String cdid : orderedCDIDs) {
+            titleRow.add(mapOfData.get("Title").get(cdid));
+            cdidRow.add(cdid);
+        }
+        rows.add(titleRow);
+        rows.add(cdidRow);
+
+        // Add years
+        List<String> yearRange = yearRange(serieses);
+        if (yearRange != null) {
+            for (String year : yearRange) {
+                List<String> newRow = new ArrayList<>();
+                newRow.add(year);
+                for (String cdid : orderedCDIDs) {
+                    newRow.add(mapOfData.get(year).get(cdid));
+                }
+                rows.add(newRow);
+            }
+        }
+
+        // Add quarters
+        List<String> quarterRange = quarterRange(serieses);
+        if (quarterRange != null) {
+            for (String quarter : quarterRange) {
+                List<String> newRow = new ArrayList<>();
+                newRow.add(quarter);
+                for (String cdid : orderedCDIDs) {
+                    newRow.add(mapOfData.get(quarter).get(cdid));
+                }
+                rows.add(newRow);
+            }
+        }
+
+        // Add quarters
+        List<String> monthRange = monthRange(serieses);
+        if (monthRange != null) {
+            for (String month : monthRange) {
+                List<String> newRow = new ArrayList<>();
+                newRow.add(month);
+                for (String cdid : orderedCDIDs) {
+                    newRow.add(mapOfData.get(month).get(cdid));
+                }
+                rows.add(newRow);
+            }
+        }
+
+        return rows;
+    }
+
+    private static void putCombination(String cdid, String row, String value, Map<String, Map<String, String>> map) {
+        Map<String, String> submap = new HashMap<>();
         if (map.containsKey(row)) { submap = map.get(row); }
 
         submap.put(cdid, value);

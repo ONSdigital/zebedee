@@ -78,13 +78,6 @@ public class Publisher {
                             publishComplete,
                             msTaken);
 
-                    if (publishComplete) {
-                        onPublishComplete(zebedee, collection);
-                    }
-
-                    // Save collection updates:
-                    collection.description.published = true;
-
                 } else {
                     Log.print("Collection is already locked for publishing. Halting publish attempt on: " + collection.description.id);
                 }
@@ -97,6 +90,10 @@ public class Publisher {
         } finally {
             writeLock.unlock();
             Log.print("Collection lock released: " + collection.description.id);
+        }
+
+        if (publishComplete) {
+            onPublishComplete(zebedee, collection);
         }
 
         return publishComplete;
@@ -151,6 +148,7 @@ public class Publisher {
                 Date publishedDate = new Date();
                 collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
                 collection.description.publishDate = publishedDate;
+                collection.description.published = true;
                 publishComplete = true;
             }
 

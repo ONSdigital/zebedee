@@ -4,8 +4,6 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollectionSearchResult;
-import com.github.onsdigital.zebedee.json.publishing.Result;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -27,8 +25,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -69,7 +65,7 @@ public class PublishedCollections {
                         .prepareCreate(index);
 
                 Log.print("Adding mapping for published collections index");
-                indexBuilder.addMapping(mapping, getMappingProperties(mapping));
+                //indexBuilder.addMapping(mapping, getMappingProperties(mapping));
                 indexBuilder.execute().actionGet();
 
                 indexExistingResults(client);

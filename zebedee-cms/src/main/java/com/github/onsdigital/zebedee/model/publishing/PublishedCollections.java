@@ -168,7 +168,7 @@ public class PublishedCollections {
     private List<PublishedCollection> readFromFile() throws IOException {
         List<PublishedCollection> publishedCollections = new ArrayList<>();
 
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.json")) {
             for (Path filePath : stream) {
                 if (!Files.isDirectory(filePath)) {
                     Log.print("Attempting to read published collection %s", filePath.toString());

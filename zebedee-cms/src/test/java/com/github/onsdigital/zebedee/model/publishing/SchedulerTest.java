@@ -115,11 +115,11 @@ public class SchedulerTest {
 
         List<DummyTask> tasks = new ArrayList<>();
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             System.out.println("Scheduling task " + i);
             DummyTask task = new DummyTask();
             tasks.add(task);
-            scheduler.schedule(task, DateTime.now().plusMillis(200).toDate());
+            scheduler.schedule(task, new Date(System.currentTimeMillis() + 200));
         }
 
         // When the time for the task passes.

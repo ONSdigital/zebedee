@@ -48,6 +48,23 @@ public class PublishedCollections {
         this.zebedee = zebedee;
     }
 
+    private static XContentBuilder getMappingProperties(String type) throws IOException {
+
+        XContentBuilder builder = jsonBuilder().startObject().startObject(type).startObject("properties");
+        try {
+            builder.startObject("id").field("type", "string").field("index", "analyzed").endObject();
+            builder.startObject("name").field("type", "string").field("index", "analyzed").endObject();
+            builder.startObject("type").field("type", "string").field("index", "analyzed").endObject();
+            builder.startObject("publishDate").field("type", "date").field("index", "analyzed").endObject();
+            builder.endObject().endObject().endObject();
+            return builder;
+        } finally {
+            if (builder != null) {
+                builder.close();
+            }
+        }
+    }
+
     // todo: Currently 'lazy loading' the index, need a hook on the end of initialising elastic search
     private void tryInit(Client client) throws IOException {
         if (!initialised) {
@@ -92,7 +109,6 @@ public class PublishedCollections {
         execution.actionGet();
     }
 
-
     /**
      * Search published collections
      *
@@ -130,7 +146,6 @@ public class PublishedCollections {
         return results;
     }
 
-
     /**
      * Read existing results from file and add them to elastic search.
      */
@@ -141,23 +156,6 @@ public class PublishedCollections {
 
         for (PublishedCollection publishedCollection : publishedCollections) {
             index(client, publishedCollection);
-        }
-    }
-
-    private static XContentBuilder getMappingProperties(String type) throws IOException {
-
-        XContentBuilder builder = jsonBuilder().startObject().startObject(type).startObject("properties");
-        try {
-            builder.startObject("id").field("type", "string").field("index", "analyzed").endObject();
-            builder.startObject("name").field("type", "string").field("index", "analyzed").endObject();
-            builder.startObject("type").field("type", "string").field("index", "analyzed").endObject();
-            builder.startObject("publishDate").field("type", "date").field("index", "analyzed").endObject();
-            builder.endObject().endObject().endObject();
-            return builder;
-        } finally {
-            if (builder != null) {
-                builder.close();
-            }
         }
     }
 
@@ -173,6 +171,7 @@ public class PublishedCollections {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path filePath : stream) {
                 if (!Files.isDirectory(filePath)) {
+                    Log.print("Attempting to read published collection %s", filePath.toString());
                     try (InputStream input = Files.newInputStream(filePath)) {
                         publishedCollections.add(Serialiser.deserialise(input,
                                 PublishedCollection.class));

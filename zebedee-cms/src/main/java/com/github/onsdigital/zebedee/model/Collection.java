@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -182,8 +183,8 @@ public class Collection {
             throws IOException {
 
         // Delete folders:
-        this.zebedee.delete(path); // delete the directory only if its empty
-        //FileUtils.deleteDirectory(path.toFile()); // delete the directory including any files.
+        //this.zebedee.delete(path); // delete the directory only if its empty
+        FileUtils.deleteDirectory(path.toFile()); // delete the directory including any files.
 
         // Delete the description file
         String filename = PathUtils.toFilename(this.description.name);

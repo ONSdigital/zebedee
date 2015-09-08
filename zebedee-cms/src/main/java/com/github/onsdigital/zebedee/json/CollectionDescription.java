@@ -19,7 +19,8 @@ public class CollectionDescription extends CollectionBase {
     public List<String> completeUris;
     public List<String> reviewedUris;
     public boolean approvedStatus;
-    public boolean published;
+    public boolean publishComplete;
+    public String publishTransactionId;
 
     /**
      * events related to this collection

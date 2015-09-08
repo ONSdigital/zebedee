@@ -1,13 +1,12 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
+import com.github.onsdigital.zebedee.util.Log;
 import org.joda.time.DateTime;
 
 import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import static org.joda.time.Seconds.secondsBetween;
 
 /**
  * Schedule a task to run at the given date.
@@ -30,10 +29,10 @@ public class Scheduler {
     public ScheduledFuture<?> schedule(Runnable task, Date date) {
         DateTime now = DateTime.now();
         DateTime scheduledDate = new DateTime(date);
-        int seconds = secondsBetween(now, scheduledDate).getSeconds();
+        long ms = scheduledDate.getMillis() - now.getMillis();
 
-        System.out.println("Task scheduled to run in " + seconds + " seconds. Current time = " + now.toString() + " Schedule time=" + scheduledDate.toString());
-        ScheduledFuture<?> future = scheduledExecutorService.schedule(task, seconds, TimeUnit.SECONDS);
+        Log.print("Task scheduled to run in " + ms + "ms. Current time = " + now.toString() + " Schedule time=" + scheduledDate.toString());
+        ScheduledFuture<?> future = scheduledExecutorService.schedule(task, ms, TimeUnit.MILLISECONDS);
         return future;
     }
 

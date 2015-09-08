@@ -20,33 +20,80 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
 
 public class Publisher {
 
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
+        boolean publishComplete = false;
 
-        Log.print("Starting publish process for collection %s", collection.description.name);
-        long publishStart = System.currentTimeMillis();
+        // First get the in-memory (within-JVM) lock.
+        // This will block attempts to write to the collection during the publishing process
+        Log.print("Attempting to lock collection before publish: " + collection.description.id);
+        Lock writeLock = collection.getWriteLock();
+        writeLock.lock();
 
-        if (!collection.description.approvedStatus) {
-            Log.print("The collection %s cannot be published as it has not been approved", collection.description.name);
-            return false;
+        try {
+            // First check the state of the collection
+            if (collection.description.publishComplete) {
+                Log.print("Collection has already been published. Halting publish: " + collection.description.id);
+                return publishComplete;
+            }
+
+            // Now attempt to get a file (inter-JVM) lock
+            // This prevents Staging and Live attempting to
+            // publish the same collection at the same time.
+            // We specify WRITE so we can get a lock and
+            // CREATE to ensure the file is created if it
+            // doesn't exist.
+            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+
+                // If the lock can't be acquired, we'll get null:
+                FileLock lock = channel.tryLock();
+                if (lock != null) {
+                    Log.print("Collection lock acquired: " + collection.description.id);
+
+                    collection.path.resolve("publish.lock");
+
+                    Log.print("Starting publish process for collection %s", collection.description.name);
+                    long publishStart = System.currentTimeMillis();
+
+                    if (!collection.description.approvedStatus) {
+                        Log.print("The collection %s cannot be published as it has not been approved", collection.description.name);
+                        return false;
+                    }
+
+                    publishComplete = PublishFilesToWebsite(collection, email);
+
+                    long msTaken = (System.currentTimeMillis() - publishStart);
+                    Log.print("Publish process finished for collection %s complete: %s time taken: %dms",
+                            collection.description.name,
+                            publishComplete,
+                            msTaken);
+
+                } else {
+                    Log.print("Collection is already locked for publishing. Halting publish attempt on: " + collection.description.id);
+                }
+
+            } finally {
+                // Save any updates to the collection
+                collection.save();
+            }
+
+        } finally {
+            writeLock.unlock();
+            Log.print("Collection lock released: " + collection.description.id);
         }
-
-        boolean publishComplete = PublishFilesToWebsite(collection, email);
-
-        long msTaken = (System.currentTimeMillis() - publishStart) / 1000;
-        Log.print("Publish process finished for collection %s complete: %s time taken: %dms",
-                collection.description.name,
-                publishComplete,
-                msTaken);
 
         if (publishComplete) {
             onPublishComplete(zebedee, collection);
@@ -69,9 +116,9 @@ public class Publisher {
 
         Host host = new Host(Configuration.getTheTrainUrl());
         String encryptionPassword = Random.password(100);
-        String transactionId = null;
         try {
-            transactionId = beginPublish(host, encryptionPassword);
+            collection.description.publishTransactionId = beginPublish(host, encryptionPassword);
+            collection.save();
             ExecutorService pool = Executors.newCachedThreadPool();
             List<Future<IOException>> results = new ArrayList<>();
 
@@ -80,7 +127,7 @@ public class Publisher {
 
                 Path source = collection.reviewed.get(uri);
                 if (source != null) {
-                    results.add(publishFile(host, transactionId, encryptionPassword, uri, source, pool));
+                    results.add(publishFile(host, collection.description.publishTransactionId, encryptionPassword, uri, source, pool));
                 }
 
                 // Add an event to the event log
@@ -98,27 +145,32 @@ public class Publisher {
             }
 
             // If all has gone well so far, commit the publishing transaction:
-            Result result = commitPublish(host, transactionId, encryptionPassword);
+            Result result = commitPublish(host, collection.description.publishTransactionId, encryptionPassword);
 
             if (!result.error) {
-                collection.description.AddEvent(new Event(new Date(), EventType.PUBLISHED, email));
+                Date publishedDate = new Date();
+                collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
+                collection.description.publishDate = publishedDate;
+                collection.description.publishComplete = true;
+                publishComplete = true;
             }
 
-            publishComplete = true;
+            collection.description.AddPublishResult(result);
 
         } catch (IOException e) {
 
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
             System.out.println(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
-            if (transactionId != null) {
+            if (collection.description.publishTransactionId != null) {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
-                rollbackPublish(host, transactionId, encryptionPassword);
+                rollbackPublish(host, collection.description.publishTransactionId, encryptionPassword);
             }
-        }
 
-        // Save a published collections log
-        collection.save();
+        } finally {
+            // Save any updates to the collection
+            collection.save();
+        }
 
         return publishComplete;
     }
@@ -136,7 +188,9 @@ public class Publisher {
         copyFilesToMaster(zebedee, collection);
 
         // move collection files to archive
-        moveCollectionToArchive(zebedee, collection);
+        Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
+
+        zebedee.publishedCollections.add(collectionJsonPath);
 
         collection.delete();
         ContentTree.dropCache();
@@ -157,13 +211,13 @@ public class Publisher {
         }
     }
 
-    public static void moveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
+    public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
 
         Log.print("Moving collection files to archive for collection: " + collection.description.name);
         String filename = PathUtils.toFilename(collection.description.name);
         Path collectionJsonSource = zebedee.collections.path.resolve(filename + ".json");
         Path collectionFilesSource = collection.reviewed.path;
-        Path logPath = zebedee.path.resolve("publish-log");
+        Path logPath = zebedee.publishedCollections.path;
 
         if (!Files.exists(logPath)) {
             Files.createDirectory(logPath);
@@ -179,8 +233,9 @@ public class Publisher {
         Files.copy(collectionJsonSource, collectionJsonDestination);
 
         Log.print("Moving collection files from %s to %s", collectionFilesSource, collectionFilesDestination);
-
         FileUtils.moveDirectoryToDirectory(collectionFilesSource.toFile(), collectionFilesDestination.toFile(), true);
+
+        return collectionJsonDestination;
     }
 
     /**

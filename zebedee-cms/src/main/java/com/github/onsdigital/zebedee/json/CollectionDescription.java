@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee.json;
 
+import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.model.Collection;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,30 +13,14 @@ import java.util.Map;
  *
  * @author david
  */
-public class CollectionDescription {
-
-    /**
-     * The unique identifier of this {@link Collection}.
-     */
-    public String id;
-    /**
-     * The readable name of this {@link Collection}.
-     */
-    public String name;
-    /**
-     * The type of the collection to determine the publish behaviour.
-     */
-    public CollectionType type;
-    /**
-     * The date-time when this {@link Collection} should be published (if it has
-     * a publish date).
-     */
-    public Date publishDate;
+public class CollectionDescription extends CollectionBase {
 
     public List<String> inProgressUris;
     public List<String> completeUris;
     public List<String> reviewedUris;
     public boolean approvedStatus;
+    public boolean publishComplete;
+    public String publishTransactionId;
 
     /**
      * events related to this collection
@@ -45,6 +31,12 @@ public class CollectionDescription {
      * A List of {@link Event} for each uri in the collection.
      */
     public Map<String, Events> eventsByUri;
+
+    /**
+     * A list of {@link com.github.onsdigital.zebedee.json.publishing.Result} for
+     * each attempt at publishing this collection.
+     */
+    public List<Result> publishResults;
 
     /**
      * Default constuructor for serialisation.
@@ -87,4 +79,16 @@ public class CollectionDescription {
         events.add(event);
     }
 
+    /**
+     * Add a {@link Result} to this
+     * {@link CollectionDescription}.
+     * @param result
+     */
+    public void AddPublishResult(Result result) {
+        if (publishResults == null) {
+            publishResults = new ArrayList<>();
+        }
+
+        publishResults.add(result);
+    }
 }

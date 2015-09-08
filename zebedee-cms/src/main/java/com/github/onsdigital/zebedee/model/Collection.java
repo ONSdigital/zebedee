@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -111,7 +113,7 @@ public class Collection {
             throws IOException {
 
         String filename = PathUtils.toFilename(collectionDescription.name);
-        collectionDescription.id = filename+ "-" + Random.id();
+        collectionDescription.id = filename + "-" + Random.id();
 
         // Create the folders:
         Path collection = zebedee.collections.path.resolve(filename);
@@ -181,8 +183,8 @@ public class Collection {
             throws IOException {
 
         // Delete folders:
-        this.zebedee.delete(path); // delete the directory only if its empty
-        //FileUtils.deleteDirectory(path.toFile()); // delete the directory including any files.
+        //this.zebedee.delete(path); // delete the directory only if its empty
+        FileUtils.deleteDirectory(path.toFile()); // delete the directory including any files.
 
         // Delete the description file
         String filename = PathUtils.toFilename(this.description.name);
@@ -195,6 +197,16 @@ public class Collection {
 
         // remove the lock for the collection
         collectionLocks.remove(path);
+    }
+
+    /**
+     * This methods is used by {@link com.github.onsdigital.zebedee.model.publishing.Publisher Publisher}
+     * to acquire a write lock on a collection during publishing.
+     *
+     * @return The collection write lock.
+     */
+    public Lock getWriteLock() {
+        return collectionLocks.get(this.path).writeLock();
     }
 
     public boolean save() throws IOException {
@@ -327,7 +339,7 @@ public class Collection {
     public Path autocreateReviewedPath(String uri) throws IOException {
         // Does this path already exist in the published area?
         Path path = reviewed.get(uri);
-        if(path == null) {
+        if (path == null) {
             path = reviewed.toPath(uri);
             PathUtils.create(path);
         }
@@ -403,27 +415,31 @@ public class Collection {
      * Set the given uri to reviewed in this collection.
      *
      * @param session The user session attempting to review
-     * @param uri   The path you would like to review.
+     * @param uri     The path you would like to review.
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
      * @throws UnauthorizedException if user
-     * @throws IOException If a filesystem error occurs.
+     * @throws IOException           If a filesystem error occurs.
      */
     public boolean review(Session session, String uri) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
-        if(session == null) { throw new UnauthorizedException("Insufficient permissions"); }
+        if (session == null) {
+            throw new UnauthorizedException("Insufficient permissions");
+        }
 
 
         boolean result = false;
 
-        if(!this.isInCollection(uri)) {
+        if (!this.isInCollection(uri)) {
             throw new NotFoundException("File not found");
         }
 
 
         boolean permission = zebedee.permissions.canEdit(session.email);
-        if(!permission) { throw new UnauthorizedException("Insufficient permissions"); }
+        if (!permission) {
+            throw new UnauthorizedException("Insufficient permissions");
+        }
 
-        if(Files.isDirectory(this.find(session.email, uri))) {
+        if (Files.isDirectory(this.find(session.email, uri))) {
             throw new BadRequestException("Cannot complete a directory");
         }
 
@@ -433,9 +449,13 @@ public class Collection {
         }
 
         boolean userCompletedContent = didUserCompleteContent(session.email, uri);
-        if(userCompletedContent) { throw new UnauthorizedException("Reviewer must be a second set of eyes"); }
+        if (userCompletedContent) {
+            throw new UnauthorizedException("Reviewer must be a second set of eyes");
+        }
 
-        if(reviewed.get(uri) != null) { throw new BadRequestException("Item has already been reviewed"); }
+        if (reviewed.get(uri) != null) {
+            throw new BadRequestException("Item has already been reviewed");
+        }
 
         if (permission && !userCompletedContent) {
 
@@ -462,7 +482,9 @@ public class Collection {
         if (!StringUtils.startsWith(uri, "/")) {
             uri = "/" + uri;
         }
-        if (this.description.eventsByUri == null) { return false; }
+        if (this.description.eventsByUri == null) {
+            return false;
+        }
 
         Events events = this.description.eventsByUri.get(uri);
         if (events == null) {
@@ -477,7 +499,9 @@ public class Collection {
         if (!StringUtils.startsWith(uri, "/")) {
             uri = "/" + uri;
         }
-        if (this.description.eventsByUri == null) { return false; }
+        if (this.description.eventsByUri == null) {
+            return false;
+        }
 
         Events events = this.description.eventsByUri.get(uri);
         if (events == null) {
@@ -543,7 +567,9 @@ public class Collection {
      */
     public void AddEvent(String uri, Event event) {
 
-        if (!StringUtils.startsWith(uri, "/")) { uri = "/" + uri; }
+        if (!StringUtils.startsWith(uri, "/")) {
+            uri = "/" + uri;
+        }
 
         if (this.description.eventsByUri == null)
             this.description.eventsByUri = new HashMap<>();

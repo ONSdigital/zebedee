@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
+import com.github.onsdigital.zebedee.util.Log;
+
 /**
  * Dummy task to test if it has been run.
  */
@@ -9,7 +11,7 @@ public class DummyTask implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("DummyTask has run at " + System.currentTimeMillis());
+        Log.print("DummyTask has run at " + System.currentTimeMillis());
         hasRun = true;
     }
 }

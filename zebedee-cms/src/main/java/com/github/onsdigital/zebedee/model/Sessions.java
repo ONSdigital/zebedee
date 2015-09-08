@@ -29,7 +29,7 @@ public class Sessions extends TimerTask {
         this.sessions = sessions;
 
         // Run every minute after the first minute:
-        timer = new Timer();
+        timer = new Timer("Florence sessions timer", true);
         timer.schedule(this, 60 * 1000, 60 * 1000);
     }
 

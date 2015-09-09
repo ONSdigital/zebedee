@@ -9,5 +9,7 @@ public enum EventType {
     EDITED,
     COMPLETED,
     REVIEWED,
+    APPROVED,
+    UNLOCKED,
     PUBLISHED
 }

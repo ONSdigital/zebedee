@@ -557,6 +557,85 @@ public class CollectionsTest {
         // Then
         // The collection should be approved (reloading to make sure it's saved)
         assertTrue(new Collection(builder.collections.get(0), zebedee).description.approvedStatus);
+        assertTrue(collection.description.events.hasEventForType(EventType.APPROVED));
+    }
+
+    @Test
+    public void shouldUnlockCollection()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A collection that's approved.
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        zebedee.collections.approve(collection, session);
+
+        // When
+        // We attempt to unlock
+        zebedee.collections.unlock(collection, session);
+
+        // Then
+        // The collection should be unlocked (approved = false)
+        assertFalse(new Collection(builder.collections.get(0), zebedee).description.approvedStatus);
+
+        // And an unlocked event should exist.
+        assertTrue(collection.description.events.hasEventForType(EventType.UNLOCKED));
+    }
+
+    @Test
+    public void shouldUnlockWithoutAddingEventIfAlreadyUnlocked()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A collection that's not been approved.
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+
+        // When
+        // We attempt to unlock
+        zebedee.collections.unlock(collection, session);
+
+        // Then
+        // The collection should be unlocked (approved = false)
+        assertFalse(new Collection(builder.collections.get(0), zebedee).description.approvedStatus);
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnUnlock()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException {
+
+        // Given
+        // A null session
+        Session session = null;
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+
+        // When
+        // We attempt to unlock
+        zebedee.collections.unlock(collection, session);
+
+        // Then
+        // We should get the expected exception, not a null pointer.
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForNullCollectionOnUnlock()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException {
+
+        // Given
+        // A null collection
+        Collection collection = null;
+        Session session = zebedee.sessions.create(builder.administrator.email);
+
+        // When
+        // We attempt to approve
+        zebedee.collections.unlock(collection, session);
+
+        // Then
+        // We should get the expected exception, not a null pointer.
     }
 
     @Test(expected = NotFoundException.class)

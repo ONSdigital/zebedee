@@ -47,99 +47,9 @@ import java.util.*;
  */
 public class DataPublisher {
     static final String BRIAN_KEY = "brian_url";
-    public static int insertions = 0;
-    public static int corrections = 0;
-    public static Map<String, String> env = System.getenv();
-
-
-    public static void preprocessCollection(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
-
-        if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0) {
-            System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
-            return;
-        }
-
-        preprocessCSDB(zebedee, collection, session);
-
-        System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
-    }
-
-
-    /**
-     * The T5 timeseries objects are made by
-     * 1. Searching for all .csdb files in a collection
-     * 2. Getting Brian to break the files down to their component stats and basic metadata.
-     * 3. Combining the stats with metadata entered with the dataset and existing data
-     *
-     * @param collection the collection to search for dataset objects
-     * @param session
-     * @throws IOException
-     * @throws BadRequestException
-     * @throws UnauthorizedException
-     */
-    static void preprocessCSDB(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
-
-        // First find all csdb files in the collection
-        List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
-
-        List<Path> pathsToTimeSeries = new ArrayList<>();
-
-        // For each file in this collection
-        for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
-
-            // Download the dataset page (for metadata)
-            Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
-            String datasetUri = zebedee.toUri(csdbDataset.get("json"));
-
-            DownloadSection section = new DownloadSection();
-            section.setTitle(dataset.getDescription().getTitle());
-            section.setCdids(new ArrayList<String>());
-
-            if (dataset.getDescription().getDatasetId() == null) {
-                dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
-            }
-
-            // Break down the csdb file to timeseries (part-built by extracting csdb files)
-            TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"));
-
-            // Process each time series
-            for (TimeSeries series : serieses) {
-
-                // Work out the correct timeseries path by working back from the dataset uri
-                String uri = uriForSeriesInDataset(datasetUri, series);
-                //Path path = collection.find("", uri);
-
-                // Construct the new page
-                TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
-                section.getCdids().add(newPage.getDescription().getCdid());
-
-                // Save the new page to reviewed
-                Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
-                IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
-
-                // Write csv and other files:
-                pathsToTimeSeries.add(savePath);
-            }
-
-            // Save the new dataset to be reviewed
-            List<DownloadSection> sections = new ArrayList<>();
-            sections.add(section);
-            dataset.setDownloads(sections);
-
-            Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
-            IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
-
-            // Save the files
-            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
-            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".csv");
-            List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
-            writeDataGridToXlsx(xlsPath, dataGrid);
-            writeDataGridToCsv(csvPath, dataGrid);
-
-
-            System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
-        }
-    }
+    public int insertions = 0;
+    public int corrections = 0;
+    public Map<String, String> env = System.getenv();
 
     /**
      * Output a grid of strings to XLSX
@@ -197,33 +107,10 @@ public class DataPublisher {
         String uri = StringUtils.join(split, "/");
         uri = ("/" + uri + "/timeseries/" + series.getCdid()).toLowerCase();
 
-        if (uri.startsWith("//")) { uri = uri.substring(1); } // edge case handler
+        if (uri.startsWith("//")) {
+            uri = uri.substring(1);
+        } // edge case handler
         return uri;
-    }
-
-    /**
-     * Combines sections of
-     *
-     * Updated upstream
-     * @param destinationUri
-     * @param dataset
-     * @param series
-     * @return
-     * @throws IOException
-     */
-    static TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, Dataset dataset, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
-
-        // Attempts to open an existing time series or creates a new one
-        TimeSeries page = startPageForSeriesWithPublishedPath(destinationUri, series);
-
-        // Add stats data from the time series (as returned by Brian)
-        // NOTE: This will log any corrections as it goes
-        populatePageFromTimeSeries(page, series, dataset);
-
-        // Add metadata from the dataset
-        populatePageFromDataSetPage(page, dataset, datasetURI);
-
-        return page;
     }
 
     //
@@ -255,7 +142,6 @@ public class DataPublisher {
 
         return page;
     }
-
 
     /**
      * Detects datasets appropriate to csdb style publication
@@ -333,136 +219,6 @@ public class DataPublisher {
     }
 
     /**
-     * Posts a csdb file to the brian Services/ConvertCSDB endpoint and deserialises the result
-     * as a collection of file series objects
-     *
-     * @param path
-     * @return a series of timeseries objects
-     * @throws IOException
-     */
-    static TimeSerieses callBrianToProcessCSDB(Path path) throws IOException {
-        URI url = csdbURI();
-
-        HttpPost post = new HttpPost(url);
-
-        // Add csdb file as a binary
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
-        FileBody bin = new FileBody(path.toFile());
-        multipartEntityBuilder.addPart("file", bin);
-
-        post.setEntity(multipartEntityBuilder.build());
-
-        // Post to the endpoint
-        try (CloseableHttpResponse response = HttpClients.createDefault().execute(post)) {
-            TimeSerieses result = null;
-
-            //
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) {
-                try (InputStream inputStream = entity.getContent()) {
-                    try {
-                        result = ContentUtil.deserialise(inputStream, TimeSerieses.class);
-                    } catch (JsonSyntaxException e) {
-                        // This can happen if an error HTTP code is received and the
-                        // body of the response doesn't contain the expected object:
-                        result = null;
-                    }
-                }
-            } else {
-                EntityUtils.consume(entity);
-            }
-            return result;
-        }
-    }
-
-    /**
-     * The URI for the Brian ConvertCSDB endpoint
-     *
-     * @return
-     */
-    static URI csdbURI() {
-        String cdsbURL = env.get("brian_url") + "/Services/ConvertCSDB";
-        URI url = null;
-        try {
-            URIBuilder uriBuilder = new URIBuilder(cdsbURL);
-            url = uriBuilder.build();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Data services URL not found: " + cdsbURL);
-        }
-        return url;
-    }
-
-    /**
-     * Takes a part-built TimeSeries page and populates the {@link com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue} list using data gathered from a csdb file
-     *
-     * @param page    a part-built time series page
-     * @param series  a time series returned by Brian by parsing a csdb file
-     * @param dataset the source dataset page
-     * @return
-     */
-    static TimeSeries populatePageFromTimeSeries(TimeSeries page, TimeSeries series, Dataset dataset) {
-
-        // Time series is a bit of an inelegant beast in that it splits data storage by time period
-        // We deal with this by
-        populatePageFromSetOfValues(page, page.years, series.years, dataset);
-        populatePageFromSetOfValues(page, page.quarters, series.quarters, dataset);
-        populatePageFromSetOfValues(page, page.months, series.months, dataset);
-
-        if (page.getDescription() == null || series.getDescription() == null) {
-            System.out.println("Problem");
-        }
-        page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
-        page.getDescription().setCdid(series.getDescription().getCdid());
-
-        // Copy across the title if it is currently blank (equates to equalling Cdid)
-        if (page.getDescription().getTitle() == null || page.getDescription().getTitle().equalsIgnoreCase("")) {
-            page.getDescription().setTitle(series.getDescription().getTitle());
-        } else if (page.getDescription().getTitle().equalsIgnoreCase(page.getCdid())) {
-            page.getDescription().setTitle(series.getDescription().getTitle());
-        }
-
-        page.getDescription().setDate(series.getDescription().getDate());
-        page.getDescription().setNumber(series.getDescription().getNumber());
-
-        return page;
-    }
-
-    // Support function for above
-    static void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, Dataset dataset) {
-
-        // Iterate through values
-        for (TimeSeriesValue value : updateValues) {
-            // Find the current value of the data point
-            TimeSeriesValue current = getCurrentValue(currentValues, value);
-
-            if (current != null) { // A point already exists for this data
-
-                if (!current.value.equalsIgnoreCase(value.value)) { // A point already exists for this data
-                    // Take a copy
-                    TimeSeriesValue old = ContentUtil.deserialise(ContentUtil.serialise(current), TimeSeriesValue.class);
-
-                    // Update the point
-                    current.value = value.value;
-                    current.sourceDataset = dataset.getDescription().getDatasetId();
-
-                    current.updateDate = new Date();
-
-                    // Log the correction
-                    logCorrection(page, old, current);
-                }
-            } else {
-                value.sourceDataset = dataset.getDescription().getDatasetId();
-                value.updateDate = new Date();
-
-                page.add(value);
-                //
-                logInsertion(page, value);
-            }
-        }
-    }
-
-    /**
      * If a {@link TimeSeriesValue} for value.time exists in currentValues returns that.
      * Otherwise null
      *
@@ -483,20 +239,6 @@ public class DataPublisher {
         return null;
     }
 
-    /**
-     * @param series
-     * @param oldValue
-     * @param newValue
-     */
-    private static void logCorrection(TimeSeries series, TimeSeriesValue oldValue, TimeSeriesValue newValue) {
-
-        corrections += 1;
-    }
-
-    private static void logInsertion(TimeSeries series, TimeSeriesValue newValue) {
-        insertions += 1;
-    }
-
     static TimeSeries populatePageFromDataSetPage(TimeSeries page, Dataset datasetPage, String datasetURI) throws URISyntaxException {
         PageDescription description = page.getDescription();
         if (description == null) {
@@ -509,13 +251,13 @@ public class DataPublisher {
         // Set some details
         if (datasetPage.getDescription().getContact() != null) {
             Contact contact = new Contact();
-            if(datasetPage.getDescription().getContact().getName() != null) {
+            if (datasetPage.getDescription().getContact().getName() != null) {
                 contact.setName(datasetPage.getDescription().getContact().getName());
             }
-            if(datasetPage.getDescription().getContact().getTelephone() != null) {
+            if (datasetPage.getDescription().getContact().getTelephone() != null) {
                 contact.setTelephone(datasetPage.getDescription().getContact().getTelephone());
             }
-            if(datasetPage.getDescription().getContact().getEmail() != null) {
+            if (datasetPage.getDescription().getContact().getEmail() != null) {
                 contact.setEmail(datasetPage.getDescription().getContact().getEmail());
             }
 
@@ -524,9 +266,11 @@ public class DataPublisher {
 
         // Ensure dataset is part of related datasets
         List<Link> relatedDatasets = datasetPage.getRelatedDatasets();
-        if (relatedDatasets == null) { relatedDatasets = new ArrayList<>(); }
+        if (relatedDatasets == null) {
+            relatedDatasets = new ArrayList<>();
+        }
         boolean datasetNotLinked = true;
-        for (Link relatedDataset: relatedDatasets) {
+        for (Link relatedDataset : relatedDatasets) {
             if (relatedDataset.getUri().toString().equalsIgnoreCase(datasetURI)) {
                 datasetNotLinked = false;
                 break;
@@ -556,7 +300,7 @@ public class DataPublisher {
 
 //        // Fix the breadcrumb
 //        page.setBreadcrumb(datasetPage.getBreadcrumb());
-;
+        ;
         return page;
     }
 
@@ -583,10 +327,11 @@ public class DataPublisher {
 
     static List<String> timeSeriesIdList(List<TimeSeries> serieses) {
         List<String> ids = new ArrayList<>();
-        for (TimeSeries series: serieses) { ids.add(series.getCdid()); }
+        for (TimeSeries series : serieses) {
+            ids.add(series.getCdid());
+        }
         return ids;
     }
-
 
     /**
      * A map of maps containing all data so that map.get(CDID).get(TIME) gives
@@ -598,19 +343,28 @@ public class DataPublisher {
     static Map<String, Map<String, String>> mapOfAllDataInTimeSeriesList(List<TimeSeries> serieses) {
         HashMap<String, Map<String, String>> map = new HashMap<>();
 
-        for (TimeSeries series: serieses) {
+        for (TimeSeries series : serieses) {
             putCombination(series.getCdid(), "Title", series.getDescription().getTitle(), map);
             putCombination(series.getCdid(), "CDID", series.getDescription().getTitle(), map);
             //TODO add further rows to give more details
 
             if (series.years != null) {
-                for (TimeSeriesValue value: series.years) { putCombination(series.getCdid(), value.date, value.value, map);};
+                for (TimeSeriesValue value : series.years) {
+                    putCombination(series.getCdid(), value.date, value.value, map);
+                }
+                ;
             }
             if (series.months != null) {
-                for (TimeSeriesValue value: series.months) { putCombination(series.getCdid(), value.date, value.value, map);};
+                for (TimeSeriesValue value : series.months) {
+                    putCombination(series.getCdid(), value.date, value.value, map);
+                }
+                ;
             }
             if (series.quarters != null) {
-                for (TimeSeriesValue value: series.quarters) { putCombination(series.getCdid(), value.date, value.value, map);};
+                for (TimeSeriesValue value : series.quarters) {
+                    putCombination(series.getCdid(), value.date, value.value, map);
+                }
+                ;
             }
         }
 
@@ -811,9 +565,268 @@ public class DataPublisher {
 
     private static void putCombination(String cdid, String row, String value, Map<String, Map<String, String>> map) {
         Map<String, String> submap = new HashMap<>();
-        if (map.containsKey(row)) { submap = map.get(row); }
+        if (map.containsKey(row)) {
+            submap = map.get(row);
+        }
 
         submap.put(cdid, value);
         map.put(row, submap);
+    }
+
+    public void preprocessCollection(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
+
+        if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0) {
+            System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
+            return;
+        }
+
+        preprocessCSDB(zebedee, collection, session);
+
+        System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
+    }
+
+    /**
+     * The T5 timeseries objects are made by
+     * 1. Searching for all .csdb files in a collection
+     * 2. Getting Brian to break the files down to their component stats and basic metadata.
+     * 3. Combining the stats with metadata entered with the dataset and existing data
+     *
+     * @param collection the collection to search for dataset objects
+     * @param session
+     * @throws IOException
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     */
+    void preprocessCSDB(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
+
+        // First find all csdb files in the collection
+        List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
+
+        List<Path> pathsToTimeSeries = new ArrayList<>();
+
+        // For each file in this collection
+        for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
+
+            // Download the dataset page (for metadata)
+            Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
+            String datasetUri = zebedee.toUri(csdbDataset.get("json"));
+
+            DownloadSection section = new DownloadSection();
+            section.setTitle(dataset.getDescription().getTitle());
+            section.setCdids(new ArrayList<String>());
+
+            if (dataset.getDescription().getDatasetId() == null) {
+                dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
+            }
+
+            // Break down the csdb file to timeseries (part-built by extracting csdb files)
+            TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"));
+
+            // Process each time series
+            for (TimeSeries series : serieses) {
+
+                // Work out the correct timeseries path by working back from the dataset uri
+                String uri = uriForSeriesInDataset(datasetUri, series);
+                //Path path = collection.find("", uri);
+
+                // Construct the new page
+                TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
+                section.getCdids().add(newPage.getDescription().getCdid());
+
+                // Save the new page to reviewed
+                Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
+                IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
+
+                // Write csv and other files:
+                pathsToTimeSeries.add(savePath);
+            }
+
+            // Save the new dataset to be reviewed
+            List<DownloadSection> sections = new ArrayList<>();
+            sections.add(section);
+            dataset.setDownloads(sections);
+
+            Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
+            IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
+
+            // Save the files
+            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
+            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".csv");
+            List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
+            writeDataGridToXlsx(xlsPath, dataGrid);
+            writeDataGridToCsv(csvPath, dataGrid);
+
+
+            System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
+        }
+    }
+
+    /**
+     * Combines sections of
+     * <p>
+     * Updated upstream
+     *
+     * @param destinationUri
+     * @param dataset
+     * @param series
+     * @return
+     * @throws IOException
+     */
+    TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, Dataset dataset, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
+
+        // Attempts to open an existing time series or creates a new one
+        TimeSeries page = startPageForSeriesWithPublishedPath(destinationUri, series);
+
+        // Add stats data from the time series (as returned by Brian)
+        // NOTE: This will log any corrections as it goes
+        populatePageFromTimeSeries(page, series, dataset);
+
+        // Add metadata from the dataset
+        populatePageFromDataSetPage(page, dataset, datasetURI);
+
+        return page;
+    }
+
+    /**
+     * Posts a csdb file to the brian Services/ConvertCSDB endpoint and deserialises the result
+     * as a collection of file series objects
+     *
+     * @param path
+     * @return a series of timeseries objects
+     * @throws IOException
+     */
+    TimeSerieses callBrianToProcessCSDB(Path path) throws IOException {
+        URI url = csdbURI();
+
+        HttpPost post = new HttpPost(url);
+
+        // Add csdb file as a binary
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+        FileBody bin = new FileBody(path.toFile());
+        multipartEntityBuilder.addPart("file", bin);
+
+        post.setEntity(multipartEntityBuilder.build());
+
+        // Post to the endpoint
+        try (CloseableHttpResponse response = HttpClients.createDefault().execute(post)) {
+            TimeSerieses result = null;
+
+            //
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                try (InputStream inputStream = entity.getContent()) {
+                    try {
+                        result = ContentUtil.deserialise(inputStream, TimeSerieses.class);
+                    } catch (JsonSyntaxException e) {
+                        // This can happen if an error HTTP code is received and the
+                        // body of the response doesn't contain the expected object:
+                        result = null;
+                    }
+                }
+            } else {
+                EntityUtils.consume(entity);
+            }
+            return result;
+        }
+    }
+
+    /**
+     * The URI for the Brian ConvertCSDB endpoint
+     *
+     * @return
+     */
+    URI csdbURI() {
+        String cdsbURL = env.get("brian_url") + "/Services/ConvertCSDB";
+        URI url = null;
+        try {
+            URIBuilder uriBuilder = new URIBuilder(cdsbURL);
+            url = uriBuilder.build();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Data services URL not found: " + cdsbURL);
+        }
+        return url;
+    }
+
+    /**
+     * Takes a part-built TimeSeries page and populates the {@link com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue} list using data gathered from a csdb file
+     *
+     * @param page    a part-built time series page
+     * @param series  a time series returned by Brian by parsing a csdb file
+     * @param dataset the source dataset page
+     * @return
+     */
+    TimeSeries populatePageFromTimeSeries(TimeSeries page, TimeSeries series, Dataset dataset) {
+
+        // Time series is a bit of an inelegant beast in that it splits data storage by time period
+        // We deal with this by
+        populatePageFromSetOfValues(page, page.years, series.years, dataset);
+        populatePageFromSetOfValues(page, page.quarters, series.quarters, dataset);
+        populatePageFromSetOfValues(page, page.months, series.months, dataset);
+
+        if (page.getDescription() == null || series.getDescription() == null) {
+            System.out.println("Problem");
+        }
+        page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
+        page.getDescription().setCdid(series.getDescription().getCdid());
+
+        // Copy across the title if it is currently blank (equates to equalling Cdid)
+        if (page.getDescription().getTitle() == null || page.getDescription().getTitle().equalsIgnoreCase("")) {
+            page.getDescription().setTitle(series.getDescription().getTitle());
+        } else if (page.getDescription().getTitle().equalsIgnoreCase(page.getCdid())) {
+            page.getDescription().setTitle(series.getDescription().getTitle());
+        }
+
+        page.getDescription().setDate(series.getDescription().getDate());
+        page.getDescription().setNumber(series.getDescription().getNumber());
+
+        return page;
+    }
+
+    // Support function for above
+    void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, Dataset dataset) {
+
+        // Iterate through values
+        for (TimeSeriesValue value : updateValues) {
+            // Find the current value of the data point
+            TimeSeriesValue current = getCurrentValue(currentValues, value);
+
+            if (current != null) { // A point already exists for this data
+
+                if (!current.value.equalsIgnoreCase(value.value)) { // A point already exists for this data
+                    // Take a copy
+                    TimeSeriesValue old = ContentUtil.deserialise(ContentUtil.serialise(current), TimeSeriesValue.class);
+
+                    // Update the point
+                    current.value = value.value;
+                    current.sourceDataset = dataset.getDescription().getDatasetId();
+
+                    current.updateDate = new Date();
+
+                    // Log the correction
+                    logCorrection(page, old, current);
+                }
+            } else {
+                value.sourceDataset = dataset.getDescription().getDatasetId();
+                value.updateDate = new Date();
+
+                page.add(value);
+                //
+                logInsertion(page, value);
+            }
+        }
+    }
+
+    /**
+     * @param series
+     * @param oldValue
+     * @param newValue
+     */
+    private void logCorrection(TimeSeries series, TimeSeriesValue oldValue, TimeSeriesValue newValue) {
+        corrections += 1;
+    }
+
+    private void logInsertion(TimeSeries series, TimeSeriesValue newValue) {
+        insertions += 1;
     }
 }

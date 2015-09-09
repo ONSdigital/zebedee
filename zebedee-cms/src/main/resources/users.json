@@ -199,6 +199,11 @@
 	  "name": "Jodie Tucker",
 	  "email": "j.tucker@ons.gov.uk",
 	  "password": "Magic5yf&Roundabout"
+	},
+	{
+	  "name": "Sam Roberts",
+	  "email": "s.roberts@ons.gov.uk",
+	  "password": "Magic5yf&Roundabout"
 	}
   ]
 }

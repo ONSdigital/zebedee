@@ -11,10 +11,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
-
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +50,7 @@ public class DataPublisherTest {
     Dataset publishedDataset = null;
     Dataset unpublishedDataset = null;
 
-    Map<String, String> envVariables;
+    DataPublisher dataPublisher = new DataPublisher();
 
     /**
      * The bootstrap resource contains master data and one collection "collection"
@@ -106,7 +103,6 @@ public class DataPublisherTest {
     @After
     public void tearDown() throws Exception {
         bob.delete();
-        DataPublisher.env = envVariables;
     }
 
 
@@ -177,11 +173,12 @@ public class DataPublisherTest {
         // we set the env variable
         Map<String, String> envNew = new HashMap<>();
         envNew.put("brian_url", "/csdbURIShouldComeFromEnvVariable");
-        DataPublisher.env = envNew;
+        DataPublisher dataPublisher = new DataPublisher();
+        dataPublisher.env = envNew;
 
         // When
         // we get the service csdbURI
-        URI uri = DataPublisher.csdbURI();
+        URI uri = dataPublisher.csdbURI();
 
         // Then
         // we expect a standard response
@@ -309,7 +306,7 @@ public class DataPublisherTest {
 
         // When
         // we generate a start page
-        DataPublisher.populatePageFromSetOfValues(startPage, startPage.years, unpublishedTimeSeries.years, unpublishedDataset);
+        dataPublisher.populatePageFromSetOfValues(startPage, startPage.years, unpublishedTimeSeries.years, unpublishedDataset);
 
         // Then
         // we expect the startPage to be
@@ -328,7 +325,7 @@ public class DataPublisherTest {
 
         // When
         // we generate a start page
-        DataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishedTimeSeries.years, publishedDataset);
+        dataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishedTimeSeries.years, publishedDataset);
 
         // Then
         // we expect the startPage to be added to
@@ -346,7 +343,7 @@ public class DataPublisherTest {
 
         // When
         // we combine the two series
-        DataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishThisPage.years, publishThisDataset);
+        dataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishThisPage.years, publishThisDataset);
 
         // Then
         // we expect equal values for
@@ -365,7 +362,7 @@ public class DataPublisherTest {
 
         // When
         // we combine the two series
-        DataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishThisPage.years, publishThisDataset);
+        dataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishThisPage.years, publishThisDataset);
 
         // Then
         // we expect the value for "2001" (not present in publishedTimeSeries)
@@ -383,7 +380,7 @@ public class DataPublisherTest {
 
         // When
         // we populate the page
-        TimeSeries newPage = DataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
+        TimeSeries newPage = dataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
 
         // Then
         // we expect the newPage to have copied details from the
@@ -404,7 +401,7 @@ public class DataPublisherTest {
 
         // When
         // we populate the page
-        TimeSeries newPage = DataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
+        TimeSeries newPage = dataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
 
         // Then
         // we expect the newPage to copy across the name
@@ -423,7 +420,7 @@ public class DataPublisherTest {
 
         // When
         // we populate the page
-        TimeSeries newPage = DataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
+        TimeSeries newPage = dataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
 
         // Then
         // we expect the newPage to not copy over the name
@@ -442,7 +439,7 @@ public class DataPublisherTest {
 
         // When
         // we populate the page
-        TimeSeries newPage = DataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
+        TimeSeries newPage = dataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
 
         // Then
         // we expect the newPage to have copied limited details from the published page

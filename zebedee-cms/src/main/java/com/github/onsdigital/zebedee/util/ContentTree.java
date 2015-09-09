@@ -47,6 +47,7 @@ public class ContentTree {
     }
 
     public static void dropCache() {
+        Log.print("Clearing browser tree cache.");
         publishedContentTree = null;
     }
 }

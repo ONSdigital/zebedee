@@ -22,7 +22,7 @@ public class Configuration {
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
 
     public static boolean isSchedulingEnabled() {
-        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("SCHEDULING_ENABLED"), "true"));
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
     }
 
     public static String getFlorenceUrl() {

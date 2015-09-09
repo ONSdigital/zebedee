@@ -155,7 +155,7 @@ public class CollectionTest {
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
         // check an event has been created for the content being created.
-        collection.description.eventsByUri.get(uri).hasEventForType(EventType.CREATED);
+        assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.CREATED));
     }
 
     @Test

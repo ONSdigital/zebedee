@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import org.apache.commons.fileupload.FileItem;
@@ -27,6 +29,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
@@ -114,6 +117,17 @@ public class Collections {
         return result;
     }
 
+    /**
+     * Approve the given collection.
+     *
+     * @param collection
+     * @param session
+     * @return
+     * @throws IOException
+     * @throws UnauthorizedException
+     * @throws BadRequestException
+     * @throws ConflictException
+     */
     public boolean approve(Collection collection, Session session)
             throws IOException, UnauthorizedException, BadRequestException,
             ConflictException {
@@ -135,8 +149,54 @@ public class Collections {
                     "This collection can't be approved because it's not empty");
         }
 
+        // Do any processing of data files
+        try {
+            new DataPublisher().preprocessCollection(zebedee, collection, session);
+        } catch (URISyntaxException e) {
+            throw new BadRequestException("Brian could not process this collection");
+        }
+
         // Go ahead
         collection.description.approvedStatus = true;
+        collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
+
+        return collection.save();
+    }
+
+    /**
+     * Unlock the given collection.
+     *
+     * @param collection
+     * @param session
+     * @return
+     * @throws IOException
+     * @throws UnauthorizedException
+     * @throws BadRequestException
+     * @throws ConflictException
+     */
+    public boolean unlock(Collection collection, Session session)
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException {
+
+        // Collection exists
+        if (collection == null) {
+            throw new BadRequestException("Please provide a valid collection.");
+        }
+
+        // User has permission
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        // nothing to do if the approved status is already false.
+        if (!collection.description.approvedStatus) {
+            return true;
+        }
+
+        // Go ahead
+        collection.description.approvedStatus = false;
+        collection.description.AddEvent(new Event(new Date(), EventType.UNLOCKED, session.email));
+
         return collection.save();
     }
 
@@ -168,13 +228,6 @@ public class Collections {
         // Check approved status
         if (!collection.description.approvedStatus) {
             throw new ConflictException("This collection cannot be published because it is not approved");
-        }
-
-        // Do any processing of data files
-        try {
-            DataPublisher.preprocessCollection(zebedee, collection, session);
-        } catch (URISyntaxException e) {
-            throw new BadRequestException("Brian could not process this collection");
         }
 
         // Break before transfer allows us to run tests on the prepublish-hook without messing up the content

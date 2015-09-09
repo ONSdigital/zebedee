@@ -149,6 +149,13 @@ public class Collections {
                     "This collection can't be approved because it's not empty");
         }
 
+        // Do any processing of data files
+        try {
+            new DataPublisher().preprocessCollection(zebedee, collection, session);
+        } catch (URISyntaxException e) {
+            throw new BadRequestException("Brian could not process this collection");
+        }
+
         // Go ahead
         collection.description.approvedStatus = true;
         collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
@@ -221,13 +228,6 @@ public class Collections {
         // Check approved status
         if (!collection.description.approvedStatus) {
             throw new ConflictException("This collection cannot be published because it is not approved");
-        }
-
-        // Do any processing of data files
-        try {
-            DataPublisher.preprocessCollection(zebedee, collection, session);
-        } catch (URISyntaxException e) {
-            throw new BadRequestException("Brian could not process this collection");
         }
 
         // Break before transfer allows us to run tests on the prepublish-hook without messing up the content

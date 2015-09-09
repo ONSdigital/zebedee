@@ -15,7 +15,7 @@ analysis :
           filter : [lowercase]
     #ONS index analyzer is used when indexing fields that are wanted to be searchable, set mappings for these fields in default-mapping.json file
     ons_index_analyzer :
-      tokenizer : standard
+      tokenizer : index_tokenizer
       filter : [lowercase, stop]
   tokenizer :
     index_tokenizer :

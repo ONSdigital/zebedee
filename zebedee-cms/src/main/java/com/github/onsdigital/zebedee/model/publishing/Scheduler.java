@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.util.Log;
-import org.joda.time.DateTime;
 
 import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
@@ -24,15 +23,13 @@ public class Scheduler {
      * Schedule a task to run on the specified date.
      *
      * @param task
-     * @param date
+     * @param scheduledDate
      */
-    public ScheduledFuture<?> schedule(Runnable task, Date date) {
-        DateTime now = DateTime.now();
-        DateTime scheduledDate = new DateTime(date);
-        long ms = scheduledDate.getMillis() - now.getMillis();
-
-        Log.print("Task scheduled to run in " + ms + "ms. Current time = " + now.toString() + " Schedule time=" + scheduledDate.toString());
+    public ScheduledFuture<?> schedule(Runnable task, Date scheduledDate) {
+        long nowMs = System.currentTimeMillis();
+        long ms = scheduledDate.getTime() - nowMs;
         ScheduledFuture<?> future = scheduledExecutorService.schedule(task, ms, TimeUnit.MILLISECONDS);
+        Log.print("Task scheduled to run in " + ms + "ms.");
         return future;
     }
 

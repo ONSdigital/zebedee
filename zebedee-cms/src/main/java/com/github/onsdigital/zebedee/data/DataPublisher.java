@@ -650,8 +650,11 @@ public class DataPublisher {
             IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
 
             // Save the files
-            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
-            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".csv");
+            String filename = dataset.getDescription().getDatasetId();
+            if (filename.equalsIgnoreCase("")) {filename = "data";}
+
+            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filename + ".xlsx");
+            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filename + ".csv");
             List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
             writeDataGridToXlsx(xlsPath, dataGrid);
             writeDataGridToCsv(csvPath, dataGrid);

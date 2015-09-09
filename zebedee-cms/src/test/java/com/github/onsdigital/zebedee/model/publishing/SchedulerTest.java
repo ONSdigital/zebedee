@@ -25,7 +25,6 @@ public class SchedulerTest {
 
     @After
     public void tearDown() throws Exception {
-        scheduler.shutdown();
     }
 
     @Test

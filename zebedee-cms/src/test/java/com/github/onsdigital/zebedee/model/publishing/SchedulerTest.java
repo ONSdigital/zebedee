@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
 import org.joda.time.DateTime;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -14,9 +16,15 @@ import static org.junit.Assert.assertFalse;
 
 public class SchedulerTest {
 
-    @Test
-    public void shutdownShouldNotThrowExceptions() {
-        Scheduler scheduler = new Scheduler();
+    Scheduler scheduler;
+
+    @Before
+    public void setUp() throws Exception {
+        scheduler = new Scheduler();
+    }
+
+    @After
+    public void tearDown() throws Exception {
         scheduler.shutdown();
     }
 
@@ -24,12 +32,8 @@ public class SchedulerTest {
     public void shutdownShouldPreventFurtherTasksBeingExecuted() {
 
         // Given a scheduled task in the future.
-        Scheduler scheduler = new Scheduler();
         DummyTask task = new DummyTask();
         scheduler.schedule(task, DateTime.now().plusSeconds(5).toDate());
-
-        // When the shutdown method is called
-        scheduler.shutdown();
 
         // Then the task has not run.
         assertFalse(task.hasRun);
@@ -39,24 +43,20 @@ public class SchedulerTest {
     public void schedulerShouldRunTheTask() throws InterruptedException {
 
         // Given a scheduled task in the future.
-        Scheduler scheduler = new Scheduler();
         DummyTask task = new DummyTask();
-        scheduler.schedule(task, DateTime.now().plusMillis(100).toDate());
+        scheduler.schedule(task, DateTime.now().plusMillis(50).toDate());
 
         // When the time for the task passes.
         Thread.sleep(200);
 
         // Then the task has not run.
         assertTrue(task.hasRun);
-
-        scheduler.shutdown();
     }
 
     @Test
     public void schedulerShouldRunTheTaskIfItsDateIsInThePast() throws InterruptedException {
 
         // Given a scheduled task in the past.
-        Scheduler scheduler = new Scheduler();
         DummyTask task = new DummyTask();
         scheduler.schedule(task, DateTime.now().minusMillis(100).toDate());
 
@@ -65,21 +65,18 @@ public class SchedulerTest {
 
         // Then the task has not run.
         assertTrue(task.hasRun);
-
-        scheduler.shutdown();
     }
 
     @Test
     public void schedulerShouldKeepRunningTasksIfOneFails() throws InterruptedException {
 
         // Given a scheduled task that fails with an exception.
-        Scheduler scheduler = new Scheduler();
 
         DummyExceptionTask exceptionTask = new DummyExceptionTask();
-        scheduler.schedule(exceptionTask, DateTime.now().plusMillis(100).toDate());
+        scheduler.schedule(exceptionTask, DateTime.now().plusMillis(50).toDate());
 
         DummyTask task = new DummyTask();
-        scheduler.schedule(task, DateTime.now().plusMillis(200).toDate());
+        scheduler.schedule(task, DateTime.now().plusMillis(100).toDate());
 
         // When the time for the task passes.
         Thread.sleep(300);
@@ -87,32 +84,24 @@ public class SchedulerTest {
         // Then check that both tasks have run.
         assertTrue(exceptionTask.hasRun);
         assertTrue(task.hasRun);
-
-        scheduler.shutdown();
     }
 
     @Test
     public void schedulerShouldScheduleWithTheCorrectTime() throws InterruptedException {
 
         // Given a scheduled task that fails with an exception.
-        Scheduler scheduler = new Scheduler();
-
         DummyTask task = new DummyTask();
         ScheduledFuture<?> future = scheduler.schedule(task, DateTime.now().plusDays(1).toDate());
 
         long delayInSeconds = future.getDelay(TimeUnit.SECONDS);
 
         assertTrue(delayInSeconds > 86395);
-
-        scheduler.shutdown();
     }
 
     @Test
     public void scheduleShouldRunMultipleTasks() throws InterruptedException {
 
         // Given a scheduled task in the future.
-        Scheduler scheduler = new Scheduler();
-
         List<DummyTask> tasks = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
@@ -132,15 +121,12 @@ public class SchedulerTest {
             assertTrue(task.hasRun);
             ++j;
         }
-
-        scheduler.shutdown();
     }
 
     @Test
     public void scheduleShouldTakeMillisecondsIntoAccount() throws InterruptedException {
 
         // Given a scheduled task that fails with an exception.
-        Scheduler scheduler = new Scheduler();
         DummyTask task = new DummyTask();
         Date now = new Date(System.currentTimeMillis() + 1333);
         ScheduledFuture<?> future = scheduler.schedule(task, now);
@@ -148,7 +134,6 @@ public class SchedulerTest {
         // When the time for the task passes.
         long delayInMs = future.getDelay(TimeUnit.MILLISECONDS);
         assertTrue(delayInMs > 1300);
-        scheduler.shutdown();
     }
 }
 

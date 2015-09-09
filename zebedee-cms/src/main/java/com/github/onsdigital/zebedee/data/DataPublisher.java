@@ -40,6 +40,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -600,8 +601,18 @@ public class DataPublisher {
 
         for (TimeSeries series: serieses) {
             putCombination(series.getCdid(), "Title", series.getDescription().getTitle(), map);
-            putCombination(series.getCdid(), "CDID", series.getDescription().getTitle(), map);
-            //TODO add further rows to give more details
+            putCombination(series.getCdid(), "CDID", series.getDescription().getCdid(), map);
+            putCombination(series.getCdid(), "National Statistic", (series.getDescription().isNationalStatistic() ? "Y" : "N"), map);
+            putCombination(series.getCdid(), "Seasonally Adjusted", (series.getDescription().getSeasonalAdjustment()), map);
+            putCombination(series.getCdid(), "PreUnit", series.getDescription().getPreUnit(), map);
+            putCombination(series.getCdid(), "Unit", series.getDescription().getUnit(), map);
+
+
+            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+            putCombination(series.getCdid(), "Release date", format.format(series.getDescription().getReleaseDate()), map);
+            putCombination(series.getCdid(), "Next release", series.getDescription().getNextRelease(), map);
+
+            putCombination(series.getCdid(), "Important notes", StringUtils.join(series.getNotes(), ", "), map);
 
             if (series.years != null) {
                 for (TimeSeriesValue value: series.years) { putCombination(series.getCdid(), value.date, value.value, map);};
@@ -760,9 +771,31 @@ public class DataPublisher {
         titleRow.add("Title");
         List<String> cdidRow = new ArrayList<>();
         cdidRow.add("CDID");
+        List<String> nationalStatistic = new ArrayList<>();
+        nationalStatistic.add("National Statistic");
+        List<String> seasonallyAdjusted = new ArrayList<>();
+        seasonallyAdjusted.add("Seasonally Adjusted");
+        List<String> preunit = new ArrayList<>();
+        preunit.add("PreUnit");
+        List<String> unit = new ArrayList<>();
+        unit.add("Unit");
+        List<String> releaseDate = new ArrayList<>();
+        releaseDate.add("Release date");
+        List<String> nextRelease = new ArrayList<>();
+        nextRelease.add("Next release");
+        List<String> importantNotes = new ArrayList<>();
+        importantNotes.add("Important notes");
+
         for (String cdid : orderedCDIDs) {
             titleRow.add(mapOfData.get("Title").get(cdid));
             cdidRow.add(cdid);
+            nationalStatistic.add(mapOfData.get("National Statistic").get(cdid));
+            seasonallyAdjusted.add(mapOfData.get("Seasonally Adjusted").get(cdid));
+            preunit.add(mapOfData.get("PreUnit").get(cdid));
+            unit.add(mapOfData.get("Unit").get(cdid));
+            releaseDate.add(mapOfData.get("Release date").get(cdid));
+            nextRelease.add(mapOfData.get("Next release").get(cdid));
+            importantNotes.add(mapOfData.get("Important notes").get(cdid));
         }
         rows.add(titleRow);
         rows.add(cdidRow);

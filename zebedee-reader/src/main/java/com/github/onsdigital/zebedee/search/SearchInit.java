@@ -16,7 +16,7 @@ public class SearchInit implements Startup {
     public void init() {
         ElasticSearchClient.init();
         try {
-            Indexer.getInstance().loadIndex();
+            Indexer.getInstance().reloadIndex();
         } catch (IOException e) {
             throw new RuntimeException("Loading search index failed", e);
         }

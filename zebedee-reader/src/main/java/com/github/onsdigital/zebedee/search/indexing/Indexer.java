@@ -43,10 +43,10 @@ public class Indexer {
      *
      * @throws IOException
      */
-    public void loadIndex() throws IOException {
+    public void reloadIndex() throws IOException {
         if (LOCK.tryLock()) {
             try {
-                reload();
+                doLoad();
             } finally {
                 LOCK.unlock();
             }
@@ -55,7 +55,7 @@ public class Indexer {
         }
     }
 
-    public void reload() throws IOException {
+    private void doLoad() throws IOException {
         String newIndex = generateIndexName();
         elasticSearchWriter.createIndex(newIndex, getSettings(),getDefaultMapping());
         indexDocuments(newIndex);

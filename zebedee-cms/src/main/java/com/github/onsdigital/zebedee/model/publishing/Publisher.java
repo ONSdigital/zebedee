@@ -13,6 +13,8 @@ import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
+import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.FileUtils;
@@ -194,6 +196,18 @@ public class Publisher {
 
         collection.delete();
         ContentTree.dropCache();
+
+        Log.print("Reindexing search");
+
+        try {
+            Indexer.loadIndex(ElasticSearchClient.getClient());
+        } catch (Exception e) {
+            // exception is thrown if loading index fails because its already in progress.
+            // Catching this exception as its possible this will happen for multiple publish
+            // tasks running concurrently.
+            Log.print("Exception reloading search index:");
+            ExceptionUtils.printRootCauseStackTrace(e);
+        }
         return true;
     }
 

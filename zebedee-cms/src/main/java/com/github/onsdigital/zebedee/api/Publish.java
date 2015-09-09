@@ -46,5 +46,4 @@ public class Publish {
 		boolean doBreakBeforeFileTransfer = BooleanUtils.toBoolean(breakBeforePublish);
 		return Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer);
 	}
-
 }

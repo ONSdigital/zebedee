@@ -1,20 +1,27 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
-import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.model.SearchDocument;
 import org.apache.commons.io.IOUtils;
+import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,7 +35,8 @@ public class Indexer {
     private final Lock LOCK = new ReentrantLock();
     private final String ROOT_URI = "/";
 
-    private ElasticSearchWriter elasticSearchWriter = new ElasticSearchWriter(ElasticSearchClient.getClient());
+    private final Client client = ElasticSearchClient.getClient();
+    private ElasticSearchWriter elasticSearchWriter = new ElasticSearchWriter(client);
     private ZebedeeReader zebedeeReader = new ZebedeeReader();
     private String currentIndex;
 
@@ -46,14 +54,18 @@ public class Indexer {
      * @throws IOException
      */
     public void reloadIndex() throws IOException {
-        if (isDisableReindex()) {
-            System.out.println("Skipping reindexing due to configuration");
-            return;
-        }
+//        if (isDisableReindex()) {
+//            System.out.println("Skipping reindexing due to configuration");
+//            return;
+//        }
 
         if (LOCK.tryLock()) {
             try {
+                long start = System.currentTimeMillis();
+                System.out.println("Triggering reindex");
                 doLoad();
+                long end = System.currentTimeMillis();
+                System.out.println("Elasticsearch: indexing complete in" + (start - end) + " ms");
             } finally {
                 LOCK.unlock();
             }
@@ -109,16 +121,33 @@ public class Indexer {
      * @throws IOException
      */
     private void index(String indexName, List<String> fileNames) throws IOException, ZebedeeException {
-        for (String path : fileNames) {
-            loadAndIndex(indexName, path);
+        try(BulkProcessor bulkProcessor = getBulkProcessor()) {
+            for (String path : fileNames) {
+                IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, path);
+                bulkProcessor.add(indexRequestBuilder.request());
+            }
         }
     }
 
     private void loadAndIndex(String indexName, String uri) throws ZebedeeException, IOException {
-        Page content = zebedeeReader.getPublishedContent(uri);
+        Page content = getPage(uri);
         if (content != null && content.getType() != null) {
             elasticSearchWriter.createDocument(indexName, content.getType().name(), content.getUri().toString(), serialise(toSearchDocument(content)));
         }
+    }
+
+    private Page getPage(String uri) throws ZebedeeException, IOException {
+        return zebedeeReader.getPublishedContent(uri);
+    }
+
+    private IndexRequestBuilder prepareIndexRequest(String indexName, String uri) throws ZebedeeException, IOException {
+        Page page = getPage(uri);
+        if (page != null && page.getType() != null) {
+            IndexRequestBuilder indexRequestBuilder = elasticSearchWriter.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
+            indexRequestBuilder.setSource(serialise(toSearchDocument(page)));
+            return indexRequestBuilder;
+        }
+        return null;
     }
 
 
@@ -144,43 +173,43 @@ public class Indexer {
 
     }
 
+    private BulkProcessor getBulkProcessor() {
+        BulkProcessor bulkProcessor = BulkProcessor.builder(
+                client,
+                new BulkProcessor.Listener() {
+                    @Override
+                    public void beforeBulk(long executionId,
+                                           BulkRequest request) {
+                        System.out.println("Builk Indexing " + request.numberOfActions() + " documents");
+                    }
 
-    // Mapping for field properties. To decide which field will be indexed
-//    private static XContentBuilder getMappingProperties(String type) throws IOException {
-//
-//        XContentBuilder builder = jsonBuilder().startObject().startObject(type).startObject("properties");
-//        try {
-//            builder.startObject("releaseDate").field("type", "date").field("index", "analyzed").endObject();
-//            builder.startObject("summary").field("type", "string").field("index", "no").endObject();
-//            builder.startObject("title").field("type", "string").field("index", "analyzed").endObject();
-//            builder.startObject("tags").field("type", "string").field("index", "analyzed").endObject();
-//            builder.startObject("edition").field("type", "string").field("index", "analyzed").endObject();
-//
-//            //builder.startObject("uri").field("type", "string").field("index", "analyzed").endObject();
-//
-//            builder.startObject("uri")
-//                    .field("type", "multi_field")
-//                    .startObject("fields")
-//                    .startObject("uri")
-//                    .field("type", "string")
-//                    .field("index", "analyzed")
-//                    .endObject()
-//                    .startObject("uri_segment")
-//                    .field("type", "string")
-//                    .field("index", "analyzed")
-//                    .field("index_analyzer", "whitespace")
-//                    .field("search_analyzer", "whitespace")
-//                    .endObject()
-//                    .endObject()
-//                    .endObject();
-//
-//            builder.endObject().endObject().endObject();
-//            return builder;
-//        } finally {
-//            if (builder != null) {
-//                builder.close();
-//            }
-//        }
-//    }
+                    @Override
+                    public void afterBulk(long executionId,
+                                          BulkRequest request,
+                                          BulkResponse response) {
+                        if (response.hasFailures()) {
+                            BulkItemResponse[] items = response.getItems();
+                            for (BulkItemResponse item : items) {
+                                if (item.isFailed()) {
+                                    System.err.println("!!!!!!!!Failed indexing: [uri:" + item.getFailure().getId() + " error:" + item.getFailureMessage() + "]");
+                                }
+                            }
+                        }
+                    }
 
+                    @Override
+                    public void afterBulk(long executionId,
+                                          BulkRequest request,
+                                          Throwable failure) {
+                        System.err.println("Failed executing bulk index :" + failure.getMessage());
+                        failure.printStackTrace();
+                    }
+                })
+                .setBulkActions(10000)
+                .setBulkSize(new ByteSizeValue(100, ByteSizeUnit.MB))
+                .setConcurrentRequests(4)
+                .build();
+
+        return bulkProcessor;
+    }
 }

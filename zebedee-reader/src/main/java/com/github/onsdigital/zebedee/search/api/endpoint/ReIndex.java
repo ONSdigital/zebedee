@@ -30,7 +30,6 @@ public class ReIndex {
         try {
             String key = request.getParameter("key");
             if (Password.verify(key, REINDEX_KEY_HASH)) {
-                System.out.println("Triggering reindex");
                 Indexer.getInstance().reloadIndex();
                 response.setStatus(HttpStatus.OK_200);
                 return "Elasticsearch: indexing complete";

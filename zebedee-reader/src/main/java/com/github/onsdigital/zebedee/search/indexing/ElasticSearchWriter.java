@@ -98,9 +98,13 @@ class ElasticSearchWriter {
      * @return
      */
     public IndexResponse createDocument(String index,String type, String id, String document) {
-        IndexRequestBuilder indexRequestBuilder = client.prepareIndex(index, type, id);
+        IndexRequestBuilder indexRequestBuilder = prepareIndex(index, type, id);
         indexRequestBuilder.setSource(document);
         return indexRequestBuilder.get();
+    }
+
+    public IndexRequestBuilder prepareIndex(String index, String type, String id) {
+        return client.prepareIndex(index, type, id);
     }
 
     private IndicesAdminClient getIndicesClient() {

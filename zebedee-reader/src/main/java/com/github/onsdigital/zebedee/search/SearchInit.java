@@ -15,10 +15,10 @@ public class SearchInit implements Startup {
     @Override
     public void init() {
         ElasticSearchClient.init();
-//        try {
-//            Indexer.getInstance().reloadIndex();
-//        } catch (IOException e) {
-//            throw new RuntimeException("Loading search index failed", e);
-//        }
+        try {
+            Indexer.getInstance().reloadIndex();
+        } catch (IOException e) {
+            throw new RuntimeException("Loading search index failed", e);
+        }
     }
 }

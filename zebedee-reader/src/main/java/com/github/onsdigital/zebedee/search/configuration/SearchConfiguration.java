@@ -13,11 +13,14 @@ public class SearchConfiguration {
     private static Integer elasticSearchPort = Integer.parseInt(defaultIfBlank(getVariableValue("ELASTIC_SEARCH_PORT"), "9300"));
     private static String elasticSearchCluster = defaultIfBlank(getVariableValue("ELASTIC_SEARCH_CLUSTER"), "ONSCluster");
     private static boolean startEmbeddedSearch = "Y".equals(defaultIfBlank(getVariableValue("START_EMBEDDED_SERVER"), "N"));
+    private static boolean disableReindex = "Y".equals(defaultIfBlank(getVariableValue("DISABLE_REINDEX"), "N"));
 
     public static boolean isStartEmbeddedSearch() {
         return startEmbeddedSearch;
     }
-
+    public static boolean isDisableReindex() {
+        return disableReindex;
+    }
     public static String getElasticSearchIndexAlias() {
         return elasticSearchIndexAlias;
     }

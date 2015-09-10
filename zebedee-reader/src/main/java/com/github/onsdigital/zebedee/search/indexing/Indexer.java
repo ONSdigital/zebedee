@@ -19,6 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.serialise;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndexAlias;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.isDisableReindex;
 
 public class Indexer {
     private static Indexer instance = new Indexer();
@@ -44,6 +45,11 @@ public class Indexer {
      * @throws IOException
      */
     public void reloadIndex() throws IOException {
+        if (isDisableReindex()) {
+            System.out.println("Skipping reindexing due to configuration");
+            return;
+        }
+
         if (LOCK.tryLock()) {
             try {
                 doLoad();

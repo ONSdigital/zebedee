@@ -21,6 +21,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -33,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Publisher {
 
@@ -75,7 +80,7 @@ public class Publisher {
                         return false;
                     }
 
-                    publishComplete = PublishFilesToWebsite(collection, email);
+                    publishComplete = PublishFilesToWebsite(zebedee, collection, email);
 
                     long msTaken = (System.currentTimeMillis() - publishStart);
                     Log.print("Publish process finished for collection %s complete: %s time taken: %dms",
@@ -104,6 +109,80 @@ public class Publisher {
         return publishComplete;
     }
 
+//    /**
+//     * Submit all files in the collection to the train destination - the website.
+//     *
+//     * @param collection
+//     * @param email
+//     * @return
+//     * @throws IOException
+//     */
+//    private static boolean PublishFilesToWebsite(Collection collection, String email) throws IOException {
+//
+//        boolean publishComplete = false;
+//
+//        Host host = new Host(Configuration.getTheTrainUrl());
+//        String encryptionPassword = Random.password(100);
+//        try {
+//            collection.description.publishTransactionId = beginPublish(host, encryptionPassword);
+//            collection.save();
+//            ExecutorService pool = Executors.newFixedThreadPool(50);
+//            List<Future<IOException>> results = new ArrayList<>();
+//
+//            // Publish each item of content:
+//            for (String uri : collection.reviewed.uris()) {
+//
+//                Path source = collection.reviewed.get(uri);
+//                if (source != null) {
+//                    results.add(publishFile(host, collection.description.publishTransactionId, encryptionPassword, uri, source, pool));
+//                }
+//
+//                // Add an event to the event log
+//                collection.AddEvent(uri, new Event(new Date(), EventType.PUBLISHED, email));
+//            }
+//
+//            // Check the publishing results:
+//            for (Future<IOException> result : results) {
+//                try {
+//                    IOException exception = result.get();
+//                    if (exception != null) throw exception;
+//                } catch (InterruptedException | ExecutionException e) {
+//                    throw new IOException("Error in file publish", e);
+//                }
+//            }
+//
+//            // If all has gone well so far, commit the publishing transaction:
+//            Result result = commitPublish(host, collection.description.publishTransactionId, encryptionPassword);
+//
+//            if (!result.error) {
+//                Date publishedDate = new Date();
+//                collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
+//                collection.description.publishDate = publishedDate;
+//                collection.description.publishComplete = true;
+//                publishComplete = true;
+//            }
+//
+//            collection.description.AddPublishResult(result);
+//
+//        } catch (IOException e) {
+//
+//            Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
+//            System.out.println(ExceptionUtils.getStackTrace(e));
+//            // If an error was caught, attempt to roll back the transaction:
+//            if (collection.description.publishTransactionId != null) {
+//                Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
+//                rollbackPublish(host, collection.description.publishTransactionId, encryptionPassword);
+//            }
+//
+//        } finally {
+//            // Save any updates to the collection
+//            collection.save();
+//        }
+//
+//        return publishComplete;
+//    }
+
+
     /**
      * Submit all files in the collection to the train destination - the website.
      *
@@ -112,9 +191,37 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    private static boolean PublishFilesToWebsite(Collection collection, String email) throws IOException {
+    private static boolean PublishFilesToWebsite(Zebedee zebedee, Collection collection, String email) throws IOException {
 
         boolean publishComplete = false;
+
+        Log.print("Starting zip of collection %s", collection.description.name);
+        long start = System.currentTimeMillis();
+
+        Path zipFilePath = zebedee.collections.path.resolve(collection.description.id + ".zip");
+        FileOutputStream fileOutputStream = new FileOutputStream(zipFilePath.toFile());
+        ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(fileOutputStream));
+
+        byte[] buffer = new byte[1024];
+
+        // Publish each item of content:
+        for (String uri : collection.reviewed.uris()) {
+            Path source = collection.reviewed.get(uri);
+            if (source != null) {
+                FileInputStream fileInputStream = new FileInputStream(source.toFile());
+                zipOutputStream.putNextEntry(new ZipEntry(uri));
+                int length;
+                while ((length = fileInputStream.read(buffer)) > 0) {
+                    zipOutputStream.write(buffer, 0, length);
+                }
+
+                zipOutputStream.closeEntry();
+                fileInputStream.close();
+            }
+        }
+        zipOutputStream.close();
+
+        Log.print("Finished zip of collection %s. Time taken = %dms", collection.description.name, System.currentTimeMillis() - start);
 
         Host host = new Host(Configuration.getTheTrainUrl());
         String encryptionPassword = Random.password(100);
@@ -124,17 +231,10 @@ public class Publisher {
             ExecutorService pool = Executors.newFixedThreadPool(50);
             List<Future<IOException>> results = new ArrayList<>();
 
-            // Publish each item of content:
-            for (String uri : collection.reviewed.uris()) {
+            results.add(publishFile(host, collection.description.publishTransactionId, encryptionPassword, zipFilePath.toString(), zipFilePath, pool));
 
-                Path source = collection.reviewed.get(uri);
-                if (source != null) {
-                    results.add(publishFile(host, collection.description.publishTransactionId, encryptionPassword, uri, source, pool));
-                }
-
-                // Add an event to the event log
-                collection.AddEvent(uri, new Event(new Date(), EventType.PUBLISHED, email));
-            }
+            // Add an event to the event log
+            collection.AddEvent(zipFilePath.toString(), new Event(new Date(), EventType.PUBLISHED, email));
 
             // Check the publishing results:
             for (Future<IOException> result : results) {

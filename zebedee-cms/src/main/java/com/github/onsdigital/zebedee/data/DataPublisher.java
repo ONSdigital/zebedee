@@ -48,6 +48,7 @@ import java.util.*;
  */
 public class DataPublisher {
     static final String BRIAN_KEY = "brian_url";
+    static final String DEFAULT_FILE = "data";
     public static int insertions = 0;
     public static int corrections = 0;
     public static Map<String, String> env = System.getenv();
@@ -92,9 +93,21 @@ public class DataPublisher {
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
             String datasetUri = zebedee.toUri(csdbDataset.get("json"));
 
-            DownloadSection section = new DownloadSection();
-            section.setTitle(dataset.getDescription().getTitle());
-            section.setCdids(new ArrayList<String>());
+            DownloadSection csdbSection = new DownloadSection();
+            csdbSection.setTitle(dataset.getDescription().getTitle());
+            csdbSection.setCdids(new ArrayList<String>());
+
+            // Get a name for the xlsx/csv files to be generated
+            String filePrefix = dataset.getDescription().getDatasetId();
+            if (filePrefix.equalsIgnoreCase("")) {filePrefix = DEFAULT_FILE;}
+
+            DownloadSection xlsxSection = new DownloadSection();
+            xlsxSection.setTitle("xlsx download");
+            xlsxSection.setFile(datasetUri + "/" + filePrefix + ".xlsx");
+
+            DownloadSection csvSection = new DownloadSection();
+            csvSection.setTitle("csv download");
+            csvSection.setFile(datasetUri + "/" + filePrefix + ".csv");
 
             if (dataset.getDescription().getDatasetId() == null) {
                 dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
@@ -112,7 +125,7 @@ public class DataPublisher {
 
                 // Construct the new page
                 TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
-                section.getCdids().add(newPage.getDescription().getCdid());
+                csdbSection.getCdids().add(newPage.getDescription().getCdid());
 
                 // Save the new page to reviewed
                 Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
@@ -124,15 +137,18 @@ public class DataPublisher {
 
             // Save the new dataset to be reviewed
             List<DownloadSection> sections = new ArrayList<>();
-            sections.add(section);
+            sections.add(csdbSection);
+            sections.add(xlsxSection);
+            sections.add(csvSection);
             dataset.setDownloads(sections);
+
 
             Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
             IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
 
             // Save the files
-            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".xlsx");
-            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + dataset.getDescription().getDatasetId() + ".csv");
+            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filePrefix + ".xlsx");
+            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filePrefix + ".csv");
             List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
             writeDataGridToXlsx(xlsPath, dataGrid);
             writeDataGridToCsv(csvPath, dataGrid);
@@ -609,7 +625,11 @@ public class DataPublisher {
 
 
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-            putCombination(series.getCdid(), "Release date", format.format(series.getDescription().getReleaseDate()), map);
+            if (series.getDescription().getReleaseDate() == null) {
+                putCombination(series.getCdid(), "Release date", "", map);
+            } else {
+                putCombination(series.getCdid(), "Release date", format.format(series.getDescription().getReleaseDate()), map);
+            }
             putCombination(series.getCdid(), "Next release", series.getDescription().getNextRelease(), map);
 
             putCombination(series.getCdid(), "Important notes", StringUtils.join(series.getNotes(), ", "), map);

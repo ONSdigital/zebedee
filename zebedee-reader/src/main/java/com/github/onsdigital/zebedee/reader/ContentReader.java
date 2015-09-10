@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.reader.util.ReleaseDateComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.URIUtil;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -62,8 +63,19 @@ class ContentReader {
      * @return Wrapper containing actual document data as text
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
+        //Resolve to see if requested content is latest content, if so return latest, otherwise requested file
         Path contentPath = resolveContentPath(path);
-        return getPage(resolvePath(path), contentPath);
+        if (isRootFolder(contentPath) == false) {
+            String parentPath = URIUtils.removeLastSegment(path);
+            try {
+                Page latestContent = getLatestContent(parentPath);
+                if (toRelativeUri(contentPath.getParent()).equals(latestContent.getUri())) {
+                    return latestContent;
+                }
+            } catch (Exception e) {
+            }
+        }
+        return getPage(contentPath);
     }
 
     /**
@@ -74,32 +86,41 @@ class ContentReader {
      */
     private Page getContent(Path path) throws ZebedeeException, IOException {
         Path dataFile = resolveDataFilePath(path);
-        return getPage(path, dataFile);
+        return getPage(dataFile);
     }
 
-    private Page getPage(Path path, Path dataFile) throws IOException, ZebedeeException {
+    private Page getPage(Path dataFile) throws IOException, ZebedeeException {
         try (Resource resource = getResource(dataFile)) {
 //            checkJsonMime(resource, path);
             Page page = deserialize(resource);
-            if (page != null) { //Contents without type is null when deserialised. There should not be no such data
-                URI uri = null;
-                String resourceUri = resource.getUri().toString();
-                if (page instanceof Table || page instanceof Chart) {
-                    uri = URI.create(removeEnd(resourceUri, ".json"));
-                } else {
-                    uri = URI.create(removeLastSegment(resourceUri));
-                }
-                page.setUri(uri);
+            if (page == null) { //Contents without type is null when deserialised. There should not be no such data
+                return null;
             }
+            String uri = resource.getUri().toString();
+            page.setUri(resolveUri(uri, page));
+            PageDescription description = page.getDescription();
+
             return page;
         }
+    }
+
+    private URI resolveUri(String uriString, Page page) {
+        URI uri;
+        if (page instanceof Table || page instanceof Chart) {
+            uri = URI.create(removeEnd(uriString, ".json"));
+        } else {
+            uri = URI.create(removeLastSegment(uriString));
+        }
+        return uri;
     }
 
     public Page getLatestContent(String path) throws ZebedeeException, IOException {
         Path contentPath = resolvePath(path);
         Path parent = contentPath.getParent();
         assertIsEditionsFolder(parent);
-        return resolveLatest(contentPath);
+        Page page = resolveLatest(contentPath);
+        page.getDescription().setLatestRelease(true);
+        return page;
     }
 
     /**
@@ -202,9 +223,8 @@ class ContentReader {
             return null;
         }
 
-
         TreeSet<ContentNode> sortedSet = sortByDate(children.values());
-        return getContent(sortedSet.iterator().next().getUri().toString());
+        return getPage(resolveDataFilePath(resolvePath(sortedSet.iterator().next().getUri().toString())));
     }
 
     private TreeSet sortByDate(Collection set) {
@@ -269,7 +289,7 @@ class ContentReader {
         assertExists(path);
         assertIsDirectory(path);
         String fileName = path.getFileName().toString();
-        if (getConfiguration().getBulletinsFolderName().equals(fileName) || getConfiguration().getArticlesFolderName().equals(fileName) ||  getConfiguration().getCompendiumFolderName().equals(fileName)) {
+        if (getConfiguration().getBulletinsFolderName().equals(fileName) || getConfiguration().getArticlesFolderName().equals(fileName) || getConfiguration().getCompendiumFolderName().equals(fileName)) {
             return;
         }
         throw new BadRequestException("Latest uri can not be resolved for this content type");

@@ -40,6 +40,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -47,9 +48,117 @@ import java.util.*;
  */
 public class DataPublisher {
     static final String BRIAN_KEY = "brian_url";
-    public int insertions = 0;
-    public int corrections = 0;
-    public Map<String, String> env = System.getenv();
+
+    static final String DEFAULT_FILE = "data";
+    public static int insertions = 0;
+    public static int corrections = 0;
+    public static Map<String, String> env = System.getenv();
+
+
+//    public static void preprocessCollection(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
+//
+//        if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0) {
+//            System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
+//            return;
+//        }
+//
+//        preprocessCSDB(zebedee, collection, session);
+//
+//        System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
+//    }
+
+
+    /**
+     * The T5 timeseries objects are made by
+     * 1. Searching for all .csdb files in a collection
+     * 2. Getting Brian to break the files down to their component stats and basic metadata.
+     * 3. Combining the stats with metadata entered with the dataset and existing data
+     *
+     * @param collection the collection to search for dataset objects
+     * @param session
+     * @throws IOException
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     */
+//    static void preprocessCSDB(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException {
+//
+//        // First find all csdb files in the collection
+//        List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
+//
+//        List<Path> pathsToTimeSeries = new ArrayList<>();
+//
+//        // For each file in this collection
+//        for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
+//
+//            // Download the dataset page (for metadata)
+//            Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
+//            String datasetUri = zebedee.toUri(csdbDataset.get("json"));
+//
+//            DownloadSection csdbSection = new DownloadSection();
+//            csdbSection.setTitle(dataset.getDescription().getTitle());
+//            csdbSection.setCdids(new ArrayList<String>());
+//
+//            // Get a name for the xlsx/csv files to be generated
+//            String filePrefix = dataset.getDescription().getDatasetId();
+//            if (filePrefix.equalsIgnoreCase("")) {filePrefix = DEFAULT_FILE;}
+//
+//            DownloadSection xlsxSection = new DownloadSection();
+//            xlsxSection.setTitle("xlsx download");
+//            xlsxSection.setFile(datasetUri + "/" + filePrefix + ".xlsx");
+//
+//            DownloadSection csvSection = new DownloadSection();
+//            csvSection.setTitle("csv download");
+//            csvSection.setFile(datasetUri + "/" + filePrefix + ".csv");
+//
+//            if (dataset.getDescription().getDatasetId() == null) {
+//                dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
+//            }
+//
+//            // Break down the csdb file to timeseries (part-built by extracting csdb files)
+//            TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"));
+//
+//            // Process each time series
+//            for (TimeSeries series : serieses) {
+//
+//                // Work out the correct timeseries path by working back from the dataset uri
+//                String uri = uriForSeriesInDataset(datasetUri, series);
+//                //Path path = collection.find("", uri);
+//
+//                // Construct the new page
+//                TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
+//                csdbSection.getCdids().add(newPage.getDescription().getCdid());
+//
+//                // Save the new page to reviewed
+//                Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
+//                IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
+//
+//                // Write csv and other files:
+//                pathsToTimeSeries.add(savePath);
+//            }
+//
+//            // Save the new dataset to be reviewed
+//            List<DownloadSection> sections = new ArrayList<>();
+//            sections.add(csdbSection);
+//            sections.add(xlsxSection);
+//            sections.add(csvSection);
+//            dataset.setDownloads(sections);
+//
+//
+//            Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
+//            IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
+//
+//            // Save the files
+//            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filePrefix + ".xlsx");
+//            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filePrefix + ".csv");
+//            List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
+//            writeDataGridToXlsx(xlsPath, dataGrid);
+//            writeDataGridToCsv(csvPath, dataGrid);
+//
+//
+//            System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
+//        }
+//    }
+//>>>>>>> feature/data-publisher-extension
 
     /**
      * Output a grid of strings to XLSX
@@ -345,8 +454,23 @@ public class DataPublisher {
 
         for (TimeSeries series : serieses) {
             putCombination(series.getCdid(), "Title", series.getDescription().getTitle(), map);
-            putCombination(series.getCdid(), "CDID", series.getDescription().getTitle(), map);
-            //TODO add further rows to give more details
+            putCombination(series.getCdid(), "CDID", series.getDescription().getCdid(), map);
+            putCombination(series.getCdid(), "National Statistic", (series.getDescription().isNationalStatistic() ? "Y" : "N"), map);
+            putCombination(series.getCdid(), "Seasonally Adjusted", (series.getDescription().getSeasonalAdjustment()), map);
+            putCombination(series.getCdid(), "PreUnit", series.getDescription().getPreUnit(), map);
+            putCombination(series.getCdid(), "Unit", series.getDescription().getUnit(), map);
+
+
+            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+            if (series.getDescription().getReleaseDate() == null) {
+                putCombination(series.getCdid(), "Release date", "", map);
+            } else {
+                putCombination(series.getCdid(), "Release date", format.format(series.getDescription().getReleaseDate()), map);
+            }
+
+            putCombination(series.getCdid(), "Next release", series.getDescription().getNextRelease(), map);
+
+            putCombination(series.getCdid(), "Important notes", StringUtils.join(series.getNotes(), ", "), map);
 
             if (series.years != null) {
                 for (TimeSeriesValue value : series.years) {
@@ -514,12 +638,41 @@ public class DataPublisher {
         titleRow.add("Title");
         List<String> cdidRow = new ArrayList<>();
         cdidRow.add("CDID");
+        List<String> nationalStatistic = new ArrayList<>();
+        nationalStatistic.add("National Statistic");
+        List<String> seasonallyAdjusted = new ArrayList<>();
+        seasonallyAdjusted.add("Seasonally Adjusted");
+        List<String> preunit = new ArrayList<>();
+        preunit.add("PreUnit");
+        List<String> unit = new ArrayList<>();
+        unit.add("Unit");
+        List<String> releaseDate = new ArrayList<>();
+        releaseDate.add("Release date");
+        List<String> nextRelease = new ArrayList<>();
+        nextRelease.add("Next release");
+        List<String> importantNotes = new ArrayList<>();
+        importantNotes.add("Important notes");
+
         for (String cdid : orderedCDIDs) {
             titleRow.add(mapOfData.get("Title").get(cdid));
             cdidRow.add(cdid);
+            nationalStatistic.add(mapOfData.get("National Statistic").get(cdid));
+            seasonallyAdjusted.add(mapOfData.get("Seasonally Adjusted").get(cdid));
+            preunit.add(mapOfData.get("PreUnit").get(cdid));
+            unit.add(mapOfData.get("Unit").get(cdid));
+            releaseDate.add(mapOfData.get("Release date").get(cdid));
+            nextRelease.add(mapOfData.get("Next release").get(cdid));
+            importantNotes.add(mapOfData.get("Important notes").get(cdid));
         }
         rows.add(titleRow);
         rows.add(cdidRow);
+        rows.add(nationalStatistic);
+        rows.add(seasonallyAdjusted);
+        rows.add(preunit);
+        rows.add(unit);
+        rows.add(releaseDate);
+        rows.add(nextRelease);
+        rows.add(importantNotes);
 
         // Add years
         List<String> yearRange = yearRange(serieses);
@@ -602,7 +755,7 @@ public class DataPublisher {
         // First find all csdb files in the collection
         List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
 
-        List<Path> pathsToTimeSeries = new ArrayList<>();
+        List<TimeSeries> newSeries = new ArrayList<>();
 
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
@@ -611,9 +764,21 @@ public class DataPublisher {
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
             String datasetUri = zebedee.toUri(csdbDataset.get("json"));
 
-            DownloadSection section = new DownloadSection();
-            section.setTitle(dataset.getDescription().getTitle());
-            section.setCdids(new ArrayList<String>());
+            DownloadSection csdbSection = new DownloadSection();
+            csdbSection.setTitle(dataset.getDescription().getTitle());
+            csdbSection.setCdids(new ArrayList<String>());
+
+            // Get a name for the xlsx/csv files to be generated
+            String filePrefix = dataset.getDescription().getDatasetId();
+            if (filePrefix.equalsIgnoreCase("")) {filePrefix = DEFAULT_FILE;}
+
+            DownloadSection xlsxSection = new DownloadSection();
+            xlsxSection.setTitle("xlsx download");
+            xlsxSection.setFile(datasetUri + "/" + filePrefix + ".xlsx");
+
+            DownloadSection csvSection = new DownloadSection();
+            csvSection.setTitle("csv download");
+            csvSection.setFile(datasetUri + "/" + filePrefix + ".csv");
 
             if (dataset.getDescription().getDatasetId() == null) {
                 dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
@@ -631,19 +796,21 @@ public class DataPublisher {
 
                 // Construct the new page
                 TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
-                section.getCdids().add(newPage.getDescription().getCdid());
+                csdbSection.getCdids().add(newPage.getDescription().getCdid());
 
                 // Save the new page to reviewed
                 Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
                 IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
 
                 // Write csv and other files:
-                pathsToTimeSeries.add(savePath);
+                newSeries.add(newPage);
             }
 
             // Save the new dataset to be reviewed
             List<DownloadSection> sections = new ArrayList<>();
-            sections.add(section);
+            sections.add(csdbSection);
+            sections.add(xlsxSection);
+            sections.add(csvSection);
             dataset.setDownloads(sections);
 
             Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
@@ -655,12 +822,12 @@ public class DataPublisher {
 
             Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filename + ".xlsx");
             Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filename + ".csv");
-            List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(serieses);
+            List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(newSeries);
             writeDataGridToXlsx(xlsPath, dataGrid);
             writeDataGridToCsv(csvPath, dataGrid);
 
 
-            System.out.println("Published " + serieses.size() + " datasets for " + datasetUri);
+            System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
         }
     }
 

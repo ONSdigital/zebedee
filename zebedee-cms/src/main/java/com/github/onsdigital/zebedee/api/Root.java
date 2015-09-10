@@ -136,7 +136,7 @@ public class Root {
                 System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());
             }
         } else {
-            Log.print("Not scheduling collection %s, scheduling is not enabled" + collection.description.name);
+            Log.print("Not scheduling collection %s, scheduling is not enabled", collection.description.name);
         }
     }
 

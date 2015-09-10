@@ -121,7 +121,7 @@ public class Publisher {
         try {
             collection.description.publishTransactionId = beginPublish(host, encryptionPassword);
             collection.save();
-            ExecutorService pool = Executors.newFixedThreadPool(100);
+            ExecutorService pool = Executors.newFixedThreadPool(500);
             List<Future<IOException>> results = new ArrayList<>();
 
             // Publish each item of content:

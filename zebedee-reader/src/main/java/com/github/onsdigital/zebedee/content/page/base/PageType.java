@@ -36,6 +36,5 @@ public enum PageType {
     reference_tables,
     chart,
     table,
-    search_results_page,
     unknown;
 }

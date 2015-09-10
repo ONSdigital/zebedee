@@ -269,10 +269,10 @@ class ContentReader {
         assertExists(path);
         assertIsDirectory(path);
         String fileName = path.getFileName().toString();
-        if (getConfiguration().getBulletinsFolderName().equals(fileName) || getConfiguration().getArticlesFolderName().equals(fileName)) {
+        if (getConfiguration().getBulletinsFolderName().equals(fileName) || getConfiguration().getArticlesFolderName().equals(fileName) ||  getConfiguration().getCompendiumFolderName().equals(fileName)) {
             return;
         }
-        throw new BadRequestException("Latest uri can not be resolve for this content type");
+        throw new BadRequestException("Latest uri can not be resolved for this content type");
     }
 
     private Path resolvePath(String path) throws BadRequestException {

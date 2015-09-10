@@ -12,10 +12,10 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.util.ReleaseDateComparator;
+import com.github.onsdigital.zebedee.util.PathUtils;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.URIUtil;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -235,7 +235,8 @@ class ContentReader {
 
     //Returns uri of content calculating relative to root folder
     private URI toRelativeUri(Path node) {
-        return URI.create("/" + URIUtils.removeTrailingSlash(getRootFolder().toUri().relativize(node.toUri()).getPath()));
+        Path rootFolder = getRootFolder();
+        return PathUtils.toRelativeUri(rootFolder, node);
     }
 
     protected Resource getResource(Path resourcePath) throws ZebedeeException, IOException {

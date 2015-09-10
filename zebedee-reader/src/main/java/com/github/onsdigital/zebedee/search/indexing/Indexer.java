@@ -13,6 +13,7 @@ import org.elasticsearch.common.settings.Settings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -79,7 +80,7 @@ public class Indexer {
      */
     public void reloadContent(URI uri) throws IOException {
         try {
-            loadAndIndex(getElasticSearchIndexAlias(), uri);
+            loadAndIndex(getElasticSearchIndexAlias(), uri.toString());
         } catch (ZebedeeException e) {
             throw new IndexingException("Failed indexing: ", e);
         }
@@ -94,8 +95,7 @@ public class Indexer {
     private void indexDocuments(String indexName) throws IOException {
 
         try {
-            Map<URI, ContentNode> contents = zebedeeReader.getPublishedContentChildren(ROOT_URI);
-            index(indexName, contents);
+            index(indexName, new FileScanner().scan());
         } catch (ZebedeeException e) {
             throw new IndexingException("Failed indexing: ", e);
         }
@@ -105,22 +105,20 @@ public class Indexer {
      * Recursively indexes contents and their child contents
      *
      * @param indexName
-     * @param contents
+     * @param fileNames
      * @throws IOException
      */
-    private void index(String indexName, Map<URI, ContentNode> contents) throws IOException, ZebedeeException {
-        for (ContentNode content : contents.values()) {
-            if (content.getType() != null) { // skip folders with no data file and unknown contents
-                loadAndIndex(indexName, content.getUri());
-            }
-            index(indexName, zebedeeReader.getPublishedContentChildren(content.getUri().toString()));//index children
+    private void index(String indexName, List<String> fileNames) throws IOException, ZebedeeException {
+        for (String path : fileNames) {
+            loadAndIndex(indexName, path);
         }
     }
 
-    private void loadAndIndex(String indexName, URI uri) throws ZebedeeException, IOException {
-        //TODO:Change zebedee reader for parametrized object mapping
-        Page content = zebedeeReader.getPublishedContent(uri.toString());
-        elasticSearchWriter.createDocument(indexName, content.getType().name(), content.getUri().toString(), serialise(toSearchDocument(content)));
+    private void loadAndIndex(String indexName, String uri) throws ZebedeeException, IOException {
+        Page content = zebedeeReader.getPublishedContent(uri);
+        if (content != null && content.getType() != null) {
+            elasticSearchWriter.createDocument(indexName, content.getType().name(), content.getUri().toString(), serialise(toSearchDocument(content)));
+        }
     }
 
 

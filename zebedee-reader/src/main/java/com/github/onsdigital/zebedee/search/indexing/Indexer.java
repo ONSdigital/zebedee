@@ -17,10 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -260,6 +257,7 @@ public class Indexer {
                     synonymList.add(contents);
                 }
             }
+            System.out.println("Synonym list:" + Arrays.toString(synonymList.toArray()));
             return synonymList;
         }
     }

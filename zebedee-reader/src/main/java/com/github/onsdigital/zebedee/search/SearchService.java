@@ -100,7 +100,8 @@ public class SearchService {
             if (!item.isFailure()) {
                 results.add(buildSearchResult(item.getResponse()));
             } else {
-                System.out.println("Warning: Search failed for " + ReflectionToStringBuilder.toString(queryBuilders));
+                System.err.println("Warning: Search failed for " + ReflectionToStringBuilder.toString(queryBuilders[i]));
+                System.err.println(item.getFailureMessage());
             }
         }
 

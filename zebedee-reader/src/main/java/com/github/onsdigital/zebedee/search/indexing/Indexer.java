@@ -28,6 +28,7 @@ public class Indexer {
 
     private static final Lock indexingLock = new ReentrantLock();
     private static String currentIndex;
+    private static List<String> synonymsList = null;
 
     public static void loadIndex(Client client) throws IOException {
 
@@ -247,18 +248,22 @@ public class Indexer {
         String[] filters = {"lowercase", "ons_synonym_filter"};
         settingsBuilder.putArray("analysis.analyzer.ons_synonyms.filter", filters);
 
-        // java 7 try-with-resources automatically closes streams after use
-        try (InputStream inputStream = Indexer.class.getResourceAsStream("/synonym.txt"); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        if (synonymsList == null) {
+            // java 7 try-with-resources automatically closes streams after use
+            try (InputStream inputStream = Indexer.class.getResourceAsStream("/synonym.txt"); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
-            List<String> synonymList = new ArrayList<String>();
-            String contents = null;
-            while ((contents = reader.readLine()) != null) {
-                if (!contents.startsWith("#")) {
-                    synonymList.add(contents);
+                List<String> synonymList = new ArrayList<String>();
+                String contents = null;
+                while ((contents = reader.readLine()) != null) {
+                    if (!contents.startsWith("#")) {
+                        synonymList.add(contents);
+                    }
                 }
+                System.out.println("Synonym list:" + Arrays.toString(synonymList.toArray()));
+                synonymsList = synonymList;
             }
-            System.out.println("Synonym list:" + Arrays.toString(synonymList.toArray()));
-            return synonymList;
         }
+
+        return synonymsList;
     }
 }

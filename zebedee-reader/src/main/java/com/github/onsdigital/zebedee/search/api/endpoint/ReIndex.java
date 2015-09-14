@@ -3,8 +3,6 @@ package com.github.onsdigital.zebedee.search.api.endpoint;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.IndexInProgressException;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.search.indexing.IndexingException;
@@ -30,7 +28,7 @@ public class ReIndex {
         try {
             String key = request.getParameter("key");
             if (Password.verify(key, REINDEX_KEY_HASH)) {
-                Indexer.getInstance().reloadIndex();
+                Indexer.getInstance().reload();
                 response.setStatus(HttpStatus.OK_200);
                 return "Elasticsearch: indexing complete";
             } else {

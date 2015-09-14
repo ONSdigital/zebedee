@@ -16,7 +16,6 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.common.unit.TimeValue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.serialise;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndexAlias;
-import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.isDisableReindex;
 
 public class Indexer {
     private static Indexer instance = new Indexer();
@@ -47,18 +45,12 @@ public class Indexer {
         return instance;
     }
 
-
     /**
      * Loads documents to a new index, switches default index alias to new index and deletes old index if available  to ensure zero down time.
      *
      * @throws IOException
      */
-    public void reloadIndex() throws IOException {
-//        if (isDisableReindex()) {
-//            System.out.println("Skipping reindexing due to configuration");
-//            return;
-//        }
-
+    public void reload() throws IOException {
         if (LOCK.tryLock()) {
             try {
                 long start = System.currentTimeMillis();

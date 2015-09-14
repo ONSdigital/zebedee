@@ -199,7 +199,7 @@ public class Publisher {
         Log.print("Reindexing search");
 
         try {
-            Indexer.getInstance().reloadIndex();
+            Indexer.getInstance().reload();
         } catch (Exception e) {
             // exception is thrown if loading index fails because its already in progress.
             // Catching this exception as its possible this will happen for multiple publish

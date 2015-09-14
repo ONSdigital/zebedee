@@ -1,10 +1,13 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.model.SearchDocument;
+import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -17,9 +20,10 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -31,7 +35,6 @@ public class Indexer {
     private static Indexer instance = new Indexer();
 
     private final Lock LOCK = new ReentrantLock();
-    private final String ROOT_URI = "/";
 
     private final Client client = ElasticSearchClient.getClient();
     private ElasticSearchWriter elasticSearchWriter = new ElasticSearchWriter(client);
@@ -68,7 +71,7 @@ public class Indexer {
 
     private void doLoad() throws IOException {
         String newIndex = generateIndexName();
-        elasticSearchWriter.createIndex(newIndex, getSettings(),getDefaultMapping());
+        elasticSearchWriter.createIndex(newIndex, getSettings(), getDefaultMapping());
         indexDocuments(newIndex);
         elasticSearchWriter.swapIndex(currentIndex, newIndex, getElasticSearchIndexAlias());
         if (currentIndex != null) {
@@ -82,14 +85,29 @@ public class Indexer {
      *
      * @param uri
      */
-    public void reloadContent(URI uri) throws IOException {
+    public void reloadContent(String uri) throws IOException {
         try {
-            loadAndIndex(getElasticSearchIndexAlias(), uri.toString());
+            System.out.println("Triggering reindex for content, uri:" + uri);
+            long start = System.currentTimeMillis();
+            Page page = getPage(uri);
+            if (page == null) {
+                throw new NotFoundException("Content not found for re-indexing, uri: " + uri);
+            }
+            if (isPeriodic(page.getType())) {
+                //TODO: optimize resolving lastest flag, only update elastic search for existing releases rather than reindexing
+                //Load old releases as well to get latest flag re-calculated
+                index(currentIndex, new FileScanner().scan(URIUtils.removeLastSegment(uri)));
+            } else {
+                indexSingleContent(currentIndex, page);
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("Elasticsearch: indexing complete for uri " + uri + " in " + (start - end) + " ms");
         } catch (ZebedeeException e) {
-            throw new IndexingException("Failed indexing: ", e);
+            throw new IndexingException("Failed re-indexint content with uri: " + uri, e);
+        } catch (NoSuchFileException e) {
+            throw new IndexingException("Content not found for re-indexing, uri: " + uri);
         }
     }
-
 
     private String generateIndexName() {
         return getElasticSearchIndexAlias() + System.currentTimeMillis();
@@ -113,7 +131,7 @@ public class Indexer {
      * @throws IOException
      */
     private void index(String indexName, List<String> fileNames) throws IOException, ZebedeeException {
-        try(BulkProcessor bulkProcessor = getBulkProcessor()) {
+        try (BulkProcessor bulkProcessor = getBulkProcessor()) {
             for (String path : fileNames) {
                 IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, path);
                 bulkProcessor.add(indexRequestBuilder.request());
@@ -121,12 +139,6 @@ public class Indexer {
         }
     }
 
-    private void loadAndIndex(String indexName, String uri) throws ZebedeeException, IOException {
-        Page content = getPage(uri);
-        if (content != null && content.getType() != null) {
-            elasticSearchWriter.createDocument(indexName, content.getType().name(), content.getUri().toString(), serialise(toSearchDocument(content)));
-        }
-    }
 
     private Page getPage(String uri) throws ZebedeeException, IOException {
         return zebedeeReader.getPublishedContent(uri);
@@ -140,6 +152,10 @@ public class Indexer {
             return indexRequestBuilder;
         }
         return null;
+    }
+
+    private void indexSingleContent(String indexName, Page page) {
+        elasticSearchWriter.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page)));
     }
 
 
@@ -163,6 +179,18 @@ public class Indexer {
         System.out.println(mappingSource);
         return mappingSource;
 
+    }
+
+
+    private boolean isPeriodic(PageType type) {
+        switch (type) {
+            case bulletin:
+            case article:
+            case compendium_landing_page:
+                return true;
+            default:
+                return false;
+        }
     }
 
     private BulkProcessor getBulkProcessor() {

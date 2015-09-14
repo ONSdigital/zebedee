@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.search.indexing;
 
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.PathUtils;
+import com.github.onsdigital.zebedee.util.URIUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -18,9 +20,20 @@ public class FileScanner {
 
     private Path root;
 
+    public FileScanner() {
+        root = Paths.get(ReaderConfiguration.getConfiguration().getContentDir());
+    }
+
     public List<String> scan() throws IOException {
-        Path dir = Paths.get(ReaderConfiguration.getConfiguration().getContentDir());
-        this.root = dir;
+        return scan(null);
+    }
+
+
+    public List<String> scan(String path) throws IOException {
+        Path dir = root;
+        if (StringUtils.isEmpty(path) == false) {
+            dir = root.resolve(URIUtils.removeLeadingSlash(path));
+        }
         List<String> fileNames = new ArrayList<>();
         return getFileNames(fileNames, dir);
     }

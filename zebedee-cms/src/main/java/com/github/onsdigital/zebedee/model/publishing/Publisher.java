@@ -36,6 +36,9 @@ import java.util.concurrent.locks.Lock;
 
 public class Publisher {
 
+    private static final Host websiteHost = new Host(Configuration.getWebsiteUrl());
+    private static final Host theTrainHost = new Host(Configuration.getTheTrainUrl());
+
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
         boolean publishComplete = false;
 
@@ -115,11 +118,9 @@ public class Publisher {
     private static boolean PublishFilesToWebsite(Collection collection, String email) throws IOException {
 
         boolean publishComplete = false;
-
-        Host host = new Host(Configuration.getTheTrainUrl());
         String encryptionPassword = Random.password(100);
         try {
-            collection.description.publishTransactionId = beginPublish(host, encryptionPassword);
+            collection.description.publishTransactionId = beginPublish(theTrainHost, encryptionPassword);
             collection.save();
             ExecutorService pool = Executors.newFixedThreadPool(50);
             List<Future<IOException>> results = new ArrayList<>();
@@ -129,7 +130,7 @@ public class Publisher {
 
                 Path source = collection.reviewed.get(uri);
                 if (source != null) {
-                    results.add(publishFile(host, collection.description.publishTransactionId, encryptionPassword, uri, source, pool));
+                    results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, source, pool));
                 }
 
                 // Add an event to the event log
@@ -147,7 +148,7 @@ public class Publisher {
             }
 
             // If all has gone well so far, commit the publishing transaction:
-            Result result = commitPublish(host, collection.description.publishTransactionId, encryptionPassword);
+            Result result = commitPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
 
             if (!result.error) {
                 Date publishedDate = new Date();
@@ -166,7 +167,7 @@ public class Publisher {
             // If an error was caught, attempt to roll back the transaction:
             if (collection.description.publishTransactionId != null) {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
-                rollbackPublish(host, collection.description.publishTransactionId, encryptionPassword);
+                rollbackPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
             }
 
         } finally {
@@ -199,6 +200,30 @@ public class Publisher {
 
         Log.print("Reindexing search");
 
+        ReIndexPublishingSearch();
+        ReIndexWebsiteSearch();
+
+        return true;
+    }
+
+    /**
+     * Post to the website to reindex search.
+     */
+    private static void ReIndexWebsiteSearch() {
+        Log.print("Reindexing website search.");
+        try (Http http = new Http()) {
+
+            Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey());
+            Response<String> response = http.post(begin, String.class);
+            Log.print("Website reindex response: %s", response.body);
+
+        } catch (Exception e) {
+            Log.print("Exception reloading website search index:");
+            ExceptionUtils.printRootCauseStackTrace(e);
+        }
+    }
+
+    private static void ReIndexPublishingSearch() {
         try {
             Indexer.loadIndex(ElasticSearchClient.getClient());
         } catch (Exception e) {
@@ -208,7 +233,6 @@ public class Publisher {
             Log.print("Exception reloading search index:");
             ExceptionUtils.printRootCauseStackTrace(e);
         }
-        return true;
     }
 
     public static void copyFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {

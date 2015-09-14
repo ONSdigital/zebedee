@@ -755,10 +755,12 @@ public class DataPublisher {
         // First find all csdb files in the collection
         List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
 
-        List<TimeSeries> newSeries = new ArrayList<>();
+
 
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
+
+            List<TimeSeries> newSeries = new ArrayList<>();
 
             // Download the dataset page (for metadata)
             Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
@@ -825,7 +827,6 @@ public class DataPublisher {
             List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(newSeries);
             writeDataGridToXlsx(xlsPath, dataGrid);
             writeDataGridToCsv(csvPath, dataGrid);
-
 
             System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
         }

@@ -19,6 +19,7 @@ public class Configuration {
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8083";
+    private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
 
     public static boolean isSchedulingEnabled() {
@@ -31,6 +32,14 @@ public class Configuration {
 
     public static String getTheTrainUrl() {
         return StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL);
+    }
+
+    public static String getWebsiteUrl() {
+        return StringUtils.defaultIfBlank(getValue("website_url"), DEFAULT_WEBSITE_URL);
+    }
+
+    public static String getReindexKey() {
+        return StringUtils.defaultIfBlank(getValue("website_reindex_key"), "");
     }
 
     /**

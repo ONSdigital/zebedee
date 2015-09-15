@@ -149,9 +149,9 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.nationalStatistic = nationalStatistic;
     }
 
-    public boolean isLatestRelease() { return latestRelease == null ? false:latestRelease; }
+    public Boolean isLatestRelease() { return latestRelease == null ? false:latestRelease; }
 
-    public void setLatestRelease(boolean latestRelease) { this.latestRelease = latestRelease; }
+    public void setLatestRelease(Boolean latestRelease) { this.latestRelease = latestRelease; }
 
     public Contact getContact() {
         return contact;

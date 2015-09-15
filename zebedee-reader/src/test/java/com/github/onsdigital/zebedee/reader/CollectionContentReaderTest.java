@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.reader.util;
+package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.article.Ar
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.reader.CollectionContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.junit.Before;

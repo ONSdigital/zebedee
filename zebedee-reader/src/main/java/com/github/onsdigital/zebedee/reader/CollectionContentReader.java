@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.reader.util;
+package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.collection.Collection;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +27,7 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
 /**
  * Created by bren on 30/07/15.
  */
-public class CollectionContentReader {
+class CollectionContentReader {
 
     private Path collections;
     private ContentReader inProgress;

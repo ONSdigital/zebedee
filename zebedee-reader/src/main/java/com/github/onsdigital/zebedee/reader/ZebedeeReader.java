@@ -10,12 +10,9 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.filter.FilterUtil;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
-import com.github.onsdigital.zebedee.reader.util.CollectionContentReader;
-import com.github.onsdigital.zebedee.reader.util.ContentReader;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +43,7 @@ public class ZebedeeReader {
      * @throws ZebedeeException
      * @throws IOException
      */
-    public Content getPublishedContent(String path) throws ZebedeeException, IOException {
+    public Page getPublishedContent(String path) throws ZebedeeException, IOException {
         return publishedContentReader.getContent(path);
     }
 

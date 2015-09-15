@@ -13,10 +13,10 @@ import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -204,20 +204,28 @@ public class Publisher {
 
         Log.print("Reindexing search");
 
-        ReIndexPublishingSearch();
-        ReIndexWebsiteSearch();
-
+        reindexSearch(collection);
         return true;
     }
+
+    private static void reindexSearch(Collection collection) throws IOException {
+        List<String> uris = collection.reviewed.uris("*data.json");
+        for (String uri : uris) {
+            String contentUri = URIUtils.removeLastSegment(uri);
+            reIndexPublishingSearch(contentUri);
+            reIndexWebsiteSearch(contentUri);
+        }
+    }
+
 
     /**
      * Post to the website to reindex search.
      */
-    private static void ReIndexWebsiteSearch() {
+    private static void reIndexWebsiteSearch(String uri) {
         Log.print("Reindexing website search.");
         try (Http http = new Http()) {
 
-            Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey());
+            Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey()).setParameter("uri",uri);
             Response<String> response = http.post(begin, String.class);
             Log.print("Website reindex response: %s", response.body);
 
@@ -227,13 +235,10 @@ public class Publisher {
         }
     }
 
-    private static void ReIndexPublishingSearch() {
+    private static void reIndexPublishingSearch(String uri) throws IOException {
         try {
-            Indexer.loadIndex(ElasticSearchClient.getClient());
+            Indexer.getInstance().reloadContent(uri);
         } catch (Exception e) {
-            // exception is thrown if loading index fails because its already in progress.
-            // Catching this exception as its possible this will happen for multiple publish
-            // tasks running concurrently.
             Log.print("Exception reloading search index:");
             ExceptionUtils.printRootCauseStackTrace(e);
         }

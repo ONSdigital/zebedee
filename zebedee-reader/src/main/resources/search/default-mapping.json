@@ -1,0 +1,47 @@
+{
+  "_default_": {
+    "dynamic_date_formats": [
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    ],
+    "properties": {
+      "type": {
+        "type": "string",
+        "index_analyzer": "ons_analyzer"
+      },
+      "description": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "analyzer": "ons_analyzer",
+            "fields": {
+              "title_raw": {
+                "type": "string"
+              }
+            }
+          },
+          "edition": {
+            "type": "string",
+            "analyzer": "ons_analyzer"
+          },
+          "metaDescription": {
+            "type": "string",
+            "analyzer": "ons_analyzer"
+          },
+          "summary": {
+            "type": "string",
+            "analyzer": "ons_analyzer"
+          },
+          "keywords": {
+            "type": "string",
+            "analyzer": "ons_analyzer",
+            "fields": {
+              "keywords_raw": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

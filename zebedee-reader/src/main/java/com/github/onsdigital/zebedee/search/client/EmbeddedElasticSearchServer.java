@@ -12,10 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class EmbeddedElasticSearchServer {
+class EmbeddedElasticSearchServer {
 
-    private static final String DEFAULT_DATA_DIRECTORY = System.getProperty("java.io.tmpdir");
-    private static final String DEFAULT_CLUSTERNAME = "ONSNode";
+    private static final String DEFAULT_CLUSTERNAME = "ONSCluster";
     private final Node node;
     private Path dataDirectory;
 
@@ -26,7 +25,7 @@ public class EmbeddedElasticSearchServer {
     public EmbeddedElasticSearchServer(Settings settings, String clusterName) throws IOException {
 
         this.dataDirectory = Files.createTempDirectory("searchindex");
-        ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder().put("cluster.title", clusterName).put("http.enabled", true).put("path.data", dataDirectory)
+        ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder().put("cluster.name", clusterName).put("http.enabled", true).put("path.data", dataDirectory)
                 .put("node.data", true);
         System.out.println("Creating index data in: " + this.dataDirectory);
 
@@ -41,7 +40,7 @@ public class EmbeddedElasticSearchServer {
         }
 
         System.out.println("Starting embedded Elastic Search node with settings" + settingsBuilder.internalMap());
-        node = NodeBuilder.nodeBuilder().local(true).settings(settingsBuilder.build()).node();
+        node = NodeBuilder.nodeBuilder().local(false).settings(settingsBuilder.build()).node();
     }
 
     public Client getClient() {

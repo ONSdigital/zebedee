@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.reader.util;
+package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
@@ -10,9 +10,9 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
-import com.github.onsdigital.zebedee.util.ReleaseDateComparator;
+import com.github.onsdigital.zebedee.reader.util.ReleaseDateComparator;
+import com.github.onsdigital.zebedee.util.PathUtils;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
@@ -39,11 +39,9 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * ContentReader will find file relative to root folder. Paths might start with forward slash or not.
  * <p>
  */
-public class ContentReader {
+class ContentReader {
 
     private final Path ROOT_FOLDER;
-    private final String NOT_FOUND = "404 - Not Found";
-
     private ContentLanguage language = ContentLanguage.en;
 
     public ContentReader(String rootFolder) {
@@ -65,8 +63,19 @@ public class ContentReader {
      * @return Wrapper containing actual document data as text
      */
     public Page getContent(String path) throws ZebedeeException, IOException {
+        //Resolve to see if requested content is latest content, if so return latest, otherwise requested file
         Path contentPath = resolveContentPath(path);
-        return getPage(resolvePath(path), contentPath);
+        if (isRootFolder(contentPath) == false) {
+            String parentPath = URIUtils.removeLastSegment(path);
+            try {
+                Page latestContent = getLatestContent(parentPath);
+                if (toRelativeUri(contentPath.getParent()).equals(latestContent.getUri())) {
+                    return latestContent;
+                }
+            } catch (Exception e) {
+            }
+        }
+        return getPage(contentPath);
     }
 
     /**
@@ -77,32 +86,41 @@ public class ContentReader {
      */
     private Page getContent(Path path) throws ZebedeeException, IOException {
         Path dataFile = resolveDataFilePath(path);
-        return getPage(path, dataFile);
+        return getPage(dataFile);
     }
 
-    private Page getPage(Path path, Path dataFile) throws IOException, ZebedeeException {
+    private Page getPage(Path dataFile) throws IOException, ZebedeeException {
         try (Resource resource = getResource(dataFile)) {
-            checkJsonMime(resource, path);
+//            checkJsonMime(resource, path);
             Page page = deserialize(resource);
-            if (page != null) { //Contents without type is null when deserialised. There should not be no such data
-                URI uri = null;
-                String resourceUri = resource.getUri().toString();
-                if (page instanceof Table || page instanceof Chart) {
-                    uri = URI.create(removeEnd(resourceUri, ".json"));
-                } else {
-                    uri = URI.create(removeLastSegment(resourceUri));
-                }
-                page.setUri(uri);
+            if (page == null) { //Contents without type is null when deserialised. There should not be no such data
+                return null;
             }
+            String uri = resource.getUri().toString();
+            page.setUri(resolveUri(uri, page));
+            PageDescription description = page.getDescription();
+
             return page;
         }
+    }
+
+    private URI resolveUri(String uriString, Page page) {
+        URI uri;
+        if (page instanceof Table || page instanceof Chart) {
+            uri = URI.create(removeEnd(uriString, ".json"));
+        } else {
+            uri = URI.create(removeLastSegment(uriString));
+        }
+        return uri;
     }
 
     public Page getLatestContent(String path) throws ZebedeeException, IOException {
         Path contentPath = resolvePath(path);
         Path parent = contentPath.getParent();
         assertIsEditionsFolder(parent);
-        return resolveLatest(contentPath);
+        Page page = resolveLatest(contentPath);
+        page.getDescription().setLatestRelease(true);
+        return page;
     }
 
     /**
@@ -137,9 +155,6 @@ public class ContentReader {
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Path node = resolvePath(path);
-//        if (!isDirectory(node)) { //resolve parents for resource files as well
-//            node = node.getParent();
-//        }
         return resolveParents(node);
     }
 
@@ -203,17 +218,13 @@ public class ContentReader {
 
     private Page resolveLatest(Path path) throws ZebedeeException, IOException {
 
-
-
-
         Map<URI, ContentNode> children = resolveChildren(path);
         if (children == null || children.isEmpty()) {
             return null;
         }
 
-
         TreeSet<ContentNode> sortedSet = sortByDate(children.values());
-        return getContent(sortedSet.iterator().next().getUri().toString());
+        return getPage(resolveDataFilePath(resolvePath(sortedSet.iterator().next().getUri().toString())));
     }
 
     private TreeSet sortByDate(Collection set) {
@@ -224,7 +235,8 @@ public class ContentReader {
 
     //Returns uri of content calculating relative to root folder
     private URI toRelativeUri(Path node) {
-        return URI.create("/" + URIUtils.removeTrailingSlash(getRootFolder().toUri().relativize(node.toUri()).getPath()));
+        Path rootFolder = getRootFolder();
+        return PathUtils.toRelativeUri(rootFolder, node);
     }
 
     protected Resource getResource(Path resourcePath) throws ZebedeeException, IOException {
@@ -258,8 +270,7 @@ public class ContentReader {
 
     private void assertExists(Path path) throws ZebedeeException {
         if (!exists(path)) {
-            System.err.println("Could not find requested content, path:" + path.toUri().toString());
-            throw new NotFoundException(NOT_FOUND);
+            throw new NotFoundException("Could not find requested content, path:" + path.toUri().toString());
         }
     }
 
@@ -279,7 +290,7 @@ public class ContentReader {
         assertExists(path);
         assertIsDirectory(path);
         String fileName = path.getFileName().toString();
-        if (getConfiguration().getBulletinsFolderName().equals(fileName) || getConfiguration().getArticlesFolderName().equals(fileName) ||  getConfiguration().getCompendiumFolderName().equals(fileName)) {
+        if (getConfiguration().getBulletinsFolderName().equals(fileName) || getConfiguration().getArticlesFolderName().equals(fileName) || getConfiguration().getCompendiumFolderName().equals(fileName)) {
             return;
         }
         throw new BadRequestException("Latest uri can not be resolved for this content type");

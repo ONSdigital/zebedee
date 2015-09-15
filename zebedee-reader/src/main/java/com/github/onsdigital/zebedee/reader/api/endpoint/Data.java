@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
-import com.github.onsdigital.zebedee.util.ResponseUtils;
+import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.util.RequestUtils.getRequestedLanguage;
+import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
 /**
  * Created by bren on 29/07/15.
@@ -51,7 +51,7 @@ public class Data {
 
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        ResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findContent(request, extractFilter(request)), response);
+        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findContent(request, extractFilter(request)), response);
     }
 
 

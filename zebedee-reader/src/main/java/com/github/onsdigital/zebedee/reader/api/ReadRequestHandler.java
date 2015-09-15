@@ -11,7 +11,7 @@ import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.util.AuthorisationHandler;
-import com.github.onsdigital.zebedee.util.ContentNodeComparator;
+import com.github.onsdigital.zebedee.reader.util.ContentNodeComparator;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
 

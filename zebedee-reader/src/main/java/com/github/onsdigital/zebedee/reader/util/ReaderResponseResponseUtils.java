@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.util;
+package com.github.onsdigital.zebedee.reader.util;
 
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -12,7 +12,7 @@ import java.io.StringReader;
 /**
  * Created by bren on 31/07/15.
  */
-public class ResponseUtils {
+public class ReaderResponseResponseUtils {
 
     public static void sendResponse(Object content, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);

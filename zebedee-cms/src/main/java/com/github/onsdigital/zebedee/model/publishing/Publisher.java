@@ -127,10 +127,14 @@ public class Publisher {
 
             // Publish each item of content:
             for (String uri : collection.reviewed.uris()) {
-
                 Path source = collection.reviewed.get(uri);
                 if (source != null) {
-                    results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, source, pool));
+                    boolean zipped = false;
+                    if (source.getFileName().toString().equals("timeseries")) {
+                        zipped = true;
+                    }
+
+                    results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, zipped, source, pool));
                 }
 
                 // Add an event to the event log
@@ -307,7 +311,14 @@ public class Publisher {
      * @return A {@link Future} that will evaluate to {@code null} unless an error occurs in publishing a file, in which case the exception will be returned.
      * @throws IOException
      */
-    private static Future<IOException> publishFile(final Host host, final String transactionId, final String encryptionPassword, final String uri, final Path source, ExecutorService pool) {
+    private static Future<IOException> publishFile(
+            final Host host,
+            final String transactionId,
+            final String encryptionPassword,
+            final String uri,
+            final boolean zipped,
+            final Path source,
+            ExecutorService pool) {
         return pool.submit(new Callable<IOException>() {
             @Override
             public IOException call() throws Exception {
@@ -316,6 +327,7 @@ public class Publisher {
                     Endpoint publish = new Endpoint(host, "publish")
                             .setParameter("transactionId", transactionId)
                             .setParameter("encryptionPassword", encryptionPassword)
+                            .setParameter("zip", Boolean.toString(zipped))
                             .setParameter("uri", uri);
                     Response<Result> response = http.postFile(publish, source, Result.class);
                     checkResponse(response);

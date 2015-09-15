@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.staticpage.base;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public abstract class BaseStaticPage extends Page {
 
-    private List<Link> downloads;
+    private List<DownloadSection> downloads;
 
     /**
      *Body in markdown format
@@ -38,11 +39,11 @@ public abstract class BaseStaticPage extends Page {
         this.links = links;
     }
 
-    public List<Link> getDownloads() {
+    public List<DownloadSection> getDownloads() {
         return downloads;
     }
 
-    public void setDownloads(List<Link> downloads) {
+    public void setDownloads(List<DownloadSection> downloads) {
         this.downloads = downloads;
     }
 }

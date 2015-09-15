@@ -14,6 +14,8 @@ public class Chart extends Page {
     private String source;
     private String notes;
     private String altText;
+    private String labelInterval;
+    private String decimalPlaces;
 
     private String unit;
     private String aspectRatio;
@@ -148,5 +150,21 @@ public class Chart extends Page {
 
     public void setGroups(List<List<String>> groups) {
         this.groups = groups;
+    }
+
+    public String getLabelInterval() {
+        return labelInterval;
+    }
+
+    public void setLabelInterval(String labelInterval) {
+        this.labelInterval = labelInterval;
+    }
+
+    public String getDecimalPlaces() {
+        return decimalPlaces;
+    }
+
+    public void setDecimalPlaces(String decimalPlaces) {
+        this.decimalPlaces = decimalPlaces;
     }
 }

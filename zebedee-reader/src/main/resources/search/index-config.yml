@@ -6,8 +6,25 @@ analysis :
     default_index :
       type : custom
       tokenizer : keyword
-      filter : [trim,lowercase]
+      filter :
+        - trim
+        - lowercase
     #ONS analyzer is used when indexing fields are wanted to be searchable, set mappings for these fields in default-mapping.json file
     ons_analyzer :
       tokenizer : standard
-      filter : [standard, lowercase, stop, porter_stem]
+      filter :
+        - lowercase
+        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
+        - standard
+        - stop
+        - porter_stem
+  filter :
+    ons_synonyms :
+      type : synonym
+      # stores synonyms for search engine
+      # there are 2 possible formats
+      # 1. term => another term = items on lhs are mapped to items on rhs
+      # 2. term,another term,and another term => term,another term,and another term = all terms are synonymous with each other
+      synonyms :
+        - "consumer price index,cpi => consumer price index,cpi"
+        - "rpi,retail price index => rpi,retail price index"

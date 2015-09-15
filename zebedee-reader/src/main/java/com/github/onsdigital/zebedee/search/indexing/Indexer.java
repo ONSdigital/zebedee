@@ -20,10 +20,9 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -171,6 +170,28 @@ public class Indexer {
         ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder().loadFromUrl(Indexer.class.getResource("/search/index-config.yml"));
         System.out.println("Index settings:\n" + settingsBuilder.internalMap());
         return settingsBuilder.build();
+    }
+
+    private void addSynonyms(ImmutableSettings.Builder settings) {
+        settings.put("analysis.filter.ons_synonym_filter.type", "synonym");
+    }
+
+    private static List<String> getSynonyms(ImmutableSettings.Builder settingsBuilder) throws IOException {
+        String[] filters = {"lowercase", "ons_synonym_filter"};
+        settingsBuilder.putArray("analysis.analyzer.ons_synonyms.filter", filters);
+
+        // java 7 try-with-resources automatically closes streams after use
+        try (InputStream inputStream = Indexer.class.getResourceAsStream("/search/synonym.txt"); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+            List<String> synonymList = new ArrayList<>();
+            String contents;
+            while ((contents = reader.readLine()) != null) {
+                if (!contents.startsWith("#")) {
+                    synonymList.add(contents);
+                }
+            }
+            return synonymList;
+        }
     }
 
     private String getDefaultMapping() throws IOException {

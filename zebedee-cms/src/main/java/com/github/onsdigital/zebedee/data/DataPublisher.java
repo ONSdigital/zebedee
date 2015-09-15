@@ -733,9 +733,13 @@ public class DataPublisher {
             return;
         }
 
+        insertions = 0; corrections = 0;
+
         preprocessCSDB(zebedee, collection, session);
 
-        System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
+        if(insertions + corrections > 0) {
+            System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
+        }
     }
 
     /**

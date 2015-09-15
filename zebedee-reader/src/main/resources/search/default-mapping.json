@@ -6,13 +6,13 @@
     "properties": {
       "type": {
         "type": "string",
-        "index_analyzer": "ons_analyzer"
+        "index_analyzer": "ons_index_analyzer"
       },
       "description": {
         "properties": {
           "title": {
             "type": "string",
-            "analyzer": "ons_analyzer",
+            "index_analyzer": "ons_index_analyzer",
             "fields": {
               "title_raw": {
                 "type": "string"
@@ -21,19 +21,19 @@
           },
           "edition": {
             "type": "string",
-            "analyzer": "ons_analyzer"
+            "index_analyzer": "ons_index_analyzer"
           },
           "metaDescription": {
             "type": "string",
-            "analyzer": "ons_analyzer"
+            "index_analyzer": "ons_index_analyzer"
           },
           "summary": {
             "type": "string",
-            "analyzer": "ons_analyzer"
+            "index_analyzer": "ons_index_analyzer"
           },
           "keywords": {
             "type": "string",
-            "analyzer": "ons_analyzer",
+            "index_analyzer": "ons_index_analyzer",
             "fields": {
               "keywords_raw": {
                 "type": "string"

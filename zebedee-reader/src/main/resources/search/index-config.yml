@@ -4,13 +4,19 @@ analysis :
     #Makes all fields filterable with exact word matching, it is used to make filtering available on all fields by default
     #Searchable fields uses ons_analyzer
     default_index :
-      type : custom
       tokenizer : keyword
       filter :
         - trim
         - lowercase
     #ONS analyzer is used when indexing fields are wanted to be searchable, set mappings for these fields in default-mapping.json file
-    ons_analyzer :
+    default_search :
+          tokenizer : standard
+          filter :
+            - lowercase
+            - standard
+            - stop
+            - porter_stem
+    ons_index_analyzer :
       tokenizer : standard
       filter :
         - lowercase

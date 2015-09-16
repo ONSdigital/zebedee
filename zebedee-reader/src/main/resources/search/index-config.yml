@@ -32,5 +32,5 @@ analysis :
       # 1. term => another term = items on lhs are mapped to items on rhs
       # 2. term,another term,and another term => term,another term,and another term = all terms are synonymous with each other
       synonyms :
-        - "consumer price inflation,cpi => consumer price inflation,cpi"
-        - "rpi,retail price inflation => rpi,retail price inflation"
+        - "consumer price inflation,consumer price index,cpi => consumer price inflation,consumer price index,cpi"
+        - "rpi,retail price index => rpi,retail price index"

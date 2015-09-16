@@ -192,28 +192,41 @@ public class Publisher {
      */
     private static boolean onPublishComplete(Zebedee zebedee, Collection collection) throws IOException {
 
-        copyFilesToMaster(zebedee, collection);
+        try {
+            copyFilesToMaster(zebedee, collection);
 
-        // move collection files to archive
-        Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
+            // move collection files to archive
+            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
 
-        zebedee.publishedCollections.add(collectionJsonPath);
+            zebedee.publishedCollections.add(collectionJsonPath);
 
-        collection.delete();
-        ContentTree.dropCache();
+            Log.print("Reindexing search");
+            reindexSearch(collection);
 
-        Log.print("Reindexing search");
+            collection.delete();
+            ContentTree.dropCache();
 
-        reindexSearch(collection);
-        return true;
+            return true;
+        } catch (Exception exception) {
+            Log.print("An error occurred during the publish cleanupon collection %s: %s", collection.description.name, exception.getMessage());
+            ExceptionUtils.printRootCauseStackTrace(exception);
+        }
+
+        return false;
     }
 
     private static void reindexSearch(Collection collection) throws IOException {
-        List<String> uris = collection.reviewed.uris("*data.json");
-        for (String uri : uris) {
-            String contentUri = URIUtils.removeLastSegment(uri);
-            reIndexPublishingSearch(contentUri);
-            reIndexWebsiteSearch(contentUri);
+
+        try {
+            List<String> uris = collection.reviewed.uris("*data.json");
+            for (String uri : uris) {
+                String contentUri = URIUtils.removeLastSegment(uri);
+                reIndexPublishingSearch(contentUri);
+                reIndexWebsiteSearch(contentUri);
+            }
+        } catch (Exception exception) {
+            Log.print("An error occurred during the search reindex of collection %s, %s", collection.description.name, exception.getMessage());
+            ExceptionUtils.printRootCauseStackTrace(exception);
         }
     }
 
@@ -225,7 +238,7 @@ public class Publisher {
         Log.print("Reindexing website search.");
         try (Http http = new Http()) {
 
-            Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey()).setParameter("uri",uri);
+            Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey()).setParameter("uri", uri);
             Response<String> response = http.post(begin, String.class);
             Log.print("Website reindex response: %s", response.body);
 

@@ -13,10 +13,10 @@ import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -127,10 +127,14 @@ public class Publisher {
 
             // Publish each item of content:
             for (String uri : collection.reviewed.uris()) {
-
                 Path source = collection.reviewed.get(uri);
                 if (source != null) {
-                    results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, source, pool));
+                    boolean zipped = false;
+                    if (source.getFileName().toString().equals("timeseries")) {
+                        zipped = true;
+                    }
+
+                    results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, zipped, source, pool));
                 }
 
                 // Add an event to the event log
@@ -188,32 +192,53 @@ public class Publisher {
      */
     private static boolean onPublishComplete(Zebedee zebedee, Collection collection) throws IOException {
 
-        copyFilesToMaster(zebedee, collection);
+        try {
+            copyFilesToMaster(zebedee, collection);
 
-        // move collection files to archive
-        Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
+            // move collection files to archive
+            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
 
-        zebedee.publishedCollections.add(collectionJsonPath);
+            zebedee.publishedCollections.add(collectionJsonPath);
 
-        collection.delete();
-        ContentTree.dropCache();
+            Log.print("Reindexing search");
+            reindexSearch(collection);
 
-        Log.print("Reindexing search");
+            collection.delete();
+            ContentTree.dropCache();
 
-        ReIndexPublishingSearch();
-        ReIndexWebsiteSearch();
+            return true;
+        } catch (Exception exception) {
+            Log.print("An error occurred during the publish cleanupon collection %s: %s", collection.description.name, exception.getMessage());
+            ExceptionUtils.printRootCauseStackTrace(exception);
+        }
 
-        return true;
+        return false;
     }
+
+    private static void reindexSearch(Collection collection) throws IOException {
+
+        try {
+            List<String> uris = collection.reviewed.uris("*data.json");
+            for (String uri : uris) {
+                String contentUri = URIUtils.removeLastSegment(uri);
+                reIndexPublishingSearch(contentUri);
+                reIndexWebsiteSearch(contentUri);
+            }
+        } catch (Exception exception) {
+            Log.print("An error occurred during the search reindex of collection %s, %s", collection.description.name, exception.getMessage());
+            ExceptionUtils.printRootCauseStackTrace(exception);
+        }
+    }
+
 
     /**
      * Post to the website to reindex search.
      */
-    private static void ReIndexWebsiteSearch() {
+    private static void reIndexWebsiteSearch(String uri) {
         Log.print("Reindexing website search.");
         try (Http http = new Http()) {
 
-            Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey());
+            Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey()).setParameter("uri", uri);
             Response<String> response = http.post(begin, String.class);
             Log.print("Website reindex response: %s", response.body);
 
@@ -223,13 +248,10 @@ public class Publisher {
         }
     }
 
-    private static void ReIndexPublishingSearch() {
+    private static void reIndexPublishingSearch(String uri) throws IOException {
         try {
-            Indexer.loadIndex(ElasticSearchClient.getClient());
+            Indexer.getInstance().reloadContent(uri);
         } catch (Exception e) {
-            // exception is thrown if loading index fails because its already in progress.
-            // Catching this exception as its possible this will happen for multiple publish
-            // tasks running concurrently.
             Log.print("Exception reloading search index:");
             ExceptionUtils.printRootCauseStackTrace(e);
         }
@@ -307,7 +329,14 @@ public class Publisher {
      * @return A {@link Future} that will evaluate to {@code null} unless an error occurs in publishing a file, in which case the exception will be returned.
      * @throws IOException
      */
-    private static Future<IOException> publishFile(final Host host, final String transactionId, final String encryptionPassword, final String uri, final Path source, ExecutorService pool) {
+    private static Future<IOException> publishFile(
+            final Host host,
+            final String transactionId,
+            final String encryptionPassword,
+            final String uri,
+            final boolean zipped,
+            final Path source,
+            ExecutorService pool) {
         return pool.submit(new Callable<IOException>() {
             @Override
             public IOException call() throws Exception {
@@ -316,6 +345,7 @@ public class Publisher {
                     Endpoint publish = new Endpoint(host, "publish")
                             .setParameter("transactionId", transactionId)
                             .setParameter("encryptionPassword", encryptionPassword)
+                            .setParameter("zip", Boolean.toString(zipped))
                             .setParameter("uri", uri);
                     Response<Result> response = http.postFile(publish, source, Result.class);
                     checkResponse(response);

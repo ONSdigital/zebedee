@@ -1,0 +1,36 @@
+analysis :
+  analyzer :
+    #Overwriting default index analyzer
+    #Makes all fields filterable with exact word matching, it is used to make filtering available on all fields by default
+    #Searchable fields uses ons_analyzer
+    default_index :
+      tokenizer : keyword
+      filter :
+        - trim
+        - lowercase
+    #ONS analyzer is used when indexing fields are wanted to be searchable, set mappings for these fields in default-mapping.json file
+    default_search :
+          tokenizer : standard
+          filter :
+            - lowercase
+            - standard
+            - stop
+            - porter_stem
+    ons_index_analyzer :
+      tokenizer : standard
+      filter :
+        - lowercase
+        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
+        - standard
+        - stop
+        - porter_stem
+  filter :
+    ons_synonyms :
+      type : synonym
+      # stores synonyms for search engine
+      # there are 2 possible formats
+      # 1. term => another term = items on lhs are mapped to items on rhs
+      # 2. term,another term,and another term => term,another term,and another term = all terms are synonymous with each other
+      synonyms :
+        - "consumer price inflation,consumer price index,cpi => consumer price inflation,consumer price index,cpi"
+        - "rpi,retail price index => rpi,retail price index"

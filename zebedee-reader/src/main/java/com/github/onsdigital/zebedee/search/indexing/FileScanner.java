@@ -1,16 +1,42 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
-import java.io.File;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
+import com.github.onsdigital.zebedee.util.PathUtils;
+import com.github.onsdigital.zebedee.util.URIUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Searches the file system
  */
-public class ScanFileSystem {
+public class FileScanner {
+
+    private Path root;
+
+    public FileScanner() {
+        root = Paths.get(ReaderConfiguration.getConfiguration().getContentDir());
+    }
+
+    public List<String> scan() throws IOException {
+        return scan(null);
+    }
+
+
+    public List<String> scan(String path) throws IOException {
+        Path dir = root;
+        if (StringUtils.isEmpty(path) == false) {
+            dir = root.resolve(URIUtils.removeLeadingSlash(path));
+        }
+        List<String> fileNames = new ArrayList<>();
+        return getFileNames(fileNames, dir);
+    }
 
     /**
      * Iterates through the file system from a specified root directory and
@@ -21,7 +47,7 @@ public class ScanFileSystem {
      * @return the list with file names
      * @throws IOException if any file io operations fail
      */
-    public static List<String> getFileNames(List<String> fileNames, Path dir)
+    private List<String> getFileNames(List<String> fileNames, Path dir)
             throws IOException {
 
         if (fileNames == null || dir == null) {
@@ -32,13 +58,12 @@ public class ScanFileSystem {
         // java 7 try-with-resources automatically closes streams after use
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
             for (Path path : stream) {
-                if (path.toFile().isDirectory())
+                if (path.toFile().isDirectory()) {
                     getFileNames(fileNames, path);
-                else {
+                } else {
                     String fileName = path.toAbsolutePath().toString();
-
                     if (isRequiredForIndex(fileName)) {
-                        fileNames.add(fileName);
+                        fileNames.add(PathUtils.toRelativeUri(root, path.getParent()).toString());
                     }
                 }
             }
@@ -47,43 +72,8 @@ public class ScanFileSystem {
         return fileNames;
     }
 
-    /**
-     * @param files collection to store the files in
-     * @param dir   the root directory to start searching from
-     * @return collection of located files
-     * @throws IOException if file lookup fails
-     */
-    public static List<File> getFiles(List<File> files, Path dir, String type)
-            throws IOException {
-
-        if (files == null || dir == null) {
-            throw new IllegalArgumentException(
-                    "List of fileNames and Path dir cannot be null");
-        }
-
-        // java 7 try-with-resources automatically closes streams after use
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-            for (Path path : stream) {
-                if (path.toFile().isDirectory()) {
-                    getFiles(files, path, type);
-                } else {
-                    File file = path.toFile();
-                    if (isCollectionItem(file.getAbsolutePath(), type)) {
-                        files.add(file);
-                    }
-                }
-            }
-        }
-
-        return files;
-    }
-
     private static boolean isRequiredForIndex(String fileName) {
         return isDataFile(fileName) && isNotRelease(fileName) && isNotPreviousVersion(fileName);
-    }
-
-    private static boolean isCollectionItem(String fileName, String type) {
-        return isDataFile(fileName) && isCollectionItemType(fileName, type) && isNotPreviousVersion(fileName);
     }
 
     private static boolean isDataFile(String fileName) {
@@ -96,9 +86,5 @@ public class ScanFileSystem {
 
     private static boolean isNotPreviousVersion(String fileName) {
         return !fileName.contains("versions");
-    }
-
-    private static boolean isCollectionItemType(String fileName, String type) {
-        return fileName.contains(type);
     }
 }

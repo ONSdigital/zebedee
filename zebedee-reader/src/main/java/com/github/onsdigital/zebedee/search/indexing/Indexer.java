@@ -71,9 +71,13 @@ public class Indexer {
     private void doLoad() throws IOException {
         String newIndex = generateIndexName();
         elasticSearchWriter.createIndex(newIndex, getSettings(), getDefaultMapping());
-        indexDocuments(newIndex);
-        elasticSearchWriter.swapIndex(currentIndex, newIndex, getElasticSearchIndexAlias());
-        if (currentIndex != null) {
+        if (currentIndex == null) {
+            //if first load add alias right away, do not wait documents get indexed
+            elasticSearchWriter.addAlias(newIndex, getElasticSearchIndexAlias());
+            indexDocuments(newIndex);
+        } else {
+            indexDocuments(newIndex);
+            elasticSearchWriter.swapIndex(currentIndex, newIndex, getElasticSearchIndexAlias());
             elasticSearchWriter.deleteIndex(currentIndex);
         }
         currentIndex = newIndex;
@@ -172,27 +176,6 @@ public class Indexer {
         return settingsBuilder.build();
     }
 
-    private void addSynonyms(ImmutableSettings.Builder settings) {
-        settings.put("analysis.filter.ons_synonym_filter.type", "synonym");
-    }
-
-    private static List<String> getSynonyms(ImmutableSettings.Builder settingsBuilder) throws IOException {
-        String[] filters = {"lowercase", "ons_synonym_filter"};
-        settingsBuilder.putArray("analysis.analyzer.ons_synonyms.filter", filters);
-
-        // java 7 try-with-resources automatically closes streams after use
-        try (InputStream inputStream = Indexer.class.getResourceAsStream("/search/synonym.txt"); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-
-            List<String> synonymList = new ArrayList<>();
-            String contents;
-            while ((contents = reader.readLine()) != null) {
-                if (!contents.startsWith("#")) {
-                    synonymList.add(contents);
-                }
-            }
-            return synonymList;
-        }
-    }
 
     private String getDefaultMapping() throws IOException {
         InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json");

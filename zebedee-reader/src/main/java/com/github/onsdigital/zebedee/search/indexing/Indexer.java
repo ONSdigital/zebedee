@@ -118,12 +118,7 @@ public class Indexer {
 
 
     private void indexDocuments(String indexName) throws IOException {
-
-        try {
-            index(indexName, new FileScanner().scan());
-        } catch (ZebedeeException e) {
-            throw new IndexingException("Failed indexing: ", e);
-        }
+        index(indexName, new FileScanner().scan());
     }
 
     /**
@@ -133,11 +128,19 @@ public class Indexer {
      * @param fileNames
      * @throws IOException
      */
-    private void index(String indexName, List<String> fileNames) throws IOException, ZebedeeException {
+    private void index(String indexName, List<String> fileNames) throws IOException {
         try (BulkProcessor bulkProcessor = getBulkProcessor()) {
             for (String path : fileNames) {
-                IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, path);
-                bulkProcessor.add(indexRequestBuilder.request());
+                try {
+                    IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, path);
+                    if (indexRequestBuilder == null) {
+                        continue;
+                    }
+                    bulkProcessor.add(indexRequestBuilder.request());
+                } catch (Exception e) {
+                    System.err.println("!!!!!!!!!Failed preparing index for " + path + " skipping...");
+                    e.printStackTrace();
+                }
             }
         }
     }

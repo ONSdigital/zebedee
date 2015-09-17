@@ -17,6 +17,7 @@ public class ProductPage extends TaxonomyNode {
     private List<Link> datasets;
     private List<Link> statsBulletins;
     private List<Link> relatedArticles;
+    private List<Link> relatedMethodology;
 
     @Override
     public PageType getType() {
@@ -54,5 +55,13 @@ public class ProductPage extends TaxonomyNode {
 
     public void setRelatedArticles(List<Link> relatedArticles) {
         this.relatedArticles = relatedArticles;
+    }
+
+    public List<Link> getRelatedMethodology() {
+        return relatedMethodology;
+    }
+
+    public void setRelatedMethodology(List<Link> relatedMethodology) {
+        this.relatedMethodology = relatedMethodology;
     }
 }

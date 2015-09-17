@@ -784,11 +784,11 @@ public class DataPublisher {
 
             DownloadSection xlsxSection = new DownloadSection();
             xlsxSection.setTitle("xlsx download");
-            xlsxSection.setFile(datasetUri + "/" + filePrefix + ".xlsx");
+            xlsxSection.setFile(datasetUri + "/" + filePrefix.toLowerCase() + ".xlsx");
 
             DownloadSection csvSection = new DownloadSection();
             csvSection.setTitle("csv download");
-            csvSection.setFile(datasetUri + "/" + filePrefix + ".csv");
+            csvSection.setFile(datasetUri + "/" + filePrefix.toLowerCase() + ".csv");
 
             if (dataset.getDescription().getDatasetId() == null) {
                 dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
@@ -843,8 +843,8 @@ public class DataPublisher {
             String filename = dataset.getDescription().getDatasetId();
             if (filename.equalsIgnoreCase("")) {filename = "data";}
 
-            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filename + ".xlsx");
-            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filename + ".csv");
+            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".xlsx");
+            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".csv");
             List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(newSeries);
             writeDataGridToXlsx(xlsPath, dataGrid);
             writeDataGridToCsv(csvPath, dataGrid);

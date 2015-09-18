@@ -1,4 +1,14 @@
 {
+  "highlightedLinks": [
+    {
+      "uri": "/employmentandlabourmarket/peoplenotinwork/unemployment",
+      "index": 0
+    },
+    {
+      "uri": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours",
+      "index": 1
+    }
+  ],
   "sections": [
     {
       "uri": "/employmentandlabourmarket/peopleinwork",

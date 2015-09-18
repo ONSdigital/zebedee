@@ -5,14 +5,17 @@ import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
@@ -22,6 +25,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
@@ -85,6 +89,7 @@ public class Publisher {
                             collection.description.name,
                             publishComplete,
                             msTaken);
+
 
                 } else {
                     Log.print("Collection is already locked for publishing. Halting publish attempt on: " + collection.description.id);
@@ -200,6 +205,9 @@ public class Publisher {
 
             zebedee.publishedCollections.add(collectionJsonPath);
 
+            // send a slack success message
+            sendSlackMessageForCollection(collectionJsonPath);
+
             Log.print("Reindexing search");
             reindexSearch(collection);
 
@@ -215,6 +223,18 @@ public class Publisher {
         return false;
     }
 
+    private static void sendSlackMessageForCollection(Path collectionJsonPath) {
+
+        try (InputStream input = Files.newInputStream(collectionJsonPath)) {
+            PublishedCollection publishedCollection = Serialiser.deserialise(input,
+                    PublishedCollection.class);
+
+            // TODO send appropriate message 
+
+        } catch (IOException e) {
+            Log.print("Failed to read published collection with path %s", collectionJsonPath.toString());
+        }
+    }
     private static void reindexSearch(Collection collection) throws IOException {
 
         try {

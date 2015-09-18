@@ -30,7 +30,7 @@ public class SearchInit implements Startup {
                               try {
                                   Indexer.getInstance().reload();
                                   return null;
-                              } catch (IOException e) {
+                              } catch (Exception e) {
                                   throw new RuntimeException("Loading search index failed", e);
                               } finally {
                                   thread.shutdown();

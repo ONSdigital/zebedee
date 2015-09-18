@@ -130,11 +130,14 @@ public class Publisher {
                 Path source = collection.reviewed.get(uri);
                 if (source != null) {
                     boolean zipped = false;
+                    String publishUri = uri;
+
                     if (source.getFileName().toString().equals("timeseries")) {
                         zipped = true;
+                        publishUri = StringUtils.removeEnd(uri,".zip");
                     }
 
-                    results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, zipped, source, pool));
+                    results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, publishUri, zipped, source, pool));
                 }
 
                 // Add an event to the event log

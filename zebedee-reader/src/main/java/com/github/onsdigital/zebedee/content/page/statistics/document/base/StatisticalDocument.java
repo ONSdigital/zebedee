@@ -19,7 +19,6 @@ public abstract class StatisticalDocument extends Statistics {
     private List<Link> relatedData = new ArrayList<>();//Link to data in the article
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
-    private Link contentMethodology;
 
     public List<MarkdownSection> getSections() {
         return sections;
@@ -53,11 +52,4 @@ public abstract class StatisticalDocument extends Statistics {
 
     public void setTables(List<FigureSection> tables) { this.tables = tables; }
 
-    public Link getContentMethodology() {
-        return contentMethodology;
-    }
-
-    public void setContentMethodology(Link contentMethodology) {
-        this.contentMethodology = contentMethodology;
-    }
 }

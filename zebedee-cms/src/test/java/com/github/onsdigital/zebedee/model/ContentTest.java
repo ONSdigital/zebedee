@@ -28,6 +28,7 @@ public class ContentTest {
     private String directoryBName = "subdirb";
     private String directoryCName = "subdirc";
     private String bulletinsDirectoryName = "bulletins";
+    private String timeseriesDirectoryName = "timeseries";
     private String exampleBulletinName = "gdppreliminaryestimateq32014";
 
     private Path basePath; // base path for the working directory
@@ -39,6 +40,8 @@ public class ContentTest {
 
     private Path bulletinDirectory;
     private Path exampleBulletinDirectory;
+    private Path timeseriesDirectory1;
+    private Path timeseriesDirectory2;
     private Path exampleBulletinJsonFile;
     private ContentDetail bulletinContent;
 
@@ -80,6 +83,11 @@ public class ContentTest {
         exampleBulletinDirectory = bulletinDirectory.resolve(exampleBulletinName);
         Files.createDirectory(exampleBulletinDirectory);
         exampleBulletinJsonFile = exampleBulletinDirectory.resolve(filename);
+
+        timeseriesDirectory1 = subDirectoryA.resolve(timeseriesDirectoryName);
+        Files.createDirectory(timeseriesDirectory1);
+        timeseriesDirectory2 = subDirectoryB.resolve(timeseriesDirectoryName);
+        Files.createDirectory(timeseriesDirectory2);
 
         bulletinContent = new ContentDetail();
         bulletinContent.description = new ContentDetailDescription("Some bulletin 2010");
@@ -202,6 +210,21 @@ public class ContentTest {
                 fail();
             }
         }
+    }
+
+    @Test
+    public void listTimeSeriesDirectoriesShouldReturnListOfTimeseriesDirectories() throws IOException {
+
+        // Given an instance of content with a timeseries folder nested under another time
+        Content content = new Content(basePath);
+
+        // When the listTimeSeriesDirectories method is called
+        List<Path> paths = content.listTimeSeriesDirectories();
+
+        // Then the releases directory will not be in the children.
+        assertNotNull(paths);
+
+        assertEquals(2, paths.size());
     }
 
     @Test

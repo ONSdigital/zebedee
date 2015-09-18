@@ -16,6 +16,7 @@ public class TaxonomyLandingPage extends TaxonomyNode {
 
     //Sections is not particularly a good name. Used for compatibility with Alpha website
     private List<Link> sections = new ArrayList<>();
+    private List<Link> highlightedLinks = new ArrayList<>();
 
     @Override
     public PageType getType() {
@@ -28,5 +29,13 @@ public class TaxonomyLandingPage extends TaxonomyNode {
 
     public void setSections(List<Link> sections) {
         this.sections = sections;
+    }
+
+    public List<Link> getHighlightedLinks() {
+        return highlightedLinks;
+    }
+
+    public void setHighlightedLinks(List<Link> highlightedLinks) {
+        this.highlightedLinks = highlightedLinks;
     }
 }

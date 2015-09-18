@@ -16,7 +16,6 @@ public abstract class StatisticalData extends Statistics {
     private MarkdownSection section; //Explanatory section
     private List<String> notes;//Markdown
     private List<Link> relatedDocuments;
-    private List<Link> relatedMethodology;
     private List<Link> relatedData;
 
     public List<Link> getRelatedDocuments() {
@@ -41,14 +40,6 @@ public abstract class StatisticalData extends Statistics {
 
     public void setSection(MarkdownSection section) {
         this.section = section;
-    }
-
-    public List<Link> getRelatedMethodology() {
-        return relatedMethodology;
-    }
-
-    public void setRelatedMethodology(List<Link> methodology) {
-        this.relatedMethodology = methodology;
     }
 
     public List<Link> getRelatedData() {

@@ -15,7 +15,6 @@ public class Dataset extends Statistics {
 
     /*Body*/
     private List<DownloadSection> downloads = new ArrayList<DownloadSection>();
-    private List<Link> relatedMethodology;
     private MarkdownSection section;
     private List<MarkdownSection> notes;
     private List<Link> relatedDatasets;
@@ -48,14 +47,6 @@ public class Dataset extends Statistics {
 
     public void setSection(MarkdownSection section) {
         this.section = section;
-    }
-
-    public List<Link> getRelatedMethodology() {
-        return relatedMethodology;
-    }
-
-    public void setRelatedMethodology(List<Link> relatedMethodology) {
-        this.relatedMethodology = relatedMethodology;
     }
 
     public List<Link> getRelatedDatasets() {

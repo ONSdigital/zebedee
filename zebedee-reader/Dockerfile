@@ -1,4 +1,4 @@
-from carboni.io/java-component
+from carboni/java-component
 
 
 # Consul

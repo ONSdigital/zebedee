@@ -42,11 +42,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Created by thomasridd on 04/06/15.
@@ -746,14 +743,18 @@ public class DataPublisher {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
         }
 
+        CompressTimeseries(collection);
+    }
+
+    private void CompressTimeseries(Collection collection) throws IOException {
+        Log.print("Compressing time series directories...");
         List<Path> timeSeriesDirectories = collection.reviewed.listTimeSeriesDirectories();
-
         for (Path timeSeriesDirectory : timeSeriesDirectories) {
+            Log.print("Compressing time series directory %s", timeSeriesDirectory.toString());
+            ZipUtils.zipFolder(timeSeriesDirectory.toFile(), new File(timeSeriesDirectory.toString() + "-to-publish.zip"));
 
-            // create zip file from path
-            ZipUtils.zipFolder(timeSeriesDirectory.toFile(), new File(timeSeriesDirectory.toString() + ".zip"));
-
-            // delete the path
+            Log.print("Deleting directory after compression %s", timeSeriesDirectory);
+            FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
         }
     }
 

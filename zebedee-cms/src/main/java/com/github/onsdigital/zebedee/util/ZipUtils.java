@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.util;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
-import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -18,11 +17,6 @@ public class ZipUtils {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null && !zipEntry.isDirectory()) {
                 String name = zipEntry.getName();
-                long size = zipEntry.getSize();
-                long compressedSize = zipEntry.getCompressedSize();
-                Log.print("name: %-20s | size: %6d | compressed size: %6d\n",
-                        name, size, compressedSize);
-
                 File file = new File(destination + File.separator + name);
                 File parent = file.getParentFile();
                 if (parent != null) {

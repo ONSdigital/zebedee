@@ -39,6 +39,7 @@ public class Publisher {
 
     private static final Host websiteHost = new Host(Configuration.getWebsiteUrl());
     private static final Host theTrainHost = new Host(Configuration.getTheTrainUrl());
+    private static final ExecutorService pool = Executors.newFixedThreadPool(50);
 
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
         boolean publishComplete = false;
@@ -123,7 +124,7 @@ public class Publisher {
         try {
             collection.description.publishTransactionId = beginPublish(theTrainHost, encryptionPassword);
             collection.save();
-            ExecutorService pool = Executors.newFixedThreadPool(50);
+
             List<Future<IOException>> results = new ArrayList<>();
 
             // Publish each item of content:

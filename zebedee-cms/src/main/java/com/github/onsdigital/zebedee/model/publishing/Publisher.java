@@ -41,6 +41,10 @@ public class Publisher {
     private static final Host theTrainHost = new Host(Configuration.getTheTrainUrl());
     private static final ExecutorService pool = Executors.newFixedThreadPool(50);
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
+    }
+
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
         boolean publishComplete = false;
 
@@ -455,6 +459,20 @@ public class Publisher {
             if (messages.size() > 0) {
                 throw new IOException(messages.toString());
             }
+        }
+    }
+
+    static class ShutDownPublisherThread extends Thread {
+
+        private final ExecutorService executorService;
+
+        public ShutDownPublisherThread(ExecutorService executorService) {
+            this.executorService = executorService;
+        }
+
+        @Override
+        public void run() {
+            this.executorService.shutdown();
         }
     }
 }

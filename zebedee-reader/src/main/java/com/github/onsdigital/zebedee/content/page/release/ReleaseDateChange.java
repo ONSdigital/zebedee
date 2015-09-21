@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class ReleaseDateChange {
     private Date previousDate;
-    private String markdown;
+    private String changeNotice;
 
     public Date getPreviousDate() {
         return previousDate;
@@ -17,11 +17,11 @@ public class ReleaseDateChange {
         this.previousDate = previousDate;
     }
 
-    public String getMarkdown() {
-        return markdown;
+    public String getChangeNotice() {
+        return changeNotice;
     }
 
-    public void setMarkdown(String markdown) {
-        this.markdown = markdown;
+    public void setChangeNotice(String changeNotice) {
+        this.changeNotice = changeNotice;
     }
 }

@@ -32,9 +32,7 @@ public enum PageType {
     dataset,
     timeseries_dataset,
     release,
-    release_list,
     reference_tables,
     chart,
-    table,
-    unknown;
+    table
 }

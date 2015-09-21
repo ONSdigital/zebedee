@@ -12,6 +12,13 @@ import java.util.zip.ZipOutputStream;
  */
 public class ZipUtils {
 
+    /**
+     * Unzip the given file into the given destination.
+     *
+     * @param zipFile
+     * @param destination
+     * @throws IOException
+     */
     public static void unzip(final File zipFile, final String destination) throws IOException {
         try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFile))) {
             ZipEntry zipEntry;
@@ -29,11 +36,18 @@ public class ZipUtils {
         }
     }
 
+    /**
+     * Zip the given folder into the given zip file.
+     *
+     * @param folder
+     * @param zipFile
+     * @throws IOException
+     */
     public static void zipFolder(final File folder, final File zipFile) throws IOException {
         zipFolder(folder, new FileOutputStream(zipFile));
     }
 
-    public static void zipFolder(final File folder, final OutputStream outputStream) throws IOException {
+    private static void zipFolder(final File folder, final OutputStream outputStream) throws IOException {
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
             zipFolder(folder, zipOutputStream, folder.getPath().length() + 1);
         }

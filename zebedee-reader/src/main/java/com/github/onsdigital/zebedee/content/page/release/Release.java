@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class Release extends Page{
 
-    private String markdown;
+    private List<String> markdown;
     private List<Link> relatedDocuments;
     private List<Link> relatedDatasets;
     private List<Link> relatedMethodology;
@@ -29,11 +29,11 @@ public class Release extends Page{
         return PageType.release;
     }
 
-    public String getMarkdown() {
+    public List<String> getMarkdown() {
         return markdown;
     }
 
-    public void setMarkdown(String markdown) {
+    public void setMarkdown(List<String> markdown) {
         this.markdown = markdown;
     }
 
@@ -81,7 +81,7 @@ public class Release extends Page{
                 "a very large shopping basket containing a large selection of the goods and services bought by households, the CPI estimates\n" +
                 "changes to the total cost of this basket.");
         release.getDescription().setCancelled(true);
-        release.getDescription().setCancellationNotice("Due to ....");
+//        release.getDescription().setCancellationNotice("Due to ....");
         release.getDescription().setFinalised(true);
 
         ArrayList linkList = new ArrayList();
@@ -100,21 +100,6 @@ public class Release extends Page{
         release.getDescription().setContact(contact);
         release.getDescription().setNationalStatistic(true);
 
-        release.setMarkdown("The phrase 'Pre-release Access' refers to the practice whereby official statistics in their final form, and any\n" +
-                "accompanying written commentary, are made available to an eligible person in advance of their publication. The rules and principles which govern pre-release access are featured within the Pre-release Access to Official Statistics Order 2008.\n" +
-                "\n" +
-                "Besides ONS staff, the following persons are given pre-release access by the period indicated before release.\n" +
-                "\n" +
-                "- Prime Minister 10 Downing Street 24 hrs\n" +
-                "- PS to Prime Minister 10 Downing Street 24 hrs\n" +
-                "- PPS to Prime Minister 10 Downing Street 24 hrs\n" +
-                "- Parliamentary Clerk 10 Downing Street 24 hrs\n" +
-                "- Senior Policy Advisor 10 Downing Street 24 hrs\n" +
-                "- Deputy Prime Minister Deputy Prime Minister's Office 24 hrs\n" +
-                "- Principal Private Secretary to DPM Deputy Prime Minister's Office 24 hrs\n" +
-                "- Private Secretary to DPM Deputy Prime Minister's Office 24 hrs\n" +
-                "- Chief Mouser to the Cabinet Office 10 Downing Street 24 hrs\n" +
-                "- Cabinet Secretary Deputy Prime Minister's Office 24 hrs");
 
 
         ArrayList changes = new ArrayList();

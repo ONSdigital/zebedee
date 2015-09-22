@@ -87,7 +87,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     /*Release fields*/
     public Boolean finalised;
     private Boolean cancelled;
-    private String cancellationNotice;
+    private List<String> cancellationNotice;
     private Boolean published;
 
 
@@ -411,11 +411,11 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.cancelled = cancelled;
     }
 
-    public String getCancellationNotice() {
+    public List<String> getCancellationNotice() {
         return cancellationNotice;
     }
 
-    public void setCancellationNotice(String cancellationNotice) {
+    public void setCancellationNotice(List<String> cancellationNotice) {
         this.cancellationNotice = cancellationNotice;
     }
 

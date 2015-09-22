@@ -2,6 +2,9 @@ package com.github.onsdigital.zebedee.reader.api;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyLandingPage;
+import com.github.onsdigital.zebedee.content.page.taxonomy.base.TaxonomyNode;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -124,14 +127,13 @@ public class ReadRequestHandler {
 
     }
 
-    public Collection<ContentNode> listChildren(HttpServletRequest request, int depth) throws ZebedeeException, IOException {
-        String uri = extractUri(request);
+    public Collection<ContentNode> getTaxonomy(HttpServletRequest request, int depth) throws ZebedeeException, IOException {
         String collectionId = getCollectionId(request);
         if (collectionId != null) {
             authorise(request, collectionId);
         }
 
-        return resolveChildren(collectionId, uri, depth);
+        return getTaxonomy(collectionId, "/", depth);
 
     }
 
@@ -152,7 +154,7 @@ public class ReadRequestHandler {
         return nodes.values();
     }
 
-    private Collection<ContentNode> resolveChildren(String collectionId, String uri, int depth) throws ZebedeeException, IOException {
+    private Collection<ContentNode> getTaxonomy(String collectionId, String uri, int depth) throws ZebedeeException, IOException {
         if (depth == 0) {
             return Collections.emptySet();
         }
@@ -160,18 +162,21 @@ public class ReadRequestHandler {
         overlayCollections(nodes, collectionId, uri);
         nodes = sortMapByContentTitle(nodes);
         depth--;
-        resolveChildren(nodes, collectionId, depth);
+        getTaxonomy(nodes, collectionId, depth);
         return nodes.values();
     }
 
-    private void resolveChildren(Map<URI, ContentNode> nodes, String collectionId, int depth) throws ZebedeeException, IOException {
+    private void getTaxonomy(Map<URI, ContentNode> nodes, String collectionId, int depth) throws ZebedeeException, IOException {
         if (depth == 0) {
             return;
         }
         Collection<ContentNode> nodeList = nodes.values();
         for (Iterator<ContentNode> iterator = nodeList.iterator(); iterator.hasNext(); ) {
             ContentNode next = iterator.next();
-            next.setChildren(resolveChildren(collectionId, next.getUri().toString(), depth));
+            if (PageType.taxonomy_landing_page.equals(next.getType()) == false) {
+                continue;
+            }
+            next.setChildren(getTaxonomy(collectionId, next.getUri().toString(), depth));
         }
     }
 
@@ -240,4 +245,5 @@ public class ReadRequestHandler {
     public static void setAuthorisationHandler(AuthorisationHandler handler) {
         authorisationHandler = handler;
     }
+
 }

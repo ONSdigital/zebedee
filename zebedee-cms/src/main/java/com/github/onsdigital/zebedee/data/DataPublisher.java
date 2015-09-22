@@ -17,6 +17,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -33,7 +34,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.*;
 import java.net.URI;
@@ -41,11 +42,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Created by thomasridd on 04/06/15.
@@ -172,7 +170,7 @@ public class DataPublisher {
      * @throws IOException
      */
     static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) throws IOException {
-        Workbook wb = new XSSFWorkbook();
+        Workbook wb = new SXSSFWorkbook(30);
         Sheet sheet = wb.createSheet("data");
 
         int rownum = 0;
@@ -744,6 +742,20 @@ public class DataPublisher {
         if(insertions + corrections > 0) {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
         }
+
+        CompressTimeseries(collection);
+    }
+
+    private void CompressTimeseries(Collection collection) throws IOException {
+        Log.print("Compressing time series directories...");
+        List<Path> timeSeriesDirectories = collection.reviewed.listTimeSeriesDirectories();
+        for (Path timeSeriesDirectory : timeSeriesDirectories) {
+            Log.print("Compressing time series directory %s", timeSeriesDirectory.toString());
+            ZipUtils.zipFolder(timeSeriesDirectory.toFile(), new File(timeSeriesDirectory.toString() + "-to-publish.zip"));
+
+            Log.print("Deleting directory after compression %s", timeSeriesDirectory);
+            FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
+        }
     }
 
     /**
@@ -797,14 +809,8 @@ public class DataPublisher {
             // Break down the csdb file to timeseries (part-built by extracting csdb files)
             TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"));
 
-            Path datasetPath = Paths.get(StringUtils.removeStart(datasetUri, "/"));
-            Path t3LevelPath = datasetPath.getParent().getParent();
-            Path zipFilePath = collection.reviewed.path.resolve(t3LevelPath.resolve("timeseries"));
-            FileOutputStream fileOutputStream = new FileOutputStream(zipFilePath.toFile());
-            ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(fileOutputStream));
 
             for (TimeSeries series : serieses) {
-
                 // Work out the correct timeseries path by working back from the dataset uri
                 String uri = uriForSeriesInDataset(datasetUri, series);
 
@@ -813,21 +819,12 @@ public class DataPublisher {
                 csdbSection.getCdids().add(newPage.getDescription().getCdid());
 
                 // Save the new page to reviewed
-                //Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
-                //IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
-
-                Path zipEntryPath = Paths.get(series.getCdid().toLowerCase()).resolve("data.json");
-
-                Log.print("Writing %s to zip file %s with filename %s", uri, zipFilePath.toString(), zipEntryPath.toString());
-                zipOutputStream.putNextEntry(new ZipEntry(zipEntryPath.toString()));
-                IOUtils.write(ContentUtil.serialise(newPage), zipOutputStream);
-                zipOutputStream.closeEntry();
+                Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
+                IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
 
                 // Write csv and other files:
                 newSeries.add(newPage);
             }
-
-            zipOutputStream.close();
 
             // Save the new dataset to be reviewed
             List<DownloadSection> sections = new ArrayList<>();

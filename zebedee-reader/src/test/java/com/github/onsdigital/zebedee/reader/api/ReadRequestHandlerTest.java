@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
-import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -72,49 +71,39 @@ public class ReadRequestHandlerTest {
     }
 
     @Test
-    public void testListChildren() throws Exception {
-        shouldResolveChildren();
-        shouldResolveChildrenInDepth();
+    public void testGetTaxonomy() throws Exception {
+        shouldResolveTaxonomyFirstLevel();
+        shouldReadTaxonomyInDepth();
         shouldFailReadingCollection();
     }
 
     //Collection reads should be available without zebedee cms module running
     private void shouldFailReadingCollection() throws Exception {
-        when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
+        ReadRequestHandler.setAuthorisationHandler(null);
         when(request.getRequestURI()).thenReturn("/browsetree/testcollection-testid/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
         try {
-            readRequestHandler.listChildren(request, 1);
+            readRequestHandler.getTaxonomy(request, 1);
             throw new AssertionFailedError("Collection read should have failed");
         } catch (UnauthorizedException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private void shouldResolveChildren() throws Exception {
-        when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
-        Collection<ContentNode> children = readRequestHandler.listChildren(request, 1);
-        assertTrue(children.size() == 1);
+    private void shouldResolveTaxonomyFirstLevel() throws Exception {
+        Collection<ContentNode> children = readRequestHandler.getTaxonomy(request, 1);
+        assertTrue(children.size() == 4);
         ContentNode child = children.iterator().next();
         assertNull(child.getChildren());
-        assertEquals("UK Natural Capital Land Cover in the UK", child.getDescription().getTitle());
+        assertEquals("Economy", child.getDescription().getTitle());
     }
 
-    private void shouldResolveChildrenInDepth() throws Exception {
-        when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts");
-        Collection<ContentNode> children = readRequestHandler.listChildren(request, 3);
-        assertTrue(children.size() == 2);
+    private void shouldReadTaxonomyInDepth() throws Exception {
+        Collection<ContentNode> children = readRequestHandler.getTaxonomy(request, 2);
         Iterator<ContentNode> iterator = children.iterator();
-        ContentNode articles = iterator.next();
-        ContentNode bulletins = iterator.next();
-        assertEquals("articles", articles.getDescription().getTitle());
-        assertEquals("bulletins", bulletins.getDescription().getTitle());
-
-        assertNotNull(bulletins.getChildren());
-        assertTrue(bulletins.getChildren().isEmpty() == false);
-        assertTrue(articles.getChildren().size() == 1);
-        ContentNode grandChild = bulletins.getChildren().iterator().next();
-        assertEquals("ukenvironmentalaccounts", grandChild.getDescription().getTitle());
-        assertNotNull(grandChild.getChildren());
+        ContentNode economy = iterator.next();//economy
+        ContentNode environmentalAccounts = economy.getChildren().iterator().next();
+        assertEquals("environmentalaccounts", environmentalAccounts.getDescription().getTitle());
+        assertNull(environmentalAccounts.getChildren());
     }
 
 

@@ -69,7 +69,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     /** This value is displayed in the "(i)" tooltips next to timeseries title. */
     private String keyNote;
 
-    /** This value is displayed beneath the timeseries title: */
+    /** This value is displayed beneath the time series title: */
     private String additionalText;
 
 
@@ -87,7 +87,8 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     /*Release fields*/
     public Boolean finalised;
     private Boolean cancelled;
-    private String cancellationNotice;
+    private List<String> cancellationNotice;
+    private Boolean published;
 
 
     /*Migration Data*/
@@ -410,11 +411,19 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.cancelled = cancelled;
     }
 
-    public String getCancellationNotice() {
+    public List<String> getCancellationNotice() {
         return cancellationNotice;
     }
 
-    public void setCancellationNotice(String cancellationNotice) {
+    public void setCancellationNotice(List<String> cancellationNotice) {
         this.cancellationNotice = cancellationNotice;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 }

@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.util.GraphUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -53,6 +54,7 @@ public class Content {
     boolean exists(URI uri, boolean doRedirect) {
         return exists(uri.getPath(), doRedirect);
     }
+
     boolean exists(String uri) {
         return exists(uri, true);
     }
@@ -126,7 +128,7 @@ public class Content {
      * {@link Content}. The {@link Path} is generated whether or not a file
      * actually exists, so this method is suitable for use when creating new
      * content.
-     *
+     * <p/>
      * toPath does not redirect uri's
      *
      * @param uri The URI of the item.
@@ -296,6 +298,38 @@ public class Content {
         return result;
     }
 
+    /**
+     * Return a list of time series folders within the content.
+     * Note: this method was made specifically for time series as when it finds
+     * a time series folder it does not recurse into it. This saves on unnecessary crawling
+     * of the filesystem when we know there will be no time series folders nested under an existing one.
+     * @return
+     * @throws IOException
+     */
+    public List<Path> listTimeSeriesDirectories() throws IOException {
+        return listTimeSeriesDirectories(this.path);
+    }
+
+    private static List<Path> listTimeSeriesDirectories(Path root) throws IOException {
+        List<Path> result = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry)) {
+                    //System.out.println(entry + ": " + entry.getFileName());
+                    if (entry.getFileName().toString().equals("timeseries")) {
+                        result.add(entry);
+                        return result;
+                    }
+
+                    result.addAll(listTimeSeriesDirectories(entry));
+                }
+            }
+        }
+
+        return result;
+    }
+
     public boolean delete(String uri) throws IOException {
         Path path = toPath(uri);
 
@@ -329,11 +363,10 @@ public class Content {
 
     /**
      * Move content from one uri to another
-     *
+     * <p/>
      * 1. Copy all content
      * 2. Cop
      * This requires a full traverse of .json content so should not be done lightly
-     *
      */
     public void moveUri(String fromUri, String toUri) throws IOException {
 
@@ -351,6 +384,7 @@ public class Content {
             GraphUtils.backwardLink(this, toUri);
         }
     }
+
     boolean moveFile(String fromUri, String toUri) throws IOException {
         Path pathFrom = toPath(fromUri);
         Path pathTo = toPath(toUri);
@@ -362,8 +396,5 @@ public class Content {
             return true;
         }
         return false;
-    }
-    void updateURIs(String fromUri, String toUri) {
-
     }
 }

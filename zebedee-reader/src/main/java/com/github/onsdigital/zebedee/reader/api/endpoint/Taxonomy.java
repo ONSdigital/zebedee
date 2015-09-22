@@ -18,15 +18,15 @@ import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRe
  * Created by bren on 03/08/15.
  */
 @Api
-public class Children {
+public class Taxonomy {
 
     /**
-     * Retrieves content endpoint <code>/children[collectionId]/?uri=[uri]</code>
+     * Retrieves content endpoint <code>/taxonomy[collectionId]/?uri=[uri]</code>
      * <p>
-     * This endpoint serves child content list for given uri.
-     * It is possible to get children of child elements using depth parameter.
+     * This endpoint serves taxonomy nodes for the content.
+     * It is possible to get taxonomy in more depth using depth parameter.
      * <p>
-     * e.g. ?uri=/economy/environmentalaccounts/articles/greenhousegasemissions&depth=2 will serve children of greenhousegasemissions and children of all its children
+     * e.g. ?depth=2 will serve two levels of taxonomy.
      * <p>
      * Depth is 1 by default, meaning only immediate children will be retrieved.
      * <p>
@@ -41,7 +41,7 @@ public class Children {
 
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).listChildren(request, getDepth(request)), response);
+        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).getTaxonomy(request, getDepth(request)), response);
     }
 
     private int getDepth(HttpServletRequest request) throws BadRequestException {

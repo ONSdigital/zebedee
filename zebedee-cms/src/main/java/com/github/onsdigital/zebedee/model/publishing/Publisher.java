@@ -17,6 +17,7 @@ import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.ZipUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,11 @@ public class Publisher {
 
     private static final Host websiteHost = new Host(Configuration.getWebsiteUrl());
     private static final Host theTrainHost = new Host(Configuration.getTheTrainUrl());
+    private static final ExecutorService pool = Executors.newFixedThreadPool(50);
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
+    }
 
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
         boolean publishComplete = false;
@@ -122,23 +128,12 @@ public class Publisher {
         try {
             collection.description.publishTransactionId = beginPublish(theTrainHost, encryptionPassword);
             collection.save();
-            ExecutorService pool = Executors.newFixedThreadPool(50);
+
             List<Future<IOException>> results = new ArrayList<>();
 
             // Publish each item of content:
             for (String uri : collection.reviewed.uris()) {
-                Path source = collection.reviewed.get(uri);
-                if (source != null) {
-                    boolean zipped = false;
-                    if (source.getFileName().toString().equals("timeseries")) {
-                        zipped = true;
-                    }
-
-                    results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, zipped, source, pool));
-                }
-
-                // Add an event to the event log
-                collection.AddEvent(uri, new Event(new Date(), EventType.PUBLISHED, email));
+                publishFile(collection, email, encryptionPassword, pool, results, uri);
             }
 
             // Check the publishing results:
@@ -182,6 +177,26 @@ public class Publisher {
         return publishComplete;
     }
 
+    private static void publishFile(Collection collection, String email, String encryptionPassword, ExecutorService pool, List<Future<IOException>> results, String uri) {
+        Path source = collection.reviewed.get(uri);
+        if (source != null) {
+            boolean zipped = false;
+            String publishUri = uri;
+
+            // if we have a recognised compressed file - set the zip header and set the correct uri so that the files
+            // are unzipped to the correct place.
+            if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
+                zipped = true;
+                publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
+            }
+
+            results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, publishUri, zipped, source, pool));
+        }
+
+        // Add an event to the event log
+        collection.AddEvent(uri, new Event(new Date(), EventType.PUBLISHED, email));
+    }
+
     /**
      * Do tasks required after a publish takes place.
      *
@@ -193,15 +208,17 @@ public class Publisher {
     private static boolean onPublishComplete(Zebedee zebedee, Collection collection) throws IOException {
 
         try {
+
+            unzipTimeseries(collection);
+
             copyFilesToMaster(zebedee, collection);
-
-            // move collection files to archive
-            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
-
-            zebedee.publishedCollections.add(collectionJsonPath);
 
             Log.print("Reindexing search");
             reindexSearch(collection);
+
+            // move collection files to archive
+            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
+            zebedee.publishedCollections.add(collectionJsonPath);
 
             collection.delete();
             ContentTree.dropCache();
@@ -213,6 +230,28 @@ public class Publisher {
         }
 
         return false;
+    }
+
+    /**
+     * Timeseries are zipped for the publish to the website, and then need to be unzipped before moving into master
+     * on the publishing side
+     *
+     * @param collection
+     * @throws IOException
+     */
+    private static void unzipTimeseries(Collection collection) throws IOException {
+        Log.print("Unzipping files if required to move to master.");
+        for (String uri : collection.reviewed.uris()) {
+            Path source = collection.reviewed.get(uri);
+            if (source != null) {
+                if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
+                    String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
+                    Path publishPath = collection.reviewed.path.resolve(publishUri);
+                    Log.print("Unzipping %s to %s", source, publishPath);
+                    ZipUtils.unzip(source.toFile(), publishPath.toString());
+                }
+            }
+        }
     }
 
     private static void reindexSearch(Collection collection) throws IOException {
@@ -420,6 +459,20 @@ public class Publisher {
             if (messages.size() > 0) {
                 throw new IOException(messages.toString());
             }
+        }
+    }
+
+    static class ShutDownPublisherThread extends Thread {
+
+        private final ExecutorService executorService;
+
+        public ShutDownPublisherThread(ExecutorService executorService) {
+            this.executorService = executorService;
+        }
+
+        @Override
+        public void run() {
+            this.executorService.shutdown();
         }
     }
 }

@@ -5,10 +5,12 @@ import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -19,19 +21,20 @@ import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
@@ -44,6 +47,7 @@ public class Publisher {
     static {
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
     }
+
 
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
         boolean publishComplete = false;
@@ -91,6 +95,7 @@ public class Publisher {
                             collection.description.name,
                             publishComplete,
                             msTaken);
+
 
                 } else {
                     Log.print("Collection is already locked for publishing. Halting publish attempt on: " + collection.description.id);
@@ -218,6 +223,11 @@ public class Publisher {
 
             // move collection files to archive
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
+
+            // send a slack success message
+            sendSlackMessageForCollection(collectionJsonPath);
+
+            // add to published collections list
             zebedee.publishedCollections.add(collectionJsonPath);
 
             collection.delete();
@@ -252,6 +262,93 @@ public class Publisher {
                 }
             }
         }
+    }
+
+    /**
+     * Send a slack message containing collection publication information
+     *
+     * @param collectionJsonPath
+     */
+    private static void sendSlackMessageForCollection(Path collectionJsonPath) {
+        String slackBaseUri = "https://slack.com/api/chat.postMessage";
+        final Host slackHost = new Host(slackBaseUri);
+
+        // publishbot requires a Slack token (which is generated for a specific team) and a channel name to publish to
+        String slackToken = System.getenv("publishbot_token");
+        String slackChannel = System.getenv("publishbot_channel");
+        if (slackToken == null || slackChannel == null) { return; }
+
+        try (InputStream input = Files.newInputStream(collectionJsonPath)) {
+            PublishedCollection publishedCollection = Serialiser.deserialise(input,
+                    PublishedCollection.class);
+
+            // set up further slack variables
+            ExecutorService pool = Executors.newFixedThreadPool(1);
+            String slackUsername = "PublishBot";
+            String slackEmoji = ":chart_with_upwards_trend:";
+
+            // get the message for the publication
+            String slackMessage = publicationMessage(publishedCollection);
+
+            // send the message
+            Future<Exception> exceptionFuture = sendSlackMessage(slackHost, slackToken, slackChannel, slackUsername, slackEmoji, slackMessage, pool);
+            exceptionFuture.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.print("Failed to slack message for published collection with path %s", collectionJsonPath.toString());
+        }
+    }
+    
+    private static Future<Exception> sendSlackMessage(
+            final Host host,
+            final String token, final String channel,
+            final String userName, final String emoji,
+            final String text,
+            ExecutorService pool) {
+        return pool.submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                Exception result = null;
+                try (Http http = new Http()) {
+                    Endpoint slack = new Endpoint(host, "")
+                            .setParameter("token", token)
+                            .setParameter("username", userName)
+                            .setParameter("channel", channel)
+                            .setParameter("icon_emoji", emoji)
+                            .setParameter("text", StringEscapeUtils.escapeHtml(text));
+                    http.getFile(slack);
+                } catch (Exception e) {
+                    result = e;
+                }
+                return result;
+            }
+        });
+    }
+    private static String publicationMessage(PublishedCollection publishedCollection) throws ParseException {
+        Result result = publishedCollection.publishResults.get(0);
+        String startDate = result.transaction.startDate;
+        String endDate = result.transaction.endDate;
+
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        Date startDateTime = parser.parse(startDate);
+        Date endDateTime = parser.parse(endDate);
+        String timeTaken = String.format("%.1f", (endDateTime.getTime() - startDateTime.getTime()) / 1000.0);
+
+        String exampleUri = "";
+        for (UriInfo info: result.transaction.uriInfos) {
+            if (info.uri.endsWith("data.json")) {
+                exampleUri = info.uri.substring(0, info.uri.length() - "data.json".length());
+                break;
+            }
+        }
+
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        String message = "Collection " + publishedCollection.name +
+                " was published at " + format.format(publishedCollection.publishDate) +
+                " with " + result.transaction.uriInfos.size() + " files " +
+                " in " + timeTaken + " seconds. Example file: http://beta.ons.gov.uk" + exampleUri;
+
+        return message;
     }
 
     private static void reindexSearch(Collection collection) throws IOException {

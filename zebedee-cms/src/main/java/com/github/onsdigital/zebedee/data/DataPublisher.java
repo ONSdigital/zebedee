@@ -34,7 +34,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.*;
 import java.net.URI;
@@ -170,7 +170,7 @@ public class DataPublisher {
      * @throws IOException
      */
     static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) throws IOException {
-        Workbook wb = new XSSFWorkbook();
+        Workbook wb = new SXSSFWorkbook(30);
         Sheet sheet = wb.createSheet("data");
 
         int rownum = 0;

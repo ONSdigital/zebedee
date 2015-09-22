@@ -22,7 +22,7 @@ public class FilterUtil {
 
     /**
      * Filters page data with given ContentFilter
-     *
+     * <p>
      * If content filter is null , no filter operation will be done and page will be returned as it is
      *
      * @param content
@@ -48,7 +48,7 @@ public class FilterUtil {
                 titleWrapper.setUri(page.getUri());
                 return titleWrapper;
             case DESCRIPTION:
-                return new DescriptionWrapper(page.getUri(),page.getDescription());
+                return new DescriptionWrapper(page.getUri(), page.getDescription());
             case SERIES:
                 return filterTimseriesData(page);
             default:
@@ -64,12 +64,12 @@ public class FilterUtil {
         Set<TimeSeriesValue> set = null;
 
         TimeSeries timeSeries = (TimeSeries) page;
-        if (timeSeries.years.size() > 0) {
-            set = timeSeries.years;
+        if (timeSeries.months.size() > 0) {
+            set = timeSeries.months;
         } else if (timeSeries.quarters.size() > 0) {
             set = timeSeries.quarters;
-        } else if (timeSeries.months.size() > 0) {
-            set = timeSeries.months;
+        } else if (timeSeries.years.size() > 0) {
+            set = timeSeries.years;
         }
 
         if (set == null) {
@@ -82,7 +82,7 @@ public class FilterUtil {
         series.getDescription().setCdid(page.getDescription().getCdid());
         series.getDescription().setTitle(page.getDescription().getTitle());
         for (TimeSeriesValue timeSeriesValue : set) {
-         series.add(new Point(timeSeriesValue.date, timeSeriesValue.value));
+            series.add(new Point(timeSeriesValue.date, timeSeriesValue.value));
         }
         return series;
     }

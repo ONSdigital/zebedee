@@ -15,12 +15,12 @@ import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,10 +31,9 @@ import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
@@ -42,6 +41,7 @@ public class Publisher {
 
     private static final Host websiteHost = new Host(Configuration.getWebsiteUrl());
     private static final Host theTrainHost = new Host(Configuration.getTheTrainUrl());
+
 
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
         boolean publishComplete = false;
@@ -223,18 +223,92 @@ public class Publisher {
         return false;
     }
 
+    /**
+     * Send a slack message containing collection publication information
+     *
+     * @param collectionJsonPath
+     */
     private static void sendSlackMessageForCollection(Path collectionJsonPath) {
+        String slackBaseUri = "https://slack.com/api/chat.postMessage";
+        final Host slackHost = new Host(slackBaseUri);
+
+        // publishbot requires a Slack token (which is generated for a specific team) and a channel name to publish to
+        String slackToken = System.getenv("publishbot_token");
+        String slackChannel = System.getenv("publishbot_channel");
+        if (slackToken == null || slackChannel == null) { return; }
 
         try (InputStream input = Files.newInputStream(collectionJsonPath)) {
             PublishedCollection publishedCollection = Serialiser.deserialise(input,
                     PublishedCollection.class);
 
-            // TODO send appropriate message 
+            // set up further slack variables
+            ExecutorService pool = Executors.newFixedThreadPool(1);
+            String slackUsername = "PublishBot";
+            String slackEmoji = ":chart_with_upwards_trend:";
 
-        } catch (IOException e) {
-            Log.print("Failed to read published collection with path %s", collectionJsonPath.toString());
+            // get the message for the publication
+            String slackMessage = publicationMessage(publishedCollection);
+
+            // send the message
+            Future<Exception> exceptionFuture = sendSlackMessage(slackHost, slackToken, slackChannel, slackUsername, slackEmoji, slackMessage, pool);
+            exceptionFuture.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.print("Failed to slack message for published collection with path %s", collectionJsonPath.toString());
         }
     }
+    private static Future<Exception> sendSlackMessage(
+            final Host host,
+            final String token, final String channel,
+            final String userName, final String emoji,
+            final String text,
+            ExecutorService pool) {
+        return pool.submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                Exception result = null;
+                try (Http http = new Http()) {
+                    Endpoint slack = new Endpoint(host, "")
+                            .setParameter("token", token)
+                            .setParameter("username", userName)
+                            .setParameter("channel", channel)
+                            .setParameter("icon_emoji", emoji)
+                            .setParameter("text", StringEscapeUtils.escapeHtml(text));
+                    http.getFile(slack);
+                } catch (Exception e) {
+                    result = e;
+                }
+                return result;
+            }
+        });
+    }
+    private static String publicationMessage(PublishedCollection publishedCollection) throws ParseException {
+        Result result = publishedCollection.publishResults.get(0);
+        String startDate = result.transaction.startDate;
+        String endDate = result.transaction.endDate;
+
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        Date startDateTime = parser.parse(startDate);
+        Date endDateTime = parser.parse(endDate);
+        String timeTaken = String.format("%.1f", (endDateTime.getTime() - startDateTime.getTime()) / 1000.0);
+
+        String exampleUri = "";
+        for (UriInfo info: result.transaction.uriInfos) {
+            if (info.uri.endsWith("data.json")) {
+                exampleUri = info.uri.substring(0, info.uri.length() - "data.json".length());
+                break;
+            }
+        }
+
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        String message = "Collection " + publishedCollection.name +
+                " was published at " + format.format(publishedCollection.publishDate) +
+                " with " + result.transaction.uriInfos.size() + " files " +
+                " in " + timeTaken + " seconds. Example file: http://beta.ons.gov.uk" + exampleUri;
+
+        return message;
+    }
+
     private static void reindexSearch(Collection collection) throws IOException {
 
         try {

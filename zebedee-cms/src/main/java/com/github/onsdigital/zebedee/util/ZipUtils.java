@@ -30,8 +30,9 @@ public class ZipUtils {
                     parent.mkdirs();
                 }
 
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-                IOUtils.copy(zipInputStream, fileOutputStream);
+                try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                    IOUtils.copy(zipInputStream, fileOutputStream);
+                }
             }
         }
     }

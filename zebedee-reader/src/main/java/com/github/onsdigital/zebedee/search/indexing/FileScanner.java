@@ -73,15 +73,11 @@ public class FileScanner {
     }
 
     private static boolean isRequiredForIndex(String fileName) {
-        return isDataFile(fileName) && isNotRelease(fileName) && isNotPreviousVersion(fileName);
+        return isDataFile(fileName) && isNotPreviousVersion(fileName);
     }
 
     private static boolean isDataFile(String fileName) {
         return fileName.endsWith("data.json");
-    }
-
-    private static boolean isNotRelease(String fileName) {
-        return !fileName.contains("releases");
     }
 
     private static boolean isNotPreviousVersion(String fileName) {

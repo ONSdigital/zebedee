@@ -376,7 +376,8 @@ public class Collection {
             if (this.isInCollection(uri))
                 PathUtils.moveFilesInDirectory(source, destination);
             else {
-                PathUtils.copyFilesInDirectory(source, destination);
+                // Optimise zebedee to only upload new files to a collection
+                PathUtils.create(destination);
             }
 
             AddEvent(uri, new Event(new Date(), EventType.EDITED, email));

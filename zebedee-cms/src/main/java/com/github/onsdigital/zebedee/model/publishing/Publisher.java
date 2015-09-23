@@ -34,7 +34,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
@@ -48,7 +50,6 @@ public class Publisher {
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
     }
 
-
     public static boolean Publish(Zebedee zebedee, Collection collection, String email) throws IOException {
         boolean publishComplete = false;
 
@@ -57,6 +58,8 @@ public class Publisher {
         Log.print("Attempting to lock collection before publish: " + collection.description.id);
         Lock writeLock = collection.getWriteLock();
         writeLock.lock();
+
+        long publishStart = System.currentTimeMillis();
 
         try {
             // First check the state of the collection
@@ -81,7 +84,7 @@ public class Publisher {
                     collection.path.resolve("publish.lock");
 
                     Log.print("Starting publish process for collection %s", collection.description.name);
-                    long publishStart = System.currentTimeMillis();
+
 
                     if (!collection.description.approvedStatus) {
                         Log.print("The collection %s cannot be published as it has not been approved", collection.description.name);
@@ -112,7 +115,14 @@ public class Publisher {
         }
 
         if (publishComplete) {
+            long onPublishCompleteStart = System.currentTimeMillis();
             onPublishComplete(zebedee, collection);
+            Log.print("onPublishComplete process finished for collection %s time taken: %dms",
+                    collection.description.name,
+                    (System.currentTimeMillis() - onPublishCompleteStart));
+            Log.print("Publish complete for collection %s total time taken: %dms",
+                    collection.description.name,
+                    (System.currentTimeMillis() - publishStart));
         }
 
         return publishComplete;
@@ -228,9 +238,10 @@ public class Publisher {
             sendSlackMessageForCollection(collectionJsonPath);
 
             // add to published collections list
-            zebedee.publishedCollections.add(collectionJsonPath);
+            indexPublishReport(zebedee, collectionJsonPath);
 
             collection.delete();
+
             ContentTree.dropCache();
 
             return true;
@@ -240,6 +251,16 @@ public class Publisher {
         }
 
         return false;
+    }
+
+    private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath) {
+        pool.submit(new Runnable() {
+            @Override
+            public void run() {
+                Log.print("Indexing publish report");
+                zebedee.publishedCollections.add(collectionJsonPath);
+            }
+        });
     }
 
     /**
@@ -353,13 +374,20 @@ public class Publisher {
 
     private static void reindexSearch(Collection collection) throws IOException {
 
+        Log.print("Reindexing search for collection %s", collection.description.name);
         try {
+
+            long start = System.currentTimeMillis();
+
             List<String> uris = collection.reviewed.uris("*data.json");
             for (String uri : uris) {
                 String contentUri = URIUtils.removeLastSegment(uri);
                 reIndexPublishingSearch(contentUri);
                 reIndexWebsiteSearch(contentUri);
             }
+
+            Log.print("Time taken re-indexing search %sms", (System.currentTimeMillis() - start));
+
         } catch (Exception exception) {
             Log.print("An error occurred during the search reindex of collection %s, %s", collection.description.name, exception.getMessage());
             ExceptionUtils.printRootCauseStackTrace(exception);
@@ -370,27 +398,33 @@ public class Publisher {
     /**
      * Post to the website to reindex search.
      */
-    private static void reIndexWebsiteSearch(String uri) {
-        Log.print("Reindexing website search.");
-        try (Http http = new Http()) {
-
-            Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey()).setParameter("uri", uri);
-            Response<String> response = http.post(begin, String.class);
-            Log.print("Website reindex response: %s", response.body);
-
-        } catch (Exception e) {
-            Log.print("Exception reloading website search index:");
-            ExceptionUtils.printRootCauseStackTrace(e);
-        }
+    private static void reIndexWebsiteSearch(final String uri) {
+        pool.submit(new Runnable() {
+            @Override
+            public void run() {
+                try (Http http = new Http()) {
+                    Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey()).setParameter("uri", uri);
+                    Response<String> response = http.post(begin, String.class);
+                } catch (Exception e) {
+                    Log.print("Exception reloading website search index:");
+                    ExceptionUtils.printRootCauseStackTrace(e);
+                }
+            }
+        });
     }
 
-    private static void reIndexPublishingSearch(String uri) throws IOException {
-        try {
-            Indexer.getInstance().reloadContent(uri);
-        } catch (Exception e) {
-            Log.print("Exception reloading search index:");
-            ExceptionUtils.printRootCauseStackTrace(e);
-        }
+    private static void reIndexPublishingSearch(final String uri) throws IOException {
+        pool.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Indexer.getInstance().reloadContent(uri);
+                } catch (Exception e) {
+                    Log.print("Exception reloading search index:");
+                    ExceptionUtils.printRootCauseStackTrace(e);
+                }
+            }
+        });
     }
 
     public static void copyFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {

@@ -13,7 +13,6 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
 import com.github.onsdigital.zebedee.model.publishing.PublishTask;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
-import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.IOUtils;
 
@@ -106,11 +105,11 @@ public class Root {
     }
 
     private static void indexPublishedCollections() {
-        try {
-            zebedee.publishedCollections.init(ElasticSearchClient.getClient());
-        } catch (IOException e) {
-            Log.print(e, "Exception indexing published collections: %s", e.getMessage());
-        }
+//        try {
+//            zebedee.publishedCollections.init(ElasticSearchClient.getClient());
+//        } catch (IOException e) {
+//            Log.print(e, "Exception indexing published collections: %s", e.getMessage());
+//        }
     }
 
     private static void loadExistingCollectionsIntoScheduler() {

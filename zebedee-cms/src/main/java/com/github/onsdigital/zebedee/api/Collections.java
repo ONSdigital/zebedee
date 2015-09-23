@@ -51,6 +51,7 @@ public class Collections {
             description.name = collection.description.name;
             description.publishDate = collection.description.publishDate;
             description.approvedStatus = collection.description.approvedStatus;
+            description.type = collection.description.type;
             result.add(description);
         }
 

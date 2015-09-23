@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.util;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import java.util.Date;
 
 /**
@@ -24,6 +26,18 @@ public class Log {
      */
     public static void print(String message, Object... args) {
         print(String.format(message, args));
+    }
+
+    /**
+     * Print an exception related message, and print the root cause stack trace.
+     *
+     * @param exception
+     * @param message
+     * @param args
+     */
+    public static void print(Exception exception, String message, Object... args) {
+        print(String.format(message, args));
+        ExceptionUtils.printRootCauseStackTrace(exception);
     }
 
     /**

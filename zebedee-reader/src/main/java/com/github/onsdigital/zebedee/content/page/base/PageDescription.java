@@ -17,6 +17,12 @@ import java.util.List;
  */
 public class PageDescription extends Content implements Comparable<PageDescription> {
 
+    /*Release fields*/
+    public Boolean finalised;
+    /*Migration Data*/
+    public transient String theme;
+    public transient String level2;
+    public transient String level3;
     //Index is used for ordering if set
     private Integer index;
     private String title;
@@ -25,7 +31,6 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String summary;
     private List<String> keywords; //Used for search engines to read ?
     private String metaDescription;
-
     /*Statistics Description*/
     private Boolean nationalStatistic;
     private Boolean latestRelease;
@@ -33,23 +38,15 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private Date releaseDate;
     private String nextRelease;
     private String language;
-
     private String edition;
     private String _abstract;
     private List<String> authors;
-
-
     private String headline;//Used in compendium
-
     /*Bulletin headlines*/
     private String headline1;
     private String headline2;
     private String headline3;
-
-
     private String datasetId;
-
-
     /*Statistical Data description*/
     private String cdid;
     // We provide a minimal default for the unit, otherwise highcharts shows
@@ -57,22 +54,15 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String unit = "";
     private String preUnit = "";
     private String source = ""; // Where a statistic comes from. Typically "Office for National Statistics"
-
-
     private String seasonalAdjustment;
-
     //Below fields appear on references to time series on other content types
     private String date;
     private String number;
     private String mainMeasure;
-
     /** This value is displayed in the "(i)" tooltips next to timeseries title. */
     private String keyNote;
-
     /** This value is displayed beneath the time series title: */
     private String additionalText;
-
-
     /*QMI Description*/
     private String surveyName;
     private String frequency;
@@ -80,21 +70,12 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String geographicCoverage;
     private String sampleSize;
     private Date lastRevised;
-
     /*Adhoc content reference*/
     private String reference;
-
-    /*Release fields*/
-    public Boolean finalised;
     private Boolean cancelled;
     private List<String> cancellationNotice;
     private Boolean published;
-
-
-    /*Migration Data*/
-    public transient String theme;
-    public transient String level2;
-    public transient String level3;
+    private String provisionalDate;
 
 
     public PageDescription() {
@@ -425,5 +406,13 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     public void setPublished(Boolean published) {
         this.published = published;
+    }
+
+    public String getProvisionalDate() {
+        return provisionalDate;
+    }
+
+    public void setProvisionalDate(String provisionalDate) {
+        this.provisionalDate = provisionalDate;
     }
 }

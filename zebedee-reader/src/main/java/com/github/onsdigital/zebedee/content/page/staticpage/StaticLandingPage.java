@@ -1,8 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.staticpage;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.content.page.staticpage.base.BaseStaticPage;
 import com.github.onsdigital.zebedee.content.page.staticpage.base.StaticPageSection;
 
 import java.util.List;
@@ -12,10 +11,9 @@ import java.util.List;
  * Landing page showing links to other static pages
  *
  */
-public class StaticLandingPage extends Page {
+public class StaticLandingPage extends BaseStaticPage {
 
     private List<StaticPageSection> sections;
-    private List<Link> links;
 
     @Override
     public PageType getType() {
@@ -28,13 +26,5 @@ public class StaticLandingPage extends Page {
 
     public void setSections(List<StaticPageSection> sections) {
         this.sections = sections;
-    }
-
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 }

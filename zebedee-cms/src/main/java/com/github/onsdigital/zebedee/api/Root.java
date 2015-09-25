@@ -100,10 +100,19 @@ public class Root {
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty("zebedee_root", root.toString());
 
-        LoadExistingCollectionsIntoScheduler();
+        loadExistingCollectionsIntoScheduler();
+        indexPublishedCollections();
     }
 
-    private static void LoadExistingCollectionsIntoScheduler() {
+    private static void indexPublishedCollections() {
+//        try {
+//            zebedee.publishedCollections.init(ElasticSearchClient.getClient());
+//        } catch (IOException e) {
+//            Log.print(e, "Exception indexing published collections: %s", e.getMessage());
+//        }
+    }
+
+    private static void loadExistingCollectionsIntoScheduler() {
         if (Configuration.isSchedulingEnabled()) {
 
             System.out.println("Adding existing collections to the scheduler.");

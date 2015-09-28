@@ -1052,7 +1052,7 @@ public class CollectionsTest {
                 // We attempt to get the session
 
                 Collection collectionToUpdate = collection.zebedee.collections.list().getCollection(collection.description.id);
-                collectionToUpdate.AddEvent("/", new Event(new Date(), EventType.EDITED, "fred@testing.com"));
+                collectionToUpdate.addEvent("/", new Event(new Date(), EventType.EDITED, "fred@testing.com"));
                 collectionToUpdate.save();
                 Collection updatedCollection = collection.zebedee.collections.list().getCollection(collection.description.id);
 

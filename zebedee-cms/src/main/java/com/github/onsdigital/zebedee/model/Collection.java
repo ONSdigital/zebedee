@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.content.page.release.Release;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -328,7 +330,7 @@ public class Collection {
             Path path = inProgress.toPath(uri);
             PathUtils.create(path);
 
-            AddEvent(uri, new Event(new Date(), EventType.CREATED, email));
+            addEvent(uri, new Event(new Date(), EventType.CREATED, email));
 
             result = true;
         }
@@ -377,10 +379,10 @@ public class Collection {
                 PathUtils.moveFilesInDirectory(source, destination);
             else {
                 // Optimise zebedee to only upload new files to a collection
-                PathUtils.create(destination);
+                PathUtils.copy(source, destination);
             }
 
-            AddEvent(uri, new Event(new Date(), EventType.EDITED, email));
+            addEvent(uri, new Event(new Date(), EventType.EDITED, email));
             result = true;
         }
 
@@ -405,7 +407,7 @@ public class Collection {
             Path destination = complete.toPath(uri);
             PathUtils.moveFilesInDirectory(source, destination);
 
-            AddEvent(uri, new Event(new Date(), EventType.COMPLETED, email));
+            addEvent(uri, new Event(new Date(), EventType.COMPLETED, email));
             result = true;
         }
 
@@ -471,7 +473,7 @@ public class Collection {
 
             PathUtils.moveFilesInDirectory(source, destination);
 
-            AddEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
+            addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
             result = true;
         }
 
@@ -566,7 +568,7 @@ public class Collection {
      * @param uri   The uri the event belongs to.
      * @param event The event to add.
      */
-    public void AddEvent(String uri, Event event) {
+    public void addEvent(String uri, Event event) {
 
         if (!StringUtils.startsWith(uri, "/")) {
             uri = "/" + uri;
@@ -621,10 +623,45 @@ public class Collection {
             hasDeleted = true;
         }
 
-        if (hasDeleted) AddEvent(uri, new Event(new Date(), EventType.DELETED, email));
+        if (hasDeleted) addEvent(uri, new Event(new Date(), EventType.DELETED, email));
         save();
 
         return hasDeleted;
+    }
+
+    /**
+     * Associate this collection with the release from the given URI.
+     *
+     * @param uri
+     * @throws NotFoundException
+     */
+    public Release associateWithRelease(String email, String uri) throws NotFoundException, IOException {
+
+        if (!zebedee.published.exists(uri, true)) {
+            throw new NotFoundException(
+                    String.format("The release for uri: %s was not found.", uri));
+        }
+
+        // add the release page to the collection in progress
+        if (!isInCollection(uri)) {
+            this.edit(email, uri);
+        }
+
+        // set the release state to published
+        Path releasePath = find(email, uri);
+
+        Release release;
+
+        try (InputStream inputStream = Files.newInputStream(releasePath)) {
+            release = (Release) ContentUtil.deserialiseContent(inputStream);
+        }
+
+        release.getDescription().setPublished(true);
+
+        // write file
+        FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
+
+        return release;
     }
 }
 

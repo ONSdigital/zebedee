@@ -4,6 +4,9 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.release.Release;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -18,6 +21,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -931,5 +935,62 @@ public class CollectionTest {
         // Then
         // We get the path to the in progress file.
         assertTrue(path.toString().contains("/" + Collection.REVIEWED + "/"));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void associateWithReleaseShouldReturnFalseIfReleaseDoesNotExist() throws IOException, NotFoundException {
+
+        // Given a collection with a release uri of a release that does not exists
+        String releaseUri = "/does/not/exist";
+
+        // When we attempt to associate the collection with a release
+        collection.associateWithRelease(publisher1Email, releaseUri);
+
+        // Then the expected exception is thrown.
+    }
+
+    @Test
+    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException {
+
+        // Given
+        // There is a release already in progress
+        String uri = "/releases/data.json";
+        createRelease(uri);
+        collection.edit(publisher1Email, uri);
+
+        // When we attempt to associate the collection with a release
+        Release release = collection.associateWithRelease(publisher1Email, uri);
+
+        assertTrue(release.getDescription().getPublished());
+        assertEquals(URI.create(uri), release.getUri());
+    }
+
+    @Test
+    public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException {
+
+        // Given a release that is announced
+        String uri = "/releases/data.json";
+        createRelease(uri);
+
+        // When we attempt to associate the collection with a release
+        Release release = collection.associateWithRelease(publisher1Email, uri);
+
+        // Then the release is now in progress for the collection and the published flag is set to true
+        collection.isInProgress(uri);
+        assertTrue(release.getDescription().getPublished());
+        assertEquals(URI.create(uri), release.getUri());
+    }
+
+    private Release createRelease(String uri) throws IOException {
+        String trimmedUri = StringUtils.removeStart(uri, "/");
+        Release release = new Release();
+        release.setDescription(new PageDescription());
+        release.getDescription().setPublished(false);
+        release.setUri(URI.create(uri));
+        String content = ContentUtil.serialise(release);
+
+        Path releasePath = zebedee.published.path.resolve(trimmedUri);
+        FileUtils.write(releasePath.toFile(), content);
+        return release;
     }
 }

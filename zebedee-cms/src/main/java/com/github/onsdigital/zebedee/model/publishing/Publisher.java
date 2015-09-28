@@ -209,7 +209,7 @@ public class Publisher {
         }
 
         // Add an event to the event log
-        collection.AddEvent(uri, new Event(new Date(), EventType.PUBLISHED, email));
+        collection.addEvent(uri, new Event(new Date(), EventType.PUBLISHED, email));
     }
 
     /**

@@ -20,4 +20,8 @@ public class CollectionBase {
      * a publish date).
      */
     public Date publishDate;
+    /**
+     * If the collection is associated with a release the releaseUri determines that release.
+     */
+    public String releaseUri;
 }

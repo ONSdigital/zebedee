@@ -82,7 +82,7 @@ public class Collection {
     @POST
     public CollectionDescription create(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        CollectionDescription collectionDescription) throws IOException {
+                                        CollectionDescription collectionDescription) throws IOException, NotFoundException {
 
         if (StringUtils.isBlank(collectionDescription.name)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
@@ -107,6 +107,10 @@ public class Collection {
 
         if (collection.description.type.equals(CollectionType.scheduled)) {
             Root.schedulePublish(collection);
+        }
+
+        if (StringUtils.isNotEmpty(collectionDescription.releaseUri)) {
+            collection.associateWithRelease(session.email, collectionDescription.releaseUri);
         }
 
         return collection.description;

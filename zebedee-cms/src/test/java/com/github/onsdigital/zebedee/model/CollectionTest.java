@@ -50,7 +50,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldCreateCollection() throws IOException {
+    public void shouldCreateCollection() throws Exception {
 
         // Given
         // The content doesn't exist at any level:
@@ -85,7 +85,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldRenameCollection() throws IOException {
+    public void shouldRenameCollection() throws Exception {
 
         // Given
         String name = "Population Release";
@@ -125,7 +125,7 @@ public class CollectionTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldNotInstantiateInInvalidFolder() throws IOException {
+    public void shouldNotInstantiateInInvalidFolder() throws Exception {
 
         // Given
         // A folder that isn't a valid release:
@@ -942,9 +942,9 @@ public class CollectionTest {
 
         // Given
         // There is a release already in progress
-        String uri = String.format("/releases/%s/data.json", Random.id());
+        String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri);
-        collection.edit(publisher1Email, uri);
+        collection.edit(publisher1Email, uri + "/data.json");
 
         // When we attempt to associate the collection with a release
         Release result = collection.associateWithRelease(publisher1Email, release);
@@ -957,7 +957,7 @@ public class CollectionTest {
     public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException {
 
         // Given a release that is announced
-        String uri = String.format("/releases/%s/data.json", Random.id());
+        String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri);
 
         // When we attempt to associate the collection with a release
@@ -970,10 +970,10 @@ public class CollectionTest {
     }
 
     @Test
-    public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws IOException {
+    public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws Exception {
 
         // Given an existing release page
-        String uri = String.format("/releases/%s/data.json", Random.id());
+        String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri);
 
         // When a new collection is created with the release uri given
@@ -995,7 +995,7 @@ public class CollectionTest {
         release.setUri(URI.create(uri));
         String content = ContentUtil.serialise(release);
 
-        Path releasePath = zebedee.published.path.resolve(trimmedUri);
+        Path releasePath = zebedee.published.path.resolve(trimmedUri + "/data.json");
         FileUtils.write(releasePath.toFile(), content);
         return release;
     }

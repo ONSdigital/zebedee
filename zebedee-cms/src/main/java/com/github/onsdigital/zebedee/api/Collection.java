@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
@@ -82,7 +83,7 @@ public class Collection {
     @POST
     public CollectionDescription create(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        CollectionDescription collectionDescription) throws IOException, NotFoundException {
+                                        CollectionDescription collectionDescription) throws IOException, ZebedeeException {
 
         if (StringUtils.isBlank(collectionDescription.name)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);

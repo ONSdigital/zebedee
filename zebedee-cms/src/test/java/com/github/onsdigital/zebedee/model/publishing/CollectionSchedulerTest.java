@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -30,7 +31,7 @@ public class CollectionSchedulerTest {
     }
 
     @Test
-    public void scheduleShouldAddCollectionTask() throws IOException {
+    public void scheduleShouldAddCollectionTask() throws IOException, ZebedeeException {
 
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
@@ -47,7 +48,7 @@ public class CollectionSchedulerTest {
     }
 
     @Test
-    public void scheduleShouldReturnFalseForManualCollection() throws IOException {
+    public void scheduleShouldReturnFalseForManualCollection() throws IOException, ZebedeeException {
 
         // Given a manual collection
         CollectionDescription description = new CollectionDescription("collectionName");
@@ -64,7 +65,7 @@ public class CollectionSchedulerTest {
     }
 
     @Test
-    public void cancelShouldRemoveTaskFromScheduler() throws IOException {
+    public void cancelShouldRemoveTaskFromScheduler() throws IOException, ZebedeeException {
 
         // Given a scheduled collection.
         CollectionDescription description = new CollectionDescription("collectionName");

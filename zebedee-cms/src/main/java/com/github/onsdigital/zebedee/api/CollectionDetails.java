@@ -73,10 +73,14 @@ public class CollectionDetails {
             if (language == null) {
                 language = "";
             } else {
-                language =  "_" +contentDetail.description.language;
+                language = "_" + contentDetail.description.language;
             }
-            Events eventsForFile = collection.description.eventsByUri.get(contentDetail.uri + "/data" +  language  + ".json");
-            contentDetail.events = eventsForFile;
+            if (collection.description.eventsByUri != null) {
+                Events eventsForFile = collection.description.eventsByUri.get(contentDetail.uri + "/data" + language + ".json");
+                contentDetail.events = eventsForFile;
+            } else {
+                contentDetail.events = new Events();
+            }
         }
     }
 }

@@ -937,48 +937,54 @@ public class CollectionTest {
         assertTrue(path.toString().contains("/" + Collection.REVIEWED + "/"));
     }
 
-    @Test(expected = NotFoundException.class)
-    public void associateWithReleaseShouldReturnFalseIfReleaseDoesNotExist() throws IOException, NotFoundException {
-
-        // Given a collection with a release uri of a release that does not exists
-        String releaseUri = "/does/not/exist";
-
-        // When we attempt to associate the collection with a release
-        collection.associateWithRelease(publisher1Email, releaseUri);
-
-        // Then the expected exception is thrown.
-    }
-
     @Test
     public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException {
 
         // Given
         // There is a release already in progress
-        String uri = "/releases/data.json";
-        createRelease(uri);
+        String uri = String.format("/releases/%s/data.json", Random.id());
+        Release release = createRelease(uri);
         collection.edit(publisher1Email, uri);
 
         // When we attempt to associate the collection with a release
-        Release release = collection.associateWithRelease(publisher1Email, uri);
+        Release result = collection.associateWithRelease(publisher1Email, release);
 
-        assertTrue(release.getDescription().getPublished());
-        assertEquals(URI.create(uri), release.getUri());
+        assertTrue(result.getDescription().getPublished());
+        assertEquals(URI.create(uri), result.getUri());
     }
 
     @Test
     public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException {
 
         // Given a release that is announced
-        String uri = "/releases/data.json";
-        createRelease(uri);
+        String uri = String.format("/releases/%s/data.json", Random.id());
+        Release release = createRelease(uri);
 
         // When we attempt to associate the collection with a release
-        Release release = collection.associateWithRelease(publisher1Email, uri);
+        Release result = collection.associateWithRelease(publisher1Email, release);
 
         // Then the release is now in progress for the collection and the published flag is set to true
-        collection.isInProgress(uri);
-        assertTrue(release.getDescription().getPublished());
-        assertEquals(URI.create(uri), release.getUri());
+        assertTrue(collection.isInProgress(uri));
+        assertTrue(result.getDescription().getPublished());
+        assertEquals(URI.create(uri), result.getUri());
+    }
+
+    @Test
+    public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws IOException {
+
+        // Given an existing release page
+        String uri = String.format("/releases/%s/data.json", Random.id());
+        Release release = createRelease(uri);
+
+        // When a new collection is created with the release uri given
+        CollectionDescription collectionDescription = new CollectionDescription(Random.id());
+        collectionDescription.releaseUri = release.getUri().toString();
+        Collection collection = Collection.create(collectionDescription, zebedee, publisher1Email);
+
+        // The release page is in progress within the collection and the collection publish date has been
+        // taken from the release page date.
+        assertTrue(collection.isInProgress(uri));
+        assertEquals(collection.description.publishDate, release.getDescription().getReleaseDate());
     }
 
     private Release createRelease(String uri) throws IOException {

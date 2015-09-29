@@ -118,11 +118,17 @@ public class Collection {
         collectionDescription.id = filename + "-" + Random.id();
 
         // Create the folders:
-        Path collection = zebedee.collections.path.resolve(filename);
-        Files.createDirectory(collection);
-        Files.createDirectory(collection.resolve(REVIEWED));
-        Files.createDirectory(collection.resolve(COMPLETE));
-        Files.createDirectory(collection.resolve(IN_PROGRESS));
+        Path collectionPath = zebedee.collections.path.resolve(filename);
+        Files.createDirectory(collectionPath);
+        Files.createDirectory(collectionPath.resolve(REVIEWED));
+        Files.createDirectory(collectionPath.resolve(COMPLETE));
+        Files.createDirectory(collectionPath.resolve(IN_PROGRESS));
+
+        Release release = null;
+        if (StringUtils.isNotEmpty(collectionDescription.releaseUri)) {
+            release = getRelease(collectionDescription.releaseUri, zebedee);
+            collectionDescription.publishDate = release.getDescription().getReleaseDate();
+        }
 
         // Create the description:
         Path collectionDescriptionPath = zebedee.collections.path.resolve(filename
@@ -134,7 +140,13 @@ public class Collection {
             Serialiser.serialise(output, collectionDescription);
         }
 
-        return new Collection(collectionDescription, zebedee);
+        Collection collection = new Collection(collectionDescription, zebedee);
+
+        if (release != null) {
+            collection.associateWithRelease(email, release);
+        }
+
+        return collection;
     }
 
     /**
@@ -173,6 +185,15 @@ public class Collection {
         Files.delete(zebedee.collections.path.resolve(filename + ".json"));
 
         return new Collection(renamedCollectionDescription, zebedee);
+    }
+
+    private static Release getRelease(String uri, Zebedee zebedee) throws IOException {
+        Release release;
+        Path releasePath = zebedee.published.get(uri);
+        try (InputStream inputStream = Files.newInputStream(releasePath)) {
+            release = (Release) ContentUtil.deserialiseContent(inputStream);
+        }
+        return release;
     }
 
     /**
@@ -561,7 +582,6 @@ public class Collection {
         }
     }
 
-
     /**
      * Add a {@link Event} for the given uri.
      *
@@ -630,32 +650,23 @@ public class Collection {
     }
 
     /**
-     * Associate this collection with the release from the given URI.
-     *
-     * @param uri
+     * Associate this collection with the given release
+     * @param email
+     * @param release
+     * @return
      * @throws NotFoundException
+     * @throws IOException
      */
-    public Release associateWithRelease(String email, String uri) throws NotFoundException, IOException {
+    public Release associateWithRelease(String email, Release release) throws IOException {
 
-        if (!zebedee.published.exists(uri, true)) {
-            throw new NotFoundException(
-                    String.format("The release for uri: %s was not found.", uri));
-        }
+        String uri = release.getUri().toString();
 
         // add the release page to the collection in progress
         if (!isInCollection(uri)) {
             this.edit(email, uri);
         }
 
-        // set the release state to published
         Path releasePath = find(email, uri);
-
-        Release release;
-
-        try (InputStream inputStream = Files.newInputStream(releasePath)) {
-            release = (Release) ContentUtil.deserialiseContent(inputStream);
-        }
-
         release.getDescription().setPublished(true);
 
         // write file

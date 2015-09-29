@@ -109,10 +109,6 @@ public class Collection {
             Root.schedulePublish(collection);
         }
 
-        if (StringUtils.isNotEmpty(collectionDescription.releaseUri)) {
-            collection.associateWithRelease(session.email, collectionDescription.releaseUri);
-        }
-
         return collection.description;
     }
 

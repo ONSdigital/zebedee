@@ -5,10 +5,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import org.apache.commons.io.FileUtils;
@@ -116,6 +113,8 @@ public class Collection {
     public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, String email)
             throws IOException, ZebedeeException {
 
+        Release release = checkForRelease(collectionDescription, zebedee);
+
         String filename = PathUtils.toFilename(collectionDescription.name);
         collectionDescription.id = filename + "-" + Random.id();
 
@@ -125,12 +124,6 @@ public class Collection {
         Files.createDirectory(collectionPath.resolve(REVIEWED));
         Files.createDirectory(collectionPath.resolve(COMPLETE));
         Files.createDirectory(collectionPath.resolve(IN_PROGRESS));
-
-        Release release = null;
-        if (StringUtils.isNotEmpty(collectionDescription.releaseUri)) {
-            release = getRelease(collectionDescription.releaseUri, zebedee);
-            collectionDescription.publishDate = release.getDescription().getReleaseDate();
-        }
 
         collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, email));
 
@@ -149,6 +142,25 @@ public class Collection {
         }
 
         return collection;
+    }
+
+    private static Release checkForRelease(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, ZebedeeException {
+        Release release = null;
+        if (StringUtils.isNotEmpty(collectionDescription.releaseUri)) {
+            release = getRelease(collectionDescription.releaseUri, zebedee);
+
+            if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
+                throw new ConflictException(
+                        "Cannot create a collection for this release. It is being edited as part of another collection.");
+            }
+
+            if (release.getDescription().getReleaseDate() == null) {
+                throw new BadRequestException("Could not create collection for release, the release has no release date.");
+            }
+
+            collectionDescription.publishDate = release.getDescription().getReleaseDate();
+        }
+        return release;
     }
 
     /**
@@ -190,9 +202,7 @@ public class Collection {
     }
 
     private static Release getRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
-        Release release;
-
-        release = (Release) new ZebedeeReader(zebedee.published.path.toString(), null).getPublishedContent(uri);
+        Release release = (Release) new ZebedeeReader(zebedee.published.path.toString(), null).getPublishedContent(uri);
         return release;
     }
 

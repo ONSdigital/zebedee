@@ -8,12 +8,14 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.EventType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +27,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -943,7 +946,7 @@ public class CollectionTest {
         // Given
         // There is a release already in progress
         String uri = String.format("/releases/%s", Random.id());
-        Release release = createRelease(uri);
+        Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
         collection.edit(publisher1Email, uri + "/data.json");
 
         // When we attempt to associate the collection with a release
@@ -958,7 +961,7 @@ public class CollectionTest {
 
         // Given a release that is announced
         String uri = String.format("/releases/%s", Random.id());
-        Release release = createRelease(uri);
+        Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
 
         // When we attempt to associate the collection with a release
         Release result = collection.associateWithRelease(publisher1Email, release);
@@ -974,7 +977,7 @@ public class CollectionTest {
 
         // Given an existing release page
         String uri = String.format("/releases/%s", Random.id());
-        Release release = createRelease(uri);
+        Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
 
         // When a new collection is created with the release uri given
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
@@ -987,11 +990,45 @@ public class CollectionTest {
         assertEquals(collection.description.publishDate, release.getDescription().getReleaseDate());
     }
 
-    private Release createRelease(String uri) throws IOException {
+    @Test(expected = BadRequestException.class)
+    public void createCollectionShouldThrowExceptionIfReleaseDateIsNull() throws Exception {
+
+        // Given an existing release page with a null release date
+        String uri = String.format("/releases/%s", Random.id());
+        Release release = createRelease(uri, null);
+
+        // When a new collection is created with the release uri given
+        CollectionDescription collectionDescription = new CollectionDescription(Random.id());
+        collectionDescription.releaseUri = release.getUri().toString();
+        Collection.create(collectionDescription, zebedee, publisher1Email);
+
+        // Then the expected exception is thrown
+    }
+
+    @Test(expected = ConflictException.class)
+    public void createCollectionShouldThrowExceptionIfReleaseIsInAnotherCollection() throws Exception {
+
+        // Given an existing release page which is associated with an existing collection
+        String uri = String.format("/releases/%s", Random.id());
+        Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
+        CollectionDescription collectionDescription = new CollectionDescription(Random.id());
+        collectionDescription.releaseUri = release.getUri().toString();
+        Collection.create(collectionDescription, zebedee, publisher1Email);
+
+        // When a new collection is created with the release uri given
+        collectionDescription = new CollectionDescription(Random.id());
+        collectionDescription.releaseUri = release.getUri().toString();
+        Collection.create(collectionDescription, zebedee, publisher1Email);
+
+        // Then the expected exception is thrown
+    }
+
+    private Release createRelease(String uri, Date releaseDate) throws IOException {
         String trimmedUri = StringUtils.removeStart(uri, "/");
         Release release = new Release();
         release.setDescription(new PageDescription());
         release.getDescription().setPublished(false);
+        release.getDescription().setReleaseDate(releaseDate);
         release.setUri(URI.create(uri));
         String content = ContentUtil.serialise(release);
 

@@ -1,10 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
@@ -33,22 +30,20 @@ public class Collection {
      */
     @GET
     public CollectionDescription get(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+            throws IOException, ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
 
-        // Check whether we found the collection:
-        if (collection == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return null;
-        }
-
         // Check whether we have access
         Session session = Root.zebedee.sessions.get(request);
         if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return null;
+            throw new UnauthorizedException("You are not authorised to delete collections.");
+        }
+
+        // Check whether we found the collection:
+        if (collection == null) {
+            throw new NotFoundException("The collection you are trying to delete was not found.");
         }
 
         // Collate the result:
@@ -92,15 +87,13 @@ public class Collection {
 
         Session session = Root.zebedee.sessions.get(request);
         if (Root.zebedee.permissions.canEdit(session.email) == false) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return null;
+            throw new UnauthorizedException("You are not authorised to create collections.");
         }
 
         collectionDescription.name = StringUtils.trim(collectionDescription.name);
         if (Root.zebedee.collections.list().hasCollection(
                 collectionDescription.name)) {
-            response.setStatus(HttpStatus.CONFLICT_409);
-            return null;
+            throw new ConflictException("Could not create collection. A collection with this name already exists.");
         }
 
         com.github.onsdigital.zebedee.model.Collection collection = com.github.onsdigital.zebedee.model.Collection.create(

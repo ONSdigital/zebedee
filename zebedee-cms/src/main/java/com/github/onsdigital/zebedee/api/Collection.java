@@ -35,15 +35,14 @@ public class Collection {
         com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
 
+        // Check whether we found the collection:
+        if (collection == null) {
+            throw new NotFoundException("The collection you are trying to delete was not found.");
+        }
         // Check whether we have access
         Session session = Root.zebedee.sessions.get(request);
         if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
             throw new UnauthorizedException("You are not authorised to delete collections.");
-        }
-
-        // Check whether we found the collection:
-        if (collection == null) {
-            throw new NotFoundException("The collection you are trying to delete was not found.");
         }
 
         // Collate the result:

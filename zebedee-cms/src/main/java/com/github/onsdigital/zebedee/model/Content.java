@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.util.GraphUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -45,6 +44,26 @@ public class Content {
     // todo: remove timeseries filter once we are caching the browse tree.
     private static boolean isNotTimeseries(Path p) {
         return !p.getFileName().toString().contains("timeseries");
+    }
+
+    private static List<Path> listTimeSeriesDirectories(Path root) throws IOException {
+        List<Path> result = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry)) {
+                    //System.out.println(entry + ": " + entry.getFileName());
+                    if (entry.getFileName().toString().equals("timeseries")) {
+                        result.add(entry);
+                        return result;
+                    }
+
+                    result.addAll(listTimeSeriesDirectories(entry));
+                }
+            }
+        }
+
+        return result;
     }
 
     boolean exists(URI uri) {
@@ -215,7 +234,7 @@ public class Content {
         // todo: remove timeseries filter once we are caching the browse tree.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path entry : stream) {
-                if (Files.isDirectory(entry) && isNotRelease(entry) && isNotTimeseries(entry)) {
+                if (Files.isDirectory(entry) && isNotTimeseries(entry)) {
                     ContentDetail child = nestedDetails(entry);
                     if (child != null) {
                         detail.children.add(child);
@@ -308,26 +327,6 @@ public class Content {
      */
     public List<Path> listTimeSeriesDirectories() throws IOException {
         return listTimeSeriesDirectories(this.path);
-    }
-
-    private static List<Path> listTimeSeriesDirectories(Path root) throws IOException {
-        List<Path> result = new ArrayList<>();
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
-            for (Path entry : stream) {
-                if (Files.isDirectory(entry)) {
-                    //System.out.println(entry + ": " + entry.getFileName());
-                    if (entry.getFileName().toString().equals("timeseries")) {
-                        result.add(entry);
-                        return result;
-                    }
-
-                    result.addAll(listTimeSeriesDirectories(entry));
-                }
-            }
-        }
-
-        return result;
     }
 
     public boolean delete(String uri) throws IOException {

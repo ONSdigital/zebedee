@@ -24,7 +24,7 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
  * Service to read published content and contents going through process in collections
  */
 public class ZebedeeReader {
-    private static ContentReader publishedContentReader;
+    private ContentReader publishedContentReader;
     private ContentLanguage language;
 
     public ZebedeeReader() {
@@ -34,6 +34,11 @@ public class ZebedeeReader {
     public ZebedeeReader(ContentLanguage language) {
         publishedContentReader = new ContentReader(getConfiguration().getContentDir());
         publishedContentReader.setLanguage(language);
+        this.language = language;
+    }
+
+    public ZebedeeReader(String rootFolder, ContentLanguage language) {
+        publishedContentReader = new ContentReader(rootFolder);
         this.language = language;
     }
 

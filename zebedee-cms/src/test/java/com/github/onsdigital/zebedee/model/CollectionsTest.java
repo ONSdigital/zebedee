@@ -49,7 +49,7 @@ public class CollectionsTest {
     }
 
     @Test
-    public void shouldFindCollection() throws IOException {
+    public void shouldFindCollection() throws Exception {
         Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(
@@ -76,7 +76,7 @@ public class CollectionsTest {
     }
 
     @Test
-    public void shouldReturnNullIfNotFound() throws IOException {
+    public void shouldReturnNullIfNotFound() throws Exception {
 
         Collections.CollectionList collections = new Collections.CollectionList();
 
@@ -89,7 +89,7 @@ public class CollectionsTest {
     }
 
     @Test
-    public void shouldHaveCollectionForName() throws IOException {
+    public void shouldHaveCollectionForName() throws Exception {
         Collections.CollectionList collectionList = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(
@@ -1000,7 +1000,7 @@ public class CollectionsTest {
     }
 
     @Test
-    public void shouldEditCollectionConcurrently() throws IOException, InterruptedException {
+    public void shouldEditCollectionConcurrently() throws Exception {
 
         // Given
         // A collection

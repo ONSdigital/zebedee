@@ -3,14 +3,12 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -147,6 +145,15 @@ public class Collections {
                 || !collection.completeUris().isEmpty()) {
             throw new ConflictException(
                     "This collection can't be approved because it's not empty");
+        }
+
+        // if the collection is release related - get the release page and add links to other pages in release
+        if (collection.isRelease()) {
+            try {
+                collection.populateRelease();
+            } catch (ZebedeeException e) {
+                Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
+            }
         }
 
         // Do any processing of data files

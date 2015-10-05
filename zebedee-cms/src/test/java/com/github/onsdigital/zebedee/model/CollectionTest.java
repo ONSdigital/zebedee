@@ -5,13 +5,12 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -971,6 +970,34 @@ public class CollectionTest {
         assertTrue(result.getDescription().getPublished());
         assertEquals(URI.create(uri), result.getUri());
     }
+
+    @Test
+    public void populateReleaseShouldAddLinksToReleasePageForCollectionContent() throws ZebedeeException, IOException {
+
+        // Given a collection that is associated with a release and has an article
+        String uri = String.format("/releases/%s", Random.id());
+        Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
+        collection.description.releaseUri = uri;
+        collection.associateWithRelease(builder.publisher1.email, release);
+
+        String releaseJsonUri = uri + "/data.json";
+
+        collection.complete(builder.publisher1.email, releaseJsonUri);
+        collection.review(builder.createSession(builder.publisher2), releaseJsonUri);
+
+        ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());
+        FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));
+
+        // When we attempt to populate the release from the collection.
+        Release result = collection.populateRelease();
+
+        // Then the release is now in progress for the collection and the published flag is set to true
+        assertEquals(1, result.getRelatedDocuments().size());
+        assertEquals("My article", result.getRelatedDocuments().get(0).getTitle());
+        assertEquals("/some/uri", result.getRelatedDocuments().get(0).getUri().toString());
+    }
+
+
 
     @Test
     public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws Exception {

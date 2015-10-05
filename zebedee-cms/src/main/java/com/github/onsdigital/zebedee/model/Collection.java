@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.util.ReleasePopulator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -151,11 +152,11 @@ public class Collection {
 
             if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
                 throw new ConflictException(
-                        "Cannot create a collection for this release. It is being edited as part of another collection.");
+                        "Cannot use this release. It is being edited as part of another collection.");
             }
 
             if (release.getDescription().getReleaseDate() == null) {
-                throw new BadRequestException("Could not create collection for release, the release has no release date.");
+                throw new BadRequestException("Could not use this release, the release has no release date.");
             }
 
             collectionDescription.publishDate = release.getDescription().getReleaseDate();
@@ -203,6 +204,27 @@ public class Collection {
 
     private static Release getRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
         Release release = (Release) new ZebedeeReader(zebedee.published.path.toString(), null).getPublishedContent(uri);
+        return release;
+    }
+
+    public Release populateRelease() throws IOException, ZebedeeException {
+
+        if (StringUtils.isEmpty(this.description.releaseUri)) {
+            throw new BadRequestException("This collection is not associated with a release.");
+        }
+
+        Release release = getRelease(this.description.releaseUri, this.zebedee);
+
+        if (release == null) {
+            throw new BadRequestException("This collection is not associated with a release.");
+        }
+
+        release = ReleasePopulator.populate(release, this);
+
+        String uri = release.getUri().toString() + "/data.json";
+        Path releasePath = reviewed.get(uri);
+        FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
+
         return release;
     }
 
@@ -683,6 +705,15 @@ public class Collection {
         FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
 
         return release;
+    }
+
+    /**
+     * Return trie if this collection is associated with a release.
+     *
+     * @return
+     */
+    public boolean isRelease() {
+        return StringUtils.isNotEmpty(this.description.releaseUri);
     }
 }
 

@@ -192,27 +192,6 @@ public class ContentTest {
     }
 
     @Test
-    public void nestedDetailsShouldIgnoreReleasesFolder() throws IOException {
-
-        // Given an instance of content with a releases folder
-        Content content = new Content(basePath);
-        Path releases = basePath.resolve("releases");
-        Files.createDirectory(releases);
-
-        // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails();
-
-        // Then the releases directory will not be in the children.
-        assertNotNull(root);
-
-        for (ContentDetail child : root.children) {
-            if (child.description.title.equals("releases")) {
-                fail();
-            }
-        }
-    }
-
-    @Test
     public void listTimeSeriesDirectoriesShouldReturnListOfTimeseriesDirectories() throws IOException {
 
         // Given an instance of content with a timeseries folder nested under another time

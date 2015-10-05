@@ -243,6 +243,14 @@ public class Content {
             java.util.Collections.sort(detail.children, new Comparator<ContentDetail>() {
                 @Override
                 public int compare(ContentDetail o1, ContentDetail o2) {
+                    if (o1.description.title == null && o2.description.title == null) {
+                        return 0;
+                    }
+
+                    if (o1.description.title == null ^ o2.description.title == null) {
+                        return (o1.description.title == null) ? -1 : 1;
+                    }
+
                     return o1.description.title.compareTo(o2.description.title);
                 }
             });

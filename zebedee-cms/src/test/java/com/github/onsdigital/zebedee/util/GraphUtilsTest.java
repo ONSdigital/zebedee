@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyLandingPage;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -169,7 +168,7 @@ public class GraphUtilsTest {
     }
 
     @Test
-    public void graphUtilsShouldIdentifyProductPage() throws IOException {
+    public void graphUtilsShouldIdentifyProductPage() throws Exception {
         // With
         // The Basic zebedee setup
         Builder bob = new Builder(GraphUtils.class, ResourceUtils.getPath("/bootstraps/basic"));

@@ -107,7 +107,11 @@ public class Collections {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path path : stream) {
                 if (Files.isDirectory(path)) {
-                    result.add(new Collection(path, zebedee));
+                    try {
+                        result.add(new Collection(path, zebedee));
+                    } catch (CollectionNotFoundException e) {
+                        Log.print(e, "Failed to deserialise collection with path %s", path.toString());
+                    }
                 }
             }
         }

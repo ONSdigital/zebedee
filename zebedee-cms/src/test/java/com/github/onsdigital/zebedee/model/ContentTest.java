@@ -5,6 +5,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.util.Librarian;
@@ -247,7 +248,7 @@ public class ContentTest {
     }
 
     @Test
-         public void moveBulletinShouldShiftDirectory() throws IOException {
+    public void moveBulletinShouldShiftDirectory() throws IOException, CollectionNotFoundException {
         // Given
         // a bootstrapped version of zebedee
         Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));
@@ -264,7 +265,7 @@ public class ContentTest {
     }
 
     @Test
-    public void moveBulletinShouldRemoveOldDirectory() throws IOException {
+    public void moveBulletinShouldRemoveOldDirectory() throws IOException, CollectionNotFoundException {
         // Given
         // a bootstrapped version of zebedee
         Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));
@@ -281,7 +282,7 @@ public class ContentTest {
     }
 
     @Test
-    public void moveBulletinShouldUpdateLinks() throws IOException {
+    public void moveBulletinShouldUpdateLinks() throws IOException, CollectionNotFoundException {
         // Given
         // a bootstrapped version of zebedee
         Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));

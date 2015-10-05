@@ -55,7 +55,7 @@ public class Collection {
      * @param zebedee The containing {@link Zebedee}.
      * @throws IOException
      */
-    public Collection(Path path, Zebedee zebedee) throws IOException {
+    public Collection(Path path, Zebedee zebedee) throws IOException, CollectionNotFoundException {
 
         // Validate the directory:
         this.path = path;
@@ -67,7 +67,7 @@ public class Collection {
                 path.getFileName() + ".json");
         if (!Files.exists(reviewed) || !Files.exists(inProgress) || !Files.exists(complete)
                 || !Files.exists(description)) {
-            throw new IllegalArgumentException(
+            throw new CollectionNotFoundException(
                     "This doesn't look like a collection folder: "
                             + path.toAbsolutePath());
         }
@@ -98,7 +98,7 @@ public class Collection {
 //        redirect = this.inProgress.redirect;
     }
 
-    Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException {
+    Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, CollectionNotFoundException {
         this(zebedee.collections.path.resolve(PathUtils.toFilename(collectionDescription.name)), zebedee);
     }
 
@@ -175,7 +175,7 @@ public class Collection {
      * @throws IOException
      */
     public static Collection rename(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
-            throws IOException {
+            throws IOException, CollectionNotFoundException {
 
         String filename = PathUtils.toFilename(collectionDescription.name);
         String newFilename = PathUtils.toFilename(newName);

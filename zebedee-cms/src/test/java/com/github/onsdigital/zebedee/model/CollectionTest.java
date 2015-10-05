@@ -126,7 +126,7 @@ public class CollectionTest {
         assertEquals(collectionDescription.publishDate, renamedCollectionDescription.publishDate);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = CollectionNotFoundException.class)
     public void shouldNotInstantiateInInvalidFolder() throws Exception {
 
         // Given

@@ -31,11 +31,13 @@ public class ReleasePopulator {
     private static void addPageDetailToRelease(Release release, ContentDetail contentDetail) {
         if (contentDetail.type.equals(PageType.article.toString())
                 || contentDetail.type.equals(PageType.bulletin.toString())) {
+            Log.print("Adding document: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
             addRelatedDocument(release, contentDetail);
         }
 
         if (contentDetail.type.equals(PageType.dataset.toString())
                 || contentDetail.type.equals(PageType.timeseries_dataset.toString())) {
+            Log.print("Adding dataset: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
             addRelatedDataset(release, contentDetail);
         }
     }

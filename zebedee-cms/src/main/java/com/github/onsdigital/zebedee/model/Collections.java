@@ -149,6 +149,7 @@ public class Collections {
 
         // if the collection is release related - get the release page and add links to other pages in release
         if (collection.isRelease()) {
+            Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
                 collection.populateRelease();
             } catch (ZebedeeException e) {

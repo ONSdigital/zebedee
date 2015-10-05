@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -214,6 +215,7 @@ public class Collection {
         }
 
         Release release = getRelease(this.description.releaseUri, this.zebedee);
+        Log.print("Release identified for collection %s: %s", this.description.name, release.getDescription().getTitle());
 
         if (release == null) {
             throw new BadRequestException("This collection is not associated with a release.");

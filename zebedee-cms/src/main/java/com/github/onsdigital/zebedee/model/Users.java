@@ -6,11 +6,13 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.UserList;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -280,5 +282,24 @@ public class Users {
         return StringUtils.lowerCase(StringUtils.trim(email));
     }
 
+    /**
+     * Return a collection of all users registered in the system
+     *
+     * @return
+     */
+    public UserList list() throws IOException {
+        UserList result = new UserList();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(users)) {
+            for (Path path : stream) {
+                if (!Files.isDirectory(path)) {
+                    try (InputStream input = Files.newInputStream(path)) {
+                        User user = Serialiser.deserialise(input, User.class);
+                        result.add(user);
+                    }
+                }
+            }
+        }
 
+        return result;
+    }
 }

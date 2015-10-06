@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
@@ -358,7 +359,7 @@ public class UsersTest {
     }
 
     @Test
-    public void shouldSetPassword() throws Exception {
+    public void shouldSetPasswordIfAdmin() throws Exception {
 
         // Given
         // An existing user and an administrator session
@@ -368,7 +369,10 @@ public class UsersTest {
 
         // When
         // We set the password
-        boolean result = zebedee.users.setPassword(email, newPassword, adminSession);
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+        credentials.password = newPassword;
+        boolean result = zebedee.users.setPassword(adminSession, credentials);
 
         // Then
         // Authentication should succeed with the new password
@@ -377,17 +381,42 @@ public class UsersTest {
     }
 
     @Test
+    public void shouldSetPasswordIfSelf() throws Exception {
+
+        // Given
+        // An existing user and an administrator session
+        String email = "patricia@example.com";
+        String newPassword = Random.password(8);
+        Session selfSession = builder.createSession("patricia@example.com");
+
+        // When
+        // We set the password
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+        credentials.password = newPassword;
+        boolean result = zebedee.users.setPassword(selfSession, credentials);
+
+        // Then
+        // Authentication should succeed with the new password
+        assertTrue(result);
+        assertTrue(zebedee.users.authenticate(email, newPassword));
+    }
+
+    @Test(expected = UnauthorizedException.class)
     public void shouldNotSetPasswordIfNotAdmin() throws Exception {
 
         // Given
         // An existing user and a non-administrator session
         String email = "patricia@example.com";
         String newPassword = Random.password(8);
-        Session nonAdminSession = builder.createSession("patricia@example.com");
+        Session nonAdminSession = builder.createSession("bernard@example.com");
 
         // When
         // We attempt to set the password
-        boolean result = zebedee.users.setPassword(email, newPassword, nonAdminSession);
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+        credentials.password = newPassword;
+        boolean result = zebedee.users.setPassword(nonAdminSession, credentials);
 
         // Then
         // Authentication should not succeed with the new password because it hasn't been changed

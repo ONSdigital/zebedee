@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,16 +12,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class RedirectTableChainedTest {
     Zebedee zebedee;
     Builder bob;
 
     @Before
-    public void setupTests() throws IOException {
+    public void setupTests() throws IOException, CollectionNotFoundException {
         // Create a setup from
         bob = new Builder(RedirectTableChainedTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         zebedee = new Zebedee(bob.zebedee);

@@ -4,13 +4,15 @@ import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.UserList;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -28,6 +30,30 @@ public class UsersTest {
     @After
     public void tearDown() throws Exception {
         builder.delete();
+    }
+
+    @Test
+    public void shouldListUsers() throws IOException {
+        // Given
+        // The users created by Builder
+        String email = "patricia@example.com";
+        String name = "Patricia Pumpkin";
+
+        // When
+        UserList users = zebedee.users.list();
+
+        // Then
+        assertNotNull(users);
+        assertTrue(users.size() > 0);
+
+        boolean userFound = false;
+        for (User user : users) {
+            if (user.name.equals(name)
+                    && user.email.equals(email)) {
+                userFound = true;
+            }
+        }
+        assertTrue(userFound);
     }
 
     @Test

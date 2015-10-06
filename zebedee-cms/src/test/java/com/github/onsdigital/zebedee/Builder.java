@@ -1,23 +1,19 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.poi.util.IOUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +29,7 @@ import java.util.*;
  */
 public class Builder {
 
+    static int teamId;
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
     public String[] teamNames = {"Economy Team", "Labour Market Team"};
     public Path parent;
@@ -40,7 +37,6 @@ public class Builder {
     public List<Path> collections;
     public List<String> teams;
     public List<String> contentUris;
-
     public User administrator;
     public User publisher1;
     public User publisher2;
@@ -55,7 +51,7 @@ public class Builder {
      * @param name
      * @throws IOException
      */
-    public Builder(Class<?> name) throws IOException {
+    public Builder(Class<?> name) throws IOException, CollectionNotFoundException {
         Root.env = new HashMap<>();
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
@@ -190,7 +186,7 @@ public class Builder {
      * @param bootStrap
      * @throws IOException
      */
-    public Builder(Class<?> name, Path bootStrap) throws IOException {
+    public Builder(Class<?> name, Path bootStrap) throws IOException, CollectionNotFoundException {
         this(name);
 
         FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
@@ -217,8 +213,6 @@ public class Builder {
         ids.add(team.id);
         return ids;
     }
-
-    static int teamId;
 
     private Team createTeam(User user, String name, Path teams) throws IOException {
         Team team = new Team();

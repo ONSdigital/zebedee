@@ -5,6 +5,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.util.Librarian;
@@ -192,27 +193,6 @@ public class ContentTest {
     }
 
     @Test
-    public void nestedDetailsShouldIgnoreReleasesFolder() throws IOException {
-
-        // Given an instance of content with a releases folder
-        Content content = new Content(basePath);
-        Path releases = basePath.resolve("releases");
-        Files.createDirectory(releases);
-
-        // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails();
-
-        // Then the releases directory will not be in the children.
-        assertNotNull(root);
-
-        for (ContentDetail child : root.children) {
-            if (child.description.title.equals("releases")) {
-                fail();
-            }
-        }
-    }
-
-    @Test
     public void listTimeSeriesDirectoriesShouldReturnListOfTimeseriesDirectories() throws IOException {
 
         // Given an instance of content with a timeseries folder nested under another time
@@ -268,7 +248,7 @@ public class ContentTest {
     }
 
     @Test
-         public void moveBulletinShouldShiftDirectory() throws IOException {
+    public void moveBulletinShouldShiftDirectory() throws IOException, CollectionNotFoundException {
         // Given
         // a bootstrapped version of zebedee
         Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));
@@ -285,7 +265,7 @@ public class ContentTest {
     }
 
     @Test
-    public void moveBulletinShouldRemoveOldDirectory() throws IOException {
+    public void moveBulletinShouldRemoveOldDirectory() throws IOException, CollectionNotFoundException {
         // Given
         // a bootstrapped version of zebedee
         Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));
@@ -302,7 +282,7 @@ public class ContentTest {
     }
 
     @Test
-    public void moveBulletinShouldUpdateLinks() throws IOException {
+    public void moveBulletinShouldUpdateLinks() throws IOException, CollectionNotFoundException {
         // Given
         // a bootstrapped version of zebedee
         Builder bob = new Builder(ContentTest.class, ResourceUtils.getPath("/bootstraps/basic"));

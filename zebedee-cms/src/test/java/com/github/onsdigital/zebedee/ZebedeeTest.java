@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
@@ -128,7 +129,7 @@ public class ZebedeeTest {
 	}
 
 	@Test
-	public void shouldPublish() throws IOException {
+	public void shouldPublish() throws IOException, CollectionNotFoundException {
 
 		// Given
 		// There is content ready to be published:
@@ -147,7 +148,7 @@ public class ZebedeeTest {
 	}
 
 	@Test
-	public void shouldNotPublishIfAnythingInProgress() throws IOException {
+	public void shouldNotPublishIfAnythingInProgress() throws IOException, CollectionNotFoundException {
 
 		// Given
 		// There is content ready to be published:
@@ -166,7 +167,7 @@ public class ZebedeeTest {
 	}
 
     @Test
-    public void shouldDeleteCollectionAfterPublish() throws IOException {
+	public void shouldDeleteCollectionAfterPublish() throws IOException, CollectionNotFoundException {
 
         // Given
         // There is content ready to be published:

@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.UserList;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -30,12 +31,11 @@ public class Users {
      * @return A {@link User} object.
      */
     @GET
-    public User read(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String email = request.getParameter("email");
         if (StringUtils.isBlank(email)) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return null;
+            return removePasswordHash(Root.zebedee.users.list());
         }
 
         User result = Root.zebedee.users.get(email);
@@ -127,5 +127,12 @@ public class Users {
             user.passwordHash = null;
         }
         return user;
+    }
+
+    private UserList removePasswordHash(UserList users) {
+        for (User user : users) {
+            removePasswordHash(user);
+        }
+        return users;
     }
 }

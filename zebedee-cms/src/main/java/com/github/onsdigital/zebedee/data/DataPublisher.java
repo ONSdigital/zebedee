@@ -205,10 +205,11 @@ public class DataPublisher {
         }
     }
 
+    // standardise by making all upper case
     static String datasetIdFromDatafilePath(Path path) {
         String[] sections = path.toString().split("/");
         sections = sections[sections.length - 1].split("\\.");
-        return sections[0];
+        return sections[0].toUpperCase();
     }
 
     static String uriForSeriesInDataset(String datasetUri, TimeSeries series) {
@@ -406,12 +407,9 @@ public class DataPublisher {
             }
         }
         if (datasetIsNew) {
-            page.sourceDatasets.add(datasetPage.getDescription().getDatasetId());
+            page.sourceDatasets.add(datasetPage.getDescription().getDatasetId().toUpperCase());
         }
 
-//        // Fix the breadcrumb
-//        page.setBreadcrumb(datasetPage.getBreadcrumb());
-        ;
         return page;
     }
 
@@ -791,8 +789,11 @@ public class DataPublisher {
             csdbSection.setCdids(new ArrayList<String>());
 
             // Get a name for the xlsx/csv files to be generated
+            //if (dataset.getDescription().getDatasetId() == null) {
+                dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
+            //}
             String filePrefix = dataset.getDescription().getDatasetId();
-            if (filePrefix.equalsIgnoreCase("")) {filePrefix = DEFAULT_FILE;}
+            if (filePrefix.equalsIgnoreCase("")) { filePrefix = DEFAULT_FILE; }
 
             DownloadSection xlsxSection = new DownloadSection();
             xlsxSection.setTitle("xlsx download");
@@ -801,10 +802,6 @@ public class DataPublisher {
             DownloadSection csvSection = new DownloadSection();
             csvSection.setTitle("csv download");
             csvSection.setFile(datasetUri + "/" + filePrefix.toLowerCase() + ".csv");
-
-            if (dataset.getDescription().getDatasetId() == null) {
-                dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
-            }
 
             // Break down the csdb file to timeseries (part-built by extracting csdb files)
             TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"));

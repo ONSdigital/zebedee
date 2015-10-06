@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
@@ -9,6 +11,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -21,7 +24,7 @@ import java.io.IOException;
 public class Users {
 
     /**
-     * Allows you to read the details of a user account.
+     * Allows you to read the details of user accounts.
      * @param request Expects an "email" get parameter.
      * @param response <ul>
      *                      <li>The user details with the password hash removed.</li>
@@ -31,20 +34,15 @@ public class Users {
      * @return A {@link User} object.
      */
     @GET
-    public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException {
 
         String email = request.getParameter("email");
         if (StringUtils.isBlank(email)) {
-            return removePasswordHash(Root.zebedee.users.list());
+            return Root.zebedee.users.getUserList(request, response);
+        } else {
+            return Root.zebedee.users.get(request, response, email);
         }
 
-        User result = Root.zebedee.users.get(email);
-
-        if (result == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-        }
-
-        return removePasswordHash(result);
     }
 
     /**
@@ -98,6 +96,11 @@ public class Users {
      */
     @PUT
     public User update(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.isAdministrator(session.email) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return null;
+        }
 
         if (!Root.zebedee.users.exists(user)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
@@ -118,6 +121,41 @@ public class Users {
 
 
         return removePasswordHash(updated);
+    }
+
+    /**
+     * Allows you to delete a user account.
+     * @param request Expects an "email" get parameter.
+     * @param response <ul>
+     *                      <li>The user details with the password hash removed.</li>
+     *                      <li>If no email parameter is provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                      <li>if no user exists for the giver email:  {@link HttpStatus#NOT_FOUND_404}</li>
+     *                      </ul>
+     * @return A {@link User} object.
+     */
+    @DELETE
+    public User delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.isAdministrator(session.email) == false) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return null;
+        }
+
+        String email = request.getParameter("email");
+        if (StringUtils.isBlank(email)) {
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            return null;
+        }
+
+        User result = Root.zebedee.users.get(email);
+        if (result == null) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+        }
+
+
+
+        return removePasswordHash(result);
     }
 
     private User removePasswordHash(User user) {

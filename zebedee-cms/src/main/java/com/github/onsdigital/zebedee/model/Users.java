@@ -3,12 +3,17 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.http.HttpStatus;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -87,6 +92,59 @@ public class Users {
             user = Serialiser.deserialise(input, User.class);
         }
 
+        return user;
+    }
+
+    /**
+     * Gets the record for an existing user.
+     *
+     * @param email The user's email in order to locate the user record.
+     * @return The requested user, unless the email is blank or no record exists for this email.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public User get(HttpServletRequest request,
+                    HttpServletResponse response,
+                    String email) throws IOException, NotFoundException, BadRequestException {
+
+        // Check email isn't blank (though this should redirect to userlist)
+        if (StringUtils.isBlank(email)) {
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            throw new BadRequestException("User email cannot be blank");
+        }
+
+        // Check user exists
+        if (!exists(email)) {
+            response.setStatus(HttpStatus.NOT_FOUND_404);
+            throw new NotFoundException("User for email " + email + " not found");
+        }
+
+        // Now deserialise the json to a user:
+        User user;
+        Path userPath = userPath(email);
+        try (InputStream input = Files.newInputStream(userPath)) {
+            user = Serialiser.deserialise(input, User.class);
+        }
+
+        return removePasswordHash(user);
+    }
+
+    public UserList getUserList(HttpServletRequest request,
+                                HttpServletResponse response) throws IOException {
+        return removePasswordHash(zebedee.users.list());
+    }
+
+    private UserList removePasswordHash(UserList users) {
+        for (User user : users) {
+            removePasswordHash(user);
+        }
+        return users;
+    }
+    private User removePasswordHash(User user) {
+        if (user != null) {
+            // Blank out the password hash.
+            // Not strictly necessary, but sensible.
+            user.passwordHash = null;
+        }
         return user;
     }
 

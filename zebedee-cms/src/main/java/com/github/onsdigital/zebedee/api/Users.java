@@ -1,8 +1,11 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
@@ -59,25 +62,9 @@ public class Users {
      * @throws IOException
      */
     @POST
-    public User create(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
+    public User create(HttpServletRequest request, HttpServletResponse response, User user) throws IOException, ConflictException, BadRequestException, UnauthorizedException {
 
-        Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.isAdministrator(session.email) == false) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return null;
-        }
-
-        if (Root.zebedee.users.exists(user)) {
-            response.setStatus(HttpStatus.CONFLICT_409);
-            return null;
-        }
-
-
-        User created = Root.zebedee.users.create(user);
-
-        if (created == null) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-        }
+        User created = Root.zebedee.users.create(request, response, user);
 
         return removePasswordHash(created);
     }

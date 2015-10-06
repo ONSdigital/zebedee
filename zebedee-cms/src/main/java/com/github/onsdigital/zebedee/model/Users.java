@@ -3,7 +3,9 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
@@ -36,7 +38,7 @@ public class Users {
     }
 
     /**
-     * Creates a user. This is used to create the initial administrator user when the system is set up.
+     * Creates a user.
      *
      * @param zebedee  A {@link Zebedee} instance.
      * @param user     The details of the {@link User} to be created.
@@ -44,7 +46,6 @@ public class Users {
      * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
-
     public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException {
         user.passwordHash = Password.hash(password);
         zebedee.users.write(user);
@@ -96,11 +97,15 @@ public class Users {
     }
 
     /**
-     * Gets the record for an existing user.
+     * Gets the record for an existing user to be used by api get requests
      *
-     * @param email The user's email in order to locate the user record.
-     * @return The requested user, unless the email is blank or no record exists for this email.
-     * @throws IOException If a filesystem error occurs.
+     * @param request
+     * @param response
+     * @param email the user email
+     * @return
+     * @throws IOException - if a filesystem error occurs
+     * @throws NotFoundException - if the email cannot be found
+     * @throws BadRequestException - if the email is left blank
      */
     public User get(HttpServletRequest request,
                     HttpServletResponse response,
@@ -175,6 +180,48 @@ public class Users {
     }
 
     /**
+     * Creates a new user.
+     *
+     * @param user The specification for the new user to be created. The name and email will be used.
+     * @return The newly created user, unless a user already exists, or the supplied {@link com.github.onsdigital.zebedee.json.User} is not valid.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public User create(HttpServletRequest request,
+                       HttpServletResponse response,
+                       User user) throws UnauthorizedException, IOException, ConflictException, BadRequestException {
+        // Check the user has create permissions
+        Session session = zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.isAdministrator(session) == false) {
+            throw new UnauthorizedException("This account is not permitted to create users.");
+        }
+
+
+        if (Root.zebedee.users.exists(user)) {
+            throw new ConflictException("User " + user.email + " already exists");
+        }
+
+        if (!valid(user)) {
+            throw new BadRequestException("Insufficient user details given");
+        }
+
+        User result = null;
+
+        result = new User();
+        result.email = user.email;
+        result.name = user.name;
+        result.inactive = true;
+        result.temporaryPassword = true;
+        result.lastAdmin = session.email;
+
+        Path userPath = userPath(result.email);
+        try (OutputStream output = Files.newOutputStream(userPath)) {
+            Serialiser.serialise(output, result);
+        }
+
+        return result;
+    }
+
+    /**
      * Updates the specified {@link com.github.onsdigital.zebedee.json.User}.
      * NB this does not allow you to update the email address, because
      * that would entail renaming the Json file that contains the user record.
@@ -189,6 +236,34 @@ public class Users {
         if (exists(user)) {
 
             result = get(user.email);
+            if (StringUtils.isNotBlank(user.name))
+                result.name = user.name;
+            if (user.inactive != null)
+                result.inactive = user.inactive;
+
+            write(result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Updates the specified {@link com.github.onsdigital.zebedee.json.User}.
+     * NB this does not allow you to update the email address, because
+     * that would entail renaming the Json file that contains the user record.
+     *
+     * @param user The user record to be updated
+     * @return The updated record.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public User update(HttpServletRequest request,
+                       HttpServletResponse response,
+                       User user) throws IOException, NotFoundException, BadRequestException {
+
+        User result = null;
+        if (exists(user)) {
+
+            result = get(request, response, user.email);
             if (StringUtils.isNotBlank(user.name))
                 result.name = user.name;
             if (user.inactive != null)

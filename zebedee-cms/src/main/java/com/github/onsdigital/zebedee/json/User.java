@@ -19,6 +19,9 @@ public class User {
      */
     public Boolean inactive;
 
+    public Boolean temporaryPassword;
+    public String lastAdmin;
+
     @Override
     public String toString() {
         return name + ", "+ email + (BooleanUtils.isTrue(inactive)?" (inactive)":"");

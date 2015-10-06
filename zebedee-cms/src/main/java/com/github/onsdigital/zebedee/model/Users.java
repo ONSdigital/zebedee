@@ -130,20 +130,15 @@ public class Users {
             user = Serialiser.deserialise(input, User.class);
         }
 
-        return removePasswordHash(user);
+        return user;
     }
 
     public UserList getUserList(HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        return removePasswordHash(zebedee.users.list());
+        return zebedee.users.list();
     }
 
-    private UserList removePasswordHash(UserList users) {
-        for (User user : users) {
-            removePasswordHash(user);
-        }
-        return users;
-    }
+
     private User removePasswordHash(User user) {
         if (user != null) {
             // Blank out the password hash.
@@ -248,31 +243,73 @@ public class Users {
     }
 
     /**
-     * Updates the specified {@link com.github.onsdigital.zebedee.json.User}.
-     * NB this does not allow you to update the email address, because
-     * that would entail renaming the Json file that contains the user record.
+     * Update user details
      *
-     * @param user The user record to be updated
-     * @return The updated record.
-     * @throws IOException If a filesystem error occurs.
+     * At present user email cannot be updated
+     *
+     * @param request - requires an admin session
+     * @param response
+     * @param user - a user object with the new details
+     * @return
+     * @throws IOException
+     * @throws UnauthorizedException - Session does not have update permissions
+     * @throws NotFoundException - user account does not exist
+     * @throws BadRequestException - problem with the update
      */
     public User update(HttpServletRequest request,
                        HttpServletResponse response,
-                       User user) throws IOException, NotFoundException, BadRequestException {
+                       User user) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
-        User result = null;
-        if (exists(user)) {
-
-            result = get(request, response, user.email);
-            if (StringUtils.isNotBlank(user.name))
-                result.name = user.name;
-            if (user.inactive != null)
-                result.inactive = user.inactive;
-
-            write(result);
+        Session session = zebedee.sessions.get(request);
+        if (zebedee.permissions.isAdministrator(session.email) == false) {
+            throw new UnauthorizedException("Administrator permissions required");
         }
 
-        return result;
+        if (!zebedee.users.exists(user)) {
+            throw new NotFoundException("User " + user.email + " could not be updated");
+        }
+
+        User updated = null;
+        updated = update(user);
+
+        // We'll allow changing the email at some point.
+        // It entails renaming the json file and checking
+        // that the new email doesn't already exist.
+        if (updated == null) {
+            throw new BadRequestException("Unknown bad request exception");
+        }
+
+        return updated;
+    }
+
+    /**
+     * Delete a user account
+     *
+     * @param request - requires an admin session
+     * @param response
+     * @param user - a user object to delete
+     * @return
+     * @throws UnauthorizedException
+     * @throws IOException
+     * @throws NotFoundException
+     */
+    public boolean delete(HttpServletRequest request,
+                       HttpServletResponse response,
+                       User user) throws IOException, UnauthorizedException, NotFoundException {
+
+        Session session = zebedee.sessions.get(request);
+        if (zebedee.permissions.isAdministrator(session.email) == false) {
+            throw new UnauthorizedException("Administrator permissions required");
+        }
+
+        if (!zebedee.users.exists(user)) {
+            throw new NotFoundException("User " + user.email + " does not exist");
+        }
+
+        Path path = userPath(user.email);
+        Files.deleteIfExists(path);
+
+        return true;
     }
 
     /**

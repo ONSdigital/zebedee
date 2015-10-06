@@ -27,39 +27,46 @@ import java.io.IOException;
 public class Users {
 
     /**
-     * Allows you to read the details of user accounts.
-     * @param request Expects an "email" get parameter.
-     * @param response <ul>
-     *                      <li>The user details with the password hash removed.</li>
-     *                      <li>If no email parameter is provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      <li>if no user exists for the giver email:  {@link HttpStatus#NOT_FOUND_404}</li>
-     *                      </ul>
-     * @return A {@link User} object.
+     * Get a user or list of users
+     *
+     * Users are returned without password details
+     *
+     * @param request for a single user should include ?email=... parameter
+     * @param response
+     * @return a user with password removed
+     *
+     * @throws IOException
+     * @throws NotFoundException - user email not found
+     * @throws BadRequestException
      */
     @GET
     public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException {
 
         String email = request.getParameter("email");
+
+        // If email is empty
         if (StringUtils.isBlank(email)) {
-            return Root.zebedee.users.getUserList(request, response);
+            return removePasswordHash( Root.zebedee.users.getUserList(request, response) );
         } else {
-            return Root.zebedee.users.get(request, response, email);
+            return removePasswordHash( Root.zebedee.users.get(request, response, email) );
         }
 
     }
 
     /**
-     * Create a new user. The user will be created as inactive and no password will be set. Use {@link Password} to complete account setup.
+     * Create a new user with basic info
      *
-     * @param request Should contain a {@link User} Json message for the account details.
-     * @param response <ul>
-     *                      <li>The {@link User} that was created.</li>
-     *                      <li>if the user (i.e. email) already exists:  {@link HttpStatus#CONFLICT_409}</li>
-     *                      <li>if the user can't be created:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      </ul>
-     * @param user The {@link User} Json message for the account details.
-     * @return The {@link User} that was created.
-     * @throws IOException
+     * The user will be inactive until password details are assigned
+     *
+     * @param request Expects session details
+     * @param response
+     * @param user user details to create (requires name and email)
+     * @return the new user
+     *
+     * @throws IOException - for general file system errors
+     * @throws ConflictException - if user already exists
+     * @throws BadRequestException - if insufficient user information is given
+     * @throws UnauthorizedException - if the session does not have admin rights
      */
     @POST
     public User create(HttpServletRequest request, HttpServletResponse response, User user) throws IOException, ConflictException, BadRequestException, UnauthorizedException {
@@ -70,79 +77,42 @@ public class Users {
     }
 
     /**
-     * Update details of a user account. NB it's not currently possible to change a user's email address.
-     * @param request Should contain a {@link User} Json message for the account details.
-     * @param response <ul>
-     *                      <li>The {@link User} that was updated.</li>
-     *                      <li>if the user (i.e. email) doesn't exist:  {@link HttpStatus#NOT_FOUND_404}</li>
-     *                      <li>if the user can't be updated: {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      </ul>
-     * @param user The {@link User} Json message containing updated account details.
-     * @return The {@link User} that was updated.
+     * Update user details
+     *
+     * At present user email cannot be updated
+     *
+     * @param request - requires an admin session
+     * @param response
+     * @param user - a user object with the new details
+     * @return
      * @throws IOException
+     * @throws UnauthorizedException - Session does not have update permissions
+     * @throws NotFoundException - user account does not exist
+     * @throws BadRequestException - problem with the update
      */
     @PUT
-    public User update(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
-        Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.isAdministrator(session.email) == false) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return null;
-        }
+    public User update(HttpServletRequest request, HttpServletResponse response, User user) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
 
-        if (!Root.zebedee.users.exists(user)) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return null;
-        }
-
-        User updated = null;
-
-        updated = Root.zebedee.users.update(user);
-
-        // We'll allow changing the email at some point.
-        // It entails renaming the json file and checking
-        // that the new email doesn't already exist.
-
-        if (updated == null) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-        }
-
+        User updated = Root.zebedee.users.update(request, response, user);
 
         return removePasswordHash(updated);
     }
 
     /**
-     * Allows you to delete a user account.
-     * @param request Expects an "email" get parameter.
-     * @param response <ul>
-     *                      <li>The user details with the password hash removed.</li>
-     *                      <li>If no email parameter is provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      <li>if no user exists for the giver email:  {@link HttpStatus#NOT_FOUND_404}</li>
-     *                      </ul>
-     * @return A {@link User} object.
+     * Delete a user account
+     *
+     * @param request - requires an admin session
+     * @param response
+     * @param user - a user object to delete
+     * @return
+     * @throws UnauthorizedException
+     * @throws IOException
+     * @throws NotFoundException
      */
     @DELETE
-    public User delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public boolean delete(HttpServletRequest request, HttpServletResponse response, User user) throws UnauthorizedException, IOException, NotFoundException {
 
-        Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.isAdministrator(session.email) == false) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return null;
-        }
-
-        String email = request.getParameter("email");
-        if (StringUtils.isBlank(email)) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
-            return null;
-        }
-
-        User result = Root.zebedee.users.get(email);
-        if (result == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-        }
-
-
-
-        return removePasswordHash(result);
+        return Root.zebedee.users.delete(request, response, user);
     }
 
     private User removePasswordHash(User user) {

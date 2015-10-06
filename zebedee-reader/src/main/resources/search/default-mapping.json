@@ -13,6 +13,7 @@
         "properties": {
           "title": {
             "type": "string",
+            "norms": { "enabled": false },
             "index_analyzer": "ons_index_analyzer",
             "fields": {
               "title_raw": {
@@ -22,18 +23,22 @@
           },
           "edition": {
             "type": "string",
+            "norms": { "enabled": false },
             "index_analyzer": "ons_index_analyzer"
           },
           "metaDescription": {
             "type": "string",
+            "norms": { "enabled": false },
             "index_analyzer": "ons_index_analyzer"
           },
           "summary": {
             "type": "string",
+            "norms": { "enabled": false },
             "index_analyzer": "ons_index_analyzer"
           },
           "keywords": {
             "type": "string",
+            "norms": { "enabled": false },
             "index_analyzer": "ons_index_analyzer",
             "fields": {
               "keywords_raw": {

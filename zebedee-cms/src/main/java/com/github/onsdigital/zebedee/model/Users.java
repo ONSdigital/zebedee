@@ -99,27 +99,23 @@ public class Users {
     /**
      * Gets the record for an existing user to be used by api get requests
      *
-     * @param request
-     * @param response
+     * @param session a user session
      * @param email the user email
      * @return
      * @throws IOException - if a filesystem error occurs
      * @throws NotFoundException - if the email cannot be found
      * @throws BadRequestException - if the email is left blank
      */
-    public User get(HttpServletRequest request,
-                    HttpServletResponse response,
+    public User get(Session session,
                     String email) throws IOException, NotFoundException, BadRequestException {
 
         // Check email isn't blank (though this should redirect to userlist)
         if (StringUtils.isBlank(email)) {
-            response.setStatus(HttpStatus.BAD_REQUEST_400);
             throw new BadRequestException("User email cannot be blank");
         }
 
         // Check user exists
         if (!exists(email)) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
             throw new NotFoundException("User for email " + email + " not found");
         }
 
@@ -133,8 +129,7 @@ public class Users {
         return user;
     }
 
-    public UserList getUserList(HttpServletRequest request,
-                                HttpServletResponse response) throws IOException {
+    public UserList getUserList(Session session) throws IOException {
         return zebedee.users.list();
     }
 
@@ -181,15 +176,13 @@ public class Users {
      * @return The newly created user, unless a user already exists, or the supplied {@link com.github.onsdigital.zebedee.json.User} is not valid.
      * @throws IOException If a filesystem error occurs.
      */
-    public User create(HttpServletRequest request,
-                       HttpServletResponse response,
+    public User create(Session session,
                        User user) throws UnauthorizedException, IOException, ConflictException, BadRequestException {
+
         // Check the user has create permissions
-        Session session = zebedee.sessions.get(request);
         if (Root.zebedee.permissions.isAdministrator(session) == false) {
             throw new UnauthorizedException("This account is not permitted to create users.");
         }
-
 
         if (Root.zebedee.users.exists(user)) {
             throw new ConflictException("User " + user.email + " already exists");
@@ -247,8 +240,7 @@ public class Users {
      *
      * At present user email cannot be updated
      *
-     * @param request - requires an admin session
-     * @param response
+     * @param session
      * @param user - a user object with the new details
      * @return
      * @throws IOException
@@ -256,11 +248,9 @@ public class Users {
      * @throws NotFoundException - user account does not exist
      * @throws BadRequestException - problem with the update
      */
-    public User update(HttpServletRequest request,
-                       HttpServletResponse response,
+    public User update(Session session,
                        User user) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
-        Session session = zebedee.sessions.get(request);
         if (zebedee.permissions.isAdministrator(session.email) == false) {
             throw new UnauthorizedException("Administrator permissions required");
         }
@@ -285,19 +275,15 @@ public class Users {
     /**
      * Delete a user account
      *
-     * @param request - requires an admin session
-     * @param response
+     * @param session - an admin user session
      * @param user - a user object to delete
      * @return
      * @throws UnauthorizedException
      * @throws IOException
      * @throws NotFoundException
      */
-    public boolean delete(HttpServletRequest request,
-                       HttpServletResponse response,
-                       User user) throws IOException, UnauthorizedException, NotFoundException {
+    public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
 
-        Session session = zebedee.sessions.get(request);
         if (zebedee.permissions.isAdministrator(session.email) == false) {
             throw new UnauthorizedException("Administrator permissions required");
         }

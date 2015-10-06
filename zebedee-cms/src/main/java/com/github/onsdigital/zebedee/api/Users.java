@@ -43,12 +43,13 @@ public class Users {
     public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException {
 
         String email = request.getParameter("email");
+        Session session = Root.zebedee.sessions.get(request);
 
         // If email is empty
         if (StringUtils.isBlank(email)) {
-            return removePasswordHash( Root.zebedee.users.getUserList(request, response) );
+            return removePasswordHash( Root.zebedee.users.getUserList(session) );
         } else {
-            return removePasswordHash( Root.zebedee.users.get(request, response, email) );
+            return removePasswordHash( Root.zebedee.users.get(session, email) );
         }
 
     }
@@ -70,8 +71,8 @@ public class Users {
      */
     @POST
     public User create(HttpServletRequest request, HttpServletResponse response, User user) throws IOException, ConflictException, BadRequestException, UnauthorizedException {
-
-        User created = Root.zebedee.users.create(request, response, user);
+        Session session = Root.zebedee.sessions.get(request);
+        User created = Root.zebedee.users.create(session, user);
 
         return removePasswordHash(created);
     }
@@ -92,8 +93,9 @@ public class Users {
      */
     @PUT
     public User update(HttpServletRequest request, HttpServletResponse response, User user) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
+        Session session = Root.zebedee.sessions.get(request);
 
-        User updated = Root.zebedee.users.update(request, response, user);
+        User updated = Root.zebedee.users.update(session, user);
 
         return removePasswordHash(updated);
     }
@@ -112,7 +114,9 @@ public class Users {
     @DELETE
     public boolean delete(HttpServletRequest request, HttpServletResponse response, User user) throws UnauthorizedException, IOException, NotFoundException {
 
-        return Root.zebedee.users.delete(request, response, user);
+        Session session = Root.zebedee.sessions.get(request);
+
+        return Root.zebedee.users.delete(session, user);
     }
 
     private User removePasswordHash(User user) {

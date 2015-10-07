@@ -3,7 +3,12 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
@@ -31,7 +36,7 @@ public class Users {
     }
 
     /**
-     * Creates a user. This is used to create the initial administrator user when the system is set up.
+     * Creates a user.
      *
      * @param zebedee  A {@link Zebedee} instance.
      * @param user     The details of the {@link User} to be created.
@@ -39,7 +44,6 @@ public class Users {
      * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
-
     public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException {
         user.passwordHash = Password.hash(password);
         zebedee.users.write(user);
@@ -91,6 +95,53 @@ public class Users {
     }
 
     /**
+     * Gets the record for an existing user to be used by api get requests
+     *
+     * @param session a user session
+     * @param email the user email
+     * @return
+     * @throws IOException - if a filesystem error occurs
+     * @throws NotFoundException - if the email cannot be found
+     * @throws BadRequestException - if the email is left blank
+     */
+    public User get(Session session,
+                    String email) throws IOException, NotFoundException, BadRequestException {
+
+        // Check email isn't blank (though this should redirect to userlist)
+        if (StringUtils.isBlank(email)) {
+            throw new BadRequestException("User email cannot be blank");
+        }
+
+        // Check user exists
+        if (!exists(email)) {
+            throw new NotFoundException("User for email " + email + " not found");
+        }
+
+        // Now deserialise the json to a user:
+        User user;
+        Path userPath = userPath(email);
+        try (InputStream input = Files.newInputStream(userPath)) {
+            user = Serialiser.deserialise(input, User.class);
+        }
+
+        return user;
+    }
+
+    public UserList getUserList(Session session) throws IOException {
+        return zebedee.users.list();
+    }
+
+
+    private User removePasswordHash(User user) {
+        if (user != null) {
+            // Blank out the password hash.
+            // Not strictly necessary, but sensible.
+            user.passwordHash = null;
+        }
+        return user;
+    }
+
+    /**
      * Creates a new user.
      *
      * @param user The specification for the new user to be created. The name and email will be used.
@@ -111,6 +162,44 @@ public class Users {
             try (OutputStream output = Files.newOutputStream(userPath)) {
                 Serialiser.serialise(output, result);
             }
+        }
+
+        return result;
+    }
+
+    /**
+     * Creates a new user.
+     *
+     * @param user The specification for the new user to be created. The name and email will be used.
+     * @return The newly created user, unless a user already exists, or the supplied {@link com.github.onsdigital.zebedee.json.User} is not valid.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public User create(Session session,
+                       User user) throws UnauthorizedException, IOException, ConflictException, BadRequestException {
+
+        // Check the user has create permissions
+        if (!zebedee.permissions.isAdministrator(session)) {
+            throw new UnauthorizedException("This account is not permitted to create users.");
+        }
+
+        if (zebedee.users.exists(user)) {
+            throw new ConflictException("User " + user.email + " already exists");
+        }
+
+        if (!valid(user)) {
+            throw new BadRequestException("Insufficient user details given");
+        }
+
+        User result = new User();
+        result.email = user.email;
+        result.name = user.name;
+        result.inactive = true;
+        result.temporaryPassword = true;
+        result.lastAdmin = session.email;
+
+        Path userPath = userPath(result.email);
+        try (OutputStream output = Files.newOutputStream(userPath)) {
+            Serialiser.serialise(output, result);
         }
 
         return result;
@@ -140,6 +229,71 @@ public class Users {
         }
 
         return result;
+    }
+
+    /**
+     * Update user details
+     *
+     * At present user email cannot be updated
+     *
+     * @param session
+     * @param user - a user object with the new details
+     * @return
+     * @throws IOException
+     * @throws UnauthorizedException - Session does not have update permissions
+     * @throws NotFoundException - user account does not exist
+     * @throws BadRequestException - problem with the update
+     */
+    public User update(Session session,
+                       User user) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
+
+        if (zebedee.permissions.isAdministrator(session.email) == false) {
+            throw new UnauthorizedException("Administrator permissions required");
+        }
+
+        if (!zebedee.users.exists(user)) {
+            throw new NotFoundException("User " + user.email + " could not be updated");
+        }
+
+        User updated = null;
+        user.lastAdmin = session.email;
+
+        updated = update(user);
+
+        // We'll allow changing the email at some point.
+        // It entails renaming the json file and checking
+        // that the new email doesn't already exist.
+        if (updated == null) {
+            throw new BadRequestException("Unknown bad request exception");
+        }
+
+        return updated;
+    }
+
+    /**
+     * Delete a user account
+     *
+     * @param session - an admin user session
+     * @param user - a user object to delete
+     * @return
+     * @throws UnauthorizedException
+     * @throws IOException
+     * @throws NotFoundException
+     */
+    public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
+
+        if (zebedee.permissions.isAdministrator(session.email) == false) {
+            throw new UnauthorizedException("Administrator permissions required");
+        }
+
+        if (!zebedee.users.exists(user)) {
+            throw new NotFoundException("User " + user.email + " does not exist");
+        }
+
+        Path path = userPath(user.email);
+        Files.deleteIfExists(path);
+
+        return true;
     }
 
     /**
@@ -184,47 +338,58 @@ public class Users {
         return result;
     }
 
-    /**
-     * Sets the specified user's password and sets the account to active.
-     *
-     * @param email    The user ID.
-     * @param password The password to set.
-     * @param session  The logged in session.
-     * @return True if the password was set. If no user exists for the given email address, false.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public boolean setPassword(String email, String password, Session session) throws IOException {
-        boolean result = false;
 
-        // Allow the password to be set for the first administrator with a null session.
-        // After the first administrator is created, always check for an admin session.
-        if (zebedee.permissions.hasAdministrator()) {
+    public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException {
 
-            // Check permissions - must be an administrator to set a password:
-            boolean isAdministrator = zebedee.permissions.isAdministrator(session.email);
-            if (!isAdministrator) {
-                return false;
-            }
+        // Passwords can be changed by ...
+        boolean permissionToChange = false;
+        if (!zebedee.permissions.hasAdministrator() ||                  // anyone if we are setting a brand new password
+                zebedee.permissions.isAdministrator(session.email) ||   // an administrator
+                credentials.email.equalsIgnoreCase(session.email)       // the user themselves
+                ) {
+            permissionToChange = true;
         }
 
-        return setPassword(email, password);
+        if (!permissionToChange) {
+            throw new UnauthorizedException("Passwords must be changed by admins or own user");
+        }
+
+        // Check the request
+        if (credentials == null || !zebedee.users.exists(credentials.email)) {
+            throw new BadRequestException("Please provide credentials (email, password)");
+        }
+
+        return setPassword(credentials.email, credentials.password, session.email);
     }
 
     /**
      * Sets the specified user's password and sets the account to active.
      *
+     * If it is the user changing the password marks it as permanent
+     * If an admin is setting marks the password as temporary
+     *
      * @param email    The user ID.
      * @param password The password to set.
      * @return True if the password was set. If no user exists for the given email address, false.
      * @throws IOException If a filesystem error occurs.
      */
-    private boolean setPassword(String email, String password) throws IOException {
+    private boolean setPassword(String email, String password, String adminEmail) throws IOException {
         boolean result = false;
 
         User user = get(email);
         if (user != null) {
             user.passwordHash = Password.hash(password);
             user.inactive = false;
+
+            // Temporary password
+            if(email.equalsIgnoreCase(adminEmail)) {
+                user.lastAdmin = email;
+                user.temporaryPassword = false;
+            } else {
+                user.lastAdmin = adminEmail;
+                user.temporaryPassword = true;
+            }
+
             write(user);
             result = true;
         }

@@ -4,6 +4,7 @@ import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Credentials;
@@ -449,22 +450,71 @@ public class UsersTest {
         }
         assertFalse(userFound);
     }
-//    @Test
-//    public void shouldChangePassword() throws Exception {
-//
-//        // Given
-//        // An existing user
-//        String email = "patricia@example.com";
-//        User existing = zebedee.users.get(email);
-//        String password = Random.password(8);
-//        String oldHosh = existing.passwordHash;
-//
-//        // When
-//        // We set the new password
-//        boolean result = zebedee.users.changePassword(email, oldPassword, password);
-//
-//        // Then
-//        // Authentication should succeed
-//        assertTrue(zebedee.users.authenticate(email, password));
-//    }
+
+    @Test
+    public void changePassword_ifChangingOwnPassword_shouldNotBeTemporary() throws IOException, UnauthorizedException, BadRequestException {
+        // Given
+        // an existing user
+        String email = "patricia@example.com";
+        Session session = builder.createSession(email);
+
+        // When
+        // password is updated by self
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+        credentials.password = Random.password(8);
+
+        zebedee.users.setPassword(session, credentials);
+
+        // Then
+        // user should be marked not temporary
+        User patricia = zebedee.users.get(email);
+        assertEquals(false, patricia.temporaryPassword);
+        assertEquals(email, patricia.lastAdmin);
+    }
+
+    @Test
+    public void changePassword_ifAdminIsChangingAnotherPassword_shouldBeTemporary() throws IOException, UnauthorizedException, BadRequestException {
+        // Given
+        // an existing user
+        String email = "patricia@example.com";
+        Session adminSession = builder.createSession("jukesie@example.com");
+
+        // When
+        // password is updated by admin
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+        credentials.password = Random.password(8);
+
+        zebedee.users.setPassword(adminSession, credentials);
+
+        // Then
+        // user should be marked temporary
+        User patricia = zebedee.users.get(email);
+        assertEquals(true, patricia.temporaryPassword);
+        assertEquals(adminSession.email, patricia.lastAdmin);
+    }
+
+
+    @Test
+    public void changePassword_ifAdminIsChangingOwnPassword_shouldNotBeTemporary() throws IOException, UnauthorizedException, BadRequestException {
+        // Given
+        // an admin user
+        String email = "jukesie@example.com";
+        Session adminSession = builder.createSession("jukesie@example.com");
+
+        // When
+        // password is updated by admin
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+        credentials.password = Random.password(8);
+
+        zebedee.users.setPassword(adminSession, credentials);
+
+        // Then
+        // user should be marked temporary
+        User jukesie = zebedee.users.get(email);
+        assertEquals(false, jukesie.temporaryPassword);
+        assertEquals(jukesie.email, jukesie.lastAdmin);
+    }
 }

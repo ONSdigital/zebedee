@@ -101,18 +101,19 @@ public class Users {
     /**
      * Delete a user account
      *
-     * @param request - requires an admin session
+     * @param request - requires an admin session - also an email as parameter
      * @param response
-     * @param user - a user object to delete
      * @return
-     * @throws UnauthorizedException
-     * @throws IOException
-     * @throws NotFoundException
+     * @throws UnauthorizedException - user cannot be deleted using this account
+     * @throws IOException - general file io
+     * @throws NotFoundException - user could not be found
      */
     @DELETE
-    public boolean delete(HttpServletRequest request, HttpServletResponse response, User user) throws UnauthorizedException, IOException, NotFoundException {
+    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException {
 
+        String email = request.getParameter("email");
         Session session = Root.zebedee.sessions.get(request);
+        User user = Root.zebedee.users.get(email);
 
         return Root.zebedee.users.delete(session, user);
     }

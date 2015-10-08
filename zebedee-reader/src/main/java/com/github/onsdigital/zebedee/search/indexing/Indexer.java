@@ -54,6 +54,7 @@ public class Indexer {
         if (searchUtils.isIndexAvailable(getElasticSearchIndex())) {
             System.out.println("Elastic search index already exists, skipping reindexing");
         } else {
+            searchUtils.createIndex(getElasticSearchIndex(), getSettings(), getDefaultMapping());
             reload();
         }
     }

@@ -57,7 +57,7 @@ public class Sessions extends TimerTask {
      * be returned.
      * @throws java.io.IOException If a filesystem error occurs.
      */
-    public Session create(String email) throws IOException {
+    public Session create(String email, boolean passwordChangeRequired) throws IOException {
         Session session = null;
 
         if (StringUtils.isNotBlank(email)) {
@@ -70,11 +70,16 @@ public class Sessions extends TimerTask {
                 session = new Session();
                 session.id = Random.id();
                 session.email = email;
+                session.passwordChangeRequired = passwordChangeRequired;
                 write(session);
             }
         }
 
         return session;
+    }
+
+    public Session create(String email) throws IOException {
+        return create(email, false);
     }
 
     /**

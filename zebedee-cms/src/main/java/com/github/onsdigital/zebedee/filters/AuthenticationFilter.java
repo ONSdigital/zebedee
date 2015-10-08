@@ -47,12 +47,22 @@ public class AuthenticationFilter implements Filter {
             if (session == null) {
                 forbidden(response);
             } else {
-                result = true;
+                if (session.passwordChangeRequired) {
+                    passwordChangeRequired(response);
+                } else {
+                    result = true;
+                }
             }
         } catch (IOException e) {
             error(response);
         }
         return result;
+    }
+
+    private void passwordChangeRequired(HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
+        Serialiser.serialise(response, "Please change your password");
     }
 
     private void forbidden(HttpServletResponse response) throws IOException {

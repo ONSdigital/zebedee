@@ -379,6 +379,7 @@ public class UsersTest {
         // Authentication should succeed with the new password
         assertTrue(result);
         assertTrue(zebedee.users.authenticate(email, newPassword));
+        assertTrue(zebedee.users.get(email).temporaryPassword);
     }
 
     @Test
@@ -401,6 +402,31 @@ public class UsersTest {
         // Authentication should succeed with the new password
         assertTrue(result);
         assertTrue(zebedee.users.authenticate(email, newPassword));
+        assertFalse(zebedee.users.get(email).temporaryPassword);
+    }
+
+    @Test
+    public void shouldSetPasswordWithoutTemporaryFlagIfItsSpecified() throws Exception {
+
+        // Given
+        // An existing user and an administrator session
+        String email = "patricia@example.com";
+        String newPassword = Random.password(8);
+        Session selfSession = builder.createSession("patricia@example.com");
+
+        // When
+        // We set the password
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+        credentials.password = newPassword;
+        credentials.temporaryPassword = false;
+        boolean result = zebedee.users.setPassword(selfSession, credentials);
+
+        // Then
+        // Authentication should succeed with the new password
+        assertTrue(result);
+        assertTrue(zebedee.users.authenticate(email, newPassword));
+        assertFalse(zebedee.users.get(email).temporaryPassword);
     }
 
     @Test(expected = UnauthorizedException.class)

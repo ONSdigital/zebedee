@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
-
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -12,6 +11,7 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -359,7 +359,12 @@ public class Users {
             throw new BadRequestException("Please provide credentials (email, password)");
         }
 
-        return setPassword(credentials.email, credentials.password, session.email);
+        boolean temporaryPassword = true;
+        if (credentials.temporaryPassword != null) {
+            temporaryPassword = BooleanUtils.toBoolean(credentials.temporaryPassword);
+        }
+
+        return setPassword(credentials.email, credentials.password, session.email, temporaryPassword);
     }
 
     /**
@@ -373,7 +378,7 @@ public class Users {
      * @return True if the password was set. If no user exists for the given email address, false.
      * @throws IOException If a filesystem error occurs.
      */
-    private boolean setPassword(String email, String password, String adminEmail) throws IOException {
+    private boolean setPassword(String email, String password, String adminEmail, boolean temporaryPassword) throws IOException {
         boolean result = false;
 
         User user = get(email);
@@ -387,7 +392,7 @@ public class Users {
                 user.temporaryPassword = false;
             } else {
                 user.lastAdmin = adminEmail;
-                user.temporaryPassword = true;
+                user.temporaryPassword = temporaryPassword;
             }
 
             write(user);
@@ -395,6 +400,10 @@ public class Users {
         }
 
         return result;
+    }
+
+    private boolean setPassword(String email, String password, String adminEmail) throws IOException {
+        return setPassword(email, password, adminEmail, true);
     }
 
     /**

@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.User;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -43,9 +45,17 @@ public class Login {
             return "Authentication failed.";
         }
 
-        response.setStatus(HttpStatus.OK_200);
+        boolean passwordChangeRequired = false;
 
-        return Root.zebedee.sessions.create(credentials.email).id;
+        User user = Root.zebedee.users.get(credentials.email);
+        if (BooleanUtils.isTrue(user.temporaryPassword)) {
+            passwordChangeRequired = true;
+            response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
+        } else {
+            response.setStatus(HttpStatus.OK_200);
+        }
+
+        return Root.zebedee.sessions.create(credentials.email, passwordChangeRequired).id;
     }
 
 }

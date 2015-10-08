@@ -8,26 +8,28 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.exists.ExistsRequest;
+import org.elasticsearch.action.exists.ExistsRequestBuilder;
+import org.elasticsearch.action.exists.ExistsResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import java.io.IOException;
-import java.util.Map;
 
-import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndexAlias;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndex;
 
 /**
  * Created by bren on 02/09/15.
  */
-class ElasticSearchWriter {
+class ElasticSearchUtils {
     private Client client;
     private String DEFAULT_TYPE = "_default_";
 
-    public ElasticSearchWriter(Client client) {
+    public ElasticSearchUtils(Client client) {
         this.client = client;
     }
 
@@ -81,7 +83,7 @@ class ElasticSearchWriter {
         IndicesAliasesRequestBuilder aliasBuilder = getAliasesBuilder();
         aliasBuilder.addAlias(newIndex, alias);
         if (oldIndex != null) {
-            aliasBuilder.removeAlias(oldIndex, getElasticSearchIndexAlias());
+            aliasBuilder.removeAlias(oldIndex, getElasticSearchIndex());
         }
         aliasBuilder.get();
     }
@@ -101,6 +103,11 @@ class ElasticSearchWriter {
         IndexRequestBuilder indexRequestBuilder = prepareIndex(index, type, id);
         indexRequestBuilder.setSource(document);
         return indexRequestBuilder.get();
+    }
+
+    public boolean isIndexAvailable(String index) {
+        IndicesExistsResponse response = client.admin().indices().prepareExists(index).execute().actionGet();
+        return response.isExists();
     }
 
     public IndexRequestBuilder prepareIndex(String index, String type, String id) {

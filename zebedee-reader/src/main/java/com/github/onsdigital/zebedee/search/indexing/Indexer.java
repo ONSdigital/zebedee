@@ -20,15 +20,15 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.serialise;
-import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndexAlias;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndex;
 
 public class Indexer {
     private static Indexer instance = new Indexer();
@@ -36,9 +36,8 @@ public class Indexer {
     private final Lock LOCK = new ReentrantLock();
 
     private final Client client = ElasticSearchClient.getClient();
-    private ElasticSearchWriter elasticSearchWriter = new ElasticSearchWriter(client);
+    private ElasticSearchUtils searchUtils = new ElasticSearchUtils(client);
     private ZebedeeReader zebedeeReader = new ZebedeeReader();
-    private String currentIndex;
 
     private Indexer() {
     }
@@ -48,7 +47,21 @@ public class Indexer {
     }
 
     /**
-     * Loads documents to a new index, switches default index alias to new index and deletes old index if available  to ensure zero down time.
+     * Initializes search index if it does not exist in the cluster, meaning it is the first node writing to elastic search cluster.
+     * It should be run on application start.
+     */
+    public void initIndex() throws IOException {
+        if (searchUtils.isIndexAvailable(getElasticSearchIndex())) {
+            System.out.println("Elastic search index already exists, skipping reindexing");
+        } else {
+            reload();
+        }
+    }
+
+
+
+    /**
+     * Scans and re-indexes all documents overwriting existing documents. Note that this will not delete documents that does not exist on the file system from the index
      *
      * @throws IOException
      */
@@ -69,18 +82,7 @@ public class Indexer {
     }
 
     private void doLoad() throws IOException {
-        String newIndex = generateIndexName();
-        elasticSearchWriter.createIndex(newIndex, getSettings(), getDefaultMapping());
-        if (currentIndex == null) {
-            //if first load add alias right away, do not wait documents get indexed
-            elasticSearchWriter.addAlias(newIndex, getElasticSearchIndexAlias());
-            indexDocuments(newIndex);
-        } else {
-            indexDocuments(newIndex);
-            elasticSearchWriter.swapIndex(currentIndex, newIndex, getElasticSearchIndexAlias());
-            elasticSearchWriter.deleteIndex(currentIndex);
-        }
-        currentIndex = newIndex;
+        indexDocuments(getElasticSearchIndex());
     }
 
     /**
@@ -97,11 +99,11 @@ public class Indexer {
                 throw new NotFoundException("Content not found for re-indexing, uri: " + uri);
             }
             if (isPeriodic(page.getType())) {
-                //TODO: optimize resolving lastest flag, only update elastic search for existing releases rather than reindexing
+                //TODO: optimize resolving latest flag, only update elastic search for existing releases rather than reindexing
                 //Load old releases as well to get latest flag re-calculated
-                index(currentIndex, new FileScanner().scan(URIUtils.removeLastSegment(uri)));
+                index(getElasticSearchIndex(), new FileScanner().scan(URIUtils.removeLastSegment(uri)));
             } else {
-                indexSingleContent(currentIndex, page);
+                indexSingleContent(getElasticSearchIndex(), page);
             }
             long end = System.currentTimeMillis();
             System.out.println("Elasticsearch: indexing complete for uri " + uri + " in " + (start - end) + " ms");
@@ -113,7 +115,7 @@ public class Indexer {
     }
 
     private String generateIndexName() {
-        return getElasticSearchIndexAlias() + System.currentTimeMillis();
+        return getElasticSearchIndex() + System.currentTimeMillis();
     }
 
 
@@ -153,7 +155,7 @@ public class Indexer {
     private IndexRequestBuilder prepareIndexRequest(String indexName, String uri) throws ZebedeeException, IOException {
         Page page = getPage(uri);
         if (page != null && page.getType() != null) {
-            IndexRequestBuilder indexRequestBuilder = elasticSearchWriter.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
+            IndexRequestBuilder indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
             indexRequestBuilder.setSource(serialise(toSearchDocument(page)));
             return indexRequestBuilder;
         }
@@ -161,7 +163,7 @@ public class Indexer {
     }
 
     private void indexSingleContent(String indexName, Page page) {
-        elasticSearchWriter.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page)));
+        searchUtils.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page)));
     }
 
 

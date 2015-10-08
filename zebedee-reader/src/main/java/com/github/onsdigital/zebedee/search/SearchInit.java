@@ -28,7 +28,7 @@ public class SearchInit implements Startup {
                           @Override
                           public Object call() throws Exception {
                               try {
-                                  Indexer.getInstance().reload();
+                                  Indexer.getInstance().initIndex();
                                   return null;
                               } catch (Exception e) {
                                   throw new RuntimeException("Loading search index failed", e);

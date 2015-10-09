@@ -341,6 +341,10 @@ public class Users {
 
     public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException {
 
+        if (session == null) {
+            throw new UnauthorizedException("Not authenticated.");
+        }
+
         // Passwords can be changed by ...
         boolean permissionToChange = false;
         if (!zebedee.permissions.hasAdministrator() ||                  // anyone if we are setting a brand new password

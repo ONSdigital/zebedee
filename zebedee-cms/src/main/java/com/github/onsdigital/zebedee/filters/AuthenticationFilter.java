@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.filters;
 import com.github.davidcarboni.restolino.framework.Filter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.api.Login;
+import com.github.onsdigital.zebedee.api.Password;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
@@ -35,8 +37,10 @@ public class AuthenticationFilter implements Filter {
         }
 
         // Pass through without authentication for login requests:
+        // Password requests check
         Path path = Path.newInstance(request);
-        if (StringUtils.equalsIgnoreCase("login", path.firstSegment())) {
+        if (StringUtils.equalsIgnoreCase(Login.class.getSimpleName(), path.firstSegment())
+                || StringUtils.equalsIgnoreCase(Password.class.getSimpleName(), path.firstSegment())) {
             return true;
         }
 
@@ -47,22 +51,12 @@ public class AuthenticationFilter implements Filter {
             if (session == null) {
                 forbidden(response);
             } else {
-                if (session.passwordChangeRequired) {
-                    passwordChangeRequired(response);
-                } else {
-                    result = true;
-                }
+                result = true;
             }
         } catch (IOException e) {
             error(response);
         }
         return result;
-    }
-
-    private void passwordChangeRequired(HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-        response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
-        Serialiser.serialise(response, "Please change your password");
     }
 
     private void forbidden(HttpServletResponse response) throws IOException {

@@ -30,11 +30,6 @@ public class Session {
      */
     public Date lastAccess = new Date();
 
-    /**
-     * Set to true if the user is required to change their password.
-     */
-    public boolean passwordChangeRequired;
-
     @Override
     public String toString() {
         return email + " (" + StringUtils.abbreviate(id, 8) + ")";

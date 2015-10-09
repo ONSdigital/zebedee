@@ -45,17 +45,15 @@ public class Login {
             return "Authentication failed.";
         }
 
-        boolean passwordChangeRequired = false;
-
         User user = Root.zebedee.users.get(credentials.email);
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
-            passwordChangeRequired = true;
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
+            return "Password change required";
         } else {
             response.setStatus(HttpStatus.OK_200);
         }
 
-        return Root.zebedee.sessions.create(credentials.email, passwordChangeRequired).id;
+        return Root.zebedee.sessions.create(credentials.email).id;
     }
 
 }

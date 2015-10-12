@@ -75,7 +75,12 @@ class ContentReader {
             } catch (Exception e) {
             }
         }
-        return getPage(contentPath);
+        Page page = getPage(contentPath);
+        PageDescription description = page.getDescription();
+        if (description != null) {
+            description.setLatestRelease(null); //overwrite existing latest flag if already in the data, might be old
+        }
+        return page;
     }
 
     /**

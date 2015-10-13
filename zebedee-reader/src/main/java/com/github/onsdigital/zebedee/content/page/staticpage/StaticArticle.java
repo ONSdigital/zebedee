@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.content.page.staticpage;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
@@ -19,6 +20,10 @@ public class StaticArticle extends Page {
 
     private List<MarkdownSection> sections = new ArrayList<>();
     private List<MarkdownSection> accordion = new ArrayList<>();
+
+    private List<FigureSection> charts = new ArrayList<>();
+    private List<FigureSection> tables = new ArrayList<>();
+    private List<FigureSection> images = new ArrayList<>();
 
 
     @Override
@@ -64,5 +69,29 @@ public class StaticArticle extends Page {
 
     public void setDownloads(List<Link> downloads) {
         this.downloads = downloads;
+    }
+
+    public List<FigureSection> getCharts() {
+        return charts;
+    }
+
+    public void setCharts(List<FigureSection> charts) {
+        this.charts = charts;
+    }
+
+    public List<FigureSection> getTables() {
+        return tables;
+    }
+
+    public void setTables(List<FigureSection> tables) {
+        this.tables = tables;
+    }
+
+    public List<FigureSection> getImages() {
+        return images;
+    }
+
+    public void setImages(List<FigureSection> images) {
+        this.images = images;
     }
 }

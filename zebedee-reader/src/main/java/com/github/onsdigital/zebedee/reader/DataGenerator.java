@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.reader;
 
-import com.github.onsdigital.zebedee.content.json.Chart;
+import com.github.onsdigital.zebedee.content.json.ChartObj;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -83,9 +83,9 @@ public class DataGenerator {
         Path filePath = Files.createTempFile("chart", "." + format);
         try(InputStream stream = resource.getData()) {
 
-            Chart chart = ContentUtil.deserialise(stream, Chart.class);
+            ChartObj chartObj = ContentUtil.deserialise(stream, ChartObj.class);
 
-            List<List<String>> grid = chartDataGrid(chart);
+            List<List<String>> grid = chartDataGrid(chartObj);
 
             if (format.equalsIgnoreCase("xls")) {
                 writeDataGridToXls(filePath, grid);
@@ -191,21 +191,21 @@ public class DataGenerator {
     /**
      * Get chart data as a grid that can be added
      *
-     * @param chart a chart object
+     * @param chartObj a chart object
      * @return a grid of data
      */
-    List<List<String>> chartDataGrid(Chart chart) {
+    List<List<String>> chartDataGrid(ChartObj chartObj) {
         List<List<String>> grid = new ArrayList<>();
-        grid.add( rowFromPair(chart.title, "") );
-        grid.add( rowFromPair(chart.subtitle, "") );
+        grid.add( rowFromPair(chartObj.title, "") );
+        grid.add( rowFromPair(chartObj.subtitle, "") );
         grid.add( rowFromPair("", ""));
-        grid.add( rowFromPair("Notes", chart.notes) );
-        grid.add( rowFromPair("Unit", chart.unit) );
+        grid.add( rowFromPair("Notes", chartObj.notes) );
+        grid.add( rowFromPair("Unit", chartObj.unit) );
         grid.add( rowFromPair("", ""));
 
-        grid.add( chart.headers );
-        for (Map<String, String> point: chart.data) {
-            grid.add( rowFromMap(chart.headers, point));
+        grid.add( chartObj.headers );
+        for (Map<String, String> point: chartObj.data) {
+            grid.add( rowFromMap(chartObj.headers, point));
         }
 
         return grid;

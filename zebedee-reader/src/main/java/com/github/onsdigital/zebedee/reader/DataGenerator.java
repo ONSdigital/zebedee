@@ -1,13 +1,10 @@
 package com.github.onsdigital.zebedee.reader;
 
-import com.github.onsdigital.zebedee.content.json.ChartObj;
+import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import org.apache.commons.lang3.StringUtils;
-
-import au.com.bytecode.opencsv.CSVWriter;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -15,7 +12,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -24,95 +20,12 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.probeContentType;
-import static java.nio.file.Files.size;
+import static java.nio.file.Files.*;
 
 /**
  * Created by thomasridd on 07/10/15.
  */
 public class DataGenerator {
-
-    /**
-     * Get data generated from a resource corresponding to a chart file
-     *
-     * @param resource
-     * @param format csv/xls/xlsx
-     * @return
-     * @throws IOException
-     */
-    public Resource generateData(Resource resource, String format) throws IOException {
-        // For now we are going to assume that all generated data from a resource is chart data
-        return generateChartData(resource, format);
-    }
-
-    /**
-     * Get data generated from a timeseries
-     *
-     * @param timeSeries
-     * @param format csv/xls/xlsx
-     * @return
-     */
-    public Resource generateData(TimeSeries timeSeries, String format) throws IOException {
-        return generateTimeseriesData(timeSeries, format);
-    }
-
-    /**
-     * Get data for a list of timeseries
-     *
-     * Currently future functionality
-     *
-     * @param timeSerieses
-     * @param format
-     * @return
-     */
-    public Resource generateData(List<TimeSeries> timeSerieses, String format) throws IOException {
-        return generateTimeseriesData(timeSerieses, format);
-    }
-
-    /**
-     * Build the data grid for a chart object
-     *
-     * @param resource a chart resource file
-     * @param format csv/xls/xlsx
-     * @return
-     * @throws IOException
-     */
-    Resource generateChartData(Resource resource, String format) throws IOException {
-
-        Path filePath = Files.createTempFile("chart", "." + format);
-        try(InputStream stream = resource.getData()) {
-
-            ChartObj chartObj = ContentUtil.deserialise(stream, ChartObj.class);
-
-            List<List<String>> grid = chartDataGrid(chartObj);
-
-            if (format.equalsIgnoreCase("xls")) {
-                writeDataGridToXls(filePath, grid);
-            } else if (format.equalsIgnoreCase("xlsx")) {
-                writeDataGridToXlsx(filePath, grid);
-            } else if (format.equalsIgnoreCase("csv")) {
-                writeDataGridToCsv(filePath, grid);
-            }
-        }
-        return buildResource(filePath);
-    }
-
-    /**
-     * Build a resource from the path given
-     *
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    protected Resource buildResource(Path path) throws IOException {
-        Resource resource = new Resource();
-        resource.setName(path.getFileName().toString());
-        resource.setMimeType(probeContentType(path));
-        resource.setData(newInputStream(path));
-        resource.setSize(size(path));
-        return resource;
-    }
 
     /**
      * Output a grid of strings to XLSX
@@ -187,95 +100,6 @@ public class DataGenerator {
             }
         }
     }
-
-    /**
-     * Get chart data as a grid that can be added
-     *
-     * @param chartObj a chart object
-     * @return a grid of data
-     */
-    List<List<String>> chartDataGrid(ChartObj chartObj) {
-        List<List<String>> grid = new ArrayList<>();
-        grid.add( rowFromPair(chartObj.title, "") );
-        grid.add( rowFromPair(chartObj.subtitle, "") );
-        grid.add( rowFromPair("", ""));
-        grid.add( rowFromPair("Notes", chartObj.notes) );
-        grid.add( rowFromPair("Unit", chartObj.unit) );
-        grid.add( rowFromPair("", ""));
-
-        grid.add( chartObj.headers );
-        for (Map<String, String> point: chartObj.data) {
-            grid.add( rowFromMap(chartObj.headers, point));
-        }
-
-        return grid;
-    }
-
-    List<String> rowFromPair(String cell1, String cell2) {
-        List<String> row = new ArrayList<>();
-        row.add(cell1);
-        row.add(cell2);
-        return row;
-    }
-    List<String> rowFromMap(List<String> keys, Map<String, String> data) {
-        List<String> row = new ArrayList<>();
-        for (String key: keys) {
-            if (data.containsKey(key)) {
-                row.add(data.get(key));
-            } else {
-                row.add("");
-            }
-        }
-        return row;
-    }
-
-
-
-
-    /*
-     T I M E S E R I E S
-     */
-
-    /**
-     * Generate a file for multiple time series
-     *
-     * @param series
-     * @param format
-     * @return
-     * @throws IOException
-     */
-    Resource generateTimeseriesData(List<TimeSeries> series, String format) throws IOException {
-
-        Path filePath = Files.createTempFile("data", "." + format);
-
-        List<List<String>> grid = timeSeriesDataGrid(series);
-
-        if (format.equalsIgnoreCase("xls")) {
-            writeDataGridToXls(filePath, grid);
-        } else if (format.equalsIgnoreCase("xlsx")) {
-            writeDataGridToXls(filePath, grid);
-        } else if (format.equalsIgnoreCase("csv")) {
-            writeDataGridToXls(filePath, grid);
-        }
-
-        return buildResource(filePath);
-    }
-
-    /**
-     * Generate a file for a single time series
-     *
-     * @param series
-     * @param format
-     * @return
-     * @throws IOException
-     */
-    Resource generateTimeseriesData(TimeSeries series, String format) throws IOException {
-        List<TimeSeries> serieses = new ArrayList<>();
-        serieses.add(series);
-
-        return generateTimeseriesData(serieses, format);
-    }
-
 
     /**
      * Get a data grid for multiple time series
@@ -478,7 +302,7 @@ public class DataGenerator {
 
     /**
      * Get an ordered list of quarters that ought to be written on a spreadsheet
-     *
+     * <p>
      * Correctly orders and fills holes for the list
      *
      * @param seriesList
@@ -536,7 +360,7 @@ public class DataGenerator {
 
     /**
      * Get an ordered list of months that ought to be written on a spreadsheet
-     *
+     * <p>
      * Correctly orders and fills holes for the list
      *
      * @param seriesList
@@ -608,6 +432,13 @@ public class DataGenerator {
         return ids;
     }
 
+
+
+
+    /*
+     T I M E S E R I E S
+     */
+
     /**
      * Write a data point to our collated timeseries map of maps
      *
@@ -624,6 +455,170 @@ public class DataGenerator {
 
         submap.put(cdid, value);
         map.put(row, submap);
+    }
+
+    /**
+     * Get data generated from a resource corresponding to a chart file
+     *
+     * @param chart
+     * @param format csv/xls/xlsx
+     * @return
+     * @throws IOException
+     */
+    public Resource generateData(Chart chart, String format) throws IOException {
+        // For now we are going to assume that all generated data from a resource is chart data
+        return generateChartData(chart, format);
+    }
+
+    /**
+     * Get data generated from a timeseries
+     *
+     * @param timeSeries
+     * @param format     csv/xls/xlsx
+     * @return
+     */
+    public Resource generateData(TimeSeries timeSeries, String format) throws IOException {
+        return generateTimeseriesData(timeSeries, format);
+    }
+
+    /**
+     * Get data for a list of timeseries
+     * <p>
+     * Currently future functionality
+     *
+     * @param timeSerieses
+     * @param format
+     * @return
+     */
+    public Resource generateData(List<TimeSeries> timeSerieses, String format) throws IOException {
+        return generateTimeseriesData(timeSerieses, format);
+    }
+
+    /**
+     * Build the data grid for a chart object
+     *
+     * @param chart  a chart resource file
+     * @param format csv/xls/xlsx
+     * @return
+     * @throws IOException
+     */
+    Resource generateChartData(Chart chart, String format) throws IOException {
+
+        Path filePath = Files.createTempFile("chart", "." + format);
+
+        List<List<String>> grid = chartDataGrid(chart);
+
+        if (format.equalsIgnoreCase("xls")) {
+            writeDataGridToXls(filePath, grid);
+        } else if (format.equalsIgnoreCase("xlsx")) {
+            writeDataGridToXlsx(filePath, grid);
+        } else if (format.equalsIgnoreCase("csv")) {
+            writeDataGridToCsv(filePath, grid);
+        }
+        return buildResource(filePath);
+    }
+
+    /**
+     * Build a resource from the path given
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    protected Resource buildResource(Path path) throws IOException {
+        Resource resource = new Resource();
+        resource.setName(path.getFileName().toString());
+        resource.setMimeType(probeContentType(path));
+        resource.setData(newInputStream(path));
+        resource.setSize(size(path));
+
+        if (resource.getMimeType() == null) {
+            resource.setMimeType("application/octet-stream");
+        }
+
+        return resource;
+    }
+
+    /**
+     * Get chart data as a grid that can be added
+     *
+     * @param chart a chart object
+     * @return a grid of data
+     */
+    List<List<String>> chartDataGrid(Chart chart) {
+        List<List<String>> grid = new ArrayList<>();
+        grid.add(rowFromPair(chart.getTitle(), ""));
+        grid.add(rowFromPair(chart.getSubtitle(), ""));
+        grid.add(rowFromPair("", ""));
+        grid.add(rowFromPair("Notes", chart.getNotes()));
+        grid.add(rowFromPair("Unit", chart.getUnit()));
+        grid.add(rowFromPair("", ""));
+
+        grid.add(chart.getHeaders());
+        for (Map<String, String> point : chart.getData()) {
+            grid.add(rowFromMap(chart.getHeaders(), point));
+        }
+
+        return grid;
+    }
+
+    List<String> rowFromPair(String cell1, String cell2) {
+        List<String> row = new ArrayList<>();
+        row.add(cell1);
+        row.add(cell2);
+        return row;
+    }
+
+    List<String> rowFromMap(List<String> keys, Map<String, String> data) {
+        List<String> row = new ArrayList<>();
+        for (String key : keys) {
+            if (data.containsKey(key)) {
+                row.add(data.get(key));
+            } else {
+                row.add("");
+            }
+        }
+        return row;
+    }
+
+    /**
+     * Generate a file for multiple time series
+     *
+     * @param series
+     * @param format
+     * @return
+     * @throws IOException
+     */
+    Resource generateTimeseriesData(List<TimeSeries> series, String format) throws IOException {
+
+        Path filePath = Files.createTempFile("data", "." + format);
+
+        List<List<String>> grid = timeSeriesDataGrid(series);
+
+        if (format.equalsIgnoreCase("xls")) {
+            writeDataGridToXls(filePath, grid);
+        } else if (format.equalsIgnoreCase("xlsx")) {
+            writeDataGridToXls(filePath, grid);
+        } else if (format.equalsIgnoreCase("csv")) {
+            writeDataGridToXls(filePath, grid);
+        }
+
+        return buildResource(filePath);
+    }
+
+    /**
+     * Generate a file for a single time series
+     *
+     * @param series
+     * @param format
+     * @return
+     * @throws IOException
+     */
+    Resource generateTimeseriesData(TimeSeries series, String format) throws IOException {
+        List<TimeSeries> serieses = new ArrayList<>();
+        serieses.add(series);
+
+        return generateTimeseriesData(serieses, format);
     }
 
 

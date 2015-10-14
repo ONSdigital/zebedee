@@ -2,8 +2,9 @@ package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.*;
+import com.github.onsdigital.zebedee.reader.DataGenerator;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
@@ -11,10 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,9 +25,10 @@ import static org.mockito.Mockito.when;
  * Created by thomasridd on 07/10/15.
  */
 public class GeneratorTest {
-    private ReadRequestHandler readRequestHandler;
+    private final String uri = "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2014-07-02/1fff043a";
     HttpServletRequest request = mock(HttpServletRequest.class);
     DataGenerator generator;
+    private ReadRequestHandler readRequestHandler;
 
     @Before
     public void initialize() {
@@ -35,55 +39,42 @@ public class GeneratorTest {
 
     @Test
     public void generateChart_givenChartJson_returnsFileForCSV() throws ZebedeeException, IOException {
-        // Given
-        // sample chart json as a resource
-        when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2014-07-02/1fff043a.json");
-        try(Resource resource = readRequestHandler.findResource(request)) {
-
-            // When
-            // we generate a csv
-            try( Resource generated = generator.generateData(resource, "csv") ) {
-                assertNotNull(generated);
-                assertNotNull(generated.getName());
-                assertNotEquals(0, generated.getSize());
-            };
-
+        Chart chart = createChart();
+        try (Resource generated = generator.generateData(chart, "csv")) {
+            assertNotNull(generated);
+            assertNotNull(generated.getName());
+            assertNotEquals(0, generated.getSize());
         }
+    }
+
+    private Chart createChart() {
+        Chart chart = new Chart();
+        chart.setData(new ArrayList<Map<String, String>>());
+        chart.setTitle("Chart title");
+        chart.setSubtitle("chart subtitle");
+        chart.setNotes("chart notes");
+        chart.setUnit("chart unit");
+        chart.setHeaders(new ArrayList<String>());
+        return chart;
     }
 
     @Test
     public void generateChart_givenChartJson_returnsFileForXLS() throws ZebedeeException, IOException {
-        // Given
-        // sample chart json as a resource
-        when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2014-07-02/1fff043a.json");
-        try(Resource resource = readRequestHandler.findResource(request)) {
-
-            // When
-            // we generate an xls
-            try( Resource generated = generator.generateData(resource, "xls") ) {
-                assertNotNull(generated);
-                assertNotNull(generated.getName());
-                assertNotEquals(0, generated.getSize());
-            };
-
+        Chart chart = createChart();
+        try (Resource generated = generator.generateData(chart, "xls")) {
+            assertNotNull(generated);
+            assertNotNull(generated.getName());
+            assertNotEquals(0, generated.getSize());
         }
     }
 
     @Test
     public void generateChart_givenChartJson_returnsFileForXLSX() throws ZebedeeException, IOException {
-        // Given
-        // sample chart json as a resource
-        when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2014-07-02/1fff043a.json");
-        try(Resource resource = readRequestHandler.findResource(request)) {
-
-            // When
-            // we generate an xls
-            try( Resource generated = generator.generateData(resource, "xlsx") ) {
-                assertNotNull(generated);
-                assertNotNull(generated.getName());
-                assertNotEquals(0, generated.getSize());
-            };
-
+        Chart chart = createChart();
+        try (Resource generated = generator.generateData(chart, "xlsx")) {
+            assertNotNull(generated);
+            assertNotNull(generated.getName());
+            assertNotEquals(0, generated.getSize());
         }
     }
 
@@ -103,7 +94,7 @@ public class GeneratorTest {
                 assertNotNull(generated);
                 assertNotNull(generated.getName());
                 assertNotEquals(0, generated.getSize());
-            };
+            }
     }
 
     @Test
@@ -122,7 +113,7 @@ public class GeneratorTest {
             assertNotNull(generated);
             assertNotNull(generated.getName());
             assertNotEquals(0, generated.getSize());
-        };
+        }
     }
 
     @Test
@@ -141,6 +132,6 @@ public class GeneratorTest {
             assertNotNull(generated);
             assertNotNull(generated.getName());
             assertNotEquals(0, generated.getSize());
-        };
+        }
     }
 }

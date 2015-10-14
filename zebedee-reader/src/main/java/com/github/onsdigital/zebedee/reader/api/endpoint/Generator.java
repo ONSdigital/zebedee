@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.reader.api.endpoint;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.DataGenerator;
@@ -25,14 +26,13 @@ public class Generator {
 
     /**
      * Generates on the fly resources for data in csv or xls format
-     *
+     * <p>
      * Data conversion is solid through the DataGenerator class
-     *
+     * <p>
      * File type detection requires hardening
      *
-     * @param request - requires parameters uri and format. Format should be csv or xls.
-     *                Uri should be a folder for timeseries or a file for resource objects
-     *
+     * @param request  - requires parameters uri and format. Format should be csv or xls.
+     *                 Uri should be a folder for timeseries or a file for resource objects
      * @param response
      * @throws IOException
      * @throws ZebedeeException
@@ -50,13 +50,15 @@ public class Generator {
         ReadRequestHandler readRequestHandler = new ReadRequestHandler((getRequestedLanguage(request)));
         Content content = readRequestHandler.findContent(request, null);
 
+
         if (content != null) {
-            // If page then write the timeseries spreadsheet requested to response
-            ReaderResponseResponseUtils.sendResponse(new DataGenerator().generateData((TimeSeries) content, format), response);
-        } else {
-            // If not page write the chart spreadsheet requested to response
-            try (com.github.onsdigital.zebedee.reader.Resource resource = readRequestHandler.findResource(request)) {
-                ReaderResponseResponseUtils.sendResponse(new DataGenerator().generateData(resource, format), response);
+
+            if (content instanceof Chart) {
+                // If page is a chart write the chart spreadsheet requested to response
+                ReaderResponseResponseUtils.sendResponse(new DataGenerator().generateData((Chart) content, format), response);
+            } else {
+                // If page then write the timeseries spreadsheet requested to response
+                ReaderResponseResponseUtils.sendResponse(new DataGenerator().generateData((TimeSeries) content, format), response);
             }
         }
     }

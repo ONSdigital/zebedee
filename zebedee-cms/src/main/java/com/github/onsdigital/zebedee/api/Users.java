@@ -115,6 +115,10 @@ public class Users {
         Session session = Root.zebedee.sessions.get(request);
         User user = Root.zebedee.users.get(email);
 
+        if (user == null) {
+            throw new NotFoundException("User " + email + " does not exist");
+        }
+
         return Root.zebedee.users.delete(session, user);
     }
 

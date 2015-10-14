@@ -1,10 +1,6 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.davidcarboni.ResourceUtils;
-import com.github.onsdigital.zebedee.api.File;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -120,45 +116,6 @@ public class Zebedee {
         user.name = "Florence";
         String password = "Doug4l";
         Users.createSystemUser(zebedee, user, password);
-        Session session = zebedee.sessions.create("florence@magicroundabout.ons.gov.uk");
-
-
-        // Initialise users
-        java.io.File file = ResourceUtils.getFile("/users.json");
-        if (file != null) {
-            Configuration.buildUserAccounts(file, zebedee, session);
-        }
-
-        // todo - remove these once access functionality is available.
-        user = new User();
-        user.email = "p1@t.com";
-        user.name = "p1";
-        password = "Doug4l";
-        Users.createPublisher(zebedee, user, password, session);
-
-        user = new User();
-        user.email = "p2@t.com";
-        user.name = "p2";
-        password = "Doug4l";
-        Users.createPublisher(zebedee, user, password, session);
-
-        user = new User();
-        user.email = "p3@t.com";
-        user.name = "p3";
-        password = "Doug4l";
-        Users.createPublisher(zebedee, user, password, session);
-
-        user = new User();
-        user.email = "p4@t.com";
-        user.name = "p4";
-        password = "Doug4l";
-        Users.createPublisher(zebedee, user, password, session);
-
-        user = new User();
-        user.email = "p5@t.com";
-        user.name = "p5";
-        password = "Doug4l";
-        Users.createPublisher(zebedee, user, password, session);
 
         return zebedee;
     }

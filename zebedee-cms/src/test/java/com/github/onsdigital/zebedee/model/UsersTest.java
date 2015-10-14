@@ -430,6 +430,20 @@ public class UsersTest {
     }
 
     @Test(expected = UnauthorizedException.class)
+    public void shouldNotSetPasswordIfSessionIsNull() throws Exception {
+
+        // Given a null session
+        Session session = null;
+
+        // When
+        // We attempt to set the password
+        Credentials credentials = new Credentials();
+        zebedee.users.setPassword(session, credentials);
+
+        // Then an UnauthorizedException is thrown
+    }
+
+    @Test(expected = UnauthorizedException.class)
     public void shouldNotSetPasswordIfNotAdmin() throws Exception {
 
         // Given

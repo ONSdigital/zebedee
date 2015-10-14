@@ -1,0 +1,2410 @@
+{
+  "years": [
+    {
+      "date": "2000",
+      "value": "100.0",
+      "year": "2000",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001",
+      "value": "103.4",
+      "year": "2001",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2002",
+      "value": "106.1",
+      "year": "2002",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2003",
+      "value": "108.2",
+      "year": "2003",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2004",
+      "value": "110.7",
+      "year": "2004",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2005",
+      "value": "113.1",
+      "year": "2005",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2006",
+      "value": "114.8",
+      "year": "2006",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2007",
+      "value": "116.9",
+      "year": "2007",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2008",
+      "value": "117.0",
+      "year": "2008",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2009",
+      "value": "116.6",
+      "year": "2009",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2010",
+      "value": "115.0",
+      "year": "2010",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2011",
+      "value": "112.3",
+      "year": "2011",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2012",
+      "value": "111.0",
+      "year": "2012",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2013",
+      "value": "109.2",
+      "year": "2013",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2014",
+      "value": "109.0",
+      "year": "2014",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    }
+  ],
+  "quarters": [
+    {
+      "date": "2000 Q1",
+      "value": "99.2",
+      "year": "2000",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 Q2",
+      "value": "99.4",
+      "year": "2000",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 Q3",
+      "value": "100.2",
+      "year": "2000",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 Q4",
+      "value": "101.2",
+      "year": "2000",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 Q1",
+      "value": "102.2",
+      "year": "2001",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 Q2",
+      "value": "102.8",
+      "year": "2001",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 Q3",
+      "value": "103.9",
+      "year": "2001",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 Q4",
+      "value": "104.9",
+      "year": "2001",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2002 Q1",
+      "value": "105.6",
+      "year": "2002",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2002 Q2",
+      "value": "106.2",
+      "year": "2002",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2002 Q3",
+      "value": "106.4",
+      "year": "2002",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2002 Q4",
+      "value": "106.4",
+      "year": "2002",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2003 Q1",
+      "value": "107.2",
+      "year": "2003",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2003 Q2",
+      "value": "108.1",
+      "year": "2003",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2003 Q3",
+      "value": "108.5",
+      "year": "2003",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2003 Q4",
+      "value": "109.1",
+      "year": "2003",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2004 Q1",
+      "value": "109.5",
+      "year": "2004",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2004 Q2",
+      "value": "110.4",
+      "year": "2004",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2004 Q3",
+      "value": "111.2",
+      "year": "2004",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2004 Q4",
+      "value": "111.8",
+      "year": "2004",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2005 Q1",
+      "value": "112.2",
+      "year": "2005",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2005 Q2",
+      "value": "112.8",
+      "year": "2005",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2005 Q3",
+      "value": "113.4",
+      "year": "2005",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2005 Q4",
+      "value": "113.9",
+      "year": "2005",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2006 Q1",
+      "value": "114.5",
+      "year": "2006",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2006 Q2",
+      "value": "114.8",
+      "year": "2006",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2006 Q3",
+      "value": "114.7",
+      "year": "2006",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2006 Q4",
+      "value": "115.4",
+      "year": "2006",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2007 Q1",
+      "value": "115.7",
+      "year": "2007",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2007 Q2",
+      "value": "116.6",
+      "year": "2007",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2007 Q3",
+      "value": "117.9",
+      "year": "2007",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2007 Q4",
+      "value": "117.6",
+      "year": "2007",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2008 Q1",
+      "value": "117.7",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2008 Q2",
+      "value": "117.2",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2008 Q3",
+      "value": "116.3",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2008 Q4",
+      "value": "116.9",
+      "year": "2008",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2009 Q1",
+      "value": "117.1",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2009 Q2",
+      "value": "117.2",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2009 Q3",
+      "value": "116.1",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2009 Q4",
+      "value": "115.8",
+      "year": "2009",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2010 Q1",
+      "value": "115.5",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2010 Q2",
+      "value": "114.8",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2010 Q3",
+      "value": "115.1",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2010 Q4",
+      "value": "114.5",
+      "year": "2010",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2011 Q1",
+      "value": "113.3",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2011 Q2",
+      "value": "112.5",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2011 Q3",
+      "value": "111.8",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2011 Q4",
+      "value": "111.6",
+      "year": "2011",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2012 Q1",
+      "value": "111.3",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2012 Q2",
+      "value": "111.4",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2012 Q3",
+      "value": "111.2",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2012 Q4",
+      "value": "110.1",
+      "year": "2012",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2013 Q1",
+      "value": "109.2",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2013 Q2",
+      "value": "109.6",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2013 Q3",
+      "value": "109.1",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2013 Q4",
+      "value": "108.9",
+      "year": "2013",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2014 Q1",
+      "value": "108.7",
+      "year": "2014",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2014 Q2",
+      "value": "108.5",
+      "year": "2014",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2014 Q3",
+      "value": "108.9",
+      "year": "2014",
+      "month": "",
+      "quarter": "Q3",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2014 Q4",
+      "value": "109.8",
+      "year": "2014",
+      "month": "",
+      "quarter": "Q4",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2015 Q1",
+      "value": "111.1",
+      "year": "2015",
+      "month": "",
+      "quarter": "Q1",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2015 Q2",
+      "value": "111.6",
+      "year": "2015",
+      "month": "",
+      "quarter": "Q2",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    }
+  ],
+  "months": [
+    {
+      "date": "2000 JAN",
+      "value": "99.3",
+      "year": "2000",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 FEB",
+      "value": "99.3",
+      "year": "2000",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 MAR",
+      "value": "99.0",
+      "year": "2000",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 APR",
+      "value": "99.1",
+      "year": "2000",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 MAY",
+      "value": "99.6",
+      "year": "2000",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 JUN",
+      "value": "99.4",
+      "year": "2000",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 JUL",
+      "value": "99.7",
+      "year": "2000",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 AUG",
+      "value": "100.3",
+      "year": "2000",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 SEP",
+      "value": "100.6",
+      "year": "2000",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 OCT",
+      "value": "101.0",
+      "year": "2000",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 NOV",
+      "value": "101.1",
+      "year": "2000",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2000 DEC",
+      "value": "101.6",
+      "year": "2000",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 JAN",
+      "value": "102.0",
+      "year": "2001",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 FEB",
+      "value": "102.1",
+      "year": "2001",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 MAR",
+      "value": "102.5",
+      "year": "2001",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 APR",
+      "value": "103.2",
+      "year": "2001",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 MAY",
+      "value": "102.7",
+      "year": "2001",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 JUN",
+      "value": "102.5",
+      "year": "2001",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.177Z"
+    },
+    {
+      "date": "2001 JUL",
+      "value": "103.6",
+      "year": "2001",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2001 AUG",
+      "value": "104.0",
+      "year": "2001",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2001 SEP",
+      "value": "104.0",
+      "year": "2001",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2001 OCT",
+      "value": "104.5",
+      "year": "2001",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2001 NOV",
+      "value": "105.1",
+      "year": "2001",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2001 DEC",
+      "value": "105.0",
+      "year": "2001",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 JAN",
+      "value": "104.9",
+      "year": "2002",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 FEB",
+      "value": "105.8",
+      "year": "2002",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 MAR",
+      "value": "106.0",
+      "year": "2002",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 APR",
+      "value": "105.9",
+      "year": "2002",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 MAY",
+      "value": "106.1",
+      "year": "2002",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 JUN",
+      "value": "106.5",
+      "year": "2002",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 JUL",
+      "value": "106.6",
+      "year": "2002",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 AUG",
+      "value": "106.2",
+      "year": "2002",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 SEP",
+      "value": "106.4",
+      "year": "2002",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 OCT",
+      "value": "106.4",
+      "year": "2002",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 NOV",
+      "value": "106.6",
+      "year": "2002",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2002 DEC",
+      "value": "106.3",
+      "year": "2002",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 JAN",
+      "value": "107.1",
+      "year": "2003",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 FEB",
+      "value": "107.3",
+      "year": "2003",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 MAR",
+      "value": "107.2",
+      "year": "2003",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 APR",
+      "value": "107.8",
+      "year": "2003",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 MAY",
+      "value": "108.1",
+      "year": "2003",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 JUN",
+      "value": "108.3",
+      "year": "2003",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 JUL",
+      "value": "108.4",
+      "year": "2003",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 AUG",
+      "value": "108.5",
+      "year": "2003",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 SEP",
+      "value": "108.7",
+      "year": "2003",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 OCT",
+      "value": "108.8",
+      "year": "2003",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 NOV",
+      "value": "109.2",
+      "year": "2003",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2003 DEC",
+      "value": "109.4",
+      "year": "2003",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 JAN",
+      "value": "109.3",
+      "year": "2004",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 FEB",
+      "value": "109.4",
+      "year": "2004",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 MAR",
+      "value": "109.7",
+      "year": "2004",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 APR",
+      "value": "110.3",
+      "year": "2004",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 MAY",
+      "value": "110.4",
+      "year": "2004",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 JUN",
+      "value": "110.6",
+      "year": "2004",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 JUL",
+      "value": "110.9",
+      "year": "2004",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 AUG",
+      "value": "111.3",
+      "year": "2004",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 SEP",
+      "value": "111.4",
+      "year": "2004",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 OCT",
+      "value": "111.8",
+      "year": "2004",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 NOV",
+      "value": "111.5",
+      "year": "2004",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2004 DEC",
+      "value": "112.0",
+      "year": "2004",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 JAN",
+      "value": "112.0",
+      "year": "2005",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 FEB",
+      "value": "112.1",
+      "year": "2005",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 MAR",
+      "value": "112.5",
+      "year": "2005",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 APR",
+      "value": "112.6",
+      "year": "2005",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 MAY",
+      "value": "112.8",
+      "year": "2005",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 JUN",
+      "value": "113.0",
+      "year": "2005",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 JUL",
+      "value": "113.2",
+      "year": "2005",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 AUG",
+      "value": "113.4",
+      "year": "2005",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 SEP",
+      "value": "113.7",
+      "year": "2005",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 OCT",
+      "value": "113.7",
+      "year": "2005",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 NOV",
+      "value": "113.9",
+      "year": "2005",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2005 DEC",
+      "value": "114.1",
+      "year": "2005",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 JAN",
+      "value": "114.3",
+      "year": "2006",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 FEB",
+      "value": "114.6",
+      "year": "2006",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 MAR",
+      "value": "114.6",
+      "year": "2006",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 APR",
+      "value": "114.7",
+      "year": "2006",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 MAY",
+      "value": "114.7",
+      "year": "2006",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 JUN",
+      "value": "114.9",
+      "year": "2006",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 JUL",
+      "value": "114.6",
+      "year": "2006",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 AUG",
+      "value": "114.5",
+      "year": "2006",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 SEP",
+      "value": "114.9",
+      "year": "2006",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 OCT",
+      "value": "115.5",
+      "year": "2006",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 NOV",
+      "value": "115.3",
+      "year": "2006",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2006 DEC",
+      "value": "115.3",
+      "year": "2006",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 JAN",
+      "value": "115.4",
+      "year": "2007",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 FEB",
+      "value": "115.8",
+      "year": "2007",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 MAR",
+      "value": "115.8",
+      "year": "2007",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 APR",
+      "value": "116.1",
+      "year": "2007",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 MAY",
+      "value": "116.6",
+      "year": "2007",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 JUN",
+      "value": "117.0",
+      "year": "2007",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 JUL",
+      "value": "117.7",
+      "year": "2007",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 AUG",
+      "value": "118.0",
+      "year": "2007",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 SEP",
+      "value": "118.0",
+      "year": "2007",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 OCT",
+      "value": "117.5",
+      "year": "2007",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 NOV",
+      "value": "117.7",
+      "year": "2007",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2007 DEC",
+      "value": "117.5",
+      "year": "2007",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 JAN",
+      "value": "117.6",
+      "year": "2008",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 FEB",
+      "value": "117.7",
+      "year": "2008",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 MAR",
+      "value": "117.8",
+      "year": "2008",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 APR",
+      "value": "118.0",
+      "year": "2008",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 MAY",
+      "value": "117.1",
+      "year": "2008",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 JUN",
+      "value": "116.6",
+      "year": "2008",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 JUL",
+      "value": "116.5",
+      "year": "2008",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 AUG",
+      "value": "116.4",
+      "year": "2008",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 SEP",
+      "value": "115.9",
+      "year": "2008",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 OCT",
+      "value": "116.6",
+      "year": "2008",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 NOV",
+      "value": "116.7",
+      "year": "2008",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2008 DEC",
+      "value": "117.5",
+      "year": "2008",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 JAN",
+      "value": "117.4",
+      "year": "2009",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 FEB",
+      "value": "117.2",
+      "year": "2009",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 MAR",
+      "value": "116.8",
+      "year": "2009",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 APR",
+      "value": "117.7",
+      "year": "2009",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 MAY",
+      "value": "117.1",
+      "year": "2009",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 JUN",
+      "value": "116.9",
+      "year": "2009",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 JUL",
+      "value": "116.0",
+      "year": "2009",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 AUG",
+      "value": "116.0",
+      "year": "2009",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 SEP",
+      "value": "116.2",
+      "year": "2009",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 OCT",
+      "value": "115.9",
+      "year": "2009",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 NOV",
+      "value": "115.7",
+      "year": "2009",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2009 DEC",
+      "value": "115.8",
+      "year": "2009",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 JAN",
+      "value": "115.6",
+      "year": "2010",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 FEB",
+      "value": "115.6",
+      "year": "2010",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 MAR",
+      "value": "115.4",
+      "year": "2010",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 APR",
+      "value": "115.0",
+      "year": "2010",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 MAY",
+      "value": "114.7",
+      "year": "2010",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 JUN",
+      "value": "114.8",
+      "year": "2010",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 JUL",
+      "value": "115.0",
+      "year": "2010",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 AUG",
+      "value": "115.0",
+      "year": "2010",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 SEP",
+      "value": "115.2",
+      "year": "2010",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 OCT",
+      "value": "115.0",
+      "year": "2010",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 NOV",
+      "value": "114.7",
+      "year": "2010",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2010 DEC",
+      "value": "113.9",
+      "year": "2010",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 JAN",
+      "value": "113.8",
+      "year": "2011",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 FEB",
+      "value": "113.2",
+      "year": "2011",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 MAR",
+      "value": "113.0",
+      "year": "2011",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 APR",
+      "value": "112.5",
+      "year": "2011",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 MAY",
+      "value": "112.5",
+      "year": "2011",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 JUN",
+      "value": "112.4",
+      "year": "2011",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 JUL",
+      "value": "112.1",
+      "year": "2011",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 AUG",
+      "value": "111.8",
+      "year": "2011",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 SEP",
+      "value": "111.5",
+      "year": "2011",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 OCT",
+      "value": "111.6",
+      "year": "2011",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 NOV",
+      "value": "111.6",
+      "year": "2011",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2011 DEC",
+      "value": "111.5",
+      "year": "2011",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 JAN",
+      "value": "111.1",
+      "year": "2012",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 FEB",
+      "value": "111.4",
+      "year": "2012",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 MAR",
+      "value": "111.4",
+      "year": "2012",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 APR",
+      "value": "111.0",
+      "year": "2012",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 MAY",
+      "value": "111.3",
+      "year": "2012",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 JUN",
+      "value": "111.8",
+      "year": "2012",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 JUL",
+      "value": "111.3",
+      "year": "2012",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 AUG",
+      "value": "111.4",
+      "year": "2012",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 SEP",
+      "value": "110.8",
+      "year": "2012",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 OCT",
+      "value": "110.2",
+      "year": "2012",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 NOV",
+      "value": "110.3",
+      "year": "2012",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2012 DEC",
+      "value": "109.9",
+      "year": "2012",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 JAN",
+      "value": "109.4",
+      "year": "2013",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 FEB",
+      "value": "109.2",
+      "year": "2013",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 MAR",
+      "value": "109.1",
+      "year": "2013",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 APR",
+      "value": "109.6",
+      "year": "2013",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 MAY",
+      "value": "109.6",
+      "year": "2013",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 JUN",
+      "value": "109.6",
+      "year": "2013",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 JUL",
+      "value": "109.4",
+      "year": "2013",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 AUG",
+      "value": "109.2",
+      "year": "2013",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 SEP",
+      "value": "108.8",
+      "year": "2013",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 OCT",
+      "value": "108.9",
+      "year": "2013",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 NOV",
+      "value": "108.8",
+      "year": "2013",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2013 DEC",
+      "value": "109.1",
+      "year": "2013",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 JAN",
+      "value": "109.2",
+      "year": "2014",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 FEB",
+      "value": "108.7",
+      "year": "2014",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 MAR",
+      "value": "108.3",
+      "year": "2014",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 APR",
+      "value": "108.4",
+      "year": "2014",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 MAY",
+      "value": "108.7",
+      "year": "2014",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 JUN",
+      "value": "108.5",
+      "year": "2014",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 JUL",
+      "value": "108.5",
+      "year": "2014",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 AUG",
+      "value": "108.8",
+      "year": "2014",
+      "month": "August",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 SEP",
+      "value": "109.4",
+      "year": "2014",
+      "month": "September",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 OCT",
+      "value": "109.6",
+      "year": "2014",
+      "month": "October",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 NOV",
+      "value": "109.7",
+      "year": "2014",
+      "month": "November",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2014 DEC",
+      "value": "110.2",
+      "year": "2014",
+      "month": "December",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2015 JAN",
+      "value": "110.7",
+      "year": "2015",
+      "month": "January",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2015 FEB",
+      "value": "111.2",
+      "year": "2015",
+      "month": "February",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2015 MAR",
+      "value": "111.4",
+      "year": "2015",
+      "month": "March",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2015 APR",
+      "value": "111.6",
+      "year": "2015",
+      "month": "April",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2015 MAY",
+      "value": "111.6",
+      "year": "2015",
+      "month": "May",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2015 JUN",
+      "value": "111.6",
+      "year": "2015",
+      "month": "June",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    },
+    {
+      "date": "2015 JUL",
+      "value": "111.8",
+      "year": "2015",
+      "month": "July",
+      "quarter": "",
+      "sourceDataset": "EMP",
+      "updateDate": "2015-10-08T15:23:28.178Z"
+    }
+  ],
+  "sourceDatasets": [
+    "EMP"
+  ],
+  "relatedDocuments": [
+    {
+      "uri": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/latest"
+    }
+  ],
+  "type": "timeseries",
+  "description": {
+    "title": "AWE:Whole Economy:Real Terms:Regular Pay:Index:SA                       ",
+    "contact": {
+      "email": "ster@ons.gsi.gov.uk",
+      "name": "Ian Richardson",
+      "telephone": "+44 (0)1633 455780"
+    },
+    "releaseDate": "2015-09-15T23:00:00.000Z",
+    "nextRelease": "14 October 2015",
+    "cdid": "A2F8",
+    "unit": "",
+    "preUnit": "",
+    "source": "",
+    "seasonalAdjustment": "NSA",
+    "date": "2015 JUL",
+    "number": "111.8"
+  }
+}

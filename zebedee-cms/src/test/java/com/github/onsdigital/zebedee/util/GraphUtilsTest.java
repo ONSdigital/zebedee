@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.util;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.zebedee.content.page.taxonomy.ProductPage;
@@ -56,7 +56,7 @@ public class GraphUtilsTest {
     public void graphUtilsShouldIdentifyRelatedLinksOnADataset() {
         // Given
         // a dataset with a bunch of links to various media
-        Dataset dataset = new Dataset();
+        DatasetLandingPage dataset = new DatasetLandingPage();
 
         List<Link> references = new ArrayList<>();
         references.add(new Link(URI.create("relatedarticle1")));

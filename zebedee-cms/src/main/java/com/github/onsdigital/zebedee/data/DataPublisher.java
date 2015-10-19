@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.partial.Link;
@@ -142,7 +142,7 @@ public class DataPublisher {
             List<TimeSeries> newSeries = new ArrayList<>();
 
             // Download the dataset page (for metadata)
-            Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
+            DatasetLandingPage dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), DatasetLandingPage.class);
             String datasetUri = zebedee.toUri(csdbDataset.get("json"));
 
             DownloadSection csdbSection = new DownloadSection();
@@ -385,7 +385,7 @@ public class DataPublisher {
      * @return
      * @throws IOException
      */
-    TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, Dataset dataset, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
+    TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, DatasetLandingPage dataset, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
 
         // Attempts to open an existing time series or creates a new one
         TimeSeries page = startPageForSeriesWithPublishedPath(destinationUri, series);
@@ -447,7 +447,7 @@ public class DataPublisher {
      * @param dataset the source dataset page
      * @return
      */
-    TimeSeries populatePageFromTimeSeries(TimeSeries page, TimeSeries series, Dataset dataset) {
+    TimeSeries populatePageFromTimeSeries(TimeSeries page, TimeSeries series, DatasetLandingPage dataset) {
 
         // Time series is a bit of an inelegant beast in that it splits data storage by time period
         // We deal with this by
@@ -475,7 +475,7 @@ public class DataPublisher {
     }
 
     // Support function for above
-    void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, Dataset dataset) {
+    void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, DatasetLandingPage dataset) {
 
         // Iterate through values
         for (TimeSeriesValue value : updateValues) {
@@ -538,7 +538,7 @@ public class DataPublisher {
      * @return
      * @throws URISyntaxException
      */
-    static TimeSeries populatePageFromDataSetPage(TimeSeries page, Dataset datasetPage, String datasetURI) throws URISyntaxException {
+    static TimeSeries populatePageFromDataSetPage(TimeSeries page, DatasetLandingPage datasetPage, String datasetURI) throws URISyntaxException {
         PageDescription description = page.getDescription();
         if (description == null) {
             description = new PageDescription();

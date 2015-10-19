@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 /**
  * Created by bren on 01/07/15.
  */
-public class ReferenceTables extends Dataset {
+public class ReferenceTables extends DatasetLandingPage {
 
     private boolean migrated;
 

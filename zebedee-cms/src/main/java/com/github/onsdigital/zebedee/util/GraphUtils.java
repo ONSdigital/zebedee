@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.util;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
@@ -331,7 +331,7 @@ public class GraphUtils {
         }
         return results;
     }
-    public static List<String> relatedUris(Dataset dataset) {
+    public static List<String> relatedUris(DatasetLandingPage dataset) {
         List<String > results = new ArrayList<>();
         if (dataset.getRelatedDocuments() != null) {
             for (Link ref : dataset.getRelatedDocuments()) {
@@ -405,7 +405,7 @@ public class GraphUtils {
         } else if (page.getType() == PageType.bulletin) {
             return relatedUris((Bulletin) page);
         } else if (page.getType() == PageType.dataset) {
-            return relatedUris((Dataset) page);
+            return relatedUris((DatasetLandingPage) page);
         } else if (page.getType() == PageType.product_page) {
             return relatedUris((ProductPage) page);
         } else if (page.getType() == PageType.taxonomy_landing_page) {

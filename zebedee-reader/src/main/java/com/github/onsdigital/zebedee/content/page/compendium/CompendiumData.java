@@ -2,13 +2,12 @@ package com.github.onsdigital.zebedee.content.page.compendium;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 
 /**
  * Created by bren on 06/07/15.
  */
-public class CompendiumData extends Dataset {
+public class CompendiumData extends DatasetLandingPage {
 
     private Link parent;
 

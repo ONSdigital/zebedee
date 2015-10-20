@@ -363,10 +363,7 @@ public class Users {
             throw new BadRequestException("Please provide credentials (email, password)");
         }
 
-        boolean temporaryPassword = true;
-        if (credentials.temporaryPassword != null) {
-            temporaryPassword = BooleanUtils.toBoolean(credentials.temporaryPassword);
-        }
+        boolean temporaryPassword = BooleanUtils.isNotFalse(credentials.temporaryPassword);
 
         return setPassword(credentials.email, credentials.password, session.email, temporaryPassword);
     }

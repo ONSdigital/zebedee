@@ -398,20 +398,45 @@ public class UsersTest {
     }
 
     @Test
-    public void shouldResetPasswordIfAdmin() throws Exception {
+    public void shouldSetPasswordIfSelfIsAdmin() throws Exception {
 
         // Given
         // An existing user and an administrator session
-        String email = builder.publisher1.email;
+        String email = builder.administrator.email;
         String newPassword = "newPassword";
         Session selfSession = builder.createSession(builder.administrator);
         Credentials credentials = new Credentials();
         credentials.email = email;
 
         // When
+        // We set the password
+        credentials.password = newPassword;
+        credentials.oldPassword = "password";
+        boolean result = zebedee.users.setPassword(selfSession, credentials);
+
+        // Then
+        // Authentication should succeed with the new password
+        assertTrue(result);
+        User user = zebedee.users.get(email);
+        assertTrue(user.authenticate(newPassword));
+        assertFalse(user.temporaryPassword);
+    }
+
+    @Test
+    public void shouldResetPasswordIfAdmin() throws Exception {
+
+        // Given
+        // An existing user and an administrator session
+        String email = builder.publisher1.email;
+        String newPassword = "newPassword";
+        Session adminSession = builder.createSession(builder.administrator);
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+
+        // When
         // We set the password and update
         credentials.password = newPassword;
-        boolean result = zebedee.users.setPassword(selfSession, credentials);
+        boolean result = zebedee.users.setPassword(adminSession, credentials);
 
         // Then
         // Authentication should succeed with the new password
@@ -432,6 +457,7 @@ public class UsersTest {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = newPassword;
+        credentials.oldPassword = "password";
 
         // When
         // We set the temporary flag expliticly and update
@@ -506,70 +532,4 @@ public class UsersTest {
         assertFalse(userFound);
     }
 
-    @Test
-    public void changePassword_ifChangingOwnPassword_shouldNotBeTemporary() throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
-        // Given
-        // an existing user
-        String email = "patricia@example.com";
-        Session session = builder.createSession(email);
-
-        // When
-        // password is updated by self
-        Credentials credentials = new Credentials();
-        credentials.email = email;
-        credentials.password = Random.password(8);
-
-        zebedee.users.setPassword(session, credentials);
-
-        // Then
-        // user should be marked not temporary
-        User patricia = zebedee.users.get(email);
-        assertEquals(false, patricia.temporaryPassword);
-        assertEquals(email, patricia.lastAdmin);
-    }
-
-    @Test
-    public void changePassword_ifAdminIsChangingAnotherPassword_shouldBeTemporary() throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
-        // Given
-        // an existing user
-        String email = "patricia@example.com";
-        Session adminSession = builder.createSession("jukesie@example.com");
-
-        // When
-        // password is updated by admin
-        Credentials credentials = new Credentials();
-        credentials.email = email;
-        credentials.password = Random.password(8);
-
-        zebedee.users.setPassword(adminSession, credentials);
-
-        // Then
-        // user should be marked temporary
-        User patricia = zebedee.users.get(email);
-        assertEquals(true, patricia.temporaryPassword);
-        assertEquals(adminSession.email, patricia.lastAdmin);
-    }
-
-
-    @Test
-    public void changePassword_ifAdminIsChangingOwnPassword_shouldNotBeTemporary() throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
-        // Given
-        // an admin user
-        String email = "jukesie@example.com";
-        Session adminSession = builder.createSession("jukesie@example.com");
-
-        // When
-        // password is updated by admin
-        Credentials credentials = new Credentials();
-        credentials.email = email;
-        credentials.password = Random.password(8);
-
-        zebedee.users.setPassword(adminSession, credentials);
-
-        // Then
-        // user should be marked temporary
-        User jukesie = zebedee.users.get(email);
-        assertEquals(false, jukesie.temporaryPassword);
-        assertEquals(jukesie.email, jukesie.lastAdmin);
-    }
 }

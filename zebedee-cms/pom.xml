@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.github.davidcarboni</groupId>
             <artifactId>cryptolite</artifactId>
-            <version>1.3.0</version>
+            <version>1.3.2-SNAPSHOT</version>
         </dependency>
 
         <!-- Zebedee Reader-->

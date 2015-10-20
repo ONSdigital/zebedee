@@ -11,5 +11,6 @@ public enum EventType {
     REVIEWED,
     APPROVED,
     UNLOCKED,
-    PUBLISHED
+    PUBLISHED,
+    VERSIONED
 }

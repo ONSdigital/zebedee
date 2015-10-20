@@ -43,9 +43,7 @@ public class VersionedContentItem extends ContentItem {
         Path versionPath = getVersionDirectoryPath().resolve(versionIdentifier);
         Files.createDirectories(versionPath);
 
-        URI versionUri = this.getUri()
-                .resolve(getVersionDirectoryName())
-                .resolve(versionIdentifier);
+        URI versionUri = URI.create(String.format("%s/%s/%s", getUri(), getVersionDirectoryName(), versionIdentifier));
 
         copyFilesIntoVersionDirectory(versionSourcePath, versionPath);
 

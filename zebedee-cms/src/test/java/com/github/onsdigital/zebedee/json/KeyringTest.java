@@ -9,10 +9,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
+<<<<<<< HEAD
 import java.security.KeyPair;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+=======
+
+import java.util.Set;
+>>>>>>> Added a Keyring to store User encryption keys.
 
 import static org.junit.Assert.*;
 
@@ -265,6 +270,7 @@ public class KeyringTest {
         assertFalse(ids.contains(collectionId));
     }
 
+<<<<<<< HEAD
 
     /**
      * Removing a key from the keyring.
@@ -286,6 +292,8 @@ public class KeyringTest {
         assertNull(keyringCheck.keys);
     }
 
+=======
+>>>>>>> Added a Keyring to store User encryption keys.
     // --- Helpers --- //
 
     /**
@@ -314,6 +322,7 @@ public class KeyringTest {
         String decrypted = new Crypto().decrypt(encrypted, keyActual);
         return StringUtils.equals(cleartext, decrypted);
     }
+<<<<<<< HEAD
 
 
     /**
@@ -323,4 +332,6 @@ public class KeyringTest {
         public  KeyPair keyPair;
         public  Map<String, SecretKey> keys = new ConcurrentHashMap<>();
     }
+=======
+>>>>>>> Added a Keyring to store User encryption keys.
 }

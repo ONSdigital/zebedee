@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -998,7 +999,6 @@ public class CollectionTest {
     }
 
 
-
     @Test
     public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws Exception {
 
@@ -1048,6 +1048,55 @@ public class CollectionTest {
         Collection.create(collectionDescription, zebedee, publisher1Email);
 
         // Then the expected exception is thrown
+    }
+
+
+    @Test(expected = NotFoundException.class)
+    public void versionShouldThrowNotFoundIfContentIsNotPublished() throws Exception {
+
+        // Given a URI that has not been published / does not exist.
+        String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
+
+        // When we attempt to create a version for the page
+        collection.version(publisher1Email, uri);
+
+        // Then a not found exception is thrown.
+    }
+
+    @Test(expected = ConflictException.class)
+    public void versionShouldNotCreateASecondVersionForAURI() throws Exception {
+
+        // Given a URI that has been published and already versioned in a collection.
+        String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
+        builder.createPublishedFile(uri + "/data.json");
+        collection.version(publisher1Email, uri);
+
+        // When we attempt to create a version for the page for a second time
+        collection.version(publisher1Email, uri);
+
+        // Then a ConflictException exception is thrown.
+    }
+
+    @Test
+    public void versionShouldCreateVersionForUri() throws Exception {
+
+        // Given an existing uri that has been publised.
+        String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
+        builder.createPublishedFile(uri + "/data.json");
+
+        // When the version function is called for the URI
+        ContentItemVersion version = collection.version(publisher1Email, uri);
+
+        // Then the version directory is created, with the page and associated files copied into it
+        // check versions file exists
+        Path versionsDirectoryPath = version.getVersionedContentItem().getVersionDirectoryPath();
+        assertTrue(Files.exists(versionsDirectoryPath));
+
+        // check the json file is in there
+        assertTrue(Files.exists(version.getPath()));
+
+        // check for an associated file
+        assertTrue(Files.exists(version.getPath().resolve("data.json")));
     }
 
     private Release createRelease(String uri, Date releaseDate) throws IOException {

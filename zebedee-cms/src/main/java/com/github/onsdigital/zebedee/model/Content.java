@@ -123,12 +123,10 @@ public class Content {
         if (doRedirect && (redirect != null)) {
             finalUri = redirect.get(uri);
         }
-        ;
 
         if (finalUri == null) {
             return null;
         }
-        ;
 
         Path path = toPath(finalUri);
         Path result = null;

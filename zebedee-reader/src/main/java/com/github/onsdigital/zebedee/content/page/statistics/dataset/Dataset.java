@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class Dataset extends Page {
 
-    private Link parent;
     private List<DownloadSection> downloads;
     private List<DownloadSection> supplementaryFiles;
     private List<Version> versions;
@@ -35,14 +34,6 @@ public class Dataset extends Page {
 
     public void setSupplementaryFiles(List<DownloadSection> supplementaryFiles) {
         this.supplementaryFiles = supplementaryFiles;
-    }
-
-    public Link getParent() {
-        return parent;
-    }
-
-    public void setParent(Link parent) {
-        this.parent = parent;
     }
 
     public List<Version> getVersions() {

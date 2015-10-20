@@ -48,7 +48,7 @@ public class KeyringTest {
      * Should be able to unlock a keyring with the correct password.
      */
     @Test
-    public void shouldUnlockKeypairWithCorrectPassword()  {
+    public void shouldUnlockKeypairWithCorrectPassword() {
 
         // Given
         // The deserialised keys
@@ -67,7 +67,7 @@ public class KeyringTest {
      * Shouldn't be able to unlock a keyring with an incorrect password.
      */
     @Test
-    public void shouldNotUnlockKeypairWithIncorrectPassword()  {
+    public void shouldNotUnlockKeypairWithIncorrectPassword() {
 
         // Given
         // The deserialised keys
@@ -87,7 +87,7 @@ public class KeyringTest {
      * Requesting a key from an unlocked keyring should be ok.
      */
     @Test
-    public void shouldRecoverKeyFromUnlockedKeyring()  {
+    public void shouldRecoverKeyFromUnlockedKeyring() {
 
         // Given
         // An unlocked keyring
@@ -108,7 +108,7 @@ public class KeyringTest {
      * Requesting a key from a locked keyring should return null.
      */
     @Test
-    public void shouldNotRecoverKeyFromLockedKeyring()  {
+    public void shouldNotRecoverKeyFromLockedKeyring() {
 
         // Given
         // A locked keyring
@@ -128,7 +128,7 @@ public class KeyringTest {
      * Requesting a nonexistent key should return null.
      */
     @Test
-    public void shouldNotRecoverNonexistentKeyFromKeyring()  {
+    public void shouldNotRecoverNonexistentKeyFromKeyring() {
 
         // Given
         // An unlocked keyring
@@ -149,7 +149,7 @@ public class KeyringTest {
      * Recovering a {@link SecretKey} after being cached in memory.
      */
     @Test
-    public void shouldAddKeyToKeyringInMemory()  {
+    public void shouldAddKeyToKeyringInMemory() {
 
         // Given
         // An unlocked keyring
@@ -173,7 +173,7 @@ public class KeyringTest {
      * Recovering a {@link SecretKey} after being serialised and deserialised.
      */
     @Test
-    public void shouldAddKeyToKeyringSerialised()  {
+    public void shouldAddKeyToKeyringSerialised() {
 
         // Given
         // An unlocked keyring
@@ -199,7 +199,7 @@ public class KeyringTest {
      * Changing a keyring password.
      */
     @Test
-    public void shouldChangePassword()  {
+    public void shouldChangePassword() {
 
         // Given
         // A new password
@@ -223,7 +223,7 @@ public class KeyringTest {
      * Listing collection IDs in the keyring.
      */
     @Test
-    public void shouldListKeys()  {
+    public void shouldListKeys() {
 
         // Given
         // An additional key in the keyring
@@ -246,7 +246,7 @@ public class KeyringTest {
      * Removing a key from the keyring.
      */
     @Test
-    public void shouldRemoveKey()  {
+    public void shouldRemoveKey() {
 
         // Given
         // An additional key in the keyring
@@ -265,12 +265,11 @@ public class KeyringTest {
         assertFalse(ids.contains(collectionId));
     }
 
-
     /**
      * Removing a key from the keyring.
      */
     @Test
-    public void shouldNotStoreTransientFields()  {
+    public void shouldNotStoreTransientFields() {
 
         // Given
         // Json for a keyring
@@ -315,12 +314,11 @@ public class KeyringTest {
         return StringUtils.equals(cleartext, decrypted);
     }
 
-
     /**
      * Test class that allows us to verify that fields we expect to be transient are not stored.
      */
     public class KeyringCheck {
-        public  KeyPair keyPair;
-        public  Map<String, SecretKey> keys = new ConcurrentHashMap<>();
+        public KeyPair keyPair;
+        public Map<String, SecretKey> keys = new ConcurrentHashMap<>();
     }
 }

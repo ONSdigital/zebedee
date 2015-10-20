@@ -9,6 +9,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.util.Log;
 
 import javax.crypto.SecretKey;
+import javax.ws.rs.HEAD;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -130,7 +131,10 @@ public class Keyring {
 
     /**
      * Removes a key from the keyring (and the in-memory cache).
+<<<<<<< HEAD
      *
+=======
+>>>>>>> Added a Keyring to store User encryption keys.
      * @param collectionId The collection to remove the key for.
      */
     public void remove(String collectionId) {
@@ -140,7 +144,10 @@ public class Keyring {
 
     /**
      * Lists the collection IDs in the keyring.
+<<<<<<< HEAD
      *
+=======
+>>>>>>> Added a Keyring to store User encryption keys.
      * @return An unmodifiable set of the key identifiers in the keyring.
      */
     public Set<String> list() {

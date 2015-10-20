@@ -20,6 +20,7 @@ public class DatasetLandingPage extends Statistics {
     private List<Link> relatedDatasets;
     private List<Link> relatedDocuments;
     private List<Link> datasets;
+    private Boolean timeseries;
 
     @Override
     public PageType getType() {
@@ -72,5 +73,13 @@ public class DatasetLandingPage extends Statistics {
 
     public void setDatasets(List<Link> datasets) {
         this.datasets = datasets;
+    }
+
+    public Boolean getTimeseries() {
+        return timeseries;
+    }
+
+    public void setTimeseries(Boolean timeseries) {
+        this.timeseries = timeseries;
     }
 }

@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 /**
  * Created by bren on 03/09/15.
  */
-public class TimeSeriesDataset extends DatasetLandingPage {
+public class TimeSeriesDataset extends Dataset {
 
     @Override
     public PageType getType() {

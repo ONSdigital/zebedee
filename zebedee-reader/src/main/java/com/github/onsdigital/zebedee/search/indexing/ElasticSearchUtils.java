@@ -1,26 +1,32 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
+import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.exists.ExistsRequest;
-import org.elasticsearch.action.exists.ExistsRequestBuilder;
-import org.elasticsearch.action.exists.ExistsResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.cluster.metadata.AliasMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
+import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import java.io.IOException;
+import java.util.List;
 
-import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndex;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.*;
 
 /**
  * Created by bren on 02/09/15.
@@ -83,7 +89,7 @@ class ElasticSearchUtils {
         IndicesAliasesRequestBuilder aliasBuilder = getAliasesBuilder();
         aliasBuilder.addAlias(newIndex, alias);
         if (oldIndex != null) {
-            aliasBuilder.removeAlias(oldIndex, getElasticSearchIndex());
+            aliasBuilder.removeAlias(oldIndex, getSearchAlias());
         }
         aliasBuilder.get();
     }
@@ -110,6 +116,17 @@ class ElasticSearchUtils {
         return response.isExists();
     }
 
+    //Returns first index of alias, ons alias will not have more than one index at any time
+    public String getAliasIndex(String alias) {
+        GetAliasesResponse getAliasesResponse = client.admin().indices().prepareGetAliases(alias).get();
+        ImmutableOpenMap<String, List<AliasMetaData>> aliases = getAliasesResponse.getAliases();
+        if (aliases.isEmpty()) {
+            return null;
+        }
+        ObjectObjectCursor<String, List<AliasMetaData>> next = aliases.iterator().next();
+        return next.key;
+    }
+
     public IndexRequestBuilder prepareIndex(String index, String type, String id) {
         return client.prepareIndex(index, type, id);
     }
@@ -125,6 +142,5 @@ class ElasticSearchUtils {
     private ListenableActionFuture execute(ActionRequestBuilder requestBuilder) {
         return requestBuilder.execute();
     }
-
 
 }

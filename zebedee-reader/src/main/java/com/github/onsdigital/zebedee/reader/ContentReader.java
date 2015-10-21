@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLConnection;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -253,11 +254,29 @@ class ContentReader {
     protected Resource buildResource(Path path) throws IOException {
         Resource resource = new Resource();
         resource.setName(path.getFileName().toString());
-        resource.setMimeType(probeContentType(path));
+        resource.setMimeType(determineMimeType(path));
         resource.setUri(toRelativeUri(path));
         resource.setData(newInputStream(path));
         resource.setSize(size(path));
         return resource;
+    }
+
+    /**
+     * Determine the mime type of the file at the given path.
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    private String determineMimeType(Path path) throws IOException {
+        String mimeType = probeContentType(path);
+
+        // probeContentType returning null for a number of file types. (images on mac at least)
+        // using another method as a fallback.
+        if (mimeType == null)
+            mimeType = URLConnection.guessContentTypeFromName(path.getFileName().toString());
+
+        return mimeType;
     }
 
     protected Page deserialize(Resource resource) {

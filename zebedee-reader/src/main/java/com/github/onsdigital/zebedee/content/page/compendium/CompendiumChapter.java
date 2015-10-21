@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class CompendiumChapter extends StatisticalDocument {
 
-    private List<Link> relatedDocuments;
     private Link parent;
 
     @Override
@@ -35,13 +34,5 @@ public class CompendiumChapter extends StatisticalDocument {
 
     public void setParent(Link parent) {
         this.parent = parent;
-    }
-
-    public List<Link> getRelatedDocuments() {
-        return relatedDocuments;
-    }
-
-    public void setRelatedDocuments(List<Link> relatedDocuments) {
-        this.relatedDocuments = relatedDocuments;
     }
 }

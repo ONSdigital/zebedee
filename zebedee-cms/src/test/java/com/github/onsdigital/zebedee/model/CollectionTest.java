@@ -1099,6 +1099,49 @@ public class CollectionTest {
         assertTrue(Files.exists(version.getPath().resolve("data.json")));
     }
 
+    @Test(expected = NotFoundException.class)
+    public void deleteVersionShouldThrowNotFoundIfVersionDoesNotExistInCollection() throws Exception {
+
+        // Given a collection and a URI of a version that does not exist in the collection.
+        String uri = String.format("/economy/inflationandpriceindices/timeseries/%s/previous/v1", Random.id());
+
+        // When we attempt to delete a version
+        collection.deleteVersion(uri);
+
+        // Then a not found exception is thrown.
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void deleteVersionShouldThrowBadRequestIfNotAValidVersionUri() throws Exception {
+
+        // Given a collection and a URI that is not a version.
+        String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
+
+        // When we attempt to delete a version
+        collection.deleteVersion(uri);
+
+        // Then a BadRequestException is thrown.
+    }
+
+    @Test
+    public void deleteVersionShouldDeleteVersionDirectory() throws Exception {
+
+        // Given an existing version URI
+        String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
+        builder.createPublishedFile(uri + "/data.json");
+        ContentItemVersion version = collection.version(publisher1Email, uri);
+
+        assertTrue(Files.exists(version.getPath()));
+        assertTrue(Files.exists(version.getPath().resolve("data.json")));
+
+        // When the delete version function is called for the version URI
+        collection.deleteVersion(version.getUri().toString());
+
+        // Then the versions directory is deleted.
+        assertFalse(Files.exists(version.getPath()));
+        assertFalse(Files.exists(version.getPath().resolve("data.json")));
+    }
+
     private Release createRelease(String uri, Date releaseDate) throws IOException {
         String trimmedUri = StringUtils.removeStart(uri, "/");
         Release release = new Release();

@@ -752,5 +752,27 @@ public class Collection {
         addEvent(uri, new Event(new Date(), EventType.VERSIONED, email, version.getIdentifier()));
         return version;
     }
+
+
+    /**
+     * Delete the version at the given URI.
+     *
+     * @param uri - The URI of the version to delete.
+     * @throws NotFoundException   - if the given URI was not found in the collection.
+     * @throws BadRequestException - if the given URI is not a valid version URI.
+     */
+    public void deleteVersion(String uri) throws NotFoundException, BadRequestException, IOException {
+
+        if (!VersionedContentItem.isVersionedUri(uri)) {
+            throw new BadRequestException("The given URI is not recognised as a version");
+        }
+
+        Path reviewedPath = this.reviewed.toPath(uri);
+        if (!Files.exists(reviewedPath)) {
+            throw new NotFoundException("This version does not exist in this collection");
+        }
+
+        FileUtils.deleteDirectory(reviewedPath.toFile());
+    }
 }
 

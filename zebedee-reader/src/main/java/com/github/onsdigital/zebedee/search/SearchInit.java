@@ -4,7 +4,6 @@ import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,7 +27,7 @@ public class SearchInit implements Startup {
                           @Override
                           public Object call() throws Exception {
                               try {
-                                  Indexer.getInstance().initIndex();
+                                  Indexer.getInstance().reload();
                                   return null;
                               } catch (Exception e) {
                                   throw new RuntimeException("Loading search index failed", e);

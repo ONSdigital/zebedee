@@ -49,39 +49,31 @@ public class Indexer {
     /**
      * Initializes search index and aliases, it should be run on application start.
      */
-    public void initIndex() throws IOException {
-        String searchAlias = getSearchAlias();
-        boolean aliasAvailable = searchUtils.isIndexAvailable(searchAlias);
-        String oldIndex = searchUtils.getAliasIndex(searchAlias);
-        String newIndex = generateIndexName();
-        System.out.println("Creating index:" + newIndex);
-        searchUtils.createIndex(newIndex, getSettings(), getDefaultMapping());
-
-        if (aliasAvailable && oldIndex == null) {
-            //In this case it is an index rather than an alias. This normally is not possible with index structure set up.
-            //This is a transition code due to elastic search index structure change, making deployment to environments with old structure possible without down time
-            searchUtils.deleteIndex(searchAlias);
-            searchUtils.addAlias(newIndex, searchAlias);
-            reload(newIndex);
-        } else if (oldIndex == null) {
-            searchUtils.addAlias(newIndex,searchAlias);
-            reload(newIndex);
-        } else {
-            reload(newIndex);
-            searchUtils.swapIndex(oldIndex, newIndex, searchAlias);
-            System.out.println("Deleting old index:" + oldIndex);
-            searchUtils.deleteIndex(oldIndex);
-        }
-    }
-
-    private void reload(String indexName) throws IOException {
+    public void reload() throws IOException {
         if (LOCK.tryLock()) {
             try {
-                long start = System.currentTimeMillis();
-                System.out.println("Triggering re-indexing on index:" + indexName);
-                doLoad(indexName);
-                long end = System.currentTimeMillis();
-                System.out.println("Elasticsearch: indexing complete in " + (end - start) + " ms");
+                String searchAlias = getSearchAlias();
+                boolean aliasAvailable = searchUtils.isIndexAvailable(searchAlias);
+                String oldIndex = searchUtils.getAliasIndex(searchAlias);
+                String newIndex = generateIndexName();
+                System.out.println("Creating index:" + newIndex);
+                searchUtils.createIndex(newIndex, getSettings(), getDefaultMapping());
+
+                if (aliasAvailable && oldIndex == null) {
+                    //In this case it is an index rather than an alias. This normally is not possible with index structure set up.
+                    //This is a transition code due to elastic search index structure change, making deployment to environments with old structure possible without down time
+                    searchUtils.deleteIndex(searchAlias);
+                    searchUtils.addAlias(newIndex, searchAlias);
+                    doLoad(newIndex);
+                } else if (oldIndex == null) {
+                    searchUtils.addAlias(newIndex, searchAlias);
+                    doLoad(newIndex);
+                } else {
+                    doLoad(newIndex);
+                    searchUtils.swapIndex(oldIndex, newIndex, searchAlias);
+                    System.out.println("Deleting old index:" + oldIndex);
+                    searchUtils.deleteIndex(oldIndex);
+                }
             } finally {
                 LOCK.unlock();
             }
@@ -90,17 +82,12 @@ public class Indexer {
         }
     }
 
-    /**
-     * Scans and re-indexes all documents overwriting existing documents.
-     *
-     * @throws IOException
-     */
-    public void reload() throws IOException {
-        reload(getSearchAlias());
-    }
-
-    private void doLoad(String index) throws IOException {
-        indexDocuments(index);
+    private void doLoad(String indexName) throws IOException {
+        long start = System.currentTimeMillis();
+        System.out.println("Triggering re-indexing on index:" + indexName);
+        indexDocuments(indexName);
+        long end = System.currentTimeMillis();
+        System.out.println("Elasticsearch: indexing complete in " + (end - start) + " ms");
     }
 
     /**
@@ -108,6 +95,7 @@ public class Indexer {
      *
      * @param uri
      */
+
     public void reloadContent(String uri) throws IOException {
         try {
             System.out.println("Triggering reindex for content, uri:" + uri);
@@ -262,7 +250,7 @@ public class Indexer {
 
     public static void main(String[] args) {
         try {
-            Indexer.getInstance().initIndex();
+            Indexer.getInstance().reload();
         } catch (IOException e) {
             e.printStackTrace();
         }

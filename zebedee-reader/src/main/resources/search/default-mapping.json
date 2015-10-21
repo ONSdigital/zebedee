@@ -11,6 +11,9 @@
       },
       "title_edition": {
         "type": "string",
+        "norms": {
+          "enabled": false
+        },
         "index_analyzer": "ons_index_analyzer"
       },
       "description": {

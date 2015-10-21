@@ -14,6 +14,7 @@ analysis :
           char_filter : char_mapping
           filter :
             - lowercase
+            - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
             - standard
             - stop
             - porter_stem
@@ -22,7 +23,6 @@ analysis :
       char_filter : char_mapping
       filter :
         - lowercase
-        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
         - standard
         - stop
         - porter_stem

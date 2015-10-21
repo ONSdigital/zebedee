@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.base;
 
 import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
@@ -22,6 +23,7 @@ public abstract class StatisticalDocument extends Statistics {
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
+    private List<Version> versions;
 
     public List<MarkdownSection> getSections() {
         return sections;
@@ -77,5 +79,13 @@ public abstract class StatisticalDocument extends Statistics {
 
     public void setTopics(List<Link> topics) {
         this.topics = topics;
+    }
+
+    public List<Version> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<Version> versions) {
+        this.versions = versions;
     }
 }

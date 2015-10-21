@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.content.page.statistics.dataset;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.List;
 

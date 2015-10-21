@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.util.GraphUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,10 @@ public class Content {
     // todo: remove timeseries filter once we are caching the browse tree.
     private static boolean isNotTimeseries(Path p) {
         return !p.getFileName().toString().contains("timeseries");
+    }
+
+    private static boolean isNotPreviousVersions(Path p) {
+        return !p.getFileName().toString().contains(VersionedContentItem.getVersionDirectoryName());
     }
 
     private static List<Path> listTimeSeriesDirectories(Path root) throws IOException {
@@ -198,7 +203,9 @@ public class Content {
     public List<ContentDetail> details() throws IOException {
         List<ContentDetail> details = new ArrayList<>();
         for (String uri : this.uris("*data*.json")) {
-            details.add(details(path.resolve(uri.replaceFirst("/", ""))));
+            if (!VersionedContentItem.isVersionedUri(uri)) {
+                details.add(details(path.resolve(uri.replaceFirst("/", ""))));
+            }
         }
         return details;
     }
@@ -228,7 +235,7 @@ public class Content {
         // todo: remove timeseries filter once we are caching the browse tree.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path entry : stream) {
-                if (Files.isDirectory(entry) && isNotTimeseries(entry)) {
+                if (Files.isDirectory(entry) && isNotTimeseries(entry) && isNotPreviousVersions(entry)) {
                     ContentDetail child = nestedDetails(entry);
                     if (child != null) {
                         detail.children.add(child);

@@ -6,8 +6,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class VersionedContentItemTest {
@@ -25,5 +24,30 @@ public class VersionedContentItemTest {
         // Then a directory exists for the version and the version identifier is set as expected.
         assertTrue(Files.exists(version.getDataFilePath()));
         assertEquals("v1", version.getIdentifier());
+    }
+
+    @Test
+    public void isVersionedUriShouldReturnFalseIfNotVersioned() {
+        // Given a URI that is not versioned (does not live under the "previous" versions directory)
+        String uri = "/some/content/not/versioned";
+
+        // When the static isVersionedUri method is called
+        boolean isVersioned = VersionedContentItem.isVersionedUri(uri);
+
+        // Then the result should be false
+        assertFalse(isVersioned);
+    }
+
+    @Test
+    public void isVersionedUriShouldReturnTrueIfVersioned() {
+
+        // Given a URI that is versioned (lives under "previous" directory and is prefixed with "v")
+        String uri = "/some/content/previous/v1";
+
+        // When the static isVersionedUri method is called
+        boolean isVersioned = VersionedContentItem.isVersionedUri(uri);
+
+        // Then the result should be true
+        assertTrue(isVersioned);
     }
 }

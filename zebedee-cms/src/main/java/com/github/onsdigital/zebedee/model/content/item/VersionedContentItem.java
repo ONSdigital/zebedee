@@ -20,13 +20,26 @@ import java.nio.file.Path;
 public class VersionedContentItem extends ContentItem {
 
     private static final String VERSION_DIRECTORY = "previous";
+    private static final String VERSION_PREFIX = "v";
 
     public VersionedContentItem(URI uri, Path path) throws NotFoundException {
         super(uri, path);
     }
 
-    private static String getVersionDirectoryName() {
+    public static String getVersionDirectoryName() {
         return VERSION_DIRECTORY;
+    }
+
+    /**
+     * Utility function to determine if a give uri is that of a previous version.
+     * <p>
+     * Versioned URI's will have /
+     *
+     * @param uri
+     * @return
+     */
+    public static boolean isVersionedUri(String uri) {
+        return uri.contains(String.format("/%s/%s", getVersionDirectoryName(), VERSION_PREFIX));
     }
 
     /**
@@ -106,6 +119,6 @@ public class VersionedContentItem extends ContentItem {
             version = getVersionDirectoryPath().toFile().listFiles().length + 1;
         }
 
-        return "v" + version;
+        return VERSION_PREFIX + version;
     }
 }

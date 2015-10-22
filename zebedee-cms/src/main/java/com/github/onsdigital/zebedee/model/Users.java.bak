@@ -254,6 +254,7 @@ public class Users {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
+
     public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException {
         boolean result = false;
 
@@ -268,12 +269,7 @@ public class Users {
 
         User user = read(credentials.email);
 
-        // Check if this is admin resetting, or own user updating
-        if (!zebedee.permissions.isAdministrator(session) && StringUtils.isBlank(credentials.oldPassword)) {
-            throw new UnauthorizedException("Passwords must be changed by admins or own user");
-        }
-
-        // If own user updating, ensure the old password is correct
+        // Check the request
         if (!zebedee.permissions.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
             throw new BadRequestException("Authentication failed with old password.");
         }
@@ -285,6 +281,8 @@ public class Users {
             // Administrator reset, or system setup
             resetPassword(user, credentials.password, session.email);
             result = true;
+        } else {
+            throw new UnauthorizedException("Passwords must be changed by admins or own user");
         }
 
         return result;

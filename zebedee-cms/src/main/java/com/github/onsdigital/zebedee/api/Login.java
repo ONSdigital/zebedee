@@ -57,8 +57,9 @@ public class Login {
             return "Password change required";
         } else {
             response.setStatus(HttpStatus.OK_200);
-            return Root.zebedee.sessions.create(credentials.email).id;
         }
+
+        return Root.zebedee.sessions.create(credentials.email).id;
     }
 
 }

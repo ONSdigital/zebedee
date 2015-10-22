@@ -10,7 +10,7 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -42,9 +42,12 @@ public class Users {
      * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException {
-        zebedee.users.create(user, session.email);
-        zebedee.users.setPassword(user, password, session.email, true);
+    public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException, ConflictException, BadRequestException {
+        zebedee.users.create(session, user);
+        Credentials credentials = new Credentials();
+        credentials.email = user.email;
+        credentials.password = password;
+        zebedee.users.setPassword(session, credentials);
         zebedee.permissions.addEditor(user.email, session);
     }
 
@@ -63,14 +66,16 @@ public class Users {
             return;
         }
 
-        zebedee.users.create(user, password);
-        zebedee.users.setPassword(user, password, null, false);
+        // Create the user at a lower level because we don't have a Session at this point:
+        zebedee.users.create(user, "system");
+        zebedee.users.resetPassword(user, password, "system");
         zebedee.permissions.addEditor(user.email, null);
         zebedee.permissions.addAdministrator(user.email, null);
     }
 
     /**
      * Lists all users of the system.
+     *
      * @return The list of users on the system.
      * @throws IOException If a general filesystem error occurs.
      */
@@ -121,7 +126,7 @@ public class Users {
         }
 
         if (!valid(user)) {
-            throw new BadRequestException("Insufficient user details given");
+            throw new BadRequestException("Insufficient user details given (name, email)");
         }
 
         return create(user, session.email);
@@ -153,32 +158,6 @@ public class Users {
     }
 
     /**
-     * Updates the specified {@link com.github.onsdigital.zebedee.json.User}.
-     * NB this does not allow you to update the email address, because
-     * that would entail renaming the Json file that contains the user record.
-     *
-     * @param user The user record to be updated
-     * @return The updated record.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public User update(User user) throws IOException {
-        User result = null;
-
-        if (exists(user)) {
-
-            result = read(user.email);
-            if (StringUtils.isNotBlank(user.name))
-                result.name = user.name;
-            if (user.inactive != null)
-                result.inactive = user.inactive;
-
-            write(result);
-        }
-
-        return result;
-    }
-
-    /**
      * Update user details
      *
      * At present user email cannot be updated
@@ -199,21 +178,31 @@ public class Users {
         }
 
         if (!zebedee.users.exists(user)) {
-            throw new NotFoundException("User " + user.email + " could not be updated");
+            throw new NotFoundException("User " + user.email + " could not be found");
         }
 
-        User updated = null;
-        user.lastAdmin = session.email;
+        if (!valid(user)) {
+            throw new BadRequestException("Insufficient user details given (name, email)");
+        }
 
-        updated = update(user);
+        // Update
+        User updated = update(user, session.email);
 
         // We'll allow changing the email at some point.
         // It entails renaming the json file and checking
         // that the new email doesn't already exist.
-        if (updated == null) {
-            throw new BadRequestException("Unknown bad request exception");
-        }
 
+        return updated;
+    }
+
+    User update(User user, String lastAdmin) throws IOException {
+
+        User updated = read(user.email);
+        updated.name = user.name;
+        updated.lastAdmin = lastAdmin;
+        // Only set this to true if explicitly set:
+        updated.inactive = BooleanUtils.isTrue(user.inactive);
+        write(updated);
         return updated;
     }
 
@@ -263,26 +252,6 @@ public class Users {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
-    /**
-     * Authenticates using the given email address and password.
-     *
-     * @param email    The user ID.
-     * @param password The user's password.
-     * @return If given email maps to a {@link com.github.onsdigital.zebedee.json.User} record
-     * and the password validates against the stored hash, true.
-     * @throws IOException
-     */
-    public boolean authenticate(String email, String password) throws IOException {
-        boolean result = false;
-
-        User user = read(email);
-        if (user != null && user.authenticate(password)) {
-            result = true;
-        }
-
-        return result;
-    }
-
 
     public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException {
         boolean result = false;
@@ -291,65 +260,72 @@ public class Users {
             throw new UnauthorizedException("Not authenticated.");
         }
 
-        // Passwords can be changed by ...
-        boolean permissionToChange = false;
-        if (!zebedee.permissions.hasAdministrator() ||                  // anyone if we are setting a brand new password
-                zebedee.permissions.isAdministrator(session.email) ||   // an administrator
-                credentials.email.equalsIgnoreCase(session.email)       // the user themselves
-                ) {
-            permissionToChange = true;
-        }
-
-        if (!permissionToChange) {
-            throw new UnauthorizedException("Passwords must be changed by admins or own user");
-        }
-
         // Check the request
         if (credentials == null || !zebedee.users.exists(credentials.email)) {
-            throw new BadRequestException("Please provide credentials (email, password)");
+            throw new BadRequestException("Please provide credentials (email, password[, oldPassword])");
         }
 
-        boolean temporaryPassword = BooleanUtils.isNotFalse(credentials.temporaryPassword);
         User user = read(credentials.email);
-        if (user != null) {
-            result = setPassword(user, credentials.password, session.email, temporaryPassword);
+
+        // Check the request
+        if (!zebedee.permissions.isAdministrator(session) && user.authenticate(credentials.oldPassword)) {
+            throw new BadRequestException("Authentication failed with old password.");
+        }
+
+        if (credentials.email.equalsIgnoreCase(session.email) && StringUtils.isNotBlank(credentials.password)) {
+            // User changing their own password
+            result = changePassword(user, credentials.oldPassword, credentials.password);
+        } else if (zebedee.permissions.isAdministrator(session.email) || !zebedee.permissions.hasAdministrator()) {
+            // Administrator reset, or system setup
+            resetPassword(user, credentials.password, session.email);
+            result = true;
+        } else {
+            throw new UnauthorizedException("Passwords must be changed by admins or own user");
         }
 
         return result;
     }
 
     /**
-     * Sets the specified user's password and sets the account to active.
+     * Changes the user's password and sets the account to active.
+     * This is done by the user themselves so the password is marked as not temporary.
      *
-     * If it is the user changing the password marks it as permanent
-     * If an admin is setting marks the password as temporary
-     *
-     * @param user     The user.
-     * @param password The password to set.
-     * @return True if the password was set. If no user exists for the given email address, false.
+     * @param user        The user.
+     * @param oldPassword The current password.
+     * @param oldPassword The new password to set.
      * @throws IOException If a filesystem error occurs.
      */
-
-    private boolean setPassword(User user, String password, String adminEmail, boolean temporaryPassword) throws IOException {
+    private boolean changePassword(User user, String oldPassword, String newPassword) throws IOException {
         boolean result = false;
 
-        if (user != null) {
-            user.resetPassword(password);
+        result = user.changePassword(oldPassword, newPassword);
+        if (result) {
             user.inactive = false;
-            user.lastAdmin = adminEmail;
-
-            // Temporary password - if the password is set by a different user.
-            if (StringUtils.equalsIgnoreCase(user.email, adminEmail)) {
-                user.temporaryPassword = false;
-            } else {
-                user.temporaryPassword = temporaryPassword;
-            }
-
+            user.lastAdmin = user.email;
+            user.temporaryPassword = false;
             write(user);
             result = true;
         }
 
         return result;
+    }
+
+    /**
+     * Resets the specified user's password and sets the account to active.
+     * This is done by an admin so the password is marked as temporary.
+     *
+     * @param user       The user.
+     * @param password   The password to set.
+     * @param adminEmail The user resetting the password.
+     * @throws IOException If a filesystem error occurs.
+     */
+
+    private void resetPassword(User user, String password, String adminEmail) throws IOException {
+        user.resetPassword(password);
+        user.inactive = false;
+        user.lastAdmin = adminEmail;
+        user.temporaryPassword = true;
+        write(user);
     }
 
     /**

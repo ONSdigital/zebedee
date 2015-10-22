@@ -65,6 +65,7 @@ public class User extends UserSanitised {
         // Update the password hash
         passwordHash = Password.hash(password);
 
+
         // Generate a new key pair and wipe out any stored keys.
         // Without the original password none of the stored keys can be recovered.
         keyring = Keyring.generate(password);

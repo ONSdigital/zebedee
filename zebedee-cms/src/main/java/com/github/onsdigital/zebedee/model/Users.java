@@ -254,7 +254,6 @@ public class Users {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
-
     public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException {
         boolean result = false;
 

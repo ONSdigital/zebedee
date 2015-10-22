@@ -25,14 +25,6 @@ public class User extends UserSanitised {
     }
 
     /**
-     * Constructor for creating a new user.
-     */
-    public User(String password) {
-        passwordHash = Password.hash(password);
-        keyring = Keyring.generate(password);
-    }
-
-    /**
      * Authenticates this user.
      * @param password The user's password.
      * @return If the given password can be verified against {@link #passwordHash}, true.

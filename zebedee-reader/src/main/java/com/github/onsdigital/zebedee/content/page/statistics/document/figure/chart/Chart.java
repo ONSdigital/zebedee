@@ -1,12 +1,12 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureBase;
 
 import java.util.List;
 import java.util.Map;
 
-public class Chart extends Page {
+public class Chart extends FigureBase {
 
     private String title;
     private String subtitle;

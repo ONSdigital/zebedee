@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.figure.table;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureBase;
 
-public class Table extends Page {
+public class Table extends FigureBase {
 
     private String title;
     private String html;

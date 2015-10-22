@@ -28,7 +28,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.serialise;
-import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchIndex;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getSearchAlias;
 
 public class Indexer {
     private static Indexer instance = new Indexer();
@@ -47,33 +47,33 @@ public class Indexer {
     }
 
     /**
-     * Initializes search index if it does not exist in the cluster, meaning it is the first node writing to elastic search cluster.
-     * It should be run on application start.
-     */
-    public void initIndex() throws IOException {
-        if (searchUtils.isIndexAvailable(getElasticSearchIndex())) {
-            System.out.println("Elastic search index already exists, skipping reindexing");
-        } else {
-            searchUtils.createIndex(getElasticSearchIndex(), getSettings(), getDefaultMapping());
-            reload();
-        }
-    }
-
-
-
-    /**
-     * Scans and re-indexes all documents overwriting existing documents. Note that this will not delete documents that does not exist on the file system from the index
-     *
-     * @throws IOException
+     * Initializes search index and aliases, it should be run on application start.
      */
     public void reload() throws IOException {
         if (LOCK.tryLock()) {
             try {
-                long start = System.currentTimeMillis();
-                System.out.println("Triggering reindex");
-                doLoad();
-                long end = System.currentTimeMillis();
-                System.out.println("Elasticsearch: indexing complete in" + (start - end) + " ms");
+                String searchAlias = getSearchAlias();
+                boolean aliasAvailable = searchUtils.isIndexAvailable(searchAlias);
+                String oldIndex = searchUtils.getAliasIndex(searchAlias);
+                String newIndex = generateIndexName();
+                System.out.println("Creating index:" + newIndex);
+                searchUtils.createIndex(newIndex, getSettings(), getDefaultMapping());
+
+                if (aliasAvailable && oldIndex == null) {
+                    //In this case it is an index rather than an alias. This normally is not possible with index structure set up.
+                    //This is a transition code due to elastic search index structure change, making deployment to environments with old structure possible without down time
+                    searchUtils.deleteIndex(searchAlias);
+                    searchUtils.addAlias(newIndex, searchAlias);
+                    doLoad(newIndex);
+                } else if (oldIndex == null) {
+                    searchUtils.addAlias(newIndex, searchAlias);
+                    doLoad(newIndex);
+                } else {
+                    doLoad(newIndex);
+                    searchUtils.swapIndex(oldIndex, newIndex, searchAlias);
+                    System.out.println("Deleting old index:" + oldIndex);
+                    searchUtils.deleteIndex(oldIndex);
+                }
             } finally {
                 LOCK.unlock();
             }
@@ -82,8 +82,12 @@ public class Indexer {
         }
     }
 
-    private void doLoad() throws IOException {
-        indexDocuments(getElasticSearchIndex());
+    private void doLoad(String indexName) throws IOException {
+        long start = System.currentTimeMillis();
+        System.out.println("Triggering re-indexing on index:" + indexName);
+        indexDocuments(indexName);
+        long end = System.currentTimeMillis();
+        System.out.println("Elasticsearch: indexing complete in " + (end - start) + " ms");
     }
 
     /**
@@ -91,6 +95,7 @@ public class Indexer {
      *
      * @param uri
      */
+
     public void reloadContent(String uri) throws IOException {
         try {
             System.out.println("Triggering reindex for content, uri:" + uri);
@@ -102,9 +107,9 @@ public class Indexer {
             if (isPeriodic(page.getType())) {
                 //TODO: optimize resolving latest flag, only update elastic search for existing releases rather than reindexing
                 //Load old releases as well to get latest flag re-calculated
-                index(getElasticSearchIndex(), new FileScanner().scan(URIUtils.removeLastSegment(uri)));
+                index(getSearchAlias(), new FileScanner().scan(URIUtils.removeLastSegment(uri)));
             } else {
-                indexSingleContent(getElasticSearchIndex(), page);
+                indexSingleContent(getSearchAlias(), page);
             }
             long end = System.currentTimeMillis();
             System.out.println("Elasticsearch: indexing complete for uri " + uri + " in " + (start - end) + " ms");
@@ -116,7 +121,7 @@ public class Indexer {
     }
 
     private String generateIndexName() {
-        return getElasticSearchIndex() + System.currentTimeMillis();
+        return getSearchAlias() + System.currentTimeMillis();
     }
 
 
@@ -241,5 +246,13 @@ public class Indexer {
                 .build();
 
         return bulkProcessor;
+    }
+
+    public static void main(String[] args) {
+        try {
+            Indexer.getInstance().reload();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

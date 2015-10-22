@@ -14,6 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.ws.rs.HEAD;
 import java.io.IOException;
 
 import static org.junit.Assert.*;

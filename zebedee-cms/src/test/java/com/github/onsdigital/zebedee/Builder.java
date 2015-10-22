@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.Root;
@@ -98,7 +97,7 @@ public class Builder {
         User jukesie = new User();
         jukesie.name = "Matt Jukes";
         jukesie.email = "jukesie@example.com";
-        jukesie.passwordHash = Password.hash("twitter");
+        jukesie.resetPassword("twitter");
         jukesie.inactive = false;
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(jukesie.email) + ".json"))) {
             Serialiser.serialise(outputStream, jukesie);
@@ -108,7 +107,7 @@ public class Builder {
         User patricia = new User();
         patricia.name = "Patricia Pumpkin";
         patricia.email = "patricia@example.com";
-        patricia.passwordHash = Password.hash("password");
+        patricia.resetPassword("password");
         patricia.inactive = false;
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(patricia.email) + ".json"))) {
             Serialiser.serialise(outputStream, patricia);
@@ -118,7 +117,7 @@ public class Builder {
         User bernard = new User();
         bernard.name = "Bernard Black";
         bernard.email = "bernard@example.com";
-        bernard.passwordHash = Password.hash("grumpy");
+        bernard.resetPassword("grumpy");
         bernard.inactive = false;
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(bernard.email) + ".json"))) {
             Serialiser.serialise(outputStream, bernard);
@@ -128,7 +127,7 @@ public class Builder {
         User freddy = new User();
         freddy.name = "freddy Pumpkin";
         freddy.email = "freddy@example.com";
-        freddy.passwordHash = Password.hash("password");
+        freddy.resetPassword("password");
         freddy.inactive = false;
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(freddy.email) + ".json"))) {
             Serialiser.serialise(outputStream, freddy);
@@ -138,7 +137,7 @@ public class Builder {
         User ronny = new User();
         ronny.name = "Ronny Roller";
         ronny.email = "ronny@example.com";
-        ronny.passwordHash = Password.hash("secret");
+        ronny.resetPassword("secret");
         ronny.inactive = false;
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(ronny.email) + ".json"))) {
             Serialiser.serialise(outputStream, ronny);

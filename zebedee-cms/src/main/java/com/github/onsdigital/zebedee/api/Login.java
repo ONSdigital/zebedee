@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang.BooleanUtils;
@@ -31,7 +33,7 @@ public class Login {
      * @throws IOException
      */
     @POST
-    public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException {
+    public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
 
         if (credentials == null || StringUtils.isBlank(credentials.email)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
@@ -47,13 +49,12 @@ public class Login {
 
         User user = Root.zebedee.users.get(credentials.email);
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
-            response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return "Password change required";
         } else {
             response.setStatus(HttpStatus.OK_200);
+            return Root.zebedee.sessions.create(credentials.email).id;
         }
-
-        return Root.zebedee.sessions.create(credentials.email).id;
     }
 
 }

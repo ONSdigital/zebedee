@@ -52,7 +52,7 @@ public class Users {
             if (StringUtils.isBlank(email)) {
                 result = sanitise(Root.zebedee.users.list());
             } else {
-                result =  sanitise(Root.zebedee.users.get(email));
+                result = sanitise(Root.zebedee.users.get(email));
             }
         }
 
@@ -89,9 +89,9 @@ public class Users {
      * At present user email cannot be updated
      *
      * @param request  Requires an admin session
-     * @param response
+     * @param response The updated user
      * @param user     A user object with the new details
-     * @return
+     * @return A sanitised view of the updated {@link User}
      * @throws IOException
      * @throws UnauthorizedException - Session does not have update permissions
      * @throws NotFoundException     - user account does not exist
@@ -110,9 +110,9 @@ public class Users {
     /**
      * Delete a user account
      *
-     * @param request  - requires an admin session - also an email as parameter
-     * @param response
-     * @return
+     * @param request  Requires an admin session - also an email as parameter
+     * @param response Whether or not the user was deleted.
+     * @return If the user was deleted, true.
      * @throws UnauthorizedException - user cannot be deleted using this account
      * @throws IOException           - general file io
      * @throws NotFoundException     - user could not be found

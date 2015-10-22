@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -16,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,8 +43,8 @@ public class Users {
      * @throws IOException If a filesystem error occurs.
      */
     public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException {
-        user.passwordHash = Password.hash(password);
-        zebedee.users.write(user);
+        zebedee.users.create(user, session.email);
+        zebedee.users.setPassword(user, password, session.email, true);
         zebedee.permissions.addEditor(user.email, session);
     }
 
@@ -61,13 +59,23 @@ public class Users {
     public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException {
 
         if (zebedee.permissions.hasAdministrator()) {
+            // An initial system user already exists
             return;
         }
 
-        zebedee.users.create(user);
-        zebedee.users.setPassword(user.email, password, null);
+        zebedee.users.create(user, password);
+        zebedee.users.setPassword(user, password, null, false);
         zebedee.permissions.addEditor(user.email, null);
         zebedee.permissions.addAdministrator(user.email, null);
+    }
+
+    /**
+     * Lists all users of the system.
+     * @return The list of users on the system.
+     * @throws IOException If a general filesystem error occurs.
+     */
+    public UserList list() throws IOException {
+        return zebedee.users.listAll();
     }
 
     /**
@@ -75,37 +83,11 @@ public class Users {
      *
      * @param email The user's email in order to locate the user record.
      * @return The requested user, unless the email is blank or no record exists for this email.
-     * @throws IOException If a filesystem error occurs.
+     * @throws IOException         If a general filesystem error occurs.
+     * @throws NotFoundException   If the email cannot be found
+     * @throws BadRequestException If the email is left blank
      */
-    public User get(String email) throws IOException {
-
-        // Check the user record exists:
-        if (!exists(email)) {
-            return null;
-        }
-
-        // Now deserialise the json to a user:
-        User user;
-        Path userPath = userPath(email);
-        try (InputStream input = Files.newInputStream(userPath)) {
-            user = Serialiser.deserialise(input, User.class);
-        }
-
-        return user;
-    }
-
-    /**
-     * Gets the record for an existing user to be used by api get requests
-     *
-     * @param session a user session
-     * @param email the user email
-     * @return
-     * @throws IOException - if a filesystem error occurs
-     * @throws NotFoundException - if the email cannot be found
-     * @throws BadRequestException - if the email is left blank
-     */
-    public User get(Session session,
-                    String email) throws IOException, NotFoundException, BadRequestException {
+    public User get(String email) throws IOException, NotFoundException, BadRequestException {
 
         // Check email isn't blank (though this should redirect to userlist)
         if (StringUtils.isBlank(email)) {
@@ -117,65 +99,17 @@ public class Users {
             throw new NotFoundException("User for email " + email + " not found");
         }
 
-        // Now deserialise the json to a user:
-        User user;
-        Path userPath = userPath(email);
-        try (InputStream input = Files.newInputStream(userPath)) {
-            user = Serialiser.deserialise(input, User.class);
-        }
-
-        return user;
-    }
-
-    public UserList getUserList(Session session) throws IOException {
-        return zebedee.users.list();
-    }
-
-
-    private User removePasswordHash(User user) {
-        if (user != null) {
-            // Blank out the password hash.
-            // Not strictly necessary, but sensible.
-            user.passwordHash = null;
-        }
-        return user;
+        return read(email);
     }
 
     /**
-     * Creates a new user.
+     * Creates a new user. This is designed to be called by an admin user, through the API.
      *
      * @param user The specification for the new user to be created. The name and email will be used.
      * @return The newly created user, unless a user already exists, or the supplied {@link com.github.onsdigital.zebedee.json.User} is not valid.
      * @throws IOException If a filesystem error occurs.
      */
-    public User create(User user) throws IOException {
-        User result = null;
-
-        if (valid(user) && !exists(user.email)) {
-
-            result = new User();
-            result.email = user.email;
-            result.name = user.name;
-            result.inactive = true;
-
-            Path userPath = userPath(result.email);
-            try (OutputStream output = Files.newOutputStream(userPath)) {
-                Serialiser.serialise(output, result);
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Creates a new user.
-     *
-     * @param user The specification for the new user to be created. The name and email will be used.
-     * @return The newly created user, unless a user already exists, or the supplied {@link com.github.onsdigital.zebedee.json.User} is not valid.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public User create(Session session,
-                       User user) throws UnauthorizedException, IOException, ConflictException, BadRequestException {
+    public User create(Session session, User user) throws UnauthorizedException, IOException, ConflictException, BadRequestException {
 
         // Check the user has create permissions
         if (!zebedee.permissions.isAdministrator(session)) {
@@ -190,16 +124,29 @@ public class Users {
             throw new BadRequestException("Insufficient user details given");
         }
 
-        User result = new User();
-        result.email = user.email;
-        result.name = user.name;
-        result.inactive = true;
-        result.temporaryPassword = true;
-        result.lastAdmin = session.email;
+        return create(user, session.email);
+    }
 
-        Path userPath = userPath(result.email);
-        try (OutputStream output = Files.newOutputStream(userPath)) {
-            Serialiser.serialise(output, result);
+    /**
+     * Creates a new user. This is designed to be used internally to create a user directly.
+     *
+     * @param user      The specification for the new user to be created. The name and email will be used.
+     * @param lastAdmin The email address of the user creating this record.
+     * @return The newly created user, unless a user already exists, or the supplied {@link com.github.onsdigital.zebedee.json.User User} is not valid.
+     * @throws IOException If a filesystem error occurs.
+     */
+    User create(User user, String lastAdmin) throws IOException {
+        User result = null;
+
+        if (valid(user) && !exists(user.email)) {
+
+            result = new User();
+            result.email = user.email;
+            result.name = user.name;
+            result.inactive = true;
+            result.temporaryPassword = true;
+            result.lastAdmin = lastAdmin;
+            write(result);
         }
 
         return result;
@@ -219,7 +166,7 @@ public class Users {
 
         if (exists(user)) {
 
-            result = get(user.email);
+            result = read(user.email);
             if (StringUtils.isNotBlank(user.name))
                 result.name = user.name;
             if (user.inactive != null)
@@ -237,12 +184,12 @@ public class Users {
      * At present user email cannot be updated
      *
      * @param session
-     * @param user - a user object with the new details
+     * @param user    - a user object with the new details
      * @return
      * @throws IOException
      * @throws UnauthorizedException - Session does not have update permissions
-     * @throws NotFoundException - user account does not exist
-     * @throws BadRequestException - problem with the update
+     * @throws NotFoundException     - user account does not exist
+     * @throws BadRequestException   - problem with the update
      */
     public User update(Session session,
                        User user) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
@@ -274,7 +221,7 @@ public class Users {
      * Delete a user account
      *
      * @param session - an admin user session
-     * @param user - a user object to delete
+     * @param user    - a user object to delete
      * @return
      * @throws UnauthorizedException
      * @throws IOException
@@ -291,9 +238,7 @@ public class Users {
         }
 
         Path path = userPath(user.email);
-        Files.deleteIfExists(path);
-
-        return true;
+        return Files.deleteIfExists(path);
     }
 
     /**
@@ -330,8 +275,8 @@ public class Users {
     public boolean authenticate(String email, String password) throws IOException {
         boolean result = false;
 
-        User user = get(email);
-        if (user != null && Password.verify(password, user.passwordHash)) {
+        User user = read(email);
+        if (user != null && user.authenticate(password)) {
             result = true;
         }
 
@@ -340,6 +285,7 @@ public class Users {
 
 
     public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException {
+        boolean result = false;
 
         if (session == null) {
             throw new UnauthorizedException("Not authenticated.");
@@ -364,8 +310,12 @@ public class Users {
         }
 
         boolean temporaryPassword = BooleanUtils.isNotFalse(credentials.temporaryPassword);
+        User user = read(credentials.email);
+        if (user != null) {
+            result = setPassword(user, credentials.password, session.email, temporaryPassword);
+        }
 
-        return setPassword(credentials.email, credentials.password, session.email, temporaryPassword);
+        return result;
     }
 
     /**
@@ -374,25 +324,24 @@ public class Users {
      * If it is the user changing the password marks it as permanent
      * If an admin is setting marks the password as temporary
      *
-     * @param email    The user ID.
+     * @param user     The user.
      * @param password The password to set.
      * @return True if the password was set. If no user exists for the given email address, false.
      * @throws IOException If a filesystem error occurs.
      */
-    private boolean setPassword(String email, String password, String adminEmail, boolean temporaryPassword) throws IOException {
+
+    private boolean setPassword(User user, String password, String adminEmail, boolean temporaryPassword) throws IOException {
         boolean result = false;
 
-        User user = get(email);
         if (user != null) {
-            user.passwordHash = Password.hash(password);
+            user.resetPassword(password);
             user.inactive = false;
+            user.lastAdmin = adminEmail;
 
-            // Temporary password
-            if(email.equalsIgnoreCase(adminEmail)) {
-                user.lastAdmin = email;
+            // Temporary password - if the password is set by a different user.
+            if (StringUtils.equalsIgnoreCase(user.email, adminEmail)) {
                 user.temporaryPassword = false;
             } else {
-                user.lastAdmin = adminEmail;
                 user.temporaryPassword = temporaryPassword;
             }
 
@@ -401,10 +350,6 @@ public class Users {
         }
 
         return result;
-    }
-
-    private boolean setPassword(String email, String password, String adminEmail) throws IOException {
-        return setPassword(email, password, adminEmail, true);
     }
 
     /**
@@ -418,6 +363,22 @@ public class Users {
     }
 
     /**
+     * Reads a user record from disk.
+     *
+     * @param email The identifier for the record to be read.
+     * @return The read user, if any.
+     * @throws IOException
+     */
+    private User read(String email) throws IOException {
+        User result = null;
+        if (exists(email)) {
+            Path userPath = userPath(email);
+            result = Serialiser.deserialise(userPath, User.class);
+        }
+        return result;
+    }
+
+    /**
      * Writes a user record to disk.
      *
      * @param user The record to be written.
@@ -426,9 +387,7 @@ public class Users {
     private void write(User user) throws IOException {
         user.email = normalise(user.email);
         Path userPath = userPath(user.email);
-        try (OutputStream output = Files.newOutputStream(userPath)) {
-            Serialiser.serialise(output, user);
-        }
+        Serialiser.serialise(userPath, user);
     }
 
     /**
@@ -460,9 +419,9 @@ public class Users {
     /**
      * Return a collection of all users registered in the system
      *
-     * @return
+     * @return A list of all users.
      */
-    public UserList list() throws IOException {
+    public UserList listAll() throws IOException {
         UserList result = new UserList();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(users)) {
             for (Path path : stream) {

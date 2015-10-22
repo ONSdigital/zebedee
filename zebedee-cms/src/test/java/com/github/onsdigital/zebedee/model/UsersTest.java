@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.cryptolite.Password;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -11,7 +10,6 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +73,7 @@ public class UsersTest {
         assertNotNull(user);
         assertEquals(user.name, name);
         assertEquals(user.email, email);
-        assertTrue(Password.verify("password", user.passwordHash));
+        assertTrue(user.authenticate("password"));
         assertFalse(user.inactive);
     }
 
@@ -86,7 +84,12 @@ public class UsersTest {
         // No preconditions
 
         // When
-        User user = zebedee.users.get(null);
+        User user = null;
+        try {
+            user = zebedee.users.get(null);
+        } catch (BadRequestException e) {
+            // Expected - for now
+        }
 
         // Then
         // We should not have an error
@@ -101,7 +104,12 @@ public class UsersTest {
         String email = null;
 
         // When
-        User user = zebedee.users.get(email);
+        User user = null;
+        try {
+            user = zebedee.users.get(email);
+        } catch (BadRequestException e) {
+            // Expected - for now
+        }
 
         // Then
         // We should not have an error
@@ -116,7 +124,13 @@ public class UsersTest {
         String email = "";
 
         // When
-        User user = zebedee.users.get(email);
+        User user = null;
+        try {
+            user = zebedee.users.get(email);
+
+        } catch (Exception e) {
+            // Ignore
+        }
 
         // Then
         // We should not have an error
@@ -135,7 +149,7 @@ public class UsersTest {
         user.email = "mr.rusty@magic.roundabout.com";
 
         // When
-        User created = zebedee.users.create(user);
+        User created = zebedee.users.create(user, builder.administrator.email);
         User read = zebedee.users.get(email);
 
         // Then
@@ -158,13 +172,15 @@ public class UsersTest {
         User user = new User();
         user.name = "Mr Rusty";
         user.email = "mr.rusty@magic.roundabout.com";
-        user.passwordHash = Password.hash(password);
+        user.resetPassword(password);
 
         // When
-        User created = zebedee.users.create(user);
+        // We create the user
+        User created = zebedee.users.create(user, builder.administrator.email);
 
         // Then
-        assertTrue(StringUtils.isBlank(created.passwordHash));
+        // The password should not be set
+        assertFalse(zebedee.users.authenticate(user.email, password));
     }
 
     @Test
@@ -178,7 +194,7 @@ public class UsersTest {
         user.inactive = false;
 
         // When
-        User created = zebedee.users.create(user);
+        User created = zebedee.users.create(user, builder.administrator.email);
 
         // Then
         assertTrue(created.inactive);
@@ -191,7 +207,7 @@ public class UsersTest {
         // No preconditions
 
         // When
-        User user = zebedee.users.create(null);
+        User user = zebedee.users.create(null, builder.administrator.email);
 
         // Then
         // We should not have an error
@@ -208,7 +224,12 @@ public class UsersTest {
         user.email = null;
 
         // When
-        User created = zebedee.users.create(user);
+        User created  = null;
+        //try {
+            created = zebedee.users.create(user, builder.administrator.email);
+        //} catch (BadRequestException e) {
+            // Expected - for now
+        //}
 
         // Then
         // We should not have an error
@@ -223,7 +244,12 @@ public class UsersTest {
         String email = "";
 
         // When
-        User user = zebedee.users.get(null);
+        User user = null;
+        try {
+            user = zebedee.users.get(null);
+        } catch (BadRequestException e) {
+            // Expected - for now
+        }
 
         // Then
         // We should not have an error
@@ -267,17 +293,17 @@ public class UsersTest {
         User existing = zebedee.users.get(email);
 
         // When
-        existing.passwordHash = Password.hash(password);
+        // We update the user, even though we set the password
+        existing.resetPassword(password);
         User updated = zebedee.users.update(existing);
         User read = zebedee.users.get(email);
 
         // Then
-
+        // The password should not be included in the update
         assertNotNull(updated);
-        assertNotEquals(updated.passwordHash, existing.passwordHash);
-
         assertNotNull(read);
-        assertNotEquals(read.passwordHash, existing.passwordHash);
+        assertFalse(updated.authenticate(password));
+        assertFalse(read.authenticate(password));
     }
 
     @Test
@@ -293,7 +319,13 @@ public class UsersTest {
         existing.email = newEmail;
         User updated = zebedee.users.update(existing);
         User read = zebedee.users.get(email);
-        User readNew = zebedee.users.get(newEmail);
+        User readNew = null;
+        try {
+            readNew = zebedee.users.get(newEmail);
+
+        } catch (Exception e) {
+            // Ignore
+        }
 
         // Then
 
@@ -466,13 +498,13 @@ public class UsersTest {
     }
 
     @Test
-    public void deleteUser_withAdminAccount_shouldDeleteUser() throws IOException, UnauthorizedException, NotFoundException {
+    public void deleteUser_withAdminAccount_shouldDeleteUser() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         // Given
         // An existing user and an admin session (as generated by Builder in setup)
         String email = "patricia@example.com";
         User patricia = zebedee.users.get(email);
 
-        Session adminSession = builder.createSession( builder.administrator );
+        Session adminSession = builder.createSession(builder.administrator);
 
         // When
         // We delete them
@@ -492,7 +524,7 @@ public class UsersTest {
     }
 
     @Test
-    public void changePassword_ifChangingOwnPassword_shouldNotBeTemporary() throws IOException, UnauthorizedException, BadRequestException {
+    public void changePassword_ifChangingOwnPassword_shouldNotBeTemporary() throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
         // Given
         // an existing user
         String email = "patricia@example.com";
@@ -514,7 +546,7 @@ public class UsersTest {
     }
 
     @Test
-    public void changePassword_ifAdminIsChangingAnotherPassword_shouldBeTemporary() throws IOException, UnauthorizedException, BadRequestException {
+    public void changePassword_ifAdminIsChangingAnotherPassword_shouldBeTemporary() throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
         // Given
         // an existing user
         String email = "patricia@example.com";
@@ -537,7 +569,7 @@ public class UsersTest {
 
 
     @Test
-    public void changePassword_ifAdminIsChangingOwnPassword_shouldNotBeTemporary() throws IOException, UnauthorizedException, BadRequestException {
+    public void changePassword_ifAdminIsChangingOwnPassword_shouldNotBeTemporary() throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
         // Given
         // an admin user
         String email = "jukesie@example.com";

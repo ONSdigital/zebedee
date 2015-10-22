@@ -25,8 +25,6 @@ public class User extends UserSanitised {
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Constructor for creating a new user.
      */
     public User(String password) {
@@ -35,7 +33,6 @@ public class User extends UserSanitised {
     }
 
     /**
->>>>>>> Added changePassword and resetPassword to User so that a user's Keyring can be re-encrypted or re-initialised at the same time.
      * Authenticates this user.
      * @param password The user's password.
      * @return If the given password can be verified against {@link #passwordHash}, true.

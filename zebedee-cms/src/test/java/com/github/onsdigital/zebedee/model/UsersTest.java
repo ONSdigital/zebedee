@@ -180,7 +180,7 @@ public class UsersTest {
 
         // Then
         // The password should not be set
-        assertFalse(zebedee.users.authenticate(user.email, password));
+        assertFalse(created.authenticate(password));
     }
 
     @Test
@@ -263,24 +263,29 @@ public class UsersTest {
         // An existing user:
         String email = "patricia@example.com";
         String name = "Sunnink ewse";
+        String lastAdmin = "admin";
         boolean inactive = true;
         User existing = zebedee.users.get(email);
 
         // When
+        // We update the user
         existing.name = name;
         existing.inactive = inactive;
-        User updated = zebedee.users.update(existing);
+        User updated = zebedee.users.update(existing, lastAdmin);
         User read = zebedee.users.get(email);
 
         // Then
+        // The expected fields should be set:
 
         assertNotNull(updated);
-        assertEquals(updated.name, name);
-        assertEquals(updated.inactive, inactive);
+        assertEquals(name, updated.name);
+        assertEquals(inactive, updated.inactive);
+        assertEquals(lastAdmin, updated.lastAdmin);
 
         assertNotNull(read);
-        assertEquals(read.name, name);
-        assertEquals(read.inactive, inactive);
+        assertEquals(name, read.name);
+        assertEquals(inactive, read.inactive);
+        assertEquals(lastAdmin, read.lastAdmin);
     }
 
     @Test
@@ -290,12 +295,13 @@ public class UsersTest {
         // An existing user:
         String email = "patricia@example.com";
         String password = "new password";
+        String lastAdmin = "admin";
         User existing = zebedee.users.get(email);
 
         // When
         // We update the user, even though we set the password
         existing.resetPassword(password);
-        User updated = zebedee.users.update(existing);
+        User updated = zebedee.users.update(existing, lastAdmin);
         User read = zebedee.users.get(email);
 
         // Then
@@ -313,16 +319,16 @@ public class UsersTest {
         // An existing user:
         String email = "patricia@example.com";
         String newEmail = "patricia@google.com";
+        String lastAdmin = "admin";
         User existing = zebedee.users.get(email);
 
         // When
         existing.email = newEmail;
-        User updated = zebedee.users.update(existing);
+        User updated = zebedee.users.update(existing, lastAdmin);
         User read = zebedee.users.get(email);
         User readNew = null;
         try {
             readNew = zebedee.users.get(newEmail);
-
         } catch (Exception e) {
             // Ignore
         }
@@ -338,57 +344,6 @@ public class UsersTest {
 
         // Nothing should have been created with the new email:
         assertNull(readNew);
-    }
-
-    @Test
-    public void shouldAuthenticateUser() throws Exception {
-
-        // Given
-        // An existing user:
-        String email = "patricia@example.com";
-        String password = "password";
-
-        // When
-        // We attempt to authenticate
-        boolean result = zebedee.users.authenticate(email, password);
-
-        // Then
-        // Authentication should succeed
-        assertTrue(result);
-    }
-
-    @Test
-    public void shouldNotAuthenticateBlankEmail() throws Exception {
-
-        // Given
-        // A null email address
-        String email = null;
-        String password = "password";
-
-        // When
-        // We attempt to authenticate
-        boolean result = zebedee.users.authenticate(email, password);
-
-        // Then
-        // We should get an authentication failure, but no error
-        assertFalse(result);
-    }
-
-    @Test
-    public void shouldNotAuthenticateBlankPassword() throws Exception {
-
-        // Given
-        // A null email address
-        String email = "patricia@example.com";
-        String password = null;
-
-        // When
-        // We attempt to authenticate
-        boolean result = zebedee.users.authenticate(email, password);
-
-        // Then
-        // We should get an authentication failure, but no error
-        assertFalse(result);
     }
 
     @Test
@@ -410,8 +365,9 @@ public class UsersTest {
         // Then
         // Authentication should succeed with the new password
         assertTrue(result);
-        assertTrue(zebedee.users.authenticate(email, newPassword));
-        assertTrue(zebedee.users.get(email).temporaryPassword);
+        User user = zebedee.users.get(email);
+        assertTrue(user.authenticate(newPassword));
+        assertTrue(user.temporaryPassword);
     }
 
     @Test
@@ -433,8 +389,9 @@ public class UsersTest {
         // Then
         // Authentication should succeed with the new password
         assertTrue(result);
-        assertTrue(zebedee.users.authenticate(email, newPassword));
-        assertFalse(zebedee.users.get(email).temporaryPassword);
+        User user = zebedee.users.get(email);
+        assertTrue(user.authenticate(newPassword));
+        assertFalse(user.temporaryPassword);
     }
 
     @Test
@@ -457,8 +414,9 @@ public class UsersTest {
         // Then
         // Authentication should succeed with the new password
         assertTrue(result);
-        assertTrue(zebedee.users.authenticate(email, newPassword));
-        assertFalse(zebedee.users.get(email).temporaryPassword);
+        User user = zebedee.users.get(email);
+        assertTrue(user.authenticate(newPassword));
+        assertFalse(user.temporaryPassword);
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -494,7 +452,7 @@ public class UsersTest {
         // Then
         // Authentication should not succeed with the new password because it hasn't been changed
         assertFalse(result);
-        assertFalse(zebedee.users.authenticate(email, newPassword));
+        assertFalse(zebedee.users.get(email).authenticate(newPassword));
     }
 
     @Test

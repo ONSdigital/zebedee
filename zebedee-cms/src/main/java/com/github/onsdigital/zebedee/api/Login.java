@@ -40,21 +40,25 @@ public class Login {
             return "Please provide credentials (email, password).";
         }
 
-        boolean result = Root.zebedee.users.authenticate(credentials.email, credentials.password);
+        User user = Root.zebedee.users.get(credentials.email);
+        boolean result =  user.authenticate(credentials.password);
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return "Authentication failed.";
         }
 
-        User user = Root.zebedee.users.get(credentials.email);
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            // Let Florence know that this user needs to change their password.
+            // This isn't what 417 is intended for, but a 4xx variation on 401 seems sensible.
+            // I guess we could use 418 just for fun and to avoid confusion.
+            response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
             return "Password change required";
         } else {
             response.setStatus(HttpStatus.OK_200);
-            return Root.zebedee.sessions.create(credentials.email).id;
         }
+
+        return Root.zebedee.sessions.create(credentials.email).id;
     }
 
 }

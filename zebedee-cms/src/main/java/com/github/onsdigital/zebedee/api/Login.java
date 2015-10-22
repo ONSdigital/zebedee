@@ -15,7 +15,7 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 /**
- * Created by david on 12/03/2015.
+ * API for processing login requests.
  */
 @Api
 public class Login {

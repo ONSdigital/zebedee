@@ -89,9 +89,15 @@ public class Users {
      * At present user email cannot be updated
      *
      * @param request  Requires an admin session
+<<<<<<< HEAD
      * @param response The updated user
      * @param user     A user object with the new details
      * @return A sanitised view of the updated {@link User}
+=======
+     * @param response
+     * @param user     A user object with the new details
+     * @return
+>>>>>>> Added changePassword and resetPassword to User so that a user's Keyring can be re-encrypted or re-initialised at the same time.
      * @throws IOException
      * @throws UnauthorizedException - Session does not have update permissions
      * @throws NotFoundException     - user account does not exist
@@ -110,9 +116,15 @@ public class Users {
     /**
      * Delete a user account
      *
+<<<<<<< HEAD
      * @param request  Requires an admin session - also an email as parameter
      * @param response Whether or not the user was deleted.
      * @return If the user was deleted, true.
+=======
+     * @param request  - requires an admin session - also an email as parameter
+     * @param response
+     * @return
+>>>>>>> Added changePassword and resetPassword to User so that a user's Keyring can be re-encrypted or re-initialised at the same time.
      * @throws UnauthorizedException - user cannot be deleted using this account
      * @throws IOException           - general file io
      * @throws NotFoundException     - user could not be found

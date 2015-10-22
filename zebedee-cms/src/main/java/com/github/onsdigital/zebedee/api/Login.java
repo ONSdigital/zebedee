@@ -49,7 +49,7 @@ public class Login {
         }
 
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
-
+            
             // Let Florence know that this user needs to change their password.
             // This isn't what 417 is intended for, but a 4xx variation on 401 seems sensible.
             // I guess we could use 418 just for fun and to avoid confusion.
@@ -57,8 +57,9 @@ public class Login {
             return "Password change required";
         } else {
             response.setStatus(HttpStatus.OK_200);
-            return Root.zebedee.sessions.create(credentials.email).id;
         }
+
+        return Root.zebedee.sessions.create(credentials.email).id;
     }
 
 }

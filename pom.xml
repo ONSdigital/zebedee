@@ -76,7 +76,7 @@
             <dependency>
                 <groupId>com.github.davidcarboni</groupId>
                 <artifactId>restolino</artifactId>
-                <version>0.1.8</version>
+                <version>0.1.12-SNAPSHOT</version>
             </dependency>
 
             <!-- Any sub modules depending on Zebedee reader and content wrappers should depend on project version as all modules are released together under same version-->

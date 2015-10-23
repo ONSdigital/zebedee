@@ -198,11 +198,13 @@ public class Users {
     User update(User user, String lastAdmin) throws IOException {
 
         User updated = read(user.email);
-        updated.name = user.name;
-        updated.lastAdmin = lastAdmin;
-        // Only set this to true if explicitly set:
-        updated.inactive = BooleanUtils.isTrue(user.inactive);
-        write(updated);
+        if (updated != null) {
+            updated.name = user.name;
+            updated.lastAdmin = lastAdmin;
+            // Only set this to true if explicitly set:
+            updated.inactive = BooleanUtils.isTrue(user.inactive);
+            write(updated);
+        }
         return updated;
     }
 
@@ -268,7 +270,7 @@ public class Users {
         User user = read(credentials.email);
 
         // Check the request
-        if (!zebedee.permissions.isAdministrator(session) && user.authenticate(credentials.oldPassword)) {
+        if (!zebedee.permissions.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
             throw new BadRequestException("Authentication failed with old password.");
         }
 

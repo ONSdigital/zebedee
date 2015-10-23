@@ -261,7 +261,7 @@ public class UsersTest {
 
         // Given
         // An existing user:
-        String email = "patricia@example.com";
+        String email = builder.publisher1.email;
         String name = "Sunnink ewse";
         String lastAdmin = "admin";
         boolean inactive = true;
@@ -293,9 +293,9 @@ public class UsersTest {
 
         // Given
         // An existing user:
-        String email = "patricia@example.com";
+        String email = builder.publisher1.email;
         String password = "new password";
-        String lastAdmin = "admin";
+        String lastAdmin = builder.administrator.email;
         User existing = zebedee.users.get(email);
 
         // When
@@ -310,6 +310,8 @@ public class UsersTest {
         assertNotNull(read);
         assertFalse(updated.authenticate(password));
         assertFalse(read.authenticate(password));
+        assertEquals(builder.administrator.email, updated.lastAdmin);
+        assertEquals(builder.administrator.email, read.lastAdmin);
     }
 
     @Test
@@ -317,9 +319,9 @@ public class UsersTest {
 
         // Given
         // An existing user:
-        String email = "patricia@example.com";
-        String newEmail = "patricia@google.com";
-        String lastAdmin = "admin";
+        String email = builder.publisher1.email;
+        String newEmail = "new@email.com";
+        String lastAdmin = builder.administrator.email;;
         User existing = zebedee.users.get(email);
 
         // When
@@ -351,9 +353,9 @@ public class UsersTest {
 
         // Given
         // An existing user and an administrator session
-        String email = "patricia@example.com";
-        String newPassword = Random.password(8);
-        Session adminSession = builder.createSession("jukesie@example.com");
+        String email = builder.publisher1.email;
+        String newPassword = "newPassword";
+        Session adminSession = builder.createSession(builder.administrator);
 
         // When
         // We set the password
@@ -375,15 +377,16 @@ public class UsersTest {
 
         // Given
         // An existing user and an administrator session
-        String email = "patricia@example.com";
-        String newPassword = Random.password(8);
-        Session selfSession = builder.createSession("patricia@example.com");
+        String email = builder.publisher1.email;
+        String newPassword = "newPassword";
+        Session selfSession = builder.createSession(builder.publisher1);
+        Credentials credentials = new Credentials();
+        credentials.email = email;
 
         // When
         // We set the password
-        Credentials credentials = new Credentials();
-        credentials.email = email;
         credentials.password = newPassword;
+        credentials.oldPassword = "password";
         boolean result = zebedee.users.setPassword(selfSession, credentials);
 
         // Then
@@ -395,20 +398,19 @@ public class UsersTest {
     }
 
     @Test
-    public void shouldSetPasswordWithoutTemporaryFlagIfItsSpecified() throws Exception {
+    public void shouldResetPasswordIfAdmin() throws Exception {
 
         // Given
         // An existing user and an administrator session
-        String email = "patricia@example.com";
-        String newPassword = Random.password(8);
-        Session selfSession = builder.createSession("patricia@example.com");
-
-        // When
-        // We set the password
+        String email = builder.publisher1.email;
+        String newPassword = "newPassword";
+        Session selfSession = builder.createSession(builder.administrator);
         Credentials credentials = new Credentials();
         credentials.email = email;
+
+        // When
+        // We set the password and update
         credentials.password = newPassword;
-        credentials.temporaryPassword = false;
         boolean result = zebedee.users.setPassword(selfSession, credentials);
 
         // Then
@@ -416,6 +418,29 @@ public class UsersTest {
         assertTrue(result);
         User user = zebedee.users.get(email);
         assertTrue(user.authenticate(newPassword));
+        assertTrue(user.temporaryPassword);
+    }
+
+    @Test
+    public void  shouldNotSetTemporaryFlagExplicitly() throws Exception {
+
+        // Given
+        // An existing user and session
+        String email = builder.publisher1.email;
+        String newPassword = "newPassword";
+        Session selfSession = builder.createSession(builder.publisher1.email);
+        Credentials credentials = new Credentials();
+        credentials.email = email;
+        credentials.password = newPassword;
+
+        // When
+        // We set the temporary flag expliticly and update
+        credentials.temporaryPassword = true;
+        zebedee.users.setPassword(selfSession, credentials);
+
+        // Then
+        // The temponary flag should not be set
+        User user = zebedee.users.get(email);
         assertFalse(user.temporaryPassword);
     }
 

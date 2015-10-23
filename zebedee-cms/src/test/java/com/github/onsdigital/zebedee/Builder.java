@@ -16,9 +16,13 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This is a utility class to build a known {@link Zebedee} structure for
@@ -43,6 +47,92 @@ public class Builder {
     public User reviewer2;
     public Team labourMarketTeam;
     public Team inflationTeam;
+
+    static User administratorTemplate;
+    static User publisher1Template;
+    static User publisher2Template;
+    static User reviewer1Template;
+    static User reviewer2Template;
+
+    static {
+        System.out.println("Generating test users and keys...");
+
+        User jukesie = new User();
+        jukesie.name = "Matt Jukes";
+        jukesie.email = "jukesie@example.com";
+        jukesie.inactive = false;
+        administratorTemplate = jukesie;
+
+        User patricia = new User();
+        patricia.name = "Patricia Pumpkin";
+        patricia.email = "patricia@example.com";
+        patricia.inactive = false;
+        publisher1Template = patricia;
+
+        User bernard = new User();
+        bernard.name = "Bernard Black";
+        bernard.email = "bernard@example.com";
+        bernard.inactive = false;
+        publisher2Template = bernard;
+
+        User freddy = new User();
+        freddy.name = "freddy Pumpkin";
+        freddy.email = "freddy@example.com";
+        freddy.inactive = false;
+        reviewer1Template = freddy;
+
+        User ronny = new User();
+        ronny.name = "Ronny Roller";
+        ronny.email = "ronny@example.com";
+        ronny.inactive = false;
+        reviewer2Template = ronny;
+
+        ExecutorService pool = Executors.newCachedThreadPool();
+        submit(pool, jukesie, patricia, bernard, freddy, ronny);
+        pool.shutdown();
+        try {
+            pool.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Done.");
+    }
+
+    private static void submit(ExecutorService pool, User... users) {
+        for (final User user : users) {
+            pool.submit(new Runnable() {
+                @Override
+                public void run() {
+                    user.resetPassword("password");
+                    System.out.println(user.email);
+                }
+            });
+        }
+    }
+
+    static User clone(User user) {
+        User clone = new User();
+
+        clone.name = user.name;
+        clone.email = user.email;
+        clone.inactive = user.inactive;
+        clone.temporaryPassword = user.temporaryPassword;
+        clone.lastAdmin = user.lastAdmin;
+        clone(clone, user, "passwordHash");
+        clone(clone, user, "keyring");
+        return clone;
+    }
+
+    static void clone(User clone, User user, String fieldName) {
+        try {
+            Field field = User.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(clone, field.get(user));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Error cloning user", e);
+        }
+    }
 
     /**
      * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
@@ -94,55 +184,30 @@ public class Builder {
         Path users = zebedee.resolve(Zebedee.USERS);
         Files.createDirectories(users);
 
-        User jukesie = new User();
-        jukesie.name = "Matt Jukes";
-        jukesie.email = "jukesie@example.com";
-        jukesie.resetPassword("twitter");
-        jukesie.inactive = false;
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(jukesie.email) + ".json"))) {
-            Serialiser.serialise(outputStream, jukesie);
+        administrator = clone(administratorTemplate);
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(administrator.email) + ".json"))) {
+            Serialiser.serialise(outputStream, administrator);
         }
-        administrator = jukesie;
 
-        User patricia = new User();
-        patricia.name = "Patricia Pumpkin";
-        patricia.email = "patricia@example.com";
-        patricia.resetPassword("password");
-        patricia.inactive = false;
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(patricia.email) + ".json"))) {
-            Serialiser.serialise(outputStream, patricia);
+        publisher1 = clone(publisher1Template);
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher1.email) + ".json"))) {
+            Serialiser.serialise(outputStream, publisher1);
         }
-        publisher1 = patricia;
 
-        User bernard = new User();
-        bernard.name = "Bernard Black";
-        bernard.email = "bernard@example.com";
-        bernard.resetPassword("grumpy");
-        bernard.inactive = false;
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(bernard.email) + ".json"))) {
-            Serialiser.serialise(outputStream, bernard);
+        publisher2 = clone(publisher2Template);
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher2.email) + ".json"))) {
+            Serialiser.serialise(outputStream, publisher2);
         }
-        publisher2 = bernard;
 
-        User freddy = new User();
-        freddy.name = "freddy Pumpkin";
-        freddy.email = "freddy@example.com";
-        freddy.resetPassword("password");
-        freddy.inactive = false;
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(freddy.email) + ".json"))) {
-            Serialiser.serialise(outputStream, freddy);
+        reviewer1 = clone(reviewer1Template);
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer1.email) + ".json"))) {
+            Serialiser.serialise(outputStream, reviewer1);
         }
-        reviewer1 = freddy;
 
-        User ronny = new User();
-        ronny.name = "Ronny Roller";
-        ronny.email = "ronny@example.com";
-        ronny.resetPassword("secret");
-        ronny.inactive = false;
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(ronny.email) + ".json"))) {
-            Serialiser.serialise(outputStream, ronny);
+        reviewer2 = clone(reviewer2Template);
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer2.email) + ".json"))) {
+            Serialiser.serialise(outputStream, reviewer2);
         }
-        reviewer2 = ronny;
 
         Path sessions = zebedee.resolve(Zebedee.SESSIONS);
         Files.createDirectories(sessions);
@@ -156,19 +221,19 @@ public class Builder {
         AccessMapping accessMapping = new AccessMapping();
 
         accessMapping.administrators = new HashSet<>();
-        accessMapping.administrators.add(jukesie.email);
+        accessMapping.administrators.add(administrator.email);
 
         accessMapping.digitalPublishingTeam = new HashSet<>();
-        accessMapping.digitalPublishingTeam.add(patricia.email);
-        accessMapping.digitalPublishingTeam.add(bernard.email);
+        accessMapping.digitalPublishingTeam.add(publisher1.email);
+        accessMapping.digitalPublishingTeam.add(publisher2.email);
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.id = Random.id();
         accessMapping.collections = new HashMap<>();
 
         Zebedee z = new Zebedee(zebedee);
-        inflationTeam = createTeam(freddy, teamNames[0], teams);
-        labourMarketTeam = createTeam(ronny, teamNames[1], teams);
+        inflationTeam = createTeam(reviewer1, teamNames[0], teams);
+        labourMarketTeam = createTeam(reviewer2, teamNames[1], teams);
         accessMapping.collections.put(new Collection(collections.get(0), z).description.id, set(inflationTeam));
         accessMapping.collections.put(new Collection(collections.get(1), z).description.id, set(labourMarketTeam));
 
@@ -177,6 +242,7 @@ public class Builder {
             Serialiser.serialise(output, accessMapping);
         }
     }
+
 
     /**
      * Constructor to build an instance of zebedee using a predefined set of content
@@ -196,13 +262,13 @@ public class Builder {
         Files.createDirectory(this.zebedee.resolve(Zebedee.COLLECTIONS));
 
         FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
-        if(Files.exists(bootStrap.resolve(Zebedee.LAUNCHPAD))) {
+        if (Files.exists(bootStrap.resolve(Zebedee.LAUNCHPAD))) {
             FileUtils.copyDirectory(bootStrap.resolve(Zebedee.LAUNCHPAD).toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
         } else {
             FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile()); // Not bothering with distinct launchpad
         }
 
-        if(Files.exists(bootStrap.resolve(Zebedee.COLLECTIONS))) {
+        if (Files.exists(bootStrap.resolve(Zebedee.COLLECTIONS))) {
             FileUtils.copyDirectory(bootStrap.resolve(Zebedee.COLLECTIONS).toFile(), this.zebedee.resolve(Zebedee.COLLECTIONS).toFile());
         }
     }
@@ -332,6 +398,7 @@ public class Builder {
 
         return session;
     }
+
     public Session createSession(User user) throws IOException {
 
         // Build the session object

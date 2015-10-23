@@ -52,7 +52,7 @@ public class VersionedContentItem extends ContentItem {
     public ContentItemVersion createVersion(Path versionSourcePath) throws IOException, NotFoundException {
 
         // create a new directory for the version. e.g. edition/previous/v1
-        String versionIdentifier = createVersionIdentifier();
+        String versionIdentifier = createVersionIdentifier(versionSourcePath);
         Path versionPath = getVersionDirectoryPath().resolve(versionIdentifier);
         Files.createDirectories(versionPath);
 
@@ -110,13 +110,16 @@ public class VersionedContentItem extends ContentItem {
      * Determine the version identifier of the next version.
      *
      * @return
+     * @param versionSourcePath
      */
-    private String createVersionIdentifier() {
+    private String createVersionIdentifier(Path versionSourcePath) {
 
         int version = 1;
 
-        if (Files.exists(getVersionDirectoryPath())) {
-            version = getVersionDirectoryPath().toFile().listFiles().length + 1;
+        Path versionDirectory = versionSourcePath.resolve(getVersionDirectoryName());
+
+        if (Files.exists(versionDirectory)) {
+            version = versionDirectory.toFile().listFiles().length + 1;
         }
 
         return VERSION_PREFIX + version;

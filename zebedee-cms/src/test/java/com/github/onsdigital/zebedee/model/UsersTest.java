@@ -459,7 +459,7 @@ public class UsersTest {
         credentials.email = email;
         credentials.password = newPassword;
         credentials.oldPassword = "password";
-        
+
         // When
         // We set the temporary flag expliticly and update
         credentials.temporaryPassword = true;

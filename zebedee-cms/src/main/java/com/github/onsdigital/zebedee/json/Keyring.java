@@ -150,7 +150,7 @@ public class Keyring {
     /**
      * @return The {@link PublicKey} for this keyring.
      */
-    private PublicKey getPublicKey() {
+    public PublicKey getPublicKey() {
         PublicKey result;
         if (keyPair != null) {
             // Return the cached copy

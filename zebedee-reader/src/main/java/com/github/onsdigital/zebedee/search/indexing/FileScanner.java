@@ -81,6 +81,6 @@ public class FileScanner {
     }
 
     private static boolean isNotPreviousVersion(String fileName) {
-        return !fileName.contains("versions");
+        return !fileName.equals("previous");
     }
 }

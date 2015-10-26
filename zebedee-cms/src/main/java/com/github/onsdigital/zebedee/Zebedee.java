@@ -29,6 +29,7 @@ public class Zebedee {
     public final Collections collections;
     public final PublishedCollections publishedCollections;
     public final Users users;
+    public final KeyringCache keyringCache;
     public final Sessions sessions;
     public final Permissions permissions;
     public final Teams teams;
@@ -73,6 +74,7 @@ public class Zebedee {
         this.collections = new Collections(collections, this) ;
         this.publishedCollections = new PublishedCollections(publishedCollections, this);
         this.users = new Users(users, this);
+        this.keyringCache = new KeyringCache(this);
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);

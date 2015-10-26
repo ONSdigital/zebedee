@@ -130,6 +130,7 @@ public class Keyring {
 
     /**
      * Removes a key from the keyring (and the in-memory cache).
+     *
      * @param collectionId The collection to remove the key for.
      */
     public void remove(String collectionId) {
@@ -139,6 +140,7 @@ public class Keyring {
 
     /**
      * Lists the collection IDs in the keyring.
+     *
      * @return An unmodifiable set of the key identifiers in the keyring.
      */
     public Set<String> list() {
@@ -150,7 +152,7 @@ public class Keyring {
      */
     private PublicKey getPublicKey() {
         PublicKey result;
-        if (keyPair!=null) {
+        if (keyPair != null) {
             // Return the cached copy
             result = keyPair.getPublic();
         } else {
@@ -160,6 +162,10 @@ public class Keyring {
             result = KeyWrapper.decodePublicKey(publicKey);
         }
         return result;
+    }
+
+    public boolean isUnlocked() {
+        return keyPair != null;
     }
 
     /**

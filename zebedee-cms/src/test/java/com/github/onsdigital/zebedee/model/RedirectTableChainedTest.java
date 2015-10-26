@@ -4,6 +4,7 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +31,9 @@ public class RedirectTableChainedTest {
         zebedee = new Zebedee(bob.zebedee);
     }
     @After
-    public void ripdownTests() {
+    public void ripdownTests() throws IOException {
         bob = null;
+        FileUtils.deleteDirectory(zebedee.path.toFile());
         zebedee = null;
     }
 

@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
@@ -381,9 +382,11 @@ public class Publisher {
 
             List<String> uris = collection.reviewed.uris("*data.json");
             for (String uri : uris) {
-                String contentUri = URIUtils.removeLastSegment(uri);
-                reIndexPublishingSearch(contentUri);
-                reIndexWebsiteSearch(contentUri);
+                if (isIndexedUri(uri)) {
+                    String contentUri = URIUtils.removeLastSegment(uri);
+                    reIndexPublishingSearch(contentUri);
+                    reIndexWebsiteSearch(contentUri);
+                }
             }
 
             Log.print("Time taken re-indexing search %sms", (System.currentTimeMillis() - start));
@@ -394,6 +397,15 @@ public class Publisher {
         }
     }
 
+    /**
+     * Method to determine if a URI is one that should be indexed in search.
+     *
+     * @param uri
+     * @return
+     */
+    static boolean isIndexedUri(String uri) {
+        return !VersionedContentItem.isVersionedUri(uri);
+    }
 
     /**
      * Post to the website to reindex search.

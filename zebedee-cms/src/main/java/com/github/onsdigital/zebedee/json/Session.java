@@ -34,4 +34,16 @@ public class Session {
     public String toString() {
         return email + " (" + StringUtils.abbreviate(id, 8) + ")";
     }
+
+    @Override
+    public int hashCode() {
+        return id == null ? 0 : id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null &&
+                Session.class.isAssignableFrom(obj.getClass()) &&
+                StringUtils.equals(id, ((Session) obj).id);
+    }
 }

@@ -9,8 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
-
+import java.security.KeyPair;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 
@@ -263,6 +265,27 @@ public class KeyringTest {
         assertFalse(ids.contains(collectionId));
     }
 
+
+    /**
+     * Removing a key from the keyring.
+     */
+    @Test
+    public void shouldNotStoreTransientFields()  {
+
+        // Given
+        // Json for a keyring
+        String json = Serialiser.serialise(generated);
+
+        // When
+        // We deserialise to the test class
+        KeyringCheck keyringCheck = Serialiser.deserialise(json, KeyringCheck.class);
+
+        // Then
+        // The fields we expect to be transient should not be present
+        assertNull(keyringCheck.keyPair);
+        assertNull(keyringCheck.keys);
+    }
+
     // --- Helpers --- //
 
     /**
@@ -290,5 +313,14 @@ public class KeyringTest {
         String encrypted = new Crypto().encrypt(cleartext, keyExpected);
         String decrypted = new Crypto().decrypt(encrypted, keyActual);
         return StringUtils.equals(cleartext, decrypted);
+    }
+
+
+    /**
+     * Test class that allows us to verify that fields we expect to be transient are not stored.
+     */
+    public class KeyringCheck {
+        public  KeyPair keyPair;
+        public  Map<String, SecretKey> keys = new ConcurrentHashMap<>();
     }
 }

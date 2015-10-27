@@ -48,6 +48,10 @@ public class Login {
             return "Authentication failed.";
         }
 
+        // Temponary whilst encryption is being put in place.
+        // This can be removed once all users have keyrings.
+        Root.zebedee.users.migrateToEncryption(user, credentials.password);
+
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
             
             // Let Florence know that this user needs to change their password.

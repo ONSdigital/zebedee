@@ -416,4 +416,56 @@ public class Users {
 
         return result;
     }
+
+    /**
+     * TODO: This is a temporary method and should be deleted once all users are set up with encryption.
+     * This is going to take a couple of releases moving through from develop to live/sandpit before we're all set.
+     *
+     * @param user     The user who has just logged in
+     * @param password The user's plaintext password
+     */
+    public void migrateToEncryption(User user, String password) throws IOException {
+
+        // Update this user if necessary:
+        migrateUserToEncryption(user, password);
+
+        int withKeyring = 0;
+        int withoutKeyring = 0;
+        UserList users = listAll();
+        for (User otherUser : users) {
+            if (user.keyring() != null) {
+                withKeyring++;
+            } else {
+                // Migrate test users automatically:
+                if (migrateUserToEncryption(otherUser, "Dou4gl") || migrateUserToEncryption(otherUser, "password"))
+                    withKeyring++;
+                else
+                    withoutKeyring++;
+            }
+        }
+
+        System.out.println(users.size() + " users in the system: " + withKeyring + " of them have keyrings and " + withoutKeyring + " ");
+    }
+
+    /**
+     * TODO: This is a temporary method and should be deleted once all users are set up with encryption.
+     * This is going to take a couple of releases moving through from develop to live/sandpit before we're all set.
+     *
+     * @param user     A user to be migrated
+     * @param password The user's plaintext password. Migration will only happen if this password can be verified,
+     *                 otherwise there's no point because the user's {@link java.security.PrivateKey}
+     *                 will be encrypted using this password, so would be unrecoverable with their actual password.
+     */
+    private boolean migrateUserToEncryption(User user, String password) {
+        boolean result = false;
+        if (user.keyring() == null && user.authenticate(password)) {
+            // The keyring has not been generated yet,
+            // so reset the password to the current password
+            // in order to generate a keyring and associated key pair:
+            System.out.println("Generating keyring for " + user.name + " (" + user.email + ")..");
+            user.resetPassword(password);
+            System.out.println("Done.");
+        }
+        return result;
+    }
 }

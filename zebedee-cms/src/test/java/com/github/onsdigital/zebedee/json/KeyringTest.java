@@ -66,7 +66,6 @@ public class KeyringTest {
     /**
      * Shouldn't be able to unlock a keyring with an incorrect password.
      */
-    @Test
     public void shouldNotUnlockKeypairWithIncorrectPassword() {
 
         // Given

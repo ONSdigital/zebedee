@@ -92,6 +92,13 @@ public class Users {
      * @param response The updated user
      * @param user     A user object with the new details
      * @return A sanitised view of the updated {@link User}
+<<<<<<< HEAD
+=======
+     * @throws IOException
+     * @throws UnauthorizedException - Session does not have update permissions
+     * @throws NotFoundException     - user account does not exist
+     * @throws BadRequestException   - problem with the update
+>>>>>>> 71d082ee2bc403744ba493c0a46e9d9229ae9455
      */
     @PUT
     public UserSanitised update(HttpServletRequest request, HttpServletResponse response, User user) throws
@@ -109,6 +116,12 @@ public class Users {
      * @param request  Requires an admin session - also an email as parameter
      * @param response Whether or not the user was deleted.
      * @return If the user was deleted, true.
+<<<<<<< HEAD
+=======
+     * @throws UnauthorizedException - user cannot be deleted using this account
+     * @throws IOException           - general file io
+     * @throws NotFoundException     - user could not be found
+>>>>>>> 71d082ee2bc403744ba493c0a46e9d9229ae9455
      */
     @DELETE
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws

@@ -457,6 +457,9 @@ public class UsersTest {
         Session selfSession = builder.createSession(builder.publisher1.email);
         Credentials credentials = new Credentials();
         credentials.email = email;
+
+        // When
+        // We set the password and update
         credentials.password = newPassword;
         credentials.oldPassword = "password";
 

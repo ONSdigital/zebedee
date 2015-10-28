@@ -10,6 +10,11 @@ public class Version {
     private URI uri;
     private Date updateDate;
     private String correctionNotice;
+    private String label;
+
+    public String getLabel() { return label; }
+
+    public void setLabel(String label) { this.label = label; }
 
     public URI getUri() {
         return uri;

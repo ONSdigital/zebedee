@@ -9,6 +9,7 @@ import java.util.Date;
 public class Version {
     private URI uri;
     private Date updateDate;
+    private String label;
     private String correctionNotice;
 
     public URI getUri() {
@@ -25,6 +26,14 @@ public class Version {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getCorrectionNotice() {

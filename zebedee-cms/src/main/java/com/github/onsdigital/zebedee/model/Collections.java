@@ -155,7 +155,7 @@ public class Collections {
         if (collection.isRelease()) {
             Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
-                collection.populateRelease();
+                collection.populateRelease(session.email);
             } catch (ZebedeeException e) {
                 Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
             }

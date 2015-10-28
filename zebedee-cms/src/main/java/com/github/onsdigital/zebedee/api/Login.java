@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang.BooleanUtils;
@@ -13,7 +15,7 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 /**
- * Created by david on 12/03/2015.
+ * API for processing login requests.
  */
 @Api
 public class Login {
@@ -31,22 +33,30 @@ public class Login {
      * @throws IOException
      */
     @POST
-    public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException {
+    public String authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, NotFoundException, BadRequestException {
 
         if (credentials == null || StringUtils.isBlank(credentials.email)) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return "Please provide credentials (email, password).";
         }
 
-        boolean result = Root.zebedee.users.authenticate(credentials.email, credentials.password);
+        User user = Root.zebedee.users.get(credentials.email);
+        boolean result =  user.authenticate(credentials.password);
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return "Authentication failed.";
         }
 
-        User user = Root.zebedee.users.get(credentials.email);
+        // Temponary whilst encryption is being put in place.
+        // This can be removed once all users have keyrings.
+        Root.zebedee.users.migrateToEncryption(user, credentials.password);
+
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
+            
+            // Let Florence know that this user needs to change their password.
+            // This isn't what 417 is intended for, but a 4xx variation on 401 seems sensible.
+            // I guess we could use 418 just for fun and to avoid confusion.
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
             return "Password change required";
         } else {

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
+import com.github.davidcarboni.httpino.Serialiser;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
@@ -8,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
+import com.github.onsdigital.zebedee.json.UserSanitised;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * API for managing user accounts. For password management, see {@link Password}.
@@ -27,52 +31,56 @@ public class Users {
     /**
      * Get a user or list of users
      *
-     * Users are returned without password details
+     * Users are returned without password or keyring details
      *
-     * @param request for a single user should include ?email=... parameter
-     * @param response
-     * @return a user with password removed
-     *
-     * @throws IOException
-     * @throws NotFoundException - user email not found
-     * @throws BadRequestException
+     * @param request  For a single user, include an {@code ?email=...} parameter.
+     * @param response The requested user (null if the email can't be found) or a list of all users if no {@code email} parameter was provided.
+     * @return A single user, or a list of users, with password(s) removed.
+     * @throws IOException         If a general error occurs.
+     * @throws NotFoundException   If the email is not found.
+     * @throws BadRequestException If the email is blank.
      */
     @GET
     public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException {
+        Object result = null;
 
         String email = request.getParameter("email");
         Session session = Root.zebedee.sessions.get(request);
 
-        // If email is empty
-        if (StringUtils.isBlank(email)) {
-            return removePasswordHash( Root.zebedee.users.getUserList(session) );
-        } else {
-            return removePasswordHash( Root.zebedee.users.get(session, email) );
+        if (session != null) {
+            // If email is empty
+            if (StringUtils.isBlank(email)) {
+                result = sanitise(Root.zebedee.users.list());
+            } else {
+                result = sanitise(Root.zebedee.users.get(email));
+            }
         }
 
+        return result;
     }
+
 
     /**
      * Create a new user with basic info
      *
      * The user will be inactive until password details are assigned
      *
-     * @param request Expects session details
-     * @param response
-     * @param user user details to create (requires name and email)
+     * @param request  Expects session details.
+     * @param response The created user, without password or keyring details.
+     * @param user     User details to create (requires name and email)
      * @return the new user
-     *
-     * @throws IOException - for general file system errors
-     * @throws ConflictException - if user already exists
-     * @throws BadRequestException - if insufficient user information is given
-     * @throws UnauthorizedException - if the session does not have admin rights
+     * @throws IOException           For general file system errors
+     * @throws ConflictException     If user already exists
+     * @throws BadRequestException   If insufficient user information is given
+     * @throws UnauthorizedException If the session does not have admin rights
      */
     @POST
-    public User create(HttpServletRequest request, HttpServletResponse response, User user) throws IOException, ConflictException, BadRequestException, UnauthorizedException {
+    public UserSanitised create(HttpServletRequest request, HttpServletResponse response, User user) throws
+            IOException, ConflictException, BadRequestException, UnauthorizedException {
         Session session = Root.zebedee.sessions.get(request);
         User created = Root.zebedee.users.create(session, user);
 
-        return removePasswordHash(created);
+        return sanitise(created);
     }
 
     /**
@@ -80,61 +88,68 @@ public class Users {
      *
      * At present user email cannot be updated
      *
-     * @param request - requires an admin session
-     * @param response
-     * @param user - a user object with the new details
-     * @return
-     * @throws IOException
-     * @throws UnauthorizedException - Session does not have update permissions
-     * @throws NotFoundException - user account does not exist
-     * @throws BadRequestException - problem with the update
+     * @param request  Requires an admin session
+     * @param response The updated user
+     * @param user     A user object with the new details
+     * @return A sanitised view of the updated {@link User}
      */
     @PUT
-    public User update(HttpServletRequest request, HttpServletResponse response, User user) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
+    public UserSanitised update(HttpServletRequest request, HttpServletResponse response, User user) throws
+            IOException, NotFoundException, BadRequestException, UnauthorizedException {
         Session session = Root.zebedee.sessions.get(request);
 
         User updated = Root.zebedee.users.update(session, user);
 
-        return removePasswordHash(updated);
+        return sanitise(updated);
     }
 
     /**
      * Delete a user account
      *
-     * @param request - requires an admin session - also an email as parameter
-     * @param response
-     * @return
-     * @throws UnauthorizedException - user cannot be deleted using this account
-     * @throws IOException - general file io
-     * @throws NotFoundException - user could not be found
+     * @param request  Requires an admin session - also an email as parameter
+     * @param response Whether or not the user was deleted.
+     * @return If the user was deleted, true.
      */
     @DELETE
-    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException {
+    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws
+            UnauthorizedException, IOException, NotFoundException, BadRequestException {
 
-        String email = request.getParameter("email");
         Session session = Root.zebedee.sessions.get(request);
+        String email = request.getParameter("email");
         User user = Root.zebedee.users.get(email);
-
-        if (user == null) {
-            throw new NotFoundException("User " + email + " does not exist");
-        }
-
         return Root.zebedee.users.delete(session, user);
     }
 
-    private User removePasswordHash(User user) {
+    // Methods to sanitise user account records going outside the system.
+    // The details that are removed are already encrypted or hashed
+    // so this is not strictly necessary, but is sensible.
+
+    /**
+     * @param user The user to be sanitised.
+     * @return A {@link UserSanitised} instance.
+     */
+
+    private UserSanitised sanitise(User user) {
+        UserSanitised result = null;
         if (user != null) {
-            // Blank out the password hash.
+            // Blank out the password and keyring.
             // Not strictly necessary, but sensible.
-            user.passwordHash = null;
+            result = Serialiser.deserialise(Serialiser.serialise(user), UserSanitised.class);
         }
-        return user;
+        return result;
     }
 
-    private UserList removePasswordHash(UserList users) {
+    /**
+     * @param users The list of users to be sanitised.
+     * @return A {@link UserSanitised} list.
+     */
+    private List<UserSanitised> sanitise(UserList users) {
+        List<UserSanitised> result = new ArrayList<>();
         for (User user : users) {
-            removePasswordHash(user);
+            if (user != null) {
+                result.add(sanitise(user));
+            }
         }
-        return users;
+        return result;
     }
 }

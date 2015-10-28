@@ -19,4 +19,13 @@ public class Point {
             System.err.println("Timeseries value is not a number");
         }
     }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public Double getY() {
+        return y;
+    }
 }

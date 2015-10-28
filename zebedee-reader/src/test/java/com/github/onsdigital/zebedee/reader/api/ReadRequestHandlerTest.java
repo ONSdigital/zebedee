@@ -48,7 +48,7 @@ public class ReadRequestHandlerTest {
 
     private void shouldFilterTitle() throws Exception {
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17");
-        Content content = readRequestHandler.findContent(request, DataFilter.TITLE);
+        Content content = readRequestHandler.findContent(request, new DataFilter(DataFilter.FilterType.TITLE));
         assertNotNull(content);
         assertTrue(content instanceof ContentNodeDetails);
         ContentNodeDetails titleWrapper = (ContentNodeDetails) content;
@@ -57,7 +57,7 @@ public class ReadRequestHandlerTest {
 
     private void shouldFilterDescription() throws Exception {
         when(request.getParameter("uri")).thenReturn("/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17");
-        Content content = readRequestHandler.findContent(request, DataFilter.DESCRIPTION);
+        Content content = readRequestHandler.findContent(request, new DataFilter(DataFilter.FilterType.DESCRIPTION));
         assertNotNull(content);
         assertTrue(content instanceof DescriptionWrapper);
         DescriptionWrapper description = (DescriptionWrapper) content;

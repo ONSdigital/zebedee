@@ -11,8 +11,9 @@ import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by bren on 03/08/15.
@@ -40,7 +41,7 @@ public class FilterUtil {
 
         Page page = (Page) content;
 
-        switch (filter) {
+        switch (filter.getType()) {
             case TITLE:
                 ContentNodeDetails titleWrapper = new ContentNodeDetails();
                 titleWrapper.setTitle(page.getDescription().getTitle());
@@ -50,31 +51,52 @@ public class FilterUtil {
             case DESCRIPTION:
                 return new DescriptionWrapper(page.getUri(), page.getDescription());
             case SERIES:
-                return filterTimseriesData(page);
+                return filterTimseriesData(page, filter.getParameters());
             default:
                 throw new IllegalArgumentException("Filter not available");
         }
     }
 
-    private static Content filterTimseriesData(Page page) throws BadRequestException, NotFoundException {
+
+    private static Content filterTimseriesData(Page page, Map<String, String[]> parameters) throws BadRequestException, NotFoundException {
         if (page instanceof TimeSeries == false) {
             throw new BadRequestException("Requested content is not a time series, can not apply series filter");
         }
 
-        Set<TimeSeriesValue> set = null;
+        SeriesFilterRequest filterRequest = new SeriesFilterRequest(parameters);
 
         TimeSeries timeSeries = (TimeSeries) page;
-        if (timeSeries.months.size() > 0) {
-            set = timeSeries.months;
-        } else if (timeSeries.quarters.size() > 0) {
-            set = timeSeries.quarters;
-        } else if (timeSeries.years.size() > 0) {
-            set = timeSeries.years;
+        String frequency = getValue(parameters, "frequency");
+        frequency = frequency == null ? "" : StringUtils.lowerCase(frequency);
+
+        Set<TimeSeriesValue> set = null;
+
+        switch (frequency) {
+            case "years":
+                set = timeSeries.years;
+                break;
+            case "months":
+                set = timeSeries.months;
+                break;
+            case "quarters":
+                set = timeSeries.quarters;
+                break;
+            default:
+                if (timeSeries.months.size() > 0) {
+                    set = timeSeries.months;
+                } else if (timeSeries.quarters.size() > 0) {
+                    set = timeSeries.quarters;
+                } else if (timeSeries.years.size() > 0) {
+                    set = timeSeries.years;
+                }
+                break;
         }
 
         if (set == null) {
             throw new NotFoundException("Time series does not contain any series data");
         }
+
+        set = applyRange(set, toDate(filterRequest.from), toDate(filterRequest.to));
 
         Series series = new Series();
         series.setUri(page.getUri());
@@ -87,6 +109,100 @@ public class FilterUtil {
         return series;
     }
 
+    private static Set<TimeSeriesValue> applyRange(Set<TimeSeriesValue> set, Date from, Date to) {
+        if (from == null && to == null) {
+            return set;
+        }
+
+        Set<TimeSeriesValue> result =new TreeSet<>();
+        
+        boolean add = false;
+        for (TimeSeriesValue timeSeriesValue : set) {
+            Date date = timeSeriesValue.toDate();
+            // Start adding if no from date has been specified:
+            if ((!add && from == null) || date.equals(from)) {
+                System.out.println("Starting range at " + date);
+                add = true;
+            }
+            if (add) {
+                // System.out.print(".");
+                result.add(timeSeriesValue);
+            }
+            if (date.equals(to)) {
+                System.out.println("Ending range at " + date);
+                break;
+            }
+        }
+
+        return result;
+    }
+
+
+    private static String getValue(Map<String, String[]> parameters, String paramName) {
+        if (parameters == null) {
+            return null;
+        }
+        String[] paramValues = parameters.get(paramName);
+        if (paramValues == null || paramValues.length == 0) {
+            return null;
+        }
+        return paramValues[0];
+    }
+
+    private static Date toDate(DateVal from) {
+        Date result = null;
+        if (from != null) {
+            result = TimeSeriesValue.toDate(from.toString());
+        }
+        return result;
+    }
+
+
+    private static class SeriesFilterRequest {
+
+        private DateVal from;
+        private DateVal to;
+
+        public SeriesFilterRequest(Map<String, String[]> parameters) {
+
+            /*From*/
+            String fromYear = getValue(parameters, "fromYear");
+            if (fromYear != null) {
+                from = new DateVal();
+                from.month = getValue(parameters, "fromMonth");
+                from.quarter = getValue(parameters, "fromQuarter");
+                from.year = Integer.parseInt(fromYear);
+            }
+
+            /*To*/
+            String toYear = getValue(parameters, "toYear");
+            if (toYear != null) {
+                to = new DateVal();
+                to.month = getValue(parameters, "toMonth");
+                to.quarter = getValue(parameters, "toQuarter");
+                to.year = Integer.parseInt(toYear);
+            }
+        }
+    }
+
+
+    private static class DateVal {
+        private int year;
+        private String quarter; //Q1,Q2,Q3 or Q4
+        private String month; //Jan,Feb .....
+
+        @Override
+        public String toString() {
+            String date = String.valueOf(year);
+            if (StringUtils.isNotBlank(month)) {
+                date += " " + month;
+            }
+            if (StringUtils.isNotBlank(quarter)) {
+                date += " " + quarter;
+            }
+            return date;
+        }
+    }
 
 }
 

@@ -6,17 +6,14 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
-import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
+import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.extractFilter;
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
 /**
@@ -54,25 +51,4 @@ public class Data {
         ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findContent(request, extractFilter(request)), response);
     }
 
-
-    /**
-     * Extracts the filter requested to be applied to content. Each request should have at most one filter, otherwise first filter found will be applied
-     *
-     * @param request
-     * @return null if no filter requested
-     */
-    private DataFilter extractFilter(HttpServletRequest request) {
-        Set<Map.Entry<String, String[]>> entries = request.getParameterMap().entrySet();
-        for (Iterator<Map.Entry<String, String[]>> iterator = entries.iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, String[]> param = iterator.next();
-            String key = param.getKey();
-            try {
-                DataFilter contentFilter = DataFilter.valueOf(key.toUpperCase());
-                return contentFilter;
-            } catch (IllegalArgumentException ie) { //Not a filter parameter
-                continue;
-            }
-        }
-        return null;
-    }
 }

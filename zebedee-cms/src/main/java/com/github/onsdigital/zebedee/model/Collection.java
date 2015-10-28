@@ -149,7 +149,7 @@ public class Collection {
     private static Release checkForRelease(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, ZebedeeException {
         Release release = null;
         if (StringUtils.isNotEmpty(collectionDescription.releaseUri)) {
-            release = getRelease(collectionDescription.releaseUri, zebedee);
+            release = getPublishedRelease(collectionDescription.releaseUri, zebedee);
 
             if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
                 throw new ConflictException(
@@ -203,18 +203,25 @@ public class Collection {
         return new Collection(renamedCollectionDescription, zebedee);
     }
 
-    private static Release getRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
+    private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
         Release release = (Release) new ZebedeeReader(zebedee.published.path.toString(), null).getPublishedContent(uri);
         return release;
     }
 
-    public Release populateRelease() throws IOException, ZebedeeException {
+    private Release getReleaseFromCollection(String email, String uri) throws IOException, ZebedeeException {
+        Path collectionReleasePath = this.find(email, uri);
+        Release release = (Release) ContentUtil.deserialiseContent(FileUtils.openInputStream(collectionReleasePath.toFile()));
+        return release;
+    }
+
+    public Release populateRelease(String email) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.description.releaseUri)) {
             throw new BadRequestException("This collection is not associated with a release.");
         }
 
-        Release release = getRelease(this.description.releaseUri, this.zebedee);
+        String uri = this.description.releaseUri + "/data.json";
+        Release release = getReleaseFromCollection(email, uri);
         Log.print("Release identified for collection %s: %s", this.description.name, release.getDescription().getTitle());
 
         if (release == null) {
@@ -223,7 +230,6 @@ public class Collection {
 
         release = ReleasePopulator.populate(release, this);
 
-        String uri = release.getUri().toString() + "/data.json";
         Path releasePath = reviewed.get(uri);
         FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
 

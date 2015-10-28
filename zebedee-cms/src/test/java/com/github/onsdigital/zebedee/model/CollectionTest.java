@@ -977,8 +977,14 @@ public class CollectionTest {
         // Given a collection that is associated with a release and has an article
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
+
+        CollectionDescription description = new CollectionDescription();
+        description.id = Random.id();
+        description.name = description.id;
+        Collection collection = Collection.create(description, zebedee, publisher1Email);
+
         collection.description.releaseUri = uri;
-        collection.associateWithRelease(builder.publisher1.email, release);
+        collection.associateWithRelease(publisher1Email, release);
 
         String releaseJsonUri = uri + "/data.json";
 
@@ -989,7 +995,7 @@ public class CollectionTest {
         FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));
 
         // When we attempt to populate the release from the collection.
-        Release result = collection.populateRelease();
+        Release result = collection.populateRelease(publisher1Email);
 
         // Then the release is now in progress for the collection and the published flag is set to true
         assertEquals(1, result.getRelatedDocuments().size());

@@ -59,10 +59,14 @@ public class FileScanner {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
             for (Path path : stream) {
                 if (path.toFile().isDirectory()) {
-                    getFileNames(fileNames, path);
+                    if(isNotPreviousVersion(path.getFileName().toString())) {
+                        getFileNames(fileNames, path);
+                    } else {
+                        continue;//skip versions
+                    }
                 } else {
                     String fileName = path.toAbsolutePath().toString();
-                    if (isRequiredForIndex(fileName)) {
+                    if (isDataFile(fileName)) {
                         fileNames.add(PathUtils.toRelativeUri(root, path.getParent()).toString());
                     }
                 }
@@ -70,10 +74,6 @@ public class FileScanner {
         }
 
         return fileNames;
-    }
-
-    private static boolean isRequiredForIndex(String fileName) {
-        return isDataFile(fileName) && isNotPreviousVersion(fileName);
     }
 
     private static boolean isDataFile(String fileName) {

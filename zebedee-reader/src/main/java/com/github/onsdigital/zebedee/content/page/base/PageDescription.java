@@ -39,7 +39,6 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String nextRelease;
     private String language;
     private String edition;
-    private String versionLabel;
     private String _abstract;
     private List<String> authors;
     private String headline;//Used in compendium
@@ -175,14 +174,6 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     public void setEdition(String edition) {
         this.edition = edition;
-    }
-
-    public String getVersionLabel() {
-        return versionLabel;
-    }
-
-    public void setVersionLabel(String versionLabel) {
-        this.versionLabel = versionLabel;
     }
 
     public String get_abstract() {

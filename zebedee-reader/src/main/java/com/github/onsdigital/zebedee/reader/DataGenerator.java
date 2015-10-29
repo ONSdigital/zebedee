@@ -1,6 +1,9 @@
 package com.github.onsdigital.zebedee.reader;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import com.github.onsdigital.zebedee.content.dynamic.timeseries.Point;
+import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
@@ -227,7 +230,6 @@ public class DataGenerator {
             putCombination(series.getCdid(), "Seasonally Adjusted", (series.getDescription().getSeasonalAdjustment()), map);
             putCombination(series.getCdid(), "PreUnit", series.getDescription().getPreUnit(), map);
             putCombination(series.getCdid(), "Unit", series.getDescription().getUnit(), map);
-
 
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
             if (series.getDescription().getReleaseDate() == null) {
@@ -481,6 +483,18 @@ public class DataGenerator {
         return generateTimeseriesData(timeSeries, format);
     }
 
+
+    /**
+     * Get data generated from a filtered time series
+     *
+     * @param series
+     * @param format
+     * @return
+     */
+    public Resource generateData(Series series, String format) throws IOException {
+        return generateSeriesData(series, format);
+    }
+
     /**
      * Get data for a list of timeseries
      * <p>
@@ -605,6 +619,61 @@ public class DataGenerator {
 
         return buildResource(filePath);
     }
+
+    /**
+     *
+     * Generate a file for time series filtered data
+     *
+     * @param series
+     * @param format
+     * @return
+     * @throws IOException
+     */
+    Resource generateSeriesData(Series series, String format) throws IOException {
+        Path filePath = Files.createTempFile("series", "." + format);
+
+        List<List<String>> grid = generateSeriesGrid(series);
+
+        if (format.equalsIgnoreCase("xls")) {
+            writeDataGridToXls(filePath, grid);
+        } else if (format.equalsIgnoreCase("xlsx")) {
+            writeDataGridToXls(filePath, grid);
+        } else if (format.equalsIgnoreCase("csv")) {
+            writeDataGridToXls(filePath, grid);
+        }
+
+        return buildResource(filePath);
+    }
+
+    private List<List<String>> generateSeriesGrid(Series series) {
+        List<List<String>> grid = new ArrayList<>();
+
+        PageDescription description = series.getDescription();
+
+        grid.add(rowFromPair("Title", description.getTitle()));
+        grid.add(rowFromPair("CDID", description.getCdid()));
+        grid.add(rowFromPair("National Statistic", (description.isNationalStatistic() ? "Y" : "N")));
+        grid.add(rowFromPair("Seasonally Adjusted", (description.getSeasonalAdjustment())));
+        grid.add(rowFromPair("PreUnit", description.getPreUnit()));
+        grid.add(rowFromPair("Unit", description.getUnit()));
+
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        if (description.getReleaseDate() == null) {
+            grid.add(rowFromPair("Release date", ""));
+        } else {
+            grid.add(rowFromPair("Release date", format.format(description.getReleaseDate())));
+        }
+        grid.add(rowFromPair("Next release", description.getNextRelease()));
+
+        Set<Point> points = series.getSeries();
+        for (Point point : points) {
+            Double value = point.getY();
+            grid.add(rowFromPair(point.getName(), value == null ? "" : String.valueOf(value)));
+        }
+
+        return grid;
+    }
+
 
     /**
      * Generate a file for a single time series

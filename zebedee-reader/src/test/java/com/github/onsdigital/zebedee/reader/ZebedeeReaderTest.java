@@ -4,6 +4,8 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
+import com.github.onsdigital.zebedee.content.dynamic.timeseries.Point;
+import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.staticpage.StaticPage;
@@ -20,6 +22,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -69,7 +72,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testTitleFilter() throws ZebedeeException, IOException {
-        Content content = createReader().getPublishedContent("about/accessibility", DataFilter.TITLE);
+        Content content = createReader().getPublishedContent("about/accessibility", new DataFilter(DataFilter.FilterType.TITLE));
         assertNotNull(content);
         assertTrue(content instanceof ContentNodeDetails);
         ContentNodeDetails titleWrapper = (ContentNodeDetails) content;
@@ -79,13 +82,33 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testDescriptionFilter() throws ZebedeeException, IOException {
-        Content content = createReader().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", DataFilter.DESCRIPTION);
+        Content content = createReader().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", new DataFilter(DataFilter.FilterType.DESCRIPTION));
         assertNotNull(content);
         assertTrue(content instanceof DescriptionWrapper);
         DescriptionWrapper description = (DescriptionWrapper) content;
         assertEquals("Labour disputes by sector: LABD02", description.getDescription().getTitle());
         assertEquals("Richard Clegg", description.getDescription().getContact().getName());
     }
+
+    @Test
+    public void testSeriesFilter() throws ZebedeeException, IOException {
+        HashMap<String, String[]> parameters = new HashMap<>();
+        parameters.put("frequency", new String[]{"quarters"});
+        parameters.put("fromYear", new String[]{"2001"});
+        parameters.put("fromQuarter", new String[]{"Q2"});
+
+        parameters.put("toYear", new String[]{"2005"});
+        parameters.put("toQuarter", new String[]{"q1"});
+
+        Content content = createReader().getPublishedContent("/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/a2f8/", new DataFilter(DataFilter.FilterType.SERIES, parameters));
+        assertNotNull(content);
+        assertTrue(content instanceof Series);
+        Series series = (Series) content;
+        Point next = series.getSeries().iterator().next();
+        assertEquals("2001 Q2",  next.getName());
+        assertEquals(16,  series.getSeries().size());
+    }
+
 
     @Test(expected = NotFoundException.class)
     public void testNonExistingContentRead() throws ZebedeeException, IOException {

@@ -20,12 +20,20 @@ public class ReaderResponseResponseUtils {
         IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());
     }
 
-    public static void sendResponse(Resource resource, HttpServletResponse response) throws IOException {
+    public static void sendResponse(Resource resource, HttpServletResponse response, String encoding) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(resource.getMimeType());
         response.setContentLengthLong(resource.getSize());
+        if (encoding != null) {
+            response.setCharacterEncoding(encoding);
+        }
         response.setHeader("Content-Disposition", "inline; filename=\"" + resource.getName() + "\"");
         IOUtils.copy(resource.getData(), response.getOutputStream());
+    }
+
+
+    public static void sendResponse(Resource resource, HttpServletResponse response) throws IOException {
+        sendResponse(resource, response, null);
     }
 
 }

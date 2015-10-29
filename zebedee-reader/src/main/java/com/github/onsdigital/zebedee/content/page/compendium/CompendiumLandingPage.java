@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.content.page.compendium;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.partial.Alert;
 import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public class CompendiumLandingPage extends Page {
     private List<Link> datasets;
     private List<Link> chapters;
     private List<Link> relatedMethodology;
+
+    private List<Alert> alerts;
 
     @Override
     public PageType getType() {
@@ -43,5 +46,13 @@ public class CompendiumLandingPage extends Page {
 
     public void setRelatedMethodology(List<Link> relatedMethodology) {
         this.relatedMethodology = relatedMethodology;
+    }
+
+    public List<Alert> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<Alert> alerts) {
+        this.alerts = alerts;
     }
 }

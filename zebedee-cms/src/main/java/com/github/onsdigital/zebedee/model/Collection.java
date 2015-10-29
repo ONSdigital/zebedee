@@ -753,6 +753,37 @@ public class Collection {
         return version;
     }
 
+    /**
+     * Create a new version for the given timeseries URI.
+     *
+     * The same as the regular timeseries function but does not record update in the event log
+     *
+     * @param uri   - The URI of the file to version
+     * @return
+     */
+    public ContentItemVersion versionTimeSeries(String uri) throws NotFoundException, IOException, ConflictException {
+
+        // first ensure the content exists in published area so we can create a version from it.
+        Path versionSource = zebedee.published.get(uri);
+        if (versionSource == null) {
+            throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
+        }
+
+        // determine path in reviewed section for the version to sit
+        Path reviewedPath = this.reviewed.toPath(uri);
+        if (!this.reviewed.exists(reviewedPath.toUri())) {
+            Files.createDirectories(reviewedPath);
+        }
+
+        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(uri), reviewedPath);
+
+        if (versionedContentItem.versionExists()) {
+            throw new ConflictException("A previous version of this file already exists");
+        }
+
+        ContentItemVersion version = versionedContentItem.createVersion(versionSource);
+        return version;
+    }
 
     /**
      * Delete the version at the given URI.

@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
@@ -47,8 +47,8 @@ public class DataPublisherTest {
     TimeSerieses serieses = null;
     TimeSeries publishedTimeSeries = null;
     TimeSeries unpublishedTimeSeries = null;
-    Dataset publishedDataset = null;
-    Dataset unpublishedDataset = null;
+    DatasetLandingPage publishedDataset = null;
+    DatasetLandingPage unpublishedDataset = null;
 
     DataPublisher dataPublisher = new DataPublisher();
 
@@ -91,10 +91,10 @@ public class DataPublisherTest {
         assertEquals("JU5C", unpublishedTimeSeries.getCdid());
 
         try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(publishedDatasetPath).resolve("data.json"))) {
-            publishedDataset = ContentUtil.deserialise(inputStream, Dataset.class);
+            publishedDataset = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
         }
         try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(unpublishedDatasetPath).resolve("data.json"))) {
-            unpublishedDataset = ContentUtil.deserialise(inputStream, Dataset.class);
+            unpublishedDataset = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
         }
 
         assertNotNull(publishedDataset);
@@ -149,16 +149,16 @@ public class DataPublisherTest {
         // Then
         // we expect the files in our collection to deserialise properly
         try(InputStream stream = Files.newInputStream(dataset1)) {
-            assertNotNull(ContentUtil.deserialise(stream, Dataset.class));
+            assertNotNull(ContentUtil.deserialise(stream, DatasetLandingPage.class));
         }
         try(InputStream stream = Files.newInputStream(dataset2)) {
-            assertNotNull(ContentUtil.deserialise(stream, Dataset.class));
+            assertNotNull(ContentUtil.deserialise(stream, DatasetLandingPage.class));
         }
         try(InputStream stream = Files.newInputStream(existingDataset)) {
-            assertNotNull(ContentUtil.deserialise(stream, Dataset.class));
+            assertNotNull(ContentUtil.deserialise(stream, DatasetLandingPage.class));
         }
         try(InputStream stream = Files.newInputStream(existingDataset)) {
-            assertNotNull(ContentUtil.deserialise(stream, Dataset.class));
+            assertNotNull(ContentUtil.deserialise(stream, DatasetLandingPage.class));
         }
 
     }
@@ -337,7 +337,7 @@ public class DataPublisherTest {
         // the time series we are using as examples cleared with some simple data
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        Dataset publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedDataset;
 
         simplifyTimeSeries(startPage, publishThisPage);
 
@@ -356,7 +356,7 @@ public class DataPublisherTest {
         // the time series we are using as examples cleared with some simple data
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        Dataset publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedDataset;
 
         simplifyTimeSeries(startPage, publishThisPage);
 
@@ -376,7 +376,7 @@ public class DataPublisherTest {
         // the time series that hadn't previously been published (
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = unpublishedTimeSeries;
-        Dataset publishThisDataset = unpublishedDataset;
+        DatasetLandingPage publishThisDataset = unpublishedDataset;
 
         // When
         // we populate the page
@@ -394,7 +394,7 @@ public class DataPublisherTest {
         // the time series that hadn't previously been published (
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        Dataset publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedDataset;
 
         publishThisPage.getDescription().setTitle("Title");
         startPage.getDescription().setTitle("");
@@ -413,7 +413,7 @@ public class DataPublisherTest {
         // the time series that hadn't previously been published (
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        Dataset publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedDataset;
 
         publishThisPage.getDescription().setTitle("New Title");
         startPage.getDescription().setTitle("Existing Title");
@@ -432,7 +432,7 @@ public class DataPublisherTest {
         // the time series that hadn't previously been published (
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        Dataset publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedDataset;
 
         publishThisPage.getDescription().setSeasonalAdjustment("SA to publish");
         startPage.getDescription().setSeasonalAdjustment("SA existing");
@@ -485,7 +485,7 @@ public class DataPublisherTest {
         // Given
         // a test dataset with some specified test values
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
-        Dataset publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedDataset;
         String publishThisUri = publishedDatasetPath;
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
@@ -515,7 +515,7 @@ public class DataPublisherTest {
         // Given
         // a test dataset with some specified test values
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
-        Dataset publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedDataset;
         String publishThisUri = publishedDatasetPath;
         publishThisDataset.getDescription().setDatasetId("Test DatasetID");
 

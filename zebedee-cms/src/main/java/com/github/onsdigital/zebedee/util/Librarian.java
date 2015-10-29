@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.home.HomePage;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
 import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
 import com.github.onsdigital.zebedee.content.page.taxonomy.ProductPage;
@@ -181,7 +181,7 @@ public class Librarian {
         for (Path datasetPath: datasets) {
             Path path = zebedee.path.resolve(datasetPath);
             try(InputStream stream = Files.newInputStream(path)) {
-                Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
+                DatasetLandingPage dataset = ContentUtil.deserialise(stream, DatasetLandingPage.class);
 
                 HashMap<String,String > datasetDetails = new HashMap<>();
                 datasetDetails.put("Theme", datasetPath.subpath(1, 2).toString());;
@@ -327,7 +327,7 @@ public class Librarian {
                     TaxonomyLandingPage typedPage = (TaxonomyLandingPage) page;
 //                    typedPage.loadReferences(launchpadService);
                 } else if (page.getType() == PageType.dataset) {
-                    Dataset typedPage = (Dataset) page;
+                    DatasetLandingPage typedPage = (DatasetLandingPage) page;
 //                    typedPage.loadReferences(launchpadService);
                 } else if (page.getType() == PageType.product_page) {
                     ProductPage typedPage = (ProductPage) page;
@@ -427,7 +427,7 @@ public class Librarian {
     private boolean checkDatasetIntegrity() throws IOException {
         for (HashMap<String, String> datasetMap : datasets) {
             try(InputStream stream = Files.newInputStream(zebedee.launchpad.get(datasetMap.get("Uri")).resolve("data.json"))) {
-                Dataset dataset = ContentUtil.deserialise(stream, Dataset.class);
+                DatasetLandingPage dataset = ContentUtil.deserialise(stream, DatasetLandingPage.class);
 
                 List<String> relatedUris = GraphUtils.relatedUris(dataset);
                 for(String uri: relatedUris) {

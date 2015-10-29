@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
@@ -17,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
@@ -722,6 +725,91 @@ public class Collection {
      */
     public boolean isRelease() {
         return StringUtils.isNotEmpty(this.description.releaseUri);
+    }
+
+    /**
+     * Create a new version for the given URI.
+     *
+     * @param email - The email of the user requesting the version.
+     * @param uri   - The URI of the file to version
+     * @return
+     */
+    public ContentItemVersion version(String email, String uri) throws NotFoundException, IOException, ConflictException {
+
+        // first ensure the content exists in published area so we can create a version from it.
+        Path versionSource = zebedee.published.get(uri);
+        if (versionSource == null) {
+            throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
+        }
+
+        // determine path in reviewed section for the version to sit
+        Path reviewedPath = this.reviewed.toPath(uri);
+        if (!this.reviewed.exists(reviewedPath.toUri())) {
+            Files.createDirectories(reviewedPath);
+        }
+
+        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(uri), reviewedPath);
+
+        if (versionedContentItem.versionExists()) {
+            throw new ConflictException("A previous version of this file already exists");
+        }
+
+        ContentItemVersion version = versionedContentItem.createVersion(versionSource);
+        addEvent(uri, new Event(new Date(), EventType.VERSIONED, email, version.getIdentifier()));
+        return version;
+    }
+
+    /**
+     * Create a new version for the given timeseries URI.
+     *
+     * The same as the regular timeseries function but does not record update in the event log
+     *
+     * @param uri   - The URI of the file to version
+     * @return
+     */
+    public ContentItemVersion versionTimeSeries(String uri) throws NotFoundException, IOException, ConflictException {
+
+        // first ensure the content exists in published area so we can create a version from it.
+        Path versionSource = zebedee.published.get(uri);
+        if (versionSource == null) {
+            throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
+        }
+
+        // determine path in reviewed section for the version to sit
+        Path reviewedPath = this.reviewed.toPath(uri);
+        if (!this.reviewed.exists(reviewedPath.toUri())) {
+            Files.createDirectories(reviewedPath);
+        }
+
+        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(uri), reviewedPath);
+
+        if (versionedContentItem.versionExists()) {
+            throw new ConflictException("A previous version of this file already exists");
+        }
+
+        ContentItemVersion version = versionedContentItem.createVersion(versionSource);
+        return version;
+    }
+
+    /**
+     * Delete the version at the given URI.
+     *
+     * @param uri - The URI of the version to delete.
+     * @throws NotFoundException   - if the given URI was not found in the collection.
+     * @throws BadRequestException - if the given URI is not a valid version URI.
+     */
+    public void deleteVersion(String uri) throws NotFoundException, BadRequestException, IOException {
+
+        if (!VersionedContentItem.isVersionedUri(uri)) {
+            throw new BadRequestException("The given URI is not recognised as a version");
+        }
+
+        Path reviewedPath = this.reviewed.toPath(uri);
+        if (!Files.exists(reviewedPath)) {
+            throw new NotFoundException("This version does not exist in this collection");
+        }
+
+        FileUtils.deleteDirectory(reviewedPath.toFile());
     }
 }
 

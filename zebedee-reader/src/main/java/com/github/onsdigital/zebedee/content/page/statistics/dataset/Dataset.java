@@ -1,24 +1,18 @@
 package com.github.onsdigital.zebedee.content.page.statistics.dataset;
 
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
-import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by bren on 04/06/15.
+ * Created by bren on 19/10/15.
  */
-public class Dataset extends Statistics {
+public class Dataset extends Page {
 
-    /*Body*/
-    private List<DownloadSection> downloads = new ArrayList<DownloadSection>();
-    private MarkdownSection section;
-    private List<MarkdownSection> notes;
-    private List<Link> relatedDatasets;
-    private List<Link> relatedDocuments;
+    private List<DownloadSection> downloads;
+    private List<DownloadSection> supplementaryFiles;
+    private List<Version> versions;
 
     @Override
     public PageType getType() {
@@ -33,35 +27,19 @@ public class Dataset extends Statistics {
         this.downloads = downloads;
     }
 
-    public List<MarkdownSection> getNotes() {
-        return notes;
+    public List<DownloadSection> getSupplementaryFiles() {
+        return supplementaryFiles;
     }
 
-    public void setNotes(List<MarkdownSection> notes) {
-        this.notes = notes;
+    public void setSupplementaryFiles(List<DownloadSection> supplementaryFiles) {
+        this.supplementaryFiles = supplementaryFiles;
     }
 
-    public MarkdownSection getSection() {
-        return section;
+    public List<Version> getVersions() {
+        return versions;
     }
 
-    public void setSection(MarkdownSection section) {
-        this.section = section;
-    }
-
-    public List<Link> getRelatedDatasets() {
-        return relatedDatasets;
-    }
-
-    public void setRelatedDatasets(List<Link> relatedDatasets) {
-        this.relatedDatasets = relatedDatasets;
-    }
-
-    public List<Link> getRelatedDocuments() {
-        return relatedDocuments;
-    }
-
-    public void setRelatedDocuments(List<Link> relatedDocuments) {
-        this.relatedDocuments = relatedDocuments;
+    public void setVersions(List<Version> versions) {
+        this.versions = versions;
     }
 }

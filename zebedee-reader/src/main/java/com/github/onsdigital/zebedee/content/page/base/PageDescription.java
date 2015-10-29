@@ -76,6 +76,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private List<String> cancellationNotice;
     private Boolean published;
     private String provisionalDate;
+    private String versionLabel;
 
 
     public PageDescription() {
@@ -414,5 +415,13 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     public void setProvisionalDate(String provisionalDate) {
         this.provisionalDate = provisionalDate;
+    }
+
+    public String getVersionLabel() {
+        return versionLabel;
+    }
+
+    public void setVersionLabel(String versionLabel) {
+        this.versionLabel = versionLabel;
     }
 }

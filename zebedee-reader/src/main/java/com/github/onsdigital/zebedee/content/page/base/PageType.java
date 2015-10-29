@@ -30,6 +30,7 @@ public enum PageType {
     static_foi,
     static_adhoc,
     dataset,
+    dataset_landing_page,
     timeseries_dataset,
     release,
     reference_tables,

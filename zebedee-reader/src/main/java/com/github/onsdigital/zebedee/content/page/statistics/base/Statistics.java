@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.statistics.base;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.partial.Alert;
 import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.List;
  * Represents statistics pages that gets released periodically. Bulletin, Article, Timeseries, Dataset, etc.
  */
 public abstract class Statistics extends Page {
+
+    private List<Alert> alerts;
     private List<Link> relatedMethodology;
 
     public List<Link> getRelatedMethodology() {
@@ -20,5 +23,13 @@ public abstract class Statistics extends Page {
 
     public void setRelatedMethodology(List<Link> relatedMethodology) {
         this.relatedMethodology = relatedMethodology;
+    }
+
+    public List<Alert> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<Alert> alerts) {
+        this.alerts = alerts;
     }
 }

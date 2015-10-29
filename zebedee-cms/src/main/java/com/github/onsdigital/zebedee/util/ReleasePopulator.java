@@ -21,6 +21,9 @@ public class ReleasePopulator {
      */
     public static Release populate(Release release, Collection collection) throws IOException {
 
+        release.setRelatedDatasets(new ArrayList<Link>());
+        release.setRelatedDocuments(new ArrayList<Link>());
+
         for (ContentDetail contentDetail : collection.reviewed.details()) {
             addPageDetailToRelease(release, contentDetail);
         }

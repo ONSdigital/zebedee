@@ -132,7 +132,7 @@ public class Collections {
      */
     public boolean approve(Collection collection, Session session)
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException {
+            ConflictException, NotFoundException {
 
         // Collection exists
         if (collection == null) {

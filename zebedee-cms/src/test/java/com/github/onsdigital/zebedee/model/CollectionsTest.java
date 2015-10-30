@@ -3,7 +3,10 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
@@ -106,7 +109,7 @@ public class CollectionsTest {
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnApprove()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException {
+            ConflictException, NotFoundException {
 
         // Given
         // A null collection
@@ -242,7 +245,7 @@ public class CollectionsTest {
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnApprove()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, CollectionNotFoundException {
+            ConflictException, NotFoundException {
 
         // Given
         // A null session

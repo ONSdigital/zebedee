@@ -224,8 +224,14 @@ public class DataPublisher {
         // 1. Detect the uri's
         for (String uri : collection.reviewedUris()) {
             // Two conditions for a file being a csdb file
+
             if (uri.endsWith(".csdb")) { // 1. - it ends with .csdb
-                csdbUris.add(uri);
+                // Only include if latest
+                Path path = Paths.get(uri);
+                if (!path.toString().contains("/previous/")) {
+                    csdbUris.add(uri);
+                }
+
             } else { // 2. - it has no extension and csdb content
                 String[] sections = uri.split("/");
                 if (!sections[sections.length - 1].contains(".")) {

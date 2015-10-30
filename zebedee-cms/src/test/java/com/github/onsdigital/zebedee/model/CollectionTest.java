@@ -232,7 +232,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldDeleteAllFilesFromInProgressDirectory() throws IOException {
+    public void shouldDeleteAllFilesFromInProgressDirectory() throws IOException, NotFoundException {
 
         // Given a content instance with a json file and csv file in it.
         String jsonFile = Random.id() + ".json";
@@ -255,7 +255,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldDeleteAllFilesFromCompleteDirectory() throws IOException {
+    public void shouldDeleteAllFilesFromCompleteDirectory() throws IOException, NotFoundException {
 
         // Given a content instance with a json file and csv file in it.
         String jsonFile = Random.id() + ".json";
@@ -277,7 +277,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldDeleteAllFilesFromReviewedDirectory() throws IOException {
+    public void shouldDeleteAllFilesFromReviewedDirectory() throws IOException, NotFoundException {
 
         // Given a content instance with a json file and csv file in it.
         String jsonFile = Random.id() + ".json";

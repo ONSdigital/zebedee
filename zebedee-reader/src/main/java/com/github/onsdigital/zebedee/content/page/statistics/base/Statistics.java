@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.content.page.statistics.base;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.content.partial.Alert;
 import com.github.onsdigital.zebedee.content.partial.Link;
 
@@ -16,6 +17,7 @@ public abstract class Statistics extends Page {
 
     private List<Alert> alerts;
     private List<Link> relatedMethodology;
+    private List<Version> versions;
 
     public List<Link> getRelatedMethodology() {
         return relatedMethodology;
@@ -31,5 +33,13 @@ public abstract class Statistics extends Page {
 
     public void setAlerts(List<Alert> alerts) {
         this.alerts = alerts;
+    }
+
+    public List<Version> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<Version> versions) {
+        this.versions = versions;
     }
 }

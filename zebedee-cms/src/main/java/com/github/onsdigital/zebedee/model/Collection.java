@@ -669,7 +669,7 @@ public class Collection {
      * @return
      * @throws IOException
      */
-    public boolean deleteContent(String email, String uri) throws IOException, NotFoundException {
+    public boolean deleteContent(String email, String uri) throws IOException {
 
         boolean hasDeleted = false;
 
@@ -702,10 +702,14 @@ public class Collection {
      * @throws IOException
      * @throws NotFoundException
      */
-    private void deleteContent(Content content, String uri) throws IOException, NotFoundException {
+    private void deleteContent(Content content, String uri) throws IOException {
         Path path = content.toPath(uri);
         PathUtils.deleteFilesInDirectory(path);
-        new VersionedContentItem(URI.create(uri), path).deleteVersionDirectory();
+        try {
+            new VersionedContentItem(URI.create(uri), path).deleteVersionDirectory();
+        } catch (NotFoundException e) {
+            // do nothing, there is nothing to delete.
+        }
     }
 
     /**

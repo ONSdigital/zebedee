@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -42,6 +43,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -174,6 +176,9 @@ public class DataPublisher {
                 // Construct the new page
                 TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
 
+                // Previous versions
+                if (differencesExist(newPage, series)) versionTimeseries(uri);
+
                 // Add the cdid to the dataset page list of cdids
                 csdbSection.getCdids().add(newPage.getDescription().getCdid());
 
@@ -224,8 +229,14 @@ public class DataPublisher {
         // 1. Detect the uri's
         for (String uri : collection.reviewedUris()) {
             // Two conditions for a file being a csdb file
+
             if (uri.endsWith(".csdb")) { // 1. - it ends with .csdb
-                csdbUris.add(uri);
+                // Only include if latest
+                Path path = Paths.get(uri);
+                if (!path.toString().contains("/previous/")) {
+                    csdbUris.add(uri);
+                }
+
             } else { // 2. - it has no extension and csdb content
                 String[] sections = uri.split("/");
                 if (!sections[sections.length - 1].contains(".")) {
@@ -614,7 +625,53 @@ public class DataPublisher {
     }
 
 
+    /**
+     *
+     * @param page    a part-built time series page
+     * @param series  a time series returned by Brian by parsing a csdb file
+     * @return
+     */
+    boolean differencesExist(TimeSeries page, TimeSeries series) {
 
+        // Time series is a bit of an inelegant beast in that it splits data storage by time period
+        // We deal with this by
+        if (differencesExist(page.years, series.years)) return true;
+        if (differencesExist(page.quarters, series.quarters)) return true;
+        if (differencesExist(page.months, series.months)) return true;
+
+        return false;
+    }
+
+    /**
+     * Check if differences exist between two sets of timeseries points
+     *
+     * @param currentValues
+     * @param updateValues
+     * @return
+     */
+    boolean differencesExist(Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues) {
+
+        // Iterate through values
+        for (TimeSeriesValue value : updateValues) {
+            // Find the current value of the data point
+
+            TimeSeriesValue current = getCurrentValue(currentValues, value);
+            if (current != null && current.value.equalsIgnoreCase(value.value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Create a previous version page for a timeseries
+     *
+     * @param page the current version of the page
+     */
+    public static void versionTimeseries(String page) {
+
+    }
 
     /************************************************************************************
      *

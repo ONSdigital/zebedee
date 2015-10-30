@@ -124,4 +124,17 @@ public class VersionedContentItem extends ContentItem {
 
         return VERSION_PREFIX + version;
     }
+
+    /**
+     * Delete the versions directory from this versioned content item.
+     * <p>
+     * This is used for removing any versions from a collection for a particular content item.
+     */
+    public void deleteVersionDirectory() throws IOException {
+        Path versionDirectory = this.getPath().resolve(getVersionDirectoryName());
+
+        if (Files.exists(versionDirectory)) {
+            FileUtils.deleteDirectory(versionDirectory.toFile());
+        }
+    }
 }

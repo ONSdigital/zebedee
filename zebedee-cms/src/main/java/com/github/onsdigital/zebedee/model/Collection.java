@@ -669,20 +669,20 @@ public class Collection {
      * @return
      * @throws IOException
      */
-    public boolean deleteContent(String email, String uri) throws IOException {
+    public boolean deleteContent(String email, String uri) throws IOException, NotFoundException {
 
         boolean hasDeleted = false;
 
         if (inProgress.exists(uri)) {
-            PathUtils.deleteFilesInDirectory(inProgress.toPath(uri));
+            deleteContent(inProgress, uri);
             hasDeleted = true;
         }
         if (complete.exists(uri)) {
-            PathUtils.deleteFilesInDirectory(complete.toPath(uri));
+            deleteContent(complete, uri);
             hasDeleted = true;
         }
         if (reviewed.exists(uri)) {
-            PathUtils.deleteFilesInDirectory(reviewed.toPath(uri));
+            deleteContent(reviewed, uri);
             hasDeleted = true;
         }
 
@@ -690,6 +690,22 @@ public class Collection {
         save();
 
         return hasDeleted;
+    }
+
+    /**
+     * When we delete content, we don't want to just delete the whole directory it lives in as it may have nested content.
+     * Instead only the files in the directory are deleted, as we know these are all associated with that content.
+     * We also delete the versions directory as all the contents will also be associated with the content being deleted.
+     *
+     * @param content
+     * @param uri
+     * @throws IOException
+     * @throws NotFoundException
+     */
+    private void deleteContent(Content content, String uri) throws IOException, NotFoundException {
+        Path path = content.toPath(uri);
+        PathUtils.deleteFilesInDirectory(path);
+        new VersionedContentItem(URI.create(uri), path).deleteVersionDirectory();
     }
 
     /**

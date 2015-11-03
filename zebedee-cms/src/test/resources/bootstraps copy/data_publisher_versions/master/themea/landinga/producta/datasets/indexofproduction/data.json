@@ -1,0 +1,41 @@
+{
+  "section": {
+    "markdown": ""
+  },
+  "relatedDatasets": [
+    {
+      "uri": "/themea/landinga/producta/datasets/indexofproduction"
+    }
+  ],
+  "relatedDocuments": [],
+  "datasets": [
+    {
+      "uri": "/themea/landinga/producta/datasets/indexofproduction/current"
+    }
+  ],
+  "timeseries": true,
+  "relatedMethodology": [],
+  "type": "dataset_landing_page",
+  "uri": "/themea/landinga/producta/datasets/indexofproduction",
+  "description": {
+    "title": "Index of Production time series spreadsheet",
+    "summary": "Measures the volume of production at base year prices for the manufacturing, mining and quarrying and energy supply industries. These are seasonally adjusted figures on the index of output of the production industries.",
+    "keywords": [
+      "iop, timeseries, backdata, growth,iop,backdata,growth"
+    ],
+    "metaDescription": "Measures the volume of production at base year prices for the manufacturing, mining and quarrying and energy supply industries. These are seasonally adjusted figures on the index of output of the production industries.",
+    "nationalStatistic": true,
+    "contact": {
+      "email": "indexofproduction@ons.gsi.gov.uk",
+      "name": "Alaa Al-Hamad",
+      "telephone": "+44 (0)1633 455648"
+    },
+    "releaseDate": "2015-10-06T23:00:00.000Z",
+    "nextRelease": "06 November 2015",
+    "datasetId": "DIOP",
+    "unit": "",
+    "preUnit": "",
+    "source": "",
+    "sampleSize": "0"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "sections": [
+    {
+      "uri": "/themeb/landingc",
+      "index": 0
+    },
+    {
+      "uri": "/themeb/productg",
+      "index": 1
+    }
+  ],
+  "index": 1,
+  "type": "taxonomy_landing_page",
+  "uri": "/themeb",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    }
+  ],
+  "description": {
+    "title": "Theme B",
+    "summary": "Top level taxonomy item B"
+  }
+}

@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -75,10 +76,10 @@ public class DataPublisherTest {
         collection = zebedee.collections.list().getCollection("collection");
 
         publishedTimeSeriesPath = "/themea/landinga/producta/timeseries/a4fk";
-        publishedDatasetPath = "/themea/landinga/producta/datasets/a4fk_dataset";
+        publishedDatasetPath = "/themea/landinga/producta/datasets/a4fk_dataset/current";
 
         unpublishedTimeSeriesPath = "/themea/landinga/producta/timeseries/ju5c";
-        unpublishedDatasetPath = "/themea/landinga/producta/datasets/another_dataset";
+        unpublishedDatasetPath = "/themea/landinga/producta/datasets/another_dataset/current/";
 
         String brianPath = "/csdb/csdb_no_extension/brian.json";
         try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
@@ -125,14 +126,17 @@ public class DataPublisherTest {
 
         assertNotNull(collection);
         // It has four items
-        assertEquals(4, collection.reviewedUris().size());
+        assertEquals(6, collection.reviewedUris().size());
         assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json")));
-        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/BB.csdb")));
+        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/current/data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/current/BB.csdb")));
+
         assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/data.json")));
-        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/PPI.csdb")));
+        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/current/data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/current/PPI.csdb")));
 
         // The pre-existing items exist
-        assertTrue(Files.exists(zebedee.published.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json")));
+        assertTrue(Files.exists(zebedee.published.toPath("/themea/landinga/producta/datasets/a4fk_dataset/current/data.json")));
         assertTrue(Files.exists(zebedee.published.toPath("/themea/landinga/producta/timeseries/a4fk/data.json")));
     }
     @Test
@@ -141,9 +145,9 @@ public class DataPublisherTest {
         // Given
         // the files in our collection
         Collection collection = zebedee.collections.list().getCollection("collection");
-        Path dataset1 = collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json");
-        Path dataset2 = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/data.json");
-        Path existingDataset = zebedee.published.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json");
+        Path dataset1 = collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/current/data.json");
+        Path dataset2 = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/current/data.json");
+        Path existingDataset = zebedee.published.toPath("/themea/landinga/producta/datasets/a4fk_dataset/current/data.json");
         Path existingTimeSeries = zebedee.published.toPath("/themea/landinga/producta/timeseries/a4fk/data.json");
 
         // Then
@@ -235,7 +239,7 @@ public class DataPublisherTest {
         // Given
         // our pre setup collection with csdb extensions
         Collection collection = zebedee.collections.list().getCollection("collection");
-        Path datasetPath = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/PPI.csdb");
+        Path datasetPath = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/current/PPI.csdb");
 
         // When
         // we get a dataset Id from this

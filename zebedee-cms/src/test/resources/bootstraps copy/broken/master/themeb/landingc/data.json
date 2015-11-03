@@ -1,0 +1,30 @@
+{
+  "sections": [
+    {
+      "uri": "/themeb/landingc/producte",
+      "index": 0
+    },
+    {
+      "uri": "/themeb/landingc/productf",
+      "index": 1
+    }
+  ],
+  "index": 0,
+  "type": "taxonomy_landing_page",
+  "uri": "/themeb/landingc",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/themeb"
+    },
+    {
+      "uri": "/themeb/landingc"
+    }
+  ],
+  "description": {
+    "title": "Landing C",
+    "summary": "Theme B Landing C"
+    }
+}

@@ -1,0 +1,30 @@
+{
+  "items": [
+  ],
+  "datasets": [
+  ],
+  "statsBulletins": [
+  ],
+  "relatedArticles": [
+  ],
+  "index": 0,
+  "type": "product_page",
+  "uri": "/themeb/landingc/producte",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/themeb"
+    },
+    {
+      "uri": "/themeb/landingc"
+    }
+  ],
+  "description": {
+    "title": "Product E",
+    "summary": "Product E"
+  },
+  "articles": [
+  ]
+}

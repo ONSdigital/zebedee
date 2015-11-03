@@ -317,7 +317,7 @@ public class Content {
             for (Path entry : stream) {
                 if (!Files.isDirectory(entry)) {
                     Path relative = this.path.relativize(entry);
-                    if (!relative.endsWith(".DS_Store")) // issue when in development on Mac's
+                    if (!relative.toString().toLowerCase().endsWith(".ds_store")) // issue when in development on Mac's
                         result.add(relative);
                 }
             }

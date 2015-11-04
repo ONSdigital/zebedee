@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
@@ -112,6 +113,8 @@ public class DataPublisher {
 
             }
         }
+
+
         return results;
     }
 
@@ -153,6 +156,120 @@ public class DataPublisher {
      *
      ***********************************************************************************/
 
+
+    /**
+     * Run preprocess routine for CSDB datasets
+     *
+     * The T5 timeseries objects are made by
+     * 1. Searching for all .csdb files in a collection
+     * 2. Getting Brian to break the files down to their component stats and basic metadata.
+     * 3. Combining the stats with metadata entered with the dataset and existing data
+     *
+     * @param collection the collection to search for dataset objects
+     * @param session a user session (required for some permissions)
+     * @throws IOException
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     */
+    void preprocessCsdbFiles(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException, NotFoundException {
+
+        // First find all csdb files in the collection
+        List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
+
+
+        // For each file in this collection
+        for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
+            preprocessCsdb(zebedee, collection, csdbDataset);
+        }
+    }
+
+    /**
+     * Run preprocess routine on a single CSDB dataset
+     *
+     * @param zebedee
+     * @param collection
+     * @param csdbDataset
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws NotFoundException
+     */
+    private void preprocessCsdb(Zebedee zebedee, Collection collection, HashMap<String, Path> csdbDataset) throws IOException, URISyntaxException, NotFoundException {
+        List<TimeSeries> newSeries = new ArrayList<>();
+
+        // Download the dataset page (for metadata)
+        Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
+        DatasetLandingPage landingPage = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("landing_page").toFile()), DatasetLandingPage.class);
+
+        String datasetUri = zebedee.toUri(csdbDataset.get("json"));
+        String landingPageUri = zebedee.toUri(csdbDataset.get("landing_page"));
+
+        // Set a name for the xlsx/csv files to be generated
+        landingPage.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
+        String filePrefix = landingPage.getDescription().getDatasetId();
+
+        // Build the download sections
+        DownloadSection csdbSection = new DownloadSection();
+        csdbSection.setTitle(landingPage.getDescription().getTitle());
+        csdbSection.setCdids(new ArrayList<String>());
+
+        DownloadSection xlsxSection = newDownloadSection("xlsx download", filePrefix.toLowerCase() + ".xlsx");
+        DownloadSection csvSection = newDownloadSection("csv download", filePrefix.toLowerCase() + ".csv");
+
+
+        // Break down the csdb file to timeseries (part-built by extracting csdb files)
+        TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"));
+
+        // Process the result from Brian
+        for (TimeSeries series : serieses) {
+            // Generate the new page
+            TimeSeries newPage = preprocessTimeseries(collection, landingPage, datasetUri, series);
+
+            // Add the cdid to the dataset page list of cdids
+            csdbSection.getCdids().add(newPage.getDescription().getCdid());
+        }
+
+
+        // Update the dataset to be reviewed
+        updateDatasetFile(collection, dataset, datasetUri, csdbSection, xlsxSection, csvSection);
+
+        // Generate xlsx and csv downloads
+        generateDownloads(collection, newSeries, landingPage, datasetUri);
+
+        System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
+    }
+
+    /**
+     * Run preprocess routine for a single timeseries
+     *
+     * @param collection
+     * @param landingPage
+     * @param datasetUri
+     * @param series
+     * @return the completed timeseries page
+     *
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws NotFoundException
+     */
+    private TimeSeries preprocessTimeseries(Collection collection, DatasetLandingPage landingPage, String datasetUri, TimeSeries series) throws IOException, URISyntaxException, NotFoundException {
+
+        // Work out the correct timeseries path by working back from the dataset uri
+        String uri = uriForSeriesInDataset(datasetUri, series);
+        Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
+
+        // Construct the new page
+        TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, landingPage, series, datasetUri);
+
+        // Previous versions
+        if (differencesExist(newPage, series)) versionTimeseries(savePath, newPage);
+
+        // Save the new page to reviewed
+        IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
+
+        // Write csv and other files:
+        return newPage;
+    }
+
     /**
      * Get a datasetId by using it's file name
      *
@@ -168,13 +285,13 @@ public class DataPublisher {
     /**
      * Derive the correct timeseries uri for a dataset at a specific URI
      *
-     * @param datasetUri the dataset uri
+     * @param datasetUri the dataset uri (note: dataset not dataset_landing_page)
      * @param series the timeseries
      * @return the timeseries uri achieved by adding cdid to a dataset's taxonomy node
      */
     static String uriForSeriesInDataset(String datasetUri, TimeSeries series) {
         String[] split = StringUtils.split(datasetUri, "/");
-        split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
+        split = (String[]) ArrayUtils.subarray(split, 0, split.length - 3);
 
         String uri = StringUtils.join(split, "/");
         uri = ("/" + uri + "/timeseries/" + series.getCdid()).toLowerCase();
@@ -206,7 +323,6 @@ public class DataPublisher {
             page = new TimeSeries();
             page.setDescription(new PageDescription());
             page.setCdid(series.getCdid());
-            // page.setUri(URI.create(uri));
         }
 
         return page;
@@ -249,21 +365,90 @@ public class DataPublisher {
      * Add release dates, contacts, and other details to a time series
      *
      * @param page
-     * @param datasetPage
-     * @param datasetURI
+     * @param landingPage
+     * @param landingUri
      * @return
      * @throws URISyntaxException
      */
-    static TimeSeries populatePageFromDataSetPage(TimeSeries page, DatasetLandingPage datasetPage, String datasetURI) throws URISyntaxException {
+    static TimeSeries populatePageFromDataSetPage(TimeSeries page, DatasetLandingPage landingPage, String landingUri) throws URISyntaxException {
         PageDescription description = page.getDescription();
         if (description == null) {
             description = new PageDescription();
             page.setDescription(description);
         }
-        description.setNextRelease(datasetPage.getDescription().getNextRelease());
-        description.setReleaseDate(datasetPage.getDescription().getReleaseDate());
+        description.setNextRelease(landingPage.getDescription().getNextRelease());
+        description.setReleaseDate(landingPage.getDescription().getReleaseDate());
 
-        // Set some details
+        // Set some contact details
+        addContactDetails(page, landingPage);
+
+        // Add the dataset id to sources if necessary
+        checkDatasetId(page, landingPage);
+
+        // Add the dataset id to sources if necessary
+        checkRelatedDatasets(page, landingUri);
+
+        // Add stats bulletins
+        if (landingPage.getRelatedDocuments() != null) {
+            page.setRelatedDocuments(landingPage.getRelatedDocuments());
+        }
+
+        return page;
+    }
+
+    /**
+     * Check if datasetId is listed as a sourceDataset for the timeseries and if not add it
+     *
+     * @param timeSeries
+     * @param landingPage
+     */
+    private static void checkDatasetId(TimeSeries timeSeries, DatasetLandingPage landingPage) {
+        boolean datasetIsNew = true;
+
+        // Check
+        for (String datasetId : timeSeries.sourceDatasets) {
+            if (landingPage.getDescription().getDatasetId().equalsIgnoreCase(datasetId)) {
+                datasetIsNew = false;
+                break;
+            }
+        }
+
+        // Link
+        if (datasetIsNew) {
+            timeSeries.sourceDatasets.add(landingPage.getDescription().getDatasetId().toUpperCase());
+        }
+    }
+
+    /**
+     * Check if a landingPage is listed as a related dataset and if not add it
+     *
+     * @param page
+     * @param landingPageUri
+     * @throws URISyntaxException
+     */
+    private static void checkRelatedDatasets(TimeSeries page, String landingPageUri) throws URISyntaxException {
+        List<Link> relatedDatasets = page.getRelatedDatasets();
+        if (relatedDatasets == null) {
+            relatedDatasets = new ArrayList<>();
+        }
+
+        // Check
+        boolean datasetNotLinked = true;
+        for (Link relatedDataset : relatedDatasets) {
+            if (relatedDataset.getUri().toString().equalsIgnoreCase(landingPageUri)) {
+                datasetNotLinked = false;
+                break;
+            }
+        }
+
+        // Link if necessary
+        if (datasetNotLinked) {
+            relatedDatasets.add(new Link(new URI(landingPageUri)));
+            page.setRelatedDatasets(relatedDatasets);
+        }
+    }
+
+    private static void addContactDetails(TimeSeries page, DatasetLandingPage datasetPage) {
         if (datasetPage.getDescription().getContact() != null) {
             Contact contact = new Contact();
             if (datasetPage.getDescription().getContact().getName() != null) {
@@ -278,42 +463,6 @@ public class DataPublisher {
 
             page.getDescription().setContact(contact);
         }
-
-        // Ensure dataset is part of related datasets
-        List<Link> relatedDatasets = page.getRelatedDatasets();
-        if (relatedDatasets == null) {
-            relatedDatasets = new ArrayList<>();
-        }
-        boolean datasetNotLinked = true;
-        for (Link relatedDataset : relatedDatasets) {
-            if (relatedDataset.getUri().toString().equalsIgnoreCase(datasetURI)) {
-                datasetNotLinked = false;
-                break;
-            }
-        }
-        if (datasetNotLinked) {
-            relatedDatasets.add(new Link(new URI(datasetURI)));
-            page.setRelatedDatasets(relatedDatasets);
-        }
-
-        // Add stats bulletins
-        if (datasetPage.getRelatedDocuments() != null) {
-            page.setRelatedDocuments(datasetPage.getRelatedDocuments());
-        }
-
-        // Add the dataset id if relevant
-        boolean datasetIsNew = true;
-        for (String datasetId : page.sourceDatasets) {
-            if (datasetPage.getDescription().getDatasetId().equalsIgnoreCase(datasetId)) {
-                datasetIsNew = false;
-                break;
-            }
-        }
-        if (datasetIsNew) {
-            page.sourceDatasets.add(datasetPage.getDescription().getDatasetId().toUpperCase());
-        }
-
-        return page;
     }
 
     /**
@@ -797,7 +946,7 @@ public class DataPublisher {
         insertions = 0;
         corrections = 0;
 
-        preprocessCSDB(zebedee, collection, session);
+        preprocessCsdbFiles(zebedee, collection, session);
 
         if (insertions + corrections > 0) {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
@@ -825,103 +974,55 @@ public class DataPublisher {
     }
 
     /**
-     * Run preprocess routine for CSDB datasets
+     * Generate the XLSX and CSV files for a collection of timeseries
      *
-     * The T5 timeseries objects are made by
-     * 1. Searching for all .csdb files in a collection
-     * 2. Getting Brian to break the files down to their component stats and basic metadata.
-     * 3. Combining the stats with metadata entered with the dataset and existing data
-     *
-     * @param collection the collection to search for dataset objects
-     * @param session a user session (required for some permissions)
+     * @param collection
+     * @param newSeries
+     * @param landingPage
+     * @param datasetUri
      * @throws IOException
-     * @throws BadRequestException
-     * @throws UnauthorizedException
      */
-    void preprocessCSDB(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException, NotFoundException {
+    private void generateDownloads(Collection collection, List<TimeSeries> newSeries, DatasetLandingPage landingPage, String datasetUri) throws IOException {
+        // Save the files
+        String filename = landingPage.getDescription().getDatasetId();
+        if (filename.equalsIgnoreCase("")) filename = "data";
+        Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".xlsx");
+        Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".csv");
 
-        // First find all csdb files in the collection
-        List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
+        // Write the files
+        List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(newSeries);
+        writeDataGridToXlsx(xlsPath, dataGrid);
+        writeDataGridToCsv(csvPath, dataGrid);
+    }
 
+    /**
+     * Update and save the dataset json we have generated files for
+     *
+     * @param collection
+     * @param dataset
+     * @param datasetUri
+     * @param csdbSection
+     * @param xlsxSection
+     * @param csvSection
+     * @throws IOException
+     */
+    private void updateDatasetFile(Collection collection, Dataset dataset, String datasetUri, DownloadSection csdbSection, DownloadSection xlsxSection, DownloadSection csvSection) throws IOException {
+        List<DownloadSection> sections = new ArrayList<>();
+        sections.add(csdbSection);
+        sections.add(xlsxSection);
+        sections.add(csvSection);
+        dataset.setDownloads(sections);
 
-        // For each file in this collection
-        for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
-
-            List<TimeSeries> newSeries = new ArrayList<>();
-
-            // Download the dataset page (for metadata)
-            DatasetLandingPage dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), DatasetLandingPage.class);
-            String datasetUri = zebedee.toUri(csdbDataset.get("json"));
-
-            DownloadSection csdbSection = new DownloadSection();
-            csdbSection.setTitle(dataset.getDescription().getTitle());
-            csdbSection.setCdids(new ArrayList<String>());
-
-            // Get a name for the xlsx/csv files to be generated
-            dataset.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
-
-            String filePrefix = dataset.getDescription().getDatasetId();
-            if (filePrefix.equalsIgnoreCase("")) {
-                filePrefix = DEFAULT_FILE;
-            }
-
-            DownloadSection xlsxSection = new DownloadSection();
-            xlsxSection.setTitle("xlsx download");
-            xlsxSection.setFile(datasetUri + "/" + filePrefix.toLowerCase() + ".xlsx");
-
-            DownloadSection csvSection = new DownloadSection();
-            csvSection.setTitle("csv download");
-            csvSection.setFile(datasetUri + "/" + filePrefix.toLowerCase() + ".csv");
-
-            // Break down the csdb file to timeseries (part-built by extracting csdb files)
-            TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"));
+        Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
+        IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
+    }
 
 
-            for (TimeSeries series : serieses) {
-                // Work out the correct timeseries path by working back from the dataset uri
-                String uri = uriForSeriesInDataset(datasetUri, series);
-                Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
-
-                // Construct the new page
-                TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, dataset, series, datasetUri);
-
-                // Previous versions
-                if (differencesExist(newPage, series)) versionTimeseries(savePath, newPage);
-
-                // Add the cdid to the dataset page list of cdids
-                csdbSection.getCdids().add(newPage.getDescription().getCdid());
-
-                // Save the new page to reviewed
-                IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
-
-                // Write csv and other files:
-                newSeries.add(newPage);
-            }
-
-            // Save the dataset to be reviewed
-            List<DownloadSection> sections = new ArrayList<>();
-            sections.add(csdbSection);
-            sections.add(xlsxSection);
-            sections.add(csvSection);
-            dataset.setDownloads(sections);
-
-            Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
-            IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
-
-            // Save the files
-            String filename = dataset.getDescription().getDatasetId();
-            if (filename.equalsIgnoreCase("")) {
-                filename = "data";
-            }
-
-            Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".xlsx");
-            Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".csv");
-            List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(newSeries);
-            writeDataGridToXlsx(xlsPath, dataGrid);
-            writeDataGridToCsv(csvPath, dataGrid);
-
-            System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
-        }
+    private DownloadSection newDownloadSection(String title, String file) {
+        DownloadSection section = new DownloadSection();
+        section.setTitle(title);
+        section.setFile(file);
+        return section;
     }
 
     /**
@@ -988,22 +1089,22 @@ public class DataPublisher {
      * Combine sections of the new timeseries, existing metadata, and metadata from the dataset file
      *
      * @param destinationUri
-     * @param dataset
+     * @param landingPage
      * @param series
      * @return
      * @throws IOException
      */
-    TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, DatasetLandingPage dataset, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
+    TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, DatasetLandingPage landingPage, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
 
         // Attempts to open an existing time series or creates a new one
         TimeSeries page = startPageForSeriesWithPublishedPath(destinationUri, series);
 
         // Add stats data from the time series (as returned by Brian)
         // NOTE: This will log any corrections as it goes
-        populatePageFromTimeSeries(page, series, dataset);
+        populatePageFromTimeSeries(page, series, landingPage);
 
         // Add metadata from the dataset
-        populatePageFromDataSetPage(page, dataset, datasetURI);
+        populatePageFromDataSetPage(page, landingPage, datasetURI);
 
         return page;
     }
@@ -1013,16 +1114,15 @@ public class DataPublisher {
      *
      * @param page    a part-built time series page
      * @param series  a time series returned by Brian by parsing a csdb file
-     * @param dataset the source dataset page
      * @return
      */
-    TimeSeries populatePageFromTimeSeries(TimeSeries page, TimeSeries series, DatasetLandingPage dataset) {
+    TimeSeries populatePageFromTimeSeries(TimeSeries page, TimeSeries series, DatasetLandingPage landingPage) {
 
         // Time series is a bit of an inelegant beast in that it splits data storage by time period
         // We deal with this by
-        populatePageFromSetOfValues(page, page.years, series.years, dataset);
-        populatePageFromSetOfValues(page, page.quarters, series.quarters, dataset);
-        populatePageFromSetOfValues(page, page.months, series.months, dataset);
+        populatePageFromSetOfValues(page, page.years, series.years, landingPage);
+        populatePageFromSetOfValues(page, page.quarters, series.quarters, landingPage);
+        populatePageFromSetOfValues(page, page.months, series.months, landingPage);
 
         if (page.getDescription() == null || series.getDescription() == null) {
             System.out.println("Problem");
@@ -1043,8 +1143,15 @@ public class DataPublisher {
         return page;
     }
 
-    // Support function for above
-    void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, DatasetLandingPage dataset) {
+    /**
+     * Add individual points to a set of points (yearly, monthly, quarterly)
+     *
+     * @param page the page
+     * @param currentValues the current value list
+     * @param updateValues the new value list
+     * @param landingPage the landing page (used to get dataset id)
+     */
+    void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, DatasetLandingPage landingPage) {
 
         // Iterate through values
         for (TimeSeriesValue value : updateValues) {
@@ -1059,7 +1166,7 @@ public class DataPublisher {
 
                     // Update the point
                     current.value = value.value;
-                    current.sourceDataset = dataset.getDescription().getDatasetId();
+                    current.sourceDataset = landingPage.getDescription().getDatasetId();
 
                     current.updateDate = new Date();
 
@@ -1067,7 +1174,7 @@ public class DataPublisher {
                     logCorrection(page, old, current);
                 }
             } else {
-                value.sourceDataset = dataset.getDescription().getDatasetId();
+                value.sourceDataset = landingPage.getDescription().getDatasetId();
                 value.updateDate = new Date();
 
                 page.add(value);
@@ -1128,9 +1235,5 @@ public class DataPublisher {
 
         return true;
     }
-
-
-
-
 
 }

@@ -33,7 +33,8 @@ public class ReleasePopulator {
 
     private static void addPageDetailToRelease(Release release, ContentDetail contentDetail) {
         if (contentDetail.type.equals(PageType.article.toString())
-                || contentDetail.type.equals(PageType.bulletin.toString())) {
+                || contentDetail.type.equals(PageType.bulletin.toString())
+                || contentDetail.type.equals(PageType.compendium_landing_page.toString())) {
             Log.print("Adding document: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
             addRelatedDocument(release, contentDetail);
         }

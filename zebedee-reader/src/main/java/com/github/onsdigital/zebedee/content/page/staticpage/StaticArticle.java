@@ -18,12 +18,14 @@ public class StaticArticle extends Page {
     private List<Link> relatedDatasets;
     private List<Link> relatedDocuments;
     private List<Link> downloads;
+    private List<Link> topics;
 
     private List<MarkdownSection> sections = new ArrayList<>();
-    private List<MarkdownSection> accordion = new ArrayList<>();
 
+    private List<MarkdownSection> accordion = new ArrayList<>();
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
+
     private List<FigureSection> images = new ArrayList<>();
 
     private List<Alert> alerts;
@@ -103,5 +105,13 @@ public class StaticArticle extends Page {
 
     public void setAlerts(List<Alert> alerts) {
         this.alerts = alerts;
+    }
+
+    public List<Link> getTopics() {
+        return topics;
+    }
+
+    public void setTopics(List<Link> topics) {
+        this.topics = topics;
     }
 }

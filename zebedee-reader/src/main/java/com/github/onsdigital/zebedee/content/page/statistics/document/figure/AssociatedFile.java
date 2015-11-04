@@ -6,6 +6,7 @@ package com.github.onsdigital.zebedee.content.page.statistics.document.figure;
 public class AssociatedFile {
     private String type;
     private String filename;
+    private String fileType;
 
     public String getType() {
         return type;
@@ -21,5 +22,13 @@ public class AssociatedFile {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 }

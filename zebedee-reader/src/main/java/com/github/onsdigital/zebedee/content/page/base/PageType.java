@@ -35,5 +35,6 @@ public enum PageType {
     release,
     reference_tables,
     chart,
-    table
+    table,
+    image
 }

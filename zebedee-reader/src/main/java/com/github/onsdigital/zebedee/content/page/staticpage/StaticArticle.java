@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.content.page.staticpage;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
+import com.github.onsdigital.zebedee.content.partial.Alert;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class StaticArticle extends Page {
 
-    private List<Link> relatedData;
+    private List<Link> relatedDatasets;
     private List<Link> relatedDocuments;
     private List<Link> downloads;
 
@@ -25,18 +26,19 @@ public class StaticArticle extends Page {
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
 
+    private List<Alert> alerts;
 
     @Override
     public PageType getType() {
         return PageType.static_article;
     }
 
-    public List<Link> getRelatedData() {
-        return relatedData;
+    public List<Link> getRelatedDatasets() {
+        return relatedDatasets;
     }
 
-    public void setRelatedData(List<Link> relatedData) {
-        this.relatedData = relatedData;
+    public void setRelatedDatasets(List<Link> relatedDatasets) {
+        this.relatedDatasets = relatedDatasets;
     }
 
     public List<Link> getRelatedDocuments() {
@@ -93,5 +95,13 @@ public class StaticArticle extends Page {
 
     public void setImages(List<FigureSection> images) {
         this.images = images;
+    }
+
+    public List<Alert> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<Alert> alerts) {
+        this.alerts = alerts;
     }
 }

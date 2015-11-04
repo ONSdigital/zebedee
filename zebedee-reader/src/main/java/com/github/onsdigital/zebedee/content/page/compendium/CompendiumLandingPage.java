@@ -15,14 +15,13 @@ public class CompendiumLandingPage extends Page {
     private List<Link> datasets;
     private List<Link> chapters;
     private List<Link> relatedMethodology;
-
+    private List<Link> relatedMethodologyArticle;
     private List<Alert> alerts;
 
     @Override
     public PageType getType() {
         return PageType.compendium_landing_page;
     }
-
 
     public List<Link> getDatasets() {
         return datasets;
@@ -54,5 +53,13 @@ public class CompendiumLandingPage extends Page {
 
     public void setAlerts(List<Alert> alerts) {
         this.alerts = alerts;
+    }
+
+    public List<Link> getRelatedMethodologyArticle() {
+        return relatedMethodologyArticle;
+    }
+
+    public void setRelatedMethodologyArticle(List<Link> relatedMethodologyArticle) {
+        this.relatedMethodologyArticle = relatedMethodologyArticle;
     }
 }

@@ -21,53 +21,9 @@ public class Release extends Page{
     private List<Link> relatedDocuments;
     private List<Link> relatedDatasets;
     private List<Link> relatedMethodology;
+    private List<Link> relatedMethodologyArticle;
 
     private List<ReleaseDateChange> dateChanges;
-
-    @Override
-    public PageType getType() {
-        return PageType.release;
-    }
-
-    public List<String> getMarkdown() {
-        return markdown;
-    }
-
-    public void setMarkdowns(List<String> markdown) {
-        this.markdown = markdown;
-    }
-
-    public List<ReleaseDateChange> getDateChanges() {
-        return dateChanges;
-    }
-
-    public void setDateChanges(List<ReleaseDateChange> dateChanges) {
-        this.dateChanges = dateChanges;
-    }
-
-    public List<Link> getRelatedDocuments() {
-        return relatedDocuments;
-    }
-
-    public void setRelatedDocuments(List<Link> relatedDocuments) {
-        this.relatedDocuments = relatedDocuments;
-    }
-
-    public List<Link> getRelatedDatasets() {
-        return relatedDatasets;
-    }
-
-    public void setRelatedDatasets(List<Link> relatedDatasets) {
-        this.relatedDatasets = relatedDatasets;
-    }
-
-    public List<Link> getRelatedMethodology() {
-        return relatedMethodology;
-    }
-
-    public void setRelatedMethodology(List<Link> relatedMethodology) {
-        this.relatedMethodology = relatedMethodology;
-    }
 
     public static void main(String[] args) {
         Release release = new Release();
@@ -131,5 +87,58 @@ public class Release extends Page{
 
         System.out.println(ContentUtil.serialise(release));
 
+    }
+
+    @Override
+    public PageType getType() {
+        return PageType.release;
+    }
+
+    public List<String> getMarkdown() {
+        return markdown;
+    }
+
+    public void setMarkdowns(List<String> markdown) {
+        this.markdown = markdown;
+    }
+
+    public List<ReleaseDateChange> getDateChanges() {
+        return dateChanges;
+    }
+
+    public void setDateChanges(List<ReleaseDateChange> dateChanges) {
+        this.dateChanges = dateChanges;
+    }
+
+    public List<Link> getRelatedDocuments() {
+        return relatedDocuments;
+    }
+
+    public void setRelatedDocuments(List<Link> relatedDocuments) {
+        this.relatedDocuments = relatedDocuments;
+    }
+
+    public List<Link> getRelatedDatasets() {
+        return relatedDatasets;
+    }
+
+    public void setRelatedDatasets(List<Link> relatedDatasets) {
+        this.relatedDatasets = relatedDatasets;
+    }
+
+    public List<Link> getRelatedMethodology() {
+        return relatedMethodology;
+    }
+
+    public void setRelatedMethodology(List<Link> relatedMethodology) {
+        this.relatedMethodology = relatedMethodology;
+    }
+
+    public List<Link> getRelatedMethodologyArticle() {
+        return relatedMethodologyArticle;
+    }
+
+    public void setRelatedMethodologyArticle(List<Link> relatedMethodologyArticle) {
+        this.relatedMethodologyArticle = relatedMethodologyArticle;
     }
 }

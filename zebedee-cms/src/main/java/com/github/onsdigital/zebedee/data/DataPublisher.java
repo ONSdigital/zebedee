@@ -198,10 +198,10 @@ public class DataPublisher {
 
         // Download the dataset page (for metadata)
         Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
-        DatasetLandingPage landingPage = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("landing_page").toFile()), DatasetLandingPage.class);
-
         String datasetUri = zebedee.toUri(csdbDataset.get("json"));
-        String landingPageUri = zebedee.toUri(csdbDataset.get("landing_page"));
+
+        DatasetLandingPage landingPage = landingPageForDataset(zebedee, collection, datasetUri);
+
 
         // Set a name for the xlsx/csv files to be generated
         landingPage.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
@@ -236,6 +236,38 @@ public class DataPublisher {
         generateDownloads(collection, newSeries, landingPage, datasetUri);
 
         System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
+    }
+
+    /**
+     * The parent landingpage uri for a dataset
+     *
+     * @param datasetUri
+     * @return URI (without data.json)
+     */
+    String uriForDatasetLandingPage(String datasetUri) {
+        String[] split = StringUtils.split(datasetUri, "/");
+        if (split[split.length - 1].equalsIgnoreCase("data.json") || split[split.length - 1].equalsIgnoreCase("")) {
+            split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
+        } else {
+            split = (String[]) ArrayUtils.subarray(split, 0, split.length - 1);
+        }
+
+        return "/" + StringUtils.join(split, "/");
+    }
+
+    DatasetLandingPage landingPageForDataset(Zebedee zebedee, Collection collection, String datasetUri) throws IOException {
+        String uri = uriForDatasetLandingPage(datasetUri);
+        Path path;
+        if (Files.exists(collection.reviewed.toPath(uri).resolve("data.json"))) {
+            path = collection.reviewed.toPath(uri).resolve("data.json");
+        } else {
+            path = zebedee.published.toPath(uri).resolve("data.json");
+        }
+        DatasetLandingPage landingPage;
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            landingPage = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
+        }
+        return landingPage;
     }
 
     /**

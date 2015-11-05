@@ -1,35 +1,40 @@
-package com.github.onsdigital.zebedee.content.page.staticpage;
+package com.github.onsdigital.zebedee.content.page.statistics.document.article;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
-import com.github.onsdigital.zebedee.content.partial.Alert;
 import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by bren on 29/06/15.
- */
-public class StaticArticle extends Page {
+public class ArticleDownload extends Statistics {
 
-    private List<Link> relatedData;
+    private List<DownloadSection> downloads;
+    private List<String> markdown;
+
+    private List<Link> relatedData = new ArrayList<>();//Link to data in the article
     private List<Link> relatedDocuments;
     private List<Link> topics;
-
-    private List<MarkdownSection> sections = new ArrayList<>();
-    private List<MarkdownSection> accordion = new ArrayList<>();
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
 
-    private List<Alert> alerts;
+    public List<DownloadSection> getDownloads() {
+        return downloads;
+    }
 
-    @Override
-    public PageType getType() {
-        return PageType.static_article;
+    public void setDownloads(List<DownloadSection> downloads) {
+        this.downloads = downloads;
+    }
+
+    public List<String> getMarkdown() {
+        return markdown;
+    }
+
+    public void setMarkdown(List<String> markdown) {
+        this.markdown = markdown;
     }
 
     public List<Link> getRelatedData() {
@@ -48,20 +53,12 @@ public class StaticArticle extends Page {
         this.relatedDocuments = relatedDocuments;
     }
 
-    public List<MarkdownSection> getSections() {
-        return sections;
+    public List<Link> getTopics() {
+        return topics;
     }
 
-    public void setSections(List<MarkdownSection> sections) {
-        this.sections = sections;
-    }
-
-    public List<MarkdownSection> getAccordion() {
-        return accordion;
-    }
-
-    public void setAccordion(List<MarkdownSection> accordion) {
-        this.accordion = accordion;
+    public void setTopics(List<Link> topics) {
+        this.topics = topics;
     }
 
     public List<FigureSection> getCharts() {
@@ -88,19 +85,8 @@ public class StaticArticle extends Page {
         this.images = images;
     }
 
-    public List<Alert> getAlerts() {
-        return alerts;
-    }
-
-    public void setAlerts(List<Alert> alerts) {
-        this.alerts = alerts;
-    }
-
-    public List<Link> getTopics() {
-        return topics;
-    }
-
-    public void setTopics(List<Link> topics) {
-        this.topics = topics;
+    @Override
+    public PageType getType() {
+        return PageType.article_download;
     }
 }

@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.image.Image;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -55,6 +56,27 @@ class ContentReader {
             throw new NullPointerException("Root folder can not be null");
         }
         this.ROOT_FOLDER = rootFolder;
+    }
+
+    /**
+     * Determine the mime type of the file at the given path.
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    static String determineMimeType(Path path) throws IOException {
+        String mimeType = probeContentType(path);
+
+        // probeContentType returning null for a number of file types. (images on mac at least)
+        // using another method as a fallback.
+        if (mimeType == null)
+            mimeType = URLConnection.guessContentTypeFromName(path.getFileName().toString());
+
+        if (mimeType == null)
+            mimeType = "application/octet-stream";
+
+        return mimeType;
     }
 
     /**
@@ -112,7 +134,7 @@ class ContentReader {
 
     private URI resolveUri(String uriString, Page page) {
         URI uri;
-        if (page instanceof Table || page instanceof Chart) {
+        if (page instanceof Table || page instanceof Chart || page instanceof Image) {
             uri = URI.create(removeEnd(uriString, ".json"));
         } else {
             uri = URI.create(removeLastSegment(uriString));
@@ -203,7 +225,6 @@ class ContentReader {
         return path.equals(getRootFolder());
     }
 
-
     private Map<URI, ContentNode> resolveChildren(Path node) throws IOException, ZebedeeException {
         Map<URI, ContentNode> nodes = new HashMap<>();
         try (DirectoryStream<Path> paths = newDirectoryStream(node)) {
@@ -259,24 +280,6 @@ class ContentReader {
         resource.setData(newInputStream(path));
         resource.setSize(size(path));
         return resource;
-    }
-
-    /**
-     * Determine the mime type of the file at the given path.
-     *
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    private String determineMimeType(Path path) throws IOException {
-        String mimeType = probeContentType(path);
-
-        // probeContentType returning null for a number of file types. (images on mac at least)
-        // using another method as a fallback.
-        if (mimeType == null)
-            mimeType = URLConnection.guessContentTypeFromName(path.getFileName().toString());
-
-        return mimeType;
     }
 
     protected Page deserialize(Resource resource) {

@@ -8,14 +8,13 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.cha
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -149,7 +148,7 @@ public class ContentReaderTest {
         assertTrue(parents.containsKey(URI.create("/")));
         URI peoplePopulation = URI.create("/peoplepopulationandcommunity");
         assertTrue(parents.containsKey(peoplePopulation));
-        assertEquals(parents.get(peoplePopulation).getDescription().getTitle(),"Pobl, poblogaeth a chymuned");
+        assertEquals(parents.get(peoplePopulation).getDescription().getTitle(), "Pobl, poblogaeth a chymuned");
     }
 
     @Test
@@ -175,4 +174,15 @@ public class ContentReaderTest {
         assertEquals("2015", latestContent.getDescription().getEdition());
     }
 
+    @Test
+    public void MimeTypeShouldReturnOctetStreamForXls() throws IOException {
+        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xls"));
+        assertEquals("application/octet-stream", mimeType);
+    }
+
+    @Test
+    public void MimeTypeShouldReturnOctetStreamForXlsx() throws IOException {
+        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xlsx"));
+        assertEquals("application/octet-stream", mimeType);
+    }
 }

@@ -17,6 +17,7 @@ public enum PageType {
     product_page,
     bulletin,
     article,
+    article_download,
     timeseries,
     data_slice,
     compendium_landing_page,
@@ -25,6 +26,7 @@ public enum PageType {
     static_landing_page,
     static_article, //With table of contents
     static_methodology,
+    static_methodology_download,
     static_page, //Pure markdown
     static_qmi,
     static_foi,
@@ -35,5 +37,6 @@ public enum PageType {
     release,
     reference_tables,
     chart,
-    table
+    table,
+    image
 }

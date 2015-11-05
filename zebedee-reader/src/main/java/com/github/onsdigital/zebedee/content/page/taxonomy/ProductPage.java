@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee.content.page.taxonomy;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.page.taxonomy.base.TaxonomyNode;
+import com.github.onsdigital.zebedee.content.partial.Link;
 
 import java.util.List;
 
@@ -18,6 +18,7 @@ public class ProductPage extends TaxonomyNode {
     private List<Link> statsBulletins;
     private List<Link> relatedArticles;
     private List<Link> relatedMethodology;
+    private List<Link> relatedMethodologyArticle;
 
     @Override
     public PageType getType() {
@@ -63,5 +64,13 @@ public class ProductPage extends TaxonomyNode {
 
     public void setRelatedMethodology(List<Link> relatedMethodology) {
         this.relatedMethodology = relatedMethodology;
+    }
+
+    public List<Link> getRelatedMethodologyArticle() {
+        return relatedMethodologyArticle;
+    }
+
+    public void setRelatedMethodologyArticle(List<Link> relatedMethodologyArticle) {
+        this.relatedMethodologyArticle = relatedMethodologyArticle;
     }
 }

@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.content.page.staticpage;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
 import com.github.onsdigital.zebedee.content.partial.Alert;
 import com.github.onsdigital.zebedee.content.partial.Link;
@@ -16,7 +15,7 @@ import java.util.List;
  */
 public class StaticArticle extends Page {
 
-    private List<Link> relatedDatasets;
+    private List<Link> relatedData;
     private List<Link> relatedDocuments;
     private List<Link> topics;
 
@@ -28,19 +27,17 @@ public class StaticArticle extends Page {
 
     private List<Alert> alerts;
 
-    private List<DownloadSection> downloads;
-
     @Override
     public PageType getType() {
         return PageType.static_article;
     }
 
-    public List<Link> getRelatedDatasets() {
-        return relatedDatasets;
+    public List<Link> getRelatedData() {
+        return relatedData;
     }
 
-    public void setRelatedDatasets(List<Link> relatedDatasets) {
-        this.relatedDatasets = relatedDatasets;
+    public void setRelatedData(List<Link> relatedData) {
+        this.relatedData = relatedData;
     }
 
     public List<Link> getRelatedDocuments() {
@@ -65,14 +62,6 @@ public class StaticArticle extends Page {
 
     public void setAccordion(List<MarkdownSection> accordion) {
         this.accordion = accordion;
-    }
-
-    public List<DownloadSection> getDownloads() {
-        return downloads;
-    }
-
-    public void setDownloads(List<DownloadSection> downloads) {
-        this.downloads = downloads;
     }
 
     public List<FigureSection> getCharts() {

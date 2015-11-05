@@ -18,6 +18,7 @@ public class Chart extends FigureBase {
     private String decimalPlaces;
 
     private String unit;
+    private String xAxisLabel;
     private String aspectRatio;
     private String chartType;
     private List<Map<String, String>> data;
@@ -166,5 +167,13 @@ public class Chart extends FigureBase {
 
     public void setDecimalPlaces(String decimalPlaces) {
         this.decimalPlaces = decimalPlaces;
+    }
+
+    public String getxAxisLabel() {
+        return xAxisLabel;
+    }
+
+    public void setxAxisLabel(String xAxisLabel) {
+        this.xAxisLabel = xAxisLabel;
     }
 }

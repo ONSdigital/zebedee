@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.data;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
@@ -21,6 +22,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.reader.api.endpoint.Data;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.google.gson.JsonSyntaxException;
@@ -65,7 +67,8 @@ public class DataPublisher {
     public static int insertions = 0;
     public static int corrections = 0;
     public static Map<String, String> env = System.getenv();
-    public Path brianTestFile = null;
+    public List<Path> brianTestFiles = new ArrayList<>();
+    public boolean doNotCompress = false;
 
     /**
      * Detects datasets appropriate to csdb style publication
@@ -200,6 +203,7 @@ public class DataPublisher {
         // Download the dataset page (for metadata)
         Dataset dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
         String datasetUri = zebedee.toUri(csdbDataset.get("json"));
+        String correctionNotice = datasetCorrectionNotice(collection, datasetUri);
 
         DatasetLandingPage landingPage = landingPageForDataset(zebedee, collection, datasetUri);
 
@@ -223,7 +227,7 @@ public class DataPublisher {
         // Process the result from Brian
         for (TimeSeries series : serieses) {
             // Generate the new page
-            TimeSeries newPage = preprocessTimeseries(collection, landingPage, datasetUri, series);
+            TimeSeries newPage = preprocessTimeseries(zebedee, collection, landingPage, datasetUri, series, correctionNotice);
 
             // Add the cdid to the dataset page list of cdids
             csdbSection.getCdids().add(newPage.getDescription().getCdid());
@@ -256,6 +260,21 @@ public class DataPublisher {
         return "/" + StringUtils.join(split, "/");
     }
 
+    String datasetCorrectionNotice(Collection collection, String datasetUri) throws IOException {
+
+        Dataset updated;
+        Path updatedPath = collection.reviewed.get(datasetUri).resolve("data.json");
+        try (InputStream stream = Files.newInputStream(updatedPath)) {
+            updated = ContentUtil.deserialise(stream, Dataset.class);
+        }
+
+        if (updated.getVersions() == null || updated.getVersions().size() == 0) {
+            return "";
+        } else {
+            return updated.getVersions().get(updated.getVersions().size()-1).getCorrectionNotice();
+        }
+    }
+
     DatasetLandingPage landingPageForDataset(Zebedee zebedee, Collection collection, String datasetUri) throws IOException {
         String uri = uriForDatasetLandingPage(datasetUri);
         Path path;
@@ -278,23 +297,24 @@ public class DataPublisher {
      * @param landingPage
      * @param datasetUri
      * @param series
+     * @param correctionNotice
      * @return the completed timeseries page
      *
      * @throws IOException
      * @throws URISyntaxException
      * @throws NotFoundException
      */
-    private TimeSeries preprocessTimeseries(Collection collection, DatasetLandingPage landingPage, String datasetUri, TimeSeries series) throws IOException, URISyntaxException, NotFoundException {
+    private TimeSeries preprocessTimeseries(Zebedee zebedee, Collection collection, DatasetLandingPage landingPage, String datasetUri, TimeSeries series, String correctionNotice) throws IOException, URISyntaxException, NotFoundException {
 
         // Work out the correct timeseries path by working back from the dataset uri
         String uri = uriForSeriesInDataset(datasetUri, series);
         Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
 
         // Construct the new page
-        TimeSeries newPage = constructTimeSeriesPageFromComponents(uri, landingPage, series, datasetUri);
+        TimeSeries newPage = constructTimeSeriesPageFromComponents(zebedee, uri, landingPage, series, datasetUri);
 
         // Previous versions
-        if (differencesExist(newPage, series)) versionTimeseries(savePath, newPage);
+        if (differencesExist(zebedee, uri, newPage)) versionTimeseries(zebedee, savePath.getParent(), newPage, uri, correctionNotice);
 
         // Save the new page to reviewed
         IOUtils.write(ContentUtil.serialise(newPage), FileUtils.openOutputStream(savePath.toFile()));
@@ -502,33 +522,38 @@ public class DataPublisher {
      * Create a previous version page for a timeseries
      * @param savePath
      * @param newPage
+     * @param uri
+     * @param correctionNotice
      * @throws URISyntaxException
      * @throws NotFoundException
      * @throws IOException
      */
-    public static void versionTimeseries(Path savePath, TimeSeries newPage) throws URISyntaxException, NotFoundException, IOException {
+    public static void versionTimeseries(Zebedee zebedee, Path savePath, TimeSeries newPage, String uri, String correctionNotice) throws URISyntaxException, NotFoundException, IOException {
 
-        Path path = Root.zebedee.published.get(newPage.getUri().toString());
+        Path path = zebedee.published.get(uri);
 
         // nothing to version if it does not exist in published.
-        if (!path.toFile().exists()) {
+        if (path == null || !path.toFile().exists()) {
             return;
         }
 
         // create directory in reviewed if it does not exist.
-        VersionedContentItem versionedContentItem = new VersionedContentItem(newPage.getUri(), savePath);
-        ContentItemVersion contentItemVersion = versionedContentItem.createVersion(path);
+        VersionedContentItem versionedContentItem = new VersionedContentItem(new URI(uri), savePath);
 
-        Version version = new Version();
-        version.setUri(contentItemVersion.getUri());
-        version.setUpdateDate(newPage.getDescription().getReleaseDate());
-        version.setLabel(contentItemVersion.getIdentifier());
+        if (versionedContentItem.versionExists() == false) {
+            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(path);
 
-        if (newPage.getVersions() == null)
-            newPage.setVersions(new ArrayList<Version>());
+            Version version = new Version();
+            version.setUri(contentItemVersion.getUri());
+            version.setUpdateDate(newPage.getDescription().getReleaseDate());
+            version.setLabel(contentItemVersion.getIdentifier());
+            version.setCorrectionNotice(correctionNotice);
 
-        newPage.getVersions().add(version);
+            if (newPage.getVersions() == null)
+                newPage.setVersions(new ArrayList<Version>());
 
+            newPage.getVersions().add(version);
+        }
     }
 
     /**
@@ -971,7 +996,7 @@ public class DataPublisher {
      */
     public void preprocessCollection(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException, NotFoundException {
 
-        if (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0) {
+        if (brianTestFiles.size() == 0 && (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0)) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
             return;
         }
@@ -985,7 +1010,7 @@ public class DataPublisher {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
         }
 
-        CompressTimeseries(collection);
+        if (!doNotCompress) CompressTimeseries(collection);
     }
 
     /**
@@ -1067,7 +1092,7 @@ public class DataPublisher {
      */
     TimeSerieses callBrianToProcessCSDB(Path path) throws IOException {
         // Hijack brian from test framework if required
-        if (this.brianTestFile != null) return presetBrianFile(this.brianTestFile);
+        if (brianTestFiles.size() != 0) return presetBrianFile();
 
         // Get the brian CSDB processing uri
         URI url = csdbURI();
@@ -1105,8 +1130,17 @@ public class DataPublisher {
         }
     }
 
-    TimeSerieses presetBrianFile(Path path) throws IOException {
+    /**
+     * Return timeseries deserialised from a file (used in test)
+     * @return
+     * @throws IOException
+     */
+    TimeSerieses presetBrianFile() throws IOException {
         TimeSerieses result = null;
+        // Pop the first file on the brian test file stack
+        Path path = brianTestFiles.get(0);
+        brianTestFiles.remove(0);
+
         try (InputStream inputStream = Files.newInputStream(path)) {
                 result = ContentUtil.deserialise(inputStream, TimeSerieses.class);
         }
@@ -1139,10 +1173,10 @@ public class DataPublisher {
      * @return
      * @throws IOException
      */
-    TimeSeries constructTimeSeriesPageFromComponents(String destinationUri, DatasetLandingPage landingPage, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
+    TimeSeries constructTimeSeriesPageFromComponents(Zebedee zebedee, String destinationUri, DatasetLandingPage landingPage, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
 
         // Attempts to open an existing time series or creates a new one
-        TimeSeries page = startPageForSeriesWithPublishedPath(destinationUri, series);
+        TimeSeries page = startPageForSeriesWithPublishedPath(zebedee, destinationUri, series);
 
         // Add stats data from the time series (as returned by Brian)
         // NOTE: This will log any corrections as it goes
@@ -1244,17 +1278,27 @@ public class DataPublisher {
 
     /**
      *
-     * @param page    a part-built time series page
-     * @param series  a time series returned by Brian by parsing a csdb file
+     * @param zebedee
+     * @param uri
+     * @param page
      * @return
      */
-    boolean differencesExist(TimeSeries page, TimeSeries series) {
+    boolean differencesExist(Zebedee zebedee, String uri, TimeSeries page) {
+        TimeSeries current;
+        if (zebedee.published.get(uri) == null) return false;
+
+        // Get the current version of the page
+        try(InputStream stream = Files.newInputStream(zebedee.published.get(uri).resolve("data.json"))) {
+            current = ContentUtil.deserialise(stream, TimeSeries.class);
+        } catch (IOException e) {
+            return false;
+        }
 
         // Time series is a bit of an inelegant beast in that it splits data storage by time period
         // We deal with this by
-        if (differencesExist(page.years, series.years)) return true;
-        if (differencesExist(page.quarters, series.quarters)) return true;
-        if (differencesExist(page.months, series.months)) return true;
+        if (differencesExist(current.years, page.years)) return true;
+        if (differencesExist(current.quarters, page.quarters)) return true;
+        if (differencesExist(current.months, page.months)) return true;
 
         return false;
     }
@@ -1273,12 +1317,12 @@ public class DataPublisher {
             // Find the current value of the data point
 
             TimeSeriesValue current = getCurrentValue(currentValues, value);
-            if (current != null && current.value.equalsIgnoreCase(value.value)) {
-                return false;
+            if (current == null || !current.value.equalsIgnoreCase(value.value)) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
 }

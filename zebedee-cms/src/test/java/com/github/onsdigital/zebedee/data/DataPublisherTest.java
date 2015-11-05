@@ -4,14 +4,21 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
+import com.github.onsdigital.zebedee.content.page.statistics.document.base.StatisticalDocument;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
@@ -44,6 +51,7 @@ public class DataPublisherTest {
     Collection collection;
 
     String publishedTimeSeriesPath = "/themea/landinga/producta/timeseries/a4fk";
+    String publishedTimeSeriesPathAlt = "/themea/landinga/producta/timeseries/a4vr";
     String publishedLandingPath = "/themea/landinga/producta/datasets/a4fk_dataset/";
     String publishedDatasetPath = "/themea/landinga/producta/datasets/a4fk_dataset/current/";
 
@@ -281,7 +289,7 @@ public class DataPublisherTest {
 
 
     /**
-     *  Get landing page tests
+     *  Find landing page and dataset tests
      */
     @Test
     public void getLandingPage_whereLandingPageInCollection_getsCollectionLandingPage() throws IOException {
@@ -368,16 +376,138 @@ public class DataPublisherTest {
         }
     }
 
+
     /**
-     * Data transfer tests
+     *  Data transfer tests
      */
+    @Test
+    public void preprocess_givenCsdbCollection_generatesTimeseries() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // timeseries get created in reviewed
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedTimeSeriesPath).resolve("data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedTimeSeriesPath).resolve("data.json")));
+    }
+
+    @Test
+    public void preprocess_givenCorrectedCsdbCollection_generatesVersions() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // a version has been created
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+    }
+
+    @Test
+    public void preprocess_givenCsdbWithOneCorrectedSeries_doesntCorrectTheOther() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPathAlt).resolve("previous/v1/data.json")));
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // a version has been created
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPathAlt).resolve("previous/v1/data.json")));
+    }
+
+    @Test
+    public void preprocess_givenInsertion_generatesVersions() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_insertion_A4VR_2015.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // a version has been created
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+    }
+
+    @Test
+    public void preprocess_givenCsdbWithOneCorrectedSeries_savesCorrectionNotice() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPathAlt).resolve("previous/v1/data.json")));
+        // & a correction notice on the dataset file
+        addVersion(collection, publishedDatasetPath, "correction");
 
 
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // a version has been created
+        List<Version> shouldBeCorrected = getVersions(collection, publishedTimeSeriesPath);
+        List<Version> shouldNotBeCorrected = getVersions(collection, publishedTimeSeriesPathAlt);
+
+        assertTrue(shouldNotBeCorrected == null || shouldNotBeCorrected.size() == 0);
+        assertEquals(1, shouldBeCorrected.size());
+        assertEquals("correction", shouldBeCorrected.get(0).getCorrectionNotice());
+       }
+
+    void addVersion(Collection collection, String uri, String notice) throws IOException {
+        Dataset dataset;
+        Path path = collection.reviewed.get(uri).resolve("data.json");
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            dataset = ContentUtil.deserialise(inputStream, Dataset.class);
+        }
+
+        Version version = new Version();
+        version.setCorrectionNotice(notice);
+        List<Version> versions = new ArrayList<>();
+        versions.add(version);
+        dataset.setVersions(versions);
+
+        try (OutputStream outputStream = Files.newOutputStream(path)) {
+            Serialiser.serialise(outputStream, dataset);
+        }
+    }
+    List<Version> getVersions(Collection collection, String uri) throws IOException {
+        TimeSeries timeseries;
+        Path path = collection.reviewed.get(uri).resolve("data.json");
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            timeseries = ContentUtil.deserialise(inputStream, TimeSeries.class);
+        }
+        return timeseries.getVersions();
+    }
 
     /**
      * Copy new timeseries tests
      */
-
     @Test
     public void startPage_givenFreshTimeSeries_shouldBeMinimal() throws IOException {
         // Given

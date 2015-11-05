@@ -65,6 +65,7 @@ public class DataPublisher {
     public static int insertions = 0;
     public static int corrections = 0;
     public static Map<String, String> env = System.getenv();
+    public Path brianTestFile = null;
 
     /**
      * Detects datasets appropriate to csdb style publication
@@ -1065,6 +1066,10 @@ public class DataPublisher {
      * @throws IOException
      */
     TimeSerieses callBrianToProcessCSDB(Path path) throws IOException {
+        // Hijack brian from test framework if required
+        if (this.brianTestFile != null) return presetBrianFile(this.brianTestFile);
+
+        // Get the brian CSDB processing uri
         URI url = csdbURI();
 
         HttpPost post = new HttpPost(url);
@@ -1098,6 +1103,14 @@ public class DataPublisher {
             }
             return result;
         }
+    }
+
+    TimeSerieses presetBrianFile(Path path) throws IOException {
+        TimeSerieses result = null;
+        try (InputStream inputStream = Files.newInputStream(path)) {
+                result = ContentUtil.deserialise(inputStream, TimeSerieses.class);
+        }
+        return result;
     }
 
     /**

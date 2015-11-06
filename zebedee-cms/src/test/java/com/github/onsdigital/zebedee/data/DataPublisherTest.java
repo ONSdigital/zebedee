@@ -1,16 +1,27 @@
 package com.github.onsdigital.zebedee.data;
 
 import com.github.davidcarboni.ResourceUtils;
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
+import com.github.onsdigital.zebedee.content.page.statistics.document.base.StatisticalDocument;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +29,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -38,17 +50,24 @@ public class DataPublisherTest {
     Session publisher;
     Collection collection;
 
-    String publishedTimeSeriesPath;
-    String publishedDatasetPath;
+    String publishedTimeSeriesPath = "/themea/landinga/producta/timeseries/a4fk";
+    String publishedTimeSeriesPathAlt = "/themea/landinga/producta/timeseries/a4vr";
+    String publishedLandingPath = "/themea/landinga/producta/datasets/a4fk_dataset/";
+    String publishedDatasetPath = "/themea/landinga/producta/datasets/a4fk_dataset/current/";
 
-    String unpublishedTimeSeriesPath;
-    String unpublishedDatasetPath;
+    String unpublishedTimeSeriesPath = "/themea/landinga/producta/timeseries/ju5c";
+    String unpublishedLandingPath = "/themea/landinga/producta/datasets/another_dataset/";
+    String unpublishedDatasetPath = "/themea/landinga/producta/datasets/another_dataset/current/";
+
+    String brianPath = "/csdb/csdb_no_extension/brian.json";
 
     TimeSerieses serieses = null;
     TimeSeries publishedTimeSeries = null;
     TimeSeries unpublishedTimeSeries = null;
-    DatasetLandingPage publishedDataset = null;
-    DatasetLandingPage unpublishedDataset = null;
+    DatasetLandingPage publishedLandingPage = null;
+    DatasetLandingPage unpublishedLandingPage = null;
+    Dataset publishedDataset = null;
+    Dataset unpublishedDataset = null;
 
     DataPublisher dataPublisher = new DataPublisher();
 
@@ -74,13 +93,6 @@ public class DataPublisherTest {
 
         collection = zebedee.collections.list().getCollection("collection");
 
-        publishedTimeSeriesPath = "/themea/landinga/producta/timeseries/a4fk";
-        publishedDatasetPath = "/themea/landinga/producta/datasets/a4fk_dataset";
-
-        unpublishedTimeSeriesPath = "/themea/landinga/producta/timeseries/ju5c";
-        unpublishedDatasetPath = "/themea/landinga/producta/datasets/another_dataset";
-
-        String brianPath = "/csdb/csdb_no_extension/brian.json";
         try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
             serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
         }
@@ -90,15 +102,25 @@ public class DataPublisherTest {
         assertEquals("AF4K", publishedTimeSeries.getCdid());
         assertEquals("JU5C", unpublishedTimeSeries.getCdid());
 
+        try (InputStream inputStream = Files.newInputStream(zebedee.published.get(publishedLandingPath).resolve("data.json"))) {
+            publishedLandingPage = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
+        }
+
+        try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(unpublishedLandingPath).resolve("data.json"))) {
+            unpublishedLandingPage = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
+        }
         try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(publishedDatasetPath).resolve("data.json"))) {
-            publishedDataset = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
+            publishedDataset = ContentUtil.deserialise(inputStream, Dataset.class);
         }
         try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(unpublishedDatasetPath).resolve("data.json"))) {
-            unpublishedDataset = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
+            unpublishedDataset = ContentUtil.deserialise(inputStream, Dataset.class);
         }
 
         assertNotNull(publishedDataset);
         assertNotNull(unpublishedDataset);
+        assertNotNull(publishedLandingPage);
+        assertNotNull(unpublishedLandingPage);
+
     }
     @After
     public void tearDown() throws Exception {
@@ -124,48 +146,50 @@ public class DataPublisherTest {
         // The collection exists
 
         assertNotNull(collection);
-        // It has four items
-        assertEquals(4, collection.reviewedUris().size());
-        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json")));
-        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/BB.csdb")));
-        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/data.json")));
-        assertTrue(Files.exists(collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/PPI.csdb")));
+        assertFalse(Files.exists(collection.reviewed.toPath(publishedLandingPath + "/data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedDatasetPath + "/data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedDatasetPath + "/bb.csdb")));
+
+        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedLandingPath + "/data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedDatasetPath + "/data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedDatasetPath + "/ppi.csdb")));
 
         // The pre-existing items exist
-        assertTrue(Files.exists(zebedee.published.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json")));
-        assertTrue(Files.exists(zebedee.published.toPath("/themea/landinga/producta/timeseries/a4fk/data.json")));
+        assertTrue(Files.exists(zebedee.published.toPath(publishedLandingPath + "/data.json")));
+        assertTrue(Files.exists(zebedee.published.toPath(publishedDatasetPath + "/data.json")));
+        assertTrue(Files.exists(zebedee.published.toPath(publishedDatasetPath + "/bb.csdb")));
     }
+
     @Test
     public void contentUtil_givenTestData_shouldDeserialise() throws IOException {
 
         // Given
         // the files in our collection
         Collection collection = zebedee.collections.list().getCollection("collection");
-        Path dataset1 = collection.reviewed.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json");
-        Path dataset2 = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/data.json");
-        Path existingDataset = zebedee.published.toPath("/themea/landinga/producta/datasets/a4fk_dataset/data.json");
-        Path existingTimeSeries = zebedee.published.toPath("/themea/landinga/producta/timeseries/a4fk/data.json");
 
         // Then
         // we expect the files in our collection to deserialise properly
-        try(InputStream stream = Files.newInputStream(dataset1)) {
-            assertNotNull(ContentUtil.deserialise(stream, DatasetLandingPage.class));
-        }
-        try(InputStream stream = Files.newInputStream(dataset2)) {
-            assertNotNull(ContentUtil.deserialise(stream, DatasetLandingPage.class));
-        }
-        try(InputStream stream = Files.newInputStream(existingDataset)) {
-            assertNotNull(ContentUtil.deserialise(stream, DatasetLandingPage.class));
-        }
-        try(InputStream stream = Files.newInputStream(existingDataset)) {
+        try(InputStream stream = Files.newInputStream(collection.reviewed.toPath(unpublishedLandingPath + "/data.json"))) {
             assertNotNull(ContentUtil.deserialise(stream, DatasetLandingPage.class));
         }
 
+        try(InputStream stream = Files.newInputStream(collection.reviewed.toPath(publishedDatasetPath + "/data.json"))) {
+            assertNotNull(ContentUtil.deserialise(stream, TimeSeriesDataset.class));
+        }
+        try(InputStream stream = Files.newInputStream(collection.reviewed.toPath(unpublishedDatasetPath + "/data.json"))) {
+            assertNotNull(ContentUtil.deserialise(stream, TimeSeriesDataset.class));
+        }
+
+        // Except for the published landing path which should be null in reviewed but true in published
+        assertEquals(false, Files.exists(collection.reviewed.toPath(publishedLandingPath + "/data.json")));
+        try(InputStream stream = Files.newInputStream(zebedee.published.toPath(publishedLandingPath + "/data.json"))) {
+            assertNotNull(ContentUtil.deserialise(stream, TimeSeriesDataset.class));
+        }
     }
 
 
     /**
-     * Brian is called using environment variables. Check the function is working and returning an expected result
+     * Brian connectivity
      */
     @Test
     public void urlForBrian_whenEnvVariablesAreSet_givesURIBasedOnBrianURL() throws Exception {
@@ -184,6 +208,7 @@ public class DataPublisherTest {
         // we expect a standard response
         assertEquals("/csdbURIShouldComeFromEnvVariable/Services/ConvertCSDB", uri.toString());
     }
+
     @Test
     public void contentUtil_givenFileReturnedByBrian_shouldDeserialiseTimeSeries() throws IOException {
         // Given
@@ -201,9 +226,8 @@ public class DataPublisherTest {
         // we expect it to be non null and to have data
         assertNotNull(serieses);
         assertTrue(serieses.size() > 0);
-
-
     }
+
 
     /**
      * The process starts by hooking into publish and pulling out pages that require being treated as CSDB datasets
@@ -227,15 +251,12 @@ public class DataPublisherTest {
         assertEquals(2, datasetsInCollection.size());
     }
 
-    /**
-     * Dataset id is identified from the ?.csdb portion of the filename
-     */
     @Test
     public void datasetIdFromDatafilePath_withTypicalFilepaths_givesExpectedIds() throws IOException {
         // Given
         // our pre setup collection with csdb extensions
         Collection collection = zebedee.collections.list().getCollection("collection");
-        Path datasetPath = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/PPI.csdb");
+        Path datasetPath = collection.reviewed.toPath("/themea/landinga/producta/datasets/another_dataset/current/PPI.csdb");
 
         // When
         // we get a dataset Id from this
@@ -250,7 +271,7 @@ public class DataPublisherTest {
     public void functionUriForSeriesInDataset_givenDatasetsSetupInBefore_ShouldBeCorrect() throws IOException {
         // Given
         // a file returned by brian
-        String datasetId = "/theme/product/datasets/1234";
+        String datasetId = "/theme/product/datasets/datasetlanding/datasetname";
         TimeSeries series = new TimeSeries();
         series.setCdid("ABCD");
 
@@ -263,6 +284,228 @@ public class DataPublisherTest {
         assertEquals("/theme/product/timeseries/abcd", uriForSeriesInDataset);
     }
 
+
+
+    /**
+     *  Find landing page and dataset tests
+     */
+    @Test
+    public void getLandingPage_whereLandingPageInCollection_getsCollectionLandingPage() throws IOException {
+        // Given
+        // a dataset page where the corresponding landing page is being edited
+        String datasetUri = unpublishedDatasetPath;
+        String landingUri = unpublishedLandingPath;
+
+        Path published = zebedee.published.toPath(landingUri).resolve("data.json");
+        Path unpublished = collection.reviewed.toPath(landingUri).resolve("data.json");
+        FileUtils.copyFile(unpublished.toFile(), published.toFile());
+        modifyPageTitle(published, "Published");
+        modifyPageTitle(unpublished, "Unpublished");
+
+        // When
+        // we get the corresponding
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, collection, datasetUri);
+
+        // Then
+        // we get the unpublished version
+        assertEquals("Unpublished", landingPage.getDescription().getTitle());
+    }
+
+    @Test
+    public void getLandingPage_whereLandingPageNotInCollection_getsPublishedPage() throws IOException {
+        // Given
+        // a dataset page where the corresponding landing page is being edited
+        String datasetUri = publishedDatasetPath;
+        String landingUri = publishedLandingPath;
+
+        Path published = zebedee.published.toPath(landingUri).resolve("data.json");
+        modifyPageTitle(published, "Published");
+
+        // When
+        // we get the corresponding
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, collection, datasetUri);
+
+        // Then
+        // we get the unpublished version
+        assertEquals("Published", landingPage.getDescription().getTitle());
+    }
+
+    @Test
+    public void uriForLandingPage_givenDatasetUri_givesLandingPageUri() {
+        // Given
+        // a dataset uri
+        String datasetUri = "/a/b/c/datasets/data_landing/dataset_name";
+        String datasetUriIncJson = "/a/b/c/datasets/data_landing/dataset_name/data.json";
+
+        // When
+        // we get the landing page uri
+        String uri = dataPublisher.uriForDatasetLandingPage(datasetUri);
+        String uriIncJson = dataPublisher.uriForDatasetLandingPage(datasetUriIncJson);
+
+        // Then
+        // we expect the parent uri
+        assertEquals("/a/b/c/datasets/data_landing", uri);
+        assertEquals("/a/b/c/datasets/data_landing", uriIncJson);
+    }
+
+    @Test
+    public void landingPageForUri_givenDatasetUriWithUnmodifiedLandingPage_givesPublishedLandingPageUri() throws IOException {
+        // Given
+        // a dataset uri
+        String datasetUri = publishedDatasetPath;
+
+        // When
+        // we get the landing page uri
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, collection, datasetUri);
+
+        // Then
+        // we expect the parent uri
+        assertNotNull(landingPage);
+    }
+
+    void modifyPageTitle(Path path, String newTitle) throws IOException {
+        DatasetLandingPage landingPage;
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            landingPage = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
+        }
+        landingPage.getDescription().setTitle(newTitle);
+        try (OutputStream outputStream = Files.newOutputStream(path)) {
+            Serialiser.serialise(outputStream, landingPage);
+        }
+    }
+
+
+    /**
+     *  Data transfer tests
+     */
+    @Test
+    public void preprocess_givenCsdbCollection_generatesTimeseries() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // timeseries get created in reviewed
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedTimeSeriesPath).resolve("data.json")));
+        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedTimeSeriesPath).resolve("data.json")));
+    }
+
+    @Test
+    public void preprocess_givenCorrectedCsdbCollection_generatesVersions() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // a version has been created
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+    }
+
+    @Test
+    public void preprocess_givenCsdbWithOneCorrectedSeries_doesntCorrectTheOther() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPathAlt).resolve("previous/v1/data.json")));
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // a version has been created
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPathAlt).resolve("previous/v1/data.json")));
+    }
+
+    @Test
+    public void preprocess_givenInsertion_generatesVersions() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_insertion_A4VR_2015.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // a version has been created
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedTimeSeriesPath).resolve("previous/v1/data.json")));
+    }
+
+    @Test
+    public void preprocess_givenCsdbWithOneCorrectedSeries_savesCorrectionNotice() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+        assertFalse(Files.exists(zebedee.published.toPath(publishedTimeSeriesPathAlt).resolve("previous/v1/data.json")));
+        // & a correction notice on the dataset file
+        addVersion(collection, publishedDatasetPath, "correction");
+
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // a version has been created
+        List<Version> shouldBeCorrected = getVersions(collection, publishedTimeSeriesPath);
+        List<Version> shouldNotBeCorrected = getVersions(collection, publishedTimeSeriesPathAlt);
+
+        assertTrue(shouldNotBeCorrected == null || shouldNotBeCorrected.size() == 0);
+        assertEquals(1, shouldBeCorrected.size());
+        assertEquals("correction", shouldBeCorrected.get(0).getCorrectionNotice());
+       }
+
+    void addVersion(Collection collection, String uri, String notice) throws IOException {
+        Dataset dataset;
+        Path path = collection.reviewed.get(uri).resolve("data.json");
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            dataset = ContentUtil.deserialise(inputStream, Dataset.class);
+        }
+
+        Version version = new Version();
+        version.setCorrectionNotice(notice);
+        List<Version> versions = new ArrayList<>();
+        versions.add(version);
+        dataset.setVersions(versions);
+
+        try (OutputStream outputStream = Files.newOutputStream(path)) {
+            Serialiser.serialise(outputStream, dataset);
+        }
+    }
+    List<Version> getVersions(Collection collection, String uri) throws IOException {
+        TimeSeries timeseries;
+        Path path = collection.reviewed.get(uri).resolve("data.json");
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            timeseries = ContentUtil.deserialise(inputStream, TimeSeries.class);
+        }
+        return timeseries.getVersions();
+    }
+
+    /**
+     * Copy new timeseries tests
+     */
     @Test
     public void startPage_givenFreshTimeSeries_shouldBeMinimal() throws IOException {
         // Given
@@ -276,7 +519,6 @@ public class DataPublisherTest {
         // we expect the startPage to be identical to the unpublishedTimeSeries
         assertEquals(0, startPage.years.size() + startPage.months.size() + startPage.quarters.size());
     }
-
 
     @Test
     public void startPage_givenExistingTimeSeries_shouldBePopulatedByExistingData() throws IOException {
@@ -297,7 +539,6 @@ public class DataPublisherTest {
         assertEquals(ContentUtil.serialise(alreadyPublished), ContentUtil.serialise(startPage));
     }
 
-
     @Test
     public void populatePageValues_withoutExistingTimeSeries_shouldFillEmptySeries() throws IOException {
         // Given
@@ -306,7 +547,7 @@ public class DataPublisherTest {
 
         // When
         // we generate a start page
-        dataPublisher.populatePageFromSetOfValues(startPage, startPage.years, unpublishedTimeSeries.years, unpublishedDataset);
+        dataPublisher.populatePageFromSetOfValues(startPage, startPage.years, unpublishedTimeSeries.years, unpublishedLandingPage);
 
         // Then
         // we expect the startPage to be
@@ -325,19 +566,20 @@ public class DataPublisherTest {
 
         // When
         // we generate a start page
-        dataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishedTimeSeries.years, publishedDataset);
+        dataPublisher.populatePageFromSetOfValues(startPage, startPage.years, publishedTimeSeries.years, publishedLandingPage);
 
         // Then
         // we expect the startPage to be added to
         assertTrue(originalYears < startPage.years.size());
     }
+
     @Test
     public void populatePageValues_overExistingTimeSeries_shouldOverwriteExistingPoints() throws IOException {
         // Given
         // the time series we are using as examples cleared with some simple data
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        DatasetLandingPage publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedLandingPage;
 
         simplifyTimeSeries(startPage, publishThisPage);
 
@@ -350,13 +592,14 @@ public class DataPublisherTest {
         assertEquals(4, startPage.years.size());
         assertEquals("4", valueForTime("2002", startPage).value);
     }
+
     @Test
     public void populatePageValues_overExistingTimeSeries_doesNotRemoveExistingPoints() throws IOException {
         // Given
         // the time series we are using as examples cleared with some simple data
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        DatasetLandingPage publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedLandingPage;
 
         simplifyTimeSeries(startPage, publishThisPage);
 
@@ -376,7 +619,7 @@ public class DataPublisherTest {
         // the time series that hadn't previously been published (
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = unpublishedTimeSeries;
-        DatasetLandingPage publishThisDataset = unpublishedDataset;
+        DatasetLandingPage publishThisDataset = unpublishedLandingPage;
 
         // When
         // we populate the page
@@ -388,13 +631,14 @@ public class DataPublisherTest {
         assertEquals(newPage.getDescription().getTitle(), publishThisPage.getDescription().getTitle());
         assertEquals(newPage.getDescription().getSeasonalAdjustment(), publishThisPage.getDescription().getSeasonalAdjustment());
     }
+
     @Test
     public void populatePageFromTimeseries_overExistingTimeSeries_shouldTransferNameFromTimeSeriesIfNameBlank() throws IOException {
         // Given
         // the time series that hadn't previously been published (
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        DatasetLandingPage publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedLandingPage;
 
         publishThisPage.getDescription().setTitle("Title");
         startPage.getDescription().setTitle("");
@@ -407,13 +651,14 @@ public class DataPublisherTest {
         // we expect the newPage to copy across the name
         assertEquals("Title", newPage.getDescription().getTitle());
     }
+
     @Test
     public void populatePageFromTimeseries_overExistingTimeSeries_shouldNotTransferNameIfNameExists() throws IOException {
         // Given
         // the time series that hadn't previously been published (
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        DatasetLandingPage publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedLandingPage;
 
         publishThisPage.getDescription().setTitle("New Title");
         startPage.getDescription().setTitle("Existing Title");
@@ -426,13 +671,14 @@ public class DataPublisherTest {
         // we expect the newPage to not copy over the name
         assertEquals("Existing Title", newPage.getDescription().getTitle());
     }
+
     @Test
     public void populatePageFromTimeseries_overExistingTimeSeries_shouldTransferDetails() throws IOException {
         // Given
         // the time series that hadn't previously been published (
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
-        DatasetLandingPage publishThisDataset = publishedDataset;
+        DatasetLandingPage publishThisDataset = publishedLandingPage;
 
         publishThisPage.getDescription().setSeasonalAdjustment("SA to publish");
         startPage.getDescription().setSeasonalAdjustment("SA existing");
@@ -447,6 +693,7 @@ public class DataPublisherTest {
         assertEquals(publishThisPage.getCdid(), newPage.getCdid());
     }
 
+    // Time series test helpers
     private void simplifyTimeSeries(TimeSeries series1, TimeSeries series2) {
         // Expected values for layering series2 over series1 are
         //[{"2000": "1"}, {"2001": "2"}, {"2002": "4"}, {"2003": "5"}]
@@ -485,7 +732,8 @@ public class DataPublisherTest {
         // Given
         // a test dataset with some specified test values
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
-        DatasetLandingPage publishThisDataset = publishedDataset;
+
+        DatasetLandingPage publishThisDataset = publishedLandingPage;
         String publishThisUri = publishedDatasetPath;
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
@@ -515,7 +763,8 @@ public class DataPublisherTest {
         // Given
         // a test dataset with some specified test values
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
-        DatasetLandingPage publishThisDataset = publishedDataset;
+
+        DatasetLandingPage publishThisDataset = publishedLandingPage;
         String publishThisUri = publishedDatasetPath;
         publishThisDataset.getDescription().setDatasetId("Test DatasetID");
 
@@ -536,6 +785,16 @@ public class DataPublisherTest {
     }
 
 
+
+
+
+
+
+
+    /**
+     * Generate XLSX and CSV functionality
+     *
+     */
     @Test
     public void generateDataFiles_givenPaths_generatesListOfTimeSeries() {
         // Given
@@ -664,7 +923,6 @@ public class DataPublisherTest {
         assertThat(yearRange, Matchers.contains("2013", "2014", "2015"));
     }
 
-
     @Test
     public void yearRange_givenOverlappingTimeSeries_givesUnionRange() {
         // Given
@@ -718,7 +976,6 @@ public class DataPublisherTest {
         assertThat(quarterRange, Matchers.containsInAnyOrder("2014 Q4", "2015 Q1", "2015 Q2"));
     }
 
-
     @Test
     public void quarterRange_givenOverlappingTimeSeries_givesUnionRange() {
         // Given
@@ -771,7 +1028,6 @@ public class DataPublisherTest {
         // we expect a three quarter range
         assertThat(monthRange, Matchers.containsInAnyOrder("2014 NOV", "2014 DEC", "2015 JAN"));
     }
-
 
     @Test
     public void monthRange_givenOverlappingTimeSeries_givesUnionRange() {

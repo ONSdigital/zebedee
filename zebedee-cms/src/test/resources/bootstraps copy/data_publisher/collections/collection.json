@@ -1,0 +1,41 @@
+{
+  "id": "collection",
+  "name": "collection",
+  "approvedStatus": false,
+  "eventsByUri": {
+    "/themea/landinga/producta/datasets/a4fk_dataset/data.json": [
+      {
+        "date": "2015-07-22T15:03:22.273Z",
+        "type": "EDITED",
+        "email": "p1@t.com"
+      },
+      {
+        "date": "2015-07-22T15:03:22.339Z",
+        "type": "COMPLETED",
+        "email": "p1@t.com"
+      },
+      {
+        "date": "2015-07-22T15:03:55.466Z",
+        "type": "EDITED",
+        "email": "p2@t.com"
+      }
+    ],
+    "/themea/landinga/producta/datasets/another_dataset/data.json": [
+      {
+        "date": "2015-07-22T15:03:22.273Z",
+        "type": "EDITED",
+        "email": "p1@t.com"
+      },
+      {
+        "date": "2015-07-22T15:03:22.339Z",
+        "type": "COMPLETED",
+        "email": "p1@t.com"
+      },
+      {
+        "date": "2015-07-22T15:03:55.466Z",
+        "type": "EDITED",
+        "email": "p2@t.com"
+      }
+    ]
+  }
+}

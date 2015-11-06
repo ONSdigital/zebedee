@@ -1,0 +1,83 @@
+{
+  "description": {
+    "edition": "The Saving Ratio: How is it affected by Households’ and Non Profit Institutions Serving Households’ income and expenditure?",
+    "nextRelease": "",
+    "contact": {
+      "name": "Christopher Watkins",
+      "email": "sector.accounts@ons.gsi.gov.uk",
+      "telephone": "+44 (0)1633 651825"
+    },
+    "abstract": "",
+    "authors": [],
+    "keywords": [
+      "household,spending,saving,investments,recession,wage,growth"
+    ],
+    "metaDescription": "How UK households have experienced increases in the cost of living since the 2008 economic downturn, as measured by the NPISH saving ratio, an estimate of the amount of money available to save as a percentage of total disposable income.",
+    "nationalStatistic": false,
+    "title": "National Accounts articles",
+    "releaseDate": "2015-06-30T23:00:00.000Z",
+    "summary": "We analyse how UK households have experienced an increase in the cost of living, caused by rising prices since the 2008 economic downturn. This is measured using the Household and Non-Profit Institutions Serving Households (NPISH) saving ratio, an estimate of the amount of money households have available to save as a percentage of their total disposable income."
+  },
+  "sections": [
+    {
+      "title": "Introduction",
+      "markdown": "Since the economic downturn in 2008, household income and expenditure patterns have developed in different ways. Weak earnings growth and the relatively high level of inflation over the post-downturn period as a whole have both played a part, as has increased uncertainty about the economic outlook. One way of examining all these issues is through the households’ saving ratio1.\n\nThe households’ saving ratio captures the saving behaviour of the household sector, as measured in the National Accounts. Household spending – on goods and services, housing and financial services – is subtracted from household income, which includes post-tax earnings from employment, benefits and net interest received, as well as imputed sources of income2. Consequently, the ratio of household saving to income yields some information about their financial position. A lower saving ratio may arise either because of a fall in households’ income, a rise in their expenditure or a combination of the two.\n\n###Notes for Introduction\n\n1. The NPISH sector is currently measured alongside households, and comprises of institutions such as charities and trade unions. For the purposes of this article, any mention of the household sector includes NPISH.\n\n2. Income imputed to households includes the value of pension and social contributions made on their behalf by employers, imputed rentals which are designed to capture the value of housing services from owner occupier housing and the imputed value of Household Financial Intermediation Services Indirectly Measured (FISIM). Consequently, the income captured in this measure differs from the perceived income of households."
+    },
+    {
+      "title": "The saving ratio is on a downward trend…",
+      "markdown": "Gross saving is the income that households have left over after their everyday spending on goods and services.\n\n<ons-chart path=\"/themea/landinga/producta/articles/articlea/2015-01-01/8cde8012\" />\n\nAt the start of 1997 the saving ratio was 13.2%, and this fell to a low of 4.8% just before the economic downturn. Strong consumer confidence helped to boost consumption over this period and the rise in house prices led many households to take on more debt over this period. As a result, a growing fraction of households’ income was accounted for by spending and interest payments, leading to a lower saving ratio.   \n\n###…but it grew sharply in response to the recession\n\nHistorically, households have tended to save more (increasing their saving ratio) during times of economic and financial uncertainty – and vice versa.\n\n The economic downturn led to higher unemployment and lower wage and salary increases. Increased unemployment meant households received more social benefits, and paid less in income taxes, while lower interest rates also reduced pressure on household budgets. However, the downturn also reduced household income from employment and caused households to become uncertain about their financial security. These effects may also have led to a reduction in their discretionary spending.\n\nThis combination of factors was partly responsible for the large increase in the saving ratio in 2009. However, since the middle of 2010, the saving ratio has fallen from 11.5% to 4.9% in the latest quarter. The saving ratio has fallen in part because disposable income has risen very slowly while their expenditure has risen more quickly – restricting the amount of money that households have available to save.\n\n###Wage levels are also beginning to rise more quickly\n\nWages and salaries capture the total income that households gain from employees in employment, excluding any earnings from self employment. Consequently, higher average earnings or a higher level of employment would both increase wages and salaries.\n\n<ons-chart path=\"/themea/landinga/producta/articles/articlea/2015-01-01/43ccc330\" />\n\nFrom 1997 to 2009 wages and salaries increased by an average of 5.4% per year. This relatively strong earnings growth helped to slow the fall in the saving ratio over this period, as households could draw on a growing income stream to finance their spending. . Since the economic downturn, wages and salaries have increased more slowly – by 2.0 % per year – placing greater pressure on household incomes, limiting the scope for greater saving. More recently, wages and salaries have been increasing more quickly, reflecting growth in earnings and employment, easing pressure on household incomes to some degree.\n\n###The economic downturn caused a sharp fall in loans\n\nOne way in which households might increase (or reduce) their savings is through borrowing less (or more). Net acquisition of loans by households’ captures the value of any new loans which they take out, less the value of any repayments that they make. A positive value indicates that households are taking on more loans, while a negative value indicates that they are paying off loans in aggregate.\n\n<ons-chart path=\"/themea/landinga/producta/articles/articlea/2015-01-01/650127f2\" />\n\nPrior to the economic downturn the value of loans being taken out by households was greater than the value of those they were paying off. At this time, the demand for loans was relatively strong, partly because of the growth in house prices and because of the relatively strong performance of the economy as a whole. The supply of lending was also much higher before the economic downturn, contributing to high levels of borrowing, allowing households to increase expenditure, but reducing their income through higher interest payments.\n\nAfter the economic downturn, tighter lending conditions may have been one factor in the reduction of loans being offered which made it more difficult for households to borrow. Households may also have preferred to pay off their existing debts because of economic and financial uncertainty. Both of these factors led to households significantly reducing their net acquisition of loans, contributing to the sharp rise in the saving ratio in 2009.\n\n###More recently households have been cautious of increasing borrowing\n\nRecent improvements in the performance of the UK economy, in combination with low interest rates, may have encouraged households to borrow more. This has been reflected by the recovery of the housing market – as the number of mortgages being approved has been increasing. However the net acquisition of loans by households remains a lot smaller than before the economic downturn. This may indicate that households remain cautious about taking on more debt, despite the recovery of the economy."
+    },
+    {
+      "title": "Conclusion: Slow wage growth and increasing expenditure caused the saving ratio to fall",
+      "markdown": "Between 1997 and 2008, the saving ratio was on a gradual downwards path, reflecting a combination of expenditure growth and growing household interest payments, offset by growth in other sources of household income. Following the economic downturn, the saving ratio increased markedly, partly as a consequence of stronger benefits claims and lower interest payments – both of which increased household income – and partly as a consequence of lower discretionary spending. In more recent periods, the falling saving ratio appears to have been driven by slower increases in income from wages and salaries – rather than large increases in consumption.\n\nIn the last 2 years, wages have started to rise more quickly, leading to the saving ratio falling at a slower rate. If wages continue to rise more quickly, it will be interesting to see whether households consume more (which will further reduce the saving ratio) or save more, which will increase it."
+    },
+    {
+      "title": "Would you like to know more about sector accounts?",
+      "markdown": "More information on the saving ratio and other sector accounts statistics are available in the [UK Economic Accounts][1].\n\n\n  [1]: http://www.ons.gov.uk/ons/rel/naa1-rd/united-kingdom-economic-accounts/q1-2015/index.html"
+    }
+  ],
+  "accordion": [
+    {
+      "title": "Background notes",
+      "markdown": "1. Details of the policy governing the release of new data are available by visiting [www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html][1] or from the Media Relations Office email: [media.relations@ons.gsi.gov.uk][2]\n\n\n  [1]: http://www.statisticsauthority.gov.uk/assessment/code-of-practice/index.html\n  [2]: http://mailto:media.relations@ons.gsi.gov.uk"
+    }
+  ],
+  "relatedArticles": [],
+  "relatedData": [],
+  "links": [],
+  "charts": [
+    {
+      "title": "Figure 1: Households' and NPISH saving ratio, quarter 1 (Jan to Mar) 1997 to 2015",
+      "filename": "8cde8012",
+      "uri": "/themea/landinga/producta/articles/articlea/2015-01-01/8cde8012"
+    },
+    {
+      "title": "Figure 2: Wages and salaries, quarter 1 (Jan to Mar) 1997 to 2015",
+      "filename": "43ccc330",
+      "uri": "/themea/landinga/producta/articles/articlea/2015-01-01/43ccc330"
+    },
+    {
+      "title": "Figure 3: Net acquisition of loans by household and NPISH, quarter 1 (Jan to Mar) 1997 to 2015",
+      "filename": "650127f2",
+      "uri": "/themea/landinga/producta/articles/articlea/2015-01-01/650127f2"
+    }
+  ],
+  "correction": [],
+  "type": "article",
+  "uri": "/themea/landinga/producta/articles/articlea/2015-01-01",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/themea"
+    },
+    {
+      "uri": "/themea/landinga"
+    },
+    {
+      "uri": "/themea/landinga/producta"
+    }
+  ],
+  "externalLinks": []
+}

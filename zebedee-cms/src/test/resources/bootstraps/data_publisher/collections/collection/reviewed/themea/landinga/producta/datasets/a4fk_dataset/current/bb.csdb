@@ -1,0 +1,25 @@
+ 02015 518BB           9 4 1 1 4 4 212 4 8
+ 1 1IDENTIFIER
+ 1 2PERIODICITY
+ 1 3SEASONAL ADJUSTMENT
+ 1 4PRICES BASE YEAR
+ 1 5INDEX BASE YEAR
+ 1 6INDEX BASE MONTH
+ 1 7STANDARD INDUSTRIAL CLASSIFICATION
+ 1 8PUBLICATION
+ 1 9TABLE NUMBER
+92A4FKAU   0   0 0            BB1414.1                   1  0  0  1  4
+93ESA:PC:LIFLOW:Currency and deposits                                     
+96AS1987  12015 515   27             710 0
+97        29         0         0        10         0         0         0
+97         0         0      -238       -25       -30       -28       -29
+97       -30       -18         0         0         0         0         0
+97         0         0         0         0         0         0
+92A4VRAU   0   0 0            BB141.7.8                  1  0  0  1  4
+93ESA10: NF: LI:FLOW:Currency and deposits                                
+96AS1987  12015 515   27             710 0
+97        29         0         0        10         0         0         0
+97         0         0      -238       -25       -30       -28       -29
+97       -30       -18         0         0         0         0         0
+97         0         0         0         0         0         0
+

@@ -242,6 +242,15 @@
       "quarter": "",
       "sourceDataset": "bb",
       "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2014",
+      "value": "0",
+      "year": "2014",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
     }
   ],
   "quarters": [],

@@ -1,0 +1,36 @@
+{
+  "downloads": [
+    {
+      "title": "United Kingdom National Accounts - The Blue Book",
+      "cdids": [
+        "A4FK"
+      ]
+    }
+  ],
+  "relatedMethodology": [],
+  "section": {
+    "markdown": ""
+  },
+  "relatedDatasets": [],
+  "relatedDocuments": [],
+  "type": "timeseries_dataset",
+  "description": {
+    "title": "United Kingdom National Accounts - The Blue Book",
+    "summary": "Records and describes economic activity in the United Kingdom and as such is used by government, banks, academics and industries to formulate the economic and social policies and monitor the economic progress of the United Kingdom.",
+    "metaDescription": "Records and describes economic activity in the United Kingdom and as such is used by government, banks, academics and industries to formulate the economic and social policies and monitor the economic progress of the United Kingdom.",
+    "nationalStatistic": true,
+    "latestRelease": false,
+    "contact": {
+      "email": "blue.book.coordination@ons.gsi.gov.uk ",
+      "name": "Emma Howley",
+      "telephone": "+44 (0)1633 455190"
+    },
+    "releaseDate": "2000-10-31T00:00:00.000Z",
+    "nextRelease": "30 October 2014",
+    "datasetId": "bb",
+    "unit": "",
+    "preUnit": "",
+    "source": "",
+    "sampleSize": 0
+  }
+}

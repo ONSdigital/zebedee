@@ -1,0 +1,282 @@
+{
+  "years": [
+    {
+      "date": "1987",
+      "value": "29",
+      "year": "1987",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1988",
+      "value": "0",
+      "year": "1988",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1989",
+      "value": "0",
+      "year": "1989",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1990",
+      "value": "10",
+      "year": "1990",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1991",
+      "value": "0",
+      "year": "1991",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1992",
+      "value": "0",
+      "year": "1992",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1993",
+      "value": "0",
+      "year": "1993",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1994",
+      "value": "0",
+      "year": "1994",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1995",
+      "value": "0",
+      "year": "1995",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1996",
+      "value": "-238",
+      "year": "1996",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1997",
+      "value": "-25",
+      "year": "1997",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1998",
+      "value": "-30",
+      "year": "1998",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "1999",
+      "value": "-28",
+      "year": "1999",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2000",
+      "value": "-29",
+      "year": "2000",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2001",
+      "value": "-30",
+      "year": "2001",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2002",
+      "value": "-18",
+      "year": "2002",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2003",
+      "value": "0",
+      "year": "2003",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2004",
+      "value": "0",
+      "year": "2004",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2005",
+      "value": "0",
+      "year": "2005",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2006",
+      "value": "0",
+      "year": "2006",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2007",
+      "value": "0",
+      "year": "2007",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2008",
+      "value": "0",
+      "year": "2008",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2009",
+      "value": "0",
+      "year": "2009",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2010",
+      "value": "0",
+      "year": "2010",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2011",
+      "value": "0",
+      "year": "2011",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2012",
+      "value": "0",
+      "year": "2012",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    },
+    {
+      "date": "2013",
+      "value": "0",
+      "year": "2013",
+      "month": "",
+      "quarter": "",
+      "sourceDataset": "bb",
+      "updateDate": "2015-07-09T00:00:07.296Z"
+    }
+  ],
+  "quarters": [],
+  "months": [],
+  "sourceDatasets": [
+    "bb"
+  ],
+  "type": "timeseries",
+  "type": "timeseries",
+  "uri": "/themea/landinga/producta/timeseries/a4vr",
+  "breadcrumb": [
+    {
+      "uri": "/"
+    },
+    {
+      "uri": "/themea"
+    },
+    {
+      "uri": "/themea/landinga"
+    },
+    {
+      "uri": "/themea/landinga/producta"
+    }
+  ],
+  "description": {
+    "title": "ESA10: NF: LI:FLOW:Currency and deposits                                ",
+    "nationalStatistic": false,
+    "releaseDate": "2014-10-31T00:00:00.000Z",
+    "nextRelease": "30-10-2015",
+    "cdid": "A4VR",
+    "unit": "",
+    "preUnit": "",
+    "source": "Office for National Statistics",
+    "seasonalAdjustment": "NSA",
+    "number": "0",
+    "sampleSize": 0
+  }
+}

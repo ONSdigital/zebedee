@@ -14,6 +14,8 @@ public class CompendiumLandingPage extends Page {
 
     private List<Link> datasets;
     private List<Link> chapters;
+    private List<Link> relatedDocuments;
+    private List<Link> relatedData;
     private List<Link> relatedMethodology;
     private List<Link> relatedMethodologyArticle;
     private List<Alert> alerts;
@@ -61,5 +63,21 @@ public class CompendiumLandingPage extends Page {
 
     public void setRelatedMethodologyArticle(List<Link> relatedMethodologyArticle) {
         this.relatedMethodologyArticle = relatedMethodologyArticle;
+    }
+
+    public List<Link> getRelatedDocuments() {
+        return relatedDocuments;
+    }
+
+    public void setRelatedDocuments(List<Link> relatedDocuments) {
+        this.relatedDocuments = relatedDocuments;
+    }
+
+    public List<Link> getRelatedData() {
+        return relatedData;
+    }
+
+    public void setRelatedData(List<Link> relatedData) {
+        this.relatedData = relatedData;
     }
 }

@@ -146,20 +146,18 @@ public class DataPublisherTest {
         // The collection exists
 
         assertNotNull(collection);
-        // It has four items
-        assertEquals(5, collection.reviewedUris().size());
         assertFalse(Files.exists(collection.reviewed.toPath(publishedLandingPath + "/data.json")));
         assertTrue(Files.exists(collection.reviewed.toPath(publishedDatasetPath + "/data.json")));
-        assertTrue(Files.exists(collection.reviewed.toPath(publishedDatasetPath + "/BB.csdb")));
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedDatasetPath + "/bb.csdb")));
 
         assertTrue(Files.exists(collection.reviewed.toPath(unpublishedLandingPath + "/data.json")));
         assertTrue(Files.exists(collection.reviewed.toPath(unpublishedDatasetPath + "/data.json")));
-        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedDatasetPath + "/PPI.csdb")));
+        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedDatasetPath + "/ppi.csdb")));
 
         // The pre-existing items exist
         assertTrue(Files.exists(zebedee.published.toPath(publishedLandingPath + "/data.json")));
         assertTrue(Files.exists(zebedee.published.toPath(publishedDatasetPath + "/data.json")));
-        assertTrue(Files.exists(zebedee.published.toPath(publishedDatasetPath + "/BB.csdb")));
+        assertTrue(Files.exists(zebedee.published.toPath(publishedDatasetPath + "/bb.csdb")));
     }
 
     @Test

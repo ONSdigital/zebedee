@@ -231,6 +231,9 @@ public class DataPublisher {
 
             // Add the cdid to the dataset page list of cdids
             csdbSection.getCdids().add(newPage.getDescription().getCdid());
+
+            // Add to the list of series (to be generated as an xlsx and csv)
+            newSeries.add(newPage);
         }
 
 

@@ -5,14 +5,12 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
-import com.github.onsdigital.zebedee.content.page.statistics.document.base.StatisticalDocument;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
@@ -502,6 +500,8 @@ public class DataPublisherTest {
         }
         return timeseries.getVersions();
     }
+
+
 
     /**
      * Copy new timeseries tests
@@ -1118,6 +1118,50 @@ public class DataPublisherTest {
         }
 
         return grid.get(rowNumber).get(colNumber);
+    }
+
+    /**
+     * Copy new timeseries tests
+     */
+    @Test
+    public void preprocess_givenCsdbWithSeries_doesGenerateXLSX() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // timeseries get created in reviewed
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedDatasetPath).resolve("bb.xlsx")));
+        assertTrue(Files.size(collection.reviewed.toPath(publishedDatasetPath).resolve("bb.xlsx")) > 4000);
+
+        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedDatasetPath).resolve("ppi.xlsx")));
+        assertTrue(Files.size(collection.reviewed.toPath(unpublishedDatasetPath).resolve("ppi.xlsx")) > 4000);
+    }
+    @Test
+    public void preprocess_givenCsdbWithSeries_doesGenerateCSV() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+        // Given
+        // current setup with faked interaction files for brian
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB.json"));
+        dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_PPI.json"));
+        dataPublisher.doNotCompress = true;
+
+        // When
+        // we run the publish
+        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+
+        // Then
+        // timeseries get created in reviewed
+        assertTrue(Files.exists(collection.reviewed.toPath(publishedDatasetPath).resolve("bb.csv")));
+        assertTrue(Files.size(collection.reviewed.toPath(publishedDatasetPath).resolve("bb.csv")) > 500);
+
+        assertTrue(Files.exists(collection.reviewed.toPath(unpublishedDatasetPath).resolve("ppi.csv")));
+        assertTrue(Files.size(collection.reviewed.toPath(unpublishedDatasetPath).resolve("ppi.csv")) > 500);
     }
 
     @Test

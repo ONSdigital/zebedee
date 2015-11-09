@@ -27,6 +27,7 @@ public class Chart extends FigureBase {
     private List<String> categories;
     private Map<String, String> chartTypes;
     private List<List<String>> groups;
+    private Boolean startFromZero;
 
     @Override
     public PageType getType() {
@@ -175,5 +176,13 @@ public class Chart extends FigureBase {
 
     public void setxAxisLabel(String xAxisLabel) {
         this.xAxisLabel = xAxisLabel;
+    }
+
+    public Boolean getStartFromZero() {
+        return startFromZero;
+    }
+
+    public void setStartFromZero(Boolean startFromZero) {
+        this.startFromZero = startFromZero;
     }
 }

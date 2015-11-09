@@ -52,6 +52,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     // We provide a minimal default for the unit, otherwise highcharts shows
     // "undefined":
     private String unit = "";
+    private Boolean isIndex;
     private String preUnit = "";
     private String source = ""; // Where a statistic comes from. Typically "Office for National Statistics"
     private String seasonalAdjustment;

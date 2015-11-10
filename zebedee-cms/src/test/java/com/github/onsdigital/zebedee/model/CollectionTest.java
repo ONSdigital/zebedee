@@ -1161,4 +1161,68 @@ public class CollectionTest {
         FileUtils.write(releasePath.toFile(), content);
         return release;
     }
+
+    @Test
+    public void moveContentShouldRenameInprogressFile() throws IOException {
+
+        // Given the content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
+        builder.createInProgressFile(uri);
+
+        // When we move content
+        boolean edited = collection.moveContent(publisher1Email, uri, toUri);
+
+        // Then the file should exist only in the new location.
+        assertTrue(edited);
+        Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
+        assertTrue(Files.exists(inProgress.resolve(toUri.substring(1))));
+
+        // check an event has been created for the content being created.
+        assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
+    }
+
+    @Test
+    public void moveContentShouldRenameCompletedFiles() throws IOException {
+
+        // Given the content already exists:
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
+        builder.createCompleteFile(uri);
+
+        // When we move content
+        boolean edited = collection.moveContent(publisher1Email, uri, toUri);
+
+        // Then the file should exist only in the new location.
+        assertTrue(edited);
+        Path complete = builder.collections.get(1).resolve(Collection.COMPLETE);
+        assertFalse(Files.exists(complete.resolve(uri.substring(1))));
+        assertTrue(Files.exists(complete.resolve(toUri.substring(1))));
+
+        // check an event has been created for the content being created.
+        assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
+    }
+
+    @Test
+    public void moveContentShouldOverwriteExistingFiles() throws IOException {
+
+        // Given some existing content in progress.
+        String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
+        String toUri = "/economy/inflationandpriceindices/timeseries/a9errenamed.html";
+        builder.createInProgressFile(uri);
+        builder.createInProgressFile(toUri);
+
+        // When we move content to a URI where some content already exists.
+        boolean edited = collection.moveContent(publisher1Email, uri, toUri);
+
+        // Then the existing content should be overwritten.
+        assertTrue(edited);
+        Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
+        assertFalse(Files.exists(inProgress.resolve(uri.substring(1))));
+        assertTrue(Files.exists(inProgress.resolve(toUri.substring(1))));
+
+        // check an event has been created for the content being created.
+        assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
+    }
 }

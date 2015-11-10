@@ -1078,7 +1078,6 @@ public class DataPublisher {
         IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
     }
 
-
     private DownloadSection newDownloadSection(String title, String file) {
         DownloadSection section = new DownloadSection();
         section.setTitle(title);

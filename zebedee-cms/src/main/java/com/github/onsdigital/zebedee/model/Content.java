@@ -38,7 +38,6 @@ public class Content {
         }
     }
 
-    // todo: remove timeseries filter once we are caching the browse tree.
     private static boolean isNotTimeseries(Path p) {
         return !p.getFileName().toString().contains("timeseries");
     }

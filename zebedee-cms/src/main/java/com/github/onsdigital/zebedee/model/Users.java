@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -456,7 +457,7 @@ public class Users {
      *                 otherwise there's no point because the user's {@link java.security.PrivateKey}
      *                 will be encrypted using this password, so would be unrecoverable with their actual password.
      */
-    private boolean migrateUserToEncryption(User user, String password) {
+    private boolean migrateUserToEncryption(User user, String password) throws IOException {
         boolean result = false;
         if (user.keyring() == null && user.authenticate(password)) {
             // The keyring has not been generated yet,
@@ -464,6 +465,8 @@ public class Users {
             // in order to generate a keyring and associated key pair:
             System.out.println("Generating keyring for " + user.name + " (" + user.email + ")..");
             user.resetPassword(password);
+            Root.zebedee.users.update(user, "Encryption migration");
+
             System.out.println("Done.");
         }
         return result;

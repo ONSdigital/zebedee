@@ -831,5 +831,42 @@ public class Collection {
 
         FileUtils.deleteDirectory(reviewedPath.toFile());
     }
+
+    /**
+     * Move the given Uri to the given newUri.
+     *
+     * @param email   - The email of the user moving the content.
+     * @param fromUri - The current URI of the content to be moved.
+     * @param toUri   - The URI to move the content to.
+     */
+    public boolean moveContent(String email, String fromUri, String toUri) throws IOException {
+
+        boolean hasMoved = false;
+
+        if (inProgress.exists(fromUri)) {
+            moveContent(inProgress, fromUri, toUri);
+            hasMoved = true;
+        }
+        if (complete.exists(fromUri)) {
+            moveContent(complete, fromUri, toUri);
+            hasMoved = true;
+        }
+        if (reviewed.exists(fromUri)) {
+            moveContent(reviewed, fromUri, toUri);
+            hasMoved = true;
+        }
+
+        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, email));
+        save();
+
+        return hasMoved;
+    }
+
+    private void moveContent(Content content, String uri, String newUri) throws IOException {
+        File fromFile = content.toPath(uri).toFile();
+        File toFile = content.toPath(newUri).toFile();
+        toFile.delete(); // delete an existing file if it is to be overwritten.
+        FileUtils.moveFile(fromFile, toFile);
+    }
 }
 

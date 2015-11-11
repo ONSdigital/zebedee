@@ -537,6 +537,47 @@ public class Collections {
         }
     }
 
+    /**
+     * Move or rename content within a collection
+     *
+     * @param session
+     * @param collection
+     * @param uri
+     * @param newUri
+     * @throws BadRequestException
+     * @throws IOException
+     * @throws UnauthorizedException
+     */
+    public void moveContent(Session session, Collection collection, String uri, String newUri) throws BadRequestException, IOException, UnauthorizedException {
+        // Collection (null check before authorisation check)
+        if (collection == null) {
+            throw new BadRequestException("Please specify a collection");
+        }
+
+        // Authorisation
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        if (StringUtils.isBlank(uri)) {
+            throw new BadRequestException("Please provide a URI");
+        }
+
+        if (StringUtils.isBlank(newUri)) {
+            throw new BadRequestException("Please provide a new URI");
+        }
+
+        // Find the file if it exists
+        Path path = collection.find(session.email, uri);
+
+        // Check we're writing a file:
+        if (path != null && Files.isDirectory(path)) {
+            throw new BadRequestException("Please provide a URI to a file");
+        }
+
+        collection.moveContent(session.email, uri, newUri);
+        collection.save();
+    }
 
     /**
      * Represents the list of all collections currently in the system. This adds

@@ -242,6 +242,57 @@ public class CollectionsTest {
         // We should get the expected exception, not a null pointer.
     }
 
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForNullCollectionOnMoveContent()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given a null collection
+        Collection collection = null;
+        String uri = "test.json";
+        String toUri = "testnew.json";
+        Session session = zebedee.sessions.create(builder.administrator.email);
+
+        // When we attempt to call the method
+        zebedee.collections.moveContent(session, collection, uri, toUri);
+
+        // Then we should get the expected exception, not a null pointer.
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForBlankUriOnMoveContent()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given an empty URI.
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        String uri = "";
+        String toUri = "testnew.json";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+
+        // When we attempt to call the method
+        zebedee.collections.moveContent(session, collection, uri, toUri);
+
+        // Then we should get the expected exception, not a null pointer.
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForBlankToUriOnMoveContent()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given an empty to URI.
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        String uri = "test";
+        String toUri = "";
+        Session session = zebedee.sessions.create(builder.publisher1.email);
+
+        // When we attempt to call the method
+        zebedee.collections.moveContent(session, collection, uri, toUri);
+
+        // Then we should get the expected exception, not a null pointer.
+    }
+
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnApprove()
             throws IOException, UnauthorizedException, BadRequestException,
@@ -378,6 +429,22 @@ public class CollectionsTest {
         // We should get the expected exception, not a null pointer.
     }
 
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnMoveContent()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given a null session
+        Session session = null;
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        String uri = "test.json";
+        String toUri = "testnew.json";
+
+        // When we attempt to call the method
+        zebedee.collections.moveContent(session, collection, uri, toUri);
+
+        // Then we should get the expected exception, not a null pointer.
+    }
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestIfNoUriOnReadContent()

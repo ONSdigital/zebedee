@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -100,7 +101,7 @@ public class Collection {
                 collectionDescription, Root.zebedee, session.email);
 
         if (collection.description.type.equals(CollectionType.scheduled)) {
-            Root.schedulePublish(collection);
+            CollectionScheduler.schedulePublish(Root.scheduler, collection, Root.zebedee);
         }
 
         return collection.description;
@@ -119,7 +120,11 @@ public class Collection {
         }
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        com.github.onsdigital.zebedee.model.Collection updatedCollection = collection.update(collection, collectionDescription, Root.zebedee);
+        com.github.onsdigital.zebedee.model.Collection updatedCollection = collection.update(
+                collection,
+                collectionDescription,
+                Root.zebedee,
+                Root.scheduler);
 
         return updatedCollection.description;
     }

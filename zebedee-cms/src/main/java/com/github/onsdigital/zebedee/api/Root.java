@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
-import com.github.onsdigital.zebedee.model.publishing.PublishTask;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.IOUtils;
@@ -127,25 +126,10 @@ public class Root {
 
             for (Collection collection : collections) {
 
-                schedulePublish(collection);
+                CollectionScheduler.schedulePublish(scheduler, collection, zebedee);
             }
         } else {
             Log.print("Scheduled publishing is disabled - not reading collections");
-        }
-    }
-
-    public static void schedulePublish(Collection collection) {
-        if (Configuration.isSchedulingEnabled()) {
-            try {
-                System.out.println("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
-                if (collection.description.type == CollectionType.scheduled) {
-                    scheduler.schedule(collection, new PublishTask(zebedee, collection));
-                }
-            } catch (Exception e) {
-                System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());
-            }
-        } else {
-            Log.print("Not scheduling collection %s, scheduling is not enabled", collection.description.name);
         }
     }
 

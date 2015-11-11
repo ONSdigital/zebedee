@@ -82,4 +82,22 @@ public class CollectionSchedulerTest {
         // Then the scheduler no longer contains a task for the collection
         Assert.assertFalse(scheduler.taskExistsForCollection(collection));
     }
+
+    @Test
+    public void cancelShouldNotThrowExceptionIfTaskDoesNotExist() throws IOException, ZebedeeException {
+
+        // Given a scheduler with no tasks.
+
+        CollectionScheduler scheduler = new CollectionScheduler();
+
+        // When the task that does not exist is cancelled
+        CollectionDescription description = new CollectionDescription("collectionName");
+        description.type = CollectionType.scheduled;
+        description.publishDate = DateTime.now().plusDays(1).toDate();
+        Collection collection = Collection.create(description, zebedee, builder.administrator.email);
+        scheduler.cancel(collection);
+
+        // Then the scheduler no longer contains a task for the collection
+        Assert.assertFalse(scheduler.taskExistsForCollection(collection));
+    }
 }

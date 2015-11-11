@@ -1,7 +1,10 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
+import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.util.Log;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +17,21 @@ public class CollectionScheduler {
 
     private final Scheduler scheduler = new Scheduler();
     private final Map<String, ScheduledFuture<?>> collectionIdToTask = new ConcurrentHashMap<>();
+
+    public static void schedulePublish(CollectionScheduler scheduler, Collection collection, Zebedee zebedee) {
+        if (Configuration.isSchedulingEnabled()) {
+            try {
+                System.out.println("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
+                if (collection.description.type == CollectionType.scheduled) {
+                    scheduler.schedule(collection, new PublishTask(zebedee, collection));
+                }
+            } catch (Exception e) {
+                System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());
+            }
+        } else {
+            Log.print("Not scheduling collection %s, scheduling is not enabled", collection.description.name);
+        }
+    }
 
     /**
      * Schedule a task related to a collection.
@@ -51,9 +69,14 @@ public class CollectionScheduler {
      * @param collection
      */
     public void cancel(Collection collection) {
-        boolean response = collectionIdToTask.get(collection.description.id).cancel(false);
-        collectionIdToTask.remove(collection.description.id);
-        System.out.println("Task cancelled for collection " + collection.description.name + " response=" + response);
+
+        ScheduledFuture<?> future = collectionIdToTask.get(collection.description.id);
+
+        if (future != null) {
+            boolean response = future.cancel(false);
+            collectionIdToTask.remove(collection.description.id);
+            System.out.println("Task cancelled for collection " + collection.description.name + " response=" + response);
+        }
     }
 
     /**

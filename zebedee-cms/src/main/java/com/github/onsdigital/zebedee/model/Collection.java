@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
@@ -218,9 +219,11 @@ public class Collection {
      * @param collection
      * @param collectionDescription
      * @param zebedee
+     * @param scheduler
+     * @param schedulingEnabled
      * @return
      */
-    public static Collection update(Collection collection, CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, CollectionNotFoundException {
+    public static Collection update(Collection collection, CollectionDescription collectionDescription, Zebedee zebedee, CollectionScheduler scheduler) throws IOException, CollectionNotFoundException {
 
         Collection updatedCollection = collection;
 
@@ -230,10 +233,14 @@ public class Collection {
         }
 
         if (collectionDescription.type != null && updatedCollection.description.type != collectionDescription.type) {
+
+            scheduler.cancel(collection);
+
             updatedCollection.description.type = collectionDescription.type;
             if (collectionDescription.type == CollectionType.scheduled) {
                 if (collectionDescription.publishDate != null) {
                     updatedCollection.description.publishDate = collectionDescription.publishDate;
+                    CollectionScheduler.schedulePublish(scheduler, updatedCollection, zebedee);
                 }
             }
 
@@ -746,6 +753,7 @@ public class Collection {
 
     /**
      * Associate this collection with the given release
+     *
      * @param email
      * @param release
      * @return
@@ -813,10 +821,10 @@ public class Collection {
 
     /**
      * Create a new version for the given timeseries URI.
-     *
+     * <p>
      * The same as the regular timeseries function but does not record update in the event log
      *
-     * @param uri   - The URI of the file to version
+     * @param uri - The URI of the file to version
      * @return
      */
     public ContentItemVersion versionTimeSeries(String uri) throws NotFoundException, IOException, ConflictException {

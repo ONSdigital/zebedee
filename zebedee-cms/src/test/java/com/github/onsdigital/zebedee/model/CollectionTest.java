@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
@@ -90,18 +91,19 @@ public class CollectionTest {
     @Test
     public void shouldRenameCollection() throws Exception {
 
-        // Given
+        // Given an existing collection
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.type = CollectionType.manual;
+        collectionDescription.publishDate = new Date();
         String newName = "Economy Release";
-
         String filename = PathUtils.toFilename(newName);
 
-        // When
+        // When the rename function is called.
         Collection.create(collectionDescription, zebedee, publisher1Email);
         Collection.rename(collectionDescription, newName, zebedee);
 
-        // Then
+        // Then the collection is renamed.
         Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
         Path releasePath = rootPath.resolve(filename);
         Path jsonPath = rootPath.resolve(filename + ".json");
@@ -121,10 +123,52 @@ public class CollectionTest {
         }
 
         assertNotNull(renamedCollectionDescription);
-        assertNotEquals(collectionDescription.id, renamedCollectionDescription.id);
-        assertEquals(filename, renamedCollectionDescription.id);
+        assertEquals(collectionDescription.id, renamedCollectionDescription.id);
         assertEquals(newName, renamedCollectionDescription.name);
         assertEquals(collectionDescription.publishDate, renamedCollectionDescription.publishDate);
+        assertEquals(collectionDescription.type, renamedCollectionDescription.type);
+    }
+
+    @Test
+    public void shouldUpdateCollection() throws Exception {
+
+        // Given an existing collection
+        String name = "Population Release";
+        CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.type = CollectionType.manual;
+        collectionDescription.publishDate = new Date();
+        Collection collection = Collection.create(collectionDescription, zebedee, publisher1Email);
+
+        // When the collection is updated
+        String newName = "Economy Release";
+        String filename = PathUtils.toFilename(newName);
+        CollectionDescription updatedDescription = new CollectionDescription(newName);
+        updatedDescription.type = CollectionType.scheduled;
+        updatedDescription.publishDate = new DateTime(collectionDescription.publishDate).plusHours(1).toDate();
+        Collection.update(collection, updatedDescription, zebedee);
+
+
+        // Then the properties of the description passed to update have been updated.
+        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path collectionFolderPath = rootPath.resolve(filename);
+        Path collectionJsonPath = rootPath.resolve(filename + ".json");
+
+        Path oldJsonPath = rootPath.resolve(PathUtils.toFilename(name) + ".json");
+
+        assertTrue(Files.exists(collectionFolderPath));
+        assertTrue(Files.exists(collectionJsonPath));
+        assertTrue(!Files.exists(oldJsonPath));
+
+        CollectionDescription updatedCollectionDescription;
+        try (InputStream inputStream = Files.newInputStream(collectionJsonPath)) {
+            updatedCollectionDescription = Serialiser.deserialise(inputStream, CollectionDescription.class);
+        }
+
+        assertNotNull(updatedCollectionDescription);
+        assertEquals(collectionDescription.id, updatedCollectionDescription.id);
+        assertEquals(newName, updatedCollectionDescription.name);
+        assertEquals(updatedDescription.type, updatedCollectionDescription.type);
+        assertEquals(updatedDescription.publishDate, updatedCollectionDescription.publishDate);
     }
 
     @Test(expected = CollectionNotFoundException.class)

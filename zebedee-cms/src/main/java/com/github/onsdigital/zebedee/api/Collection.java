@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import java.io.IOException;
 
 @Api
@@ -104,6 +105,25 @@ public class Collection {
 
         return collection.description;
     }
+
+    @PUT
+    public CollectionDescription update(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            CollectionDescription collectionDescription
+    ) throws IOException, ZebedeeException {
+
+        Session session = Root.zebedee.sessions.get(request);
+        if (Root.zebedee.permissions.canEdit(session.email) == false) {
+            throw new UnauthorizedException("You are not authorised to update collections.");
+        }
+
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        com.github.onsdigital.zebedee.model.Collection updatedCollection = collection.update(collection, collectionDescription, Root.zebedee);
+
+        return updatedCollection.description;
+    }
+
 
     /**
      * Deletes the collection details at the endpoint /Collection/[CollectionName]

@@ -195,7 +195,8 @@ public class Collection {
         CollectionDescription renamedCollectionDescription = new CollectionDescription(
                 newName,
                 collectionDescription.publishDate);
-        renamedCollectionDescription.id = newFilename;
+        renamedCollectionDescription.id = collectionDescription.id;
+        renamedCollectionDescription.type = collectionDescription.type;
 
         try (OutputStream output = Files.newOutputStream(newPath)) {
             Serialiser.serialise(output, renamedCollectionDescription);
@@ -209,6 +210,37 @@ public class Collection {
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
         Release release = (Release) new ZebedeeReader(zebedee.published.path.toString(), null).getPublishedContent(uri);
         return release;
+    }
+
+    /**
+     * Helper method to update the given collection with only the specified properties in the given CollectionDescription.
+     *
+     * @param collection
+     * @param collectionDescription
+     * @param zebedee
+     * @return
+     */
+    public static Collection update(Collection collection, CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, CollectionNotFoundException {
+
+        Collection updatedCollection = collection;
+
+        // only update the collection name if its given and its changed.
+        if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
+            updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
+        }
+
+        if (collectionDescription.type != null && updatedCollection.description.type != collectionDescription.type) {
+            updatedCollection.description.type = collectionDescription.type;
+            if (collectionDescription.type == CollectionType.scheduled) {
+                if (collectionDescription.publishDate != null) {
+                    updatedCollection.description.publishDate = collectionDescription.publishDate;
+                }
+            }
+
+            updatedCollection.save();
+        }
+
+        return updatedCollection;
     }
 
     private Release getReleaseFromCollection(String email, String uri) throws IOException, ZebedeeException {

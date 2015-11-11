@@ -15,7 +15,7 @@ public class User extends UserSanitised {
     // to unlock the keyring, so we need to
     // manage these fields together.
     private String passwordHash;
-    private Keyring keyring;
+    public Keyring keyring;
 
     /**
      * Constructor for deserialisation.

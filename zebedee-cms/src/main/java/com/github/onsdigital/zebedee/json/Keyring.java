@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Represents the encryption keys needed for a user account to access collections.
  */
-public class Keyring {
+public class Keyring implements Cloneable {
 
     // Key storage:
     private String privateKeySalt;
@@ -49,6 +49,20 @@ public class Keyring {
         result.keys = new HashMap<>();
 
         return result;
+    }
+
+    @Override
+    public Keyring clone() {
+        Keyring keyring = new Keyring();
+        keyring.privateKey = this.privateKey;
+        keyring.publicKey = this.publicKey;
+        keyring.privateKeySalt = this.privateKeySalt;
+
+        Map<String , String> clonedKeyring = new ConcurrentHashMap<>();
+        for (String key: this.keyring.keySet()) { clonedKeyring.put(key, this.keyring.get(key)); }
+        keyring.keyring = clonedKeyring;
+
+        return keyring;
     }
 
     /**

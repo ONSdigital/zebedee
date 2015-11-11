@@ -19,6 +19,8 @@ import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by david on 12/03/2015.
@@ -196,12 +198,25 @@ public class Users {
         return updated;
     }
 
-    User update(User user, String lastAdmin) throws IOException {
+    /**
+     * Save the user file
+     *
+     * To avoid concurrency issues this deserialises the saved user and updates
+     * details atomically
+     *
+     * @param user the user
+     * @param lastAdmin the last person to administrate the user
+     * @return
+     * @throws IOException
+     */
+    synchronized User update(User user, String lastAdmin) throws IOException {
 
         User updated = read(user.email);
         if (updated != null) {
             updated.name = user.name;
             updated.lastAdmin = lastAdmin;
+            updated.keyring = user.keyring.clone();
+
             // Only set this to true if explicitly set:
             updated.inactive = BooleanUtils.isTrue(user.inactive);
             write(updated);
@@ -465,6 +480,7 @@ public class Users {
             // in order to generate a keyring and associated key pair:
             System.out.println("Generating keyring for " + user.name + " (" + user.email + ")..");
             user.resetPassword(password);
+
             Root.zebedee.users.update(user, "Encryption migration");
 
             System.out.println("Done.");

@@ -172,6 +172,18 @@ public class CollectionTest {
         assertEquals(updatedDescription.publishDate, updatedCollectionDescription.publishDate);
     }
 
+    @Test(expected = BadRequestException.class)
+    public void updateCollectionShouldThrowBadRequestExceptionForNullCollection() throws Exception {
+
+        // Given a null collection
+        Collection collection = null;
+
+        // When we call the static update method
+        Collection.update(collection, new CollectionDescription("name"), zebedee, new CollectionScheduler());
+
+        // Then the expected exception is thrown.
+    }
+
     @Test(expected = CollectionNotFoundException.class)
     public void shouldNotInstantiateInInvalidFolder() throws Exception {
 

@@ -193,19 +193,15 @@ public class Collection {
         Path newPath = zebedee.collections.path.resolve(newFilename
                 + ".json");
 
-        CollectionDescription renamedCollectionDescription = new CollectionDescription(
-                newName,
-                collectionDescription.publishDate);
-        renamedCollectionDescription.id = collectionDescription.id;
-        renamedCollectionDescription.type = collectionDescription.type;
+        collectionDescription.name = newName;
 
         try (OutputStream output = Files.newOutputStream(newPath)) {
-            Serialiser.serialise(output, renamedCollectionDescription);
+            Serialiser.serialise(output, collectionDescription);
         }
 
         Files.delete(zebedee.collections.path.resolve(filename + ".json"));
 
-        return new Collection(renamedCollectionDescription, zebedee);
+        return new Collection(collectionDescription, zebedee);
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
@@ -220,11 +216,13 @@ public class Collection {
      * @param collectionDescription
      * @param zebedee
      * @param scheduler
-     * @param schedulingEnabled
      * @return
      */
-    public static Collection update(Collection collection, CollectionDescription collectionDescription, Zebedee zebedee, CollectionScheduler scheduler) throws IOException, CollectionNotFoundException {
+    public static Collection update(Collection collection, CollectionDescription collectionDescription, Zebedee zebedee, CollectionScheduler scheduler) throws IOException, CollectionNotFoundException, BadRequestException {
 
+        if (collection == null) {
+            throw new BadRequestException("Please specify a collection");
+        }
         Collection updatedCollection = collection;
 
         // only update the collection name if its given and its changed.

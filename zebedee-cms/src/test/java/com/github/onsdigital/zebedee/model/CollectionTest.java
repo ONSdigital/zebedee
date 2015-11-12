@@ -170,6 +170,7 @@ public class CollectionTest {
         assertEquals(newName, updatedCollectionDescription.name);
         assertEquals(updatedDescription.type, updatedCollectionDescription.type);
         assertEquals(updatedDescription.publishDate, updatedCollectionDescription.publishDate);
+        assertTrue(updatedCollectionDescription.events.hasEventForType(EventType.CREATED));
     }
 
     @Test(expected = BadRequestException.class)

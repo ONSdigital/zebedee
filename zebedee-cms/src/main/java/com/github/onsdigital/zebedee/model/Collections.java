@@ -374,21 +374,34 @@ public class Collections {
         }
 
         try (InputStream input = Files.newInputStream(path)) {
-//            if (resolveReferences) {
-//                Page page = ContentUtil.deserialisePage(input);
-//                page.loadReferences(new DataReader(session, collection));
-//                // Write the file to the response
-//                org.apache.commons.io.IOUtils.copy(new StringReader(page.toJson()),
-//                        response.getOutputStream());
-//            } else {
             // Write the file to the response
             org.apache.commons.io.IOUtils.copy(input,
                     response.getOutputStream());
         }
-//        } catch (ContentNotFoundException e) {
-//            throw new NotFoundException(e.getMessage());
-//        }
+    }
 
+
+    /**
+     * Create new content if it does not already exist.
+     *
+     * @param collection
+     * @param uri
+     * @param session
+     * @param request
+     * @param requestBody
+     * @throws ConflictException
+     * @throws NotFoundException
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     * @throws IOException
+     */
+    public void createContent(Collection collection, String uri, Session session, HttpServletRequest request, InputStream requestBody) throws ConflictException, NotFoundException, BadRequestException, UnauthorizedException, IOException {
+
+        if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0) {
+            throw new ConflictException("This URI already exists");
+        }
+
+        writeContent(collection, uri, session, request, requestBody);
     }
 
     public void writeContent(Collection collection, String uri,

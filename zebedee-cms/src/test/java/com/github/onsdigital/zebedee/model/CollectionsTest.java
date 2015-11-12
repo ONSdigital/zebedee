@@ -1064,6 +1064,26 @@ public class CollectionsTest {
         assertNotNull(collection.find(builder.publisher1.email, folderUri));
     }
 
+    @Test(expected = ConflictException.class)
+    public void shouldThrowConflictExceptionOnCreateContentIfAlreadyPublished() throws Exception {
+        String uri = "/this/is/a/directory/file.json";
+
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+
+        builder.createPublishedFile(uri);
+        zebedee.collections.createContent(collection, uri, null, null, null);
+    }
+
+    @Test(expected = ConflictException.class)
+    public void shouldThrowConflictExceptionOnCreateContentIfAlreadyInCollection() throws Exception {
+        String uri = "/this/is/a/directory/file.json";
+
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+
+        builder.createInProgressFile(uri);
+        zebedee.collections.createContent(collection, uri, null, null, null);
+    }
+
     @Test
     public void shouldEditCollectionConcurrently() throws Exception {
 

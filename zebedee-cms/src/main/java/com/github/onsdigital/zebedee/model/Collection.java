@@ -230,20 +230,23 @@ public class Collection {
             updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
         }
 
-        if (collectionDescription.type != null && updatedCollection.description.type != collectionDescription.type) {
-
-            scheduler.cancel(collection);
-
+        // if the type has changed
+        if (collectionDescription.type != null
+                && updatedCollection.description.type != collectionDescription.type) {
             updatedCollection.description.type = collectionDescription.type;
-            if (collectionDescription.type == CollectionType.scheduled) {
-                if (collectionDescription.publishDate != null) {
-                    updatedCollection.description.publishDate = collectionDescription.publishDate;
-                    CollectionScheduler.schedulePublish(scheduler, updatedCollection, zebedee);
-                }
-            }
-
-            updatedCollection.save();
         }
+
+        if (updatedCollection.description.type == CollectionType.scheduled) {
+            if (collectionDescription.publishDate != null
+                    && !updatedCollection.description.publishDate.equals(collectionDescription.publishDate)) {
+                updatedCollection.description.publishDate = collectionDescription.publishDate;
+                CollectionScheduler.schedulePublish(scheduler, updatedCollection, zebedee);
+            }
+        } else { // the type is now manual so cancel it
+            scheduler.cancel(collection);
+        }
+
+        updatedCollection.save();
 
         return updatedCollection;
     }

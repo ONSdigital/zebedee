@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledFuture;
 
 public class CollectionSchedulerTest {
 
@@ -42,6 +43,34 @@ public class CollectionSchedulerTest {
         // When a new task is scheduled for the collection.
         CollectionScheduler scheduler = new CollectionScheduler();
         Assert.assertTrue(scheduler.schedule(collection, new DummyTask()));
+
+        // Then the scheduler contains a task for the collection.
+        Assert.assertTrue(scheduler.taskExistsForCollection(collection));
+    }
+
+    @Test
+    public void scheduleShouldCancelAnExistingCollectionTask() throws IOException, ZebedeeException, InterruptedException {
+
+        // Given a scheduled collection
+        CollectionDescription description = new CollectionDescription("collectionName");
+        description.type = CollectionType.scheduled;
+        final DummyTask firstTask = new DummyTask();
+        description.publishDate = DateTime.now().plusSeconds(1).toDate();
+        Collection collection = Collection.create(description, zebedee, builder.administrator.email);
+        CollectionScheduler scheduler = new CollectionScheduler();
+        Assert.assertTrue(scheduler.schedule(collection, firstTask));
+
+        final ScheduledFuture<?> taskForCollection = scheduler.getTaskForCollection(collection);
+        Assert.assertFalse(taskForCollection.isCancelled());
+
+        // When a second task is scheduled for the collection.
+        final DummyTask secondTask = new DummyTask();
+        collection.description.publishDate = DateTime.now().plusSeconds(1).toDate();
+        Assert.assertTrue(scheduler.schedule(collection, secondTask));
+        final ScheduledFuture<?> updatedForCollection = scheduler.getTaskForCollection(collection);
+
+        Assert.assertFalse(updatedForCollection.isCancelled());
+        Assert.assertTrue(taskForCollection.isCancelled());
 
         // Then the scheduler contains a task for the collection.
         Assert.assertTrue(scheduler.taskExistsForCollection(collection));

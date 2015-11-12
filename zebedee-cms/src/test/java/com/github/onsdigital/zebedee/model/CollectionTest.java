@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -171,6 +172,30 @@ public class CollectionTest {
         assertEquals(updatedDescription.type, updatedCollectionDescription.type);
         assertEquals(updatedDescription.publishDate, updatedCollectionDescription.publishDate);
         assertTrue(updatedCollectionDescription.events.hasEventForType(EventType.CREATED));
+    }
+
+    @Test
+    public void shouldUpdateScheduleTimeForAScheduledCollection() throws Exception {
+
+        // Given an existing collection that has been scheduled
+        String name = "Population Release";
+        CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.publishDate = DateTime.now().plusSeconds(2).toDate();
+        collectionDescription.type = CollectionType.scheduled;
+        Collection collection = Collection.create(collectionDescription, zebedee, publisher1Email);
+        CollectionScheduler scheduler = new CollectionScheduler();
+        CollectionScheduler.schedulePublish(scheduler, collection, zebedee);
+
+        // When the collection is updated with a new release time
+        String newName = "Economy Release";
+        CollectionDescription updatedDescription = new CollectionDescription(newName);
+        updatedDescription.type = CollectionType.scheduled;
+        updatedDescription.publishDate = DateTime.now().plusSeconds(10).toDate();
+        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler);
+
+        assertTrue(scheduler.taskExistsForCollection(updated));
+        long timeUntilTaskRun = scheduler.getTaskForCollection(updated).getDelay(TimeUnit.SECONDS);
+        assertTrue(timeUntilTaskRun > 8);
     }
 
     @Test(expected = BadRequestException.class)

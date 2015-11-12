@@ -43,11 +43,16 @@ public class CollectionScheduler {
 
         // throw exception if a manual collection is given.
         if (collection.description.type == CollectionType.manual) {
-            System.out.println("Not scheduling this collection as it is manual collection.");
+            Log.print("Not scheduling this collection as it is manual collection.");
             return false;
         }
 
-        System.out.println("Scheduling task for collection: " + collection.description.id);
+        if (taskExistsForCollection(collection)) {
+            Log.print("A task already exists for collection" + collection.description.id + " this will now be cancelled");
+            cancel(collection);
+        }
+
+        Log.print("Scheduling task for collection: " + collection.description.id);
         ScheduledFuture<?> future = scheduler.schedule(task, collection.description.publishDate);
         collectionIdToTask.put(collection.description.id, future);
         return true;
@@ -64,12 +69,23 @@ public class CollectionScheduler {
     }
 
     /**
+     * Return the task associated with this collection.
+     *
+     * @param collection
+     * @return
+     */
+    public ScheduledFuture<?> getTaskForCollection(Collection collection) {
+        return collectionIdToTask.get(collection.description.id);
+    }
+
+    /**
      * Cancel and remove the task for the given collection.
      *
      * @param collection
      */
     public void cancel(Collection collection) {
 
+        System.out.println("Attempting to cancel task for collection " + collection.description.name);
         ScheduledFuture<?> future = collectionIdToTask.get(collection.description.id);
 
         if (future != null) {

@@ -237,8 +237,7 @@ public class Collection {
         }
 
         if (updatedCollection.description.type == CollectionType.scheduled) {
-            if (collectionDescription.publishDate != null
-                    && !updatedCollection.description.publishDate.equals(collectionDescription.publishDate)) {
+            if (collectionDescription.publishDate != null) {
                 updatedCollection.description.publishDate = collectionDescription.publishDate;
                 CollectionScheduler.schedulePublish(scheduler, updatedCollection, zebedee);
             }

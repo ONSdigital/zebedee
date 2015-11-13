@@ -75,7 +75,7 @@ public class Content {
 
         String uri = request.getParameter("uri");
 
-        Root.zebedee.collections.createContent(collection, uri, session, request, requestBody);
+        Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
 
         return true;
     }

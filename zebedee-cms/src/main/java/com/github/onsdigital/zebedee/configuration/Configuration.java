@@ -24,6 +24,10 @@ public class Configuration {
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
 
+    private static final String DEFAULT_VERIFICATION_URL = "http://testhost:8080";
+    private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
+    private static final int VERIFY_RETRTY_COUNT = 10;
+
     public static boolean isSchedulingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
     }
@@ -38,6 +42,18 @@ public class Configuration {
 
     public static String getWebsiteUrl() {
         return StringUtils.defaultIfBlank(getValue("website_url"), DEFAULT_WEBSITE_URL);
+    }
+
+    public static String getDefaultVerificationUrl() {
+        return StringUtils.defaultIfBlank(getValue("verification_url"), DEFAULT_WEBSITE_URL);
+    }
+
+    public static int getVerifyRetrtyDelay() {
+        return VERIFY_RETRTY_DELAY;
+    }
+
+    public static int getVerifyRetrtyCount() {
+        return VERIFY_RETRTY_COUNT;
     }
 
     public static String getReindexKey() {

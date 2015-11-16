@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.json.publishing;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Information about the transfer of a single file.
  */
@@ -15,6 +17,11 @@ public class UriInfo {
 
     public static final String CREATE = "created";
     public static final String UPDATE = "updated";
+
+    public static final String VERIFYING = "verifying";
+    public static final String VERIFY_RETRYING = "retrying verification";
+    public static final String VERIFY_FAILED = "verification failed";
+    public static final String VERIFIED = "verified";
 
     /**
      * This is a String rather than an enum to make deserialisation lenient.
@@ -46,6 +53,10 @@ public class UriInfo {
     public String start;
     public String end;
     public long duration;
+    public String verificationStatus;
+    public String verificationEnd;
+    public int verificationRetryCount;
+    public String verifyMessage;
     public String sha;
     public long size;
     public String error;

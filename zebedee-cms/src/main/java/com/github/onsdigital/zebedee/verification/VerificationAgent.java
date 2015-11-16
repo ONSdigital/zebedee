@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.util.DateConverter;
 import com.github.onsdigital.zebedee.verification.http.ClientConfiguration;
 import com.github.onsdigital.zebedee.verification.http.PooledHttpClient;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -50,13 +51,13 @@ public class VerificationAgent {
         for (Result publishResult : publishResults) {
             Set<UriInfo> uriInfos = publishResult.transaction.uriInfos;
             for (UriInfo uriInfo : uriInfos) {
+                uriInfo.verificationStatus = UriInfo.VERIFYING;
                 submit(publishedCollection, jsonPath, uriInfo);
             }
         }
     }
 
     private void submit(PublishedCollection publishedCollection, Path jsoPath,   UriInfo uriInfo) {
-        uriInfo.verificationStatus = UriInfo.VERIFYING;
         pool.submit(new VerifyTask(publishedCollection, jsoPath, uriInfo));
     }
 
@@ -70,6 +71,7 @@ public class VerificationAgent {
                 } catch (InterruptedException e) {
                     System.err.println("Warning! Retry delay failed, continues with verification retry ");
                 }
+                uriInfo.verificationStatus = UriInfo.VERIFY_RETRYING;
                 submit(publishedCollection, jsonPath, uriInfo);
             }
         }.run();
@@ -96,8 +98,10 @@ public class VerificationAgent {
                 } else {
                     onVerifyFailed("Not yet available");
                 }
+            } catch (HttpResponseException e) {
+                onVerifyFailed("Verification agent error code:" + e.getStatusCode());
             } catch (IOException e) {
-                String errorMessage = "Failed verifying";
+                String errorMessage = "Failed verifying " + e.getMessage();
                 System.err.println(errorMessage + " " + uriInfo.uri + "\n" + e.getMessage());
                 onVerifyFailed(errorMessage);
             }
@@ -118,7 +122,6 @@ public class VerificationAgent {
                 publishedCollection.incrementVerifyFailed();
                 uriInfo.verifyMessage = errorMessage;
             } else {
-                uriInfo.verificationStatus = UriInfo.VERIFY_RETRYING;
                 reSubmit(publishedCollection, jsonPath, uriInfo);
             }
             save();

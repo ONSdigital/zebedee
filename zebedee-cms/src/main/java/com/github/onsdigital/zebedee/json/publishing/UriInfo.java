@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.json.publishing;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * Information about the transfer of a single file.
  */
@@ -19,8 +17,8 @@ public class UriInfo {
     public static final String UPDATE = "updated";
 
     public static final String VERIFYING = "verifying";
-    public static final String VERIFY_RETRYING = "retrying verification";
-    public static final String VERIFY_FAILED = "verification failed";
+    public static final String VERIFY_RETRYING = "retrying";
+    public static final String VERIFY_FAILED = "failed";
     public static final String VERIFIED = "verified";
 
     /**

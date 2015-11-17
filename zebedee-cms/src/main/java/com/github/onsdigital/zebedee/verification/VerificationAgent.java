@@ -52,6 +52,7 @@ public class VerificationAgent {
             Set<UriInfo> uriInfos = publishResult.transaction.uriInfos;
             for (UriInfo uriInfo : uriInfos) {
                 uriInfo.verificationStatus = UriInfo.VERIFYING;
+                publishedCollection.incrementVerifyInProgressCount();
                 submit(publishedCollection, jsonPath, uriInfo);
             }
         }
@@ -111,8 +112,10 @@ public class VerificationAgent {
         private void onVerified() {
             System.out.println("Succesfully verified " + uriInfo.uri);
             publishedCollection.incrementVerified();
+            publishedCollection.decrementVerifyInProgressCount();
             uriInfo.verificationStatus = UriInfo.VERIFIED;
             uriInfo.verificationEnd = DateConverter.toString(new Date());
+            save();
         }
 
         private void onVerifyFailed(String errorMessage) {
@@ -120,6 +123,7 @@ public class VerificationAgent {
             if (Configuration.getVerifyRetrtyCount() == uriInfo.verificationRetryCount) {
                 uriInfo.verificationStatus = UriInfo.VERIFY_FAILED;
                 publishedCollection.incrementVerifyFailed();
+                publishedCollection.decrementVerifyInProgressCount();
                 uriInfo.verifyMessage = errorMessage;
             } else {
                 reSubmit(publishedCollection, jsonPath, uriInfo);
@@ -146,8 +150,7 @@ public class VerificationAgent {
     private boolean isPublished(UriInfo uriInfo) throws IOException {
         CloseableHttpResponse response = verificationProxyClient.sendGet("/hash", null, asList((NameValuePair) new BasicNameValuePair("uri", uriInfo.uri)));
         String hash = EntityUtils.toString(response.getEntity());
-        return false;
-
+        return uriInfo.sha.equals(hash);
     }
 
 

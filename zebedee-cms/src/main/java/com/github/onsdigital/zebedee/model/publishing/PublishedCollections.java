@@ -21,6 +21,7 @@ import org.elasticsearch.search.sort.SortOrder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -99,12 +100,13 @@ public class PublishedCollections {
      *
      * @param publishedCollection
      */
-    private void index(Client client, PublishedCollection publishedCollection) throws IOException {
+    public void index(Client client, PublishedCollection publishedCollection) throws IOException {
 
         Log.print("Indexing collection %s", publishedCollection.name);
 
         IndexRequestBuilder indexRequest = client.prepareIndex(index, type);
         indexRequest.setSource(Serialiser.serialise(publishedCollection));
+        indexRequest.setId(publishedCollection.id);
         ListenableActionFuture<IndexResponse> execution = indexRequest.execute();
         execution.actionGet();
     }
@@ -186,14 +188,26 @@ public class PublishedCollections {
     }
 
 
-    public void add(Path collectionJsonPath) {
+    public PublishedCollection add(Path collectionJsonPath) {
         try (InputStream input = Files.newInputStream(collectionJsonPath)) {
             PublishedCollection publishedCollection = Serialiser.deserialise(input,
                     PublishedCollection.class);
 
             index(ElasticSearchClient.getClient(), publishedCollection);
+            return publishedCollection;
         } catch (IOException e) {
             Log.print("Failed to read published collection with path %s", collectionJsonPath.toString());
+            return null;
+        }
+    }
+
+    public boolean save(PublishedCollection publishedCollection, Path path) throws IOException {
+        synchronized (publishedCollection) {
+            try (OutputStream output = Files.newOutputStream(path)) {
+                Serialiser.serialise(output, publishedCollection);
+                index(ElasticSearchClient.getClient(), publishedCollection);
+                return true;
+            }
         }
     }
 }

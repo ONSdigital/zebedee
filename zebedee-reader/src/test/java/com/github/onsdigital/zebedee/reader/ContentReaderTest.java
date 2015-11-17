@@ -174,15 +174,15 @@ public class ContentReaderTest {
         assertEquals("2015", latestContent.getDescription().getEdition());
     }
 
-    @Test
-    public void mimeTypeShouldNotBeEmptyForXls() throws IOException {
-        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xls"));
-        assertNotNull(mimeType);
-    }
-
-    @Test
-    public void mimeTypeShouldNotBeEmptyForXlsx() throws IOException {
-        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xlsx"));
-        assertNotNull(mimeType);
-    }
+//    @Test
+//    public void mimeTypeShouldNotBeEmptyForXls() throws IOException {
+//        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xls"));
+//        assertNotNull(mimeType);
+//    }
+//
+//    @Test
+//    public void mimeTypeShouldNotBeEmptyForXlsx() throws IOException {
+//        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xlsx"));
+//        assertNotNull(mimeType);
+//    }
 }

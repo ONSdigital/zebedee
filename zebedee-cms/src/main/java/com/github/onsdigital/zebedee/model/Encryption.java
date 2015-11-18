@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -60,9 +61,8 @@ public class Encryption {
      * @param collection a collection
      */
     public static void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection) throws NotFoundException, BadRequestException, IOException, UnauthorizedException {
-        User keyMaster = zebedee.users.get(session.email);
 
-        SecretKey key = keyMaster.keyring.get(collection.description.id);
+        SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
 
         // Distribute to all publishers
         for (User user: zebedee.users.list()) {
@@ -76,5 +76,16 @@ public class Encryption {
         // Distribute to team members
         // TODO: Whatever logic assigns users to teams to collections
 
+    }
+
+    public static void assignKeyToSignedInUser(Zebedee zebedee, Session session, Collection collection, SecretKey key) throws IOException, NotFoundException, BadRequestException {
+        // Update the cached keyring
+        Keyring keyring = zebedee.keyringCache.get(session);
+        keyring.put(collection.description.id, key);
+
+        // Update the user json
+        User user = zebedee.users.get(session.email);
+        user.keyring = keyring;
+        zebedee.users.updateKeyring(user);
     }
 }

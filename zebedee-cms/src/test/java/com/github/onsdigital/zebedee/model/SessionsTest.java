@@ -3,6 +3,9 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -46,34 +49,34 @@ public class SessionsTest {
 
 
     @Test
-    public void shouldCreateSession() throws IOException {
+    public void shouldCreateSession() throws IOException, NotFoundException, BadRequestException {
 
         // Given
         // No session have been created
-        String email = "blue@cat.com";
+        Credentials credentials = builder.administratorCredentials;
 
         // When
         // We create a session
-        Session session = zebedee.sessions.create(email);
+        Session session = zebedee.openSession(credentials);
 
         // Then
         // The session should exist
         Assert.assertNotNull(session);
-        Assert.assertEquals(email, session.email);
+        Assert.assertEquals(credentials.email, session.email);
     }
 
 
     @Test
-    public void shouldNotCreateDuplicateSession() throws IOException {
+    public void shouldNotCreateDuplicateSession() throws IOException, NotFoundException, BadRequestException {
 
         // Given
         // A session has been created
-        String email = "blue@cat.com";
-        Session session = zebedee.sessions.create(email);
+        Credentials credentials = builder.administratorCredentials;
+        Session session = zebedee.openSession(credentials);
 
         // When
         // We attempt to create a session for the same user
-        Session newSession = zebedee.sessions.create(email);
+        Session newSession = zebedee.openSession(credentials);
 
 
         // Then
@@ -83,12 +86,12 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldGetSession() throws IOException {
+    public void shouldGetSession() throws IOException, NotFoundException, BadRequestException {
 
         // Given
         // A session has been created
-        String email = "blue@cat.com";
-        Session existingSession = zebedee.sessions.create(email);
+        Credentials credentials = builder.administratorCredentials;
+        Session existingSession = zebedee.openSession(credentials);
 
         // When
         // We attempt to get the session
@@ -101,16 +104,15 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldNotGetNonexistentSession() throws IOException {
+    public void shouldNotGetNonexistentSession() throws IOException, NotFoundException, BadRequestException {
 
         // Given
         // No session have been created
-        String email = "blue@cat.com";
-        Session existingSession = zebedee.sessions.create(email);
+        Credentials credentials = builder.administratorCredentials;
 
         // When
         // We try to get a session
-        Session session = zebedee.sessions.get(Random.id());
+        Session session = zebedee.openSession(credentials);
 
         // Then
         // No session should be returned
@@ -118,15 +120,15 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldNotThrowErrorForNullSessionToken() throws IOException {
+    public void shouldNotThrowErrorForNullSessionToken() throws IOException, NotFoundException, BadRequestException {
 
         // Given
         // An empty session token
-        String token = null;
+        Credentials token = null;
 
         // When
         // We try to get a session
-        Session session = zebedee.sessions.get(token);
+        Session session = zebedee.openSession(token);
 
         // Then
         // No error should be thrown
@@ -134,12 +136,12 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldGetSessionConcurrently() throws IOException, InterruptedException {
+    public void shouldGetSessionConcurrently() throws IOException, InterruptedException, NotFoundException, BadRequestException {
 
         // Given
         // A session has been created
-        String email = "blue@cat.com";
-        Session existingSession = zebedee.sessions.create(email);
+        Credentials credentials = builder.administratorCredentials;
+        Session existingSession = zebedee.openSession(credentials);
 
 
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -164,16 +166,16 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldFindSession() throws IOException {
+    public void shouldFindSession() throws IOException, NotFoundException, BadRequestException {
 
         // Given
         // A session has been created
-        String email = "blue@cat.com";
-        Session existingSession = zebedee.sessions.create(email);
+        Credentials credentials = builder.administratorCredentials;
+        Session existingSession = zebedee.openSession(credentials);
 
         // When
         // We attempt to get the session
-        Session session = zebedee.sessions.find(email);
+        Session session = zebedee.sessions.find(credentials.email);
 
         // Then
         // The expected session should be returned
@@ -214,12 +216,12 @@ public class SessionsTest {
     }
 
     @Test
-    public void shouldExpireSessions() throws IOException, InterruptedException {
+    public void shouldExpireSessions() throws IOException, InterruptedException, NotFoundException, BadRequestException {
 
         // Given
         // A short expiry time and a session
-        String email = "byebye@example.com";
-        Session session = zebedee.sessions.create(email);
+        Credentials credentials = builder.administratorCredentials;
+        Session session = zebedee.openSession(credentials);
         Sessions.expiryUnit = Calendar.MILLISECOND;
         Sessions.expiryAmount = 1;
 

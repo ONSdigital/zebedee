@@ -50,6 +50,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldFindCollection() throws Exception {
+        zebedee.openSession(builder.administratorCredentials);
         Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(
@@ -79,6 +80,7 @@ public class CollectionsTest {
     public void shouldReturnNullIfNotFound() throws Exception {
 
         Collections.CollectionList collections = new Collections.CollectionList();
+        zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
                 new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
@@ -91,6 +93,7 @@ public class CollectionsTest {
     @Test
     public void shouldHaveCollectionForName() throws Exception {
         Collections.CollectionList collectionList = new Collections.CollectionList();
+        zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
                 new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
@@ -114,7 +117,7 @@ public class CollectionsTest {
         // Given
         // A null collection
         Collection collection = null;
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We attempt to approve
@@ -133,7 +136,7 @@ public class CollectionsTest {
         // A null collection
         Collection collection = null;
         String uri = "test.json";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We attempt to list directory
@@ -152,7 +155,7 @@ public class CollectionsTest {
         // A null collection
         Collection collection = null;
         String uri = "test.json";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We attempt to complete
@@ -171,7 +174,7 @@ public class CollectionsTest {
         // A null collection
         Collection collection = null;
         String uri = "test.json";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We attempt to delete
@@ -190,7 +193,7 @@ public class CollectionsTest {
         // A null collection
         Collection collection = null;
         String uri = "test.json";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         HttpServletResponse response = null;
 
         // When
@@ -210,7 +213,7 @@ public class CollectionsTest {
         // A null collection
         Collection collection = null;
         String uri = "test.json";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         HttpServletRequest request = null;
         InputStream inputStream = null;
 
@@ -232,7 +235,7 @@ public class CollectionsTest {
         // A null collection
         Collection collection = null;
         String uri = "test.json";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We attempt to call the method
@@ -251,7 +254,7 @@ public class CollectionsTest {
         Collection collection = null;
         String uri = "test.json";
         String toUri = "testnew.json";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When we attempt to call the method
         zebedee.collections.moveContent(session, collection, uri, toUri);
@@ -268,7 +271,7 @@ public class CollectionsTest {
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         String uri = "";
         String toUri = "testnew.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
 
         // When we attempt to call the method
         zebedee.collections.moveContent(session, collection, uri, toUri);
@@ -285,7 +288,7 @@ public class CollectionsTest {
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         String uri = "test";
         String toUri = "";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
 
         // When we attempt to call the method
         zebedee.collections.moveContent(session, collection, uri, toUri);
@@ -453,7 +456,7 @@ public class CollectionsTest {
 
         // Given
         // A null session
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         String uri = null;
         HttpServletResponse response = null;
@@ -473,7 +476,7 @@ public class CollectionsTest {
 
         // Given
         // A null session
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         String uri = null;
         HttpServletRequest request = null;
@@ -495,7 +498,7 @@ public class CollectionsTest {
 
         // Given
         // A null session
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         String uri = null;
 
@@ -515,7 +518,7 @@ public class CollectionsTest {
         // Given
         // A URI that is not in progress
         String uri = "/this/content/is/not/in/progress.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         // When
@@ -534,7 +537,7 @@ public class CollectionsTest {
         // Given
         // A URI that indicates a directory
         String uri = "/this/is/a/directory";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri + "/file.json"));
 
@@ -554,7 +557,7 @@ public class CollectionsTest {
         // Given
         // A URI that indicates a file
         String uri = "/this/is/valid/content.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri));
 
@@ -574,7 +577,7 @@ public class CollectionsTest {
         // Given
         // A URI that is in progress
         String uri = "/this/is/in/progress.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri));
 
@@ -594,7 +597,7 @@ public class CollectionsTest {
         // Given
         // A URI that is in progress
         String uri = "/this/is/complete.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri));
         assertTrue(collection.complete(builder.publisher1.email, uri));
@@ -614,7 +617,7 @@ public class CollectionsTest {
 
         // Given
         // A collection that's ready to approve
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         // When
@@ -634,7 +637,7 @@ public class CollectionsTest {
 
         // Given
         // A collection that's approved.
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         zebedee.collections.approve(collection, session);
 
@@ -656,7 +659,7 @@ public class CollectionsTest {
 
         // Given
         // A collection that's not been approved.
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         // When
@@ -688,12 +691,12 @@ public class CollectionsTest {
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnUnlock()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException {
+            ConflictException, NotFoundException {
 
         // Given
         // A null collection
         Collection collection = null;
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We attempt to approve
@@ -711,7 +714,7 @@ public class CollectionsTest {
         // Given
         // A directory that doesn't exist
         String uri = "/this/directory/doesnt/exist";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         // When
@@ -730,7 +733,7 @@ public class CollectionsTest {
         // Given
         // A URI that points to a file
         String uri = "/this/is/a/file.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri));
 
@@ -752,7 +755,7 @@ public class CollectionsTest {
         String uri = "/this/is/a/directory";
         String file = "file.json";
         String folder = "folder";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri + "/" + file));
         assertTrue(collection.create(builder.publisher1.email, uri + "/" + folder + "/" + file));
@@ -777,7 +780,7 @@ public class CollectionsTest {
         String uri = "/this/is/a/directory";
         String file = "file.json";
         String folder = "folder";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
 
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri + "/" + file));
@@ -805,7 +808,7 @@ public class CollectionsTest {
         // Given
         // A collection with some content in it
         String uri = "/this/is/some/content.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri));
 
@@ -824,7 +827,7 @@ public class CollectionsTest {
 
         // Given
         // An empty collection
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         // When
@@ -844,7 +847,7 @@ public class CollectionsTest {
         // Given
         // A nonexisten file
         String uri = "/this/file/doesnt/exist.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         HttpServletResponse response = null;
 
@@ -864,7 +867,7 @@ public class CollectionsTest {
         // Given
         // A nonexisten file
         String uri = "/this/is/a/directory/";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri + "file.json"));
         HttpServletResponse response = null;
@@ -885,7 +888,7 @@ public class CollectionsTest {
         // Given
         // A nonexisten file
         String uri = "/file.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri));
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
@@ -908,7 +911,7 @@ public class CollectionsTest {
         // Given
         // A directory instead of a file
         String uri = "/this/is/a/directory/";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri + "file.json"));
         HttpServletRequest request = null;
@@ -930,7 +933,7 @@ public class CollectionsTest {
         // Given
         // A file in a different collection
         String uri = "/this/is/a/file/in/another/collection.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         Collection otherCollection = new Collection(builder.collections.get(1), zebedee);
         assertTrue(otherCollection.create(builder.publisher1.email, uri));
@@ -953,7 +956,7 @@ public class CollectionsTest {
         // Given
         // A file being edited in a different collection
         String uri = "/this/is/a/file/in/another/collection.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         Collection otherCollection = new Collection(builder.collections.get(1), zebedee);
         Path path = zebedee.published.toPath(uri);
@@ -979,7 +982,7 @@ public class CollectionsTest {
         // Given
         // A new file
         String uri = "/this/a/file.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         HttpServletRequest request = mock(HttpServletRequest.class);
         InputStream inputStream = mock(InputStream.class);
@@ -1004,7 +1007,7 @@ public class CollectionsTest {
         // Given
         // A file that doesn't exist in the collection
         String uri = "/this/file/does/not/exist.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         // When
@@ -1023,7 +1026,7 @@ public class CollectionsTest {
         // Given
         // A file that doesn't exist in the collection
         String uri = "/this/is/a/file.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         collection.create(builder.publisher1.email, uri);
 
@@ -1046,7 +1049,7 @@ public class CollectionsTest {
         // A file that doesn't exist in the collection
         String folderUri = "/this/is/a/folder/";
         String fileUri = folderUri + "file.json";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         collection.create(builder.publisher1.email, fileUri);
 
@@ -1089,6 +1092,7 @@ public class CollectionsTest {
 
         // Given
         // A collection
+        zebedee.openSession(builder.administratorCredentials);
         Collection collection = Collection.create(
                 new CollectionDescription("collection"), zebedee, builder.administrator.email);
 

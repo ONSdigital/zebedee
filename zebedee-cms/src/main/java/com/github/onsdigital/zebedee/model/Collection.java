@@ -152,9 +152,9 @@ public class Collection {
         }
 
         // Encryption
-        User user = zebedee.users.get(email);
-        user.keyring.put(collectionDescription.id, Keys.newSecretKey());
-        Encryption.distributeCollectionKey(zebedee, zebedee.sessions.get(email), collection);
+        Encryption.assignKeyToSignedInUser(zebedee, zebedee.sessions.find(email), collection, Keys.newSecretKey());
+
+        // Encryption.distributeCollectionKey(zebedee, zebedee.sessions.find(email), collection);
 
         return collection;
     }

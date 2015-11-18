@@ -1,6 +1,10 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -231,5 +235,34 @@ public class Zebedee {
             }
         }
         Files.delete(path);
+    }
+
+    /**
+     * Open a user session
+     *
+     * This is a zebedee level operation since we need to unlock the keyring
+     *
+     * @param credentials
+     * @return
+     * @throws IOException
+     * @throws NotFoundException
+     * @throws BadRequestException
+     */
+    public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
+        if (credentials == null) return null;
+
+        // Get the user
+        User user = users.get(credentials.email);
+
+        // Create a session
+        Session session = sessions.create(user);
+
+        // Unlock and cache keyring
+        if (user == null) return null;
+        user.keyring.unlock(credentials.password);
+        keyringCache.put(user);
+
+        // Return a session
+        return session;
     }
 }

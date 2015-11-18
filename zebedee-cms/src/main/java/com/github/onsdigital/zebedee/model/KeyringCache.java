@@ -58,6 +58,22 @@ public class KeyringCache {
     }
 
     /**
+     * Gets the specified session's keyring, if present in the cache.
+     *
+     * @param session The session whose {@link Keyring} is to be retrieved.
+     * @return The {@link Keyring} if present, or null.
+     * @throws IOException If a general error occurs.
+     */
+    public  Keyring get(Session session) throws IOException {
+        Keyring result = null;
+
+        if (session != null) {
+            result = keyringMap.get(session);
+        }
+        return result;
+    }
+
+    /**
      * Removes a keyring, if present, from the cache, based on an expired session.
      *
      * @param session The expired {@link Session} for which the {@link Keyring} is to be removed.

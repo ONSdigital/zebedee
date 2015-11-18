@@ -47,6 +47,10 @@ public class CollectionTest {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
         collection = new Collection(builder.collections.get(1), zebedee);
+
+        zebedee.openSession(builder.administratorCredentials);
+        zebedee.openSession(builder.publisher1Credentials);
+
         publisher1Email = builder.publisher1.email;
     }
 

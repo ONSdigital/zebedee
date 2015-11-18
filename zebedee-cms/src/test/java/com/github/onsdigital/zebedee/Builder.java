@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -45,6 +46,11 @@ public class Builder {
     public User publisher2;
     public User reviewer1;
     public User reviewer2;
+    public Credentials administratorCredentials;
+    public Credentials publisher1Credentials;
+    public Credentials publisher2Credentials;
+    public Credentials reviewer1Credentials;
+    public Credentials reviewer2Credentials;
     public Team labourMarketTeam;
     public Team inflationTeam;
 
@@ -189,10 +195,12 @@ public class Builder {
             Serialiser.serialise(outputStream, administrator);
         }
 
+
         publisher1 = clone(publisher1Template);
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher1.email) + ".json"))) {
             Serialiser.serialise(outputStream, publisher1);
         }
+
 
         publisher2 = clone(publisher2Template);
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher2.email) + ".json"))) {
@@ -208,6 +216,12 @@ public class Builder {
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer2.email) + ".json"))) {
             Serialiser.serialise(outputStream, reviewer2);
         }
+
+        administratorCredentials = userCredentials(administrator);
+        publisher1Credentials = userCredentials(publisher1);
+        publisher2Credentials = userCredentials(publisher2);
+        reviewer1Credentials = userCredentials(reviewer1);
+        reviewer2Credentials = userCredentials(reviewer2);
 
         Path sessions = zebedee.resolve(Zebedee.SESSIONS);
         Files.createDirectories(sessions);
@@ -242,7 +256,12 @@ public class Builder {
             Serialiser.serialise(output, accessMapping);
         }
     }
-
+    private Credentials userCredentials(User user) {
+        Credentials credentials = new Credentials();
+        credentials.email = user.email;
+        credentials.password = "password";
+        return credentials;
+    }
 
     /**
      * Constructor to build an instance of zebedee using a predefined set of content

@@ -3,8 +3,6 @@ package com.github.onsdigital.zebedee.reader.api;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.content.page.taxonomy.TaxonomyLandingPage;
-import com.github.onsdigital.zebedee.content.page.taxonomy.base.TaxonomyNode;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -21,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 
 import static com.github.onsdigital.zebedee.util.URIUtils.getLastSegment;
@@ -53,6 +52,12 @@ public class ReadRequestHandler {
         this.reader = new ZebedeeReader(language);
     }
 
+    /**
+     * set authorisation handler
+     */
+    public static void setAuthorisationHandler(AuthorisationHandler handler) {
+        authorisationHandler = handler;
+    }
 
     /**
      * Finds requested content , if a collection is required handles authorisation
@@ -83,7 +88,7 @@ public class ReadRequestHandler {
             try {
                 //A content in a collection should be the latest one
                 return reader.getLatestCollectionContent(collectionId, uri, dataFilter);
-            } catch (NotFoundException e) {
+            } catch (NotFoundException | NoSuchFileException e) {
                 System.out.println("Could not found " + uri + " under collection " + collectionId + " , trying published content");
             }
         }
@@ -210,21 +215,21 @@ public class ReadRequestHandler {
         authorisationHandler.authorise(request, collectionId);
     }
 
-
     /*By default tries to read collection id from cookies named collection. If not found falls back to reading from uri.*/
     private String getCollectionId(HttpServletRequest request) {
         return URIUtils.getPathSegment(request.getRequestURI(), 2);
     }
-
 
     private String extractUri(HttpServletRequest request) throws BadRequestException {
         String uri = request.getParameter("uri");
         if (StringUtils.isEmpty(uri)) {
             throw new BadRequestException("Please specify uri");
         }
+
+        uri = uri.replace(" ", "%20");
+
         return uri;
     }
-
 
     /**
      * Sorts given map by content node rather than map key
@@ -236,14 +241,6 @@ public class ReadRequestHandler {
         TreeMap<URI, ContentNode> sortedMap = new TreeMap<>(new ContentNodeComparator(nodes, false));
         sortedMap.putAll(nodes);
         return sortedMap;
-    }
-
-
-    /**
-     * set authorisation handler
-     */
-    public static void setAuthorisationHandler(AuthorisationHandler handler) {
-        authorisationHandler = handler;
     }
 
 }

@@ -51,6 +51,17 @@ public class Keyring implements Cloneable {
         return result;
     }
 
+    public Keyring emptyClone() {
+        Keyring keyring = new Keyring();
+        keyring.privateKey = this.privateKey;
+        keyring.publicKey = this.publicKey;
+        keyring.privateKeySalt = this.privateKeySalt;
+
+        Map<String , String> clonedKeyring = new ConcurrentHashMap<>();
+
+        return keyring;
+    }
+
     @Override
     public Keyring clone() {
         Keyring keyring = new Keyring();

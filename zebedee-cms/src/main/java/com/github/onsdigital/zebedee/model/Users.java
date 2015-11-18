@@ -225,6 +225,25 @@ public class Users {
     }
 
     /**
+     * Save the user file after a keyring update
+     *
+     * @param user
+     * @return
+     * @throws IOException
+     */
+    public User updateKeyring(User user) throws IOException {
+        User updated = read(user.email);
+        if (updated != null) {
+            updated.keyring = user.keyring.clone();
+
+            // Only set this to true if explicitly set:
+            updated.inactive = BooleanUtils.isTrue(user.inactive);
+            write(updated);
+        }
+        return updated;
+    }
+
+    /**
      * Delete a user account
      *
      * @param session - an admin user session

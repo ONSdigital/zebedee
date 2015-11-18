@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -15,7 +16,9 @@ import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.security.Credential;
 
+import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -147,6 +150,11 @@ public class Collection {
             collection.associateWithRelease(email, release);
             collection.save();
         }
+
+        // Encryption
+        User user = zebedee.users.get(email);
+        user.keyring.put(collectionDescription.id, Keys.newSecretKey());
+        Encryption.distributeCollectionKey(zebedee, zebedee.sessions.get(email), collection);
 
         return collection;
     }

@@ -21,6 +21,7 @@ public class CollectionDescription extends CollectionBase {
     public boolean approvedStatus;
     public boolean publishComplete;
     public String publishTransactionId;
+    public boolean isEncrypted;
 
     /**
      * events related to this collection

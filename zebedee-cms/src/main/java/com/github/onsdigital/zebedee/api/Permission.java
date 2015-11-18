@@ -27,6 +27,7 @@ public class Permission {
      * @param response             <ul>
      *                             <li>If admin is True, grants administrator permission. If admin is False, revokes</li>
      *                             <li>If editor is True, grants editing permission. If editor is False, revokes</li>
+     *                             <li>Note that admins automatically get editor permissions</li>
      *                             </ul>
      * @param permissionDefinition The email and permission details for the user.
      * @return A String message confirming that the user's permissions were updated.
@@ -42,6 +43,8 @@ public class Permission {
         // Administrator
         if (BooleanUtils.isTrue(permissionDefinition.admin)) {
             Root.zebedee.permissions.addAdministrator(permissionDefinition.email, session);
+            // Admins must be publishers so update the permissions accordingly
+            permissionDefinition.editor = true;
         } else if (BooleanUtils.isFalse(permissionDefinition.admin)) {
             Root.zebedee.permissions.removeAdministrator(permissionDefinition.email, session);
         }

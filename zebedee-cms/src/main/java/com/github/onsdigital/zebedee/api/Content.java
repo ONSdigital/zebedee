@@ -7,13 +7,14 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -63,7 +64,7 @@ public class Content {
      * @throws NotFoundException     If the file cannot be edited for some other reason
      */
     @POST
-    public boolean create(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException, UnauthorizedException, ConflictException {
+    public boolean saveContent(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException, UnauthorizedException, ConflictException {
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
@@ -74,46 +75,16 @@ public class Content {
         Collection collection = Collections.getCollection(request);
 
         String uri = request.getParameter("uri");
+        Boolean overwriteExisting = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("overwriteExisting"), "true"));
 
-        Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
-
-        return true;
-    }
-
-    /**
-     * Posts file content to the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
-     *
-     * @param request  This should contain a X-Florence-Token header for the current session
-     *                 <ul>Body should contain
-     *                 <li>Page content - JSON Serialized content</li>
-     *                 <li>File Upload - A multipart content object with part "file" as binary data </li>
-     *                 </ul>
-     * @param response Returns true or false according to whether the URI was written.
-     * @return true/false
-     * @throws IOException           If an error occurs in processing data, typically to the filesystem, but also on the HTTP connection.
-     * @throws BadRequestException   IF the request cannot be completed because of a problem with request parameters
-     * @throws UnauthorizedException If the user does not have publisher permission.
-     * @throws ConflictException     If the URI is being edited in another collection
-     * @throws NotFoundException     If the file cannot be edited for some other reason
-     */
-    @PUT
-    public boolean update(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException, UnauthorizedException, ConflictException {
-
-        // We have to get the request InputStream before reading any request parameters
-        // otherwise the call to get a request parameter will actually consume the body:
-        InputStream requestBody = request.getInputStream();
-
-        Session session = Root.zebedee.sessions.get(request);
-
-        Collection collection = Collections.getCollection(request);
-
-        String uri = request.getParameter("uri");
-
-        Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
+        if (overwriteExisting) {
+            Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
+        } else {
+            Root.zebedee.collections.createContent(collection, uri, session, request, requestBody);
+        }
 
         return true;
     }
-
 
     /**
      * Deletes file content from the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>

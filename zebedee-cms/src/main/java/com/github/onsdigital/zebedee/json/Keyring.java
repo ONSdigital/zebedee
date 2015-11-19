@@ -51,6 +51,9 @@ public class Keyring implements Cloneable {
         return result;
     }
 
+    public int size() {
+        return keyring.size();
+    }
     public Keyring emptyClone() {
         Keyring keyring = new Keyring();
         keyring.privateKey = this.privateKey;
@@ -146,7 +149,9 @@ public class Keyring implements Cloneable {
                 // Error decrypting key
                 Log.print("Error recovering encryption key for collection " + collectionId + ": " + e.getMessage());
             }
-        } else {
+        }
+
+        if (result == null) {
             Log.print("Keyring has not been unlocked, cannot recover encryption key for collection " + collectionId);
         }
 

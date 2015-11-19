@@ -152,7 +152,7 @@ public class Collection {
         // Encryption
         KeyManager.assignKeyToSignedInUser(zebedee, zebedee.sessions.find(email), collection, Keys.newSecretKey());
 
-        // Encryption.distributeCollectionKey(zebedee, zebedee.sessions.find(email), collection);
+        KeyManager.distributeCollectionKey(zebedee, zebedee.sessions.find(email), collection);
 
         return collection;
     }

@@ -41,7 +41,7 @@ public class Zebedee {
     public final Content launchpad;
     public final VerificationAgent verificationAgent;
 
-    public Zebedee(Path path)  {
+    public Zebedee(Path path, boolean useVerificationAgent)  {
 
         // Validate the directory:
         this.path = path;
@@ -85,7 +85,15 @@ public class Zebedee {
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
         this.launchpad = new Content(launchpad);
-        this.verificationAgent = new VerificationAgent(this);
+        if (useVerificationAgent) {
+            this.verificationAgent = new VerificationAgent(this);
+        } else {
+            this.verificationAgent = null;
+        }
+    }
+
+    public Zebedee(Path path) {
+        this(path, true);
     }
 
     /**
@@ -254,11 +262,12 @@ public class Zebedee {
         // Get the user
         User user = users.get(credentials.email);
 
+        if (user == null) return null;
+
         // Create a session
         Session session = sessions.create(user);
 
         // Unlock and cache keyring
-        if (user == null) return null;
         user.keyring.unlock(credentials.password);
         keyringCache.put(user);
 

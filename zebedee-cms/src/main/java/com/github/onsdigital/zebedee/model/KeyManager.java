@@ -34,13 +34,13 @@ public class KeyManager {
 
         if (!zebedee.permissions.canEdit(session.email)) throw new UnauthorizedException("User unauthorised");
 
-        User sessionUser = Root.zebedee.users.get(session.email);
+        User sessionUser = zebedee.users.get(session.email);
 
         // Remove all current keys
         user.keyring = user.keyring.emptyClone();
 
         // Walk through all current collections
-        Collections.CollectionList collectionList = Root.zebedee.collections.list();
+        Collections.CollectionList collectionList = zebedee.collections.list();
         for (Collection collection: collectionList) {
             // Add all keys for
             if (zebedee.permissions.canEdit(user.email)) {
@@ -80,8 +80,13 @@ public class KeyManager {
 
     public static void assignKeyToSignedInUser(Zebedee zebedee, Session session, Collection collection, SecretKey key) throws IOException, NotFoundException, BadRequestException {
         // Update the cached keyring
+        System.out.println("assignKeyToSignedInUser: zebedee=" + ((zebedee == null)?"null":"OK") + " session=" + ((session == null)?"null":"OK") + " collection=" + ((collection == null)?"null":"OK") + " key=" + ((key == null)?"null":"OK"));
         Keyring keyring = zebedee.keyringCache.get(session);
-        keyring.put(collection.description.id, key);
+        try {
+            keyring.put(collection.description.id, key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Update the user json
         User user = zebedee.users.get(session.email);

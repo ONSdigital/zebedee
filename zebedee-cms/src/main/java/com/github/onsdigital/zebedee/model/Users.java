@@ -459,20 +459,20 @@ public class Users {
      * @param user     The user who has just logged in
      * @param password The user's plaintext password
      */
-    public void migrateToEncryption(User user, String password) throws IOException {
+    public static void migrateToEncryption(Zebedee zebedee, User user, String password) throws IOException {
 
         // Update this user if necessary:
-        migrateUserToEncryption(user, password);
+        migrateUserToEncryption(zebedee, user, password);
 
         int withKeyring = 0;
         int withoutKeyring = 0;
-        UserList users = listAll();
+        UserList users = zebedee.users.listAll();
         for (User otherUser : users) {
             if (user.keyring() != null) {
                 withKeyring++;
             } else {
                 // Migrate test users automatically:
-                if (migrateUserToEncryption(otherUser, "Dou4gl") || migrateUserToEncryption(otherUser, "password"))
+                if (migrateUserToEncryption(zebedee, otherUser, "Dou4gl") || migrateUserToEncryption(zebedee, otherUser, "password"))
                     withKeyring++;
                 else
                     withoutKeyring++;
@@ -491,7 +491,7 @@ public class Users {
      *                 otherwise there's no point because the user's {@link java.security.PrivateKey}
      *                 will be encrypted using this password, so would be unrecoverable with their actual password.
      */
-    private boolean migrateUserToEncryption(User user, String password) throws IOException {
+    private static boolean migrateUserToEncryption(Zebedee zebedee, User user, String password) throws IOException {
         boolean result = false;
         if (user.keyring() == null && user.authenticate(password)) {
             // The keyring has not been generated yet,
@@ -500,7 +500,7 @@ public class Users {
             System.out.println("Generating keyring for " + user.name + " (" + user.email + ")..");
             user.resetPassword(password);
 
-            Root.zebedee.users.update(user, "Encryption migration");
+            zebedee.users.update(user, "Encryption migration");
 
             System.out.println("Done.");
         }

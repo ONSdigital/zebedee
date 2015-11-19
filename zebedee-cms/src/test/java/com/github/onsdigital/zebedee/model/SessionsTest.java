@@ -35,16 +35,12 @@ public class SessionsTest {
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
-        zebedee = new Zebedee(builder.zebedee);
-        expiryUnit = Sessions.expiryUnit;
-        expiryAmount = Sessions.expiryAmount;
+        zebedee = new Zebedee(builder.zebedee, false);
     }
 
     @After
     public void tearDown() throws Exception {
         builder.delete();
-        Sessions.expiryUnit = expiryUnit;
-        Sessions.expiryAmount = expiryAmount;
     }
 
 
@@ -222,8 +218,7 @@ public class SessionsTest {
         // A short expiry time and a session
         Credentials credentials = builder.administratorCredentials;
         Session session = zebedee.openSession(credentials);
-        Sessions.expiryUnit = Calendar.MILLISECOND;
-        Sessions.expiryAmount = 1;
+        zebedee.sessions.setExpiry(1, Calendar.MILLISECOND);
 
         // When
         // We clear out expired sessions

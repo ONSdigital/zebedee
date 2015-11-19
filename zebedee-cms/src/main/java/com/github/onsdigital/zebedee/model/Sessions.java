@@ -22,8 +22,8 @@ import java.util.*;
 public class Sessions extends TimerTask {
 
     public static final String TOKEN_HEADER = "X-Florence-Token";
-    static int expiryUnit = Calendar.MINUTE;
-    static int expiryAmount = 60;
+    int expiryUnit = Calendar.MINUTE;
+    int expiryAmount = 60;
     Timer timer;
     private Path sessions;
 
@@ -33,6 +33,11 @@ public class Sessions extends TimerTask {
         // Run every minute after the first minute:
         timer = new Timer("Florence sessions timer", true);
         timer.schedule(this, 60 * 1000, 60 * 1000);
+    }
+
+    public void setExpiry(int expiryAmount, int expiryUnit) {
+        this.expiryAmount = expiryAmount;
+        this.expiryUnit = expiryUnit;
     }
 
     /**

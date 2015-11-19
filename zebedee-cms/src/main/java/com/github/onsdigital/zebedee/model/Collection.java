@@ -150,9 +150,12 @@ public class Collection {
         }
 
         // Encryption
-        KeyManager.assignKeyToSignedInUser(zebedee, zebedee.sessions.find(email), collection, Keys.newSecretKey());
+        Session session = zebedee.sessions.find(email);
+        if (session == null) System.out.println("Session is null");
 
-        KeyManager.distributeCollectionKey(zebedee, zebedee.sessions.find(email), collection);
+        KeyManager.assignKeyToSignedInUser(zebedee, session, collection, Keys.newSecretKey());
+
+        KeyManager.distributeCollectionKey(zebedee, session, collection);
 
         return collection;
     }

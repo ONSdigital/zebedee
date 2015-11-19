@@ -257,12 +257,18 @@ public class Zebedee {
      * @throws BadRequestException
      */
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
-        if (credentials == null) return null;
+        if (credentials == null) {
+            System.out.println("Null session due to credentials being null");
+            return null;
+        }
 
         // Get the user
         User user = users.get(credentials.email);
 
-        if (user == null) return null;
+        if (user == null) {
+            System.out.println("Null session due to users.get returning null");
+            return null;
+        }
 
         // Create a session
         Session session = sessions.create(user);

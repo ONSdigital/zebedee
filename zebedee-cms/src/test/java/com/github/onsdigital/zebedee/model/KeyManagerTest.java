@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 /**
  * Created by thomasridd on 18/11/15.
  */
-public class EncryptionTest {
+public class KeyManagerTest {
     Zebedee zebedee;
     Builder builder;
 

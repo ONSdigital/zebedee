@@ -17,7 +17,7 @@ import java.io.IOException;
 /**
  * Created by thomasridd on 18/11/15.
  */
-public class Encryption {
+public class KeyManager {
 
     /**
      * Builds a user keyring from scratch

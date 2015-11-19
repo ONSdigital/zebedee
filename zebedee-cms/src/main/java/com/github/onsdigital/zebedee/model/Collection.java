@@ -16,9 +16,7 @@ import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.security.Credential;
 
-import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -152,7 +150,7 @@ public class Collection {
         }
 
         // Encryption
-        Encryption.assignKeyToSignedInUser(zebedee, zebedee.sessions.find(email), collection, Keys.newSecretKey());
+        KeyManager.assignKeyToSignedInUser(zebedee, zebedee.sessions.find(email), collection, Keys.newSecretKey());
 
         // Encryption.distributeCollectionKey(zebedee, zebedee.sessions.find(email), collection);
 

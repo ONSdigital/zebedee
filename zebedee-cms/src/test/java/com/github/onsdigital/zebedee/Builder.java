@@ -245,7 +245,7 @@ public class Builder {
         collectionDescription.id = Random.id();
         accessMapping.collections = new HashMap<>();
 
-        Zebedee z = new Zebedee(zebedee);
+        Zebedee z = new Zebedee(zebedee, false);
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);
         labourMarketTeam = createTeam(reviewer2, teamNames[1], teams);
         accessMapping.collections.put(new Collection(collections.get(0), z).description.id, set(inflationTeam));

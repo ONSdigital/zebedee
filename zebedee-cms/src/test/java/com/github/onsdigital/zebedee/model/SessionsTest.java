@@ -108,11 +108,11 @@ public class SessionsTest {
 
         // Given
         // No session have been created
-        Credentials credentials = builder.administratorCredentials;
+        Credentials credentials = builder.publisher2Credentials;
 
         // When
         // We try to get a session
-        Session session = zebedee.openSession(credentials);
+        Session session = zebedee.sessions.find(credentials.email);
 
         // Then
         // No session should be returned

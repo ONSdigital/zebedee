@@ -21,6 +21,7 @@ import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.github.onsdigital.zebedee.util.ZipUtils;
+import com.github.onsdigital.zebedee.verification.VerificationAgent;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -175,6 +176,7 @@ public class Publisher {
 
             collection.description.AddPublishResult(result);
 
+
         } catch (IOException e) {
 
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
@@ -259,7 +261,8 @@ public class Publisher {
             @Override
             public void run() {
                 Log.print("Indexing publish report");
-                zebedee.publishedCollections.add(collectionJsonPath);
+                PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
+                zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath);
             }
         });
     }

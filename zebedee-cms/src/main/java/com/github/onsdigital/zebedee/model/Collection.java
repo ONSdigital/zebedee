@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -896,8 +897,14 @@ public class Collection {
             hasMoved = true;
         }
 
+        // Fix up links within the content
+        if (hasMoved) replaceLinksWithinCollection(email, fromUri, toUri);
+
         if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, email));
+
+
         save();
+
 
         return hasMoved;
     }
@@ -906,7 +913,61 @@ public class Collection {
         File fromFile = content.toPath(uri).toFile();
         File toFile = content.toPath(newUri).toFile();
         toFile.delete(); // delete an existing file if it is to be overwritten.
-        FileUtils.moveFile(fromFile, toFile);
+        if (fromFile.isFile()) {
+            FileUtils.moveFile(fromFile, toFile);
+        } else {
+            FileUtils.moveDirectory(fromFile, toFile);
+        }
+    }
+
+    /**
+     * Replace all uri references within a collection
+     *
+     * @param email user email
+     * @param oldUri the uri we are moving from
+     * @param newUri the uri we are moving to
+     * @throws IOException if we encounter file problems
+     */
+    private void replaceLinksWithinCollection(String email, String oldUri, String newUri) throws IOException {
+        for (String uri: inProgressUris()) {
+            File file = inProgress.toPath(uri).toFile();
+            if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
+                replaceLinksInFile(file, email, oldUri, newUri);
+            }
+        }
+        for (String uri: completeUris()) {
+            File file = complete.toPath(uri).toFile();
+            if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
+                replaceLinksInFile(file, email, oldUri, newUri);
+            }
+        }
+        for (String uri: reviewedUris()) {
+            File file = reviewed.toPath(uri).toFile();
+            if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
+                replaceLinksInFile(file, email, oldUri, newUri);
+            }
+        }
+    }
+
+    /**
+     * Replace uri references within a file
+     *
+     * @param file a file
+     * @param email email of the user replacing links
+     * @param oldUri the uri we are moving from
+     * @param newUri the uri we are moving to
+     * @throws IOException if we encounter file problems
+     */
+    private void replaceLinksInFile(File file, String email, String oldUri, String newUri) throws IOException {
+        String content;
+        try(Scanner scanner = new Scanner(file)) {
+            content = scanner.useDelimiter("//Z").next();
+        }
+
+        content = content.replaceAll("\"" + oldUri + "\"", "\"" + newUri + "\"");
+        content = content.replaceAll(oldUri + "/", newUri + "/");
+
+        Files.write(file.toPath(), content.getBytes());
     }
 }
 

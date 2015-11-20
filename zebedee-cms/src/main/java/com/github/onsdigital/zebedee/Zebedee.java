@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
+import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -34,6 +35,7 @@ public class Zebedee {
     public final Permissions permissions;
     public final Teams teams;
     public final Content launchpad;
+    public final VerificationAgent verificationAgent;
 
     public Zebedee(Path path)  {
 
@@ -71,7 +73,7 @@ public class Zebedee {
         }
 
 
-        this.collections = new Collections(collections, this) ;
+        this.collections = new Collections(collections, this);
         this.publishedCollections = new PublishedCollections(publishedCollections, this);
         this.users = new Users(users, this);
         this.keyringCache = new KeyringCache(this);
@@ -79,6 +81,7 @@ public class Zebedee {
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
         this.launchpad = new Content(launchpad);
+        this.verificationAgent = new VerificationAgent(this);
     }
 
     /**

@@ -16,6 +16,11 @@ public class UriInfo {
     public static final String CREATE = "created";
     public static final String UPDATE = "updated";
 
+    public static final String VERIFYING = "verifying";
+    public static final String VERIFY_RETRYING = "retrying";
+    public static final String VERIFY_FAILED = "failed";
+    public static final String VERIFIED = "verified";
+
     /**
      * This is a String rather than an enum to make deserialisation lenient.
      * <p/>
@@ -46,6 +51,10 @@ public class UriInfo {
     public String start;
     public String end;
     public long duration;
+    public String verificationStatus;
+    public String verificationEnd;
+    public int verificationRetryCount;
+    public String verifyMessage;
     public String sha;
     public long size;
     public String error;

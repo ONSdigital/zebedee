@@ -1,10 +1,12 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.davidcarboni.httpino.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -112,5 +114,26 @@ public class KeyManagerTest {
         // publisher B gets a key for the collection
         User user = zebedee.users.get(builder.publisher2.email);
         assertEquals(1, user.keyring.size());
+    }
+
+    @Test
+    public void assignKeyToUser_givenUserWithoutKeyring_doesNothing() throws IOException, ZebedeeException {
+        // Given
+        // a publisher user without a key
+        Session session = zebedee.openSession(builder.administratorCredentials);
+        User user = Serialiser.deserialise("{\"name\":\"Alison Davies\",\"email\":\"a.davies@ons.gov.uk\",\"passwordHash\":\"VewEkE+p3X4zuLQP6fMBkhrPgY99y2ajXwWfTAYifH71CfROf3I8XU/K0Ps0dakJ\"}", User.class);
+        zebedee.users.create(user, builder.administrator.email);
+        zebedee.permissions.addEditor(user.email, session);
+
+        // When
+        // we publish a collection
+        CollectionDescription collectionDescription = new CollectionDescription();
+        collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
+        Collection.create(collectionDescription, zebedee, session.email);
+
+        // Then
+        // they dont get a key
+        user = zebedee.users.get(user.email);
+        assertNull(user.keyring);
     }
 }

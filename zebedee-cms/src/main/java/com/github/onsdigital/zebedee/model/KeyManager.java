@@ -83,6 +83,9 @@ public class KeyManager {
      * @throws IOException
      */
     public static void assignKeyToUser(Zebedee zebedee, User user, Collection collection, SecretKey key) throws IOException {
+        // Escape in case user keyring has not been generated
+        if (user.keyring == null) return;
+
         // Add the key to the user keyring and save
         user.keyring.put(collection.description.id, key);
         zebedee.users.updateKeyring(user);

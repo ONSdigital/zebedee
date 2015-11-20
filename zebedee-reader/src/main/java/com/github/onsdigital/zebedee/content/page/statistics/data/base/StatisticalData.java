@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee.content.page.statistics.data.base;
 
+import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
-import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
 
 import java.util.List;
 
@@ -17,6 +17,7 @@ public abstract class StatisticalData extends Statistics {
     private List<String> notes;//Markdown
     private List<Link> relatedDocuments;
     private List<Link> relatedData;
+    private List<Link> topics;
 
     public List<Link> getRelatedDocuments() {
         return relatedDocuments;
@@ -56,5 +57,13 @@ public abstract class StatisticalData extends Statistics {
 
     public void setRelatedDatasets(List<Link> relatedDatasets) {
         this.relatedDatasets = relatedDatasets;
+    }
+
+    public List<Link> getTopics() {
+        return topics;
+    }
+
+    public void setTopics(List<Link> topics) {
+        this.topics = topics;
     }
 }

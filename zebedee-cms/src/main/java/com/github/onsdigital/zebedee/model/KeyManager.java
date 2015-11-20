@@ -22,7 +22,7 @@ public class KeyManager {
     /**
      * Builds a user keyring from scratch
      *
-     * @param session a session with publisher rights
+     * @param session the session that is updating user
      * @param user a user
      *
      * @throws IOException
@@ -42,9 +42,10 @@ public class KeyManager {
         // Walk through all current collections
         Collections.CollectionList collectionList = zebedee.collections.list();
         for (Collection collection: collectionList) {
-            // Add all keys for
+
             if (zebedee.permissions.canEdit(user.email)) {
-                user.keyring.put(collection.description.id, sessionUser.keyring.get(collection.description.id));
+                // Distribute to all publishers
+                assignKeyToUser(zebedee, user, collection, sessionUser.keyring.get(collection.description.id));
             } else {
                 // Distribute to team members
                 // TODO: Whatever logic assigns users to teams to collections
@@ -61,36 +62,48 @@ public class KeyManager {
      * @param collection a collection
      */
     public static void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection) throws NotFoundException, BadRequestException, IOException, UnauthorizedException {
-
+        // Get the
         SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
 
-        // Distribute to all publishers
+        // Distribute to all users that should have access
         for (User user: zebedee.users.list()) {
-            if (zebedee.permissions.canEdit(user.email)) {
-                // Add the key and save
-                user.keyring.put(collection.description.id, key);
-                zebedee.users.updateKeyring(user);
+            if (userShouldAccessCollection(zebedee, user, collection)) {
+                // Add the key
+                assignKeyToUser(zebedee, user, collection, key);
             }
         }
-
-        // Distribute to team members
-        // TODO: Whatever logic assigns users to teams to collections
-
     }
 
-    public static void assignKeyToSignedInUser(Zebedee zebedee, Session session, Collection collection, SecretKey key) throws IOException, NotFoundException, BadRequestException {
-        // Update the cached keyring
-        System.out.println("assignKeyToSignedInUser: zebedee=" + ((zebedee == null)?"null":"OK") + " session=" + ((session == null)?"null":"OK") + " collection=" + ((collection == null)?"null":"OK") + " key=" + ((key == null)?"null":"OK"));
-        Keyring keyring = zebedee.keyringCache.get(session);
-        try {
-            keyring.put(collection.description.id, key);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Update the user json
-        User user = zebedee.users.get(session.email);
-        user.keyring = keyring;
+    /**
+     *
+     * @param zebedee
+     * @param user
+     * @param collection
+     * @param key
+     * @throws IOException
+     */
+    public static void assignKeyToUser(Zebedee zebedee, User user, Collection collection, SecretKey key) throws IOException {
+        // Add the key to the user keyring and save
+        user.keyring.put(collection.description.id, key);
         zebedee.users.updateKeyring(user);
+
+        // If the user is locked in assign the key to their cached keyring
+        Session session = zebedee.sessions.find(user.email);
+        if (session != null) {
+            Keyring keyring = zebedee.keyringCache.get(session);
+            try {
+                keyring.put(collection.description.id, key);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private static boolean userShouldAccessCollection(Zebedee zebedee, User user, Collection collection) throws IOException {
+        if (zebedee.permissions.canEdit(user.email)) return true;
+
+        // TODO logic for team members
+        return false;
     }
 }

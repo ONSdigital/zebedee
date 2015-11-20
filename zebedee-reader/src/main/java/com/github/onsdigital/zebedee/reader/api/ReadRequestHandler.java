@@ -226,8 +226,6 @@ public class ReadRequestHandler {
             throw new BadRequestException("Please specify uri");
         }
 
-        uri = uri.replace(" ", "%20");
-
         return uri;
     }
 

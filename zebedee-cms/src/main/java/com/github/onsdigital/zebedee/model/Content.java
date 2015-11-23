@@ -43,7 +43,7 @@ public class Content {
     }
 
     private static boolean isNotPreviousVersions(Path p) {
-        return !p.getFileName().toString().contains(VersionedContentItem.getVersionDirectoryName());
+        return !VersionedContentItem.isVersionedUri(p.toString());
     }
 
     private static List<Path> listTimeSeriesDirectories(Path root) throws IOException {

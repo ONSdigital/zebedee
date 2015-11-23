@@ -8,15 +8,15 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.*;
+import org.apache.lucene.search.grouping.AbstractFirstPassGroupingCollector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.security.PublicKey;
 
 import static org.junit.Assert.*;
 
@@ -114,6 +114,76 @@ public class KeyManagerTest {
         // publisher B gets a key for the collection
         User user = zebedee.users.get(builder.publisher2.email);
         assertEquals(1, user.keyring.size());
+    }
+
+    private CollectionDescription publishCollection(Session session) throws IOException, ZebedeeException {
+        CollectionDescription collectionDescription = new CollectionDescription();
+        collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
+        Collection.create(collectionDescription, zebedee, session.email);
+        return collectionDescription;
+    }
+
+    @Test
+    public void publisherKeyring_whenPasswordReset_receivesAllCollections() throws ZebedeeException, IOException {
+        // Given
+        // publisher A and details for publisher B
+        Session sessionA = zebedee.openSession(builder.publisher1Credentials);
+        publishCollection(sessionA);
+
+        assertEquals(1, builder.publisher1.keyring().size());
+        assertEquals(1, builder.publisher2.keyring().size());
+        String lockedKeyring = com.github.davidcarboni.restolino.json.Serialiser.serialise(builder.publisher2.keyring);
+
+        // When
+        // publisher A resets password
+        Credentials credentials = builder.publisher2Credentials;
+        credentials.password = "Adam Bob Charlie Danny";
+        zebedee.users.setPassword(sessionA, credentials);
+
+        // Then
+        // publisher B gets a new key for the collection
+        assertEquals(1, builder.publisher2.keyring().size());
+
+    }
+
+    @Test
+    public void publisherKeyring_whenPasswordResetByAdmin_receivesNewPublicKey() throws ZebedeeException, IOException {
+        // Given
+        // admin A and details for publisher B
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        PublicKey initialPublicKey = builder.publisher2.keyring.getPublicKey();
+
+        // When
+        // admin A resets password
+        Credentials credentials = builder.publisher2Credentials;
+        credentials.password = "Adam Bob Charlie Danny";
+        zebedee.users.setPassword(sessionA, credentials);
+
+        // Then
+        // publisher B gets a new public key
+        PublicKey secondPublicKey = zebedee.users.get(builder.publisher2.email).keyring.getPublicKey();
+        assertNotEquals(initialPublicKey.toString(), secondPublicKey.toString());
+    }
+
+    @Test
+    public void publisherKeyring_whenPasswordResetBySelf_reencryptsKey() throws ZebedeeException, IOException {
+        // Given
+        // publisher A
+        Session sessionA = zebedee.openSession(builder.publisher1Credentials);
+        assertTrue(builder.publisher1.keyring().unlock(builder.publisher1Credentials.password));
+
+        // When
+        // A resets own password
+        Credentials credentials = builder.publisher1Credentials;
+        credentials.oldPassword = credentials.password;
+        credentials.password = "Adam Bob Charlie Danny";
+        zebedee.users.setPassword(sessionA, credentials);
+
+        // Then
+        // A can unlock their keyring with the new password and not the old
+        User reloaded =  zebedee.users.get(builder.publisher1.email);
+        assertTrue(reloaded.keyring.unlock(credentials.password));
+        assertFalse(reloaded.keyring.unlock(builder.publisher1Credentials.password));
     }
 
     @Test

@@ -123,26 +123,29 @@ public class KeyManagerTest {
         return collectionDescription;
     }
 
-    //@Test
+    @Test
     public void publisherKeyring_whenPasswordReset_receivesAllCollections() throws ZebedeeException, IOException {
         // Given
         // publisher A and details for publisher B
-        Session sessionA = zebedee.openSession(builder.publisher1Credentials);
-        publishCollection(sessionA);
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        CollectionDescription collection = publishCollection(sessionA);
 
-        assertEquals(1, builder.publisher1.keyring().size());
-        assertEquals(1, builder.publisher2.keyring().size());
-        String lockedKeyring = com.github.davidcarboni.restolino.json.Serialiser.serialise(builder.publisher2.keyring);
+        assertEquals(1, zebedee.users.get(builder.administrator.email).keyring().size());
+        assertEquals(1, zebedee.users.get(builder.publisher1.email).keyring().size());
+
 
         // When
         // publisher A resets password
-        Credentials credentials = builder.publisher2Credentials;
+
+        Credentials credentials = builder.publisher1Credentials;
         credentials.password = "Adam Bob Charlie Danny";
         zebedee.users.setPassword(sessionA, credentials);
 
         // Then
-        // publisher B gets a new key for the collection
-        assertEquals(1, builder.publisher2.keyring().size());
+        // publisher A retains keys
+        User user = zebedee.users.get(builder.publisher1.email);
+        assertTrue(user.keyring.unlock(credentials.password));
+        assertEquals(1, user.keyring().size());
 
     }
 

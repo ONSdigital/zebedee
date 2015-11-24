@@ -7,20 +7,20 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
+import com.github.onsdigital.zebedee.json.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by david on 12/03/2015.
@@ -45,7 +45,7 @@ public class Users {
      * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException, ConflictException, BadRequestException {
+    public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
         zebedee.users.create(session, user);
         Credentials credentials = new Credentials();
         credentials.email = user.email;
@@ -289,7 +289,7 @@ public class Users {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
-    public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException {
+    public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
         boolean result = false;
 
         if (session == null) {
@@ -318,7 +318,12 @@ public class Users {
             result = changePassword(user, credentials.oldPassword, credentials.password);
         } else if (zebedee.permissions.isAdministrator(session.email) || !zebedee.permissions.hasAdministrator()) {
             // Administrator reset, or system setup
+            Keyring originalKeyring = user.keyring.clone();
+
             resetPassword(user, credentials.password, session.email);
+            refreshKeyring(session, user.keyring, originalKeyring);
+            write(user);
+
             result = true;
         }
 
@@ -367,6 +372,18 @@ public class Users {
         write(user);
     }
 
+    private void refreshKeyring(Session session, Keyring keyring, Keyring originalKeyring) throws NotFoundException, BadRequestException, IOException {
+        Keyring adminKeyring = zebedee.keyringCache.get(session);
+
+        Set<String> collections = originalKeyring.list();
+        for (String collectionId : collections) {
+            SecretKey key = adminKeyring.get(collectionId);
+            if (key != null) {
+                keyring.put(collectionId, key);
+            }
+        }
+
+    }
     /**
      * Determines whether the given {@link com.github.onsdigital.zebedee.json.User} is valid.
      *

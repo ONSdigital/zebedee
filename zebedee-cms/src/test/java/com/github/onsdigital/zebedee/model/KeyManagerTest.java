@@ -265,7 +265,7 @@ public class KeyManagerTest {
     }
 
     @Test
-    public void schedulerKeyring_whenCollectionCreated_populates() throws IOException, ZebedeeException {
+    public void schedulerKeyring_whenCollectionCreated_getsSecretKey() throws IOException, ZebedeeException {
         // Given
         // a user that can create publications
         Session sessionA = zebedee.openSession(builder.administratorCredentials);

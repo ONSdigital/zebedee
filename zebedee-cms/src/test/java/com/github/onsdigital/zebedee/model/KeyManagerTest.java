@@ -17,6 +17,7 @@ import org.junit.Test;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.PublicKey;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 
@@ -239,6 +240,45 @@ public class KeyManagerTest {
         User user = zebedee.users.get(test.email);
         assertTrue(user.keyring.unlock("password"));
         assertEquals(1, user.keyring().size());
+
+    }
+
+    @Test
+    public void schedulerKeyring_whenUserLogsIn_populates() throws IOException, ZebedeeException {
+        // Given
+        // an instance of zebedee with two collections but an empty scheduler key cache
+        // (this simulates when zebedee restarts)
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        publishCollection(sessionA);
+        publishCollection(sessionA);
+        zebedee.keyringCache.schedulerCache = new ConcurrentHashMap<>();
+        assertEquals(0, zebedee.keyringCache.schedulerCache.size());
+
+        // When
+        // a publisher signs in
+        Session sessionB = zebedee.openSession(builder.publisher1Credentials);
+
+        // Then
+        // the key cache recovers the secret keys
+        assertEquals(2, zebedee.keyringCache.schedulerCache.size());
+
+    }
+
+    @Test
+    public void schedulerKeyring_whenCollectionCreated_populates() throws IOException, ZebedeeException {
+        // Given
+        // a user that can create publications
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        assertEquals(0, zebedee.keyringCache.schedulerCache.size());
+
+        // When
+        // they create a couple of collections
+        publishCollection(sessionA);
+        publishCollection(sessionA);
+
+        // Then
+        // keys are added to the schedulerCache keyring
+        assertEquals(2, zebedee.keyringCache.schedulerCache.size());
 
     }
 }

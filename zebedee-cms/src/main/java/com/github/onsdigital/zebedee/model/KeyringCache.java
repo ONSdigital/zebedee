@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,12 +16,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KeyringCache {
 
     private  Map<Session, Keyring> keyringMap = new ConcurrentHashMap<>();
+
+    // Publisher keyring keeps all available secret keys available
+    public Map<String, SecretKey> schedulerCache = new ConcurrentHashMap<>();
+
+
     private Zebedee zebedee;
 
     public KeyringCache(Zebedee zebedee) {
 
         this.zebedee = zebedee;
     }
+
+
 
     /**
      * Stores the specified user's keyring, if unlocked, in the cache.
@@ -32,7 +40,13 @@ public class KeyringCache {
         if (user != null && user.keyring() != null && user.keyring().isUnlocked()) {
             Session session = zebedee.sessions.find(user.email);
             if (session != null) {
+                // add the keyring by session
                 keyringMap.put(session, user.keyring());
+
+                // populate the scheduler keyring
+                for (String collectionId: user.keyring.list()) {
+                    schedulerCache.put(collectionId, user.keyring.get(collectionId));
+                }
             }
         }
     }

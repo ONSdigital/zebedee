@@ -73,6 +73,9 @@ public class KeyManager {
                 assignKeyToUser(zebedee, user, collection, key);
             }
         }
+
+        // Add to the cached scheduler keyring
+        zebedee.keyringCache.schedulerCache.put(collection.description.id, key);
     }
 
     /**

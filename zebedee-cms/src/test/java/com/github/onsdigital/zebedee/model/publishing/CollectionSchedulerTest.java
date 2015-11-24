@@ -24,6 +24,7 @@ public class CollectionSchedulerTest {
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
+        zebedee.openSession(builder.administratorCredentials);
     }
 
     @After

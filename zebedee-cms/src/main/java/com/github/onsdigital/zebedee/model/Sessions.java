@@ -2,7 +2,9 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.User;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +22,8 @@ import java.util.*;
 public class Sessions extends TimerTask {
 
     public static final String TOKEN_HEADER = "X-Florence-Token";
-    static int expiryUnit = Calendar.MINUTE;
-    static int expiryAmount = 60;
+    int expiryUnit = Calendar.MINUTE;
+    int expiryAmount = 60;
     Timer timer;
     private Path sessions;
 
@@ -31,6 +33,11 @@ public class Sessions extends TimerTask {
         // Run every minute after the first minute:
         timer = new Timer("Florence sessions timer", true);
         timer.schedule(this, 60 * 1000, 60 * 1000);
+    }
+
+    public void setExpiry(int expiryAmount, int expiryUnit) {
+        this.expiryAmount = expiryAmount;
+        this.expiryUnit = expiryUnit;
     }
 
     /**
@@ -51,25 +58,26 @@ public class Sessions extends TimerTask {
     /**
      * Creates a new session.
      *
-     * @param email The email address of the user to create a session for
+     * @param user the user to create a session for
      * @return A session for the email. If one exists it returns that else it
      * creates a new one. If the supplied email is blank then null will
      * be returned.
      * @throws java.io.IOException If a filesystem error occurs.
      */
-    public Session create(String email) throws IOException {
+    public Session create(User user) throws IOException {
         Session session = null;
 
-        if (StringUtils.isNotBlank(email)) {
+        if (StringUtils.isNotBlank(user.email)) {
 
             // Check for an existing session:
-            session = find(email);
+            session = find(user.email);
 
             // Otherwise go ahead and create
             if (session == null) {
                 session = new Session();
                 session.id = Random.id();
-                session.email = email;
+                session.email = user.email;
+
                 write(session);
             }
         }

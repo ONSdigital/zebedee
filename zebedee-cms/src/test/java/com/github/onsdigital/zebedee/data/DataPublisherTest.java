@@ -86,7 +86,7 @@ public class DataPublisherTest {
         // Loads a zebedee with two collections, each of which contain a dataset
         //
         bob = new Builder(DataPublisherTest.class, ResourceUtils.getPath("/bootstraps/data_publisher"));
-        zebedee = new Zebedee(bob.zebedee);
+        zebedee = new Zebedee(bob.zebedee, false);
         publisher = bob.createSession(bob.publisher1);
 
         collection = zebedee.collections.list().getCollection("collection");

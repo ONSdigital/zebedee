@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -31,11 +32,11 @@ public class PermissionsTest {
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
-        zebedee = new Zebedee(builder.zebedee);
+        zebedee = new Zebedee(builder.zebedee, false);
         inflationCollection = new Collection(builder.collections.get(0), zebedee);
         labourMarketCollection = new Collection(builder.collections.get(1), zebedee);
 
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // A new collection
         collectionDescription = new CollectionDescription();
@@ -105,12 +106,12 @@ public class PermissionsTest {
 
     @Test
 
-    public void shouldAddAdministrator() throws IOException, UnauthorizedException {
+    public void shouldAddAdministrator() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A new Administrator user
         String email = "Franklin.D.Roosevelt@whitehouse.gov";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We add the user as an administrator (NB case-insensitive)
@@ -122,12 +123,12 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddAdministratorIfPublisher() throws IOException, UnauthorizedException {
+    public void shouldNotAddAdministratorIfPublisher() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A new Administrator user
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
 
         // When
         // We add the user as an administrator (NB case-insensitive)
@@ -138,12 +139,12 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddAdministratorIfViewer() throws IOException, UnauthorizedException {
+    public void shouldNotAddAdministratorIfViewer() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A new Administrator user
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.reviewer1.email);
+        Session session = zebedee.openSession(builder.reviewer1Credentials);
 
         // When
         // We add the user as an administrator (NB case-insensitive)
@@ -170,12 +171,12 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldAddFirstAdministrator() throws IOException, UnauthorizedException {
+    public void shouldAddFirstAdministrator() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // The Administrator user has been removed (NB case-insensitive)
         String email = builder.administrator.email;
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.permissions.removeAdministrator(email.toUpperCase(), session);
 
         // When
@@ -203,12 +204,12 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldRemoveAdministrator() throws IOException, UnauthorizedException {
+    public void shouldRemoveAdministrator() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A short-lived Administrator user (NB case-insensitive)
         String email = "William.Henry.Harrison@whitehouse.gov";
-        Session session = zebedee.sessions.create("jukesie@example.com");
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.permissions.addAdministrator(email.toUpperCase(), session);
 
         // When
@@ -221,11 +222,11 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveAdministratorIfPublisher() throws IOException, UnauthorizedException {
+    public void shouldNotRemoveAdministratorIfPublisher() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // Users with insufficient permission
-        Session publisher = zebedee.sessions.create(builder.publisher1.email);
+        Session publisher = zebedee.openSession(builder.publisher1Credentials);
 
         // When
         // We remove the user as an administrator
@@ -236,11 +237,11 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveAdministratorIfViewer() throws IOException, UnauthorizedException {
+    public void shouldNotRemoveAdministratorIfViewer() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // Users with insufficient permission
-        Session viewer = zebedee.sessions.create(builder.reviewer1.email);
+        Session viewer = zebedee.openSession(builder.reviewer1Credentials);
 
         // When
         // We remove the user as an administrator
@@ -281,12 +282,12 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldHaveNoAdministrator() throws IOException, UnauthorizedException {
+    public void shouldHaveNoAdministrator() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // The Administrator user has been removed
         String email = builder.administrator.email;
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.permissions.removeAdministrator(email, session);
 
         // When
@@ -351,12 +352,12 @@ public class PermissionsTest {
 
     @Test
 
-    public void shouldAddPublisher() throws IOException, UnauthorizedException {
+    public void shouldAddPublisher() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A new publisher user
         String email = "Harper.Collins@publishing.team";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We add the user as a publisher (NB case-insensitive)
@@ -368,12 +369,12 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddPublisherIfPublisher() throws IOException, UnauthorizedException {
+    public void shouldNotAddPublisherIfPublisher() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A new publisher user
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
 
         // When
         // We add the user as a publisher (NB case-insensitive)
@@ -384,12 +385,12 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddPublisherIfViewer() throws IOException, UnauthorizedException {
+    public void shouldNotAddPublisherIfViewer() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A new publisher user
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.reviewer1.email);
+        Session session = zebedee.openSession(builder.reviewer1Credentials);
 
         // When
         // We add the user as a publisher (NB case-insensitive)
@@ -416,12 +417,12 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldRemovePublisher() throws IOException, UnauthorizedException {
+    public void shouldRemovePublisher() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A short-lived publisher user (NB case-insensitive)
         String email = "Pearson.Longman@whitehouse.gov";
-        Session session = zebedee.sessions.create("jukesie@example.com");
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.permissions.addAdministrator(email.toUpperCase(), session);
 
         // When
@@ -434,11 +435,11 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemovePublisherIfPublisher() throws IOException, UnauthorizedException {
+    public void shouldNotRemovePublisherIfPublisher() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // Users with insufficient permission
-        Session publisher = zebedee.sessions.create(builder.publisher1.email);
+        Session publisher = zebedee.openSession(builder.publisher1Credentials);
 
         // When
         // We remove the user as an editor
@@ -449,11 +450,11 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemovePublisherIfViewer() throws IOException, UnauthorizedException {
+    public void shouldNotRemovePublisherIfViewer() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // Users with insufficient permission
-        Session viewer = zebedee.sessions.create(builder.reviewer1.email);
+        Session viewer = zebedee.openSession(builder.reviewer1Credentials);
 
         // When
         // We remove the user as an publisher
@@ -546,11 +547,11 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldAddViewer() throws IOException, UnauthorizedException, NotFoundException {
+    public void shouldAddViewer() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A new publisher user
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
 
         // When
         // We add the user as a viewer (NB case-insensitive)
@@ -562,12 +563,12 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddViewerIfAdmin() throws IOException, UnauthorizedException, NotFoundException {
+    public void shouldNotAddViewerIfAdmin() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A session with insufficient permission
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We add the user as a viewer (NB case-insensitive)
@@ -578,12 +579,12 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddViewerIfViewer() throws IOException, UnauthorizedException, NotFoundException {
+    public void shouldNotAddViewerIfViewer() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A session with insufficient permission
         String email = "Some.Guy@example.com";
-        Session session = zebedee.sessions.create(builder.reviewer1.email);
+        Session session = zebedee.openSession(builder.reviewer1Credentials);
 
         // When
         // We add the user as a viewer (NB case-insensitive)
@@ -610,11 +611,11 @@ public class PermissionsTest {
     }
 
     @Test
-    public void shouldRemoveViewer() throws IOException, UnauthorizedException, NotFoundException {
+    public void shouldRemoveViewer() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A short-lived publisher user (NB case-insensitive)
-        Session session = zebedee.sessions.create(builder.publisher1.email);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
         zebedee.permissions.addViewerTeam(collectionDescription, team, session);
 
         // When
@@ -627,11 +628,11 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveViewerIfAdministrator() throws IOException, UnauthorizedException {
+    public void shouldNotRemoveViewerIfAdministrator() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A user with insufficient permission
-        Session publisher = zebedee.sessions.create(builder.administrator.email);
+        Session publisher = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We remove the viewer team
@@ -642,11 +643,11 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveViewerIfViewer() throws IOException, UnauthorizedException {
+    public void shouldNotRemoveViewerIfViewer() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // Users with insufficient permission
-        Session viewer = zebedee.sessions.create(builder.reviewer1.email);
+        Session viewer = zebedee.openSession(builder.reviewer1Credentials);
 
         // When
         // We remove the viewer team

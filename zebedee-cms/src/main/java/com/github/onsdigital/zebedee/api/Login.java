@@ -50,7 +50,7 @@ public class Login {
 
         // Temponary whilst encryption is being put in place.
         // This can be removed once all users have keyrings.
-        Root.zebedee.users.migrateToEncryption(user, credentials.password);
+        com.github.onsdigital.zebedee.model.Users.migrateToEncryption(Root.zebedee, user, credentials.password);
 
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
             
@@ -63,7 +63,7 @@ public class Login {
             response.setStatus(HttpStatus.OK_200);
         }
 
-        return Root.zebedee.sessions.create(credentials.email).id;
+        return Root.zebedee.openSession(credentials).id;
     }
 
 }

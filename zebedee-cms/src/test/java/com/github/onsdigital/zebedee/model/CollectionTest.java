@@ -45,8 +45,12 @@ public class CollectionTest {
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
-        zebedee = new Zebedee(builder.zebedee);
+        zebedee = new Zebedee(builder.zebedee, false);
         collection = new Collection(builder.collections.get(1), zebedee);
+
+        zebedee.openSession(builder.administratorCredentials);
+        zebedee.openSession(builder.publisher1Credentials);
+
         publisher1Email = builder.publisher1.email;
     }
 

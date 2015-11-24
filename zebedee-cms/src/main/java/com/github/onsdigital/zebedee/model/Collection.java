@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -147,6 +148,12 @@ public class Collection {
             collection.associateWithRelease(email, release);
             collection.save();
         }
+
+        // Encryption
+        // assign a key for the collection to the session user
+        KeyManager.assignKeyToUser(zebedee, zebedee.users.get(email), collection, Keys.newSecretKey());
+        // get the session user to distribute the key to all
+        KeyManager.distributeCollectionKey(zebedee, zebedee.sessions.find(email), collection);
 
         return collection;
     }

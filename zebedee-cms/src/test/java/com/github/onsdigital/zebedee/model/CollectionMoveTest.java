@@ -42,6 +42,8 @@ public class CollectionMoveTest {
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
+        zebedee.openSession(builder.publisher1Credentials);
+
         collection = Collection.create(new CollectionDescription("Collection"), zebedee, builder.publisher1.email);
         martin  = createArticle("/people/martin", "Martin");
         bedford = createArticle("/places/bedford", "Bedford");

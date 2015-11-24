@@ -32,7 +32,7 @@ public class TeamsTest {
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
-        zebedee = new Zebedee(builder.zebedee);
+        zebedee = new Zebedee(builder.zebedee, false);
         inflationCollection = new Collection(builder.collections.get(0), zebedee);
         labourMarketCollection = new Collection(builder.collections.get(1), zebedee);
     }

@@ -103,7 +103,7 @@ public class Zebedee {
      * @return A {@link Zebedee} instance representing the newly created folder.
      * @throws IOException If a filesystem error occurs.
      */
-    public static Zebedee create(Path parent) throws IOException, UnauthorizedException {
+    public static Zebedee create(Path parent) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Create the folder structure
         Path path;

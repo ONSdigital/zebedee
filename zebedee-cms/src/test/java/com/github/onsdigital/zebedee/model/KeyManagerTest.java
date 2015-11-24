@@ -210,4 +210,35 @@ public class KeyManagerTest {
         user = zebedee.users.get(user.email);
         assertNull(user.keyring);
     }
+
+    @Test
+    public void publisherKeyring_onCreation_receivesAllCollections() throws ZebedeeException, IOException {
+        // Given
+        // An administrator and a collection
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        publishCollection(sessionA);
+        assertEquals(1, zebedee.users.get(builder.administrator.email).keyring().size());
+
+        // When
+        // a new user is created and assigned Publisher permissions
+        User test = new User();
+        test.name = "Test User";
+        test.email = Random.id() + "@example.com";
+        test.inactive = false;
+        zebedee.users.create(sessionA, test);
+
+        Credentials credentials = new Credentials();
+        credentials.email = test.email;
+        credentials.password = "password";
+        zebedee.users.setPassword(sessionA, credentials);
+
+        zebedee.permissions.addEditor(test.email, sessionA);
+
+        // Then
+        // publisher A retains keys
+        User user = zebedee.users.get(test.email);
+        assertTrue(user.keyring.unlock("password"));
+        assertEquals(1, user.keyring().size());
+
+    }
 }

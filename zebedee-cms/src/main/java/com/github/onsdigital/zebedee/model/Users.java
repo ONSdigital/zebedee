@@ -62,7 +62,7 @@ public class Users {
      * @param password The plaintext password for the user.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException {
+    public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         if (zebedee.permissions.hasAdministrator()) {
             // An initial system user already exists
@@ -318,10 +318,17 @@ public class Users {
             result = changePassword(user, credentials.oldPassword, credentials.password);
         } else if (zebedee.permissions.isAdministrator(session.email) || !zebedee.permissions.hasAdministrator()) {
             // Administrator reset, or system setup
-            Keyring originalKeyring = user.keyring.clone();
+
+            // Grab current keyring (null if this is system setup)
+            Keyring originalKeyring = null;
+            if (user.keyring != null) originalKeyring = user.keyring.clone();
 
             resetPassword(user, credentials.password, session.email);
-            refreshKeyring(session, user.keyring, originalKeyring);
+
+            // Restore the user keyring (or not if this is system setup)
+            if (originalKeyring != null) KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session), originalKeyring.list());
+
+            // Save the user
             write(user);
 
             result = true;
@@ -382,7 +389,6 @@ public class Users {
                 keyring.put(collectionId, key);
             }
         }
-
     }
     /**
      * Determines whether the given {@link com.github.onsdigital.zebedee.json.User} is valid.

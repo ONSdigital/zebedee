@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
@@ -138,7 +139,7 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addEditor(String email, Session session) throws IOException, UnauthorizedException {
+    public void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -149,6 +150,13 @@ public class Permissions {
         //}
         accessMapping.digitalPublishingTeam.add(PathUtils.standardise(email));
         writeAccessMapping(accessMapping);
+
+        // Update keyring (assuming this is not the system initialisation)
+        User user = zebedee.users.get(email);
+        if (session != null && user.keyring != null) {
+            KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session));
+            zebedee.users.updateKeyring(user);
+        }
     }
 
 

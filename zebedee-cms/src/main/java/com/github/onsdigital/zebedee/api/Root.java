@@ -4,6 +4,8 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
@@ -91,7 +93,7 @@ public class Root {
                 Path taxonomy = Paths.get(".").resolve(Configuration.getContentDirectory());
                 List<Path> content = listContent(taxonomy);
                 copyContent(content, taxonomy);
-            } catch (IOException | UnauthorizedException e) {
+            } catch (IOException | UnauthorizedException | BadRequestException | NotFoundException e) {
                 throw new RuntimeException("Error initialising Zebedee ", e);
             }
         }

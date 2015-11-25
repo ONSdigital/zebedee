@@ -92,14 +92,6 @@ public class DataPublisher {
                 if (!path.toString().contains("/previous/")) {
                     csdbUris.add(uri);
                 }
-
-            } else { // 2. - it has no extension and csdb content
-                String[] sections = uri.split("/");
-                if (!sections[sections.length - 1].contains(".")) {
-                    if (fileIsCsdbFile(collection, session, uri)) {
-                        csdbUris.add(uri);
-                    }
-                }
             }
         }
 
@@ -121,38 +113,6 @@ public class DataPublisher {
 
         return results;
     }
-
-    /**
-     * Advanced checking for csdb files
-     *
-     * @param collection the collection to process
-     * @param session a user session (required for some permissions)
-     * @param uri the uri for a file
-     * @return whether the file contents is in csdb format
-     * @throws IOException
-     */
-    static boolean fileIsCsdbFile(Collection collection, Session session, String uri) throws IOException {
-        Path path = collection.find(session.email, uri);
-        boolean confirmed;
-
-        if (!Files.exists(path)) {
-            return false;
-        } // trivial cases
-        if (Files.isDirectory(path)) {
-            return false;
-        }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) { // read the top four lines and compare to .csdb pattern
-            br.readLine();
-            String firstLine = br.readLine();
-            String secondLine = br.readLine();
-            String thirdLine = br.readLine();
-            confirmed = firstLine.contains("IDENTIFIER") && secondLine.contains("PERIODICITY") && thirdLine.contains("SEASONAL ADJUSTMENT");
-        }
-
-        return confirmed;
-    }
-
 
     /************************************************************************************
      *

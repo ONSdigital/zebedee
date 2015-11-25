@@ -415,7 +415,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !zebedee.permissions.canEdit(session, collection.description)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

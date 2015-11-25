@@ -208,7 +208,7 @@ public class ReadRequestHandler {
         nodes.putAll(collectionContentParents);
     }
 
-    private void authorise(HttpServletRequest request, String collectionId) throws UnauthorizedException, IOException, NotFoundException {
+    private void authorise(HttpServletRequest request, String collectionId) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
         if (authorisationHandler == null) {
             throw new UnauthorizedException("Collection reads are not available");
         }

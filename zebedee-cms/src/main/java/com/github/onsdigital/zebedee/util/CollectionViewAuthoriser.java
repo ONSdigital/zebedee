@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.util;
 
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -17,7 +18,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
  */
 public class CollectionViewAuthoriser implements AuthorisationHandler {
     @Override
-    public void authorise(HttpServletRequest request, String collectionId) throws IOException, UnauthorizedException, NotFoundException {
+    public void authorise(HttpServletRequest request, String collectionId) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         Session session = Root.zebedee.sessions.get(request);
 
         CollectionDescription collectionDescription = new CollectionDescription();

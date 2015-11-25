@@ -134,6 +134,34 @@ public class Permissions {
     }
 
     /**
+     * Get whether a user session can edit a collection
+     *
+     * Future-proofing only at present
+     *
+     * @param session the session
+     * @param collectionDescription the collection description
+     * @return
+     * @throws IOException
+     */
+    public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
+        return canEdit(session.email) && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
+    }
+
+    /**
+     * Get whether a user can edit a collection
+     *
+     * @param user the user
+     * @param collectionDescription
+     * @return
+     * @throws IOException
+     */
+    public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
+        return canEdit(user.email) && user.keyring.list().contains(collectionDescription.id);
+    }
+
+
+
+    /**
      * Adds the specified user to the Digital Publishing team, giving them access to read and write all content.
      *
      * @param email The user's email.
@@ -180,7 +208,7 @@ public class Permissions {
     }
 
     /**
-     * Determines whether the specified user has viewing rights.
+     * Determines whether a session has viewing rights.
      *
      * @param session               The user's session. Can be null.
      * @param collectionDescription The collection to check access for.
@@ -189,7 +217,20 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        return session != null && canView(session.email, collectionDescription);
+        return session != null && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
+    }
+
+    /**
+     * Determines whether the specified user has viewing rights.
+     *
+     * @param user               The user. Can be null.
+     * @param collectionDescription The collection to check access for.
+     * @return True if the user is a member of the Digital Publishing team or
+     * the user is a content owner with access to the given path or any parent path.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
+        return user != null && user.keyring.list().contains(collectionDescription.id);
     }
 
     /**
@@ -201,10 +242,10 @@ public class Permissions {
      * the user is a content owner with access to the given path or any parent path.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
-        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
-    }
+//    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
+//        AccessMapping accessMapping = readAccessMapping();
+//        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
+//    }
 
     /**
      * Grants the given team access to the given collection.

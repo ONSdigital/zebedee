@@ -25,6 +25,10 @@
             "fields": {
               "title_raw": {
                 "type": "string"
+              },
+              "title_first_letter" : {
+                "type": "string",
+                "index_analyzer" : "first_letter_analyzer"
               }
             }
           },

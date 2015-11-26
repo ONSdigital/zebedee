@@ -17,6 +17,7 @@ import org.junit.Test;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.PublicKey;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 
@@ -123,26 +124,29 @@ public class KeyManagerTest {
         return collectionDescription;
     }
 
-    //@Test
+    @Test
     public void publisherKeyring_whenPasswordReset_receivesAllCollections() throws ZebedeeException, IOException {
         // Given
         // publisher A and details for publisher B
-        Session sessionA = zebedee.openSession(builder.publisher1Credentials);
-        publishCollection(sessionA);
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        CollectionDescription collection = publishCollection(sessionA);
 
-        assertEquals(1, builder.publisher1.keyring().size());
-        assertEquals(1, builder.publisher2.keyring().size());
-        String lockedKeyring = com.github.davidcarboni.restolino.json.Serialiser.serialise(builder.publisher2.keyring);
+        assertEquals(1, zebedee.users.get(builder.administrator.email).keyring().size());
+        assertEquals(1, zebedee.users.get(builder.publisher1.email).keyring().size());
+
 
         // When
         // publisher A resets password
-        Credentials credentials = builder.publisher2Credentials;
+
+        Credentials credentials = builder.publisher1Credentials;
         credentials.password = "Adam Bob Charlie Danny";
         zebedee.users.setPassword(sessionA, credentials);
 
         // Then
-        // publisher B gets a new key for the collection
-        assertEquals(1, builder.publisher2.keyring().size());
+        // publisher A retains keys
+        User user = zebedee.users.get(builder.publisher1.email);
+        assertTrue(user.keyring.unlock(credentials.password));
+        assertEquals(1, user.keyring().size());
 
     }
 
@@ -206,5 +210,75 @@ public class KeyManagerTest {
         // they dont get a key
         user = zebedee.users.get(user.email);
         assertNull(user.keyring);
+    }
+
+    @Test
+    public void publisherKeyring_onCreation_receivesAllCollections() throws ZebedeeException, IOException {
+        // Given
+        // An administrator and a collection
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        publishCollection(sessionA);
+        assertEquals(1, zebedee.users.get(builder.administrator.email).keyring().size());
+
+        // When
+        // a new user is created and assigned Publisher permissions
+        User test = new User();
+        test.name = "Test User";
+        test.email = Random.id() + "@example.com";
+        test.inactive = false;
+        zebedee.users.create(sessionA, test);
+
+        Credentials credentials = new Credentials();
+        credentials.email = test.email;
+        credentials.password = "password";
+        zebedee.users.setPassword(sessionA, credentials);
+
+        zebedee.permissions.addEditor(test.email, sessionA);
+
+        // Then
+        // publisher A retains keys
+        User user = zebedee.users.get(test.email);
+        assertTrue(user.keyring.unlock("password"));
+        assertEquals(1, user.keyring().size());
+
+    }
+
+    @Test
+    public void schedulerKeyring_whenUserLogsIn_populates() throws IOException, ZebedeeException {
+        // Given
+        // an instance of zebedee with two collections but an empty scheduler key cache
+        // (this simulates when zebedee restarts)
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        publishCollection(sessionA);
+        publishCollection(sessionA);
+        zebedee.keyringCache.schedulerCache = new ConcurrentHashMap<>();
+        assertEquals(0, zebedee.keyringCache.schedulerCache.size());
+
+        // When
+        // a publisher signs in
+        Session sessionB = zebedee.openSession(builder.publisher1Credentials);
+
+        // Then
+        // the key cache recovers the secret keys
+        assertEquals(2, zebedee.keyringCache.schedulerCache.size());
+
+    }
+
+    @Test
+    public void schedulerKeyring_whenCollectionCreated_getsSecretKey() throws IOException, ZebedeeException {
+        // Given
+        // a user that can create publications
+        Session sessionA = zebedee.openSession(builder.administratorCredentials);
+        assertEquals(0, zebedee.keyringCache.schedulerCache.size());
+
+        // When
+        // they create a couple of collections
+        publishCollection(sessionA);
+        publishCollection(sessionA);
+
+        // Then
+        // keys are added to the schedulerCache keyring
+        assertEquals(2, zebedee.keyringCache.schedulerCache.size());
+
     }
 }

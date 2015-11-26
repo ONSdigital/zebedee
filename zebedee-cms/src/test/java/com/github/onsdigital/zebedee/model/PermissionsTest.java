@@ -109,13 +109,13 @@ public class PermissionsTest {
     public void shouldAddAdministrator() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
-        // A new Administrator user
-        String email = "Franklin.D.Roosevelt@whitehouse.gov";
+        // A session for an administrator and a user without any permissions
+        String email = builder.reviewer1.email;
         Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
         // We add the user as an administrator (NB case-insensitive)
-        zebedee.permissions.addAdministrator(email.toUpperCase(), session);
+        zebedee.permissions.addAdministrator(email, session);
 
         // Then
         // The new user should get only admin permission:
@@ -126,8 +126,8 @@ public class PermissionsTest {
     public void shouldNotAddAdministratorIfPublisher() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
-        // A new Administrator user
-        String email = "Some.Guy@example.com";
+        // A session for an administrator and a user without any permissions
+        String email = builder.reviewer1.email;
         Session session = zebedee.openSession(builder.publisher1Credentials);
 
         // When
@@ -143,8 +143,8 @@ public class PermissionsTest {
 
         // Given
         // A new Administrator user
-        String email = "Some.Guy@example.com";
-        Session session = zebedee.openSession(builder.reviewer1Credentials);
+        String email = builder.reviewer1.email;
+        Session session = zebedee.openSession(builder.reviewer2Credentials);
 
         // When
         // We add the user as an administrator (NB case-insensitive)
@@ -159,7 +159,7 @@ public class PermissionsTest {
 
         // Given
         // A new Administrator user
-        String email = "Some.Guy@example.com";
+        String email = builder.reviewer1.email;
         Session session = null;
 
         // When
@@ -208,7 +208,7 @@ public class PermissionsTest {
 
         // Given
         // A short-lived Administrator user (NB case-insensitive)
-        String email = "William.Henry.Harrison@whitehouse.gov";
+        String email = builder.reviewer1.email;
         Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.permissions.addAdministrator(email.toUpperCase(), session);
 
@@ -356,7 +356,7 @@ public class PermissionsTest {
 
         // Given
         // A new publisher user
-        String email = "Harper.Collins@publishing.team";
+        String email = builder.reviewer1.email;
         Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When
@@ -401,7 +401,7 @@ public class PermissionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddPublisherIfNotLoggedIn() throws IOException, UnauthorizedException {
+    public void shouldNotAddPublisherIfNotLoggedIn() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Given
         // A new publisher user

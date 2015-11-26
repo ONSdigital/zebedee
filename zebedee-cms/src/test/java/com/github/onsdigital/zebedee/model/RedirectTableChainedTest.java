@@ -28,7 +28,7 @@ public class RedirectTableChainedTest {
     public void setupTests() throws IOException, CollectionNotFoundException {
         // Create a setup from
         bob = new Builder(RedirectTableChainedTest.class, ResourceUtils.getPath("/bootstraps/basic"));
-        zebedee = new Zebedee(bob.zebedee);
+        zebedee = new Zebedee(bob.zebedee, false);
     }
     @After
     public void ripdownTests() throws IOException {

@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
@@ -41,7 +43,7 @@ public class ZebedeeTest {
 	}
 
 	@Test
-	public void shouldCreate() throws IOException, UnauthorizedException {
+	public void shouldCreate() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
 		// Given
 		// No existing Zebedee structure

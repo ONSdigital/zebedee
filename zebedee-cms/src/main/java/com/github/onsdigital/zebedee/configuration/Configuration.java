@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
@@ -80,7 +81,7 @@ public class Configuration {
         return CONTENT_DIRECTORY;
     }
 
-    public static void buildUserAccounts(java.io.File file, Zebedee zebedee, Session superSession) throws IOException, UnauthorizedException, ConflictException, BadRequestException {
+    public static void buildUserAccounts(java.io.File file, Zebedee zebedee, Session superSession) throws IOException, UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
 
         try(InputStream stream = Files.newInputStream(file.toPath())) {
             UserList list = Serialiser.deserialise(stream, UserList.class);

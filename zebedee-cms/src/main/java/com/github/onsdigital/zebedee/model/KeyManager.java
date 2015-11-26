@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.json.User;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Created by thomasridd on 18/11/15.
@@ -72,6 +73,9 @@ public class KeyManager {
                 assignKeyToUser(zebedee, user, collection, key);
             }
         }
+
+        // Add to the cached scheduler keyring
+        zebedee.keyringCache.schedulerCache.put(collection.description.id, key);
     }
 
     /**
@@ -102,6 +106,39 @@ public class KeyManager {
         }
     }
 
+    /**
+     * Transfer a set of secret keys from the source keyring to the target
+     *
+     * @param targetKeyring the keyring to be populated
+     * @param sourceKeyring the keyring to take keys from
+     * @param collectionIds the keys to transfer
+     * @throws NotFoundException
+     * @throws BadRequestException
+     * @throws IOException
+     */
+    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring, Set<String> collectionIds) throws NotFoundException, BadRequestException, IOException {
+
+        for (String collectionId : collectionIds) {
+            SecretKey key = sourceKeyring.get(collectionId);
+            if (key != null) {
+                targetKeyring.put(collectionId, key);
+            }
+        }
+    }
+
+    /**
+     * Transfer all secret keys from the source keyring to the target
+     *
+     * @param targetKeyring the keyring to be populated
+     * @param sourceKeyring the keyring to take keys from
+     * @throws NotFoundException
+     * @throws BadRequestException
+     * @throws IOException
+     */
+    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring) throws NotFoundException, BadRequestException, IOException {
+        Set<String> collectionIds = sourceKeyring.list();
+        transferKeyring(targetKeyring, sourceKeyring, collectionIds);
+    }
 
     private static boolean userShouldAccessCollection(Zebedee zebedee, User user, Collection collection) throws IOException {
         if (zebedee.permissions.canEdit(user.email)) return true;

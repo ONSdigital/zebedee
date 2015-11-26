@@ -36,7 +36,7 @@ public class Permission {
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
      */
     @POST
-    public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException, UnauthorizedException, NotFoundException {
+    public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         Session session = Root.zebedee.sessions.get(request);
 

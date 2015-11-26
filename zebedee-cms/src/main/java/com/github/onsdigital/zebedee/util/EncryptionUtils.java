@@ -17,15 +17,39 @@ public class EncryptionUtils {
     /**
      * Get an output stream to write with encryption
      *
+     * @param outputStream any outputStream
+     * @param key an encryption key
+     * @return
+     * @throws IOException
+     */
+    public static OutputStream encryptionOutputStream(OutputStream outputStream, SecretKey key) throws IOException {
+        OutputStream cipherOutputStream = new Crypto().encrypt(outputStream, key);
+        return cipherOutputStream;
+    }
+    /**
+     * Get an output stream to write with encryption
+     *
      * @param path a path to a file
      * @param key an encryption key
      * @return
      * @throws IOException
      */
     public static OutputStream encryptionOutputStream(Path path, SecretKey key) throws IOException {
-        OutputStream pathOutputStream = Files.newOutputStream(path);
-        OutputStream cipherOutputStream = new Crypto().encrypt(pathOutputStream, key);
-        return cipherOutputStream;
+        return encryptionOutputStream(Files.newOutputStream(path), key);
+    }
+
+
+    /**
+     * Get an input stream to read with decryption
+     *
+     * @param inputStream any input stream
+     * @param key a decryption key
+     * @return
+     * @throws IOException
+     */
+    public static InputStream encryptionInputStream(InputStream inputStream, SecretKey key) throws IOException {
+        InputStream cipherInputStream = new Crypto().decrypt(inputStream, key);
+        return cipherInputStream;
     }
 
     /**
@@ -37,8 +61,6 @@ public class EncryptionUtils {
      * @throws IOException
      */
     public static InputStream encryptionInputStream(Path path, SecretKey key) throws IOException {
-        InputStream pathInputStream = Files.newInputStream(path);
-        InputStream cipherInputStream = new Crypto().decrypt(pathInputStream, key);
-        return cipherInputStream;
+        return encryptionInputStream(Files.newInputStream(path), key);
     }
 }

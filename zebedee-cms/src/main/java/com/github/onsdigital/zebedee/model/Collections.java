@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
@@ -8,6 +9,7 @@ import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -15,8 +17,10 @@ import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -459,18 +463,30 @@ public class Collections {
                     "Somehow we weren't able to edit the requested URI");
         }
 
+
         // Detect whether this is a multipart request
         if (ServletFileUpload.isMultipartContent(request)) {
             // If it is we're doing an xls/csv file upload
             try {
-                postDataFile(request, path);
+                if (collection.description.isEncrypted) {
+                    postDataFile(request, path, zebedee.keyringCache.get(session).get(collection.description.id));
+                } else {
+                    postDataFile(request, path);
+                }
             } catch (Exception e) {
 
             }
         } else {
             // Otherwise we're doing a json content update
-            try (OutputStream output = Files.newOutputStream(path)) {
-                org.apache.commons.io.IOUtils.copy(requestBody, output);
+            if (collection.description.isEncrypted) {
+                SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
+                try (OutputStream output = EncryptionUtils.encryptionOutputStream(path, key)) {
+                    org.apache.commons.io.IOUtils.copy(requestBody, output);
+                }
+            } else {
+                try (OutputStream output = Files.newOutputStream(path)) {
+                    org.apache.commons.io.IOUtils.copy(requestBody, output);
+                }
             }
         }
     }
@@ -516,16 +532,81 @@ public class Collections {
         return deleted;
     }
 
+    /**
+     * Save a data file from a servlet (no encryption)
+     *
+     * @param request
+     * @param path
+     * @throws FileUploadException
+     * @throws IOException
+     */
     private void postDataFile(HttpServletRequest request, Path path)
             throws FileUploadException, IOException {
 
+        ServletFileUpload upload = getServletFileUpload();
+
+        try {
+            // Read the items - this will save the values to temp files
+            for (FileItem item : upload.parseRequest(request)) {
+                item.write(path.toFile());
+            }
+        } catch (Exception e) {
+            // item.write throws Exception
+            throw new IOException("Error processing uploaded file", e);
+        }
+    }
+
+    /**
+     * Save a data file from a servlet using encryption
+     *
+     * @param request
+     * @param path
+     * @param key
+     * @throws FileUploadException
+     * @throws IOException
+     */
+    private void postDataFile(HttpServletRequest request, Path path, SecretKey key)
+            throws FileUploadException, IOException {
+
+        ServletFileUpload upload = getServletFileUpload();
+
+        try {
+            // Read the items - this will save the values to temp files
+            for (FileItem item : upload.parseRequest(request)) {
+                try(InputStream inputStream = item.getInputStream(); OutputStream outputStream = EncryptionUtils.encryptionOutputStream(path, key)) {
+                    IOUtils.copy(inputStream, outputStream);
+                }
+            }
+        } catch (Exception e) {
+            // item.write throws Exception
+            throw new IOException("Error processing uploaded file", e);
+        }
+    }
+
+    /**
+     * get a file upload object with progress listener
+     *
+     * @return
+     */
+    private ServletFileUpload getServletFileUpload() {
         // Set up the objects that do all the heavy lifting
         // PrintWriter out = response.getWriter();
         DiskFileItemFactory factory = new DiskFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
 
+        ProgressListener progressListener = getProgressListener();
+        upload.setProgressListener(progressListener);
+        return upload;
+    }
+
+    /**
+     * get a progress listener
+     *
+     * @return
+     */
+    private ProgressListener getProgressListener() {
         // Set up a progress listener that we can use to power a progress bar
-        ProgressListener progressListener = new ProgressListener() {
+        return new ProgressListener() {
             private long megaBytes = -1;
 
             @Override
@@ -537,17 +618,6 @@ public class Collections {
                 megaBytes = mBytes;
             }
         };
-        upload.setProgressListener(progressListener);
-
-        try {
-            // Read the items - this will save the values to temp files
-            for (FileItem item : upload.parseRequest(request)) {
-                item.write(path.toFile());
-            }
-        } catch (Exception e) {
-            // item.write throws Exception
-            throw new IOException("Error processing uploaded file", e);
-        }
     }
 
     /**

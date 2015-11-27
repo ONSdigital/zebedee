@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.File;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
@@ -14,7 +14,6 @@ import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -633,7 +632,7 @@ public class Collections {
     private ServletFileUpload getServletFileUpload() {
         // Set up the objects that do all the heavy lifting
         // PrintWriter out = response.getWriter();
-        DiskFileItemFactory factory = new DiskFileItemFactory();
+        EncryptedFileItemFactory factory = new EncryptedFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
 
         ProgressListener progressListener = getProgressListener();

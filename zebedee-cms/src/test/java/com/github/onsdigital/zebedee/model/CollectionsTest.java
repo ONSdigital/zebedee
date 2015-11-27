@@ -1126,6 +1126,33 @@ public class CollectionsTest {
         }
     }
 
+    @Test
+    public void shouldWriteEncryptedContent()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A new file
+        String uri = "/this/a/file.json";
+        Session session = zebedee.openSession(builder.publisher1Credentials);
+
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any(byte[].class))).thenReturn(-1);
+
+        // When
+        // We attempt to write to the directory as if it were a file
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+
+        // Then
+        // We should see the file
+        Path path = collection.getInProgressPath(uri);
+        assertNotNull(path);
+        assertTrue(Files.exists(path));
+    }
+
+
     public class UpdateCollection implements Runnable {
         public boolean failed = false;
         private Collection collection;

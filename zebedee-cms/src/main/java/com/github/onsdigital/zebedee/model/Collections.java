@@ -23,10 +23,12 @@ import org.apache.commons.lang3.StringUtils;
 import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.net.URLConnection;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,6 +70,17 @@ public class Collections {
         return listing;
     }
 
+    /**
+     * Mark a file in a collection as 'complete'
+     *
+     * @param collection
+     * @param uri
+     * @param session
+     * @throws IOException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws BadRequestException
+     */
     public void complete(Collection collection, String uri,
                          Session session) throws IOException, NotFoundException,
             UnauthorizedException, BadRequestException {
@@ -288,7 +301,7 @@ public class Collections {
     }
 
     /**
-                                             * List the given directory of a collection including the files that have already been published.
+     * List the given directory of a collection including the files that have already been published.
      *
      * @param collection the collection to overlay on master content
      * @param uri        the uri of the directory
@@ -372,16 +385,45 @@ public class Collections {
         // Guess the MIME type
         if (StringUtils.equalsIgnoreCase("json", FilenameUtils.getExtension(path.toString()))) {
             response.setContentType("application/json");
+        } else if (collection.description.isEncrypted) {
+            setEncryptedMIMEType(response, collection, session, path);
         } else {
-            String contentType = Files.probeContentType(path);
-            response.setContentType(contentType);
+            setUnencryptedMIMEType(response, path);
         }
 
-        try (InputStream input = Files.newInputStream(path)) {
-            // Write the file to the response
-            org.apache.commons.io.IOUtils.copy(input,
-                    response.getOutputStream());
+        if (collection.description.isEncrypted) {
+            try (InputStream inputStream = EncryptionUtils.encryptionInputStream(path, zebedee.keyringCache.get(session).get(collection.description.id))) {
+                org.apache.commons.io.IOUtils.copy(inputStream, response.getOutputStream());
+            }
+        } else {
+            try (InputStream input = Files.newInputStream(path)) {
+                // Write the file to the response
+                org.apache.commons.io.IOUtils.copy(input, response.getOutputStream());
+            }
         }
+    }
+
+    /**
+     * Set MIME Type using an encrypted stream
+     *
+     * http://stackoverflow.com/questions/51438/getting-a-files-mime-type-in-java/847849#847849
+     *
+     * @param response
+     * @param collection
+     * @param session
+     * @param path
+     * @throws IOException
+     */
+    private void setEncryptedMIMEType(HttpServletResponse response, Collection collection, Session session, Path path) throws IOException {
+        try (InputStream stream = new BufferedInputStream(EncryptionUtils.encryptionInputStream(path, zebedee.keyringCache.get(session).get(collection.description.id)))) {
+            String contentType = URLConnection.guessContentTypeFromStream(stream);
+            response.setContentType(contentType);
+        }
+    }
+
+    private void setUnencryptedMIMEType(HttpServletResponse response, Path path) throws IOException {
+        String contentType = Files.probeContentType(path);
+        response.setContentType(contentType);
     }
 
 
@@ -586,7 +628,7 @@ public class Collections {
     /**
      * get a file upload object with progress listener
      *
-     * @return
+     * @return an upload object
      */
     private ServletFileUpload getServletFileUpload() {
         // Set up the objects that do all the heavy lifting
@@ -602,7 +644,7 @@ public class Collections {
     /**
      * get a progress listener
      *
-     * @return
+     * @return a ProgressListener object
      */
     private ProgressListener getProgressListener() {
         // Set up a progress listener that we can use to power a progress bar

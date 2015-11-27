@@ -27,15 +27,10 @@ class ZebedeeCollectionReader implements CollectionReader {
     private ContentReader complete;
     private ContentReader reviewed;
 
-    public ZebedeeCollectionReader(Zebedee zebedee, Collection collection, ContentLanguage language) {
-
+    public ZebedeeCollectionReader(Zebedee zebedee, Collection collection) {
         inProgress = getContentReader(zebedee.collections.path, getConfiguration().getInProgressFolderName());
         complete = getContentReader(zebedee.collections.path, getConfiguration().getCompleteFolderName());
         reviewed = getContentReader(zebedee.collections.path, getConfiguration().getReviewedFolderName());
-
-        inProgress.setLanguage(language);
-        reviewed.setLanguage(language);
-        complete.setLanguage(language);
     }
 
     /**
@@ -91,6 +86,25 @@ class ZebedeeCollectionReader implements CollectionReader {
         parents.putAll(getParentsQuite(path, complete));//overwrites reviewed content if appears in both places
         parents.putAll(getParentsQuite(path, inProgress));//overwrites complete and reviewed content if appears in both places
         return parents;
+    }
+
+    @Override
+    public Page getLatestContent(String path) throws ZebedeeException, IOException {
+        Page content = getLatestQuite(path, inProgress);
+        if (content == null) {
+            content = getLatestQuite(path, complete);
+            if (content == null) {
+                content = reviewed.getLatestContent(path);
+            }
+        }
+        return content;
+    }
+
+    @Override
+    public void setLanguage(ContentLanguage language) {
+        inProgress.setLanguage(language);
+        reviewed.setLanguage(language);
+        complete.setLanguage(language);
     }
 
     private Page findContent(String path) throws IOException, ZebedeeException {
@@ -160,19 +174,6 @@ class ZebedeeCollectionReader implements CollectionReader {
             return Collections.emptyMap();
         }
     }
-
-    @Override
-    public Page getLatestContent(String path) throws ZebedeeException, IOException {
-        Page content = getLatestQuite(path, inProgress);
-        if (content == null) {
-            content = getLatestQuite(path, complete);
-            if (content == null) {
-                content = reviewed.getLatestContent(path);
-            }
-        }
-        return content;
-    }
-
 
     private ContentReader getContentReader(Path collectionPath, String folderName) {
         return new ContentReader(collectionPath.resolve(folderName));

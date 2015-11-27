@@ -41,7 +41,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * ContentReader will find file relative to root folder. Paths might start with forward slash or not.
  * <p>
  */
-class ContentReader {
+public class ContentReader {
 
     private final Path ROOT_FOLDER;
     private ContentLanguage language = ContentLanguage.en;

@@ -349,8 +349,10 @@ public class Collections {
         collection.delete();
     }
 
-    public void readContent(Collection collection, String uri, boolean resolveReferences, Session session,
-                            HttpServletResponse response) throws IOException,
+    public void readContent(
+            Collection collection, String uri, Session session,
+            HttpServletResponse response
+    ) throws IOException,
             UnauthorizedException, BadRequestException, NotFoundException {
 
         // Collection (null check before authorisation check)

@@ -26,6 +26,10 @@ analysis :
         - standard
         - stop
         - porter_stem
+    first_letter_analyzer :
+      #Extracts first letter, elastic search does not seem to have a prefix aggregation, as a workaround a calculated first letter is indexed for a to z tool
+      type : pattern
+      pattern: "(?<=^.).*"
   char_filter :
     char_mapping :
       type: mapping

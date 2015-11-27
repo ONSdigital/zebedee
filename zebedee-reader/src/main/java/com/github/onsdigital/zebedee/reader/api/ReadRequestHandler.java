@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.reader.api;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -72,6 +73,10 @@ public class ReadRequestHandler {
      */
     public Content findContent(HttpServletRequest request, DataFilter dataFilter) throws ZebedeeException, IOException {
         String uri = extractUri(request);
+        return find(request, dataFilter, uri);
+    }
+
+    public Content find(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         String collectionId = getCollectionId(request);
         String lastSegment = getLastSegment(uri);
         if (LATEST.equalsIgnoreCase(lastSegment)) {
@@ -79,8 +84,8 @@ public class ReadRequestHandler {
         } else {
             return getContent(request, collectionId, dataFilter, uri);
         }
-
     }
+
 
     private Content getLatestContent(HttpServletRequest request, String collectionId, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         if (collectionId != null) {

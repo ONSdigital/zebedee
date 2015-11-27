@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.json;
 
 import com.github.onsdigital.zebedee.json.publishing.Result;
-import com.github.onsdigital.zebedee.model.Collection;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +37,15 @@ public class CollectionDescription extends CollectionBase {
      * each attempt at publishing this collection.
      */
     public List<Result> publishResults;
+
+    /**
+     * TODO: Temporary property.
+     *
+     * This is only needed during migration to encrypted collections.
+     * Once all collections are encrypted this will become redundant.
+     *
+     */
+    public boolean encrypted;
 
     /**
      * Default constuructor for serialisation.

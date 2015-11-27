@@ -9,7 +9,7 @@ export PACKAGE_PREFIX=com.github.onsdigital.zebedee.reader.api
 export CONTENT_DIR="content"
 
 # Development: reloadable
-mvn clean package dependency:copy-dependencies && \
+mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
 java $JAVA_OPTS \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Dcontent_dir=$CONTENT_DIR \

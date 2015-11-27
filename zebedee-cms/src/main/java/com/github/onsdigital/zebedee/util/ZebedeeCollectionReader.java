@@ -47,7 +47,6 @@ class ZebedeeCollectionReader implements CollectionReader {
         return findContent(path);
     }
 
-
     @Override
     public Resource getResource(String path) throws ZebedeeException, IOException {
         return findResource(path);

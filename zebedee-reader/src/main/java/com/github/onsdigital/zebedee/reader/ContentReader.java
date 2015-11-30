@@ -65,7 +65,7 @@ public class ContentReader {
      * @return
      * @throws IOException
      */
-    static String determineMimeType(Path path) throws IOException {
+    protected static String determineMimeType(Path path) throws IOException {
         String mimeType = probeContentType(path);
 
         // probeContentType returning null for a number of file types. (images on mac at least)
@@ -261,7 +261,7 @@ public class ContentReader {
     }
 
     //Returns uri of content calculating relative to root folder
-    private URI toRelativeUri(Path node) {
+    protected URI toRelativeUri(Path node) {
         Path rootFolder = getRootFolder();
         return PathUtils.toRelativeUri(rootFolder, node);
     }

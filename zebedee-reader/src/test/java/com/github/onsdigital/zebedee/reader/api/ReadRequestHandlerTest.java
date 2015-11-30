@@ -6,8 +6,11 @@ import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.reader.FakeCollectionReaderFactory;
+import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,12 +30,19 @@ import static org.mockito.Mockito.when;
  */
 public class ReadRequestHandlerTest {
 
+    static {
+        ReaderConfiguration.init("target/test-content");
+
+        if (ZebedeeReader.getCollectionReaderFactory() == null) {
+            ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));
+        }
+    }
+
     HttpServletRequest request = mock(HttpServletRequest.class);
     private ReadRequestHandler readRequestHandler;
 
     @Before
     public void initialize() {
-        ReaderConfiguration.init("target/test-content");
         readRequestHandler = new ReadRequestHandler();
     }
 
@@ -109,6 +119,7 @@ public class ReadRequestHandlerTest {
     }
 
     private void shouldOverlayCollectionPaths() throws IOException, ZebedeeException {
+        when(request.getHeader(RequestUtils.TOKEN_HEADER)).thenReturn("any token is fine in test");
         when(request.getParameter("uri")).thenReturn("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         when(request.getRequestURI()).thenReturn("/breadcrumb/testcollection-testid/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         Collection<ContentNode> parents = readRequestHandler.getParents(request);

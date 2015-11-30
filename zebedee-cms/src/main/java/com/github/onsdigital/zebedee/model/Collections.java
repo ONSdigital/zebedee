@@ -15,7 +15,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -347,61 +346,6 @@ public class Collections {
 
         // Go ahead
         collection.delete();
-    }
-
-    public void readContent(
-            Collection collection, String uri, Session session,
-            HttpServletResponse response
-    ) throws IOException,
-            UnauthorizedException, BadRequestException, NotFoundException {
-
-        // Collection (null check before authorisation check)
-        if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
-        }
-
-        // Authorisation
-        if (session == null
-                || !zebedee.permissions.canView(session.email,
-                collection.description)) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
-        }
-
-        // Requested path
-        if (StringUtils.isBlank(uri)) {
-            throw new BadRequestException("Please provide a URI");
-        }
-
-        // Path
-        Path path = collection.find(session.email, uri);
-        if (path == null) {
-            throw new NotFoundException("URI not found in collection: " + uri);
-        }
-
-        // Check we're requesting a file:
-        if (Files.isDirectory(path)) {
-            throw new BadRequestException("URI does not specify a file");
-        }
-
-        // Guess the MIME type
-        if (StringUtils.equalsIgnoreCase("json", FilenameUtils.getExtension(path.toString()))) {
-            response.setContentType("application/json");
-        } else if (collection.description.isEncrypted) {
-            setEncryptedMIMEType(response, collection, session, path);
-        } else {
-            setUnencryptedMIMEType(response, path);
-        }
-
-        if (collection.description.isEncrypted) {
-            try (InputStream inputStream = EncryptionUtils.encryptionInputStream(path, zebedee.keyringCache.get(session).get(collection.description.id))) {
-                org.apache.commons.io.IOUtils.copy(inputStream, response.getOutputStream());
-            }
-        } else {
-            try (InputStream input = Files.newInputStream(path)) {
-                // Write the file to the response
-                org.apache.commons.io.IOUtils.copy(input, response.getOutputStream());
-            }
-        }
     }
 
     /**

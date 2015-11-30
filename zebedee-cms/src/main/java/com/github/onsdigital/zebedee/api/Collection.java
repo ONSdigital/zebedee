@@ -97,8 +97,6 @@ public class Collection {
             throw new ConflictException("Could not create collection. A collection with this name already exists.");
         }
 
-        collectionDescription.isEncrypted = true;
-
         com.github.onsdigital.zebedee.model.Collection collection = com.github.onsdigital.zebedee.model.Collection.create(
                 collectionDescription, Root.zebedee, session.email);
 

@@ -4,18 +4,15 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
-import com.github.onsdigital.zebedee.reader.util.AuthorisationHandler;
 import junit.framework.AssertionFailedError;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
@@ -30,8 +27,8 @@ import static org.mockito.Mockito.when;
  */
 public class ReadRequestHandlerTest {
 
-    private ReadRequestHandler readRequestHandler;
     HttpServletRequest request = mock(HttpServletRequest.class);
+    private ReadRequestHandler readRequestHandler;
 
     @Before
     public void initialize() {
@@ -79,7 +76,6 @@ public class ReadRequestHandlerTest {
 
     //Collection reads should be available without zebedee cms module running
     private void shouldFailReadingCollection() throws Exception {
-        ReadRequestHandler.setAuthorisationHandler(null);
         when(request.getRequestURI()).thenReturn("/browsetree/testcollection-testid/economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk");
         try {
             readRequestHandler.getTaxonomy(request, 1);
@@ -115,12 +111,6 @@ public class ReadRequestHandlerTest {
     private void shouldOverlayCollectionPaths() throws IOException, ZebedeeException {
         when(request.getParameter("uri")).thenReturn("employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         when(request.getRequestURI()).thenReturn("/breadcrumb/testcollection-testid/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
-        ReadRequestHandler.setAuthorisationHandler(new AuthorisationHandler() {
-            @Override
-            public void authorise(HttpServletRequest request, String collectionId) throws IOException, UnauthorizedException, NotFoundException {
-                return;
-            }
-        });
         Collection<ContentNode> parents = readRequestHandler.getParents(request);
         assertTrue(parents.size() == 2);
         Iterator<ContentNode> iterator = parents.iterator();

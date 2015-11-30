@@ -27,15 +27,22 @@ analysis :
         - stop
         - porter_stem
     first_letter_analyzer :
-      #Extracts first letter, elastic search does not seem to have a prefix aggregation, as a workaround a calculated first letter is indexed for a to z tool
-      type : pattern
-      pattern: "(?<=^.).*"
+      #Extracts first letter, elastic search does not seem to have a prefix aggregation, as a workaround first letter is indexed for a to z tool
+      #Not that the pattern skips any non-letter character at the beginning
+      tokenizer : keyword
+      filter :
+        - lowercase
+        - first_letter
   char_filter :
     char_mapping :
       type: mapping
       mappings :
         - "&=>and"
   filter :
+    first_letter :
+      type : pattern_replace
+      pattern: "^[^a-zA-Z]*(.).*"
+      replacement: "$1"
     ons_synonyms :
       type : synonym
       # stores synonyms for search engine

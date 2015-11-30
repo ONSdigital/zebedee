@@ -1,36 +1,30 @@
-package com.github.onsdigital.zebedee.util;
+package com.github.onsdigital.zebedee.reader;
 
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
-import com.github.onsdigital.zebedee.reader.util.CollectionReader;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
+public abstract class CollectionReader {
 
-class ZebedeeCollectionReader implements CollectionReader {
+    protected ContentReader inProgress;
+    protected ContentReader complete;
+    protected ContentReader reviewed;
 
-    private Zebedee zebedee;
-    private ContentReader inProgress;
-    private ContentReader complete;
-    private ContentReader reviewed;
+    protected boolean isEncrypted = false;
 
-    public ZebedeeCollectionReader(Zebedee zebedee, Collection collection) {
-        inProgress = getContentReader(zebedee.collections.path, getConfiguration().getInProgressFolderName());
-        complete = getContentReader(zebedee.collections.path, getConfiguration().getCompleteFolderName());
-        reviewed = getContentReader(zebedee.collections.path, getConfiguration().getReviewedFolderName());
+    public CollectionReader(boolean isEncrypted) {
+        this.isEncrypted = isEncrypted;
+    }
+
+    public CollectionReader() {
     }
 
     /**
@@ -42,12 +36,11 @@ class ZebedeeCollectionReader implements CollectionReader {
      * @throws NotFoundException
      * @throws IOException
      */
-    @Override
     public Page getContent(String path) throws ZebedeeException, IOException {
         return findContent(path);
     }
 
-    @Override
+
     public Resource getResource(String path) throws ZebedeeException, IOException {
         return findResource(path);
     }
@@ -58,7 +51,6 @@ class ZebedeeCollectionReader implements CollectionReader {
      * @throws ZebedeeException
      * @throws IOException
      */
-    @Override
     public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
         Map<URI, ContentNode> children = new HashMap<>();
         //TODO: Same document should not be in two different state, it should be safe to overwrite if it appears in multiple places?.
@@ -76,7 +68,6 @@ class ZebedeeCollectionReader implements CollectionReader {
      * @throws ZebedeeException
      * @throws IOException
      */
-    @Override
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Map<URI, ContentNode> parents = new HashMap<>();
         //TODO: Same document should not be in two different state, it should be safe to overwrite if it appears in multiple places?.
@@ -85,25 +76,6 @@ class ZebedeeCollectionReader implements CollectionReader {
         parents.putAll(getParentsQuite(path, complete));//overwrites reviewed content if appears in both places
         parents.putAll(getParentsQuite(path, inProgress));//overwrites complete and reviewed content if appears in both places
         return parents;
-    }
-
-    @Override
-    public Page getLatestContent(String path) throws ZebedeeException, IOException {
-        Page content = getLatestQuite(path, inProgress);
-        if (content == null) {
-            content = getLatestQuite(path, complete);
-            if (content == null) {
-                content = reviewed.getLatestContent(path);
-            }
-        }
-        return content;
-    }
-
-    @Override
-    public void setLanguage(ContentLanguage language) {
-        inProgress.setLanguage(language);
-        reviewed.setLanguage(language);
-        complete.setLanguage(language);
     }
 
     private Page findContent(String path) throws IOException, ZebedeeException {
@@ -174,8 +146,21 @@ class ZebedeeCollectionReader implements CollectionReader {
         }
     }
 
-    private ContentReader getContentReader(Path collectionPath, String folderName) {
-        return new ContentReader(collectionPath.resolve(folderName));
+    public Page getLatestContent(String path) throws ZebedeeException, IOException {
+        Page content = getLatestQuite(path, inProgress);
+        if (content == null) {
+            content = getLatestQuite(path, complete);
+            if (content == null) {
+                content = reviewed.getLatestContent(path);
+            }
+        }
+        return content;
+    }
+
+    public void setLanguage(ContentLanguage language) {
+        inProgress.setLanguage(language);
+        reviewed.setLanguage(language);
+        complete.setLanguage(language);
     }
 
 }

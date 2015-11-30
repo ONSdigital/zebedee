@@ -24,14 +24,14 @@ import static org.junit.Assert.*;
 
 /*Notice that resources must be generated for these tests to pass. Maven test phase runs after resources are generated.* */
 
-public class CollectionContentReaderTest {
+public class CollectionReaderTest {
 
-    private CollectionContentReader collectionReader;
     private final static String COLLECTION_ID = "testcollection-testid";
+    private CollectionReader collectionReader;
 
     @Before
     public void createContentReader() throws IOException, NotFoundException, CollectionNotFoundException {
-        this.collectionReader = new CollectionContentReader("target/test-content/zebedee/collections",COLLECTION_ID);
+        this.collectionReader = new FakeCollectionReader("target/test-content/zebedee/collections",COLLECTION_ID);
     }
 
     @Test

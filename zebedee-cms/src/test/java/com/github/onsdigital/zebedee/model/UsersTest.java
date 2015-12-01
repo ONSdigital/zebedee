@@ -14,7 +14,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.HEAD;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
@@ -462,7 +461,6 @@ public class UsersTest {
 
         // When
         // We set the temporary flag expliticly and update
-        credentials.temporaryPassword = true;
         zebedee.users.setPassword(selfSession, credentials);
 
         // Then

@@ -12,5 +12,4 @@ public class Credentials {
      * Optional - only needed when changing a password.
      */
     public String oldPassword;
-    public Boolean temporaryPassword;
 }

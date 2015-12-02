@@ -31,10 +31,9 @@ public class CollectionContentReader extends ContentReader {
 
     @Override
     protected Resource buildResource(Path path) throws IOException {
-
-
         Resource resource = new Resource();
         resource.setName(path.getFileName().toString());
+        resource.setMimeType(determineMimeType(path));
 
         InputStream inputStream;
 

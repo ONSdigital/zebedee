@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.article.Ar
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,14 +25,23 @@ import static org.junit.Assert.*;
 
 /*Notice that resources must be generated for these tests to pass. Maven test phase runs after resources are generated.* */
 
-public class CollectionContentReaderTest {
+public class CollectionReaderTest {
 
-    private CollectionContentReader collectionReader;
     private final static String COLLECTION_ID = "testcollection-testid";
+
+    static {
+        ReaderConfiguration.init("target/test-content/");
+
+        if (ZebedeeReader.getCollectionReaderFactory() == null) {
+            ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));
+        }
+    }
+
+    private CollectionReader collectionReader;
 
     @Before
     public void createContentReader() throws IOException, NotFoundException, CollectionNotFoundException {
-        this.collectionReader = new CollectionContentReader("target/test-content/zebedee/collections",COLLECTION_ID);
+        this.collectionReader = new FakeCollectionReader(ReaderConfiguration.getConfiguration().getCollectionsFolder(), COLLECTION_ID);
     }
 
     @Test

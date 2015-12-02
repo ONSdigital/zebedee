@@ -1,12 +1,11 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
+import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,6 +16,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.extractFilter;
+import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
 @Api
 public class Content {
@@ -35,16 +37,16 @@ public class Content {
      * @throws UnauthorizedException If the user does not have viewer permission.
      */
     @GET
-    public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
+    public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.sessions.get(request);
-        Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
-        //Resolve references to other content types by reading referenced content into requested content
-        boolean resolveReferences = request.getParameter("resolve") != null;
-        System.out.println("Reading content under " + uri + " Resolve references: " + resolveReferences);
-        Root.zebedee.collections.readContent(collection, uri, resolveReferences, session, response);
+        // Requested path
+        if (StringUtils.isBlank(uri)) {
+            throw new BadRequestException("Please provide a URI");
+        }
+
+        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findContent(request, extractFilter(request)), response);
     }
 
     /**

@@ -2,9 +2,9 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +21,6 @@ import java.util.*;
  */
 public class Sessions extends TimerTask {
 
-    public static final String TOKEN_HEADER = "X-Florence-Token";
     int expiryUnit = Calendar.MINUTE;
     int expiryAmount = 60;
     Timer timer;
@@ -88,13 +87,13 @@ public class Sessions extends TimerTask {
     /**
      * Gets the record for an existing session.
      *
-     * @param request The {@link HttpServletRequest}. The session ID will be retrieved from the {@value #TOKEN_HEADER} header.
+     * @param request The {@link HttpServletRequest}.
      * @return The requested session, unless the ID is blank or no record exists
      * for this ID.
      * @throws java.io.IOException If a filesystem error occurs.
      */
     public Session get(HttpServletRequest request) throws IOException {
-        String token = request.getHeader(TOKEN_HEADER);
+        String token = RequestUtils.getSessionId(request);
         return get(token);
     }
 

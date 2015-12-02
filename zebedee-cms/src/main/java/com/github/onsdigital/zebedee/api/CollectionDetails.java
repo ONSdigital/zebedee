@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Events;
@@ -28,7 +30,7 @@ public class CollectionDetails {
      */
     @GET
     public CollectionDetail get(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+            throws IOException, NotFoundException, BadRequestException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);

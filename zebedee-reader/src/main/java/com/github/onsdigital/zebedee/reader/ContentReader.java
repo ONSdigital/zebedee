@@ -41,7 +41,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * ContentReader will find file relative to root folder. Paths might start with forward slash or not.
  * <p>
  */
-class ContentReader {
+public class ContentReader {
 
     private final Path ROOT_FOLDER;
     private ContentLanguage language = ContentLanguage.en;
@@ -65,7 +65,7 @@ class ContentReader {
      * @return
      * @throws IOException
      */
-    static String determineMimeType(Path path) throws IOException {
+    protected static String determineMimeType(Path path) throws IOException {
         String mimeType = probeContentType(path);
 
         // probeContentType returning null for a number of file types. (images on mac at least)
@@ -261,7 +261,7 @@ class ContentReader {
     }
 
     //Returns uri of content calculating relative to root folder
-    private URI toRelativeUri(Path node) {
+    protected URI toRelativeUri(Path node) {
         Path rootFolder = getRootFolder();
         return PathUtils.toRelativeUri(rootFolder, node);
     }

@@ -348,7 +348,9 @@ public class Collection {
         Path result = null;
 
         // Does the user have permission tno see this content?
-        boolean permission = zebedee.permissions.canView(email, description);
+        boolean permission;
+        permission = zebedee.permissions.canView(email, description);
+
 
         // Only show edited material if the user has permission:
         if (permission) {
@@ -480,7 +482,7 @@ public class Collection {
                 && zebedee.isBeingEdited(uri) > 0;
 
         // Does the user have permission to edit?
-        boolean permission = zebedee.permissions.canEdit(email);
+        boolean permission = zebedee.permissions.canEdit(email, description);
 
         if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:

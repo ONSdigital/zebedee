@@ -20,43 +20,7 @@ import java.util.Set;
  */
 public class KeyManager {
 
-    /**
-     * Builds a user keyring from scratch
-     *
-     * @param session the session that is updating user
-     * @param user a user
-     *
-     * @throws IOException
-     * @throws UnauthorizedException
-     * @throws NotFoundException
-     * @throws BadRequestException
-     */
-    public void buildUserKeyring(Zebedee zebedee, Session session, User user) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
-
-        if (!zebedee.permissions.canEdit(session.email)) throw new UnauthorizedException("User unauthorised");
-
-        User sessionUser = zebedee.users.get(session.email);
-
-        // Remove all current keys
-        user.keyring = user.keyring.emptyClone();
-
-        // Walk through all current collections
-        Collections.CollectionList collectionList = zebedee.collections.list();
-        for (Collection collection: collectionList) {
-
-            if (zebedee.permissions.canEdit(user.email)) {
-                // Distribute to all publishers
-                assignKeyToUser(zebedee, user, collection, sessionUser.keyring.get(collection.description.id));
-            } else {
-                // Distribute to team members
-                // TODO: Whatever logic assigns users to teams to collections
-            }
-        }
-
-        zebedee.users.updateKeyring(user);
-    }
-
-    /**
+       /**
      * Distributes an encryption key
      *
      * @param session session for a user that possesses the key

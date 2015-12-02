@@ -16,6 +16,13 @@ import java.util.List;
 @Api
 public class Collections {
 
+    /**
+     * Get the collection defined by the given HttpServletRequest
+     *
+     * @param request the request containing the id of the collection to get.
+     * @return
+     * @throws IOException
+     */
     public static Collection getCollection(HttpServletRequest request)
             throws IOException {
 
@@ -27,6 +34,18 @@ public class Collections {
             collectionId = segments.get(1);
         }
 
+        return getCollection(collectionId);
+    }
+
+    /**
+     * Get the collection with the given collection ID.
+     *
+     * @param collectionId
+     * @return
+     * @throws IOException
+     */
+    public static Collection getCollection(String collectionId)
+            throws IOException {
         return Root.zebedee.collections.list().getCollection(collectionId);
     }
 

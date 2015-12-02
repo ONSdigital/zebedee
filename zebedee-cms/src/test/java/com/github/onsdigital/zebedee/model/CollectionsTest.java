@@ -15,10 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -184,25 +182,6 @@ public class CollectionsTest {
         // We should get the expected exception, not a null pointer.
     }
 
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnReadContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A null collection
-        Collection collection = null;
-        String uri = "test.json";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        HttpServletResponse response = null;
-
-        // When
-        // We attempt to read content
-        zebedee.collections.readContent(collection, uri, false, session, response);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnWriteContent()
@@ -372,26 +351,6 @@ public class CollectionsTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnReadContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "test.json";
-        HttpServletResponse response = null;
-
-        // When
-        // We attempt to read content
-        zebedee.collections.readContent(collection, uri, false, session, response);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnWriteContent()
             throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
@@ -447,26 +406,6 @@ public class CollectionsTest {
         zebedee.collections.moveContent(session, collection, uri, toUri);
 
         // Then we should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestIfNoUriOnReadContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A null session
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = null;
-        HttpServletResponse response = null;
-
-        // When
-        // We attempt to read content
-        zebedee.collections.readContent(collection, uri, false, session, response);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
     }
 
     @Test(expected = BadRequestException.class)
@@ -839,70 +778,6 @@ public class CollectionsTest {
         assertFalse(Files.exists(builder.collections.get(0)));
     }
 
-    @Test(expected = NotFoundException.class)
-    public void shouldThrowNotFoundForReadingNonexistentFile()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A nonexisten file
-        String uri = "/this/file/doesnt/exist.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        HttpServletResponse response = null;
-
-        // When
-        // We attempt to read the file
-        zebedee.collections.readContent(collection, uri, false, session, response);
-
-        // Then
-        // We should get the expected exception
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForReadingADirectoryAsAFile()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A nonexisten file
-        String uri = "/this/is/a/directory/";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri + "file.json"));
-        HttpServletResponse response = null;
-
-        // When
-        // We attempt to read the file
-        zebedee.collections.readContent(collection, uri, false, session, response);
-
-        // Then
-        // We should get the expected exception
-    }
-
-    @Test
-    public void shouldReadFile()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A nonexisten file
-        String uri = "/file.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri));
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-
-        // When
-        // We attempt to read the file
-        zebedee.collections.readContent(collection, uri, false, session, response);
-
-        // Then
-        // Check the expected interactions
-        verify(response).setContentType("application/json");
-        verify(response, atLeastOnce()).getOutputStream();
-    }
-
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForWritingADirectoryAsAFile()
             throws IOException, UnauthorizedException, BadRequestException,
@@ -1125,6 +1000,33 @@ public class CollectionsTest {
             assertFalse(runnable.failed);
         }
     }
+
+    @Test
+    public void shouldWriteEncryptedContent()
+            throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+
+        // Given
+        // A new file
+        String uri = "/this/a/file.json";
+        Session session = zebedee.openSession(builder.publisher1Credentials);
+
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any(byte[].class))).thenReturn(-1);
+
+        // When
+        // We attempt to write to the directory as if it were a file
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+
+        // Then
+        // We should see the file
+        Path path = collection.getInProgressPath(uri);
+        assertNotNull(path);
+        assertTrue(Files.exists(path));
+    }
+
 
     public class UpdateCollection implements Runnable {
         public boolean failed = false;

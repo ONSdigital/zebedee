@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.util;
 
 import org.apache.commons.io.IOUtils;
 
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -66,6 +67,31 @@ public class ZipUtils {
                 zipOutputStream.closeEntry();
             } else if (file.isDirectory()) {
                 zipFolder(file, zipOutputStream, prefixLength);
+            }
+        }
+    }
+
+    public static void zipFolderWithEncryption(final File folder, final File zipFile, SecretKey key) throws IOException {
+        zipFolderWithEncryption(folder, EncryptionUtils.encryptionOutputStream(zipFile.toPath(), key), key);
+    }
+    private static void zipFolderWithEncryption(final File folder, final OutputStream outputStream, SecretKey key) throws IOException {
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+            zipFolderWithEncryption(folder, zipOutputStream, key, folder.getPath().length() + 1);
+        }
+    }
+
+    private static void zipFolderWithEncryption(final File folder, final ZipOutputStream zipOutputStream, SecretKey key, final int prefixLength)
+            throws IOException {
+        for (final File file : folder.listFiles()) {
+            if (file.isFile()) {
+                final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
+                zipOutputStream.putNextEntry(zipEntry);
+                try (InputStream inputStream = EncryptionUtils.encryptionInputStream(file.toPath(), key)) {
+                    IOUtils.copy(inputStream, zipOutputStream);
+                }
+                zipOutputStream.closeEntry();
+            } else if (file.isDirectory()) {
+                zipFolderWithEncryption(file, zipOutputStream, key, prefixLength);
             }
         }
     }

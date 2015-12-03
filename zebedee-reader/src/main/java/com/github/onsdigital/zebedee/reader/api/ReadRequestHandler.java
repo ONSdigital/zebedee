@@ -76,7 +76,7 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getLatestCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException | NoSuchFileException e) {
-                System.out.println("Could not found " + uri + " under collection " + collectionId + " , trying published content");
+                System.out.println("Could not find " + uri + " under collection " + collectionId + " , trying published content");
             }
         }
 
@@ -89,7 +89,7 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException e) {
-                System.out.println("Could not found " + uri + " under collection " + collectionId + " , trying published content");
+                System.out.println("Could not find " + uri + " under collection " + collectionId + " , trying published content");
             }
         }
 
@@ -112,7 +112,7 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionResource(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-                System.out.println("Could not found " + uri + " under collection " + collectionId + ", trying published content");
+                System.out.println("Could not find " + uri + " under collection " + collectionId + ", trying published content");
             }
         }
         return reader.getPublishedResource(uri);

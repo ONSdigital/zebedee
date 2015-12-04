@@ -885,32 +885,6 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldFilterOnPermissions() throws IOException {
-
-        // Given
-        // We have different content in each of published, reviewed and in progress
-        String uri = "/economy/inflationandpriceindices/timeseries/permissions.html";
-        Path published = builder.createPublishedFile(uri);
-        Path reviewed = builder.createReviewedFile(uri);
-        Path inProgress = builder.createInProgressFile(uri);
-        String publishedContent = Random.id();
-        String reviewedContent = Random.id();
-        String inProgressContent = Random.id();
-        FileUtils.writeStringToFile(published.toFile(), publishedContent);
-        FileUtils.writeStringToFile(reviewed.toFile(), reviewedContent);
-        FileUtils.writeStringToFile(inProgress.toFile(), inProgressContent);
-
-        // When
-        // A user without permissions attempts to locate the content
-        Path found = collection.find("user.without.permissions@example.com", uri);
-        String foundContent = FileUtils.readFileToString(found.toFile());
-
-        // Then
-        // The published content should be returned, not reviewed or in progress
-        assertEquals(publishedContent, foundContent);
-    }
-
-    @Test
     public void shouldReturnInProgressUris() throws IOException {
         // Given
         // There are these files in progress:
@@ -988,7 +962,7 @@ public class CollectionTest {
 
         // When
         // We attempt to find the file.
-        Path path = collection.find(builder.publisher1.email, uri);
+        Path path = collection.find(uri);
 
         // Then
         // We get the path to the in progress file.
@@ -1004,7 +978,7 @@ public class CollectionTest {
 
         // When
         // We attempt to find the file.
-        Path path = collection.find(builder.publisher1.email, uri);
+        Path path = collection.find(uri);
 
         // Then
         // We get the path to the in progress file.
@@ -1020,7 +994,7 @@ public class CollectionTest {
 
         // When
         // We attempt to find the file.
-        Path path = collection.find(builder.publisher1.email, uri);
+        Path path = collection.find(uri);
 
         // Then
         // We get the path to the in progress file.
@@ -1083,7 +1057,7 @@ public class CollectionTest {
         FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));
 
         // When we attempt to populate the release from the collection.
-        Release result = collection.populateRelease(publisher1Email);
+        Release result = collection.populateRelease(new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id));
 
         // Then the release is now in progress for the collection and the published flag is set to true
         assertEquals(1, result.getRelatedDocuments().size());

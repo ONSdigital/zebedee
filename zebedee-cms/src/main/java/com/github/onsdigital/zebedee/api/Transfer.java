@@ -51,7 +51,7 @@ public class Transfer {
             return false;
         }
 
-        Path sourcePath = source.find(session.email,params.uri);
+        Path sourcePath = source.find(params.uri);
         if (Files.notExists(sourcePath)) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return false;

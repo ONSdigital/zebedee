@@ -912,7 +912,7 @@ public class CollectionsTest {
         // Then
         // The file should be gone
         assertTrue(result);
-        assertNull(collection.find(builder.publisher1.email, uri));
+        assertNull(collection.find(uri));
     }
 
     @Test
@@ -938,8 +938,8 @@ public class CollectionsTest {
         // but not the folder itself. This may need to be reviewed,
         // however this test has been written to reflect current behaviour.
         assertTrue(result);
-        assertNull(collection.find(builder.publisher1.email, fileUri));
-        assertNotNull(collection.find(builder.publisher1.email, folderUri));
+        assertNull(collection.find(fileUri));
+        assertNotNull(collection.find(folderUri));
     }
 
     @Test(expected = ConflictException.class)

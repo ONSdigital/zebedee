@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.reader.util;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -57,5 +58,9 @@ public class RequestUtils {
         }
 
         return new ReadRequestHandler(getRequestedLanguage(request)).findResource(request);
+    }
+
+    public static ZebedeeReader getZebedeeReader(HttpServletRequest request) {
+        return new ZebedeeReader(getRequestedLanguage(request));
     }
 }

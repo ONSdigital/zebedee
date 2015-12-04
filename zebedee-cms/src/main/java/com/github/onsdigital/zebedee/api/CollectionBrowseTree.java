@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.ContentTree;
-import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,16 +33,7 @@ public class CollectionBrowseTree {
         com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
 
-        if (collection == null) {
-            response.setStatus(HttpStatus.NOT_FOUND_404);
-            return null;
-        }
-
         Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            return null;
-        }
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
         return ContentTree.getOverlayed(collection, collectionReader);

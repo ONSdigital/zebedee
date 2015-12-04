@@ -12,8 +12,6 @@ import com.github.onsdigital.zebedee.reader.CollectionReaderFactory;
 
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-
 /**
  * Creates instances of CollectionReader.
  */
@@ -44,19 +42,6 @@ public class ZebedeeCollectionReaderFactory implements CollectionReaderFactory {
     }
 
     CollectionReader getCollectionReader(Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException {
-
-        // Collection (null check before authorisation check)
-        if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
-        }
-
-        // Authorisation
-        if (session == null
-                || !zebedee.permissions.canView(session.email,
-                collection.description)) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
-        }
-
         return new ZebedeeCollectionReader(zebedee, collection, session);
     }
 }

@@ -20,13 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.net.URLConnection;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -348,30 +345,6 @@ public class Collections {
         // Go ahead
         collection.delete();
     }
-
-    /**
-     * Set MIME Type using an encrypted stream
-     *
-     * http://stackoverflow.com/questions/51438/getting-a-files-mime-type-in-java/847849#847849
-     *
-     * @param response
-     * @param collection
-     * @param session
-     * @param path
-     * @throws IOException
-     */
-    private void setEncryptedMIMEType(HttpServletResponse response, Collection collection, Session session, Path path) throws IOException {
-        try (InputStream stream = new BufferedInputStream(EncryptionUtils.encryptionInputStream(path, zebedee.keyringCache.get(session).get(collection.description.id)))) {
-            String contentType = URLConnection.guessContentTypeFromStream(stream);
-            response.setContentType(contentType);
-        }
-    }
-
-    private void setUnencryptedMIMEType(HttpServletResponse response, Path path) throws IOException {
-        String contentType = Files.probeContentType(path);
-        response.setContentType(contentType);
-    }
-
 
     /**
      * Create new content if it does not already exist.

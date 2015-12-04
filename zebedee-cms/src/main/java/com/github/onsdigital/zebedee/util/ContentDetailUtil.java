@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
-import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Content;
@@ -23,7 +23,10 @@ public class ContentDetailUtil {
 
         for (String uri : content.uris("*data*.json")) {
             if (!VersionedContentItem.isVersionedUri(uri)) {
-                com.github.onsdigital.zebedee.json.ContentDetail contentDetail = Serialiser.deserialise(reader.getResource(uri).getData(), com.github.onsdigital.zebedee.json.ContentDetail.class);
+                Page page = reader.getContent(uri);
+                ContentDetail contentDetail = new ContentDetail(page.getDescription().getTitle(), page.getUri().toString(), page.getType().toString());
+                contentDetail.description.edition = page.getDescription().getEdition();
+                contentDetail.description.language = page.getDescription().getLanguage();
                 details.add(contentDetail);
             }
         }

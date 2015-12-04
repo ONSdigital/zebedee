@@ -12,7 +12,6 @@ import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import com.github.onsdigital.zebedee.reader.util.ContentNodeComparator;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
-import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -191,7 +190,7 @@ public class ReadRequestHandler {
 
     /*By default tries to read collection id from cookies named collection. If not found falls back to reading from uri.*/
     private String getCollectionId(HttpServletRequest request) {
-        return URIUtils.getPathSegment(request.getRequestURI(), 2);
+        return RequestUtils.getCollectionId(request);
     }
 
     private String extractUri(HttpServletRequest request) throws BadRequestException {

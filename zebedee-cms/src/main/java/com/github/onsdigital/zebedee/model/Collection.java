@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
@@ -258,27 +259,27 @@ public class Collection {
         return updatedCollection;
     }
 
-    private Release getReleaseFromCollection(String email, String uri) throws IOException, ZebedeeException {
-        Path collectionReleasePath = this.find(email, uri);
+    private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {
+        Path collectionReleasePath = this.find(uri);
         Release release = (Release) ContentUtil.deserialiseContent(FileUtils.openInputStream(collectionReleasePath.toFile()));
         return release;
     }
 
-    public Release populateRelease(String email) throws IOException, ZebedeeException {
+    public Release populateRelease(CollectionReader reader) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.description.releaseUri)) {
             throw new BadRequestException("This collection is not associated with a release.");
         }
 
         String uri = this.description.releaseUri + "/data.json";
-        Release release = getReleaseFromCollection(email, uri);
+        Release release = getReleaseFromCollection(uri);
         Log.print("Release identified for collection %s: %s", this.description.name, release.getDescription().getTitle());
 
         if (release == null) {
             throw new BadRequestException("This collection is not associated with a release.");
         }
 
-        release = ReleasePopulator.populate(release, this);
+        release = ReleasePopulator.populate(release, this, reader);
 
         Path releasePath = reviewed.get(uri);
         FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
@@ -344,42 +345,23 @@ public class Collection {
      * @return The {@link #inProgress} path, otherwise the {@link #reviewed}
      * path, otherwise the existing published path, otherwise null.
      */
-    public Path find(String email, String uri) throws IOException {
-        Path result = null;
+    public Path find(String uri) throws IOException {
+        Path result = inProgress.get(uri);
 
-        // Does the user have permission tno see this content?
-        boolean permission;
-        permission = zebedee.permissions.canView(email, description);
-
-
-        // Only show edited material if the user has permission:
-        if (permission) {
-            //String redirected = redirect.get(uri);
-            //if (redirected == null) { redirected = uri; }
-
-            result = inProgress.get(uri);
-
-            if (result == null) {
-                result = complete.get(uri);
-            }
-
-            if (result == null) {
-                result = reviewed.get(uri);
-            }
-
-            if (result == null) {
-                result = zebedee.published.get(uri);
-            }
-
-            return result;
+        if (result == null) {
+            result = complete.get(uri);
         }
 
-        // Default is the published version:
+        if (result == null) {
+            result = reviewed.get(uri);
+        }
+
         if (result == null) {
             result = zebedee.published.get(uri);
         }
 
         return result;
+
     }
 
     /**
@@ -430,7 +412,7 @@ public class Collection {
         boolean result = false;
 
         // Does this path already exist in the published area?
-        boolean exists = find(email, uri) != null;
+        boolean exists = find(uri) != null;
 
         // Is someone creating the same file in another collection?
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
@@ -475,7 +457,7 @@ public class Collection {
         if (isInProgress(uri))
             return true;
 
-        Path source = find(email, uri);
+        Path source = find(uri);
 
         // Is the path being edited anywhere but here?
         boolean isBeingEditedElsewhere = !isInCollection(uri)
@@ -555,7 +537,7 @@ public class Collection {
             throw new UnauthorizedException("Insufficient permissions");
         }
 
-        if (Files.isDirectory(this.find(session.email, uri))) {
+        if (Files.isDirectory(this.find(uri))) {
             throw new BadRequestException("Cannot complete a directory");
         }
 
@@ -779,7 +761,7 @@ public class Collection {
             this.edit(email, uri);
         }
 
-        Path releasePath = find(email, uri);
+        Path releasePath = find(uri);
         release.getDescription().setPublished(true);
 
         // write file
@@ -932,25 +914,25 @@ public class Collection {
     /**
      * Replace all uri references within a collection
      *
-     * @param email user email
+     * @param email  user email
      * @param oldUri the uri we are moving from
      * @param newUri the uri we are moving to
      * @throws IOException if we encounter file problems
      */
     private void replaceLinksWithinCollection(String email, String oldUri, String newUri) throws IOException {
-        for (String uri: inProgressUris()) {
+        for (String uri : inProgressUris()) {
             File file = inProgress.toPath(uri).toFile();
             if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
                 replaceLinksInFile(file, email, oldUri, newUri);
             }
         }
-        for (String uri: completeUris()) {
+        for (String uri : completeUris()) {
             File file = complete.toPath(uri).toFile();
             if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
                 replaceLinksInFile(file, email, oldUri, newUri);
             }
         }
-        for (String uri: reviewedUris()) {
+        for (String uri : reviewedUris()) {
             File file = reviewed.toPath(uri).toFile();
             if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
                 replaceLinksInFile(file, email, oldUri, newUri);
@@ -961,15 +943,15 @@ public class Collection {
     /**
      * Replace uri references within a file
      *
-     * @param file a file
-     * @param email email of the user replacing links
+     * @param file   a file
+     * @param email  email of the user replacing links
      * @param oldUri the uri we are moving from
      * @param newUri the uri we are moving to
      * @throws IOException if we encounter file problems
      */
     private void replaceLinksInFile(File file, String email, String oldUri, String newUri) throws IOException {
         String content;
-        try(Scanner scanner = new Scanner(file)) {
+        try (Scanner scanner = new Scanner(file)) {
             content = scanner.useDelimiter("//Z").next();
         }
 

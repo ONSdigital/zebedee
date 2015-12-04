@@ -17,7 +17,6 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.extractFilter;
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
 @Api
@@ -46,7 +45,7 @@ public class Content {
             throw new BadRequestException("Please provide a URI");
         }
 
-        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findContent(request, extractFilter(request)), response);
+        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findResource(request), response);
     }
 
     /**

@@ -20,7 +20,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
         reviewed = getContentReader(zebedee, collection, session, collection.path, getConfiguration().getReviewedFolderName());
     }
 
-    private ContentReader getContentReader(Zebedee zebedee, Collection collection, Session session, Path collectionPath, String folderName) {
+    private ContentReader getContentReader(Zebedee zebedee, Collection collection, Session session, Path collectionPath, String folderName) throws UnauthorizedException, IOException {
         return new CollectionContentReader(zebedee, collection, session, collectionPath.resolve(folderName));
     }
 }

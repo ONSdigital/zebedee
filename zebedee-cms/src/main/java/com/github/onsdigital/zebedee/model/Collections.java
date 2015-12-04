@@ -170,7 +170,8 @@ public class Collections {
         if (collection.isRelease()) {
             Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
-                collection.populateRelease(session.email);
+                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+                collection.populateRelease(collectionReader);
             } catch (ZebedeeException e) {
                 Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
             }
@@ -284,7 +285,7 @@ public class Collections {
         }
 
         // Locate the path:
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
         if (path == null) {
             throw new NotFoundException("URI not found in collection: " + uri);
         }
@@ -416,7 +417,7 @@ public class Collections {
         }
 
         // Find the file if it exists
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
 
         // Check we're writing a file:
         if (path != null && Files.isDirectory(path)) {
@@ -498,7 +499,7 @@ public class Collections {
         }
 
         // Find the file if it exists
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
 
         // Check the user has access to the given file
         if (path == null || !collection.isInCollection(uri)) {
@@ -638,7 +639,7 @@ public class Collections {
         }
 
         // Find the file if it exists
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
 
         // Check we're writing a file:
         if (path != null && Files.isDirectory(path)) {
@@ -703,20 +704,6 @@ public class Collections {
                     }
                 }
             }
-
-            return result;
-        }
-
-        public boolean transfer(String email, String uri, Collection source,
-                                Collection destination) throws IOException {
-            boolean result = false;
-
-            // Move the file
-            Path sourcePath = source.find(email, uri);
-            Path destinationPath = destination.getInProgressPath(uri);
-
-            PathUtils.moveFilesInDirectory(sourcePath, destinationPath);
-            result = true;
 
             return result;
         }

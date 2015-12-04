@@ -3,7 +3,10 @@ package com.github.onsdigital.zebedee.reader;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.filter.FilterUtil;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
@@ -184,7 +187,7 @@ public class ZebedeeReader {
     }
 
 
-    private CollectionReader createCollectionReader(String collectionId, String sessionId) throws NotFoundException, IOException, CollectionNotFoundException, UnauthorizedException, BadRequestException {
+    private CollectionReader createCollectionReader(String collectionId, String sessionId) throws NotFoundException, IOException, UnauthorizedException, BadRequestException {
         if (collectionReaderFactory == null) {
             throw new UnauthorizedException("Collection reads are not available");
         }

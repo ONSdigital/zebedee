@@ -12,7 +12,7 @@ import java.nio.file.Path;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 
-class ZebedeeCollectionReader extends CollectionReader {
+public class ZebedeeCollectionReader extends CollectionReader {
 
     public ZebedeeCollectionReader(Zebedee zebedee, Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException {
         inProgress = getContentReader(zebedee, collection, session, collection.path, getConfiguration().getInProgressFolderName());

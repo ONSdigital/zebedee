@@ -27,6 +27,18 @@ public abstract class CollectionReader {
     public CollectionReader() {
     }
 
+    public ContentReader getInProgress() {
+        return inProgress;
+    }
+
+    public ContentReader getComplete() {
+        return complete;
+    }
+
+    public ContentReader getReviewed() {
+        return reviewed;
+    }
+
     /**
      * Reads content under a given collection root folder.
      * Tries finding content under in progress, completePath and reviewedPath folders respectively. Throws not found exception if not found

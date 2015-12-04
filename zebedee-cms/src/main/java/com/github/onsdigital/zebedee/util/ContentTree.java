@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.util;
 
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 
 import java.io.IOException;
 
@@ -37,12 +39,13 @@ public class ContentTree {
      * Returns a content tree overlayed with the files of the given collection.
      *
      * @return
+     * @param collection
      */
-    public static ContentDetail getOverlayed(Collection collection) throws IOException {
+    public static ContentDetail getOverlayed(Collection collection, CollectionReader reader) throws IOException, ZebedeeException {
         ContentDetail publishedDetails = get();
-        publishedDetails.overlayDetails(collection.inProgress.details());
-        publishedDetails.overlayDetails(collection.complete.details());
-        publishedDetails.overlayDetails(collection.reviewed.details());
+        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.inProgress, reader.getInProgress()));
+        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.complete, reader.getComplete()));
+        publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed()));
         return publishedDetails;
     }
 
@@ -50,4 +53,5 @@ public class ContentTree {
         Log.print("Clearing browser tree cache.");
         publishedContentTree = null;
     }
+
 }

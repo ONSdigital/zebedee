@@ -194,22 +194,6 @@ public class Content {
     }
 
     /**
-     * Returns a flat list of {@link ContentDetail} objects for each file within this {@link Content}
-     *
-     * @return
-     * @throws IOException
-     */
-    public List<ContentDetail> details() throws IOException {
-        List<ContentDetail> details = new ArrayList<>();
-        for (String uri : this.uris("*data*.json")) {
-            if (!VersionedContentItem.isVersionedUri(uri)) {
-                details.add(details(path.resolve(uri.replaceFirst("/", ""))));
-            }
-        }
-        return details;
-    }
-
-    /**
      * Returns a list of details with the details of child page details nested.
      *
      * @return
@@ -269,7 +253,7 @@ public class Content {
      * @return
      * @throws IOException
      */
-    public ContentDetail details(Path path) throws IOException {
+    ContentDetail details(Path path) throws IOException {
         ContentDetail result = null;
         if (Files.exists(path)) {
             try (InputStream input = Files.newInputStream(path)) {

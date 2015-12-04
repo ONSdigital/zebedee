@@ -1,12 +1,14 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +32,7 @@ public class CollectionDetails {
      */
     @GET
     public CollectionDetail get(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, NotFoundException, BadRequestException {
+            throws IOException, ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
@@ -46,16 +48,19 @@ public class CollectionDetails {
             return null;
         }
 
+        CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
+
         CollectionDetail result = new CollectionDetail();
         result.id = collection.description.id;
         result.name = collection.description.name;
         result.type = collection.description.type;
         result.publishDate = collection.description.publishDate;
-        result.inProgress = collection.inProgress.details();
-        result.complete = collection.complete.details();
-        result.reviewed = collection.reviewed.details();
-        result.approvedStatus = collection.description.approvedStatus;
 
+        result.inProgress = ContentDetailUtil.resolveDetails(collection.inProgress, collectionReader.getInProgress());
+        result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());
+        result.reviewed = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+
+        result.approvedStatus = collection.description.approvedStatus;
         result.events = collection.description.events;
 
         addEventsForDetails(result.inProgress, result, collection);
@@ -65,10 +70,12 @@ public class CollectionDetails {
         return result;
     }
 
+
     private void addEventsForDetails(
             List<ContentDetail> detailsToAddEventsFor,
             CollectionDetail result,
-            com.github.onsdigital.zebedee.model.Collection collection) {
+            com.github.onsdigital.zebedee.model.Collection collection
+    ) {
 
         for (ContentDetail contentDetail : detailsToAddEventsFor) {
             String language = contentDetail.description.language;

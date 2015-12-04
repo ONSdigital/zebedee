@@ -18,6 +18,10 @@
       },
       "description": {
         "properties": {
+          "cdid": {
+            "type": "string",
+            "search_analyzer": "cdid_search"
+          },
           "title": {
             "type": "string",
             "copy_to" : "title_edition",

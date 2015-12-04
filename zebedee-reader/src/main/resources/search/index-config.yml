@@ -17,6 +17,15 @@ analysis :
             - standard
             - stop
             - porter_stem
+    #Porter stem does not work for some cdids (e.g. a4ae is tokenized as a4a when search.). Solution to this is to apply analysis on search term with no stemming.
+    #cdid_search analyzer is created for this purpose and only applied to search terms, cdid when indexed is analysed with default_index analyzer which does not apply stemming
+    cdid_search:
+          tokenizer : standard
+          char_filter : char_mapping
+          filter :
+            - lowercase
+            - standard
+            - stop
     ons_index_analyzer :
       tokenizer : standard
       char_filter : char_mapping

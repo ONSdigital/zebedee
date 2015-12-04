@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ContentDetailUtil {
 
         for (String uri : content.uris("*data*.json")) {
             if (!VersionedContentItem.isVersionedUri(uri)) {
-                Page page = reader.getContent(uri);
+                Page page = reader.getContent(Paths.get(uri).getParent().toString());
                 ContentDetail contentDetail = new ContentDetail(page.getDescription().getTitle(), page.getUri().toString(), page.getType().toString());
                 contentDetail.description.edition = page.getDescription().getEdition();
                 contentDetail.description.language = page.getDescription().getLanguage();

@@ -4,8 +4,9 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,8 +17,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
 @Api
 public class Content {
@@ -37,16 +36,10 @@ public class Content {
      */
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-
-        String uri = request.getParameter("uri");
-
-        // Requested path
-        if (StringUtils.isBlank(uri)) {
-            throw new BadRequestException("Please provide a URI");
-        }
-
-        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findResource(request), response);
+        Resource resource = RequestUtils.getResource(request);
+        ReaderResponseResponseUtils.sendResponse(resource, response);
     }
+
 
     /**
      * Posts file content to the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>

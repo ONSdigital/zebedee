@@ -35,5 +35,4 @@ public class ReaderResponseResponseUtils {
     public static void sendResponse(Resource resource, HttpServletResponse response) throws IOException {
         sendResponse(resource, response, null);
     }
-
 }

@@ -249,6 +249,7 @@ public class Content {
 
     /**
      * Returns an individual {@link ContentDetail} object for the given uri.
+     * This method only ever reads published content so assumes no decryption is required.
      *
      * @return
      * @throws IOException

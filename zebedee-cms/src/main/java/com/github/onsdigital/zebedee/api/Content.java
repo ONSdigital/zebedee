@@ -45,7 +45,7 @@ public class Content {
             throw new BadRequestException("Please provide a URI");
         }
 
-        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findContent(request, null), response);
+        ReaderResponseResponseUtils.sendResponse(new ReadRequestHandler(getRequestedLanguage(request)).findResource(request), response);
     }
 
     /**

@@ -1,20 +1,9 @@
 package com.github.onsdigital.zebedee.configuration;
 
-import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.model.Users;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 
@@ -79,19 +68,6 @@ public class Configuration {
 
     public static String getContentDirectory() {
         return CONTENT_DIRECTORY;
-    }
-
-    public static void buildUserAccounts(java.io.File file, Zebedee zebedee, Session superSession) throws IOException, UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
-
-        try(InputStream stream = Files.newInputStream(file.toPath())) {
-            UserList list = Serialiser.deserialise(stream, UserList.class);
-            for (UserObject object: list.users) {
-                User user = new User();
-                user.email = object.email;
-                user.name = object.name;
-                Users.createPublisher(zebedee, user, object.password, superSession);
-            }
-        }
     }
 
     public static String getUnauthorizedMessage(Session session) {

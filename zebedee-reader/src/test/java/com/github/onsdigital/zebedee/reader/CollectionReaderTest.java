@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
@@ -40,7 +39,7 @@ public class CollectionReaderTest {
     private CollectionReader collectionReader;
 
     @Before
-    public void createContentReader() throws IOException, NotFoundException, CollectionNotFoundException {
+    public void createContentReader() throws IOException, NotFoundException {
         this.collectionReader = new FakeCollectionReader(ReaderConfiguration.getConfiguration().getCollectionsFolder(), COLLECTION_ID);
     }
 

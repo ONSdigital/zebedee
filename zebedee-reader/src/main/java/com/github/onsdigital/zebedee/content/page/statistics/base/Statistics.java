@@ -19,6 +19,7 @@ public abstract class Statistics extends Page {
     private List<Link> relatedMethodology;
     private List<Link> relatedMethodologyArticle;
     private List<Version> versions;
+    private List<Link> topics;
 
     public List<Link> getRelatedMethodology() {
         return relatedMethodology;
@@ -50,5 +51,13 @@ public abstract class Statistics extends Page {
 
     public void setRelatedMethodologyArticle(List<Link> relatedMethodologyArticle) {
         this.relatedMethodologyArticle = relatedMethodologyArticle;
+    }
+
+    public List<Link> getTopics() {
+        return topics;
+    }
+
+    public void setTopics(List<Link> topics) {
+        this.topics = topics;
     }
 }

@@ -17,7 +17,6 @@ public abstract class StatisticalData extends Statistics {
     private List<String> notes;//Markdown
     private List<Link> relatedDocuments;
     private List<Link> relatedData;
-    private List<Link> topics;
 
     public List<Link> getRelatedDocuments() {
         return relatedDocuments;
@@ -59,11 +58,4 @@ public abstract class StatisticalData extends Statistics {
         this.relatedDatasets = relatedDatasets;
     }
 
-    public List<Link> getTopics() {
-        return topics;
-    }
-
-    public void setTopics(List<Link> topics) {
-        this.topics = topics;
-    }
 }

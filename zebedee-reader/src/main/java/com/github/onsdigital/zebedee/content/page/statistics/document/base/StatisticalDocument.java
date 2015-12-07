@@ -18,7 +18,6 @@ public abstract class StatisticalDocument extends Statistics {
     private List<MarkdownSection> accordion = new ArrayList<>();
     private List<Link> relatedData = new ArrayList<>();//Link to data in the article
     private List<Link> relatedDocuments;
-    private List<Link> topics;
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
@@ -71,11 +70,4 @@ public abstract class StatisticalDocument extends Statistics {
         this.images = images;
     }
 
-    public List<Link> getTopics() {
-        return topics;
-    }
-
-    public void setTopics(List<Link> topics) {
-        this.topics = topics;
-    }
 }

@@ -816,7 +816,7 @@ public class DataPublisher {
         Dataset dataset = (Dataset) collectionReader.getContent(datasetUri);
         String correctionNotice = datasetCorrectionNotice(collectionReader, datasetUri);
 
-        DatasetLandingPage landingPage = landingPageForDataset(zebedee, session, collection, datasetUri);
+        DatasetLandingPage landingPage = landingPageForDataset(collectionReader, zebedee, datasetUri);
 
         // Set a name for the xlsx/csv files to be generated
         landingPage.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
@@ -883,37 +883,14 @@ public class DataPublisher {
         }
     }
 
-    DatasetLandingPage landingPageForDataset(Zebedee zebedee, Session session, Collection collection, String datasetUri) throws IOException {
+    DatasetLandingPage landingPageForDataset(CollectionReader collectionReader, Zebedee zebedee, String datasetUri) throws IOException, ZebedeeException {
         String uri = uriForDatasetLandingPage(datasetUri);
-        Path path;
-        if (Files.exists(collection.reviewed.toPath(uri).resolve("data.json"))) {
-            path = collection.reviewed.toPath(uri).resolve("data.json");
-        } else {
-            path = zebedee.published.toPath(uri).resolve("data.json");
-        }
-
-        DatasetLandingPage landingPage = getDatasetLandingPage(zebedee, session, collection, path);
-
-        return landingPage;
-    }
-
-    /**
-     * Get dataset landing page (with encryption taken care of)
-     *
-     * @param zebedee
-     * @param session
-     * @param collection
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    private DatasetLandingPage getDatasetLandingPage(Zebedee zebedee, Session session, Collection collection, Path path) throws IOException {
         DatasetLandingPage landingPage;
-        if (collection.description.isEncrypted) {
-            try (InputStream inputStream = EncryptionUtils.encryptionInputStream(path, zebedee.keyringCache.get(session).get(collection.description.id))) {
-                landingPage = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
-            }
-        } else {
+
+        try {
+            landingPage = (DatasetLandingPage) collectionReader.getReviewed().getContent(uri);
+        } catch (NotFoundException e) {
+            Path path = zebedee.published.toPath(uri).resolve("data.json");
             try (InputStream inputStream = Files.newInputStream(path)) {
                 landingPage = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
             }
@@ -1146,7 +1123,7 @@ public class DataPublisher {
      * @throws IOException
      */
     TimeSerieses presetBrianFile() throws IOException {
-        TimeSerieses result = null;
+        TimeSerieses result;
         // Pop the first file on the brian test file stack
         Path path = brianTestFiles.get(0);
         brianTestFiles.remove(0);

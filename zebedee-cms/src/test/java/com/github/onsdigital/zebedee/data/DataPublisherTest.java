@@ -288,7 +288,7 @@ public class DataPublisherTest {
      * Find landing page and dataset tests
      */
     @Test
-    public void getLandingPage_whereLandingPageInCollection_getsCollectionLandingPage() throws IOException {
+    public void getLandingPage_whereLandingPageInCollection_getsCollectionLandingPage() throws IOException, ZebedeeException {
         // Given
         // a dataset page where the corresponding landing page is being edited
         String datasetUri = unpublishedDatasetPath;
@@ -302,7 +302,7 @@ public class DataPublisherTest {
 
         // When
         // we get the corresponding
-        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, publisher, collection, datasetUri);
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(collectionReader, zebedee, datasetUri);
 
         // Then
         // we get the unpublished version
@@ -310,7 +310,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void getLandingPage_whereLandingPageNotInCollection_getsPublishedPage() throws IOException {
+    public void getLandingPage_whereLandingPageNotInCollection_getsPublishedPage() throws IOException, ZebedeeException {
         // Given
         // a dataset page where the corresponding landing page is being edited
         String datasetUri = publishedDatasetPath;
@@ -321,7 +321,7 @@ public class DataPublisherTest {
 
         // When
         // we get the corresponding
-        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, publisher, collection, datasetUri);
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(collectionReader, zebedee, datasetUri);
 
         // Then
         // we get the unpublished version
@@ -347,14 +347,14 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void landingPageForUri_givenDatasetUriWithUnmodifiedLandingPage_givesPublishedLandingPageUri() throws IOException {
+    public void landingPageForUri_givenDatasetUriWithUnmodifiedLandingPage_givesPublishedLandingPageUri() throws IOException, ZebedeeException {
         // Given
         // a dataset uri
         String datasetUri = publishedDatasetPath;
 
         // When
         // we get the landing page uri
-        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, publisher, collection, datasetUri);
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(collectionReader, zebedee, datasetUri);
 
         // Then
         // we expect the parent uri

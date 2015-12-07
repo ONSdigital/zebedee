@@ -162,7 +162,7 @@ public class DataPublisher {
      * @return
      * @throws IOException
      */
-    static TimeSeries startPageForSeriesWithPublishedPath(Zebedee zebedee, Session session, Collection collection, String uri, TimeSeries series) throws IOException {
+    static TimeSeries startPageForSeriesWithPublishedPath(Zebedee zebedee, String uri, TimeSeries series) throws IOException {
         TimeSeries page;
         Path path = zebedee.published.toPath(uri);
 
@@ -988,7 +988,7 @@ public class DataPublisher {
         Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
 
         // Construct the new page
-        TimeSeries newPage = constructTimeSeriesPageFromComponents(zebedee, session, collection, uri, landingPage, series, datasetUri);
+        TimeSeries newPage = constructTimeSeriesPageFromComponents(zebedee, uri, landingPage, series, datasetUri);
 
         // Previous versions
         if (differencesExist(zebedee, uri, newPage)) versionTimeseries(zebedee, savePath.getParent(), newPage, uri, correctionNotice);
@@ -1217,10 +1217,10 @@ public class DataPublisher {
      * @return
      * @throws IOException
      */
-    TimeSeries constructTimeSeriesPageFromComponents(Zebedee zebedee, Session session, Collection collection, String destinationUri, DatasetLandingPage landingPage, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
+    TimeSeries constructTimeSeriesPageFromComponents(Zebedee zebedee, String destinationUri, DatasetLandingPage landingPage, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
 
         // Attempts to open an existing time series or creates a new one
-        TimeSeries page = startPageForSeriesWithPublishedPath(zebedee, session, collection, destinationUri, series);
+        TimeSeries page = startPageForSeriesWithPublishedPath(zebedee, destinationUri, series);
 
         // Add stats data from the time series (as returned by Brian)
         // NOTE: This will log any corrections as it goes

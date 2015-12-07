@@ -143,8 +143,7 @@ public class Collections {
      * @throws ConflictException
      */
     public boolean approve(Collection collection, Session session)
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Collection exists
         if (collection == null) {
@@ -163,11 +162,12 @@ public class Collections {
                     "This collection can't be approved because it's not empty");
         }
 
+        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+
         // if the collection is release related - get the release page and add links to other pages in release
         if (collection.isRelease()) {
             Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
-                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
                 collection.populateRelease(collectionReader);
             } catch (ZebedeeException e) {
                 Log.print(e, "Failed to populate release page for collection %s", collection.description.name);

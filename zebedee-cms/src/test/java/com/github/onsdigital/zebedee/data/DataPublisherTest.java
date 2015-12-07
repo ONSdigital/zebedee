@@ -13,11 +13,11 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.FakeCollectionReader;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -46,6 +46,7 @@ public class DataPublisherTest {
     Builder bob;
     Session publisher;
     Collection collection;
+    CollectionReader collectionReader;
 
     String publishedTimeSeriesPath = "/themea/landinga/producta/timeseries/a4fk";
     String publishedTimeSeriesPathAlt = "/themea/landinga/producta/timeseries/a4vr";
@@ -89,6 +90,8 @@ public class DataPublisherTest {
         publisher = bob.createSession(bob.publisher1);
 
         collection = zebedee.collections.list().getCollection("collection");
+
+        collectionReader = new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id);
 
         try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
             serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
@@ -374,7 +377,7 @@ public class DataPublisherTest {
      * Data transfer tests
      */
     @Test
-    public void preprocess_givenCsdbCollection_generatesTimeseries() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+    public void preprocess_givenCsdbCollection_generatesTimeseries() throws URISyntaxException, ZebedeeException, IOException {
         // Given
         // current setup with faked interaction files for brian
         dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB.json"));
@@ -383,7 +386,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed
@@ -392,7 +395,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void preprocess_givenCorrectedCsdbCollection_generatesVersions() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+    public void preprocess_givenCorrectedCsdbCollection_generatesVersions() throws URISyntaxException, ZebedeeException, IOException {
         // Given
         // current setup with faked interaction files for brian
         dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
@@ -402,7 +405,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -410,7 +413,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void preprocess_givenCsdbWithOneCorrectedSeries_doesntCorrectTheOther() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+    public void preprocess_givenCsdbWithOneCorrectedSeries_doesntCorrectTheOther() throws URISyntaxException, ZebedeeException, IOException {
         // Given
         // current setup with faked interaction files for brian
         dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
@@ -420,7 +423,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -429,7 +432,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void preprocess_givenInsertion_generatesVersions() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+    public void preprocess_givenInsertion_generatesVersions() throws URISyntaxException, ZebedeeException, IOException {
         // Given
         // current setup with faked interaction files for brian
         dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_insertion_A4VR_2015.json"));
@@ -439,7 +442,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -447,7 +450,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void preprocess_givenCsdbWithOneCorrectedSeries_savesCorrectionNotice() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+    public void preprocess_givenCsdbWithOneCorrectedSeries_savesCorrectionNotice() throws URISyntaxException, ZebedeeException, IOException {
         // Given
         // current setup with faked interaction files for brian
         dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB_correction_A4VR_2014.json"));
@@ -460,7 +463,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -1117,7 +1120,7 @@ public class DataPublisherTest {
      * Copy new timeseries tests
      */
     @Test
-    public void preprocess_givenCsdbWithSeries_doesGenerateXLSX() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+    public void preprocess_givenCsdbWithSeries_doesGenerateXLSX() throws URISyntaxException, ZebedeeException, IOException {
         // Given
         // current setup with faked interaction files for brian
         dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB.json"));
@@ -1126,7 +1129,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed
@@ -1138,7 +1141,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void preprocess_givenCsdbWithSeries_doesGenerateCSV() throws URISyntaxException, BadRequestException, NotFoundException, UnauthorizedException, IOException {
+    public void preprocess_givenCsdbWithSeries_doesGenerateCSV() throws URISyntaxException, ZebedeeException, IOException {
         // Given
         // current setup with faked interaction files for brian
         dataPublisher.brianTestFiles.add(ResourceUtils.getPath("/brian/brian_BB.json"));
@@ -1147,7 +1150,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed

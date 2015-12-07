@@ -16,10 +16,12 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
@@ -784,7 +786,7 @@ public class DataPublisher {
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    void preprocessCsdbFiles(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException, NotFoundException {
+    void preprocessCsdbFiles(CollectionReader collectionReader, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
 
         // First find all csdb files in the collection
         List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
@@ -792,7 +794,7 @@ public class DataPublisher {
 
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
-            preprocessCsdb(zebedee, session, collection, csdbDataset);
+            preprocessCsdb(collectionReader, zebedee, session, collection, csdbDataset);
         }
     }
 
@@ -806,14 +808,13 @@ public class DataPublisher {
      * @throws URISyntaxException
      * @throws NotFoundException
      */
-    private void preprocessCsdb(Zebedee zebedee, Session session, Collection collection, HashMap<String, Path> csdbDataset) throws IOException, URISyntaxException, NotFoundException {
+    private void preprocessCsdb(CollectionReader collectionReader, Zebedee zebedee, Session session, Collection collection, HashMap<String, Path> csdbDataset) throws IOException, URISyntaxException, ZebedeeException {
         List<TimeSeries> newSeries = new ArrayList<>();
+        String datasetUri = zebedee.toUri(csdbDataset.get("json"));
 
         // Download the dataset page (for metadata)
-        Dataset dataset;
-        dataset = getDataset(zebedee, session, collection, csdbDataset);
+        Dataset dataset = (Dataset) collectionReader.getContent(datasetUri);
 
-        String datasetUri = zebedee.toUri(csdbDataset.get("json"));
         String correctionNotice = datasetCorrectionNotice(zebedee, session, collection, datasetUri);
 
         DatasetLandingPage landingPage = landingPageForDataset(zebedee, session, collection, datasetUri);
@@ -854,16 +855,6 @@ public class DataPublisher {
         generateDownloads(collection, newSeries, landingPage, datasetUri);
 
         System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
-    }
-
-    private Dataset getDataset(Zebedee zebedee, Session session, Collection collection, HashMap<String, Path> csdbDataset) throws IOException {
-        Dataset dataset;
-        if (collection.description.isEncrypted) {
-            dataset = ContentUtil.deserialise(EncryptionUtils.encryptionInputStream(csdbDataset.get("json"), zebedee.keyringCache.get(session).get(collection.description.id)), Dataset.class);
-        } else {
-            dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
-        }
-        return dataset;
     }
 
     /**
@@ -1025,6 +1016,8 @@ public class DataPublisher {
     /**
      * Run the preprocessing step that converts data to timeseries
      *
+     *
+     * @param collectionReader
      * @param zebedee a zebedee instance
      * @param collection the collection being published
      * @param session a user session (required for some permissions)
@@ -1034,7 +1027,7 @@ public class DataPublisher {
      * @throws UnauthorizedException
      * @throws URISyntaxException
      */
-    public void preprocessCollection(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException, NotFoundException {
+    public void preprocessCollection(CollectionReader collectionReader, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
 
         if (brianTestFiles.size() == 0 && (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0)) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
@@ -1044,7 +1037,7 @@ public class DataPublisher {
         insertions = 0;
         corrections = 0;
 
-        preprocessCsdbFiles(zebedee, collection, session);
+        preprocessCsdbFiles(collectionReader, zebedee, collection, session);
 
         if (insertions + corrections > 0) {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);

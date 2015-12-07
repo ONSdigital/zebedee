@@ -167,37 +167,15 @@ public class DataPublisher {
         Path path = zebedee.published.toPath(uri);
 
         if ((path != null) && Files.exists(path.resolve("data.json"))) {
-            page = getTimeSeries(zebedee, session, collection, path);
+            try (InputStream inputStream = FileUtils.openInputStream(path.resolve("data.json").toFile())) {
+                page = ContentUtil.deserialise(inputStream, TimeSeries.class);
+            }
         } else {
             page = new TimeSeries();
             page.setDescription(new PageDescription());
             page.setCdid(series.getCdid());
         }
 
-        return page;
-    }
-
-    /**
-     * Get a timeseries from file (taking care of encryption if necessary)
-     *
-     * @param zebedee
-     * @param session
-     * @param collection
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    private static TimeSeries getTimeSeries(Zebedee zebedee, Session session, Collection collection, Path path) throws IOException {
-        TimeSeries page;
-        if (collection.description.isEncrypted) {
-            try(InputStream inputStream = EncryptionUtils.encryptionInputStream(path.resolve("data.json"), zebedee.keyringCache.get(session).get(collection.description.id))) {
-                page = ContentUtil.deserialise(inputStream, TimeSeries.class);
-            }
-        } else {
-            try(InputStream inputStream = FileUtils.openInputStream(path.resolve("data.json").toFile())) {
-                page = ContentUtil.deserialise(inputStream, TimeSeries.class);
-            }
-        }
         return page;
     }
 

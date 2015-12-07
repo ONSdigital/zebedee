@@ -38,7 +38,6 @@ public class Zebedee {
     public final Sessions sessions;
     public final Permissions permissions;
     public final Teams teams;
-    public final Content launchpad;
     public final VerificationAgent verificationAgent;
 
     public Zebedee(Path path, boolean useVerificationAgent)  {
@@ -84,7 +83,6 @@ public class Zebedee {
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
-        this.launchpad = new Content(launchpad);
         if (useVerificationAgent) {
             this.verificationAgent = new VerificationAgent(this);
         } else {
@@ -196,26 +194,6 @@ public class Zebedee {
 
     public String toUri(String string) {
         return toUri(Paths.get(string));
-    }
-
-    public boolean publish(Collection collection) throws IOException {
-
-        // Check everything has been reviewed:
-        if (collection.inProgress.uris().size() > 0) {
-            return false;
-        }
-
-        // Move each item of content:
-        for (String uri : collection.reviewed.uris()) {
-            Path source = collection.reviewed.get(uri);
-            Path destination = launchpad.toPath(uri);
-            PathUtils.moveFilesInDirectory(source, destination);
-        }
-
-        // Delete the folders:
-        delete(collection.path);
-
-        return true;
     }
 
     /**

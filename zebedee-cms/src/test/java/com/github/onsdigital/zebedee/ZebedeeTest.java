@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -128,101 +127,6 @@ public class ZebedeeTest {
 
 		// Then
 		assertEquals(1, actual);
-	}
-
-	@Test
-	public void shouldPublish() throws IOException, CollectionNotFoundException {
-
-		// Given
-		// There is content ready to be published:
-		Zebedee zebedee = new Zebedee(expectedPath);
-		Collection release = new Collection(builder.collections.get(1), zebedee);
-		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createReviewedFile(uri);
-
-		// When
-		boolean published = zebedee.publish(release);
-
-		// Then
-		assertTrue(published);
-		Path launchpadPath = builder.zebedee.resolve(Zebedee.LAUNCHPAD);
-		assertTrue(Files.exists(launchpadPath.resolve(uri.substring(1))));
-	}
-
-	@Test
-	public void shouldNotPublishIfAnythingInProgress() throws IOException, CollectionNotFoundException {
-
-		// Given
-		// There is content ready to be published:
-		Zebedee zebedee = new Zebedee(expectedPath);
-		Collection release = new Collection(builder.collections.get(1), zebedee);
-		String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createInProgressFile(uri);
-
-		// When
-		boolean published = zebedee.publish(release);
-
-		// Then
-		assertFalse(published);
-		Path publishedPath = builder.zebedee.resolve(Zebedee.PUBLISHED);
-		assertFalse(Files.exists(publishedPath.resolve(uri.substring(1))));
-	}
-
-    @Test
-	public void shouldDeleteCollectionAfterPublish() throws IOException, CollectionNotFoundException {
-
-        // Given
-        // There is content ready to be published:
-        Zebedee zebedee = new Zebedee(expectedPath);
-        Collection release = new Collection(builder.collections.get(1), zebedee);
-        String uri = "/economy/inflationandpriceindices/timeseries/abmi.html";
-        builder.createReviewedFile(uri);
-
-        // When
-        zebedee.publish(release);
-
-        // Then
-        // The release folder should have been deleted:
-        Path releaseFolder = builder.collections.get(1);
-        assertFalse(Files.exists(releaseFolder));
-    }
-
-	@Test
-	public void toUri_givenPublishedFilePath_shouldReturnUri() {
-		// Given
-		// a zebedee implementation
-		Zebedee zebedee = new Zebedee(expectedPath);
-		String expectedURI = "/expected";
-		String suffix = "expected/data.json";
-
-		// When
-		// we convert these to URIs
-		String publishedURI = zebedee.toUri(zebedee.published.path.resolve(suffix));
-		String launchpadURI = zebedee.toUri(zebedee.launchpad.path.resolve(suffix));
-
-		// Then
-		// we expect the uri
-		assertEquals(expectedURI, publishedURI);
-		assertEquals(expectedURI, launchpadURI);
-	}
-
-	@Test
-	public void toUri_givenPublishedFilePathAsString_shouldReturnUri() {
-		// Given
-		// a zebedee implementation
-		Zebedee zebedee = new Zebedee(expectedPath);
-		String expectedURI = "/expected";
-		String suffix = "expected/data.json";
-
-		// When
-		// we convert these to URIs
-		String publishedURI = zebedee.toUri(zebedee.published.path.resolve(suffix).toString());
-		String launchpadURI = zebedee.toUri(zebedee.launchpad.path.resolve(suffix).toString());
-
-		// Then
-		// we expect the uri
-		assertEquals(expectedURI, publishedURI);
-		assertEquals(expectedURI, launchpadURI);
 	}
 
 	@Test

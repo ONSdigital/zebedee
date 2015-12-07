@@ -163,15 +163,9 @@ public class Root {
         for (Path item : content) {
             Path source = taxonomy.resolve(item);
             Path masterDestination = zebedee.published.path.resolve(item);
-            Path launchpadDestination = zebedee.launchpad.path.resolve(item);
             Files.createDirectories(masterDestination.getParent());
-            Files.createDirectories(launchpadDestination.getParent());
             try (InputStream input = Files.newInputStream(source);
                  OutputStream output = Files.newOutputStream(masterDestination)) {
-                IOUtils.copy(input, output);
-            }
-            try (InputStream input = Files.newInputStream(source);
-                 OutputStream output = Files.newOutputStream(launchpadDestination)) {
                 IOUtils.copy(input, output);
             }
         }

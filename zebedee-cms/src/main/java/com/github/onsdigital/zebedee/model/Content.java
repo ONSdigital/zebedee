@@ -4,7 +4,6 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.util.GraphUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -350,30 +349,6 @@ public class Content {
             } else {
                 break;
             }
-        }
-    }
-
-    /**
-     * Move content from one uri to another
-     * <p/>
-     * 1. Copy all content
-     * 2. Cop
-     * This requires a full traverse of .json content so should not be done lightly
-     */
-    public void moveUri(String fromUri, String toUri) throws IOException {
-
-        if (Files.exists(toPath(fromUri))) {
-            // remove current linking from current parent tree
-            GraphUtils.backwardStrip(this, fromUri);
-
-            // move file
-            GraphUtils.replaceLinks(this, fromUri, toUri);
-
-            moveFile(fromUri, toUri);
-
-
-            // implement new linking in parent tree
-            GraphUtils.backwardLink(this, toUri);
         }
     }
 

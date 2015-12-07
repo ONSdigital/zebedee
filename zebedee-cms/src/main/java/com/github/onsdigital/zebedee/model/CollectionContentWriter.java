@@ -28,7 +28,7 @@ public class CollectionContentWriter extends ContentWriter {
      *
      * @param rootFolder
      */
-    public CollectionContentWriter(Path rootFolder, Zebedee zebedee, Collection collection, Session session) throws IOException, UnauthorizedException {
+    public CollectionContentWriter(Zebedee zebedee, Collection collection, Session session, Path rootFolder) throws IOException, UnauthorizedException {
         super(rootFolder);
         this.zebedee = zebedee;
         this.collection = collection;

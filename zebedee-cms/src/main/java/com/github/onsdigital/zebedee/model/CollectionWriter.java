@@ -1,5 +1,8 @@
 package com.github.onsdigital.zebedee.model;
 
+/**
+ * Define the interface for writing to collections, i.e. the available folders inprogress, complete, and reviewed.
+ */
 public abstract class CollectionWriter {
 
     protected ContentWriter inProgress;

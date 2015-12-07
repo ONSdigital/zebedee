@@ -814,8 +814,7 @@ public class DataPublisher {
 
         // Download the dataset page (for metadata)
         Dataset dataset = (Dataset) collectionReader.getContent(datasetUri);
-
-        String correctionNotice = datasetCorrectionNotice(zebedee, session, collection, datasetUri);
+        String correctionNotice = datasetCorrectionNotice(collectionReader, datasetUri);
 
         DatasetLandingPage landingPage = landingPageForDataset(zebedee, session, collection, datasetUri);
 
@@ -826,7 +825,7 @@ public class DataPublisher {
         // Build the download sections
         DownloadSection csdbSection = new DownloadSection();
         csdbSection.setTitle(landingPage.getDescription().getTitle());
-        csdbSection.setCdids(new ArrayList<String>());
+        csdbSection.setCdids(new ArrayList<>());
 
         DownloadSection xlsxSection = newDownloadSection("xlsx download", filePrefix.toLowerCase() + ".xlsx");
         DownloadSection csvSection = newDownloadSection("csv download", filePrefix.toLowerCase() + ".csv");
@@ -866,48 +865,22 @@ public class DataPublisher {
     String uriForDatasetLandingPage(String datasetUri) {
         String[] split = StringUtils.split(datasetUri, "/");
         if (split[split.length - 1].equalsIgnoreCase("data.json") || split[split.length - 1].equalsIgnoreCase("")) {
-            split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
+            split = ArrayUtils.subarray(split, 0, split.length - 2);
         } else {
-            split = (String[]) ArrayUtils.subarray(split, 0, split.length - 1);
+            split = ArrayUtils.subarray(split, 0, split.length - 1);
         }
 
         return "/" + StringUtils.join(split, "/");
     }
 
-    String datasetCorrectionNotice(Zebedee zebedee, Session session, Collection collection, String datasetUri) throws IOException {
-
-        Dataset updated = getDataset(zebedee, session, collection, datasetUri);
+    String datasetCorrectionNotice(CollectionReader collectionReader, String datasetUri) throws IOException, ZebedeeException {
+        Dataset updated = (Dataset) collectionReader.getReviewed().getContent(datasetUri);
 
         if (updated.getVersions() == null || updated.getVersions().size() == 0) {
             return "";
         } else {
             return updated.getVersions().get(updated.getVersions().size()-1).getCorrectionNotice();
         }
-    }
-
-    /**
-     * Read a dataset from file (takes care of )
-     *
-     * @param zebedee
-     * @param session
-     * @param collection
-     * @param datasetUri
-     * @return
-     * @throws IOException
-     */
-    private Dataset getDataset(Zebedee zebedee, Session session, Collection collection, String datasetUri) throws IOException {
-        Dataset dataset;
-        Path path = collection.reviewed.get(datasetUri).resolve("data.json");
-        if (collection.description.isEncrypted) {
-            try (InputStream stream = EncryptionUtils.encryptionInputStream(path, zebedee.keyringCache.get(session).get(collection.description.id))) {
-                dataset = ContentUtil.deserialise(stream, Dataset.class);
-            }
-        } else {
-            try (InputStream stream = Files.newInputStream(path)) {
-                dataset = ContentUtil.deserialise(stream, Dataset.class);
-            }
-        }
-        return dataset;
     }
 
     DatasetLandingPage landingPageForDataset(Zebedee zebedee, Session session, Collection collection, String datasetUri) throws IOException {

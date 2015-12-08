@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,6 +17,8 @@ import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -100,6 +103,37 @@ public class Users {
         }
 
         System.out.println(users.size() + " users in the system: " + withKeyring + " of them have keyrings and " + withoutKeyring + " ");
+    }
+
+    /**
+     * Remove keys for collections that no longer exist.
+     */
+    public static void cleanupCollectionKeys(Zebedee zebedee, User user) throws IOException {
+        if (user.keyring != null) {
+
+            List<String> keysToRemove = new ArrayList<>();
+
+            Collections.CollectionList collections = zebedee.collections.list();
+
+            for (String key : user.keyring.list()) {
+                boolean keyIsValid = false;
+
+                for (Collection collection : collections) {
+                    if (collection.description.id.equals(key)) {
+                        keyIsValid = true;
+                    }
+                }
+
+                if (!keyIsValid) {
+                    keysToRemove.add(key);
+                }
+            }
+
+            for (String key : keysToRemove) {
+                Log.print("Removing stale key %s" + key);
+                user.keyring.remove(key);
+            }
+        }
     }
 
     /**

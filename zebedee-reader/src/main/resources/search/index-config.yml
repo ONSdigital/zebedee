@@ -17,6 +17,15 @@ analysis :
             - standard
             - stop
             - porter_stem
+    #Porter stem does not work for some cdids (e.g. a4ae is tokenized as a4a when search.). Solution to this is to apply analysis on search term with no stemming.
+    #cdid_search analyzer is created for this purpose and only applied to search terms, cdid when indexed is analysed with default_index analyzer which does not apply stemming
+    cdid_search:
+          tokenizer : standard
+          char_filter : char_mapping
+          filter :
+            - lowercase
+            - standard
+            - stop
     ons_index_analyzer :
       tokenizer : standard
       char_filter : char_mapping
@@ -26,12 +35,23 @@ analysis :
         - standard
         - stop
         - porter_stem
+    first_letter_analyzer :
+      #Extracts first letter, elastic search does not seem to have a prefix aggregation, as a workaround first letter is indexed for a to z tool
+      #Not that the pattern skips any non-letter character at the beginning
+      tokenizer : keyword
+      filter :
+        - lowercase
+        - first_letter
   char_filter :
     char_mapping :
       type: mapping
       mappings :
         - "&=>and"
   filter :
+    first_letter :
+      type : pattern_replace
+      pattern: "^[^a-zA-Z]*(.).*"
+      replacement: "$1"
     ons_synonyms :
       type : synonym
       # stores synonyms for search engine

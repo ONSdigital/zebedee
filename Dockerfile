@@ -1,9 +1,4 @@
-from onsdigital/java-component
-
-
-# Consul
-WORKDIR /etc/consul.d
-RUN echo '{"service": {"name": "zebedee-cms", "tags": ["blue"], "port": 8080, "check": {"script": "curl http://localhost:8080 >/dev/null 2>&1", "interval": "10s"}}}' > zebedee.json
+FROM onsdigital/java-component
 
 # Add the repo source
 WORKDIR /usr/src
@@ -16,9 +11,8 @@ ADD ./zebedee-cms/target/classes /usr/src/target/classes
 EXPOSE 9200
 
 # Update the entry point script
-RUN mv /usr/entrypoint/container.sh /usr/src/
-RUN echo "java -Xmx2048m \
+ENTRYPOINT java -Xmx2048m \
           -Drestolino.classes=target/classes \
           -Drestolino.packageprefix=com.github.onsdigital.zebedee.api \
-          -cp \"target/dependency/*:target/classes/\" \
-          com.github.davidcarboni.restolino.Main" >> container.sh
+          -cp "target/dependency/*:target/classes/" \
+          com.github.davidcarboni.restolino.Main

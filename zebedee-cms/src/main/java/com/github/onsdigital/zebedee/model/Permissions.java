@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
@@ -121,7 +122,7 @@ public class Permissions {
     }
 
     /**
-     * Determines whether the specified user has editing rights.
+     * Responds only on the basis of whether a user is an editor
      *
      * @param email The user's email.
      * @return If the user is a member of the Digital Publishing team, true.
@@ -133,12 +134,65 @@ public class Permissions {
     }
 
     /**
+     * Get whether a user session can edit a collection
+     *
+     * Future-proofing only at present
+     *
+     * @param session the session
+     * @param collectionDescription the collection description
+     * @return
+     * @throws IOException
+     */
+    public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
+        if (collectionDescription.isEncrypted) {
+            return canEdit(session.email) && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
+        } else {
+            return canEdit(session.email);
+        }
+    }
+
+    /**
+     * Get whether a user can edit a collection
+     *
+     * @param user the user
+     * @param collectionDescription
+     * @return
+     * @throws IOException
+     */
+    public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
+        if (collectionDescription.isEncrypted) {
+            return canEdit(user.email) && user.keyring.list().contains(collectionDescription.id);
+        } else {
+            return canEdit(user.email);
+        }
+    }
+
+
+    /**
+     * Get whether a user can edit a collection
+     *
+     * @param email the user email
+     * @param collectionDescription
+     * @return
+     * @throws IOException
+     */
+    public boolean canEdit(String email, CollectionDescription collectionDescription) throws IOException {
+        try {
+            return canEdit(zebedee.users.get(email), collectionDescription);
+        } catch (BadRequestException | NotFoundException e) {
+            return false;
+        }
+    }
+
+
+
+    /**
      * Adds the specified user to the Digital Publishing team, giving them access to read and write all content.
      *
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addEditor(String email, Session session) throws IOException, UnauthorizedException {
+    public void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -149,6 +203,13 @@ public class Permissions {
         //}
         accessMapping.digitalPublishingTeam.add(PathUtils.standardise(email));
         writeAccessMapping(accessMapping);
+
+        // Update keyring (assuming this is not the system initialisation)
+        User user = zebedee.users.get(email);
+        if (session != null && user.keyring != null) {
+            KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session));
+            zebedee.users.updateKeyring(user);
+        }
     }
 
 
@@ -172,7 +233,10 @@ public class Permissions {
     }
 
     /**
-     * Determines whether the specified user has viewing rights.
+     * Determines whether a session has viewing rights.
+     *
+     * If a collection has its encrypted flag set returns yes for any user with the key
+     * If not encrypted only gives view permission to publisher/admins
      *
      * @param session               The user's session. Can be null.
      * @param collectionDescription The collection to check access for.
@@ -181,7 +245,49 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        return session != null && canView(session.email, collectionDescription);
+        if (collectionDescription.isEncrypted) {
+            return session != null && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
+        } else {
+            return session != null && canEdit(session);
+        }
+    }
+
+    /**
+     * Determines whether the specified user has viewing rights.
+     *
+     * If a collection has its encrypted flag set returns yes for any user with the key
+     * If not encrypted only gives view permission to publisher/admins
+     *
+     * @param user               The user. Can be null.
+     * @param collectionDescription The collection to check access for.
+     * @return True if the user is a member of the Digital Publishing team or
+     * the user is a content owner with access to the given path or any parent path.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
+        if (collectionDescription.isEncrypted) {
+            return user != null && user.keyring.list().contains(collectionDescription.id);
+        } else {
+            return user != null && canEdit(user.email);
+        }
+    }
+
+    /**
+     * Determines whether the specified user has viewing rights.
+     *
+     * @param email               The email of the user
+     * @param collectionDescription The collection to check access for.
+     * @return True if the user is a member of the Digital Publishing team or
+     * the user is a content owner with access to the given path or any parent path.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
+
+        try {
+            return canView(zebedee.users.get(email), collectionDescription);
+        } catch (NotFoundException | BadRequestException e) {
+            return false;
+        }
     }
 
     /**
@@ -193,10 +299,10 @@ public class Permissions {
      * the user is a content owner with access to the given path or any parent path.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
-        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
-    }
+//    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
+//        AccessMapping accessMapping = readAccessMapping();
+//        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
+//    }
 
     /**
      * Grants the given team access to the given collection.

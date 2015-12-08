@@ -51,7 +51,7 @@ public class Table {
         }
 
         // Path
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
         if (path == null) {
             throw new NotFoundException("URI not found in collection: " + uri);
         }

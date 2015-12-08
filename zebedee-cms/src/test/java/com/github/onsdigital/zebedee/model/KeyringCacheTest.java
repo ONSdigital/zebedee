@@ -31,7 +31,7 @@ public class KeyringCacheTest {
 
     @Before
     public  void before() throws IOException, CollectionNotFoundException {
-        zebedee = new Zebedee(builder.zebedee);
+        zebedee = new Zebedee(builder.zebedee, false);
          keyringCache = zebedee.keyringCache;
     }
 

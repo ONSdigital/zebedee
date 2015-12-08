@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
@@ -8,17 +9,17 @@ import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -64,6 +65,17 @@ public class Collections {
         return listing;
     }
 
+    /**
+     * Mark a file in a collection as 'complete'
+     *
+     * @param collection
+     * @param uri
+     * @param session
+     * @throws IOException
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws BadRequestException
+     */
     public void complete(Collection collection, String uri,
                          Session session) throws IOException, NotFoundException,
             UnauthorizedException, BadRequestException {
@@ -155,7 +167,8 @@ public class Collections {
         if (collection.isRelease()) {
             Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
-                collection.populateRelease(session.email);
+                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+                collection.populateRelease(collectionReader);
             } catch (ZebedeeException e) {
                 Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
             }
@@ -269,7 +282,7 @@ public class Collections {
         }
 
         // Locate the path:
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
         if (path == null) {
             throw new NotFoundException("URI not found in collection: " + uri);
         }
@@ -284,7 +297,7 @@ public class Collections {
     }
 
     /**
-                                             * List the given directory of a collection including the files that have already been published.
+     * List the given directory of a collection including the files that have already been published.
      *
      * @param collection the collection to overlay on master content
      * @param uri        the uri of the directory
@@ -333,54 +346,6 @@ public class Collections {
         collection.delete();
     }
 
-    public void readContent(Collection collection, String uri, boolean resolveReferences, Session session,
-                            HttpServletResponse response) throws IOException,
-            UnauthorizedException, BadRequestException, NotFoundException {
-
-        // Collection (null check before authorisation check)
-        if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
-        }
-
-        // Authorisation
-        if (session == null
-                || !zebedee.permissions.canView(session.email,
-                collection.description)) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
-        }
-
-        // Requested path
-        if (StringUtils.isBlank(uri)) {
-            throw new BadRequestException("Please provide a URI");
-        }
-
-        // Path
-        Path path = collection.find(session.email, uri);
-        if (path == null) {
-            throw new NotFoundException("URI not found in collection: " + uri);
-        }
-
-        // Check we're requesting a file:
-        if (Files.isDirectory(path)) {
-            throw new BadRequestException("URI does not specify a file");
-        }
-
-        // Guess the MIME type
-        if (StringUtils.equalsIgnoreCase("json", FilenameUtils.getExtension(path.toString()))) {
-            response.setContentType("application/json");
-        } else {
-            String contentType = Files.probeContentType(path);
-            response.setContentType(contentType);
-        }
-
-        try (InputStream input = Files.newInputStream(path)) {
-            // Write the file to the response
-            org.apache.commons.io.IOUtils.copy(input,
-                    response.getOutputStream());
-        }
-    }
-
-
     /**
      * Create new content if it does not already exist.
      *
@@ -415,7 +380,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !zebedee.permissions.canEdit(session, collection.description)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -425,7 +390,7 @@ public class Collections {
         }
 
         // Find the file if it exists
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
 
         // Check we're writing a file:
         if (path != null && Files.isDirectory(path)) {
@@ -459,18 +424,30 @@ public class Collections {
                     "Somehow we weren't able to edit the requested URI");
         }
 
+
         // Detect whether this is a multipart request
         if (ServletFileUpload.isMultipartContent(request)) {
             // If it is we're doing an xls/csv file upload
             try {
-                postDataFile(request, path);
+                if (collection.description.isEncrypted) {
+                    postDataFile(request, path, zebedee.keyringCache.get(session).get(collection.description.id));
+                } else {
+                    postDataFile(request, path);
+                }
             } catch (Exception e) {
 
             }
         } else {
             // Otherwise we're doing a json content update
-            try (OutputStream output = Files.newOutputStream(path)) {
-                org.apache.commons.io.IOUtils.copy(requestBody, output);
+            if (collection.description.isEncrypted) {
+                SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
+                try (OutputStream output = EncryptionUtils.encryptionOutputStream(path, key)) {
+                    org.apache.commons.io.IOUtils.copy(requestBody, output);
+                }
+            } else {
+                try (OutputStream output = Files.newOutputStream(path)) {
+                    org.apache.commons.io.IOUtils.copy(requestBody, output);
+                }
             }
         }
     }
@@ -495,7 +472,7 @@ public class Collections {
         }
 
         // Find the file if it exists
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
 
         // Check the user has access to the given file
         if (path == null || !collection.isInCollection(uri)) {
@@ -516,16 +493,81 @@ public class Collections {
         return deleted;
     }
 
+    /**
+     * Save a data file from a servlet (no encryption)
+     *
+     * @param request
+     * @param path
+     * @throws FileUploadException
+     * @throws IOException
+     */
     private void postDataFile(HttpServletRequest request, Path path)
             throws FileUploadException, IOException {
 
+        ServletFileUpload upload = getServletFileUpload();
+
+        try {
+            // Read the items - this will save the values to temp files
+            for (FileItem item : upload.parseRequest(request)) {
+                item.write(path.toFile());
+            }
+        } catch (Exception e) {
+            // item.write throws Exception
+            throw new IOException("Error processing uploaded file", e);
+        }
+    }
+
+    /**
+     * Save a data file from a servlet using encryption
+     *
+     * @param request
+     * @param path
+     * @param key
+     * @throws FileUploadException
+     * @throws IOException
+     */
+    private void postDataFile(HttpServletRequest request, Path path, SecretKey key)
+            throws FileUploadException, IOException {
+
+        ServletFileUpload upload = getServletFileUpload();
+
+        try {
+            // Read the items - this will save the values to temp files
+            for (FileItem item : upload.parseRequest(request)) {
+                try(InputStream inputStream = item.getInputStream(); OutputStream outputStream = EncryptionUtils.encryptionOutputStream(path, key)) {
+                    IOUtils.copy(inputStream, outputStream);
+                }
+            }
+        } catch (Exception e) {
+            // item.write throws Exception
+            throw new IOException("Error processing uploaded file", e);
+        }
+    }
+
+    /**
+     * get a file upload object with progress listener
+     *
+     * @return an upload object
+     */
+    private ServletFileUpload getServletFileUpload() {
         // Set up the objects that do all the heavy lifting
         // PrintWriter out = response.getWriter();
-        DiskFileItemFactory factory = new DiskFileItemFactory();
+        EncryptedFileItemFactory factory = new EncryptedFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
 
+        ProgressListener progressListener = getProgressListener();
+        upload.setProgressListener(progressListener);
+        return upload;
+    }
+
+    /**
+     * get a progress listener
+     *
+     * @return a ProgressListener object
+     */
+    private ProgressListener getProgressListener() {
         // Set up a progress listener that we can use to power a progress bar
-        ProgressListener progressListener = new ProgressListener() {
+        return new ProgressListener() {
             private long megaBytes = -1;
 
             @Override
@@ -537,17 +579,6 @@ public class Collections {
                 megaBytes = mBytes;
             }
         };
-        upload.setProgressListener(progressListener);
-
-        try {
-            // Read the items - this will save the values to temp files
-            for (FileItem item : upload.parseRequest(request)) {
-                item.write(path.toFile());
-            }
-        } catch (Exception e) {
-            // item.write throws Exception
-            throw new IOException("Error processing uploaded file", e);
-        }
     }
 
     /**
@@ -581,7 +612,7 @@ public class Collections {
         }
 
         // Find the file if it exists
-        Path path = collection.find(session.email, uri);
+        Path path = collection.find(uri);
 
         // Check we're writing a file:
         if (path != null && Files.isDirectory(path)) {
@@ -646,20 +677,6 @@ public class Collections {
                     }
                 }
             }
-
-            return result;
-        }
-
-        public boolean transfer(String email, String uri, Collection source,
-                                Collection destination) throws IOException {
-            boolean result = false;
-
-            // Move the file
-            Path sourcePath = source.find(email, uri);
-            Path destinationPath = destination.getInProgressPath(uri);
-
-            PathUtils.moveFilesInDirectory(sourcePath, destinationPath);
-            result = true;
 
             return result;
         }

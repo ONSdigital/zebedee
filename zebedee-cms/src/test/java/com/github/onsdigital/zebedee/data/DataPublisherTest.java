@@ -86,7 +86,7 @@ public class DataPublisherTest {
         // Loads a zebedee with two collections, each of which contain a dataset
         //
         bob = new Builder(DataPublisherTest.class, ResourceUtils.getPath("/bootstraps/data_publisher"));
-        zebedee = new Zebedee(bob.zebedee);
+        zebedee = new Zebedee(bob.zebedee, false);
         publisher = bob.createSession(bob.publisher1);
 
         collection = zebedee.collections.list().getCollection("collection");
@@ -302,7 +302,7 @@ public class DataPublisherTest {
 
         // When
         // we get the corresponding
-        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, collection, datasetUri);
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, publisher, collection, datasetUri);
 
         // Then
         // we get the unpublished version
@@ -321,7 +321,7 @@ public class DataPublisherTest {
 
         // When
         // we get the corresponding
-        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, collection, datasetUri);
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, publisher, collection, datasetUri);
 
         // Then
         // we get the unpublished version
@@ -354,7 +354,7 @@ public class DataPublisherTest {
 
         // When
         // we get the landing page uri
-        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, collection, datasetUri);
+        DatasetLandingPage landingPage = dataPublisher.landingPageForDataset(zebedee, publisher, collection, datasetUri);
 
         // Then
         // we expect the parent uri
@@ -513,7 +513,7 @@ public class DataPublisherTest {
 
         // When
         // we generate a start page
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, unpublishedTimeSeriesPath, unpublishedTimeSeries);
 
         // Then
         // we expect the startPage to be identical to the unpublishedTimeSeries
@@ -532,7 +532,7 @@ public class DataPublisherTest {
 
         // When
         // we generate a start page to build
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, publishedTimeSeriesPath, publishedTimeSeries);
 
         // Then
         // we expect the startPage to be based on the alreadyPublished timeseries
@@ -543,7 +543,7 @@ public class DataPublisherTest {
     public void populatePageValues_withoutExistingTimeSeries_shouldFillEmptySeries() throws IOException {
         // Given
         // the page we have started building that didn't previously exist
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, unpublishedTimeSeriesPath, unpublishedTimeSeries);
 
         // When
         // we generate a start page
@@ -558,7 +558,7 @@ public class DataPublisherTest {
     public void populatePageValues_overExistingTimeSeries_shouldAddNewPoints() throws IOException {
         // Given
         // the page we have started building that didn't previously exist
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, publishedTimeSeriesPath, publishedTimeSeries);
         simplifyTimeSeries(startPage, publishedTimeSeries);
 
         int originalYears = startPage.years.size();
@@ -577,7 +577,7 @@ public class DataPublisherTest {
     public void populatePageValues_overExistingTimeSeries_shouldOverwriteExistingPoints() throws IOException {
         // Given
         // the time series we are using as examples cleared with some simple data
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, publishedTimeSeriesPath, publishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
         DatasetLandingPage publishThisDataset = publishedLandingPage;
 
@@ -597,7 +597,7 @@ public class DataPublisherTest {
     public void populatePageValues_overExistingTimeSeries_doesNotRemoveExistingPoints() throws IOException {
         // Given
         // the time series we are using as examples cleared with some simple data
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publishedTimeSeriesPath, publishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, publishedTimeSeriesPath, publishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
         DatasetLandingPage publishThisDataset = publishedLandingPage;
 
@@ -617,7 +617,7 @@ public class DataPublisherTest {
     public void populatePageFromTimeSeries_givenFreshTimeSeries_shouldTransferDetails() throws IOException {
         // Given
         // the time series that hadn't previously been published (
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = unpublishedTimeSeries;
         DatasetLandingPage publishThisDataset = unpublishedLandingPage;
 
@@ -636,7 +636,7 @@ public class DataPublisherTest {
     public void populatePageFromTimeseries_overExistingTimeSeries_shouldTransferNameFromTimeSeriesIfNameBlank() throws IOException {
         // Given
         // the time series that hadn't previously been published (
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
         DatasetLandingPage publishThisDataset = publishedLandingPage;
 
@@ -656,7 +656,7 @@ public class DataPublisherTest {
     public void populatePageFromTimeseries_overExistingTimeSeries_shouldNotTransferNameIfNameExists() throws IOException {
         // Given
         // the time series that hadn't previously been published (
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
         DatasetLandingPage publishThisDataset = publishedLandingPage;
 
@@ -676,7 +676,7 @@ public class DataPublisherTest {
     public void populatePageFromTimeseries_overExistingTimeSeries_shouldTransferDetails() throws IOException {
         // Given
         // the time series that hadn't previously been published (
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
         DatasetLandingPage publishThisDataset = publishedLandingPage;
 
@@ -731,7 +731,7 @@ public class DataPublisherTest {
     public void populatePageFromDataset_withSampleDataset_doesCopyDatesAndContactToTimeseries() throws IOException, URISyntaxException, ParseException {
         // Given
         // a test dataset with some specified test values
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, unpublishedTimeSeriesPath, unpublishedTimeSeries);
 
         DatasetLandingPage publishThisDataset = publishedLandingPage;
         String publishThisUri = publishedDatasetPath;
@@ -762,7 +762,7 @@ public class DataPublisherTest {
     public void populatePageFromDataset_withSampleDataset_doesCopyDatasetIdToTimeseries() throws IOException, URISyntaxException, ParseException {
         // Given
         // a test dataset with some specified test values
-        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
+        TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, publisher, collection, unpublishedTimeSeriesPath, unpublishedTimeSeries);
 
         DatasetLandingPage publishThisDataset = publishedLandingPage;
         String publishThisUri = publishedDatasetPath;

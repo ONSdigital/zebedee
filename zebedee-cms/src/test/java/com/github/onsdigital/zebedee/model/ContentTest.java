@@ -121,20 +121,6 @@ public class ContentTest {
     }
 
     @Test
-    public void shouldGetDetails() throws IOException {
-
-        // Given an instance of content
-        Content content = new Content(basePath);
-
-        // When the details method is called
-        List<ContentDetail> results = content.details();
-
-        // The result has the expected values
-        assertTrue(results.size() > 0);
-        assertEquals(baseContent.description.title, results.get(0).description.title);
-    }
-
-    @Test
     public void shouldGetNestedDetails() throws IOException {
 
         // Given an instance of content

@@ -32,7 +32,7 @@ public class TeamsTest {
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
-        zebedee = new Zebedee(builder.zebedee);
+        zebedee = new Zebedee(builder.zebedee, false);
         inflationCollection = new Collection(builder.collections.get(0), zebedee);
         labourMarketCollection = new Collection(builder.collections.get(1), zebedee);
     }
@@ -92,7 +92,7 @@ public class TeamsTest {
 
         // When
         // We create the team
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         Team ukTradeAndIndustryTeam = zebedee.teams.createTeam(name, session);
 
         // Then
@@ -119,7 +119,7 @@ public class TeamsTest {
 
         // When
         // We create a bunch of teams
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         for (int i = 0; i < 10; i++) {
             zebedee.teams.createTeam(name + " " + i, session);
         }
@@ -140,7 +140,7 @@ public class TeamsTest {
         // Given
         // A new team
         String name = "The twin project team";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.teams.createTeam(name, session);
 
         // When
@@ -161,7 +161,7 @@ public class TeamsTest {
 
         // When
         // We create the team
-        Session session = zebedee.sessions.create(builder.reviewer2.email);
+        Session session = zebedee.openSession(builder.reviewer1Credentials);
         Team ukTradeAndIndustryTeam = zebedee.teams.createTeam(name, session);
 
         // Then
@@ -181,7 +181,7 @@ public class TeamsTest {
         // When
         // We rename the team
         team.name = newName;
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.teams.renameTeam(team, session);
 
         // Then
@@ -207,7 +207,7 @@ public class TeamsTest {
         // When
         // We rename the team
         team.name = duplicateName;
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.teams.renameTeam(team, session);
 
         // Then
@@ -226,7 +226,7 @@ public class TeamsTest {
 
         // When
         // We rename the team
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.teams.renameTeam(team, session);
 
         // Then
@@ -245,7 +245,7 @@ public class TeamsTest {
 
         // When
         // We rename the team
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.teams.renameTeam(team, session);
 
         // Then
@@ -265,7 +265,7 @@ public class TeamsTest {
         // When
         // We rename the team
         team.name = newName;
-        Session session = zebedee.sessions.create(builder.reviewer2.email);
+        Session session = zebedee.openSession(builder.reviewer2Credentials);
         zebedee.teams.renameTeam(team, session);
 
         // Then
@@ -282,7 +282,7 @@ public class TeamsTest {
 
         // When
         // We delete the team
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.teams.deleteTeam(team, session);
 
         // Then
@@ -304,7 +304,7 @@ public class TeamsTest {
 
         // When
         // We rename the team
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.teams.deleteTeam(team, session);
 
         // Then
@@ -320,7 +320,7 @@ public class TeamsTest {
 
         // When
         // We rename the team
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         zebedee.teams.renameTeam(team, session);
 
         // Then
@@ -337,7 +337,7 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
 
         // When
         // We attempt to delete the team
-        Session session = zebedee.sessions.create(builder.reviewer2.email);
+        Session session = zebedee.openSession(builder.reviewer2Credentials);
         zebedee.teams.deleteTeam(team, session);
 
         // Then
@@ -351,7 +351,7 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
         // Given
         // A new team
         String name = "My team";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         Team team = zebedee.teams.createTeam(name, session);
 
         // When
@@ -371,12 +371,12 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
         // Given
         // A new team
         String name = "My team";
-        Session adminSession = zebedee.sessions.create(builder.administrator.email);
+        Session adminSession = zebedee.openSession(builder.administratorCredentials);
         Team team = zebedee.teams.createTeam(name, adminSession);
 
         // When
         // We add a team member without being an administrator
-        Session session = zebedee.sessions.create(builder.reviewer1.email);
+        Session session = zebedee.openSession(builder.reviewer1Credentials);
         zebedee.teams.addTeamMember(builder.reviewer1.email, team, session);
 
         // Then
@@ -390,7 +390,7 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
         // Given
         // A new team
         String name = "My team";
-        Session session = zebedee.sessions.create(builder.administrator.email);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         Team team = zebedee.teams.createTeam(name, session);
         zebedee.teams.addTeamMember(builder.reviewer1.email, team, session);
         zebedee.teams.addTeamMember(builder.reviewer2.email, team, session);
@@ -412,14 +412,14 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
         // Given
         // A new team
         String name = "My team";
-        Session adminSession = zebedee.sessions.create(builder.administrator.email);
+        Session adminSession = zebedee.openSession(builder.administratorCredentials);
         Team team = zebedee.teams.createTeam(name, adminSession);
         zebedee.teams.addTeamMember(builder.reviewer1.email, team, adminSession);
         zebedee.teams.addTeamMember(builder.reviewer2.email, team, adminSession);
 
         // When
         // We add a team member without being an administrator
-        Session session = zebedee.sessions.create(builder.reviewer1.email);
+        Session session = zebedee.openSession(builder.reviewer1Credentials);
         zebedee.teams.removeTeamMember(builder.reviewer2.email, team, session);
 
         // Then

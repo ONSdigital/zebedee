@@ -43,7 +43,10 @@ public class Password {
         if (session == null && credentials != null) {
             User user = Root.zebedee.users.get(credentials.email);
             if (user.authenticate(credentials.oldPassword)) {
-                session = Root.zebedee.sessions.create(credentials.email);
+                Credentials oldPasswordCredentials = new Credentials();
+                oldPasswordCredentials.email = credentials.email;
+                oldPasswordCredentials.password = credentials.oldPassword;
+                session = Root.zebedee.openSession(oldPasswordCredentials);
             }
         }
 

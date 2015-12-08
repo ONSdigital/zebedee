@@ -11,8 +11,6 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.junit.After;
-
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,6 +21,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -42,6 +42,8 @@ public class CollectionMoveTest {
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
+        zebedee.openSession(builder.publisher1Credentials);
+
         collection = Collection.create(new CollectionDescription("Collection"), zebedee, builder.publisher1.email);
         martin  = createArticle("/people/martin", "Martin");
         bedford = createArticle("/places/bedford", "Bedford");
@@ -135,7 +137,7 @@ public class CollectionMoveTest {
         bedfordshire = (Article) readPageFromCollection(collection, bedfordshire.getUri().toString());
     }
     Page readPageFromCollection(Collection collection, String uri) throws IOException {
-        Path path = collection.find(builder.publisher1.email, uri).resolve("data.json");
+        Path path = collection.find(uri).resolve("data.json");
         Page page = null;
         try(InputStream stream = Files.newInputStream(path)) {
             page = ContentUtil.deserialiseContent(stream);

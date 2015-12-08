@@ -1,6 +1,10 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -37,7 +41,7 @@ public class Zebedee {
     public final Content launchpad;
     public final VerificationAgent verificationAgent;
 
-    public Zebedee(Path path)  {
+    public Zebedee(Path path, boolean useVerificationAgent)  {
 
         // Validate the directory:
         this.path = path;
@@ -81,7 +85,15 @@ public class Zebedee {
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
         this.launchpad = new Content(launchpad);
-        this.verificationAgent = new VerificationAgent(this);
+        if (useVerificationAgent) {
+            this.verificationAgent = new VerificationAgent(this);
+        } else {
+            this.verificationAgent = null;
+        }
+    }
+
+    public Zebedee(Path path) {
+        this(path, true);
     }
 
     /**
@@ -91,7 +103,7 @@ public class Zebedee {
      * @return A {@link Zebedee} instance representing the newly created folder.
      * @throws IOException If a filesystem error occurs.
      */
-    public static Zebedee create(Path parent) throws IOException, UnauthorizedException {
+    public static Zebedee create(Path parent) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         // Create the folder structure
         Path path;
@@ -231,5 +243,41 @@ public class Zebedee {
             }
         }
         Files.delete(path);
+    }
+
+    /**
+     * Open a user session
+     *
+     * This is a zebedee level operation since we need to unlock the keyring
+     *
+     * @param credentials
+     * @return
+     * @throws IOException
+     * @throws NotFoundException
+     * @throws BadRequestException
+     */
+    public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
+        if (credentials == null) {
+            System.out.println("Null session due to credentials being null");
+            return null;
+        }
+
+        // Get the user
+        User user = users.get(credentials.email);
+
+        if (user == null) {
+            System.out.println("Null session due to users.get returning null");
+            return null;
+        }
+
+        // Create a session
+        Session session = sessions.create(user);
+
+        // Unlock and cache keyring
+        user.keyring.unlock(credentials.password);
+        keyringCache.put(user);
+
+        // Return a session
+        return session;
     }
 }

@@ -4,8 +4,8 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.filter.FilterUtil;
@@ -24,6 +24,10 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
  * Service to read published content and contents going through process in collections
  */
 public class ZebedeeReader {
+    /**
+     * If Zebedee Reader is running standalone, no reader factory registered, thus no collection reads are allowed
+     */
+    private static CollectionReaderFactory collectionReaderFactory;
     private ContentReader publishedContentReader;
     private ContentLanguage language;
 
@@ -40,6 +44,14 @@ public class ZebedeeReader {
     public ZebedeeReader(String rootFolder, ContentLanguage language) {
         publishedContentReader = new ContentReader(rootFolder);
         this.language = language;
+    }
+
+    public static CollectionReaderFactory getCollectionReaderFactory() {
+        return collectionReaderFactory;
+    }
+
+    public static void setCollectionReaderFactory(CollectionReaderFactory collectionReaderFactory) {
+        ZebedeeReader.collectionReaderFactory = collectionReaderFactory;
     }
 
     /**
@@ -77,9 +89,9 @@ public class ZebedeeReader {
      * @throws com.github.onsdigital.zebedee.exceptions.NotFoundException
      * @throws IOException
      */
-    public Content getCollectionContent(String collectionId, String path) throws ZebedeeException, IOException {
+    public Content getCollectionContent(String collectionId, String sessionId, String path) throws ZebedeeException, IOException {
         assertId(collectionId);
-        return createCollectionReader(collectionId).getContent(path);
+        return createCollectionReader(collectionId, sessionId).getContent(path);
     }
 
     /**
@@ -96,8 +108,8 @@ public class ZebedeeReader {
      * @throws com.github.onsdigital.zebedee.exceptions.NotFoundException
      * @throws IOException
      */
-    public Content getCollectionContent(String collectionId, String path, DataFilter filter) throws ZebedeeException, IOException {
-        Content collectionContent = getCollectionContent(collectionId, path);
+    public Content getCollectionContent(String collectionId, String sessionId, String path, DataFilter filter) throws ZebedeeException, IOException {
+        Content collectionContent = getCollectionContent(collectionId, sessionId, path);
         return FilterUtil.filterPageData(collectionContent, filter);
     }
 
@@ -123,9 +135,9 @@ public class ZebedeeReader {
      * @throws ZebedeeException
      * @throws IOException
      */
-    public Resource getCollectionResource(String collectionId, String path) throws ZebedeeException, IOException {
+    public Resource getCollectionResource(String collectionId, String sessionId, String path) throws ZebedeeException, IOException {
         assertId(collectionId);
-        return createCollectionReader(collectionId).getResource(path);
+        return createCollectionReader(collectionId, sessionId).getResource(path);
     }
 
     public Map<URI, ContentNode> getPublishedContentChildren(String path) throws ZebedeeException, IOException {
@@ -138,19 +150,17 @@ public class ZebedeeReader {
     }
 
 
-    public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String path) throws ZebedeeException, IOException {
-        return createCollectionReader(collectionId).getChildren(path);
+    public Map<URI, ContentNode> getCollectionContentChildren(String collectionId, String sessionId, String path) throws ZebedeeException, IOException {
+        return createCollectionReader(collectionId, sessionId).getChildren(path);
     }
 
     public Map<URI, ContentNode> getPublishedContentParents(String path) throws ZebedeeException, IOException {
         return publishedContentReader.getParents(path);
     }
 
-
-    public Map<URI, ContentNode> getCollectionContentParents(String collectionId, String path) throws IOException, ZebedeeException {
-        return createCollectionReader(collectionId).getParents(path);
+    public Map<URI, ContentNode> getCollectionContentParents(String collectionId, String sessionId, String path) throws IOException, ZebedeeException {
+        return createCollectionReader(collectionId, sessionId).getParents(path);
     }
-
 
     public Content getLatestPublishedContent(String uri) throws ZebedeeException, IOException {
         return getLatestPublishedContent(uri, null);
@@ -161,12 +171,12 @@ public class ZebedeeReader {
         return FilterUtil.filterPageData(content, dataFilter);
     }
 
-    public Content getLatestCollectionContent(String collectionId, String uri) throws IOException, ZebedeeException {
-        return getLatestCollectionContent(collectionId, uri, null);
+    public Content getLatestCollectionContent(String collectionId, String sessionId, String uri) throws IOException, ZebedeeException {
+        return getLatestCollectionContent(collectionId, sessionId, uri, null);
     }
 
-    public Content getLatestCollectionContent(String collectionId, String uri, DataFilter dataFilter) throws IOException, ZebedeeException {
-        Page content = createCollectionReader(collectionId).getLatestContent(uri);
+    public Content getLatestCollectionContent(String collectionId, String sessionId, String uri, DataFilter dataFilter) throws IOException, ZebedeeException {
+        Page content = createCollectionReader(collectionId, sessionId).getLatestContent(uri);
         return FilterUtil.filterPageData(content, dataFilter);
     }
 
@@ -177,8 +187,12 @@ public class ZebedeeReader {
     }
 
 
-    private CollectionContentReader createCollectionReader(String collectionId) throws NotFoundException, IOException, CollectionNotFoundException {
-        CollectionContentReader collectionContentReader = new CollectionContentReader(getConfiguration().getCollectionsFolder(), collectionId);
+    private CollectionReader createCollectionReader(String collectionId, String sessionId) throws NotFoundException, IOException, UnauthorizedException, BadRequestException {
+        if (collectionReaderFactory == null) {
+            throw new UnauthorizedException("Collection reads are not available");
+        }
+
+        CollectionReader collectionContentReader = collectionReaderFactory.createCollectionReader(collectionId, sessionId);
         collectionContentReader.setLanguage(language);
         return collectionContentReader;
     }

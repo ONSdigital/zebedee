@@ -24,7 +24,7 @@ public class RedirectTablePartialMatchTest {
         // Create a
         Builder bob = new Builder(RedirectTablePartialMatchTest.class, ResourceUtils.getPath("/bootstraps/basic"));
         root = bob.zebedee;
-        zebedee = new Zebedee(root);
+        zebedee = new Zebedee(root, false);
     }
 
     @After

@@ -1,12 +1,12 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,17 +35,11 @@ public class Content {
      * @throws UnauthorizedException If the user does not have viewer permission.
      */
     @GET
-    public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
-
-        Session session = Root.zebedee.sessions.get(request);
-        Collection collection = Collections.getCollection(request);
-        String uri = request.getParameter("uri");
-
-        //Resolve references to other content types by reading referenced content into requested content
-        boolean resolveReferences = request.getParameter("resolve") != null;
-        System.out.println("Reading content under " + uri + " Resolve references: " + resolveReferences);
-        Root.zebedee.collections.readContent(collection, uri, resolveReferences, session, response);
+    public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
+        Resource resource = RequestUtils.getResource(request);
+        ReaderResponseResponseUtils.sendResponse(resource, response);
     }
+
 
     /**
      * Posts file content to the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>

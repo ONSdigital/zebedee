@@ -7,20 +7,20 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
+import com.github.onsdigital.zebedee.json.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by david on 12/03/2015.
@@ -45,7 +45,7 @@ public class Users {
      * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException, ConflictException, BadRequestException {
+    public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
         zebedee.users.create(session, user);
         Credentials credentials = new Credentials();
         credentials.email = user.email;
@@ -62,7 +62,7 @@ public class Users {
      * @param password The plaintext password for the user.
      * @throws IOException If a filesystem error occurs.
      */
-    public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException {
+    public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         if (zebedee.permissions.hasAdministrator()) {
             // An initial system user already exists
@@ -225,6 +225,25 @@ public class Users {
     }
 
     /**
+     * Save the user file after a keyring update
+     *
+     * @param user
+     * @return
+     * @throws IOException
+     */
+    public User updateKeyring(User user) throws IOException {
+        User updated = read(user.email);
+        if (updated != null) {
+            updated.keyring = user.keyring.clone();
+
+            // Only set this to true if explicitly set:
+            updated.inactive = BooleanUtils.isTrue(user.inactive);
+            write(updated);
+        }
+        return updated;
+    }
+
+    /**
      * Delete a user account
      *
      * @param session - an admin user session
@@ -270,7 +289,7 @@ public class Users {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
-    public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException {
+    public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
         boolean result = false;
 
         if (session == null) {
@@ -299,7 +318,19 @@ public class Users {
             result = changePassword(user, credentials.oldPassword, credentials.password);
         } else if (zebedee.permissions.isAdministrator(session.email) || !zebedee.permissions.hasAdministrator()) {
             // Administrator reset, or system setup
+
+            // Grab current keyring (null if this is system setup)
+            Keyring originalKeyring = null;
+            if (user.keyring != null) originalKeyring = user.keyring.clone();
+
             resetPassword(user, credentials.password, session.email);
+
+            // Restore the user keyring (or not if this is system setup)
+            if (originalKeyring != null) KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session), originalKeyring.list());
+
+            // Save the user
+            write(user);
+
             result = true;
         }
 
@@ -348,6 +379,17 @@ public class Users {
         write(user);
     }
 
+    private void refreshKeyring(Session session, Keyring keyring, Keyring originalKeyring) throws NotFoundException, BadRequestException, IOException {
+        Keyring adminKeyring = zebedee.keyringCache.get(session);
+
+        Set<String> collections = originalKeyring.list();
+        for (String collectionId : collections) {
+            SecretKey key = adminKeyring.get(collectionId);
+            if (key != null) {
+                keyring.put(collectionId, key);
+            }
+        }
+    }
     /**
      * Determines whether the given {@link com.github.onsdigital.zebedee.json.User} is valid.
      *
@@ -440,20 +482,20 @@ public class Users {
      * @param user     The user who has just logged in
      * @param password The user's plaintext password
      */
-    public void migrateToEncryption(User user, String password) throws IOException {
+    public static void migrateToEncryption(Zebedee zebedee, User user, String password) throws IOException {
 
         // Update this user if necessary:
-        migrateUserToEncryption(user, password);
+        migrateUserToEncryption(zebedee, user, password);
 
         int withKeyring = 0;
         int withoutKeyring = 0;
-        UserList users = listAll();
+        UserList users = zebedee.users.listAll();
         for (User otherUser : users) {
             if (user.keyring() != null) {
                 withKeyring++;
             } else {
                 // Migrate test users automatically:
-                if (migrateUserToEncryption(otherUser, "Dou4gl") || migrateUserToEncryption(otherUser, "password"))
+                if (migrateUserToEncryption(zebedee, otherUser, "Dou4gl") || migrateUserToEncryption(zebedee, otherUser, "password"))
                     withKeyring++;
                 else
                     withoutKeyring++;
@@ -472,7 +514,7 @@ public class Users {
      *                 otherwise there's no point because the user's {@link java.security.PrivateKey}
      *                 will be encrypted using this password, so would be unrecoverable with their actual password.
      */
-    private boolean migrateUserToEncryption(User user, String password) throws IOException {
+    private static boolean migrateUserToEncryption(Zebedee zebedee, User user, String password) throws IOException {
         boolean result = false;
         if (user.keyring() == null && user.authenticate(password)) {
             // The keyring has not been generated yet,
@@ -481,7 +523,7 @@ public class Users {
             System.out.println("Generating keyring for " + user.name + " (" + user.email + ")..");
             user.resetPassword(password);
 
-            Root.zebedee.users.update(user, "Encryption migration");
+            zebedee.users.update(user, "Encryption migration");
 
             System.out.println("Done.");
         }

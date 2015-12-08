@@ -3,8 +3,10 @@ package com.github.onsdigital.zebedee.util;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,14 +19,15 @@ public class ReleasePopulator {
      *
      * @param release
      * @param collection
+     * @param reader
      * @return
      */
-    public static Release populate(Release release, Collection collection) throws IOException {
+    public static Release populate(Release release, Collection collection, CollectionReader reader) throws IOException, ZebedeeException {
 
         release.setRelatedDatasets(new ArrayList<Link>());
         release.setRelatedDocuments(new ArrayList<Link>());
 
-        for (ContentDetail contentDetail : collection.reviewed.details()) {
+        for (ContentDetail contentDetail : ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed())) {
             addPageDetailToRelease(release, contentDetail);
         }
 

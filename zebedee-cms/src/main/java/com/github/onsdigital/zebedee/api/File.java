@@ -57,7 +57,7 @@ public class File {
         }
 
         // Path
-        Path path = collection.find(session.email, uriPath);
+        Path path = collection.find(uriPath);
         if (path == null) {
             throw new NotFoundException("URI not found in collection: " + uriPath);
         }

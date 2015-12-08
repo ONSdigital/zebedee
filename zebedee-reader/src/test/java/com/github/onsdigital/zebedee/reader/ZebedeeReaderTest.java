@@ -17,7 +17,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -32,14 +31,19 @@ import static org.junit.Assert.*;
  */
 
 public class ZebedeeReaderTest {
-    private final String TEST_COLLECTION_ID = "testcollection-testid";
+    private final static String TEST_COLLECTION_ID = "testcollection-testid";
+    private final static String TEST_SESSION_ID = "testcollection-session";
+    private final static String ZEBEDEE_ROOT = "target/test-content";
 
 
     //TODO: mime type resolving not working on Mac machines due to java bug in Files.probeContentType, use a lib to resolve mime type based on extension and enable test bits checking mime types
 
-    @Before
-    public void initializeTestConfig() {
-        ReaderConfiguration.init("target/test-content");
+    static {
+        ReaderConfiguration.init(ZEBEDEE_ROOT);
+
+        if (ZebedeeReader.getCollectionReaderFactory() == null) {
+            ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));
+        }
     }
 
     @Test
@@ -82,7 +86,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testDescriptionFilter() throws ZebedeeException, IOException {
-        Content content = createReader().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", new DataFilter(DataFilter.FilterType.DESCRIPTION));
+        Content content = createReader().getCollectionContent(TEST_COLLECTION_ID, TEST_SESSION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02", new DataFilter(DataFilter.FilterType.DESCRIPTION));
         assertNotNull(content);
         assertTrue(content instanceof DescriptionWrapper);
         DescriptionWrapper description = (DescriptionWrapper) content;
@@ -105,8 +109,8 @@ public class ZebedeeReaderTest {
         assertTrue(content instanceof Series);
         Series series = (Series) content;
         Point next = series.getSeries().iterator().next();
-        assertEquals("2001 Q2",  next.getName());
-        assertEquals(16,  series.getSeries().size());
+        assertEquals("2001 Q2", next.getName());
+        assertEquals(16, series.getSeries().size());
     }
 
 
@@ -126,7 +130,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testReadCollectionContent() throws ZebedeeException, IOException {
-        Content content = createReader().getCollectionContent(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
+        Content content = createReader().getCollectionContent(TEST_COLLECTION_ID, TEST_SESSION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16");
         assertNotNull(content);
         assertTrue(content instanceof Page);
         Page page = (Page) content;
@@ -136,12 +140,12 @@ public class ZebedeeReaderTest {
 
     @Test(expected = CollectionNotFoundException.class)
     public void testNonExistingCollectionRead() throws ZebedeeException, IOException {
-        Content content = createReader().getCollectionContent("nonexistingcollection", "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
+        Content content = createReader().getCollectionContent("nonexistingcollection", TEST_SESSION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles/labourdisputes/2015-07-16/0c908062.json");
     }
 
     @Test
     public void testXlsResource() throws ZebedeeException, IOException {
-        try (Resource resource = createReader().getCollectionResource(TEST_COLLECTION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
+        try (Resource resource = createReader().getCollectionResource(TEST_COLLECTION_ID, TEST_SESSION_ID, "employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets/labourdisputesbysectorlabd02/labd02jul2015_tcm77-408195.xls")) {
             assertNotNull(resource != null);
 //            assertEquals("application/vnd.ms-excel", resource.getMimeType());
             assertTrue(resource.isNotEmpty());
@@ -162,7 +166,7 @@ public class ZebedeeReaderTest {
 
     @Test
     public void testGetCollectionChildren() throws ZebedeeException, IOException {
-        Map<URI, ContentNode> children = createReader().getCollectionContentChildren(TEST_COLLECTION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
+        Map<URI, ContentNode> children = createReader().getCollectionContentChildren(TEST_COLLECTION_ID, TEST_SESSION_ID, "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions");
         URI datasetsUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/datasets");
         assertTrue(children.containsKey(datasetsUri));
         URI articlesUri = URI.create("/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/articles");
@@ -196,4 +200,8 @@ public class ZebedeeReaderTest {
     private ZebedeeReader createReader(ContentLanguage language) {
         return new ZebedeeReader(language);
     }
+
+
 }
+
+

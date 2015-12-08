@@ -16,7 +16,6 @@ public class ArticleDownload extends Statistics {
 
     private List<Link> relatedData = new ArrayList<>();//Link to data in the article
     private List<Link> relatedDocuments;
-    private List<Link> topics;
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
@@ -51,14 +50,6 @@ public class ArticleDownload extends Statistics {
 
     public void setRelatedDocuments(List<Link> relatedDocuments) {
         this.relatedDocuments = relatedDocuments;
-    }
-
-    public List<Link> getTopics() {
-        return topics;
-    }
-
-    public void setTopics(List<Link> topics) {
-        this.topics = topics;
     }
 
     public List<FigureSection> getCharts() {

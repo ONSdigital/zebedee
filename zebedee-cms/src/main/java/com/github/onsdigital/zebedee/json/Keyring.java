@@ -53,13 +53,14 @@ public class Keyring implements Cloneable {
     public int size() {
         return keyring.size();
     }
+
     public Keyring emptyClone() {
         Keyring keyring = new Keyring();
         keyring.privateKey = this.privateKey;
         keyring.publicKey = this.publicKey;
         keyring.privateKeySalt = this.privateKeySalt;
 
-        Map<String , String> clonedKeyring = new ConcurrentHashMap<>();
+        Map<String, String> clonedKeyring = new ConcurrentHashMap<>();
         keyring.keyring = clonedKeyring;
 
         return keyring;
@@ -72,8 +73,10 @@ public class Keyring implements Cloneable {
         keyring.publicKey = this.publicKey;
         keyring.privateKeySalt = this.privateKeySalt;
 
-        Map<String , String> clonedKeyring = new ConcurrentHashMap<>();
-        for (String key: this.keyring.keySet()) { clonedKeyring.put(key, this.keyring.get(key)); }
+        Map<String, String> clonedKeyring = new ConcurrentHashMap<>();
+        for (String key : this.keyring.keySet()) {
+            clonedKeyring.put(key, this.keyring.get(key));
+        }
         keyring.keyring = clonedKeyring;
 
         return keyring;
@@ -145,10 +148,7 @@ public class Keyring implements Cloneable {
             try {
                 // Attempt to decrypt the key
                 result = new KeyExchange().decryptKey(keyring.get(collectionId), keyPair.getPrivate());
-
-                if (keys == null) {
-                    keys.put(collectionId, result);
-                }
+                keys.put(collectionId, result);
             } catch (IllegalArgumentException e) {
                 // Error decrypting key
                 Log.print("Error recovering encryption key for collection " + collectionId + ": " + e.getMessage());

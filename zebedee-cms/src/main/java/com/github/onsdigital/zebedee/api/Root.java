@@ -8,6 +8,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.UserList;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -103,6 +105,26 @@ public class Root {
 
         loadExistingCollectionsIntoScheduler();
         indexPublishedCollections();
+
+        cleanupStaleCollectionKeys();
+    }
+
+    private static void cleanupStaleCollectionKeys() {
+
+        try {
+            UserList users = zebedee.users.list();
+
+            for (User user : users) {
+                Log.print("start cleanupCollectionKeys");
+                com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(zebedee, user);
+                Log.print("end cleanupCollectionKeys");
+            }
+
+        } catch (IOException e) {
+            Log.print(e, "");
+        }
+
+
     }
 
     private static void indexPublishedCollections() {

@@ -41,11 +41,11 @@ public class KeyringCacheTest {
         // Given
         // A user with a session
         User user = user();
-        builder.createSession(user);
+        Session session = builder.createSession(user);
 
         // When
         // We put the user's keyring
-        keyringCache.put(user);
+        keyringCache.put(user, session);
         Keyring keyring = zebedee.keyringCache.get(user);
 
         // Then
@@ -61,11 +61,12 @@ public class KeyringCacheTest {
         // A null user and missing session
         User nullUser = null;
         User noSessionUser = user();
+        Session session = null;
 
         // When
         // We put the user's keyring
-        keyringCache.put(nullUser);
-        keyringCache.put(noSessionUser);
+        keyringCache.put(nullUser, session);
+        keyringCache.put(noSessionUser, session);
 
         // Then
         // We should get no error and nothing should be present in the cache
@@ -99,7 +100,7 @@ public class KeyringCacheTest {
         // A keyring in the cache
         User user = user();
         Session session = builder.createSession(user);
-        keyringCache.put(user);
+        keyringCache.put(user, session);
 
         // When
         // We remove the user's keyring

@@ -40,7 +40,7 @@ public class Zebedee {
     public final Teams teams;
     public final VerificationAgent verificationAgent;
 
-    public Zebedee(Path path, boolean useVerificationAgent)  {
+    public Zebedee(Path path, boolean useVerificationAgent) {
 
         // Validate the directory:
         this.path = path;
@@ -64,7 +64,7 @@ public class Zebedee {
         this.published = new Content(published);
 
         Path redirectPath = this.published.path.resolve(Content.REDIRECT);
-        if(!Files.exists(redirectPath)) {
+        if (!Files.exists(redirectPath)) {
             this.published.redirect = new RedirectTablePartialMatch(this.published);
             try {
                 Files.createFile(redirectPath);
@@ -105,21 +105,35 @@ public class Zebedee {
 
         // Create the folder structure
         Path path;
-        if(!Files.exists(parent.resolve(ZEBEDEE))) {
+        if (!Files.exists(parent.resolve(ZEBEDEE))) {
             path = Files.createDirectory(parent.resolve(ZEBEDEE));
         } else {
             path = parent.resolve(ZEBEDEE);
         }
-        if (!Files.exists(path.resolve(PUBLISHED))) { Files.createDirectory(path.resolve(PUBLISHED)); }
-        if (!Files.exists(path.resolve(COLLECTIONS))) { Files.createDirectory(path.resolve(COLLECTIONS)); }
-        if (!Files.exists(path.resolve(USERS))) {Files.createDirectory(path.resolve(USERS));}
-        if (!Files.exists(path.resolve(SESSIONS))) {Files.createDirectory(path.resolve(SESSIONS));}
-        if (!Files.exists(path.resolve(PERMISSIONS))) {Files.createDirectory(path.resolve(PERMISSIONS));}
-        if (!Files.exists(path.resolve(TEAMS))) {Files.createDirectory(path.resolve(TEAMS));}
-        if (!Files.exists(path.resolve(LAUNCHPAD))) {Files.createDirectory(path.resolve(LAUNCHPAD));}
+        if (!Files.exists(path.resolve(PUBLISHED))) {
+            Files.createDirectory(path.resolve(PUBLISHED));
+        }
+        if (!Files.exists(path.resolve(COLLECTIONS))) {
+            Files.createDirectory(path.resolve(COLLECTIONS));
+        }
+        if (!Files.exists(path.resolve(USERS))) {
+            Files.createDirectory(path.resolve(USERS));
+        }
+        if (!Files.exists(path.resolve(SESSIONS))) {
+            Files.createDirectory(path.resolve(SESSIONS));
+        }
+        if (!Files.exists(path.resolve(PERMISSIONS))) {
+            Files.createDirectory(path.resolve(PERMISSIONS));
+        }
+        if (!Files.exists(path.resolve(TEAMS))) {
+            Files.createDirectory(path.resolve(TEAMS));
+        }
+        if (!Files.exists(path.resolve(LAUNCHPAD))) {
+            Files.createDirectory(path.resolve(LAUNCHPAD));
+        }
 
         Path redirectPath = path.resolve(PUBLISHED).resolve(Content.REDIRECT);
-        if(!Files.exists(redirectPath)) {
+        if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
         }
 
@@ -169,10 +183,12 @@ public class Zebedee {
 
 
     public String toUri(Path path) {
-        if (path == null) { return null; }
+        if (path == null) {
+            return null;
+        }
 
         // Remove zebedee section of path
-        Path uriPath =  this.path.relativize(path);
+        Path uriPath = this.path.relativize(path);
 
         // Strip off either launchpad, master or collections/mycollection/inprogress etc
         if (uriPath.startsWith("collections")) {
@@ -185,7 +201,7 @@ public class Zebedee {
         String s = uriPath.toString();
         if (s.startsWith("..")) {
             return null;
-        } else if( s.endsWith("data.json") ) {
+        } else if (s.endsWith("data.json")) {
             return "/" + s.substring(0, s.length() - "/data.json".length());
         } else {
             return "/" + s;
@@ -225,7 +241,7 @@ public class Zebedee {
 
     /**
      * Open a user session
-     *
+     * <p>
      * This is a zebedee level operation since we need to unlock the keyring
      *
      * @param credentials
@@ -253,7 +269,7 @@ public class Zebedee {
 
         // Unlock and cache keyring
         user.keyring.unlock(credentials.password);
-        keyringCache.put(user);
+        keyringCache.put(user, session);
 
         // Return a session
         return session;

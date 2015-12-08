@@ -21,15 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Keyring implements Cloneable {
 
+    public transient Map<String, SecretKey> keys = new ConcurrentHashMap<>();
     // Key storage:
     private String privateKeySalt;
     private String privateKey;
     private String publicKey;
     private Map<String, String> keyring = new ConcurrentHashMap<>();
-
     // Runtime cache of decrypted keys:
     private transient KeyPair keyPair;
-    public transient Map<String, SecretKey> keys = new ConcurrentHashMap<>();
 
     /**
      * Generates a new {@link KeyPair} and initialises an empty keyring.
@@ -146,6 +145,7 @@ public class Keyring implements Cloneable {
             try {
                 // Attempt to decrypt the key
                 result = new KeyExchange().decryptKey(keyring.get(collectionId), keyPair.getPrivate());
+                keys.put(collectionId, result);
             } catch (IllegalArgumentException e) {
                 // Error decrypting key
                 Log.print("Error recovering encryption key for collection " + collectionId + ": " + e.getMessage());

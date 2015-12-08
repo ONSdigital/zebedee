@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -17,9 +16,6 @@ import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.Key;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -74,6 +70,61 @@ public class Users {
         zebedee.users.resetPassword(user, password, "system");
         zebedee.permissions.addEditor(user.email, null);
         zebedee.permissions.addAdministrator(user.email, null);
+    }
+
+    /**
+     * TODO: This is a temporary method and should be deleted once all users are set up with encryption.
+     * This is going to take a couple of releases moving through from develop to live/sandpit before we're all set.
+     *
+     * @param user     The user who has just logged in
+     * @param password The user's plaintext password
+     */
+    public static void migrateToEncryption(Zebedee zebedee, User user, String password) throws IOException {
+
+        // Update this user if necessary:
+        migrateUserToEncryption(zebedee, user, password);
+
+        int withKeyring = 0;
+        int withoutKeyring = 0;
+        UserList users = zebedee.users.listAll();
+        for (User otherUser : users) {
+            if (user.keyring() != null) {
+                withKeyring++;
+            } else {
+                // Migrate test users automatically:
+                if (migrateUserToEncryption(zebedee, otherUser, "Dou4gl") || migrateUserToEncryption(zebedee, otherUser, "password"))
+                    withKeyring++;
+                else
+                    withoutKeyring++;
+            }
+        }
+
+        System.out.println(users.size() + " users in the system: " + withKeyring + " of them have keyrings and " + withoutKeyring + " ");
+    }
+
+    /**
+     * TODO: This is a temporary method and should be deleted once all users are set up with encryption.
+     * This is going to take a couple of releases moving through from develop to live/sandpit before we're all set.
+     *
+     * @param user     A user to be migrated
+     * @param password The user's plaintext password. Migration will only happen if this password can be verified,
+     *                 otherwise there's no point because the user's {@link java.security.PrivateKey}
+     *                 will be encrypted using this password, so would be unrecoverable with their actual password.
+     */
+    private static boolean migrateUserToEncryption(Zebedee zebedee, User user, String password) throws IOException {
+        boolean result = false;
+        if (user.keyring() == null && user.authenticate(password)) {
+            // The keyring has not been generated yet,
+            // so reset the password to the current password
+            // in order to generate a keyring and associated key pair:
+            System.out.println("Generating keyring for " + user.name + " (" + user.email + ")..");
+            user.resetPassword(password);
+
+            zebedee.users.update(user, "Encryption migration");
+
+            System.out.println("Done.");
+        }
+        return result;
     }
 
     /**
@@ -303,14 +354,9 @@ public class Users {
 
         User user = read(credentials.email);
 
-        // Check if this is admin resetting, or own user updating
-        if (!zebedee.permissions.isAdministrator(session) && StringUtils.isBlank(credentials.oldPassword)) {
-            throw new UnauthorizedException("Passwords must be changed by admins or own user");
-        }
-
         // If own user updating, ensure the old password is correct
         if (!zebedee.permissions.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
-            throw new BadRequestException("Authentication failed with old password.");
+            throw new UnauthorizedException("Authentication failed with old password.");
         }
 
         if (credentials.email.equalsIgnoreCase(session.email) && StringUtils.isNotBlank(credentials.password)) {
@@ -390,6 +436,7 @@ public class Users {
             }
         }
     }
+
     /**
      * Determines whether the given {@link com.github.onsdigital.zebedee.json.User} is valid.
      *
@@ -472,61 +519,6 @@ public class Users {
             }
         }
 
-        return result;
-    }
-
-    /**
-     * TODO: This is a temporary method and should be deleted once all users are set up with encryption.
-     * This is going to take a couple of releases moving through from develop to live/sandpit before we're all set.
-     *
-     * @param user     The user who has just logged in
-     * @param password The user's plaintext password
-     */
-    public static void migrateToEncryption(Zebedee zebedee, User user, String password) throws IOException {
-
-        // Update this user if necessary:
-        migrateUserToEncryption(zebedee, user, password);
-
-        int withKeyring = 0;
-        int withoutKeyring = 0;
-        UserList users = zebedee.users.listAll();
-        for (User otherUser : users) {
-            if (user.keyring() != null) {
-                withKeyring++;
-            } else {
-                // Migrate test users automatically:
-                if (migrateUserToEncryption(zebedee, otherUser, "Dou4gl") || migrateUserToEncryption(zebedee, otherUser, "password"))
-                    withKeyring++;
-                else
-                    withoutKeyring++;
-            }
-        }
-
-        System.out.println(users.size() + " users in the system: " + withKeyring + " of them have keyrings and " + withoutKeyring + " ");
-    }
-
-    /**
-     * TODO: This is a temporary method and should be deleted once all users are set up with encryption.
-     * This is going to take a couple of releases moving through from develop to live/sandpit before we're all set.
-     *
-     * @param user     A user to be migrated
-     * @param password The user's plaintext password. Migration will only happen if this password can be verified,
-     *                 otherwise there's no point because the user's {@link java.security.PrivateKey}
-     *                 will be encrypted using this password, so would be unrecoverable with their actual password.
-     */
-    private static boolean migrateUserToEncryption(Zebedee zebedee, User user, String password) throws IOException {
-        boolean result = false;
-        if (user.keyring() == null && user.authenticate(password)) {
-            // The keyring has not been generated yet,
-            // so reset the password to the current password
-            // in order to generate a keyring and associated key pair:
-            System.out.println("Generating keyring for " + user.name + " (" + user.email + ")..");
-            user.resetPassword(password);
-
-            zebedee.users.update(user, "Encryption migration");
-
-            System.out.println("Done.");
-        }
         return result;
     }
 }

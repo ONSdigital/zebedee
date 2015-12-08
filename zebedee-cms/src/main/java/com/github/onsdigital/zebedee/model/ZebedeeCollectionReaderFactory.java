@@ -41,7 +41,7 @@ public class ZebedeeCollectionReaderFactory implements CollectionReaderFactory {
         return getCollectionReader(collection, session);
     }
 
-    CollectionReader getCollectionReader(Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException {
+    CollectionReader getCollectionReader(Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
         return new ZebedeeCollectionReader(zebedee, collection, session);
     }
 }

@@ -31,8 +31,8 @@ public class ZebedeeCollectionReaderFactoryTest {
         builder.delete();
     }
 
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollection()
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowNotFoundForNullCollection()
             throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
 

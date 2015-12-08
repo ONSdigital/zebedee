@@ -39,7 +39,8 @@ public class KeyringCache {
 
                 // populate the scheduler keyring
                 for (String collectionId : user.keyring.list()) {
-                    schedulerCache.put(collectionId, user.keyring.get(collectionId));
+                    if (!schedulerCache.containsKey(collectionId))
+                        schedulerCache.put(collectionId, user.keyring.get(collectionId));
                 }
             }
         }

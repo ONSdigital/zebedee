@@ -1,14 +1,11 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.json.User;
 
 import javax.crypto.SecretKey;
@@ -20,10 +17,10 @@ import java.util.Set;
  */
 public class KeyManager {
 
-       /**
+    /**
      * Distributes an encryption key
      *
-     * @param session session for a user that possesses the key
+     * @param session    session for a user that possesses the key
      * @param collection a collection
      */
     public static void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection) throws NotFoundException, BadRequestException, IOException, UnauthorizedException {
@@ -31,7 +28,7 @@ public class KeyManager {
         SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
 
         // Distribute to all users that should have access
-        for (User user: zebedee.users.list()) {
+        for (User user : zebedee.users.list()) {
             if (userShouldAccessCollection(zebedee, user, collection)) {
                 // Add the key
                 assignKeyToUser(zebedee, user, collection, key);
@@ -43,7 +40,6 @@ public class KeyManager {
     }
 
     /**
-     *
      * @param zebedee
      * @param user
      * @param collection
@@ -63,7 +59,8 @@ public class KeyManager {
         if (session != null) {
             Keyring keyring = zebedee.keyringCache.get(session);
             try {
-                keyring.put(collection.description.id, key);
+                if (keyring != null)
+                    keyring.put(collection.description.id, key);
             } catch (Exception e) {
                 e.printStackTrace();
             }

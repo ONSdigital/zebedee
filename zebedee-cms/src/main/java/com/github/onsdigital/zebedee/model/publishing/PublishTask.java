@@ -51,7 +51,8 @@ public class PublishTask implements Runnable {
             } else {
 
                 // Publish the s
-                Publisher.Publish(zebedee, collection, "System");
+                boolean skipVerification = false;
+                Publisher.Publish(zebedee, collection, "System", skipVerification);
             }
         } catch (IOException e) {
             System.out.println("Exception publishing collection for ID" + collectionId + " exception:" + e.getMessage());

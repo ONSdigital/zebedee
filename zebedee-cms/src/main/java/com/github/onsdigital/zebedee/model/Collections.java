@@ -230,13 +230,14 @@ public class Collections {
      *
      * @param collection the collection to publish
      * @param session    a session with editor priviledges
+     * @param skipVerification
      * @return success
      * @throws IOException
      * @throws UnauthorizedException
      * @throws BadRequestException
      * @throws ConflictException     - If there
      */
-    public boolean publish(Collection collection, Session session, Boolean breakBeforePublish)
+    public boolean publish(Collection collection, Session session, boolean breakBeforePublish, boolean skipVerification)
             throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
 
@@ -262,7 +263,7 @@ public class Collections {
         }
         System.out.println("Going ahead with publish");
 
-        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email);
+        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email, skipVerification);
 
         return publishComplete;
     }

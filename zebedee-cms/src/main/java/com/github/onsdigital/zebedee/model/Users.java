@@ -133,6 +133,9 @@ public class Users {
                 Log.print("Removing stale key %s" + key);
                 user.keyring.remove(key);
             }
+
+            if (keysToRemove.size() > 0)
+                zebedee.users.update(user, user.lastAdmin);
         }
     }
 

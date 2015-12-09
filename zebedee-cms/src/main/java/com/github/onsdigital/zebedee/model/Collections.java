@@ -263,7 +263,8 @@ public class Collections {
         }
         System.out.println("Going ahead with publish");
 
-        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email, skipVerification);
+        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email, skipVerification, collectionReader);
 
         return publishComplete;
     }

@@ -21,7 +21,11 @@ public class ZipUtils {
      * @throws IOException
      */
     public static void unzip(final File zipFile, final String destination) throws IOException {
-        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFile))) {
+        unzip(new FileInputStream(zipFile), destination);
+    }
+
+    public static void unzip(final InputStream inputStream, final String destination) throws IOException {
+        try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null && !zipEntry.isDirectory()) {
                 String name = zipEntry.getName();

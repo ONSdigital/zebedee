@@ -120,7 +120,7 @@ public class Collection {
      * @return
      * @throws IOException
      */
-    public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, String email)
+    public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
 
         Release release = checkForRelease(collectionDescription, zebedee);
@@ -135,7 +135,7 @@ public class Collection {
         Files.createDirectory(collectionPath.resolve(COMPLETE));
         Files.createDirectory(collectionPath.resolve(IN_PROGRESS));
 
-        collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, email));
+        collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, session.email));
 
         // Create the description:
         Path collectionDescriptionPath = zebedee.collections.path.resolve(filename
@@ -146,16 +146,16 @@ public class Collection {
 
         Collection collection = new Collection(collectionDescription, zebedee);
 
-        if (release != null) {
-            collection.associateWithRelease(email, release);
-            collection.save();
-        }
-
         // Encryption
         // assign a key for the collection to the session user
-        KeyManager.assignKeyToUser(zebedee, zebedee.users.get(email), collection, Keys.newSecretKey());
+        KeyManager.assignKeyToUser(zebedee, zebedee.users.get(session.email), collection, Keys.newSecretKey());
         // get the session user to distribute the key to all
-        KeyManager.distributeCollectionKey(zebedee, zebedee.sessions.find(email), collection);
+        KeyManager.distributeCollectionKey(zebedee, session, collection);
+
+        if (release != null) {
+            collection.associateWithRelease(session.email, release, new ZebedeeCollectionWriter(zebedee, collection, session));
+            collection.save();
+        }
 
         return collection;
     }
@@ -444,7 +444,7 @@ public class Collection {
      * exists in the published content, false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean edit(String email, String uri) throws IOException {
+    public boolean edit(String email, String uri, CollectionWriter collectionWriter) throws IOException {
         boolean result = false;
 
         if (isInProgress(uri))
@@ -745,13 +745,13 @@ public class Collection {
      * @throws NotFoundException
      * @throws IOException
      */
-    public Release associateWithRelease(String email, Release release) throws IOException {
+    public Release associateWithRelease(String email, Release release, CollectionWriter collectionWriter) throws IOException {
 
         String uri = release.getUri().toString() + "/data.json";
 
         // add the release page to the collection in progress
         if (!isInCollection(uri)) {
-            this.edit(email, uri);
+            this.edit(email, uri, collectionWriter);
         }
 
         Path releasePath = find(uri);

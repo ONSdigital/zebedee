@@ -98,7 +98,7 @@ public class Collection {
         }
 
         com.github.onsdigital.zebedee.model.Collection collection = com.github.onsdigital.zebedee.model.Collection.create(
-                collectionDescription, Root.zebedee, session.email);
+                collectionDescription, Root.zebedee, session);
 
         if (collection.description.type.equals(CollectionType.scheduled)) {
             CollectionScheduler.schedulePublish(Root.scheduler, collection, Root.zebedee);

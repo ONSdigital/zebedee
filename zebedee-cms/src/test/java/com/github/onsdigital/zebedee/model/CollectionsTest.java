@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -31,11 +32,13 @@ public class CollectionsTest {
 
     Zebedee zebedee;
     Builder builder;
+    Session session;
 
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee, false);
+        session = zebedee.openSession(builder.administratorCredentials);
     }
 
     @After
@@ -45,13 +48,13 @@ public class CollectionsTest {
 
     @Test
     public void shouldFindCollection() throws Exception {
-        zebedee.openSession(builder.administratorCredentials);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("FirstCollection"), zebedee, session);
         Collection secondCollection = Collection.create(
-                new CollectionDescription("SecondCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("SecondCollection"), zebedee, session);
 
         collections.add(firstCollection);
         collections.add(secondCollection);
@@ -75,10 +78,9 @@ public class CollectionsTest {
     public void shouldReturnNullIfNotFound() throws Exception {
 
         Collections.CollectionList collections = new Collections.CollectionList();
-        zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("FirstCollection"), zebedee, session);
 
         collections.add(firstCollection);
 
@@ -91,9 +93,9 @@ public class CollectionsTest {
         zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("FirstCollection"), zebedee, session);
         Collection secondCollection = Collection.create(
-                new CollectionDescription("SecondCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("SecondCollection"), zebedee, session);
 
         collectionList.add(firstCollection);
         collectionList.add(secondCollection);
@@ -179,10 +181,10 @@ public class CollectionsTest {
     }
 
 
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnWriteContent()
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowNotFoundForNullCollectionOnWriteContent()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
         // Given
         // A null collection
@@ -348,7 +350,7 @@ public class CollectionsTest {
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnWriteContent()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
         // Given
         // A null session
@@ -406,7 +408,7 @@ public class CollectionsTest {
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestIfNoUriOnWriteContent()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
         // Given
         // A null session
@@ -772,7 +774,7 @@ public class CollectionsTest {
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForWritingADirectoryAsAFile()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
         // Given
         // A directory instead of a file
@@ -794,7 +796,7 @@ public class CollectionsTest {
     @Test(expected = ConflictException.class)
     public void shouldThrowConflictForCreatingFileBeingEditedElsewhere()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
         // Given
         // A file in a different collection
@@ -817,7 +819,7 @@ public class CollectionsTest {
     @Test(expected = ConflictException.class)
     public void shouldThrowConflictForEditingFileBeingEditedElsewhere()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
         // Given
         // A file being edited in a different collection
@@ -828,7 +830,9 @@ public class CollectionsTest {
         Path path = zebedee.published.toPath(uri);
         Files.createDirectories(path.getParent());
         Files.createFile(path);
-        assertTrue(otherCollection.edit(builder.publisher1.email, uri));
+
+        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
+        assertTrue(otherCollection.edit(builder.publisher1.email, uri, collectionWriter));
         HttpServletRequest request = null;
         InputStream inputStream = null;
 
@@ -843,7 +847,7 @@ public class CollectionsTest {
     @Test
     public void shouldWriteContent()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
         // Given
         // A new file
@@ -960,7 +964,7 @@ public class CollectionsTest {
         // A collection
         zebedee.openSession(builder.administratorCredentials);
         Collection collection = Collection.create(
-                new CollectionDescription("collection"), zebedee, builder.administrator.email);
+                new CollectionDescription("collection"), zebedee, session);
 
         // When the collection is updated concurrently.
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -995,7 +999,7 @@ public class CollectionsTest {
     @Test
     public void shouldWriteEncryptedContent()
             throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
         // Given
         // A new file

@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class TimeSeries extends StatisticalData implements  Comparable<TimeSeries> {
+public class TimeSeries extends StatisticalData implements Comparable<TimeSeries> {
 
     // Regexes (what might the plural be?)
     public static Pattern year = Pattern.compile("\\d{4}");
@@ -23,6 +23,9 @@ public class TimeSeries extends StatisticalData implements  Comparable<TimeSerie
 
     /**
      * The nectar, the goodness, the very juice of the fireflower: data.
+     *
+     * Important: {@link #years}, {@link #quarters} and {@link #months} are explicitly declared as
+     * {@link TreeSet} so {@link TimeSeriesValue} abjects are correctly ordered when de-serialised from Json.
      */
     public TreeSet<TimeSeriesValue> years = new TreeSet<>();
     public TreeSet<TimeSeriesValue> quarters = new TreeSet<>();

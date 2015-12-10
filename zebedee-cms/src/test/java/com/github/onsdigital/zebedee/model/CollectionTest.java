@@ -1040,11 +1040,6 @@ public class CollectionTest {
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
 
-        CollectionDescription description = new CollectionDescription();
-        description.id = Random.id();
-        description.name = description.id;
-        Collection collection = Collection.create(description, zebedee, session);
-
         collection.description.releaseUri = uri;
         collection.associateWithRelease(publisher1Email, release, collectionWriter);
 

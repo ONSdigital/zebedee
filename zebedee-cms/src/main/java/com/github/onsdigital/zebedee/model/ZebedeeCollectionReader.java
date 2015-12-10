@@ -20,6 +20,10 @@ public class ZebedeeCollectionReader extends CollectionReader {
 
     public ZebedeeCollectionReader(Zebedee zebedee, Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
 
+        if (collection == null) {
+            throw new NotFoundException("Please specify a collection");
+        }
+
         // Authorisation
         if (session == null
                 || !zebedee.permissions.canView(session.email,

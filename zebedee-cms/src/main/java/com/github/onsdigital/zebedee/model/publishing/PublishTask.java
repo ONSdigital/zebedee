@@ -57,7 +57,7 @@ public class PublishTask implements Runnable {
                 // Publish the s
                 boolean skipVerification = false;
 
-                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, zebedee.keyringCache.schedulerCache.get(collectionId));
+                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.keyringCache.schedulerCache.get(collectionId));
                 Publisher.Publish(zebedee, collection, "System", skipVerification, collectionReader);
             }
         } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {

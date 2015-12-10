@@ -35,26 +35,25 @@ public class ZebedeeCollectionReader extends CollectionReader {
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
 
         SecretKey key = keyring.get(collection.description.id);
-        init(zebedee, collection, key);
+        init(collection, key);
     }
 
-    public ZebedeeCollectionReader(Zebedee zebedee, Collection collection, SecretKey key) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
-
-        init(zebedee, collection, key);
+    public ZebedeeCollectionReader(Collection collection, SecretKey key) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+        init(collection, key);
     }
 
-    private void init(Zebedee zebedee, Collection collection, SecretKey key) throws NotFoundException, UnauthorizedException, IOException {
+    private void init(Collection collection, SecretKey key) throws NotFoundException, UnauthorizedException, IOException {
 
         if (collection == null) {
             throw new NotFoundException("Collection not found");
         }
 
-        inProgress = getContentReader(zebedee, collection, key, collection.path, getConfiguration().getInProgressFolderName());
-        complete = getContentReader(zebedee, collection, key, collection.path, getConfiguration().getCompleteFolderName());
-        reviewed = getContentReader(zebedee, collection, key, collection.path, getConfiguration().getReviewedFolderName());
+        inProgress = getContentReader(collection, key, collection.path, getConfiguration().getInProgressFolderName());
+        complete = getContentReader(collection, key, collection.path, getConfiguration().getCompleteFolderName());
+        reviewed = getContentReader(collection, key, collection.path, getConfiguration().getReviewedFolderName());
     }
 
-    private ContentReader getContentReader(Zebedee zebedee, Collection collection, SecretKey key, Path collectionPath, String folderName) throws UnauthorizedException, IOException {
-        return new CollectionContentReader(zebedee, collection, key, collectionPath.resolve(folderName));
+    private ContentReader getContentReader(Collection collection, SecretKey key, Path collectionPath, String folderName) throws UnauthorizedException, IOException {
+        return new CollectionContentReader(collection, key, collectionPath.resolve(folderName));
     }
 }

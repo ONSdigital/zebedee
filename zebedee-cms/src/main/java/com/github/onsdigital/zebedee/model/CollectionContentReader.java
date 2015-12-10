@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -19,13 +18,11 @@ import static java.nio.file.Files.size;
  */
 public class CollectionContentReader extends ContentReader {
 
-    private Zebedee zebedee;
     private Collection collection;
     private SecretKey key;
 
-    public CollectionContentReader(Zebedee zebedee, Collection collection, SecretKey key, Path rootFolder) throws UnauthorizedException, IOException {
+    public CollectionContentReader(Collection collection, SecretKey key, Path rootFolder) throws UnauthorizedException, IOException {
         super(rootFolder);
-        this.zebedee = zebedee;
         this.collection = collection;
         this.key = key;
     }

@@ -751,12 +751,8 @@ public class Collection {
             this.edit(email, uri, collectionWriter);
         }
 
-        Path releasePath = find(uri);
         release.getDescription().setPublished(true);
-
-        // write file
-        FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
-
+        collectionWriter.getInProgress().write(IOUtils.toInputStream(ContentUtil.serialise(release)), uri);
         return release;
     }
 

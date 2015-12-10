@@ -1,11 +1,11 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
@@ -38,14 +38,15 @@ public class ContentWriter {
      * @throws BadRequestException
      * @throws IOException
      */
-    public void write(InputStream input, String uri) throws BadRequestException, IOException {
+    public void write(InputStream input, String uri) throws IOException, BadRequestException {
         Path path = resolvePath(uri);
         write(input, path);
     }
 
     protected void write(InputStream input, Path path) throws BadRequestException, IOException {
         assertNotDirectory(path);
-        try (OutputStream output = Files.newOutputStream(path)) {
+
+        try (OutputStream output = FileUtils.openOutputStream(path.toFile())) {
             org.apache.commons.io.IOUtils.copy(input, output);
         }
     }
@@ -56,7 +57,7 @@ public class ContentWriter {
         }
     }
 
-    private Path resolvePath(String path) throws BadRequestException {
+    private Path resolvePath(String path) {
         if (path == null) {
             throw new NullPointerException("Path can not be null");
         }

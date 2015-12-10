@@ -449,7 +449,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditPublished() throws IOException {
+    public void shouldEditPublished() throws IOException, BadRequestException {
 
         // Given
         // The content exists publicly:
@@ -473,7 +473,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditComplete() throws IOException {
+    public void shouldEditComplete() throws IOException, BadRequestException {
 
         // Given
         // The content exists, has been edited and completed:
@@ -498,7 +498,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditReviewed() throws IOException {
+    public void shouldEditReviewed() throws IOException, BadRequestException {
 
         // Given
         // The content exists, has been edited and reviewed:
@@ -523,7 +523,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditIfEditingAlready() throws IOException {
+    public void shouldEditIfEditingAlready() throws IOException, BadRequestException {
 
         // Given
         // The content already exists:
@@ -538,7 +538,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldNotEditIfEditingElsewhere() throws IOException {
+    public void shouldNotEditIfEditingElsewhere() throws IOException, BadRequestException {
 
         // Given
         // The content already exists in another release:
@@ -553,7 +553,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldNotEditIfDoesNotExist() throws IOException {
+    public void shouldNotEditIfDoesNotExist() throws IOException, BadRequestException {
 
         // Given
         // The content does not exist:
@@ -608,13 +608,13 @@ public class CollectionTest {
         return uri;
     }
 
-    private String CreateEditedContent() throws IOException {
+    private String CreateEditedContent() throws IOException, BadRequestException {
         String uri = CreatePublishedContent();
         collection.edit(publisher1Email, uri, collectionWriter);
         return uri;
     }
 
-    private String CreateCompleteContent() throws IOException {
+    private String CreateCompleteContent() throws IOException, BadRequestException {
         String uri = CreateEditedContent();
         collection.complete(publisher1Email, uri);
         return uri;
@@ -1002,7 +1002,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException {
+    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException, BadRequestException {
 
         // Given
         // There is a release already in progress
@@ -1018,7 +1018,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException {
+    public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException, BadRequestException {
 
         // Given a release that is announced
         String uri = String.format("/releases/%s", Random.id());

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.util;
 
 import com.github.davidcarboni.cryptolite.Crypto;
+import org.apache.commons.io.FileUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class EncryptionUtils {
      * @throws IOException
      */
     public static OutputStream encryptionOutputStream(Path path, SecretKey key) throws IOException {
-        return encryptionOutputStream(Files.newOutputStream(path), key);
+        return encryptionOutputStream(FileUtils.openOutputStream(path.toFile()), key);
     }
 
 

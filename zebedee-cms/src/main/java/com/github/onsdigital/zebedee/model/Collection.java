@@ -19,10 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -444,7 +441,7 @@ public class Collection {
      * exists in the published content, false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean edit(String email, String uri, CollectionWriter collectionWriter) throws IOException {
+    public boolean edit(String email, String uri, CollectionWriter collectionWriter) throws IOException, BadRequestException {
         boolean result = false;
 
         if (isInProgress(uri))
@@ -461,13 +458,13 @@ public class Collection {
 
         if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
-            Path destination = inProgress.toPath(uri);
 
-            if (this.isInCollection(uri))
+
+            if (this.isInCollection(uri)) {
+                Path destination = inProgress.toPath(uri);
                 PathUtils.moveFilesInDirectory(source, destination);
-            else {
-                // Optimise zebedee to only upload new files to a collection
-                PathUtils.copy(source, destination);
+            } else {
+                collectionWriter.getInProgress().write(new FileInputStream(source.toFile()), uri);
             }
 
             addEvent(uri, new Event(new Date(), EventType.EDITED, email));
@@ -745,7 +742,7 @@ public class Collection {
      * @throws NotFoundException
      * @throws IOException
      */
-    public Release associateWithRelease(String email, Release release, CollectionWriter collectionWriter) throws IOException {
+    public Release associateWithRelease(String email, Release release, CollectionWriter collectionWriter) throws IOException, BadRequestException {
 
         String uri = release.getUri().toString() + "/data.json";
 

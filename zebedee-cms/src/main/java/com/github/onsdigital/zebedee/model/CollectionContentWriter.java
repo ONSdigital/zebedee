@@ -6,12 +6,12 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
+import org.apache.commons.io.FileUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -54,7 +54,7 @@ public class CollectionContentWriter extends ContentWriter {
                 org.apache.commons.io.IOUtils.copy(input, output);
             }
         } else {
-            try (OutputStream output = Files.newOutputStream(path)) {
+            try (OutputStream output = FileUtils.openOutputStream(path.toFile())) {
                 org.apache.commons.io.IOUtils.copy(input, output);
             }
         }

@@ -831,8 +831,9 @@ public class CollectionsTest {
         Files.createDirectories(path.getParent());
         Files.createFile(path);
 
-        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
+        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), otherCollection.description.id);
         assertTrue(otherCollection.edit(builder.publisher1.email, uri, collectionWriter));
+
         HttpServletRequest request = null;
         InputStream inputStream = null;
 

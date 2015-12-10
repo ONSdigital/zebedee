@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
@@ -162,7 +163,7 @@ public class Collections {
                     "This collection can't be approved because it's not empty");
         }
 
-        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+        CollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
 
         // if the collection is release related - get the release page and add links to other pages in release
         if (collection.isRelease()) {

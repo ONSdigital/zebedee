@@ -164,12 +164,13 @@ public class Collections {
         }
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
         // if the collection is release related - get the release page and add links to other pages in release
         if (collection.isRelease()) {
             Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
-                collection.populateRelease(collectionReader);
+                collection.populateRelease(collectionReader, collectionWriter);
             } catch (ZebedeeException e) {
                 Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
             }

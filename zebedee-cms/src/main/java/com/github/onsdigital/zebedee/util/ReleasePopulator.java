@@ -24,8 +24,8 @@ public class ReleasePopulator {
      */
     public static Release populate(Release release, Collection collection, CollectionReader reader) throws IOException, ZebedeeException {
 
-        release.setRelatedDatasets(new ArrayList<Link>());
-        release.setRelatedDocuments(new ArrayList<Link>());
+        release.setRelatedDatasets(new ArrayList<>());
+        release.setRelatedDocuments(new ArrayList<>());
 
         for (ContentDetail contentDetail : ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed())) {
             addPageDetailToRelease(release, contentDetail);

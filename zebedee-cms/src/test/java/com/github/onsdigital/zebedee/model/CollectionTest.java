@@ -1057,14 +1057,15 @@ public class CollectionTest {
         FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));
 
         // When we attempt to populate the release from the collection.
-        Release result = collection.populateRelease(new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id));
+        Release result = collection.populateRelease(
+                new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id),
+                new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id));
 
         // Then the release is now in progress for the collection and the published flag is set to true
         assertEquals(1, result.getRelatedDocuments().size());
         assertEquals("My article", result.getRelatedDocuments().get(0).getTitle());
         assertEquals("/some/uri", result.getRelatedDocuments().get(0).getUri().toString());
     }
-
 
     @Test
     public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws Exception {

@@ -16,6 +16,7 @@ import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -259,20 +260,14 @@ public class Collection {
         return updatedCollection;
     }
 
-    private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {
-        Path collectionReleasePath = this.find(uri);
-        Release release = (Release) ContentUtil.deserialiseContent(FileUtils.openInputStream(collectionReleasePath.toFile()));
-        return release;
-    }
-
-    public Release populateRelease(CollectionReader reader) throws IOException, ZebedeeException {
+    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.description.releaseUri)) {
             throw new BadRequestException("This collection is not associated with a release.");
         }
 
         String uri = this.description.releaseUri + "/data.json";
-        Release release = getReleaseFromCollection(uri);
+        Release release = (Release) ContentUtil.deserialiseContent(reader.getResource(uri).getData());
         Log.print("Release identified for collection %s: %s", this.description.name, release.getDescription().getTitle());
 
         if (release == null) {
@@ -280,9 +275,7 @@ public class Collection {
         }
 
         release = ReleasePopulator.populate(release, this, reader);
-
-        Path releasePath = reviewed.get(uri);
-        FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
+        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(release)), uri);
 
         return release;
     }

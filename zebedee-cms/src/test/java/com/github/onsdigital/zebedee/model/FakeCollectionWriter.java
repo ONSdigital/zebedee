@@ -2,10 +2,10 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.content.collection.Collection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,25 +18,27 @@ import java.nio.file.Paths;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 
-public class FakeCollectionReader extends CollectionReader {
+public class FakeCollectionWriter extends CollectionWriter {
 
     private Path collections;
 
-    /**
-     * @param collectionsFolderPath path of the collections folder
-     */
-    public FakeCollectionReader(String collectionsFolderPath, String collectionId) throws NotFoundException, IOException {
+    public FakeCollectionWriter(String collectionsFolderPath, String collectionId) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
+
         if (collectionsFolderPath == null) {
             throw new NullPointerException("Collections folder can not be null");
         }
         this.collections = Paths.get(collectionsFolderPath);
         Path collectionsPath = findCollectionPath(collectionId);
-        inProgress = getContentReader(collectionsPath, getConfiguration().getInProgressFolderName());
-        complete = getContentReader(collectionsPath, getConfiguration().getCompleteFolderName());
-        reviewed = getContentReader(collectionsPath, getConfiguration().getReviewedFolderName());
+        inProgress = getContentWriter(collectionsPath, getConfiguration().getInProgressFolderName());
+        complete = getContentWriter(collectionsPath, getConfiguration().getCompleteFolderName());
+        reviewed = getContentWriter(collectionsPath, getConfiguration().getReviewedFolderName());
     }
 
-    private Path findCollectionPath(String collectionId) throws IOException, NotFoundException, CollectionNotFoundException {
+    private ContentWriter getContentWriter(Path collectionPath, String folderName) {
+        return new ContentWriter(collectionPath.resolve(folderName));
+    }
+
+    private Path findCollectionPath(String collectionId) throws IOException, NotFoundException {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(collections, "*.{json}")) {
             for (Path path : stream) {
                 if (Files.isDirectory(path)) {
@@ -53,9 +55,5 @@ public class FakeCollectionReader extends CollectionReader {
             }
             throw new CollectionNotFoundException("Collection with given id not found, id:" + collectionId);
         }
-    }
-
-    private ContentReader getContentReader(Path collectionPath, String folderName) {
-        return new ContentReader(collectionPath.resolve(folderName));
     }
 }

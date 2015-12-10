@@ -45,8 +45,6 @@ public class ZebedeeCollectionReader extends CollectionReader {
 
     private void init(Zebedee zebedee, Collection collection, SecretKey key) throws NotFoundException, UnauthorizedException, IOException {
 
-        if (key == null) throw new UnauthorizedException("Key cannot be null");
-
         if (collection == null) {
             throw new NotFoundException("Collection not found");
         }

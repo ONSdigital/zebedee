@@ -311,11 +311,20 @@ public class DataPublisher {
      * @param newPage
      * @param uri
      * @param correctionNotice
-     * @throws URISyntaxException
+     * @param collection
+     *@param collectionWriter  @throws URISyntaxException
      * @throws NotFoundException
      * @throws IOException
      */
-    public static void versionTimeseries(Zebedee zebedee, Path savePath, TimeSeries newPage, String uri, String correctionNotice) throws URISyntaxException, NotFoundException, IOException {
+    public static void versionTimeseries(
+            Zebedee zebedee,
+            TimeSeries newPage,
+            String uri,
+            String correctionNotice,
+            Collection collection,
+            CollectionReader collectionReader,
+            CollectionWriter collectionWriter
+    ) throws URISyntaxException, ZebedeeException, IOException {
 
         Path path = zebedee.published.get(uri);
 
@@ -325,19 +334,19 @@ public class DataPublisher {
         }
 
         // create directory in reviewed if it does not exist.
-        VersionedContentItem versionedContentItem = new VersionedContentItem(new URI(uri), savePath);
+        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, collectionWriter.getReviewed());
 
-        if (versionedContentItem.versionExists() == false) {
-            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(path);
+        if (versionedContentItem.versionExists(collection.reviewed) == false) {
+            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(zebedee.published.path, collectionReader.getReviewed());
 
             Version version = new Version();
-            version.setUri(contentItemVersion.getUri());
+            version.setUri(URI.create(contentItemVersion.getUri()));
             version.setUpdateDate(newPage.getDescription().getReleaseDate());
             version.setLabel(contentItemVersion.getIdentifier());
             version.setCorrectionNotice(correctionNotice);
 
             if (newPage.getVersions() == null)
-                newPage.setVersions(new ArrayList<Version>());
+                newPage.setVersions(new ArrayList<>());
 
             newPage.getVersions().add(version);
         }
@@ -839,7 +848,7 @@ public class DataPublisher {
         // Process the result from Brian
         for (TimeSeries series : serieses) {
             // Generate the new page
-            TimeSeries newPage = preprocessTimeseries(zebedee, collection, landingPage, datasetUri, series, correctionNotice, collectionWriter);
+            TimeSeries newPage = preprocessTimeseries(zebedee, collection, landingPage, datasetUri, series, correctionNotice, collectionReader, collectionWriter);
 
             // Add the cdid to the dataset page list of cdids
             csdbSection.getCdids().add(newPage.getDescription().getCdid());
@@ -930,8 +939,9 @@ public class DataPublisher {
             String datasetUri,
             TimeSeries series,
             String correctionNotice,
+            CollectionReader collectionReader,
             CollectionWriter collectionWriter
-    ) throws IOException, URISyntaxException, NotFoundException, BadRequestException {
+    ) throws IOException, URISyntaxException, ZebedeeException {
 
         // Work out the correct timeseries path by working back from the dataset uri
         String uri = uriForSeriesInDataset(datasetUri, series);
@@ -942,7 +952,7 @@ public class DataPublisher {
 
         // Previous versions
         if (differencesExist(zebedee, uri, newPage))
-            versionTimeseries(zebedee, savePath.getParent(), newPage, uri, correctionNotice);
+            versionTimeseries(zebedee, newPage, uri, correctionNotice, collection, collectionReader, collectionWriter);
 
         // Save the new page to reviewed
         collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(newPage)), uri + "/data.json");

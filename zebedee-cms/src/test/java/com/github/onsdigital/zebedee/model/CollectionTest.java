@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -1121,7 +1123,7 @@ public class CollectionTest {
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
 
         // When we attempt to create a version for the page
-        collection.version(publisher1Email, uri);
+        collection.version(publisher1Email, uri, collectionWriter);
 
         // Then a not found exception is thrown.
     }
@@ -1132,10 +1134,10 @@ public class CollectionTest {
         // Given a URI that has been published and already versioned in a collection.
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
         builder.createPublishedFile(uri + "/data.json");
-        collection.version(publisher1Email, uri);
+        collection.version(publisher1Email, uri, collectionWriter);
 
         // When we attempt to create a version for the page for a second time
-        collection.version(publisher1Email, uri);
+        collection.version(publisher1Email, uri, collectionWriter);
 
         // Then a ConflictException exception is thrown.
     }
@@ -1148,18 +1150,18 @@ public class CollectionTest {
         builder.createPublishedFile(uri + "/data.json");
 
         // When the version function is called for the URI
-        ContentItemVersion version = collection.version(publisher1Email, uri);
+        ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
 
         // Then the version directory is created, with the page and associated files copied into it
         // check versions file exists
-        Path versionsDirectoryPath = version.getVersionedContentItem().getVersionDirectoryPath();
+        Path versionsDirectoryPath = collection.reviewed.get(Paths.get(uri).resolve(VersionedContentItem.getVersionDirectoryName()).toUri());
         assertTrue(Files.exists(versionsDirectoryPath));
 
         // check the json file is in there
-        assertTrue(Files.exists(version.getPath()));
+        assertTrue(Files.exists(collection.reviewed.get(version.getUri())));
 
         // check for an associated file
-        assertTrue(Files.exists(version.getPath().resolve("data.json")));
+        assertTrue(Files.exists(collection.reviewed.get(Paths.get(version.getUri()).resolve("data.json").toString())));
     }
 
     @Test(expected = NotFoundException.class)
@@ -1192,17 +1194,16 @@ public class CollectionTest {
         // Given an existing version URI
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
         builder.createPublishedFile(uri + "/data.json");
-        ContentItemVersion version = collection.version(publisher1Email, uri);
+        ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
 
-        assertTrue(Files.exists(version.getPath()));
-        assertTrue(Files.exists(version.getPath().resolve("data.json")));
+        assertTrue(Files.exists(collection.reviewed.get(version.getUri())));
+        assertTrue(Files.exists(collection.reviewed.get(version.getUri()).resolve("data.json")));
 
         // When the delete version function is called for the version URI
         collection.deleteVersion(version.getUri().toString());
 
         // Then the versions directory is deleted.
-        assertFalse(Files.exists(version.getPath()));
-        assertFalse(Files.exists(version.getPath().resolve("data.json")));
+        assertNull(collection.reviewed.get(version.getUri()));
     }
 
     private Release createRelease(String uri, Date releaseDate) throws IOException {

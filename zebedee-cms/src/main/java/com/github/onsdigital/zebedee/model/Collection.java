@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
@@ -20,7 +21,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
@@ -726,11 +726,9 @@ public class Collection {
     private void deleteContent(Content content, String uri) throws IOException {
         Path path = content.toPath(uri);
         PathUtils.deleteFilesInDirectory(path);
-        try {
-            new VersionedContentItem(URI.create(uri), path).deleteVersionDirectory();
-        } catch (NotFoundException e) {
-            // do nothing, there is nothing to delete.
-        }
+
+        File versionsDirectory = path.resolve(VersionedContentItem.getVersionDirectoryName()).toFile();
+        FileUtils.deleteDirectory(versionsDirectory);
     }
 
     /**
@@ -772,7 +770,7 @@ public class Collection {
      * @param uri   - The URI of the file to version
      * @return
      */
-    public ContentItemVersion version(String email, String uri) throws NotFoundException, IOException, ConflictException {
+    public ContentItemVersion version(String email, String uri, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
 
         // first ensure the content exists in published area so we can create a version from it.
         Path versionSource = zebedee.published.get(uri);
@@ -780,52 +778,16 @@ public class Collection {
             throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
         }
 
-        // determine path in reviewed section for the version to sit
-        Path reviewedPath = this.reviewed.toPath(uri);
-        if (!this.reviewed.exists(reviewedPath.toUri())) {
-            Files.createDirectories(reviewedPath);
-        }
+        ContentReader contentReader = new ContentReader(zebedee.published.path);
 
-        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(uri), reviewedPath);
+        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, collectionWriter.getReviewed());
 
-        if (versionedContentItem.versionExists()) {
+        if (versionedContentItem.versionExists(this.reviewed)) {
             throw new ConflictException("A previous version of this file already exists");
         }
 
-        ContentItemVersion version = versionedContentItem.createVersion(versionSource);
+        ContentItemVersion version = versionedContentItem.createVersion(zebedee.published.path, contentReader);
         addEvent(uri, new Event(new Date(), EventType.VERSIONED, email, version.getIdentifier()));
-        return version;
-    }
-
-    /**
-     * Create a new version for the given timeseries URI.
-     * <p>
-     * The same as the regular timeseries function but does not record update in the event log
-     *
-     * @param uri - The URI of the file to version
-     * @return
-     */
-    public ContentItemVersion versionTimeSeries(String uri) throws NotFoundException, IOException, ConflictException {
-
-        // first ensure the content exists in published area so we can create a version from it.
-        Path versionSource = zebedee.published.get(uri);
-        if (versionSource == null) {
-            throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
-        }
-
-        // determine path in reviewed section for the version to sit
-        Path reviewedPath = this.reviewed.toPath(uri);
-        if (!this.reviewed.exists(reviewedPath.toUri())) {
-            Files.createDirectories(reviewedPath);
-        }
-
-        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(uri), reviewedPath);
-
-        if (versionedContentItem.versionExists()) {
-            throw new ConflictException("A previous version of this file already exists");
-        }
-
-        ContentItemVersion version = versionedContentItem.createVersion(versionSource);
         return version;
     }
 

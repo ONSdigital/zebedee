@@ -20,9 +20,11 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
@@ -337,7 +339,7 @@ public class DataPublisher {
         VersionedContentItem versionedContentItem = new VersionedContentItem(uri, collectionWriter.getReviewed());
 
         if (versionedContentItem.versionExists(collection.reviewed) == false) {
-            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(zebedee.published.path, collectionReader.getReviewed());
+            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(zebedee.published.path, new ContentReader(zebedee.published.path));
 
             Version version = new Version();
             version.setUri(URI.create(contentItemVersion.getUri()));
@@ -437,18 +439,6 @@ public class DataPublisher {
             }
         }
     }
-//
-//    /**
-//     * Get a starting point by opening the existing time series page with uri
-//     *
-//     * @param uri
-//     * @param series
-//     * @return
-//     * @throws IOException
-//     */
-//    static TimeSeries startPageForSeriesWithPublishedPath(String uri, TimeSeries series) throws IOException {
-//        return startPageForSeriesWithPublishedPath(Root.zebedee, uri, series);
-//    }
 
     /**
      * Update a map of maps with a value for a cdid with a specified row heading
@@ -740,11 +730,13 @@ public class DataPublisher {
     /**
      * Output a grid of strings to XLSX
      *
+     * @param contentWriter
      * @param xlsPath the path to save the file
      * @param grid    the data grid to save
+     * @param contentWriter
      * @throws IOException
      */
-    static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) throws IOException {
+    static void writeDataGridToXlsx(String xlsPath, List<List<String>> grid, ContentWriter contentWriter) throws IOException, BadRequestException {
         Workbook wb = new SXSSFWorkbook(30);
         Sheet sheet = wb.createSheet("data");
 
@@ -758,7 +750,7 @@ public class DataPublisher {
             }
         }
 
-        try (OutputStream stream = Files.newOutputStream(xlsPath)) {
+        try (OutputStream stream = contentWriter.getOutputStream(xlsPath)) {
             wb.write(stream);
         }
     }
@@ -768,10 +760,12 @@ public class DataPublisher {
      *
      * @param csvPath path to write to
      * @param grid    grid to output to
+     * @param contentWriter
      * @throws IOException
      */
-    static void writeDataGridToCsv(Path csvPath, List<List<String>> grid) throws IOException {
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(csvPath), Charset.forName("UTF8")), ',')) {
+    static void writeDataGridToCsv(String csvPath, List<List<String>> grid, ContentWriter contentWriter) throws IOException, BadRequestException {
+        OutputStream outputStream = contentWriter.getOutputStream(csvPath);
+        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(outputStream, Charset.forName("UTF8")), ',')) {
             for (List<String> gridRow : grid) {
                 String[] row = new String[gridRow.size()];
                 row = gridRow.toArray(row);
@@ -857,12 +851,11 @@ public class DataPublisher {
             newSeries.add(newPage);
         }
 
-
         // Update the dataset to be reviewed
         updateDatasetFile(dataset, datasetUri, csdbSection, xlsxSection, csvSection, collectionWriter);
 
         // Generate xlsx and csv downloads
-        generateDownloads(collection, newSeries, landingPage, datasetUri);
+        generateDownloads(newSeries, landingPage, datasetUri, collectionWriter);
 
         System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
     }
@@ -945,7 +938,6 @@ public class DataPublisher {
 
         // Work out the correct timeseries path by working back from the dataset uri
         String uri = uriForSeriesInDataset(datasetUri, series);
-        Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
 
         // Construct the new page
         TimeSeries newPage = constructTimeSeriesPageFromComponents(zebedee, uri, landingPage, series, datasetUri);
@@ -1046,23 +1038,27 @@ public class DataPublisher {
      * @param datasetUri
      * @throws IOException
      */
-    private void generateDownloads(Collection collection, List<TimeSeries> newSeries, DatasetLandingPage landingPage, String datasetUri) throws IOException {
+    private void generateDownloads(
+            List<TimeSeries> newSeries,
+            DatasetLandingPage landingPage,
+            String datasetUri,
+            CollectionWriter collectionWriter
+    ) throws IOException, BadRequestException {
         // Save the files
         String filename = landingPage.getDescription().getDatasetId();
         if (filename.equalsIgnoreCase("")) filename = "data";
-        Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".xlsx");
-        Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".csv");
+        String xlsPath = datasetUri + "/" + filename.toLowerCase() + ".xlsx";
+        String csvPath = datasetUri + "/" + filename.toLowerCase() + ".csv";
 
         // Write the files
         List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(newSeries);
-        writeDataGridToXlsx(xlsPath, dataGrid);
-        writeDataGridToCsv(csvPath, dataGrid);
+        writeDataGridToXlsx(xlsPath, dataGrid, collectionWriter.getReviewed());
+        writeDataGridToCsv(csvPath, dataGrid, collectionWriter.getReviewed());
     }
 
     /**
      * Update and save the dataset json we have generated files for
      *
-     * @param collection
      * @param dataset
      * @param datasetUri
      * @param csdbSection

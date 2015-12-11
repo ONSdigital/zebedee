@@ -13,12 +13,11 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.FakeCollectionReader;
-import com.github.onsdigital.zebedee.model.FakeCollectionWriter;
+import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
@@ -1166,7 +1165,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void writeXLSX_givenGridOfData_willCreateFile() throws IOException {
+    public void writeXLSX_givenGridOfData_willCreateFile() throws IOException, BadRequestException {
         // Given
         // random data
         List<Path> serieses = new ArrayList<>();
@@ -1179,8 +1178,9 @@ public class DataPublisherTest {
 
         // When
         // we generate an XLSX as a temp file
-        Path path = Files.createTempFile("temporary", ".xlsx");
-        DataPublisher.writeDataGridToXlsx(path, grid);
+        Path tempDirectory = Files.createTempDirectory("xls");
+        Path path = tempDirectory.resolve("temp.xls");
+        DataPublisher.writeDataGridToXlsx(path.toString(), grid, new ContentWriter(path));
 
         // Then
         // It will save a file
@@ -1188,7 +1188,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void writeCSV_givenGridOfData_willCreateFile() throws IOException {
+    public void writeCSV_givenGridOfData_willCreateFile() throws IOException, BadRequestException {
         // Given
         // random data
         List<Path> serieses = new ArrayList<>();
@@ -1198,11 +1198,11 @@ public class DataPublisherTest {
         List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
         List<List<String>> grid = DataPublisher.gridOfAllDataInTimeSeriesList(timeSerieses);
 
-
         // When
         // we generate an XLSX as a temp file
-        Path path = Files.createTempFile("temporary", ".csv");
-        DataPublisher.writeDataGridToCsv(path, grid);
+        Path tempDirectory = Files.createTempDirectory("csv");
+        Path path = tempDirectory.resolve("temp.csv");
+        DataPublisher.writeDataGridToCsv(path.toString(), grid, new ContentWriter(path));
 
         // Then
         // It will save a file

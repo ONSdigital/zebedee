@@ -39,32 +39,39 @@ public class ContentWriter {
      * @throws IOException
      */
     public void write(InputStream input, String uri) throws IOException, BadRequestException {
-        Path path = resolvePath(uri);
-        write(input, path);
-    }
-
-    protected void write(InputStream input, Path path) throws BadRequestException, IOException {
-        assertNotDirectory(path);
-
-        try (OutputStream output = FileUtils.openOutputStream(path.toFile())) {
+        try (OutputStream output = getOutputStream(uri)) {
             org.apache.commons.io.IOUtils.copy(input, output);
         }
     }
 
-    private void assertNotDirectory(Path path) throws BadRequestException {
+    /**
+     * Get an output stream for the given URI.
+     *
+     * @param uri
+     * @return
+     * @throws IOException
+     * @throws BadRequestException
+     */
+    public OutputStream getOutputStream(String uri) throws IOException, BadRequestException {
+        Path path = resolvePath(uri);
+        assertNotDirectory(path);
+        return FileUtils.openOutputStream(path.toFile());
+    }
+
+    protected void assertNotDirectory(Path path) throws BadRequestException {
         if (isDirectory(path)) {
             throw new BadRequestException("Requested path is a directory");
         }
     }
 
-    private Path resolvePath(String path) {
+    protected Path resolvePath(String path) {
         if (path == null) {
             throw new NullPointerException("Path can not be null");
         }
         return getRootFolder().resolve(removeLeadingSlash(path));
     }
 
-    private Path getRootFolder() {
+    protected Path getRootFolder() {
         return ROOT_FOLDER;
     }
 

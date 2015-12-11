@@ -263,7 +263,6 @@ public class Collections {
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
         boolean publishComplete = Publisher.Publish(zebedee, collection, session.email, skipVerification, collectionReader);
-
         return publishComplete;
     }
 

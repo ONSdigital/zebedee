@@ -234,7 +234,7 @@ public class Publisher {
 
         try {
 
-            unzipTimeseries(collection);
+            unzipTimeseries(collection, collectionReader);
 
             copyFilesToMaster(zebedee, collection, collectionReader);
 
@@ -283,7 +283,7 @@ public class Publisher {
      * @param collection
      * @throws IOException
      */
-    private static void unzipTimeseries(Collection collection) throws IOException {
+    private static void unzipTimeseries(Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
         Log.print("Unzipping files if required to move to master.");
         for (String uri : collection.reviewed.uris()) {
             Path source = collection.reviewed.get(uri);
@@ -292,7 +292,9 @@ public class Publisher {
                     String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
                     Path publishPath = collection.reviewed.path.resolve(publishUri);
                     Log.print("Unzipping %s to %s", source, publishPath);
-                    ZipUtils.unzip(source.toFile(), publishPath.toString());
+
+                    Resource resource = collectionReader.getResource(uri);
+                    ZipUtils.unzip(resource.getData(), publishPath.toString());
                 }
             }
         }

@@ -2,11 +2,13 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import java.io.IOException;
-import java.net.URI;
 
 @Api
 public class Version {
@@ -31,7 +32,7 @@ public class Version {
      *                 Returns HTTP 401 if the user is not authorised to edit content.
      */
     @POST
-    public URI create(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException, ConflictException {
+    public String create(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
         Session session = Root.zebedee.sessions.get(request);
         if (session == null || !Root.zebedee.permissions.canEdit(session.email)) {
@@ -41,7 +42,8 @@ public class Version {
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
-        ContentItemVersion version = collection.version(session.email, uri);
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
+        ContentItemVersion version = collection.version(session.email, uri, collectionWriter);
         return version.getUri();
     }
 

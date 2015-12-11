@@ -16,7 +16,9 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.FakeCollectionReader;
+import com.github.onsdigital.zebedee.model.FakeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
@@ -47,6 +49,7 @@ public class DataPublisherTest {
     Session publisher;
     Collection collection;
     CollectionReader collectionReader;
+    CollectionWriter collectionWriter;
 
     String publishedTimeSeriesPath = "/themea/landinga/producta/timeseries/a4fk";
     String publishedTimeSeriesPathAlt = "/themea/landinga/producta/timeseries/a4vr";
@@ -92,6 +95,7 @@ public class DataPublisherTest {
         collection = zebedee.collections.list().getCollection("collection");
 
         collectionReader = new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id);
+        collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
 
         try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
             serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
@@ -243,7 +247,7 @@ public class DataPublisherTest {
 
         // When
         // we search for csdb datasets with a publisher
-        List<HashMap<String, Path>> datasetsInCollection = DataPublisher.csdbDatasetsInCollection(collection, publisher);
+        List<HashMap<String, String>> datasetsInCollection = DataPublisher.csdbDatasetsInCollection(collection);
 
         // Then
         // we expect two results
@@ -386,7 +390,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed
@@ -405,7 +409,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -423,7 +427,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -442,7 +446,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -463,7 +467,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -1129,7 +1133,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed
@@ -1150,7 +1154,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed

@@ -174,7 +174,7 @@ public class Collections {
 
         // Do any processing of data files
         try {
-            new DataPublisher().preprocessCollection(collectionReader, zebedee, collection, session);
+            new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }

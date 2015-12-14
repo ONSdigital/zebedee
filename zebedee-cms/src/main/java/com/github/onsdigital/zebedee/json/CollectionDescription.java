@@ -22,6 +22,8 @@ public class CollectionDescription extends CollectionBase {
     public String publishTransactionId;
     public boolean isEncrypted;
 
+    public List<Integer> teams;
+
     /**
      * events related to this collection
      */

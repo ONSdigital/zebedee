@@ -119,7 +119,7 @@ public class Collection {
      * @return
      * @throws IOException
      */
-    public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, String email)
+    public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
 
         Release release = checkForRelease(collectionDescription, zebedee);
@@ -134,7 +134,7 @@ public class Collection {
         Files.createDirectory(collectionPath.resolve(COMPLETE));
         Files.createDirectory(collectionPath.resolve(IN_PROGRESS));
 
-        collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, email));
+        collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, session.email));
 
         // Create the description:
         Path collectionDescriptionPath = zebedee.collections.path.resolve(filename
@@ -146,15 +146,22 @@ public class Collection {
         Collection collection = new Collection(collectionDescription, zebedee);
 
         if (release != null) {
-            collection.associateWithRelease(email, release);
+            collection.associateWithRelease(session.email, release);
             collection.save();
+        }
+
+        if (collectionDescription.teams != null) {
+            for (String teamName : collectionDescription.teams) {
+                Team team = zebedee.teams.findTeam(teamName);
+                zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+            }
         }
 
         // Encryption
         // assign a key for the collection to the session user
-        KeyManager.assignKeyToUser(zebedee, zebedee.users.get(email), collection, Keys.newSecretKey());
+        KeyManager.assignKeyToUser(zebedee, zebedee.users.get(session.email), collection, Keys.newSecretKey());
         // get the session user to distribute the key to all
-        KeyManager.distributeCollectionKey(zebedee, zebedee.sessions.find(email), collection);
+        KeyManager.distributeCollectionKey(zebedee, zebedee.sessions.find(session.email), collection);
 
         return collection;
     }

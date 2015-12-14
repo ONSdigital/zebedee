@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +43,9 @@ public class CollectionMoveTest {
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
-        zebedee.openSession(builder.publisher1Credentials);
+        Session session = zebedee.openSession(builder.publisher1Credentials);
 
-        collection = Collection.create(new CollectionDescription("Collection"), zebedee, builder.publisher1.email);
+        collection = Collection.create(new CollectionDescription("Collection"), zebedee, session);
         martin  = createArticle("/people/martin", "Martin");
         bedford = createArticle("/places/bedford", "Bedford");
         bedfordshire = createArticle("/places/bedfordshire", "Bedfordshire");

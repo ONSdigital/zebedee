@@ -45,13 +45,13 @@ public class CollectionsTest {
 
     @Test
     public void shouldFindCollection() throws Exception {
-        zebedee.openSession(builder.administratorCredentials);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         Collections.CollectionList collections = new Collections.CollectionList();
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("FirstCollection"), zebedee, session);
         Collection secondCollection = Collection.create(
-                new CollectionDescription("SecondCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("SecondCollection"), zebedee, session);
 
         collections.add(firstCollection);
         collections.add(secondCollection);
@@ -75,10 +75,10 @@ public class CollectionsTest {
     public void shouldReturnNullIfNotFound() throws Exception {
 
         Collections.CollectionList collections = new Collections.CollectionList();
-        zebedee.openSession(builder.administratorCredentials);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("FirstCollection"), zebedee, session);
 
         collections.add(firstCollection);
 
@@ -88,12 +88,12 @@ public class CollectionsTest {
     @Test
     public void shouldHaveCollectionForName() throws Exception {
         Collections.CollectionList collectionList = new Collections.CollectionList();
-        zebedee.openSession(builder.administratorCredentials);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("FirstCollection"), zebedee, session);
         Collection secondCollection = Collection.create(
-                new CollectionDescription("SecondCollection"), zebedee, builder.administrator.email);
+                new CollectionDescription("SecondCollection"), zebedee, session);
 
         collectionList.add(firstCollection);
         collectionList.add(secondCollection);
@@ -958,9 +958,9 @@ public class CollectionsTest {
 
         // Given
         // A collection
-        zebedee.openSession(builder.administratorCredentials);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         Collection collection = Collection.create(
-                new CollectionDescription("collection"), zebedee, builder.administrator.email);
+                new CollectionDescription("collection"), zebedee, session);
 
         // When the collection is updated concurrently.
         ExecutorService executor = Executors.newCachedThreadPool();

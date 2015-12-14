@@ -22,7 +22,7 @@ public class CollectionDescription extends CollectionBase {
     public String publishTransactionId;
     public boolean isEncrypted;
 
-    public List<Integer> teams;
+    public List<String> teams; // list of team Id's
 
     /**
      * events related to this collection

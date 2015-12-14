@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.elasticsearch.common.joda.time.DateTime;
 import org.junit.After;
@@ -19,12 +20,12 @@ public class CollectionSchedulerTest {
 
     Zebedee zebedee;
     Builder builder;
-
+    Session session;
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
-        zebedee.openSession(builder.administratorCredentials);
+        session = zebedee.openSession(builder.administratorCredentials);
     }
 
     @After
@@ -39,7 +40,7 @@ public class CollectionSchedulerTest {
         CollectionDescription description = new CollectionDescription("collectionName");
         description.type = CollectionType.scheduled;
         description.publishDate = DateTime.now().plusDays(1).toDate();
-        Collection collection = Collection.create(description, zebedee, builder.administrator.email);
+        Collection collection = Collection.create(description, zebedee, session);
 
         // When a new task is scheduled for the collection.
         CollectionScheduler scheduler = new CollectionScheduler();
@@ -57,7 +58,7 @@ public class CollectionSchedulerTest {
         description.type = CollectionType.scheduled;
         final DummyTask firstTask = new DummyTask();
         description.publishDate = DateTime.now().plusSeconds(1).toDate();
-        Collection collection = Collection.create(description, zebedee, builder.administrator.email);
+        Collection collection = Collection.create(description, zebedee, session);
         CollectionScheduler scheduler = new CollectionScheduler();
         Assert.assertTrue(scheduler.schedule(collection, firstTask));
 
@@ -83,7 +84,7 @@ public class CollectionSchedulerTest {
         // Given a manual collection
         CollectionDescription description = new CollectionDescription("collectionName");
         description.type = CollectionType.manual;
-        Collection collection = Collection.create(description, zebedee, builder.administrator.email);
+        Collection collection = Collection.create(description, zebedee, session);
 
         // When a task is scheduled for the collection.
         CollectionScheduler scheduler = new CollectionScheduler();
@@ -101,7 +102,7 @@ public class CollectionSchedulerTest {
         CollectionDescription description = new CollectionDescription("collectionName");
         description.type = CollectionType.scheduled;
         description.publishDate = DateTime.now().plusDays(1).toDate();
-        Collection collection = Collection.create(description, zebedee, builder.administrator.email);
+        Collection collection = Collection.create(description, zebedee, session);
 
         CollectionScheduler scheduler = new CollectionScheduler();
         scheduler.schedule(collection, new DummyTask());
@@ -124,7 +125,7 @@ public class CollectionSchedulerTest {
         CollectionDescription description = new CollectionDescription("collectionName");
         description.type = CollectionType.scheduled;
         description.publishDate = DateTime.now().plusDays(1).toDate();
-        Collection collection = Collection.create(description, zebedee, builder.administrator.email);
+        Collection collection = Collection.create(description, zebedee, session);
         scheduler.cancel(collection);
 
         // Then the scheduler no longer contains a task for the collection

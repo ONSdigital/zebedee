@@ -102,9 +102,8 @@ public class KeyManager {
     }
 
     private static boolean userShouldAccessCollection(Zebedee zebedee, User user, Collection collection) throws IOException {
-        if (zebedee.permissions.canEdit(user.email)) return true;
+        if (zebedee.permissions.canView(user, collection.description)) return true;
 
-        // TODO logic for team members
         return false;
     }
 }

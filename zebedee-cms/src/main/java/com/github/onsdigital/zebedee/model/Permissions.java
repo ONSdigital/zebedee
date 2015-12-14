@@ -248,7 +248,8 @@ public class Permissions {
         if (collectionDescription.isEncrypted) {
             return session != null && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
         } else {
-            return session != null && canEdit(session);
+            AccessMapping accessMapping = readAccessMapping();
+            return session != null && (canEdit(session) || canView(session.email, collectionDescription, accessMapping));
         }
     }
 
@@ -269,7 +270,7 @@ public class Permissions {
             return user != null && user.keyring.list().contains(collectionDescription.id);
         } else {
             AccessMapping accessMapping = readAccessMapping();
-            return user != null && canEdit(user.email) || canView(user.email, collectionDescription, accessMapping);
+            return user != null && (canEdit(user.email) || canView(user.email, collectionDescription, accessMapping));
         }
     }
 

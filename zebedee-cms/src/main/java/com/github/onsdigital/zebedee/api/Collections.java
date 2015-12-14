@@ -4,7 +4,9 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,16 +63,21 @@ public class Collections {
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
+        Session session = Root.zebedee.sessions.get(request);
+
         CollectionDescriptions result = new CollectionDescriptions();
         List<Collection> collections = Root.zebedee.collections.list();
+
         for (Collection collection : collections) {
-            CollectionDescription description = new CollectionDescription();
-            description.id = collection.description.id;
-            description.name = collection.description.name;
-            description.publishDate = collection.description.publishDate;
-            description.approvedStatus = collection.description.approvedStatus;
-            description.type = collection.description.type;
-            result.add(description);
+            if (Root.zebedee.permissions.canView(session,collection.description)) {
+                CollectionDescription description = new CollectionDescription();
+                description.id = collection.description.id;
+                description.name = collection.description.name;
+                description.publishDate = collection.description.publishDate;
+                description.approvedStatus = collection.description.approvedStatus;
+                description.type = collection.description.type;
+                result.add(description);
+            }
         }
 
         // sort the collections alphabetically by name.

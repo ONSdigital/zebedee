@@ -268,7 +268,8 @@ public class Permissions {
         if (collectionDescription.isEncrypted) {
             return user != null && user.keyring.list().contains(collectionDescription.id);
         } else {
-            return user != null && canEdit(user.email);
+            AccessMapping accessMapping = readAccessMapping();
+            return user != null && canEdit(user.email) || canView(user.email, collectionDescription, accessMapping);
         }
     }
 
@@ -289,20 +290,6 @@ public class Permissions {
             return false;
         }
     }
-
-    /**
-     * Determines whether the specified user has viewing rights.
-     *
-     * @param email                 The user's email.
-     * @param collectionDescription The collection to check access for.
-     * @return True if the user is a member of the Digital Publishing team or
-     * the user is a content owner with access to the given path or any parent path.
-     * @throws IOException If a filesystem error occurs.
-     */
-//    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-//        AccessMapping accessMapping = readAccessMapping();
-//        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
-//    }
 
     /**
      * Grants the given team access to the given collection.

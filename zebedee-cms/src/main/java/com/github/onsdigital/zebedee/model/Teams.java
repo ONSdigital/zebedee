@@ -58,10 +58,7 @@ public class Teams {
     }
 
     public Team findTeam(String teamName) throws IOException, NotFoundException {
-        Team result = null;
-
-        result = readTeam(teamName);
-
+        Team result = readTeam(teamName);
         return result;
     }
 

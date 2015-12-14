@@ -62,7 +62,6 @@ public class Collections {
             throws IOException {
 
         CollectionDescriptions result = new CollectionDescriptions();
-
         List<Collection> collections = Root.zebedee.collections.list();
         for (Collection collection : collections) {
             CollectionDescription description = new CollectionDescription();

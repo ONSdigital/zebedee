@@ -43,7 +43,12 @@ public class Publish {
 
 		String breakBeforePublish = request.getParameter("breakbeforefiletransfer");
 		System.out.println("breakBeforeFileTransfer = " + breakBeforePublish);
+
+		String skipVerification = request.getParameter("skipVerification");
+		System.out.println("skipVerification = " + skipVerification);
+
 		boolean doBreakBeforeFileTransfer = BooleanUtils.toBoolean(breakBeforePublish);
-		return Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer);
+		boolean doSkipVerification = BooleanUtils.toBoolean(skipVerification);
+		return Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer, doSkipVerification);
 	}
 }

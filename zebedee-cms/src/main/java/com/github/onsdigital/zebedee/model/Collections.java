@@ -143,8 +143,7 @@ public class Collections {
      * @throws ConflictException
      */
     public boolean approve(Collection collection, Session session)
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Collection exists
         if (collection == null) {
@@ -163,11 +162,12 @@ public class Collections {
                     "This collection can't be approved because it's not empty");
         }
 
+        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+
         // if the collection is release related - get the release page and add links to other pages in release
         if (collection.isRelease()) {
             Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
-                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
                 collection.populateRelease(collectionReader);
             } catch (ZebedeeException e) {
                 Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
@@ -176,7 +176,7 @@ public class Collections {
 
         // Do any processing of data files
         try {
-            new DataPublisher().preprocessCollection(zebedee, collection, session);
+            new DataPublisher().preprocessCollection(collectionReader, zebedee, collection, session);
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }
@@ -230,13 +230,14 @@ public class Collections {
      *
      * @param collection the collection to publish
      * @param session    a session with editor priviledges
+     * @param skipVerification
      * @return success
      * @throws IOException
      * @throws UnauthorizedException
      * @throws BadRequestException
      * @throws ConflictException     - If there
      */
-    public boolean publish(Collection collection, Session session, Boolean breakBeforePublish)
+    public boolean publish(Collection collection, Session session, boolean breakBeforePublish, boolean skipVerification)
             throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
 
@@ -262,7 +263,7 @@ public class Collections {
         }
         System.out.println("Going ahead with publish");
 
-        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email);
+        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email, skipVerification);
 
         return publishComplete;
     }

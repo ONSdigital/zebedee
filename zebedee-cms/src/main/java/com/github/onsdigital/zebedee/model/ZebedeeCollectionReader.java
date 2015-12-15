@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -15,11 +16,12 @@ import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfigura
 
 public class ZebedeeCollectionReader extends CollectionReader {
 
-    public ZebedeeCollectionReader(Zebedee zebedee, Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException {
+    public ZebedeeCollectionReader(Zebedee zebedee, Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
 
         if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
+            throw new NotFoundException("Collection not found");
         }
+
         // Authorisation
         if (session == null
                 || !zebedee.permissions.canView(session.email,

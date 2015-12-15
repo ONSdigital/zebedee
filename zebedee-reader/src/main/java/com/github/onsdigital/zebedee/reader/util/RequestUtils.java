@@ -60,6 +60,11 @@ public class RequestUtils {
         return new ReadRequestHandler(getRequestedLanguage(request)).findResource(request);
     }
 
+    /**
+     * Helper method to create instances of ZebedeeReader from a request.
+     * @param request
+     * @return
+     */
     public static ZebedeeReader getZebedeeReader(HttpServletRequest request) {
         return new ZebedeeReader(getRequestedLanguage(request));
     }

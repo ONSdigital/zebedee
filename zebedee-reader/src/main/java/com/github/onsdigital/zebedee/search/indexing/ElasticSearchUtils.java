@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.search.indexing;
 
-import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequestBuilder;
@@ -11,22 +10,21 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.delete.DeleteRequestBuilder;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.metadata.AliasMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import java.io.IOException;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.*;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getSearchAlias;
 
 /**
  * Created by bren on 02/09/15.
@@ -77,8 +75,7 @@ class ElasticSearchUtils {
     }
 
 
-    /***
-     *
+    /**
      * Swaps alias referring to old index to a new one.
      *
      * @param oldIndex Old index name, if null will not attempt removing alias from old index
@@ -96,7 +93,6 @@ class ElasticSearchUtils {
 
 
     /**
-     *
      * Creates given document under given index and given type, if document wit the id already exists overwrites the existing one
      *
      * @param index
@@ -105,10 +101,15 @@ class ElasticSearchUtils {
      * @param document
      * @return
      */
-    public IndexResponse createDocument(String index,String type, String id, String document) {
+    public IndexResponse createDocument(String index, String type, String id, String document) {
         IndexRequestBuilder indexRequestBuilder = prepareIndex(index, type, id);
         indexRequestBuilder.setSource(document);
         return indexRequestBuilder.get();
+    }
+
+    public DeleteResponse deleteDocument(String index, String type, String id) {
+        DeleteRequestBuilder deleteRequestBuilder = client.prepareDelete(index, type, id);
+        return deleteRequestBuilder.get();
     }
 
     public boolean isIndexAvailable(String index) {

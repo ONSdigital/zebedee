@@ -14,6 +14,7 @@ import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
@@ -52,6 +53,7 @@ public class Indexer {
     public void reload() throws IOException {
         if (LOCK.tryLock()) {
             try {
+                lockGlobal();//lock in cluster
                 String searchAlias = getSearchAlias();
                 boolean aliasAvailable = searchUtils.isIndexAvailable(searchAlias);
                 String oldIndex = searchUtils.getAliasIndex(searchAlias);
@@ -76,6 +78,7 @@ public class Indexer {
                 }
             } finally {
                 LOCK.unlock();
+                unlockGlobal();
             }
         } else {
             throw new IndexInProgressException();
@@ -194,6 +197,19 @@ public class Indexer {
         System.out.println(mappingSource);
         return mappingSource;
 
+    }
+
+    //acquires global lock
+    private void lockGlobal() {
+        IndexResponse lockResponse = searchUtils.createDocument("fs", "lock", "global", "{}");
+        if(!lockResponse.isCreated()) {
+            throw new IndexInProgressException();
+        }
+    }
+
+
+    private void unlockGlobal() {
+        searchUtils.deleteDocument("fs", "lock", "global");
     }
 
 

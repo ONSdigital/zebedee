@@ -16,10 +16,12 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
@@ -162,42 +164,20 @@ public class DataPublisher {
      * @return
      * @throws IOException
      */
-    static TimeSeries startPageForSeriesWithPublishedPath(Zebedee zebedee, Session session, Collection collection, String uri, TimeSeries series) throws IOException {
+    static TimeSeries startPageForSeriesWithPublishedPath(Zebedee zebedee, String uri, TimeSeries series) throws IOException {
         TimeSeries page;
         Path path = zebedee.published.toPath(uri);
 
         if ((path != null) && Files.exists(path.resolve("data.json"))) {
-            page = getTimeSeries(zebedee, session, collection, path);
+            try (InputStream inputStream = FileUtils.openInputStream(path.resolve("data.json").toFile())) {
+                page = ContentUtil.deserialise(inputStream, TimeSeries.class);
+            }
         } else {
             page = new TimeSeries();
             page.setDescription(new PageDescription());
             page.setCdid(series.getCdid());
         }
 
-        return page;
-    }
-
-    /**
-     * Get a timeseries from file (taking care of encryption if necessary)
-     *
-     * @param zebedee
-     * @param session
-     * @param collection
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    private static TimeSeries getTimeSeries(Zebedee zebedee, Session session, Collection collection, Path path) throws IOException {
-        TimeSeries page;
-        if (collection.description.isEncrypted) {
-            try(InputStream inputStream = EncryptionUtils.encryptionInputStream(path.resolve("data.json"), zebedee.keyringCache.get(session).get(collection.description.id))) {
-                page = ContentUtil.deserialise(inputStream, TimeSeries.class);
-            }
-        } else {
-            try(InputStream inputStream = FileUtils.openInputStream(path.resolve("data.json").toFile())) {
-                page = ContentUtil.deserialise(inputStream, TimeSeries.class);
-            }
-        }
         return page;
     }
 
@@ -806,7 +786,7 @@ public class DataPublisher {
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    void preprocessCsdbFiles(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException, NotFoundException {
+    void preprocessCsdbFiles(CollectionReader collectionReader, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
 
         // First find all csdb files in the collection
         List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
@@ -814,7 +794,7 @@ public class DataPublisher {
 
         // For each file in this collection
         for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
-            preprocessCsdb(zebedee, session, collection, csdbDataset);
+            preprocessCsdb(collectionReader, zebedee, session, collection, csdbDataset);
         }
     }
 
@@ -828,17 +808,15 @@ public class DataPublisher {
      * @throws URISyntaxException
      * @throws NotFoundException
      */
-    private void preprocessCsdb(Zebedee zebedee, Session session, Collection collection, HashMap<String, Path> csdbDataset) throws IOException, URISyntaxException, NotFoundException {
+    private void preprocessCsdb(CollectionReader collectionReader, Zebedee zebedee, Session session, Collection collection, HashMap<String, Path> csdbDataset) throws IOException, URISyntaxException, ZebedeeException {
         List<TimeSeries> newSeries = new ArrayList<>();
+        String datasetUri = zebedee.toUri(csdbDataset.get("json"));
 
         // Download the dataset page (for metadata)
-        Dataset dataset;
-        dataset = getDataset(zebedee, session, collection, csdbDataset);
+        Dataset dataset = (Dataset) collectionReader.getContent(datasetUri);
+        String correctionNotice = datasetCorrectionNotice(collectionReader, datasetUri);
 
-        String datasetUri = zebedee.toUri(csdbDataset.get("json"));
-        String correctionNotice = datasetCorrectionNotice(zebedee, session, collection, datasetUri);
-
-        DatasetLandingPage landingPage = landingPageForDataset(zebedee, session, collection, datasetUri);
+        DatasetLandingPage landingPage = landingPageForDataset(collectionReader, zebedee, datasetUri);
 
         // Set a name for the xlsx/csv files to be generated
         landingPage.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
@@ -847,7 +825,7 @@ public class DataPublisher {
         // Build the download sections
         DownloadSection csdbSection = new DownloadSection();
         csdbSection.setTitle(landingPage.getDescription().getTitle());
-        csdbSection.setCdids(new ArrayList<String>());
+        csdbSection.setCdids(new ArrayList<>());
 
         DownloadSection xlsxSection = newDownloadSection("xlsx download", filePrefix.toLowerCase() + ".xlsx");
         DownloadSection csvSection = newDownloadSection("csv download", filePrefix.toLowerCase() + ".csv");
@@ -878,16 +856,6 @@ public class DataPublisher {
         System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
     }
 
-    private Dataset getDataset(Zebedee zebedee, Session session, Collection collection, HashMap<String, Path> csdbDataset) throws IOException {
-        Dataset dataset;
-        if (collection.description.isEncrypted) {
-            dataset = ContentUtil.deserialise(EncryptionUtils.encryptionInputStream(csdbDataset.get("json"), zebedee.keyringCache.get(session).get(collection.description.id)), Dataset.class);
-        } else {
-            dataset = ContentUtil.deserialise(FileUtils.openInputStream(csdbDataset.get("json").toFile()), Dataset.class);
-        }
-        return dataset;
-    }
-
     /**
      * The parent landingpage uri for a dataset
      *
@@ -897,17 +865,16 @@ public class DataPublisher {
     String uriForDatasetLandingPage(String datasetUri) {
         String[] split = StringUtils.split(datasetUri, "/");
         if (split[split.length - 1].equalsIgnoreCase("data.json") || split[split.length - 1].equalsIgnoreCase("")) {
-            split = (String[]) ArrayUtils.subarray(split, 0, split.length - 2);
+            split = ArrayUtils.subarray(split, 0, split.length - 2);
         } else {
-            split = (String[]) ArrayUtils.subarray(split, 0, split.length - 1);
+            split = ArrayUtils.subarray(split, 0, split.length - 1);
         }
 
         return "/" + StringUtils.join(split, "/");
     }
 
-    String datasetCorrectionNotice(Zebedee zebedee, Session session, Collection collection, String datasetUri) throws IOException {
-
-        Dataset updated = getDataset(zebedee, session, collection, datasetUri);
+    String datasetCorrectionNotice(CollectionReader collectionReader, String datasetUri) throws IOException, ZebedeeException {
+        Dataset updated = (Dataset) collectionReader.getReviewed().getContent(datasetUri);
 
         if (updated.getVersions() == null || updated.getVersions().size() == 0) {
             return "";
@@ -916,62 +883,14 @@ public class DataPublisher {
         }
     }
 
-    /**
-     * Read a dataset from file (takes care of )
-     *
-     * @param zebedee
-     * @param session
-     * @param collection
-     * @param datasetUri
-     * @return
-     * @throws IOException
-     */
-    private Dataset getDataset(Zebedee zebedee, Session session, Collection collection, String datasetUri) throws IOException {
-        Dataset dataset;
-        Path path = collection.reviewed.get(datasetUri).resolve("data.json");
-        if (collection.description.isEncrypted) {
-            try (InputStream stream = EncryptionUtils.encryptionInputStream(path, zebedee.keyringCache.get(session).get(collection.description.id))) {
-                dataset = ContentUtil.deserialise(stream, Dataset.class);
-            }
-        } else {
-            try (InputStream stream = Files.newInputStream(path)) {
-                dataset = ContentUtil.deserialise(stream, Dataset.class);
-            }
-        }
-        return dataset;
-    }
-
-    DatasetLandingPage landingPageForDataset(Zebedee zebedee, Session session, Collection collection, String datasetUri) throws IOException {
+    DatasetLandingPage landingPageForDataset(CollectionReader collectionReader, Zebedee zebedee, String datasetUri) throws IOException, ZebedeeException {
         String uri = uriForDatasetLandingPage(datasetUri);
-        Path path;
-        if (Files.exists(collection.reviewed.toPath(uri).resolve("data.json"))) {
-            path = collection.reviewed.toPath(uri).resolve("data.json");
-        } else {
-            path = zebedee.published.toPath(uri).resolve("data.json");
-        }
-
-        DatasetLandingPage landingPage = getDatasetLandingPage(zebedee, session, collection, path);
-
-        return landingPage;
-    }
-
-    /**
-     * Get dataset landing page (with encryption taken care of)
-     *
-     * @param zebedee
-     * @param session
-     * @param collection
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    private DatasetLandingPage getDatasetLandingPage(Zebedee zebedee, Session session, Collection collection, Path path) throws IOException {
         DatasetLandingPage landingPage;
-        if (collection.description.isEncrypted) {
-            try (InputStream inputStream = EncryptionUtils.encryptionInputStream(path, zebedee.keyringCache.get(session).get(collection.description.id))) {
-                landingPage = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
-            }
-        } else {
+
+        try {
+            landingPage = (DatasetLandingPage) collectionReader.getReviewed().getContent(uri);
+        } catch (NotFoundException e) {
+            Path path = zebedee.published.toPath(uri).resolve("data.json");
             try (InputStream inputStream = Files.newInputStream(path)) {
                 landingPage = ContentUtil.deserialise(inputStream, DatasetLandingPage.class);
             }
@@ -1010,7 +929,7 @@ public class DataPublisher {
         Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
 
         // Construct the new page
-        TimeSeries newPage = constructTimeSeriesPageFromComponents(zebedee, session, collection, uri, landingPage, series, datasetUri);
+        TimeSeries newPage = constructTimeSeriesPageFromComponents(zebedee, uri, landingPage, series, datasetUri);
 
         // Previous versions
         if (differencesExist(zebedee, uri, newPage)) versionTimeseries(zebedee, savePath.getParent(), newPage, uri, correctionNotice);
@@ -1047,6 +966,8 @@ public class DataPublisher {
     /**
      * Run the preprocessing step that converts data to timeseries
      *
+     *
+     * @param collectionReader
      * @param zebedee a zebedee instance
      * @param collection the collection being published
      * @param session a user session (required for some permissions)
@@ -1056,7 +977,7 @@ public class DataPublisher {
      * @throws UnauthorizedException
      * @throws URISyntaxException
      */
-    public void preprocessCollection(Zebedee zebedee, Collection collection, Session session) throws IOException, BadRequestException, UnauthorizedException, URISyntaxException, NotFoundException {
+    public void preprocessCollection(CollectionReader collectionReader, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
 
         if (brianTestFiles.size() == 0 && (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0)) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
@@ -1066,7 +987,7 @@ public class DataPublisher {
         insertions = 0;
         corrections = 0;
 
-        preprocessCsdbFiles(zebedee, collection, session);
+        preprocessCsdbFiles(collectionReader, zebedee, collection, session);
 
         if (insertions + corrections > 0) {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
@@ -1202,7 +1123,7 @@ public class DataPublisher {
      * @throws IOException
      */
     TimeSerieses presetBrianFile() throws IOException {
-        TimeSerieses result = null;
+        TimeSerieses result;
         // Pop the first file on the brian test file stack
         Path path = brianTestFiles.get(0);
         brianTestFiles.remove(0);
@@ -1239,10 +1160,10 @@ public class DataPublisher {
      * @return
      * @throws IOException
      */
-    TimeSeries constructTimeSeriesPageFromComponents(Zebedee zebedee, Session session, Collection collection, String destinationUri, DatasetLandingPage landingPage, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
+    TimeSeries constructTimeSeriesPageFromComponents(Zebedee zebedee, String destinationUri, DatasetLandingPage landingPage, TimeSeries series, String datasetURI) throws IOException, URISyntaxException {
 
         // Attempts to open an existing time series or creates a new one
-        TimeSeries page = startPageForSeriesWithPublishedPath(zebedee, session, collection, destinationUri, series);
+        TimeSeries page = startPageForSeriesWithPublishedPath(zebedee, destinationUri, series);
 
         // Add stats data from the time series (as returned by Brian)
         // NOTE: This will log any corrections as it goes

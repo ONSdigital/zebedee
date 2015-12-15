@@ -1,9 +1,10 @@
 # Zebedee
-Simple CMS back-end
 
-This is a simple, file-based CMS back-end.
+Simple CMS back-end: a file-based CMS with Json API and no UI.
 
-It provides the ability to create and approve change-sets and preview these, overlaid onto existing content.
+It provides the ability to create and approve collections of change and preview these, overlaid onto existing content.
+
+Pre-release content is encrypted until published and only shared with permitted users
 
 David
 

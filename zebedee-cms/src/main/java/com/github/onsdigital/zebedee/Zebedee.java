@@ -38,10 +38,9 @@ public class Zebedee {
     public final Sessions sessions;
     public final Permissions permissions;
     public final Teams teams;
-    public final Content launchpad;
     public final VerificationAgent verificationAgent;
 
-    public Zebedee(Path path, boolean useVerificationAgent)  {
+    public Zebedee(Path path, boolean useVerificationAgent) {
 
         // Validate the directory:
         this.path = path;
@@ -65,7 +64,7 @@ public class Zebedee {
         this.published = new Content(published);
 
         Path redirectPath = this.published.path.resolve(Content.REDIRECT);
-        if(!Files.exists(redirectPath)) {
+        if (!Files.exists(redirectPath)) {
             this.published.redirect = new RedirectTablePartialMatch(this.published);
             try {
                 Files.createFile(redirectPath);
@@ -84,7 +83,6 @@ public class Zebedee {
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
-        this.launchpad = new Content(launchpad);
         if (useVerificationAgent) {
             this.verificationAgent = new VerificationAgent(this);
         } else {
@@ -107,21 +105,35 @@ public class Zebedee {
 
         // Create the folder structure
         Path path;
-        if(!Files.exists(parent.resolve(ZEBEDEE))) {
+        if (!Files.exists(parent.resolve(ZEBEDEE))) {
             path = Files.createDirectory(parent.resolve(ZEBEDEE));
         } else {
             path = parent.resolve(ZEBEDEE);
         }
-        if (!Files.exists(path.resolve(PUBLISHED))) { Files.createDirectory(path.resolve(PUBLISHED)); }
-        if (!Files.exists(path.resolve(COLLECTIONS))) { Files.createDirectory(path.resolve(COLLECTIONS)); }
-        if (!Files.exists(path.resolve(USERS))) {Files.createDirectory(path.resolve(USERS));}
-        if (!Files.exists(path.resolve(SESSIONS))) {Files.createDirectory(path.resolve(SESSIONS));}
-        if (!Files.exists(path.resolve(PERMISSIONS))) {Files.createDirectory(path.resolve(PERMISSIONS));}
-        if (!Files.exists(path.resolve(TEAMS))) {Files.createDirectory(path.resolve(TEAMS));}
-        if (!Files.exists(path.resolve(LAUNCHPAD))) {Files.createDirectory(path.resolve(LAUNCHPAD));}
+        if (!Files.exists(path.resolve(PUBLISHED))) {
+            Files.createDirectory(path.resolve(PUBLISHED));
+        }
+        if (!Files.exists(path.resolve(COLLECTIONS))) {
+            Files.createDirectory(path.resolve(COLLECTIONS));
+        }
+        if (!Files.exists(path.resolve(USERS))) {
+            Files.createDirectory(path.resolve(USERS));
+        }
+        if (!Files.exists(path.resolve(SESSIONS))) {
+            Files.createDirectory(path.resolve(SESSIONS));
+        }
+        if (!Files.exists(path.resolve(PERMISSIONS))) {
+            Files.createDirectory(path.resolve(PERMISSIONS));
+        }
+        if (!Files.exists(path.resolve(TEAMS))) {
+            Files.createDirectory(path.resolve(TEAMS));
+        }
+        if (!Files.exists(path.resolve(LAUNCHPAD))) {
+            Files.createDirectory(path.resolve(LAUNCHPAD));
+        }
 
         Path redirectPath = path.resolve(PUBLISHED).resolve(Content.REDIRECT);
-        if(!Files.exists(redirectPath)) {
+        if (!Files.exists(redirectPath)) {
             Files.createFile(redirectPath);
         }
 
@@ -171,10 +183,12 @@ public class Zebedee {
 
 
     public String toUri(Path path) {
-        if (path == null) { return null; }
+        if (path == null) {
+            return null;
+        }
 
         // Remove zebedee section of path
-        Path uriPath =  this.path.relativize(path);
+        Path uriPath = this.path.relativize(path);
 
         // Strip off either launchpad, master or collections/mycollection/inprogress etc
         if (uriPath.startsWith("collections")) {
@@ -187,7 +201,7 @@ public class Zebedee {
         String s = uriPath.toString();
         if (s.startsWith("..")) {
             return null;
-        } else if( s.endsWith("data.json") ) {
+        } else if (s.endsWith("data.json")) {
             return "/" + s.substring(0, s.length() - "/data.json".length());
         } else {
             return "/" + s;
@@ -196,26 +210,6 @@ public class Zebedee {
 
     public String toUri(String string) {
         return toUri(Paths.get(string));
-    }
-
-    public boolean publish(Collection collection) throws IOException {
-
-        // Check everything has been reviewed:
-        if (collection.inProgress.uris().size() > 0) {
-            return false;
-        }
-
-        // Move each item of content:
-        for (String uri : collection.reviewed.uris()) {
-            Path source = collection.reviewed.get(uri);
-            Path destination = launchpad.toPath(uri);
-            PathUtils.moveFilesInDirectory(source, destination);
-        }
-
-        // Delete the folders:
-        delete(collection.path);
-
-        return true;
     }
 
     /**
@@ -247,7 +241,7 @@ public class Zebedee {
 
     /**
      * Open a user session
-     *
+     * <p>
      * This is a zebedee level operation since we need to unlock the keyring
      *
      * @param credentials
@@ -275,7 +269,7 @@ public class Zebedee {
 
         // Unlock and cache keyring
         user.keyring.unlock(credentials.password);
-        keyringCache.put(user);
+        keyringCache.put(user, session);
 
         // Return a session
         return session;

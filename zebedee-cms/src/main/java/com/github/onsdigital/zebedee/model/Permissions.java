@@ -245,12 +245,8 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted) {
-            return session != null && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
-        } else {
-            AccessMapping accessMapping = readAccessMapping();
-            return session != null && (canEdit(session) || canView(session.email, collectionDescription, accessMapping));
-        }
+        AccessMapping accessMapping = readAccessMapping();
+        return session != null && (canEdit(session) || canView(session.email, collectionDescription, accessMapping));
     }
 
     /**
@@ -266,12 +262,8 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted) {
-            return user != null && user.keyring.list().contains(collectionDescription.id);
-        } else {
-            AccessMapping accessMapping = readAccessMapping();
-            return user != null && (canEdit(user.email) || canView(user.email, collectionDescription, accessMapping));
-        }
+        AccessMapping accessMapping = readAccessMapping();
+        return user != null && (canEdit(user.email) || canView(user.email, collectionDescription, accessMapping));
     }
 
     /**
@@ -313,6 +305,23 @@ public class Permissions {
         }
         collectionTeams.add(team.id);
         writeAccessMapping(accessMapping);
+    }
+
+    /**
+     * Provide a list of team ID's currently associated with a collection
+     * @param collectionDescription
+     * @param session
+     * @return
+     * @throws IOException
+     * @throws UnauthorizedException
+     */
+    public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws IOException, UnauthorizedException {
+        if (session == null || !canEdit(session.email)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        return java.util.Collections.unmodifiableSet(accessMapping.collections.get(collectionDescription.id));
     }
 
     /**
@@ -432,4 +441,5 @@ public class Permissions {
         definition.editor = canEdit(email);
         return definition;
     }
+
 }

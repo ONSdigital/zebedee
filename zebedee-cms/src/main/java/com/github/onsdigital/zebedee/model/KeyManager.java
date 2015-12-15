@@ -40,11 +40,16 @@ public class KeyManager {
      * Determine if the user should have the key assigned or removed for the given collection.
      * @param zebedee
      * @param collection
-     * @param key
+     * @param session
      * @param user
      * @throws IOException
      */
-    public static void distributeKeyToUser(Zebedee zebedee, Collection collection, SecretKey key, User user) throws IOException {
+    public static void distributeKeyToUser(Zebedee zebedee, Collection collection, Session session, User user) throws IOException {
+        SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
+        distributeKeyToUser(zebedee, collection, key, user);
+    }
+
+    private static void distributeKeyToUser(Zebedee zebedee, Collection collection, SecretKey key, User user) throws IOException {
         if (userShouldAccessCollection(zebedee, user, collection)) {
             // Add the key
             assignKeyToUser(zebedee, user, collection, key);
@@ -82,12 +87,15 @@ public class KeyManager {
     }
 
     /**
+     * Remove the collection key for the given user.
+     * This method is intentionally private as the distribute* methods should be used
+     * to re-evaluate whether a key should be removed instead of just removing it.
      * @param zebedee
      * @param user
      * @param collection
      * @throws IOException
      */
-    public static void removeKeyFromUser(Zebedee zebedee, User user, Collection collection) throws IOException {
+    private static void removeKeyFromUser(Zebedee zebedee, User user, Collection collection) throws IOException {
         // Escape in case user keyring has not been generated
         if (user.keyring == null) return;
 

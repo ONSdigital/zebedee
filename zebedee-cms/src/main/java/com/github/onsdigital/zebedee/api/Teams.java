@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.helpers.Path;
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -9,6 +10,9 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.json.TeamList;
+import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +49,7 @@ public class Teams {
      * @throws NotFoundException        {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if team can not be found/created
      */
     @POST
-    public boolean post(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException {
+    public boolean post(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException, BadRequestException {
 
         String email = request.getParameter("email");
         if (email == null) {
@@ -64,14 +68,15 @@ public class Teams {
 
         return true;
     }
-    public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException {
-
-        Session session = Root.zebedee.sessions.get(request);
+    public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
+        Zebedee zebedee = Root.zebedee;
+        Session session = zebedee.sessions.get(request);
 
         String email = request.getParameter("email");
-        Team team = Root.zebedee.teams.findTeam(getTeamName(request));
+        Team team = zebedee.teams.findTeam(getTeamName(request));
 
         Root.zebedee.teams.addTeamMember(email, team, session);
+        evaluateCollectionKeys(zebedee, session, team, email);
 
         return true;
     }
@@ -100,24 +105,52 @@ public class Teams {
     }
     public boolean deleteTeam(HttpServletRequest request, HttpServletResponse response) throws NotFoundException, BadRequestException, UnauthorizedException, IOException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Zebedee zebedee = Root.zebedee;
+        Session session = zebedee.sessions.get(request);
+        Team team = zebedee.teams.findTeam(getTeamName(request));
+        zebedee.teams.deleteTeam(team, session);
 
-        Team team = Root.zebedee.teams.findTeam(getTeamName(request));
-
-        Root.zebedee.teams.deleteTeam(team, session);
+        for (Collection collection : zebedee.collections.list()) {
+            if (collection.description.teams.contains(team.name)) {
+                for (String memberEmail : team.members) {
+                    KeyManager.distributeKeyToUser(zebedee, collection, session, zebedee.users.get(memberEmail));
+                }
+            }
+        }
+        evaluateCollectionKeys(zebedee, session, team, team.members.toArray(new String[team.members.size()]));
 
         return true;
     }
-    public boolean removeTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException {
+    public boolean removeTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
 
+        Zebedee zebedee = Root.zebedee;
         Session session = Root.zebedee.sessions.get(request);
-
         String email = request.getParameter("email");
-        Team team = Root.zebedee.teams.findTeam(getTeamName(request));
+        Team team = zebedee.teams.findTeam(getTeamName(request));
 
-        Root.zebedee.teams.removeTeamMember(email, team, session);
-
+        zebedee.teams.removeTeamMember(email, team, session);
+        evaluateCollectionKeys(zebedee, session, team, email);
         return true;
+    }
+
+    /**
+     * For a given list of user emails, evaluate if they should have keys added or removed.
+     * @param zebedee
+     * @param session
+     * @param team
+     * @param emails
+     * @throws IOException
+     * @throws NotFoundException
+     * @throws BadRequestException
+     */
+    private void evaluateCollectionKeys(Zebedee zebedee, Session session, Team team, String... emails) throws IOException, NotFoundException, BadRequestException {
+        for (Collection collection : zebedee.collections.list()) {
+            if (collection.description.teams.contains(team.name)) {
+                for (String memberEmail : emails) {
+                    KeyManager.distributeKeyToUser(zebedee, collection, session, zebedee.users.get(memberEmail));
+                }
+            }
+        }
     }
 
     /**

@@ -25,10 +25,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -161,7 +158,7 @@ public class Collection {
         // assign a key for the collection to the session user
         KeyManager.assignKeyToUser(zebedee, zebedee.users.get(session.email), collection, Keys.newSecretKey());
         // get the session user to distribute the key to all
-        KeyManager.distributeCollectionKey(zebedee, zebedee.sessions.find(session.email), collection);
+        KeyManager.distributeCollectionKey(zebedee, session, collection);
 
         return collection;
     }
@@ -234,7 +231,11 @@ public class Collection {
      * @param scheduler
      * @return
      */
-    public static Collection update(Collection collection, CollectionDescription collectionDescription, Zebedee zebedee, CollectionScheduler scheduler) throws IOException, CollectionNotFoundException, BadRequestException {
+    public static Collection update(Collection collection,
+                                    CollectionDescription collectionDescription,
+                                    Zebedee zebedee,
+                                    CollectionScheduler scheduler,
+                                    Session session) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
 
         if (collection == null) {
             throw new BadRequestException("Please specify a collection");
@@ -261,12 +262,40 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
-        //TODO: !!!!!!!!!!!!!!!!!!!! Permission management not done on edit
-        updatedCollection.description.teams = collection.description.teams;
-
         updatedCollection.save();
 
+        updateViewerTeams(collectionDescription, zebedee, session);
+        KeyManager.distributeCollectionKey(zebedee, session, collection);
+
+
         return updatedCollection;
+    }
+
+    private static void updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, UnauthorizedException {
+        if (collectionDescription.teams != null) {
+            // work out which teams need to be removed from the existing teams.
+            Set<Integer> currentTeamIds = zebedee.permissions.listViewerTeams(collectionDescription, session);
+            List<Team> teams = zebedee.teams.listTeams();
+            for (Integer currentTeamId : currentTeamIds) { // for each current team ID
+                for (Team team : teams) { // iterate the teams list to find the team object
+                    if (currentTeamId.equals(team.id)) { // if the ID's match
+                        if (!collectionDescription.teams.contains(team.name)) { // if the team is not listed in the updated list
+                            zebedee.permissions.removeViewerTeam(collectionDescription, team, session);
+                        }
+                    }
+                }
+            }
+
+            // Add all the new teams. The add is idempotent so we don't need to check if it already exists.
+            for (String teamName : collectionDescription.teams) {
+                // We have already deserialised the teams list to its more efficient to iterate it again rather than deserialise by team name.
+                for (Team team : teams) { // iterate the teams list to find the team object
+                    if (teamName.equals(team.name)) {
+                        zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+                    }
+                }
+            }
+        }
     }
 
     private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {

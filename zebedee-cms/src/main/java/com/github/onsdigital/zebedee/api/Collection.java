@@ -125,7 +125,8 @@ public class Collection {
                 collection,
                 collectionDescription,
                 Root.zebedee,
-                Root.scheduler);
+                Root.scheduler,
+                session);
 
         return updatedCollection.description;
     }

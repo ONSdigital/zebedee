@@ -148,7 +148,7 @@ public class CollectionTest {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.type = CollectionType.scheduled;
         updatedDescription.publishDate = new DateTime(collectionDescription.publishDate).plusHours(1).toDate();
-        Collection.update(collection, updatedDescription, zebedee, new CollectionScheduler());
+        Collection.update(collection, updatedDescription, zebedee, new CollectionScheduler(), publisherSession);
 
 
         // Then the properties of the description passed to update have been updated.
@@ -192,7 +192,7 @@ public class CollectionTest {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.type = CollectionType.scheduled;
         updatedDescription.publishDate = DateTime.now().plusSeconds(10).toDate();
-        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler);
+        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler, publisherSession);
 
         assertTrue(scheduler.taskExistsForCollection(updated));
         long timeUntilTaskRun = scheduler.getTaskForCollection(updated).getDelay(TimeUnit.SECONDS);
@@ -206,7 +206,7 @@ public class CollectionTest {
         Collection collection = null;
 
         // When we call the static update method
-        Collection.update(collection, new CollectionDescription("name"), zebedee, new CollectionScheduler());
+        Collection.update(collection, new CollectionDescription("name"), zebedee, new CollectionScheduler(), publisherSession);
 
         // Then the expected exception is thrown.
     }

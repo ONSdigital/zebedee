@@ -76,6 +76,7 @@ public class Collections {
                 description.publishDate = collection.description.publishDate;
                 description.approvedStatus = collection.description.approvedStatus;
                 description.type = collection.description.type;
+                description.teams = collection.description.teams;
                 result.add(description);
             }
         }

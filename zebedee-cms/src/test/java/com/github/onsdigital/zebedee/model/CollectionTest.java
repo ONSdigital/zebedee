@@ -20,7 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.HEAD;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -50,7 +49,7 @@ public class CollectionTest {
         zebedee = new Zebedee(builder.zebedee, false);
         collection = new Collection(builder.collections.get(1), zebedee);
 
-        zebedee.openSession(builder.administratorCredentials);
+        publisherSession = zebedee.openSession(builder.publisher1Credentials);
         publisher1Email = builder.publisher1.email;
         collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
     }
@@ -1051,8 +1050,6 @@ public class CollectionTest {
         CollectionDescription description = new CollectionDescription();
         description.id = Random.id();
         description.name = description.id;
-        Collection collection = Collection.create(description, zebedee, publisherSession);
-
 
         collection.description.releaseUri = uri;
         collection.associateWithRelease(publisher1Email, release, collectionWriter);

@@ -261,6 +261,9 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
+        //TODO: !!!!!!!!!!!!!!!!!!!! Permission management not done on edit
+        updatedCollection.description.teams = collection.description.teams;
+
         updatedCollection.save();
 
         return updatedCollection;

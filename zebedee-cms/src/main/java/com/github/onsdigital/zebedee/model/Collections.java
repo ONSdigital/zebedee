@@ -557,10 +557,10 @@ public class Collections {
         // Find the file if it exists
         Path path = collection.find(uri);
 
-        // Check we're writing a file:
-        if (path != null && Files.isDirectory(path)) {
-            throw new BadRequestException("Please provide a URI to a file");
-        }
+//        // Check we're writing a file:
+//        if (path != null && Files.isDirectory(path)) {
+//            throw new BadRequestException("Please provide a URI to a file");
+//        }
 
         collection.moveContent(session.email, uri, newUri);
         collection.save();

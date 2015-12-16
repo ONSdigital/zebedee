@@ -986,12 +986,13 @@ public class DataPublisher {
      * @throws BadRequestException
      * @throws UnauthorizedException
      * @throws URISyntaxException
+     * @return list of all uris, including uris in the compressed files
      */
-    public void preprocessCollection(CollectionReader collectionReader, CollectionWriter collectionWriter, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
+    public List<String> preprocessCollection(CollectionReader collectionReader, CollectionWriter collectionWriter, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
 
         if (brianTestFiles.size() == 0 && (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0)) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
-            return;
+            return collection.reviewedUris();
         }
 
         insertions = 0;
@@ -999,11 +1000,14 @@ public class DataPublisher {
 
         preprocessCsdbFiles(collectionReader, collectionWriter, zebedee, collection, session);
 
+
         if (insertions + corrections > 0) {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
         }
 
+        List<String> uriList =collection.reviewedUris();
         if (!doNotCompress) CompressTimeseries(zebedee, session, collection);
+        return uriList;
     }
 
     /**

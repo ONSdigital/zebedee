@@ -246,7 +246,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        return canView(session.email, collectionDescription);
+        return session != null && canView(session.email, collectionDescription);
     }
 
     /**
@@ -261,9 +261,7 @@ public class Permissions {
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         return user != null && (
-                canEdit(user.email, accessMapping)
-                        || isAdministrator(user.email, accessMapping)
-                        || canView(user.email, collectionDescription, accessMapping));
+                canEdit(user.email, accessMapping) || canView(user.email, collectionDescription, accessMapping));
     }
 
     /**

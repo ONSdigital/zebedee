@@ -50,7 +50,7 @@ public class KeyManager {
     }
 
     private static void distributeKeyToUser(Zebedee zebedee, Collection collection, SecretKey key, User user) throws IOException {
-        if (userShouldAccessCollection(zebedee, user, collection)) {
+        if (userShouldHaveKey(zebedee, user, collection)) {
             // Add the key
             assignKeyToUser(zebedee, user, collection, key);
         } else {
@@ -150,9 +150,9 @@ public class KeyManager {
         transferKeyring(targetKeyring, sourceKeyring, collectionIds);
     }
 
-    private static boolean userShouldAccessCollection(Zebedee zebedee, User user, Collection collection) throws IOException {
-        if (zebedee.permissions.canView(user, collection.description)) return true;
-
+    private static boolean userShouldHaveKey(Zebedee zebedee, User user, Collection collection) throws IOException {
+        if (zebedee.permissions.isAdministrator(user.email)
+                || zebedee.permissions.canView(user, collection.description)) return true;
         return false;
     }
 }

@@ -197,9 +197,9 @@ public class Builder {
         AccessMapping accessMapping = new AccessMapping();
 
         accessMapping.administrators = new HashSet<>();
-        accessMapping.administrators.add(administrator.email);
-
         accessMapping.digitalPublishingTeam = new HashSet<>();
+
+        accessMapping.administrators.add(administrator.email);
         accessMapping.digitalPublishingTeam.add(publisher1.email);
         accessMapping.digitalPublishingTeam.add(publisher2.email);
 

@@ -214,7 +214,7 @@ public class Publisher {
                 publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
             }
 
-            results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, publishUri, zipped, source, reader, pool));
+            results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, publishUri, zipped, source, reader, pool));
         }
 
         // Add an event to the event log
@@ -527,6 +527,7 @@ public class Publisher {
             final String transactionId,
             final String encryptionPassword,
             final String uri,
+            final String publishUri,
             final boolean zipped,
             final Path source,
             final CollectionReader reader,
@@ -540,7 +541,7 @@ public class Publisher {
                             .setParameter("transactionId", transactionId)
                             .setParameter("encryptionPassword", encryptionPassword)
                             .setParameter("zip", Boolean.toString(zipped))
-                            .setParameter("uri", uri);
+                            .setParameter("uri", publishUri);
 
                     Resource resource = reader.getResource(uri);
                     Response<Result> response = http.post(publish, resource.getData(), source.getFileName().toString(), Result.class);

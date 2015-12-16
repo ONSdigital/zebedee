@@ -532,26 +532,23 @@ public class Publisher {
             final Path source,
             final CollectionReader reader,
             ExecutorService pool) {
-        return pool.submit(new Callable<IOException>() {
-            @Override
-            public IOException call() throws Exception {
-                IOException result = null;
-                try (Http http = new Http()) {
-                    Endpoint publish = new Endpoint(host, "publish")
-                            .setParameter("transactionId", transactionId)
-                            .setParameter("encryptionPassword", encryptionPassword)
-                            .setParameter("zip", Boolean.toString(zipped))
-                            .setParameter("uri", publishUri);
+        return pool.submit(() -> {
+            IOException result = null;
+            try (Http http = new Http()) {
+                Endpoint publish = new Endpoint(host, "publish")
+                        .setParameter("transactionId", transactionId)
+                        .setParameter("encryptionPassword", encryptionPassword)
+                        .setParameter("zip", Boolean.toString(zipped))
+                        .setParameter("uri", publishUri);
 
-                    Resource resource = reader.getResource(uri);
-                    Response<Result> response = http.post(publish, resource.getData(), source.getFileName().toString(), Result.class);
-                    checkResponse(response);
+                Resource resource = reader.getResource(uri);
+                Response<Result> response = http.post(publish, resource.getData(), source.getFileName().toString(), Result.class);
+                checkResponse(response);
 
-                } catch (IOException e) {
-                    result = e;
-                }
-                return result;
+            } catch (IOException e) {
+                result = e;
             }
+            return result;
         });
     }
 

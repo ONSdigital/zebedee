@@ -54,6 +54,10 @@ public class Permissions {
      */
     public boolean isAdministrator(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        return isAdministrator(email, accessMapping);
+    }
+
+    private boolean isAdministrator(String email, AccessMapping accessMapping) {
         return accessMapping.administrators != null && accessMapping.administrators.contains(standardise(email));
     }
 
@@ -235,9 +239,6 @@ public class Permissions {
     /**
      * Determines whether a session has viewing rights.
      *
-     * If a collection has its encrypted flag set returns yes for any user with the key
-     * If not encrypted only gives view permission to publisher/admins
-     *
      * @param session               The user's session. Can be null.
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
@@ -245,16 +246,12 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
-        return session != null && (canEdit(session) || canView(session.email, collectionDescription, accessMapping));
+        return canView(session.email, collectionDescription);
     }
 
     /**
      * Determines whether the specified user has viewing rights.
-     *
-     * If a collection has its encrypted flag set returns yes for any user with the key
-     * If not encrypted only gives view permission to publisher/admins
-     *
+     **
      * @param user               The user. Can be null.
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
@@ -263,7 +260,10 @@ public class Permissions {
      */
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
-        return user != null && (canEdit(user.email) || canView(user.email, collectionDescription, accessMapping));
+        return user != null && (
+                canEdit(user.email, accessMapping)
+                        || isAdministrator(user.email, accessMapping)
+                        || canView(user.email, collectionDescription, accessMapping));
     }
 
     /**

@@ -26,8 +26,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
 
         // Authorisation
         if (session == null
-                || !zebedee.permissions.canView(session.email,
-                collection.description)) {
+                || !zebedee.permissions.canView(session, collection.description)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

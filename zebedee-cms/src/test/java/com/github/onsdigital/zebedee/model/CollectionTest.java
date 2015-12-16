@@ -20,6 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.ws.rs.HEAD;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -39,8 +40,8 @@ public class CollectionTest {
     Zebedee zebedee;
     Collection collection;
     Builder builder;
+    Session publisherSession;
     String publisher1Email;
-    Session session;
     FakeCollectionWriter collectionWriter;
 
     @Before
@@ -50,9 +51,7 @@ public class CollectionTest {
         collection = new Collection(builder.collections.get(1), zebedee);
 
         zebedee.openSession(builder.administratorCredentials);
-        session = zebedee.openSession(builder.publisher1Credentials);
         publisher1Email = builder.publisher1.email;
-
         collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
     }
 
@@ -71,7 +70,9 @@ public class CollectionTest {
         String filename = PathUtils.toFilename(name);
 
         // When
-        Collection.create(collectionDescription, zebedee, session);
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
+
 
         // Then
         Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
@@ -108,7 +109,9 @@ public class CollectionTest {
         String filename = PathUtils.toFilename(newName);
 
         // When the rename function is called.
-        Collection.create(collectionDescription, zebedee, session);
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
+
         Collection.rename(collectionDescription, newName, zebedee);
 
         // Then the collection is renamed.
@@ -145,7 +148,7 @@ public class CollectionTest {
         CollectionDescription collectionDescription = new CollectionDescription(name);
         collectionDescription.type = CollectionType.manual;
         collectionDescription.publishDate = new Date();
-        Collection collection = Collection.create(collectionDescription, zebedee, session);
+        Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         // When the collection is updated
         String newName = "Economy Release";
@@ -153,7 +156,7 @@ public class CollectionTest {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.type = CollectionType.scheduled;
         updatedDescription.publishDate = new DateTime(collectionDescription.publishDate).plusHours(1).toDate();
-        Collection.update(collection, updatedDescription, zebedee, new CollectionScheduler());
+        Collection.update(collection, updatedDescription, zebedee, new CollectionScheduler(), publisherSession);
 
 
         // Then the properties of the description passed to update have been updated.
@@ -188,7 +191,8 @@ public class CollectionTest {
         CollectionDescription collectionDescription = new CollectionDescription(name);
         collectionDescription.publishDate = DateTime.now().plusSeconds(2).toDate();
         collectionDescription.type = CollectionType.scheduled;
-        Collection collection = Collection.create(collectionDescription, zebedee, session);
+        Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
+
         CollectionScheduler scheduler = new CollectionScheduler();
         CollectionScheduler.schedulePublish(scheduler, collection, zebedee);
 
@@ -197,7 +201,7 @@ public class CollectionTest {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.type = CollectionType.scheduled;
         updatedDescription.publishDate = DateTime.now().plusSeconds(10).toDate();
-        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler);
+        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler, publisherSession);
 
         assertTrue(scheduler.taskExistsForCollection(updated));
         long timeUntilTaskRun = scheduler.getTaskForCollection(updated).getDelay(TimeUnit.SECONDS);
@@ -211,7 +215,7 @@ public class CollectionTest {
         Collection collection = null;
 
         // When we call the static update method
-        Collection.update(collection, new CollectionDescription("name"), zebedee, new CollectionScheduler());
+        Collection.update(collection, new CollectionDescription("name"), zebedee, new CollectionScheduler(), publisherSession);
 
         // Then the expected exception is thrown.
     }
@@ -223,7 +227,9 @@ public class CollectionTest {
         // A folder that isn't a valid release:
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
-        Collection.create(collectionDescription, zebedee, session);
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
+
         Path releasePath = builder.zebedee.resolve(Zebedee.COLLECTIONS).resolve(
                 PathUtils.toFilename(name));
         FileUtils.cleanDirectory(releasePath.toFile());
@@ -263,7 +269,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean created = collection.create(publisher1Email, uri);
+        boolean created = collection.create(publisherSession.email, uri);
 
         // Then
         assertFalse(created);
@@ -280,7 +286,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(publisher1Email, uri);
+        boolean created = collection.create(publisherSession.email, uri);
 
         // Then
         assertFalse(created);
@@ -297,7 +303,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(publisher1Email, uri);
+        boolean created = collection.create(publisherSession.email, uri);
 
         // Then
         assertFalse(created);
@@ -314,7 +320,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean created = collection.create(publisher1Email, uri);
+        boolean created = collection.create(publisherSession.email, uri);
 
         // Then
         assertFalse(created);
@@ -333,7 +339,7 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(publisher1Email, jsonFile);
+        boolean result = collection.deleteContent(publisherSession.email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -356,7 +362,7 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(publisher1Email, jsonFile);
+        boolean result = collection.deleteContent(publisherSession.email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -1042,6 +1048,12 @@ public class CollectionTest {
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
 
+        CollectionDescription description = new CollectionDescription();
+        description.id = Random.id();
+        description.name = description.id;
+        Collection collection = Collection.create(description, zebedee, publisherSession);
+
+
         collection.description.releaseUri = uri;
         collection.associateWithRelease(publisher1Email, release, collectionWriter);
 
@@ -1074,7 +1086,8 @@ public class CollectionTest {
         // When a new collection is created with the release uri given
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
-        Collection collection = Collection.create(collectionDescription, zebedee, session);
+
+        Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         // The release page is in progress within the collection and the collection publish date has been
         // taken from the release page date.
@@ -1092,7 +1105,9 @@ public class CollectionTest {
         // When a new collection is created with the release uri given
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
-        Collection.create(collectionDescription, zebedee, session);
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
+
 
         // Then the expected exception is thrown
     }
@@ -1105,12 +1120,16 @@ public class CollectionTest {
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
-        Collection.create(collectionDescription, zebedee, session);
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
+
 
         // When a new collection is created with the release uri given
         collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
-        Collection.create(collectionDescription, zebedee, session);
+
+        Collection.create(collectionDescription, zebedee, publisherSession);
+
 
         // Then the expected exception is thrown
     }

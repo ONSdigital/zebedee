@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -34,26 +33,6 @@ import java.util.concurrent.TimeUnit;
 public class Builder {
 
     static int teamId;
-    public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
-    public String[] teamNames = {"Economy Team", "Labour Market Team"};
-    public Path parent;
-    public Path zebedee;
-    public List<Path> collections;
-    public List<String> teams;
-    public List<String> contentUris;
-    public User administrator;
-    public User publisher1;
-    public User publisher2;
-    public User reviewer1;
-    public User reviewer2;
-    public Credentials administratorCredentials;
-    public Credentials publisher1Credentials;
-    public Credentials publisher2Credentials;
-    public Credentials reviewer1Credentials;
-    public Credentials reviewer2Credentials;
-    public Team labourMarketTeam;
-    public Team inflationTeam;
-
     static User administratorTemplate;
     static User publisher1Template;
     static User publisher2Template;
@@ -105,40 +84,25 @@ public class Builder {
         System.out.println("Done.");
     }
 
-    private static void submit(ExecutorService pool, User... users) {
-        for (final User user : users) {
-            pool.submit(new Runnable() {
-                @Override
-                public void run() {
-                    user.resetPassword("password");
-                    System.out.println(user.email);
-                }
-            });
-        }
-    }
-
-    static User clone(User user) {
-        User clone = new User();
-
-        clone.name = user.name;
-        clone.email = user.email;
-        clone.inactive = user.inactive;
-        clone.temporaryPassword = user.temporaryPassword;
-        clone.lastAdmin = user.lastAdmin;
-        clone(clone, user, "passwordHash");
-        clone(clone, user, "keyring");
-        return clone;
-    }
-
-    static void clone(User clone, User user, String fieldName) {
-        try {
-            Field field = User.class.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(clone, field.get(user));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Error cloning user", e);
-        }
-    }
+    public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
+    public String[] teamNames = {"Economy Team", "Labour Market Team"};
+    public Path parent;
+    public Path zebedee;
+    public List<Path> collections;
+    public List<String> teams;
+    public List<String> contentUris;
+    public User administrator;
+    public User publisher1;
+    public User publisher2;
+    public User reviewer1;
+    public User reviewer2;
+    public Credentials administratorCredentials;
+    public Credentials publisher1Credentials;
+    public Credentials publisher2Credentials;
+    public Credentials reviewer1Credentials;
+    public Credentials reviewer2Credentials;
+    public Team labourMarketTeam;
+    public Team inflationTeam;
 
     /**
      * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
@@ -195,12 +159,10 @@ public class Builder {
             Serialiser.serialise(outputStream, administrator);
         }
 
-
         publisher1 = clone(publisher1Template);
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher1.email) + ".json"))) {
             Serialiser.serialise(outputStream, publisher1);
         }
-
 
         publisher2 = clone(publisher2Template);
         try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher2.email) + ".json"))) {
@@ -235,9 +197,9 @@ public class Builder {
         AccessMapping accessMapping = new AccessMapping();
 
         accessMapping.administrators = new HashSet<>();
-        accessMapping.administrators.add(administrator.email);
-
         accessMapping.digitalPublishingTeam = new HashSet<>();
+
+        accessMapping.administrators.add(administrator.email);
         accessMapping.digitalPublishingTeam.add(publisher1.email);
         accessMapping.digitalPublishingTeam.add(publisher2.email);
 
@@ -255,12 +217,6 @@ public class Builder {
         try (OutputStream output = Files.newOutputStream(path)) {
             Serialiser.serialise(output, accessMapping);
         }
-    }
-    private Credentials userCredentials(User user) {
-        Credentials credentials = new Credentials();
-        credentials.email = user.email;
-        credentials.password = "password";
-        return credentials;
     }
 
     /**
@@ -290,6 +246,48 @@ public class Builder {
         if (Files.exists(bootStrap.resolve(Zebedee.COLLECTIONS))) {
             FileUtils.copyDirectory(bootStrap.resolve(Zebedee.COLLECTIONS).toFile(), this.zebedee.resolve(Zebedee.COLLECTIONS).toFile());
         }
+    }
+
+    private static void submit(ExecutorService pool, User... users) {
+        for (final User user : users) {
+            pool.submit(new Runnable() {
+                @Override
+                public void run() {
+                    user.resetPassword("password");
+                    System.out.println(user.email);
+                }
+            });
+        }
+    }
+
+    static User clone(User user) {
+        User clone = new User();
+
+        clone.name = user.name;
+        clone.email = user.email;
+        clone.inactive = user.inactive;
+        clone.temporaryPassword = user.temporaryPassword;
+        clone.lastAdmin = user.lastAdmin;
+        clone(clone, user, "passwordHash");
+        clone(clone, user, "keyring");
+        return clone;
+    }
+
+    static void clone(User clone, User user, String fieldName) {
+        try {
+            Field field = User.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(clone, field.get(user));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Error cloning user", e);
+        }
+    }
+
+    private Credentials userCredentials(User user) {
+        Credentials credentials = new Credentials();
+        credentials.email = user.email;
+        credentials.password = "password";
+        return credentials;
     }
 
     private Set<Integer> set(Team team) {

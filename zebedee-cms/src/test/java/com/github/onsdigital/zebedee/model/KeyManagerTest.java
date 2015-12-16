@@ -61,6 +61,7 @@ public class KeyManagerTest {
         // a collection is created, isEncrypted is set, and is set to true
         CollectionDescription collectionDescription = createCollection(true);
 
+
         // When
         // we reload the collection
         Collection reloaded = zebedee.collections.list().getCollection(collectionDescription.id);

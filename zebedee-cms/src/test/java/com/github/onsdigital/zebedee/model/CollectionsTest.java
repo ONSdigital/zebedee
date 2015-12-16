@@ -79,6 +79,8 @@ public class CollectionsTest {
 
         Collections.CollectionList collections = new Collections.CollectionList();
 
+        Session session = zebedee.openSession(builder.administratorCredentials);
+
         Collection firstCollection = Collection.create(
                 new CollectionDescription("FirstCollection"), zebedee, session);
 
@@ -90,7 +92,7 @@ public class CollectionsTest {
     @Test
     public void shouldHaveCollectionForName() throws Exception {
         Collections.CollectionList collectionList = new Collections.CollectionList();
-        zebedee.openSession(builder.administratorCredentials);
+        Session session = zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
                 new CollectionDescription("FirstCollection"), zebedee, session);
@@ -963,7 +965,7 @@ public class CollectionsTest {
 
         // Given
         // A collection
-        zebedee.openSession(builder.administratorCredentials);
+        Session session = zebedee.openSession(builder.administratorCredentials);
         Collection collection = Collection.create(
                 new CollectionDescription("collection"), zebedee, session);
 

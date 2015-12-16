@@ -58,10 +58,7 @@ public class Teams {
     }
 
     public Team findTeam(String teamName) throws IOException, NotFoundException {
-        Team result = null;
-
-        result = readTeam(teamName);
-
+        Team result = readTeam(teamName);
         return result;
     }
 
@@ -218,7 +215,6 @@ public class Teams {
             team.members.remove(PathUtils.standardise(email));
             writeTeam(team);
         }
-
     }
 
 

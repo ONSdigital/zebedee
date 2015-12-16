@@ -55,6 +55,8 @@ public class CollectionDetails {
         result.name = collection.description.name;
         result.type = collection.description.type;
         result.publishDate = collection.description.publishDate;
+        result.teams = collection.description.teams;
+
 
         result.inProgress = ContentDetailUtil.resolveDetails(collection.inProgress, collectionReader.getInProgress());
         result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());

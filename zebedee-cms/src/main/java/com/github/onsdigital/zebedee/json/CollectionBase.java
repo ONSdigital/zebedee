@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.json;
 
 import java.util.Date;
+import java.util.List;
 
 public class CollectionBase {
     /**
@@ -24,4 +25,7 @@ public class CollectionBase {
      * If the collection is associated with a release the releaseUri determines that release.
      */
     public String releaseUri;
+
+    public List<String> teams; // list of team Id's
+
 }

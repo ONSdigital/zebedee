@@ -22,6 +22,7 @@ public class CollectionDescription extends CollectionBase {
     public String publishTransactionId;
     public boolean isEncrypted;
 
+
     /**
      * events related to this collection
      */

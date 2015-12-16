@@ -58,6 +58,7 @@ public class Collection {
         result.eventsByUri = collection.description.eventsByUri;
         result.approvedStatus = collection.description.approvedStatus;
         result.type = collection.description.type;
+        result.teams = collection.description.teams;
         return result;
     }
 
@@ -124,7 +125,8 @@ public class Collection {
                 collection,
                 collectionDescription,
                 Root.zebedee,
-                Root.scheduler);
+                Root.scheduler,
+                session);
 
         return updatedCollection.description;
     }

@@ -10,9 +10,8 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.json.TeamList;
-import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.model.KeyManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +35,19 @@ import java.util.List;
 @Api
 public class Teams {
 
+    private static String getTeamName(HttpServletRequest request)
+            throws IOException {
+
+        Path path = Path.newInstance(request);
+        List<String> segments = path.segments();
+
+        if (segments.size() > 1) {
+            return segments.get(1);
+        }
+
+        return null;
+    }
+
     /**
      * POST {@code /teams/[teamname]} creates a team with name {@code teamname}
      * <p>POST {@code /teams/[teamname]?email=user@example.com} adds a user to the team</p>
@@ -58,6 +70,7 @@ public class Teams {
             return addTeamMember(request, response);
         }
     }
+
     public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException {
 
         Session session = Root.zebedee.sessions.get(request);
@@ -68,6 +81,7 @@ public class Teams {
 
         return true;
     }
+
     public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
         Zebedee zebedee = Root.zebedee;
         Session session = zebedee.sessions.get(request);
@@ -103,6 +117,7 @@ public class Teams {
             return removeTeamMember(request, response);
         }
     }
+
     public boolean deleteTeam(HttpServletRequest request, HttpServletResponse response) throws NotFoundException, BadRequestException, UnauthorizedException, IOException {
 
         Zebedee zebedee = Root.zebedee;
@@ -110,17 +125,11 @@ public class Teams {
         Team team = zebedee.teams.findTeam(getTeamName(request));
         zebedee.teams.deleteTeam(team, session);
 
-        for (Collection collection : zebedee.collections.list()) {
-            if (collection.description.teams.contains(team.name)) {
-                for (String memberEmail : team.members) {
-                    KeyManager.distributeKeyToUser(zebedee, collection, session, zebedee.users.get(memberEmail));
-                }
-            }
-        }
         evaluateCollectionKeys(zebedee, session, team, team.members.toArray(new String[team.members.size()]));
 
         return true;
     }
+
     public boolean removeTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
 
         Zebedee zebedee = Root.zebedee;
@@ -145,7 +154,7 @@ public class Teams {
      */
     private void evaluateCollectionKeys(Zebedee zebedee, Session session, Team team, String... emails) throws IOException, NotFoundException, BadRequestException {
         for (Collection collection : zebedee.collections.list()) {
-            if (collection.description.teams.contains(team.name)) {
+            if (collection.description.teams != null && collection.description.teams.contains(team.name)) {
                 for (String memberEmail : emails) {
                     KeyManager.distributeKeyToUser(zebedee, collection, session, zebedee.users.get(memberEmail));
                 }
@@ -172,18 +181,5 @@ public class Teams {
             result = new TeamList(Root.zebedee.teams.listTeams());
         }
         return result;
-    }
-
-    private static String getTeamName(HttpServletRequest request)
-            throws IOException {
-
-        Path path = Path.newInstance(request);
-        List<String> segments = path.segments();
-
-        if (segments.size() > 1) {
-            return segments.get(1);
-        }
-
-        return null;
     }
 }

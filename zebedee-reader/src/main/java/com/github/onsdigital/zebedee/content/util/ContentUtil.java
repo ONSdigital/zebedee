@@ -1,11 +1,14 @@
 package com.github.onsdigital.zebedee.content.util;
 
+import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
@@ -146,6 +149,14 @@ public class ContentUtil {
     public static <O extends Cloneable> O clone(O o) {
         Cloneable cloneable = o;
         return ObjectUtils.clone(o);
+    }
+
+    public static String hash(Content content) {
+        return DigestUtils.sha1Hex(serialise(content));
+    }
+
+    public static String hash(InputStream stream) throws IOException {
+        return DigestUtils.sha1Hex(stream);
     }
 
     private static Gson gson() {

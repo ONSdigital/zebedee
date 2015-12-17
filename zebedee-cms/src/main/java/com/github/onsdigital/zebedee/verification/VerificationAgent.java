@@ -2,12 +2,20 @@ package com.github.onsdigital.zebedee.verification;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.DateConverter;
+import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.verification.http.ClientConfiguration;
 import com.github.onsdigital.zebedee.verification.http.PooledHttpClient;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -24,9 +32,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
  * Created by bren on 16/11/15.
+ * Verification agent works after each publish to connect to website ( or another proxy ) to verify the content by checking content's hash
  */
 public class VerificationAgent {
 
@@ -42,40 +52,39 @@ public class VerificationAgent {
         clientConfiguration.setMaxTotalConnection(100);
         clientConfiguration.setDisableRedirectHandling(true);
         verificationProxyClient = new PooledHttpClient(defaultVerificationUrl, clientConfiguration);
-        pool = Executors.newFixedThreadPool(50);
+        pool = Executors.newFixedThreadPool(100);
     }
 
-    public void submitForVerification(PublishedCollection publishedCollection, Path jsonPath) {
+    public void submitForVerification(PublishedCollection publishedCollection, Path jsonPath, CollectionReader reader) {
         System.out.println("Submitting collection " + publishedCollection.name + " for external verification");
         List<Result> publishResults = publishedCollection.publishResults;
         for (Result publishResult : publishResults) {
             Set<UriInfo> uriInfos = publishResult.transaction.uriInfos;
             for (UriInfo uriInfo : uriInfos) {
+                setHash(uriInfo, reader);
                 uriInfo.verificationStatus = UriInfo.VERIFYING;
                 publishedCollection.incrementVerifyInProgressCount();
                 submit(publishedCollection, jsonPath, uriInfo);
             }
         }
+        save(publishedCollection, jsonPath);
     }
 
-    private void submit(PublishedCollection publishedCollection, Path jsoPath,   UriInfo uriInfo) {
+    private void submit(PublishedCollection publishedCollection, Path jsoPath, UriInfo uriInfo) {
         pool.submit(new VerifyTask(publishedCollection, jsoPath, uriInfo));
     }
 
     //Resubmits uri to be verified with configured delay if failed
-    private void reSubmit(final  PublishedCollection publishedCollection, final Path jsonPath, final UriInfo uriInfo) {
-        new Runnable(){
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(Configuration.getVerifyRetrtyDelay());
-                } catch (InterruptedException e) {
-                    System.err.println("Warning! Retry delay failed, continues with verification retry ");
-                }
-                uriInfo.verificationStatus = UriInfo.VERIFY_RETRYING;
-                submit(publishedCollection, jsonPath, uriInfo);
+    private void reSubmit(final PublishedCollection publishedCollection, final Path jsonPath, final UriInfo uriInfo) {
+        ((Runnable) () -> {
+            try {
+                Thread.sleep(Configuration.getVerifyRetrtyDelay());
+            } catch (InterruptedException e) {
+                System.err.println("Warning! Retry delay failed, continues with verification retry ");
             }
-        }.run();
+            uriInfo.verificationStatus = UriInfo.VERIFY_RETRYING;
+            submit(publishedCollection, jsonPath, uriInfo);
+        }).run();
     }
 
     private class VerifyTask implements Callable<Object> {
@@ -90,7 +99,6 @@ public class VerificationAgent {
         }
 
         private void verify() {
-            //TODO: Use proper etag headers with a head call when caching solution is implemented
             try {
                 uriInfo.verificationRetryCount++;
                 System.out.println("Verifying " + uriInfo.uri + ", trial number " + uriInfo.verificationRetryCount);
@@ -115,7 +123,6 @@ public class VerificationAgent {
             publishedCollection.decrementVerifyInProgressCount();
             uriInfo.verificationStatus = UriInfo.VERIFIED;
             uriInfo.verificationEnd = DateConverter.toString(new Date());
-            save();
         }
 
         private void onVerifyFailed(String errorMessage) {
@@ -128,14 +135,11 @@ public class VerificationAgent {
             } else {
                 reSubmit(publishedCollection, jsonPath, uriInfo);
             }
-            save();
         }
 
-        private void save()  {
-            try {
-                zebedee.publishedCollections.save(publishedCollection, jsonPath);
-            } catch (IOException e) {
-                System.err.println("!!!!!!Saving published collection verification status failed for " + uriInfo.uri);
+        private void saveIfDone(PublishedCollection publishedCollection) {
+            if (publishedCollection.verifyInprogressCount == 0) {
+                save(publishedCollection, jsonPath);
             }
         }
 
@@ -149,9 +153,34 @@ public class VerificationAgent {
     //Verifies content is published by comparing hash value obtained through external website proxy with published hash value
     private boolean isPublished(UriInfo uriInfo) throws IOException {
         CloseableHttpResponse response = verificationProxyClient.sendGet("/hash", null, asList((NameValuePair) new BasicNameValuePair("uri", uriInfo.uri)));
-        String hash = EntityUtils.toString(response.getEntity());
-        return uriInfo.sha.equals(hash);
+        String websiteHash = EntityUtils.toString(response.getEntity());
+        StringUtils.remove(websiteHash, "--gzip"); //TODO: Jetty sets gzip at the end
+        return uriInfo.sha.equals(websiteHash);
     }
 
+    private void setHash(UriInfo uriInfo, CollectionReader reader) {
+        String uri = uriInfo.uri;
+        try {
+            if (uri.endsWith(".json")) {
+                uri = removeEnd(removeEnd(uri, "/data.json"), ".json");
+                Page content = reader.getContent(uri);
+                uriInfo.sha = ContentUtil.hash(content);
+            } else {
+                try (Resource resource = reader.getResource(uri)) {
+                    uriInfo.sha = ContentUtil.hash(resource.getData());
+                }
+            }
+        } catch (Exception e) {
+            Log.print(e, "Failed resolving hash for content " + uri);
+            e.printStackTrace();
+        }
+    }
 
+    private void save(PublishedCollection publishedCollection, Path jsonPath) {
+        try {
+            zebedee.publishedCollections.save(publishedCollection, jsonPath);
+        } catch (IOException e) {
+            Log.print(e, "!!!!!!Saving published collection failed, name: ", publishedCollection.name);
+        }
+    }
 }

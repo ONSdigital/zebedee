@@ -251,7 +251,7 @@ public class Publisher {
 
             if (!skipVerification) {
                 // add to published collections list
-                indexPublishReport(zebedee, collectionJsonPath);
+                indexPublishReport(zebedee, collectionJsonPath, collectionReader);
             }
 
             collection.delete();
@@ -265,14 +265,11 @@ public class Publisher {
         return false;
     }
 
-    private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath) {
-        pool.submit(new Runnable() {
-            @Override
-            public void run() {
-                Log.print("Indexing publish report");
-                PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
-                zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath);
-            }
+    private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
+        pool.submit(() -> {
+            Log.print("Indexing publish report");
+            PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
+            zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
         });
     }
 

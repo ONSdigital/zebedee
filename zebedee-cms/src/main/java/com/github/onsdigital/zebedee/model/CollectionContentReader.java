@@ -42,7 +42,6 @@ public class CollectionContentReader extends ContentReader {
         Resource resource = new Resource();
         resource.setName(path.getFileName().toString());
         resource.setMimeType(determineMimeType(path));
-        // have to read the stream to determine length when content is encrypted.
         resource.setUri(toRelativeUri(path));
         resource.setData(getInputStream(path));
         return resource;

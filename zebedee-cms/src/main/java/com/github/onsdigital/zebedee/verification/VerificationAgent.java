@@ -165,15 +165,9 @@ public class VerificationAgent {
     private void setHash(UriInfo uriInfo, CollectionReader reader) {
         String uri = uriInfo.uri;
         try {
-            if (uri.endsWith(".json")) {
-                uri = removeEnd(removeEnd(uri, "/data.json"), ".json");
-                Page content = reader.getContent(uri);
-                uriInfo.sha = ContentUtil.hash(content);
-            } else {
                 try (Resource resource = reader.getResource(uri)) {
                     uriInfo.sha = ContentUtil.hash(resource.getData());
                 }
-            }
         } catch (Exception e) {
             Log.print(e, "Failed resolving hash for content " + uri);
             e.printStackTrace();

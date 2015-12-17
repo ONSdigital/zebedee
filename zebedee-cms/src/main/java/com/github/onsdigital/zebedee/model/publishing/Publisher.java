@@ -234,8 +234,7 @@ public class Publisher {
 
         try {
 
-            unzipTimeseries(collection, collectionReader);
-
+            unzipTimeseries(collection, collectionReader, zebedee);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
             Log.print("Reindexing search");
@@ -278,17 +277,18 @@ public class Publisher {
      * on the publishing side
      *
      * @param collection
+     * @param zebedee
      * @throws IOException
      */
-    private static void unzipTimeseries(Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
+    private static void unzipTimeseries(Collection collection, CollectionReader collectionReader, Zebedee zebedee) throws IOException, ZebedeeException {
         Log.print("Unzipping files if required to move to master.");
         for (String uri : collection.reviewed.uris()) {
             Path source = collection.reviewed.get(uri);
             if (source != null) {
                 if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
                     String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
-                    Path publishPath = collection.reviewed.path.resolve(publishUri);
-                    Log.print("Unzipping %s to %s", source, publishPath);
+                    Path publishPath = zebedee.published.path.resolve(publishUri);
+                    Log.print("Unzipping %s to %s", source.toString(), publishPath.toString());
 
                     Resource resource = collectionReader.getResource(uri);
                     ZipUtils.unzip(resource.getData(), publishPath.toString());

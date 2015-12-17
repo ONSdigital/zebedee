@@ -123,6 +123,7 @@ public class VerificationAgent {
             publishedCollection.decrementVerifyInProgressCount();
             uriInfo.verificationStatus = UriInfo.VERIFIED;
             uriInfo.verificationEnd = DateConverter.toString(new Date());
+            saveIfDone();
         }
 
         private void onVerifyFailed(String errorMessage) {
@@ -135,9 +136,10 @@ public class VerificationAgent {
             } else {
                 reSubmit(publishedCollection, jsonPath, uriInfo);
             }
+            saveIfDone();
         }
 
-        private void saveIfDone(PublishedCollection publishedCollection) {
+        private void saveIfDone() {
             if (publishedCollection.verifyInprogressCount == 0) {
                 save(publishedCollection, jsonPath);
             }

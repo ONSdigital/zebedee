@@ -28,18 +28,16 @@ public class ReaderResponseResponseUtils {
     }
 
     public static void sendResponse(Resource resource, HttpServletResponse response, String encoding) throws IOException {
-        try (BufferedInputStream stream = new BufferedInputStream(resource.getData())) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType(resource.getMimeType());
-            if (encoding != null) {
-                response.setCharacterEncoding(encoding);
-            }
-            response.setHeader("Content-Disposition", "inline; filename=\"" + resource.getName() + "\"");
-            response.setHeader("Etag", ContentUtil.hash(stream));
-            stream.reset();
-            int contentLength = IOUtils.copy(stream, response.getOutputStream());
-            response.setContentLength(contentLength);
+        byte[] bytes = IOUtils.toByteArray(resource.getData());
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType(resource.getMimeType());
+        if (encoding != null) {
+            response.setCharacterEncoding(encoding);
         }
+        response.setHeader("Content-Disposition", "inline; filename=\"" + resource.getName() + "\"");
+        response.setHeader("Etag", ContentUtil.hash(bytes));
+        IOUtils.write(bytes, response.getOutputStream());
+        response.setContentLength(bytes.length);
     }
 
 

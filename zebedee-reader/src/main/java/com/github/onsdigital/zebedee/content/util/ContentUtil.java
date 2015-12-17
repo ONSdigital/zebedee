@@ -145,6 +145,9 @@ public class ContentUtil {
     public static String hash(InputStream stream) throws IOException {
         return DigestUtils.sha1Hex(stream);
     }
+    public static String hash(byte[] bytes) throws IOException {
+        return DigestUtils.sha1Hex(bytes);
+    }
 
     /**
      * Clones given object and returns a new copy

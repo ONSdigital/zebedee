@@ -25,6 +25,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -154,7 +155,9 @@ public class VerificationAgent {
 
     //Verifies content is published by comparing hash value obtained through external website proxy with published hash value
     private boolean isPublished(UriInfo uriInfo) throws IOException {
-        CloseableHttpResponse response = verificationProxyClient.sendGet("/hash", null, asList((NameValuePair) new BasicNameValuePair("uri", uriInfo.uri)));
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("If-None-Match", uriInfo.sha);
+        CloseableHttpResponse response = verificationProxyClient.sendGet("/hash", headers, asList((NameValuePair) new BasicNameValuePair("uri", uriInfo.uri)));
         String websiteHash = EntityUtils.toString(response.getEntity());
         return uriInfo.sha.equals(websiteHash);
     }

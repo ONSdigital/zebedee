@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.DataGenerator;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
-import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;

@@ -156,7 +156,6 @@ public class VerificationAgent {
     private boolean isPublished(UriInfo uriInfo) throws IOException {
         CloseableHttpResponse response = verificationProxyClient.sendGet("/hash", null, asList((NameValuePair) new BasicNameValuePair("uri", uriInfo.uri)));
         String websiteHash = EntityUtils.toString(response.getEntity());
-        StringUtils.remove(websiteHash, "--gzip"); //TODO: Jetty sets gzip at the end
         return uriInfo.sha.equals(websiteHash);
     }
 

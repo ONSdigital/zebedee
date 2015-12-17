@@ -8,7 +8,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
@@ -138,6 +137,13 @@ public class ContentUtil {
         return createBuilder(datePattern).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(json, Page.class);
     }
 
+    public static String hash(Content content) {
+        return DigestUtils.sha1Hex(ContentUtil.serialise(content));
+    }
+
+    public static String hash(InputStream content) {
+        return DigestUtils.sha1Hex(ContentUtil.serialise(content));
+    }
 
     /**
      * Clones given object and returns a new copy
@@ -149,14 +155,6 @@ public class ContentUtil {
     public static <O extends Cloneable> O clone(O o) {
         Cloneable cloneable = o;
         return ObjectUtils.clone(o);
-    }
-
-    public static String hash(Content content) {
-        return DigestUtils.sha1Hex(serialise(content));
-    }
-
-    public static String hash(InputStream stream) throws IOException {
-        return DigestUtils.sha1Hex(stream);
     }
 
     private static Gson gson() {

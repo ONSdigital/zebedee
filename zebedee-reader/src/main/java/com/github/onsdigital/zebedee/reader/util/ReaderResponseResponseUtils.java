@@ -1,12 +1,16 @@
 package com.github.onsdigital.zebedee.reader.util;
 
+import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.reader.Resource;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 
 /**
@@ -17,23 +21,30 @@ public class ReaderResponseResponseUtils {
     public static void sendResponse(Object content, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON);
+        if (content instanceof Content) {
+            response.setHeader("Etag", ContentUtil.hash((Content) content));
+        }
         IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());
     }
 
     public static void sendResponse(Resource resource, HttpServletResponse response, String encoding) throws IOException {
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType(resource.getMimeType());
-
-        if (encoding != null) {
-            response.setCharacterEncoding(encoding);
+        try (BufferedInputStream stream = new BufferedInputStream(resource.getData())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType(resource.getMimeType());
+            if (encoding != null) {
+                response.setCharacterEncoding(encoding);
+            }
+            response.setHeader("Content-Disposition", "inline; filename=\"" + resource.getName() + "\"");
+            response.setHeader("Etag", ContentUtil.hash(stream));
+            stream.reset();
+            int contentLength = IOUtils.copy(stream, response.getOutputStream());
+            response.setContentLength(contentLength);
         }
-        response.setHeader("Content-Disposition", "inline; filename=\"" + resource.getName() + "\"");
-        int contentLength = IOUtils.copy(resource.getData(), response.getOutputStream());
-        response.setContentLength(contentLength);
     }
 
 
     public static void sendResponse(Resource resource, HttpServletResponse response) throws IOException {
         sendResponse(resource, response, null);
     }
+
 }

@@ -8,6 +8,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
@@ -141,8 +142,8 @@ public class ContentUtil {
         return DigestUtils.sha1Hex(ContentUtil.serialise(content));
     }
 
-    public static String hash(InputStream content) {
-        return DigestUtils.sha1Hex(ContentUtil.serialise(content));
+    public static String hash(InputStream stream) throws IOException {
+        return DigestUtils.sha1Hex(stream);
     }
 
     /**

@@ -241,6 +241,8 @@ public class Publisher {
             Log.print("Reindexing search");
             reindexSearch(collection);
 
+            new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
+
             // move collection files to archive
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
 
@@ -253,9 +255,7 @@ public class Publisher {
             }
 
             collection.delete();
-
             ContentTree.dropCache();
-
             return true;
         } catch (Exception exception) {
             Log.print("An error occurred during the publish cleanupon collection %s: %s", collection.description.name, exception.getMessage());
@@ -399,7 +399,6 @@ public class Publisher {
                 if (isIndexedUri(uri)) {
                     String contentUri = URIUtils.removeLastSegment(uri);
                     reIndexPublishingSearch(contentUri);
-                    reIndexWebsiteSearch(contentUri);
                 }
             }
 

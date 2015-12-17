@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.Log;
@@ -26,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
@@ -172,9 +174,11 @@ public class Collections {
             }
         }
 
+        List<String> uriList;
+
         // Do any processing of data files
         try {
-            new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
+            uriList =  new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }
@@ -183,7 +187,9 @@ public class Collections {
         collection.description.approvedStatus = true;
         collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
 
-        return collection.save();
+        boolean result =  collection.save();
+        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
+        return result;
     }
 
     /**
@@ -220,7 +226,9 @@ public class Collections {
         collection.description.approvedStatus = false;
         collection.description.AddEvent(new Event(new Date(), EventType.UNLOCKED, session.email));
 
-        return collection.save();
+        boolean result =  collection.save();
+        new PublishNotification(collection).sendNotification(EventType.UNLOCKED);
+        return result;
     }
 
     /**

@@ -23,12 +23,13 @@ public class ReaderResponseResponseUtils {
     public static void sendResponse(Resource resource, HttpServletResponse response, String encoding) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(resource.getMimeType());
-        response.setContentLengthLong(resource.getSize());
+
         if (encoding != null) {
             response.setCharacterEncoding(encoding);
         }
         response.setHeader("Content-Disposition", "inline; filename=\"" + resource.getName() + "\"");
-        IOUtils.copy(resource.getData(), response.getOutputStream());
+        int contentLength = IOUtils.copy(resource.getData(), response.getOutputStream());
+        response.setContentLength(contentLength);
     }
 
 

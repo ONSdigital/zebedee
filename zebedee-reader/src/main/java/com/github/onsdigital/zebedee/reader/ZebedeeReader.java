@@ -140,6 +140,15 @@ public class ZebedeeReader {
         return createCollectionReader(collectionId, sessionId).getResource(path);
     }
 
+    public long getCollectionContentLength(String collectionId, String sessionId, String path) throws ZebedeeException, IOException {
+        assertId(collectionId);
+        return createCollectionReader(collectionId, sessionId).getContentLength(path);
+    }
+
+    public long getPublishedContentLength(String path) throws ZebedeeException, IOException {
+        return publishedContentReader.getContentLength(path);
+    }
+
     public Map<URI, ContentNode> getPublishedContentChildren(String path) throws ZebedeeException, IOException {
         try {
             return publishedContentReader.getChildren(path);
@@ -196,5 +205,4 @@ public class ZebedeeReader {
         collectionContentReader.setLanguage(language);
         return collectionContentReader;
     }
-
 }

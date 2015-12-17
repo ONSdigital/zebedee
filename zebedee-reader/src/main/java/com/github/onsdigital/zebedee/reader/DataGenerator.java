@@ -23,7 +23,8 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.probeContentType;
 
 /**
  * Created by thomasridd on 07/10/15.
@@ -544,7 +545,6 @@ public class DataGenerator {
         resource.setName(path.getFileName().toString());
         resource.setMimeType(probeContentType(path));
         resource.setData(newInputStream(path));
-        resource.setSize(size(path));
 
         if (resource.getMimeType() == null) {
             resource.setMimeType("application/octet-stream");

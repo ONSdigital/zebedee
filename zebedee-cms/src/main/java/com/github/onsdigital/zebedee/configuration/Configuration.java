@@ -34,7 +34,7 @@ public class Configuration {
     }
 
     public static String getDefaultVerificationUrl() {
-        return StringUtils.defaultIfBlank(getValue("verification_url"), DEFAULT_WEBSITE_URL);
+        return StringUtils.defaultIfBlank(getValue("verification_url"), getWebsiteUrl());
     }
 
     public static int getVerifyRetrtyDelay() {

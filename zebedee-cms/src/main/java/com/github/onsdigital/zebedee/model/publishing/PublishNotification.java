@@ -11,6 +11,11 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.util.Date;
 import java.util.List;
@@ -43,7 +48,13 @@ public class PublishNotification {
         try (Http http = new Http()) {
             Endpoint endpoint = new Endpoint(new Host(Configuration.getWebsiteUrl()), getEndPointName(eventType));
             Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
-            System.out.println("Response from website for publish notification: " + response.body.getMessage());
+            String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
+            if (response.statusLine.getStatusCode() > 302) {
+                System.err.println("Error response from website for publish notification: " + responseMessage  + " for collection id:" + payload.collectionId);
+            } else {
+                System.out.println("Response from website for publish notification: " + responseMessage  + " for collection id:" + payload.collectionId);
+            }
+
         } catch (Exception e) {
             Log.print("Failed sending publish notification to website fo " + eventType);
             ExceptionUtils.printRootCauseStackTrace(e);

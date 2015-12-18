@@ -26,7 +26,6 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.google.gson.JsonSyntaxException;
@@ -954,28 +953,6 @@ public class DataPublisher {
     }
 
     /**
-     * Save a timeseries to
-     *
-     * @param zebedee
-     * @param session
-     * @param collection
-     * @param savePath
-     * @param newPage
-     * @throws IOException
-     */
-    private void saveTimeseries(Zebedee zebedee, Session session, Collection collection, Path savePath, TimeSeries newPage) throws IOException {
-        if (collection.description.isEncrypted) {
-            try (OutputStream outputStream = EncryptionUtils.encryptionOutputStream(savePath, zebedee.keyringCache.get(session).get(collection.description.id))) {
-                IOUtils.write(ContentUtil.serialise(newPage), outputStream);
-            }
-        } else {
-            try (OutputStream outputStream = FileUtils.openOutputStream(savePath.toFile())) {
-                IOUtils.write(ContentUtil.serialise(newPage), outputStream);
-            }
-        }
-    }
-
-    /**
      * Run the preprocessing step that converts data to timeseries
      *
      * @param collectionReader
@@ -999,7 +976,6 @@ public class DataPublisher {
         corrections = 0;
 
         preprocessCsdbFiles(collectionReader, collectionWriter, zebedee, collection, session);
-
 
         if (insertions + corrections > 0) {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
@@ -1036,7 +1012,6 @@ public class DataPublisher {
     /**
      * Generate the XLSX and CSV files for a collection of timeseries
      *
-     * @param collection
      * @param newSeries
      * @param landingPage
      * @param datasetUri

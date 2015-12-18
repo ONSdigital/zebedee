@@ -38,7 +38,7 @@ public class KeyManagerTest {
     }
 
     @Test
-    public void isEncrypted_whenCollectionGenerated_isSetToFalse() throws ZebedeeException, IOException {
+    public void isEncrypted_whenCollectionGenerated_isSetToTrue() throws ZebedeeException, IOException {
         // Given
         // a collection is created
         Session session = zebedee.openSession(builder.publisher1Credentials);
@@ -52,7 +52,7 @@ public class KeyManagerTest {
 
         // Then
         // isEncrypted is false
-        assertEquals(false, reloaded.description.isEncrypted);
+        assertTrue(reloaded.description.isEncrypted);
     }
 
     @Test

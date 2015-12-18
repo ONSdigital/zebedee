@@ -117,8 +117,9 @@ public class Collection {
     public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
 
-        Release release = checkForRelease(collectionDescription, zebedee);
+        collectionDescription.isEncrypted = true; // force encryption on new collections.
 
+        Release release = checkForRelease(collectionDescription, zebedee);
         String filename = PathUtils.toFilename(collectionDescription.name);
         collectionDescription.id = filename + "-" + Random.id();
 

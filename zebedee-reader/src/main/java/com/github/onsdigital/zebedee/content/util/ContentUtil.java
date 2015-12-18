@@ -171,7 +171,7 @@ public class ContentUtil {
     }
 
     private static GsonBuilder createBuilder(String datePattern) {
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
+        GsonBuilder builder = new GsonBuilder();
         if (StringUtils.isNotBlank(datePattern)) {
             builder.registerTypeAdapter(Date.class, new IsoDateSerializer(datePattern));
         } else {

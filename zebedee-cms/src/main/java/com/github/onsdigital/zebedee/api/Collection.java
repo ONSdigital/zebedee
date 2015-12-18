@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
 import org.apache.commons.lang3.StringUtils;
@@ -90,6 +91,11 @@ public class Collection {
         Session session = Root.zebedee.sessions.get(request);
         if (Root.zebedee.permissions.canEdit(session.email) == false) {
             throw new UnauthorizedException("You are not authorised to create collections.");
+        }
+
+        Keyring keyring = Root.zebedee.keyringCache.get(session);
+        if (keyring == null) {
+            throw new UnauthorizedException("Keyring is not initialised.");
         }
 
         collectionDescription.name = StringUtils.trim(collectionDescription.name);

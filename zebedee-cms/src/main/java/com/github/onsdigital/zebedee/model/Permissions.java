@@ -429,7 +429,7 @@ public class Permissions {
      */
     public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
 
-        if ((session == null) || !isAdministrator(session.email) || !session.email.equals(email)) {
+        if ((session == null) || (!isAdministrator(session.email) && !session.email.equals(email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

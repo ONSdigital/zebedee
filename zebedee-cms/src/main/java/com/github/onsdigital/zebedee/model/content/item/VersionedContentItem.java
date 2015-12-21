@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.util.URIUtils;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -60,7 +61,8 @@ public class VersionedContentItem extends ContentItem {
     public ContentItemVersion createVersion(Path contentRoot, ContentReader contentReader) throws IOException, ZebedeeException {
 
         // create a new directory for the version. e.g. edition/previous/v1
-        String versionIdentifier = createVersionIdentifier(contentRoot.resolve(getUri().toString()));
+        Path absolutePath = contentRoot.resolve(URIUtils.removeLeadingSlash(getUri().toString()));
+        String versionIdentifier = createVersionIdentifier(absolutePath);
         String versionUri = String.format("%s/%s/%s", getUri(), getVersionDirectoryName(), versionIdentifier);
 
         copyFilesIntoVersionDirectory(contentRoot, versionUri, contentReader);

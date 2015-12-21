@@ -429,7 +429,7 @@ public class Permissions {
      */
     public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
 
-        if ((session == null) || !isAdministrator(session.email)) {
+        if ((session == null) || !isAdministrator(session.email) || !session.email.equals(email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -439,5 +439,4 @@ public class Permissions {
         definition.editor = canEdit(email);
         return definition;
     }
-
 }

@@ -102,7 +102,7 @@ public class VerificationAgent {
         private void verify() {
             try {
                 uriInfo.verificationRetryCount++;
-                System.out.println("Verifying " + uriInfo.uri + ", trial number " + uriInfo.verificationRetryCount);
+//                System.out.println("Verifying " + uriInfo.uri + ", trial number " + uriInfo.verificationRetryCount);
                 if (isPublished(uriInfo)) {
                     onVerified();
                 } else {
@@ -128,7 +128,7 @@ public class VerificationAgent {
         }
 
         private void onVerifyFailed(String errorMessage) {
-            System.out.println("Failed verifying " + uriInfo.uri + " " + errorMessage);
+//            System.out.println("Failed verifying " + uriInfo.uri + " " + errorMessage);
             if (Configuration.getVerifyRetrtyCount() == uriInfo.verificationRetryCount) {
                 uriInfo.verificationStatus = UriInfo.VERIFY_FAILED;
                 publishedCollection.incrementVerifyFailed();

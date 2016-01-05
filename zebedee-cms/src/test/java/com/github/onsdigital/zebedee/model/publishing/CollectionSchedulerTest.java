@@ -21,6 +21,7 @@ public class CollectionSchedulerTest {
     Zebedee zebedee;
     Builder builder;
     Session session;
+
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());

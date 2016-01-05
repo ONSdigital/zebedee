@@ -110,21 +110,16 @@ public class Root {
     }
 
     private static void cleanupStaleCollectionKeys() {
-
         try {
             UserList users = zebedee.users.list();
 
             for (User user : users) {
-                Log.print("start cleanupCollectionKeys");
                 com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(zebedee, user);
-                Log.print("end cleanupCollectionKeys");
             }
 
         } catch (IOException e) {
             Log.print(e, "");
         }
-
-
     }
 
     private static void indexPublishedCollections() {

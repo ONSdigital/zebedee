@@ -19,10 +19,13 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.util.EncryptionUtils;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.google.gson.JsonSyntaxException;
@@ -35,7 +38,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -55,9 +58,9 @@ import java.util.*;
 
 /**
  * Created by thomasridd on 04/06/15.
- *
+ * <p>
  * Runs the logic to process dataset files into timeseries and downloadable spreadsheets
- *
+ * <p>
  * Presently these are CSDB files only
  */
 public class DataPublisher {
@@ -81,13 +84,12 @@ public class DataPublisher {
      * Detects datasets appropriate to csdb style publication
      *
      * @param collection a collection ready to be published
-     * @param session    a session for the publisher (necessary for easy access)
      * @return a list of hashmaps [{"json": Dataset-definition-data.json, "file": csdb-file.csdb}]
      * @throws IOException
      */
-    static List<HashMap<String, Path>> csdbDatasetsInCollection(Collection collection, Session session) throws IOException {
+    static List<HashMap<String, String>> csdbDatasetsInCollection(Collection collection) throws IOException {
         List<String> csdbUris = new ArrayList<>();
-        List<HashMap<String, Path>> results = new ArrayList<>();
+        List<HashMap<String, String>> results = new ArrayList<>();
 
         // 1. Detect the uri's
         for (String uri : collection.reviewedUris()) {
@@ -95,8 +97,7 @@ public class DataPublisher {
 
             if (uri.endsWith(".csdb")) { // 1. - it ends with .csdb
                 // Only include if latest
-                Path path = Paths.get(uri);
-                if (!path.toString().contains("/previous/")) {
+                if (!VersionedContentItem.isVersionedUri(uri)) {
                     csdbUris.add(uri);
                 }
             }
@@ -106,14 +107,12 @@ public class DataPublisher {
         for (String csdbUri : csdbUris) {
             Path csdbPath = collection.find(csdbUri);
             if (Files.exists(csdbPath)) {
-                Path jsonPath = csdbPath.getParent().resolve("data.json");
-                if (Files.exists(jsonPath)) {
-                    HashMap<String, Path> csdbDataset = new HashMap<>();
-                    csdbDataset.put("json", jsonPath);
-                    csdbDataset.put("file", csdbPath);
-                    results.add(csdbDataset);
-                }
 
+                String jsonUri = Paths.get(csdbUri).getParent().resolve("data.json").toString();
+                HashMap<String, String> csdbDataset = new HashMap<>();
+                csdbDataset.put("json", jsonUri);
+                csdbDataset.put("file", csdbUri);
+                results.add(csdbDataset);
             }
         }
 
@@ -137,7 +136,7 @@ public class DataPublisher {
      * Derive the correct timeseries uri for a dataset at a specific URI
      *
      * @param datasetUri the dataset uri (note: dataset not dataset_landing_page)
-     * @param series the timeseries
+     * @param series     the timeseries
      * @return the timeseries uri achieved by adding cdid to a dataset's taxonomy node
      */
     static String uriForSeriesInDataset(String datasetUri, TimeSeries series) {
@@ -155,7 +154,7 @@ public class DataPublisher {
 
     /**
      * Get a starting point by opening the existing time series page with uri
-     *
+     * <p>
      * If it doesn't exist create a new one
      *
      * @param zebedee
@@ -308,15 +307,25 @@ public class DataPublisher {
 
     /**
      * Create a previous version page for a timeseries
+     *
      * @param savePath
      * @param newPage
      * @param uri
      * @param correctionNotice
-     * @throws URISyntaxException
+     * @param collection
+     *@param collectionWriter  @throws URISyntaxException
      * @throws NotFoundException
      * @throws IOException
      */
-    public static void versionTimeseries(Zebedee zebedee, Path savePath, TimeSeries newPage, String uri, String correctionNotice) throws URISyntaxException, NotFoundException, IOException {
+    public static void versionTimeseries(
+            Zebedee zebedee,
+            TimeSeries newPage,
+            String uri,
+            String correctionNotice,
+            Collection collection,
+            CollectionReader collectionReader,
+            CollectionWriter collectionWriter
+    ) throws URISyntaxException, ZebedeeException, IOException {
 
         Path path = zebedee.published.get(uri);
 
@@ -326,19 +335,19 @@ public class DataPublisher {
         }
 
         // create directory in reviewed if it does not exist.
-        VersionedContentItem versionedContentItem = new VersionedContentItem(new URI(uri), savePath);
+        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, collectionWriter.getReviewed());
 
-        if (versionedContentItem.versionExists() == false) {
-            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(path);
+        if (versionedContentItem.versionExists(collection.reviewed) == false) {
+            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(zebedee.published.path, new ContentReader(zebedee.published.path));
 
             Version version = new Version();
-            version.setUri(contentItemVersion.getUri());
+            version.setUri(URI.create(contentItemVersion.getUri()));
             version.setUpdateDate(newPage.getDescription().getReleaseDate());
             version.setLabel(contentItemVersion.getIdentifier());
             version.setCorrectionNotice(correctionNotice);
 
             if (newPage.getVersions() == null)
-                newPage.setVersions(new ArrayList<Version>());
+                newPage.setVersions(new ArrayList<>());
 
             newPage.getVersions().add(version);
         }
@@ -429,18 +438,6 @@ public class DataPublisher {
             }
         }
     }
-//
-//    /**
-//     * Get a starting point by opening the existing time series page with uri
-//     *
-//     * @param uri
-//     * @param series
-//     * @return
-//     * @throws IOException
-//     */
-//    static TimeSeries startPageForSeriesWithPublishedPath(String uri, TimeSeries series) throws IOException {
-//        return startPageForSeriesWithPublishedPath(Root.zebedee, uri, series);
-//    }
 
     /**
      * Update a map of maps with a value for a cdid with a specified row heading
@@ -512,7 +509,7 @@ public class DataPublisher {
     /**
      * Add the standard set of metadata at the top of each column
      *
-     * @param rows data grid rows by columns
+     * @param rows         data grid rows by columns
      * @param orderedCDIDs
      * @param mapOfData
      */
@@ -711,10 +708,10 @@ public class DataPublisher {
     /**
      * Add rows to a data grid for a given set of time periods
      *
-     * @param rows a grid to add data to
+     * @param rows         a grid to add data to
      * @param orderedCDIDs the columns
-     * @param mapOfData a map to source the data values
-     * @param timeRange the rows
+     * @param mapOfData    a map to source the data values
+     * @param timeRange    the rows
      */
     private static void addTimeRangeRows(List<List<String>> rows, List<String> orderedCDIDs, Map<String, Map<String, String>> mapOfData, List<String> timeRange) {
         if (timeRange != null) {
@@ -732,11 +729,13 @@ public class DataPublisher {
     /**
      * Output a grid of strings to XLSX
      *
+     * @param contentWriter
      * @param xlsPath the path to save the file
-     * @param grid the data grid to save
+     * @param grid    the data grid to save
+     * @param contentWriter
      * @throws IOException
      */
-    static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) throws IOException {
+    static void writeDataGridToXlsx(String xlsPath, List<List<String>> grid, ContentWriter contentWriter) throws IOException, BadRequestException {
         Workbook wb = new SXSSFWorkbook(30);
         Sheet sheet = wb.createSheet("data");
 
@@ -750,7 +749,7 @@ public class DataPublisher {
             }
         }
 
-        try (OutputStream stream = Files.newOutputStream(xlsPath)) {
+        try (OutputStream stream = contentWriter.getOutputStream(xlsPath)) {
             wb.write(stream);
         }
     }
@@ -760,10 +759,12 @@ public class DataPublisher {
      *
      * @param csvPath path to write to
      * @param grid    grid to output to
+     * @param contentWriter
      * @throws IOException
      */
-    static void writeDataGridToCsv(Path csvPath, List<List<String>> grid) throws IOException {
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(csvPath), Charset.forName("UTF8")), ',')) {
+    static void writeDataGridToCsv(String csvPath, List<List<String>> grid, ContentWriter contentWriter) throws IOException, BadRequestException {
+        OutputStream outputStream = contentWriter.getOutputStream(csvPath);
+        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(outputStream, Charset.forName("UTF8")), ',')) {
             for (List<String> gridRow : grid) {
                 String[] row = new String[gridRow.size()];
                 row = gridRow.toArray(row);
@@ -774,27 +775,27 @@ public class DataPublisher {
 
     /**
      * Run preprocess routine for CSDB datasets
-     *
+     * <p>
      * The T5 timeseries objects are made by
      * 1. Searching for all .csdb files in a collection
      * 2. Getting Brian to break the files down to their component stats and basic metadata.
      * 3. Combining the stats with metadata entered with the dataset and existing data
      *
      * @param collection the collection to search for dataset objects
-     * @param session a user session (required for some permissions)
+     * @param session    a user session (required for some permissions)
      * @throws IOException
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    void preprocessCsdbFiles(CollectionReader collectionReader, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
+    void preprocessCsdbFiles(CollectionReader collectionReader, CollectionWriter collectionWriter, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
 
         // First find all csdb files in the collection
-        List<HashMap<String, Path>> csdbDatasetPages = csdbDatasetsInCollection(collection, session);
+        List<HashMap<String, String>> csdbDatasetPages = csdbDatasetsInCollection(collection);
 
 
         // For each file in this collection
-        for (HashMap<String, Path> csdbDataset : csdbDatasetPages) {
-            preprocessCsdb(collectionReader, zebedee, session, collection, csdbDataset);
+        for (HashMap<String, String> csdbDataset : csdbDatasetPages) {
+            preprocessCsdb(collectionReader, collectionWriter, zebedee, collection, csdbDataset);
         }
     }
 
@@ -808,18 +809,22 @@ public class DataPublisher {
      * @throws URISyntaxException
      * @throws NotFoundException
      */
-    private void preprocessCsdb(CollectionReader collectionReader, Zebedee zebedee, Session session, Collection collection, HashMap<String, Path> csdbDataset) throws IOException, URISyntaxException, ZebedeeException {
+    private void preprocessCsdb(
+            CollectionReader collectionReader,
+            CollectionWriter collectionWriter,
+            Zebedee zebedee, Collection collection,
+            HashMap<String, String> csdbDataset
+    ) throws IOException, URISyntaxException, ZebedeeException {
         List<TimeSeries> newSeries = new ArrayList<>();
-        String datasetUri = zebedee.toUri(csdbDataset.get("json"));
+        String datasetUri = Paths.get(csdbDataset.get("json")).getParent().toString();
 
         // Download the dataset page (for metadata)
         Dataset dataset = (Dataset) collectionReader.getContent(datasetUri);
         String correctionNotice = datasetCorrectionNotice(collectionReader, datasetUri);
-
         DatasetLandingPage landingPage = landingPageForDataset(collectionReader, zebedee, datasetUri);
 
         // Set a name for the xlsx/csv files to be generated
-        landingPage.getDescription().setDatasetId(datasetIdFromDatafilePath(csdbDataset.get("file")));
+        landingPage.getDescription().setDatasetId(datasetIdFromDatafilePath(Paths.get(csdbDataset.get("file"))));
         String filePrefix = landingPage.getDescription().getDatasetId();
 
         // Build the download sections
@@ -830,14 +835,13 @@ public class DataPublisher {
         DownloadSection xlsxSection = newDownloadSection("xlsx download", filePrefix.toLowerCase() + ".xlsx");
         DownloadSection csvSection = newDownloadSection("csv download", filePrefix.toLowerCase() + ".csv");
 
-
         // Break down the csdb file to timeseries (part-built by extracting csdb files)
-        TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"));
+        TimeSerieses serieses = callBrianToProcessCSDB(csdbDataset.get("file"), collectionReader);
 
         // Process the result from Brian
         for (TimeSeries series : serieses) {
             // Generate the new page
-            TimeSeries newPage = preprocessTimeseries(zebedee, session, collection, landingPage, datasetUri, series, correctionNotice);
+            TimeSeries newPage = preprocessTimeseries(zebedee, collection, landingPage, datasetUri, series, correctionNotice, collectionReader, collectionWriter);
 
             // Add the cdid to the dataset page list of cdids
             csdbSection.getCdids().add(newPage.getDescription().getCdid());
@@ -846,12 +850,11 @@ public class DataPublisher {
             newSeries.add(newPage);
         }
 
-
         // Update the dataset to be reviewed
-        updateDatasetFile(collection, dataset, datasetUri, csdbSection, xlsxSection, csvSection);
+        updateDatasetFile(dataset, datasetUri, csdbSection, xlsxSection, csvSection, collectionWriter);
 
         // Generate xlsx and csv downloads
-        generateDownloads(collection, newSeries, landingPage, datasetUri);
+        generateDownloads(newSeries, landingPage, datasetUri, collectionWriter);
 
         System.out.println("Published " + newSeries.size() + " datasets for " + datasetUri);
     }
@@ -879,7 +882,7 @@ public class DataPublisher {
         if (updated.getVersions() == null || updated.getVersions().size() == 0) {
             return "";
         } else {
-            return updated.getVersions().get(updated.getVersions().size()-1).getCorrectionNotice();
+            return updated.getVersions().get(updated.getVersions().size() - 1).getCorrectionNotice();
         }
     }
 
@@ -917,83 +920,70 @@ public class DataPublisher {
      * @param series
      * @param correctionNotice
      * @return the completed timeseries page
-     *
      * @throws IOException
      * @throws URISyntaxException
      * @throws NotFoundException
      */
-    private TimeSeries preprocessTimeseries(Zebedee zebedee, Session session, Collection collection, DatasetLandingPage landingPage, String datasetUri, TimeSeries series, String correctionNotice) throws IOException, URISyntaxException, NotFoundException {
+    private TimeSeries preprocessTimeseries(
+            Zebedee zebedee,
+            Collection collection,
+            DatasetLandingPage landingPage,
+            String datasetUri,
+            TimeSeries series,
+            String correctionNotice,
+            CollectionReader collectionReader,
+            CollectionWriter collectionWriter
+    ) throws IOException, URISyntaxException, ZebedeeException {
 
         // Work out the correct timeseries path by working back from the dataset uri
         String uri = uriForSeriesInDataset(datasetUri, series);
-        Path savePath = collection.autocreateReviewedPath(uri + "/data.json");
 
         // Construct the new page
         TimeSeries newPage = constructTimeSeriesPageFromComponents(zebedee, uri, landingPage, series, datasetUri);
 
         // Previous versions
-        if (differencesExist(zebedee, uri, newPage)) versionTimeseries(zebedee, savePath.getParent(), newPage, uri, correctionNotice);
+        if (differencesExist(zebedee, uri, newPage))
+            versionTimeseries(zebedee, newPage, uri, correctionNotice, collection, collectionReader, collectionWriter);
 
         // Save the new page to reviewed
-        saveTimeseries(zebedee, session, collection, savePath, newPage);
+        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(newPage)), uri + "/data.json");
 
         // Write csv and other files:
         return newPage;
     }
 
     /**
-     * Save a timeseries to
-     *
-     * @param zebedee
-     * @param session
-     * @param collection
-     * @param savePath
-     * @param newPage
-     * @throws IOException
-     */
-    private void saveTimeseries(Zebedee zebedee, Session session, Collection collection, Path savePath, TimeSeries newPage) throws IOException {
-        if (collection.description.isEncrypted) {
-            try(OutputStream outputStream = EncryptionUtils.encryptionOutputStream(savePath, zebedee.keyringCache.get(session).get(collection.description.id))) {
-                IOUtils.write(ContentUtil.serialise(newPage), outputStream);
-            }
-        } else {
-            try(OutputStream outputStream = FileUtils.openOutputStream(savePath.toFile())) {
-                IOUtils.write(ContentUtil.serialise(newPage), outputStream);
-            }
-        }
-    }
-
-    /**
      * Run the preprocessing step that converts data to timeseries
      *
-     *
      * @param collectionReader
-     * @param zebedee a zebedee instance
-     * @param collection the collection being published
-     * @param session a user session (required for some permissions)
-     *
+     * @param zebedee          a zebedee instance
+     * @param collection       the collection being published
+     * @param session          a user session (required for some permissions)
      * @throws IOException
      * @throws BadRequestException
      * @throws UnauthorizedException
      * @throws URISyntaxException
+     * @return list of all uris, including uris in the compressed files
      */
-    public void preprocessCollection(CollectionReader collectionReader, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
+    public List<String> preprocessCollection(CollectionReader collectionReader, CollectionWriter collectionWriter, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
 
         if (brianTestFiles.size() == 0 && (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0)) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");
-            return;
+            return collection.reviewedUris();
         }
 
         insertions = 0;
         corrections = 0;
 
-        preprocessCsdbFiles(collectionReader, zebedee, collection, session);
+        preprocessCsdbFiles(collectionReader, collectionWriter, zebedee, collection, session);
 
         if (insertions + corrections > 0) {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
         }
 
+        List<String> uriList =collection.reviewedUris();
         if (!doNotCompress) CompressTimeseries(zebedee, session, collection);
+        return uriList;
     }
 
     /**
@@ -1022,29 +1012,32 @@ public class DataPublisher {
     /**
      * Generate the XLSX and CSV files for a collection of timeseries
      *
-     * @param collection
      * @param newSeries
      * @param landingPage
      * @param datasetUri
      * @throws IOException
      */
-    private void generateDownloads(Collection collection, List<TimeSeries> newSeries, DatasetLandingPage landingPage, String datasetUri) throws IOException {
+    private void generateDownloads(
+            List<TimeSeries> newSeries,
+            DatasetLandingPage landingPage,
+            String datasetUri,
+            CollectionWriter collectionWriter
+    ) throws IOException, BadRequestException {
         // Save the files
         String filename = landingPage.getDescription().getDatasetId();
         if (filename.equalsIgnoreCase("")) filename = "data";
-        Path xlsPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".xlsx");
-        Path csvPath = collection.autocreateReviewedPath(datasetUri + "/" + filename.toLowerCase() + ".csv");
+        String xlsPath = datasetUri + "/" + filename.toLowerCase() + ".xlsx";
+        String csvPath = datasetUri + "/" + filename.toLowerCase() + ".csv";
 
         // Write the files
         List<List<String>> dataGrid = gridOfAllDataInTimeSeriesList(newSeries);
-        writeDataGridToXlsx(xlsPath, dataGrid);
-        writeDataGridToCsv(csvPath, dataGrid);
+        writeDataGridToXlsx(xlsPath, dataGrid, collectionWriter.getReviewed());
+        writeDataGridToCsv(csvPath, dataGrid, collectionWriter.getReviewed());
     }
 
     /**
      * Update and save the dataset json we have generated files for
      *
-     * @param collection
      * @param dataset
      * @param datasetUri
      * @param csdbSection
@@ -1052,15 +1045,21 @@ public class DataPublisher {
      * @param csvSection
      * @throws IOException
      */
-    private void updateDatasetFile(Collection collection, Dataset dataset, String datasetUri, DownloadSection csdbSection, DownloadSection xlsxSection, DownloadSection csvSection) throws IOException {
+    private void updateDatasetFile(
+            Dataset dataset,
+            String datasetUri,
+            DownloadSection csdbSection,
+            DownloadSection xlsxSection,
+            DownloadSection csvSection,
+            CollectionWriter collectionWriter
+    ) throws IOException, BadRequestException {
         List<DownloadSection> sections = new ArrayList<>();
         sections.add(csdbSection);
         sections.add(xlsxSection);
         sections.add(csvSection);
         dataset.setDownloads(sections);
 
-        Path savePath = collection.autocreateReviewedPath(datasetUri + "/data.json");
-        IOUtils.write(ContentUtil.serialise(dataset), FileUtils.openOutputStream(savePath.toFile()));
+        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(dataset)), datasetUri + "/data.json");
     }
 
     private DownloadSection newDownloadSection(String title, String file) {
@@ -1072,32 +1071,31 @@ public class DataPublisher {
 
     /**
      * Post a csdb file to the brian Services/ConvertCSDB endpoint
-     *
-     * @param path
-     * @return a series of timeseries objects
+     * @param uri
+     * @param collectionReader
+     * @return
      * @throws IOException
      */
-    TimeSerieses callBrianToProcessCSDB(Path path) throws IOException {
+    TimeSerieses callBrianToProcessCSDB(String uri, CollectionReader collectionReader) throws IOException, ZebedeeException {
         // Hijack brian from test framework if required
         if (brianTestFiles.size() != 0) return presetBrianFile();
 
         // Get the brian CSDB processing uri
         URI url = csdbURI();
-
         HttpPost post = new HttpPost(url);
 
         // Add csdb file as a binary
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
-        FileBody bin = new FileBody(path.toFile());
-        multipartEntityBuilder.addPart("file", bin);
+
+        Resource resource = collectionReader.getResource(uri);
+        InputStreamBody body = new InputStreamBody(resource.getData(), resource.getName());
+        multipartEntityBuilder.addPart("file", body);
 
         post.setEntity(multipartEntityBuilder.build());
 
         // Post to the endpoint
         try (CloseableHttpResponse response = HttpClients.createDefault().execute(post)) {
             TimeSerieses result = null;
-
-            //
             HttpEntity entity = response.getEntity();
 
             if (entity != null) {
@@ -1119,6 +1117,7 @@ public class DataPublisher {
 
     /**
      * Return timeseries deserialised from a file (used in test)
+     *
      * @return
      * @throws IOException
      */
@@ -1129,7 +1128,7 @@ public class DataPublisher {
         brianTestFiles.remove(0);
 
         try (InputStream inputStream = Files.newInputStream(path)) {
-                result = ContentUtil.deserialise(inputStream, TimeSerieses.class);
+            result = ContentUtil.deserialise(inputStream, TimeSerieses.class);
         }
         return result;
     }
@@ -1178,8 +1177,8 @@ public class DataPublisher {
     /**
      * Takes a part-built TimeSeries page and populates the {@link com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue} list using data gathered from a csdb file
      *
-     * @param page    a part-built time series page
-     * @param series  a time series returned by Brian by parsing a csdb file
+     * @param page   a part-built time series page
+     * @param series a time series returned by Brian by parsing a csdb file
      * @return
      */
     TimeSeries populatePageFromTimeSeries(TimeSeries page, TimeSeries series, DatasetLandingPage landingPage) {
@@ -1212,10 +1211,10 @@ public class DataPublisher {
     /**
      * Add individual points to a set of points (yearly, monthly, quarterly)
      *
-     * @param page the page
+     * @param page          the page
      * @param currentValues the current value list
-     * @param updateValues the new value list
-     * @param landingPage the landing page (used to get dataset id)
+     * @param updateValues  the new value list
+     * @param landingPage   the landing page (used to get dataset id)
      */
     void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, DatasetLandingPage landingPage) {
 
@@ -1264,7 +1263,6 @@ public class DataPublisher {
     }
 
     /**
-     *
      * @param zebedee
      * @param uri
      * @param page
@@ -1275,7 +1273,7 @@ public class DataPublisher {
         if (zebedee.published.get(uri) == null) return false;
 
         // Get the current version of the page
-        try(InputStream stream = Files.newInputStream(zebedee.published.get(uri).resolve("data.json"))) {
+        try (InputStream stream = Files.newInputStream(zebedee.published.get(uri).resolve("data.json"))) {
             current = ContentUtil.deserialise(stream, TimeSeries.class);
         } catch (IOException e) {
             return false;

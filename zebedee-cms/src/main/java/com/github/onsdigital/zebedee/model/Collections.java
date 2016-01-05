@@ -8,27 +8,26 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.util.EncryptionUtils;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
@@ -162,21 +161,24 @@ public class Collections {
                     "This collection can't be approved because it's not empty");
         }
 
-        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+        CollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
         // if the collection is release related - get the release page and add links to other pages in release
         if (collection.isRelease()) {
             Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
-                collection.populateRelease(collectionReader);
+                collection.populateRelease(collectionReader, collectionWriter);
             } catch (ZebedeeException e) {
                 Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
             }
         }
 
+        List<String> uriList;
+
         // Do any processing of data files
         try {
-            new DataPublisher().preprocessCollection(collectionReader, zebedee, collection, session);
+            uriList =  new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }
@@ -185,7 +187,9 @@ public class Collections {
         collection.description.approvedStatus = true;
         collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
 
-        return collection.save();
+        boolean result =  collection.save();
+        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
+        return result;
     }
 
     /**
@@ -222,7 +226,9 @@ public class Collections {
         collection.description.approvedStatus = false;
         collection.description.AddEvent(new Event(new Date(), EventType.UNLOCKED, session.email));
 
-        return collection.save();
+        boolean result =  collection.save();
+        new PublishNotification(collection).sendNotification(EventType.UNLOCKED);
+        return result;
     }
 
     /**
@@ -263,8 +269,8 @@ public class Collections {
         }
         System.out.println("Going ahead with publish");
 
-        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email, skipVerification);
-
+        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email, skipVerification, collectionReader);
         return publishComplete;
     }
 
@@ -361,7 +367,7 @@ public class Collections {
      * @throws UnauthorizedException
      * @throws IOException
      */
-    public void createContent(Collection collection, String uri, Session session, HttpServletRequest request, InputStream requestBody) throws ConflictException, NotFoundException, BadRequestException, UnauthorizedException, IOException {
+    public void createContent(Collection collection, String uri, Session session, HttpServletRequest request, InputStream requestBody) throws ConflictException, NotFoundException, BadRequestException, UnauthorizedException, IOException, FileUploadException {
 
         if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0) {
             throw new ConflictException("This URI already exists");
@@ -373,17 +379,9 @@ public class Collections {
     public void writeContent(Collection collection, String uri,
                              Session session, HttpServletRequest request, InputStream requestBody)
             throws IOException, BadRequestException, UnauthorizedException,
-            ConflictException, NotFoundException {
+            ConflictException, NotFoundException, FileUploadException {
 
-        // Collection (null check before authorisation check)
-        if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
-        }
-
-        // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session, collection.description)) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
-        }
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
         // Requested path
         if (StringUtils.isBlank(uri)) {
@@ -408,7 +406,7 @@ public class Collections {
             }
         } else {
             // edit the file
-            boolean result = collection.edit(session.email, uri);
+            boolean result = collection.edit(session.email, uri, collectionWriter);
             if (!result) {
                 // file may be being edited in a different collection
                 throw new ConflictException(
@@ -428,28 +426,9 @@ public class Collections {
 
         // Detect whether this is a multipart request
         if (ServletFileUpload.isMultipartContent(request)) {
-            // If it is we're doing an xls/csv file upload
-            try {
-                if (collection.description.isEncrypted) {
-                    postDataFile(request, path, zebedee.keyringCache.get(session).get(collection.description.id));
-                } else {
-                    postDataFile(request, path);
-                }
-            } catch (Exception e) {
-
-            }
+            postDataFile(request, uri, collectionWriter);
         } else {
-            // Otherwise we're doing a json content update
-            if (collection.description.isEncrypted) {
-                SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
-                try (OutputStream output = EncryptionUtils.encryptionOutputStream(path, key)) {
-                    org.apache.commons.io.IOUtils.copy(requestBody, output);
-                }
-            } else {
-                try (OutputStream output = Files.newOutputStream(path)) {
-                    org.apache.commons.io.IOUtils.copy(requestBody, output);
-                }
-            }
+            collectionWriter.getInProgress().write(requestBody, uri);
         }
     }
 
@@ -495,52 +474,23 @@ public class Collections {
     }
 
     /**
-     * Save a data file from a servlet (no encryption)
-     *
+     * Save uploaded files.
      * @param request
-     * @param path
+     * @param uri
+     * @param collectionWriter
      * @throws FileUploadException
      * @throws IOException
      */
-    private void postDataFile(HttpServletRequest request, Path path)
+    private void postDataFile(HttpServletRequest request, String uri, CollectionWriter collectionWriter)
             throws FileUploadException, IOException {
 
         ServletFileUpload upload = getServletFileUpload();
 
         try {
-            // Read the items - this will save the values to temp files
             for (FileItem item : upload.parseRequest(request)) {
-                item.write(path.toFile());
+                collectionWriter.getInProgress().write(item.getInputStream(), uri);
             }
         } catch (Exception e) {
-            // item.write throws Exception
-            throw new IOException("Error processing uploaded file", e);
-        }
-    }
-
-    /**
-     * Save a data file from a servlet using encryption
-     *
-     * @param request
-     * @param path
-     * @param key
-     * @throws FileUploadException
-     * @throws IOException
-     */
-    private void postDataFile(HttpServletRequest request, Path path, SecretKey key)
-            throws FileUploadException, IOException {
-
-        ServletFileUpload upload = getServletFileUpload();
-
-        try {
-            // Read the items - this will save the values to temp files
-            for (FileItem item : upload.parseRequest(request)) {
-                try(InputStream inputStream = item.getInputStream(); OutputStream outputStream = EncryptionUtils.encryptionOutputStream(path, key)) {
-                    IOUtils.copy(inputStream, outputStream);
-                }
-            }
-        } catch (Exception e) {
-            // item.write throws Exception
             throw new IOException("Error processing uploaded file", e);
         }
     }
@@ -615,7 +565,7 @@ public class Collections {
         // Find the file if it exists
         Path path = collection.find(uri);
 
-        // Check we're writing a file:
+//        // Check we're writing a file:
 //        if (path != null && Files.isDirectory(path)) {
 //            throw new BadRequestException("Please provide a URI to a file");
 //        }

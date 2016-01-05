@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +41,7 @@ public class CollectionTest {
     Builder builder;
     Session publisherSession;
     String publisher1Email;
+    FakeCollectionWriter collectionWriter;
 
     @Before
     public void setUp() throws Exception {
@@ -46,9 +49,9 @@ public class CollectionTest {
         zebedee = new Zebedee(builder.zebedee, false);
         collection = new Collection(builder.collections.get(1), zebedee);
 
-        zebedee.openSession(builder.administratorCredentials);
         publisherSession = zebedee.openSession(builder.publisher1Credentials);
-        publisher1Email = publisherSession.email;
+        publisher1Email = builder.publisher1.email;
+        collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
     }
 
     @After
@@ -66,7 +69,9 @@ public class CollectionTest {
         String filename = PathUtils.toFilename(name);
 
         // When
+
         Collection.create(collectionDescription, zebedee, publisherSession);
+
 
         // Then
         Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
@@ -103,7 +108,9 @@ public class CollectionTest {
         String filename = PathUtils.toFilename(newName);
 
         // When the rename function is called.
+
         Collection.create(collectionDescription, zebedee, publisherSession);
+
         Collection.rename(collectionDescription, newName, zebedee);
 
         // Then the collection is renamed.
@@ -148,7 +155,7 @@ public class CollectionTest {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.type = CollectionType.scheduled;
         updatedDescription.publishDate = new DateTime(collectionDescription.publishDate).plusHours(1).toDate();
-        Collection.update(collection, updatedDescription, zebedee, new CollectionScheduler());
+        Collection.update(collection, updatedDescription, zebedee, new CollectionScheduler(), publisherSession);
 
 
         // Then the properties of the description passed to update have been updated.
@@ -184,6 +191,7 @@ public class CollectionTest {
         collectionDescription.publishDate = DateTime.now().plusSeconds(2).toDate();
         collectionDescription.type = CollectionType.scheduled;
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
+
         CollectionScheduler scheduler = new CollectionScheduler();
         CollectionScheduler.schedulePublish(scheduler, collection, zebedee);
 
@@ -192,7 +200,7 @@ public class CollectionTest {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.type = CollectionType.scheduled;
         updatedDescription.publishDate = DateTime.now().plusSeconds(10).toDate();
-        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler);
+        Collection updated = Collection.update(collection, updatedDescription, zebedee, scheduler, publisherSession);
 
         assertTrue(scheduler.taskExistsForCollection(updated));
         long timeUntilTaskRun = scheduler.getTaskForCollection(updated).getDelay(TimeUnit.SECONDS);
@@ -206,7 +214,7 @@ public class CollectionTest {
         Collection collection = null;
 
         // When we call the static update method
-        Collection.update(collection, new CollectionDescription("name"), zebedee, new CollectionScheduler());
+        Collection.update(collection, new CollectionDescription("name"), zebedee, new CollectionScheduler(), publisherSession);
 
         // Then the expected exception is thrown.
     }
@@ -218,7 +226,9 @@ public class CollectionTest {
         // A folder that isn't a valid release:
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
+
         Collection.create(collectionDescription, zebedee, publisherSession);
+
         Path releasePath = builder.zebedee.resolve(Zebedee.COLLECTIONS).resolve(
                 PathUtils.toFilename(name));
         FileUtils.cleanDirectory(releasePath.toFile());
@@ -446,7 +456,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditPublished() throws IOException {
+    public void shouldEditPublished() throws IOException, BadRequestException {
 
         // Given
         // The content exists publicly:
@@ -454,7 +464,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
 
         // Then
         assertTrue(edited);
@@ -470,7 +480,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditComplete() throws IOException {
+    public void shouldEditComplete() throws IOException, BadRequestException {
 
         // Given
         // The content exists, has been edited and completed:
@@ -479,7 +489,7 @@ public class CollectionTest {
         builder.createCompleteFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
 
         // Then
         // It should be edited
@@ -495,7 +505,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditReviewed() throws IOException {
+    public void shouldEditReviewed() throws IOException, BadRequestException {
 
         // Given
         // The content exists, has been edited and reviewed:
@@ -504,7 +514,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
 
         // Then
         // It should be edited
@@ -520,7 +530,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldEditIfEditingAlready() throws IOException {
+    public void shouldEditIfEditingAlready() throws IOException, BadRequestException {
 
         // Given
         // The content already exists:
@@ -528,14 +538,14 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
 
         // Then
         assertTrue(edited);
     }
 
     @Test
-    public void shouldNotEditIfEditingElsewhere() throws IOException {
+    public void shouldNotEditIfEditingElsewhere() throws IOException, BadRequestException {
 
         // Given
         // The content already exists in another release:
@@ -543,21 +553,21 @@ public class CollectionTest {
         builder.isBeingEditedElsewhere(uri, 0);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
 
         // Then
         assertFalse(edited);
     }
 
     @Test
-    public void shouldNotEditIfDoesNotExist() throws IOException {
+    public void shouldNotEditIfDoesNotExist() throws IOException, BadRequestException {
 
         // Given
         // The content does not exist:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
 
         // Then
         assertFalse(edited);
@@ -605,13 +615,13 @@ public class CollectionTest {
         return uri;
     }
 
-    private String CreateEditedContent() throws IOException {
+    private String CreateEditedContent() throws IOException, BadRequestException {
         String uri = CreatePublishedContent();
-        collection.edit(publisher1Email, uri);
+        collection.edit(publisher1Email, uri, collectionWriter);
         return uri;
     }
 
-    private String CreateCompleteContent() throws IOException {
+    private String CreateCompleteContent() throws IOException, BadRequestException {
         String uri = CreateEditedContent();
         collection.complete(publisher1Email, uri);
         return uri;
@@ -623,7 +633,7 @@ public class CollectionTest {
         // Given some content that has been edited by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        collection.edit(publisher1Email, uri);
+        collection.edit(publisher1Email, uri, collectionWriter);
 
         // When - A reviewer edits reviews content
         boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri);
@@ -742,7 +752,7 @@ public class CollectionTest {
         // Given
         // Some content:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        collection.edit(publisher1Email, uri);
+        collection.edit(publisher1Email, uri, collectionWriter);
 
         // When content is trying to be reviewed before being completed
         boolean reviewed = collection.review(builder.createSession(publisher1Email), uri);
@@ -999,30 +1009,30 @@ public class CollectionTest {
     }
 
     @Test
-    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException {
+    public void associateWithReleaseShouldUseExistingReleaseIfItsAlreadyInCollection() throws NotFoundException, IOException, BadRequestException {
 
         // Given
         // There is a release already in progress
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
-        collection.edit(publisher1Email, uri + "/data.json");
+        collection.edit(publisher1Email, uri + "/data.json", collectionWriter);
 
         // When we attempt to associate the collection with a release
-        Release result = collection.associateWithRelease(publisher1Email, release);
+        Release result = collection.associateWithRelease(publisher1Email, release, collectionWriter);
 
         assertTrue(result.getDescription().getPublished());
         assertEquals(URI.create(uri), result.getUri());
     }
 
     @Test
-    public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException {
+    public void associateWithReleaseShouldSetReleaseToPublished() throws NotFoundException, IOException, BadRequestException {
 
         // Given a release that is announced
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
 
         // When we attempt to associate the collection with a release
-        Release result = collection.associateWithRelease(publisher1Email, release);
+        Release result = collection.associateWithRelease(publisher1Email, release, collectionWriter);
 
         // Then the release is now in progress for the collection and the published flag is set to true
         assertTrue(collection.isInProgress(uri));
@@ -1040,10 +1050,9 @@ public class CollectionTest {
         CollectionDescription description = new CollectionDescription();
         description.id = Random.id();
         description.name = description.id;
-        Collection collection = Collection.create(description, zebedee, publisherSession);
 
         collection.description.releaseUri = uri;
-        collection.associateWithRelease(publisher1Email, release);
+        collection.associateWithRelease(publisher1Email, release, collectionWriter);
 
         String releaseJsonUri = uri + "/data.json";
 
@@ -1054,14 +1063,15 @@ public class CollectionTest {
         FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));
 
         // When we attempt to populate the release from the collection.
-        Release result = collection.populateRelease(new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id));
+        Release result = collection.populateRelease(
+                new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id),
+                new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id));
 
         // Then the release is now in progress for the collection and the published flag is set to true
         assertEquals(1, result.getRelatedDocuments().size());
         assertEquals("My article", result.getRelatedDocuments().get(0).getTitle());
         assertEquals("/some/uri", result.getRelatedDocuments().get(0).getUri().toString());
     }
-
 
     @Test
     public void createCollectionShouldAssociateWithReleaseIfReleaseUriIsPresent() throws Exception {
@@ -1073,6 +1083,7 @@ public class CollectionTest {
         // When a new collection is created with the release uri given
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
+
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         // The release page is in progress within the collection and the collection publish date has been
@@ -1091,7 +1102,9 @@ public class CollectionTest {
         // When a new collection is created with the release uri given
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
+
         Collection.create(collectionDescription, zebedee, publisherSession);
+
 
         // Then the expected exception is thrown
     }
@@ -1104,12 +1117,16 @@ public class CollectionTest {
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
+
         Collection.create(collectionDescription, zebedee, publisherSession);
+
 
         // When a new collection is created with the release uri given
         collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
+
         Collection.create(collectionDescription, zebedee, publisherSession);
+
 
         // Then the expected exception is thrown
     }
@@ -1122,7 +1139,7 @@ public class CollectionTest {
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
 
         // When we attempt to create a version for the page
-        collection.version(publisher1Email, uri);
+        collection.version(publisher1Email, uri, collectionWriter);
 
         // Then a not found exception is thrown.
     }
@@ -1133,10 +1150,10 @@ public class CollectionTest {
         // Given a URI that has been published and already versioned in a collection.
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
         builder.createPublishedFile(uri + "/data.json");
-        collection.version(publisher1Email, uri);
+        collection.version(publisher1Email, uri, collectionWriter);
 
         // When we attempt to create a version for the page for a second time
-        collection.version(publisher1Email, uri);
+        collection.version(publisher1Email, uri, collectionWriter);
 
         // Then a ConflictException exception is thrown.
     }
@@ -1149,18 +1166,18 @@ public class CollectionTest {
         builder.createPublishedFile(uri + "/data.json");
 
         // When the version function is called for the URI
-        ContentItemVersion version = collection.version(publisher1Email, uri);
+        ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
 
         // Then the version directory is created, with the page and associated files copied into it
         // check versions file exists
-        Path versionsDirectoryPath = version.getVersionedContentItem().getVersionDirectoryPath();
+        Path versionsDirectoryPath = collection.reviewed.get(Paths.get(uri).resolve(VersionedContentItem.getVersionDirectoryName()).toUri());
         assertTrue(Files.exists(versionsDirectoryPath));
 
         // check the json file is in there
-        assertTrue(Files.exists(version.getPath()));
+        assertTrue(Files.exists(collection.reviewed.get(version.getUri())));
 
         // check for an associated file
-        assertTrue(Files.exists(version.getPath().resolve("data.json")));
+        assertTrue(Files.exists(collection.reviewed.get(Paths.get(version.getUri()).resolve("data.json").toString())));
     }
 
     @Test(expected = NotFoundException.class)
@@ -1193,17 +1210,16 @@ public class CollectionTest {
         // Given an existing version URI
         String uri = String.format("/economy/inflationandpriceindices/timeseries/%s", Random.id());
         builder.createPublishedFile(uri + "/data.json");
-        ContentItemVersion version = collection.version(publisher1Email, uri);
+        ContentItemVersion version = collection.version(publisher1Email, uri, collectionWriter);
 
-        assertTrue(Files.exists(version.getPath()));
-        assertTrue(Files.exists(version.getPath().resolve("data.json")));
+        assertTrue(Files.exists(collection.reviewed.get(version.getUri())));
+        assertTrue(Files.exists(collection.reviewed.get(version.getUri()).resolve("data.json")));
 
         // When the delete version function is called for the version URI
         collection.deleteVersion(version.getUri().toString());
 
         // Then the versions directory is deleted.
-        assertFalse(Files.exists(version.getPath()));
-        assertFalse(Files.exists(version.getPath().resolve("data.json")));
+        assertNull(collection.reviewed.get(version.getUri()));
     }
 
     private Release createRelease(String uri, Date releaseDate) throws IOException {

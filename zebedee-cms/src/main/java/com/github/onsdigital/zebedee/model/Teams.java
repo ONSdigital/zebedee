@@ -215,7 +215,6 @@ public class Teams {
             team.members.remove(PathUtils.standardise(email));
             writeTeam(team);
         }
-
     }
 
 

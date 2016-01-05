@@ -18,6 +18,10 @@ public class Log {
         System.out.println(timeStamp(message));
     }
 
+    public static void printError(String message) {
+        System.err.println(timeStamp(message));
+    }
+
     /**
      * Format and print the given message prefixed with a timestamp.
      *
@@ -36,7 +40,7 @@ public class Log {
      * @param args
      */
     public static void print(Exception exception, String message, Object... args) {
-        print(String.format(message, args));
+        printError(String.format(message, args));
         ExceptionUtils.printRootCauseStackTrace(exception);
     }
 

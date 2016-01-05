@@ -1,11 +1,14 @@
 package com.github.onsdigital.zebedee.content.util;
 
+import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
@@ -135,6 +138,16 @@ public class ContentUtil {
         return createBuilder(datePattern).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(json, Page.class);
     }
 
+    public static String hash(Content content) {
+        return DigestUtils.sha1Hex(ContentUtil.serialise(content));
+    }
+
+    public static String hash(InputStream stream) throws IOException {
+        return DigestUtils.sha1Hex(stream);
+    }
+    public static String hash(byte[] bytes) throws IOException {
+        return DigestUtils.sha1Hex(bytes);
+    }
 
     /**
      * Clones given object and returns a new copy
@@ -158,7 +171,7 @@ public class ContentUtil {
     }
 
     private static GsonBuilder createBuilder(String datePattern) {
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
+        GsonBuilder builder = new GsonBuilder();
         if (StringUtils.isNotBlank(datePattern)) {
             builder.registerTypeAdapter(Date.class, new IsoDateSerializer(datePattern));
         } else {

@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -172,6 +171,12 @@ public class ContentReaderTest {
     public void testGetLatestContent() throws ZebedeeException, IOException {
         Page latestContent = contentReader.getLatestContent("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts");
         assertEquals("2015", latestContent.getDescription().getEdition());
+    }
+
+    @Test
+    public void testGetContentLength() throws ZebedeeException, IOException {
+        long contentLength = contentReader.getContentLength("economy/environmentalaccounts/articles/uknaturalcapitallandcoverintheuk/2015-03-17/4f5b14cb.xls");
+        assertEquals(56320, contentLength);
     }
 
 //    @Test

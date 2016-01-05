@@ -4,17 +4,15 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.httpino.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.*;
-import org.apache.lucene.search.grouping.AbstractFirstPassGroupingCollector;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +38,7 @@ public class KeyManagerTest {
     }
 
     @Test
-    public void isEncrypted_whenCollectionGenerated_isSetToFalse() throws ZebedeeException, IOException {
+    public void isEncrypted_whenCollectionGenerated_isSetToTrue() throws ZebedeeException, IOException {
         // Given
         // a collection is created
         Session session = zebedee.openSession(builder.publisher1Credentials);
@@ -54,18 +52,15 @@ public class KeyManagerTest {
 
         // Then
         // isEncrypted is false
-        assertEquals(false, reloaded.description.isEncrypted);
+        assertTrue(reloaded.description.isEncrypted);
     }
 
     @Test
     public void isEncrypted_whenSetToTrue_persists() throws IOException, ZebedeeException {
         // Given
         // a collection is created, isEncrypted is set, and is set to true
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
-        collectionDescription.isEncrypted = true;
-        Collection.create(collectionDescription, zebedee, session);
+        CollectionDescription collectionDescription = createCollection(true);
+
 
         // When
         // we reload the collection
@@ -74,6 +69,15 @@ public class KeyManagerTest {
         // Then
         // isEncrypted is true
         assertEquals(true, reloaded.description.isEncrypted);
+    }
+
+    private CollectionDescription createCollection(boolean isEncrypted) throws IOException, ZebedeeException {
+        Session session = zebedee.openSession(builder.publisher1Credentials);
+        CollectionDescription collectionDescription = new CollectionDescription();
+        collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
+        collectionDescription.isEncrypted = isEncrypted;
+        Collection.create(collectionDescription, zebedee, session);
+        return collectionDescription;
     }
 
     @Test

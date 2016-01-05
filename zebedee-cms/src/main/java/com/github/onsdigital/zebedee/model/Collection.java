@@ -12,23 +12,18 @@ import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -122,8 +117,9 @@ public class Collection {
     public static Collection create(CollectionDescription collectionDescription, Zebedee zebedee, Session session)
             throws IOException, ZebedeeException {
 
-        Release release = checkForRelease(collectionDescription, zebedee);
+        collectionDescription.isEncrypted = true; // force encryption on new collections.
 
+        Release release = checkForRelease(collectionDescription, zebedee);
         String filename = PathUtils.toFilename(collectionDescription.name);
         collectionDescription.id = filename + "-" + Random.id();
 
@@ -145,11 +141,6 @@ public class Collection {
 
         Collection collection = new Collection(collectionDescription, zebedee);
 
-        if (release != null) {
-            collection.associateWithRelease(session.email, release);
-            collection.save();
-        }
-
         if (collectionDescription.teams != null) {
             for (String teamName : collectionDescription.teams) {
                 Team team = zebedee.teams.findTeam(teamName);
@@ -161,7 +152,12 @@ public class Collection {
         // assign a key for the collection to the session user
         KeyManager.assignKeyToUser(zebedee, zebedee.users.get(session.email), collection, Keys.newSecretKey());
         // get the session user to distribute the key to all
-        KeyManager.distributeCollectionKey(zebedee, zebedee.sessions.find(session.email), collection);
+        KeyManager.distributeCollectionKey(zebedee, session, collection);
+
+        if (release != null) {
+            collection.associateWithRelease(session.email, release, new ZebedeeCollectionWriter(zebedee, collection, session));
+            collection.save();
+        }
 
         return collection;
     }
@@ -234,7 +230,11 @@ public class Collection {
      * @param scheduler
      * @return
      */
-    public static Collection update(Collection collection, CollectionDescription collectionDescription, Zebedee zebedee, CollectionScheduler scheduler) throws IOException, CollectionNotFoundException, BadRequestException {
+    public static Collection update(Collection collection,
+                                    CollectionDescription collectionDescription,
+                                    Zebedee zebedee,
+                                    CollectionScheduler scheduler,
+                                    Session session) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
 
         if (collection == null) {
             throw new BadRequestException("Please specify a collection");
@@ -261,12 +261,40 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
-        //TODO: !!!!!!!!!!!!!!!!!!!! Permission management not done on edit
-        updatedCollection.description.teams = collection.description.teams;
-
         updatedCollection.save();
 
+        updateViewerTeams(collectionDescription, zebedee, session);
+        KeyManager.distributeCollectionKey(zebedee, session, collection);
+
+
         return updatedCollection;
+    }
+
+    private static void updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, UnauthorizedException {
+        if (collectionDescription.teams != null) {
+            // work out which teams need to be removed from the existing teams.
+            Set<Integer> currentTeamIds = zebedee.permissions.listViewerTeams(collectionDescription, session);
+            List<Team> teams = zebedee.teams.listTeams();
+            for (Integer currentTeamId : currentTeamIds) { // for each current team ID
+                for (Team team : teams) { // iterate the teams list to find the team object
+                    if (currentTeamId.equals(team.id)) { // if the ID's match
+                        if (!collectionDescription.teams.contains(team.name)) { // if the team is not listed in the updated list
+                            zebedee.permissions.removeViewerTeam(collectionDescription, team, session);
+                        }
+                    }
+                }
+            }
+
+            // Add all the new teams. The add is idempotent so we don't need to check if it already exists.
+            for (String teamName : collectionDescription.teams) {
+                // We have already deserialised the teams list to its more efficient to iterate it again rather than deserialise by team name.
+                for (Team team : teams) { // iterate the teams list to find the team object
+                    if (teamName.equals(team.name)) {
+                        zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+                    }
+                }
+            }
+        }
     }
 
     private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {
@@ -275,14 +303,14 @@ public class Collection {
         return release;
     }
 
-    public Release populateRelease(CollectionReader reader) throws IOException, ZebedeeException {
+    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.description.releaseUri)) {
             throw new BadRequestException("This collection is not associated with a release.");
         }
 
         String uri = this.description.releaseUri + "/data.json";
-        Release release = getReleaseFromCollection(uri);
+        Release release = (Release) ContentUtil.deserialiseContent(reader.getResource(uri).getData());
         Log.print("Release identified for collection %s: %s", this.description.name, release.getDescription().getTitle());
 
         if (release == null) {
@@ -290,9 +318,7 @@ public class Collection {
         }
 
         release = ReleasePopulator.populate(release, this, reader);
-
-        Path releasePath = reviewed.get(uri);
-        FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
+        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(release)), uri);
 
         return release;
     }
@@ -461,7 +487,7 @@ public class Collection {
      * exists in the published content, false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean edit(String email, String uri) throws IOException {
+    public boolean edit(String email, String uri, CollectionWriter collectionWriter) throws IOException, BadRequestException {
         boolean result = false;
 
         if (isInProgress(uri))
@@ -478,13 +504,13 @@ public class Collection {
 
         if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
-            Path destination = inProgress.toPath(uri);
 
-            if (this.isInCollection(uri))
+
+            if (this.isInCollection(uri)) {
+                Path destination = inProgress.toPath(uri);
                 PathUtils.moveFilesInDirectory(source, destination);
-            else {
-                // Optimise zebedee to only upload new files to a collection
-                PathUtils.copy(source, destination);
+            } else {
+                collectionWriter.getInProgress().write(new FileInputStream(source.toFile()), uri);
             }
 
             addEvent(uri, new Event(new Date(), EventType.EDITED, email));
@@ -746,11 +772,9 @@ public class Collection {
     private void deleteContent(Content content, String uri) throws IOException {
         Path path = content.toPath(uri);
         PathUtils.deleteFilesInDirectory(path);
-        try {
-            new VersionedContentItem(URI.create(uri), path).deleteVersionDirectory();
-        } catch (NotFoundException e) {
-            // do nothing, there is nothing to delete.
-        }
+
+        File versionsDirectory = path.resolve(VersionedContentItem.getVersionDirectoryName()).toFile();
+        FileUtils.deleteDirectory(versionsDirectory);
     }
 
     /**
@@ -762,21 +786,17 @@ public class Collection {
      * @throws NotFoundException
      * @throws IOException
      */
-    public Release associateWithRelease(String email, Release release) throws IOException {
+    public Release associateWithRelease(String email, Release release, CollectionWriter collectionWriter) throws IOException, BadRequestException {
 
         String uri = release.getUri().toString() + "/data.json";
 
         // add the release page to the collection in progress
         if (!isInCollection(uri)) {
-            this.edit(email, uri);
+            this.edit(email, uri, collectionWriter);
         }
 
-        Path releasePath = find(uri);
         release.getDescription().setPublished(true);
-
-        // write file
-        FileUtils.write(releasePath.toFile(), ContentUtil.serialise(release));
-
+        collectionWriter.getInProgress().write(IOUtils.toInputStream(ContentUtil.serialise(release)), uri);
         return release;
     }
 
@@ -796,7 +816,7 @@ public class Collection {
      * @param uri   - The URI of the file to version
      * @return
      */
-    public ContentItemVersion version(String email, String uri) throws NotFoundException, IOException, ConflictException {
+    public ContentItemVersion version(String email, String uri, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
 
         // first ensure the content exists in published area so we can create a version from it.
         Path versionSource = zebedee.published.get(uri);
@@ -804,52 +824,16 @@ public class Collection {
             throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
         }
 
-        // determine path in reviewed section for the version to sit
-        Path reviewedPath = this.reviewed.toPath(uri);
-        if (!this.reviewed.exists(reviewedPath.toUri())) {
-            Files.createDirectories(reviewedPath);
-        }
+        ContentReader contentReader = new ContentReader(zebedee.published.path);
 
-        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(uri), reviewedPath);
+        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, collectionWriter.getReviewed());
 
-        if (versionedContentItem.versionExists()) {
+        if (versionedContentItem.versionExists(this.reviewed)) {
             throw new ConflictException("A previous version of this file already exists");
         }
 
-        ContentItemVersion version = versionedContentItem.createVersion(versionSource);
+        ContentItemVersion version = versionedContentItem.createVersion(zebedee.published.path, contentReader);
         addEvent(uri, new Event(new Date(), EventType.VERSIONED, email, version.getIdentifier()));
-        return version;
-    }
-
-    /**
-     * Create a new version for the given timeseries URI.
-     * <p>
-     * The same as the regular timeseries function but does not record update in the event log
-     *
-     * @param uri - The URI of the file to version
-     * @return
-     */
-    public ContentItemVersion versionTimeSeries(String uri) throws NotFoundException, IOException, ConflictException {
-
-        // first ensure the content exists in published area so we can create a version from it.
-        Path versionSource = zebedee.published.get(uri);
-        if (versionSource == null) {
-            throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
-        }
-
-        // determine path in reviewed section for the version to sit
-        Path reviewedPath = this.reviewed.toPath(uri);
-        if (!this.reviewed.exists(reviewedPath.toUri())) {
-            Files.createDirectories(reviewedPath);
-        }
-
-        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(uri), reviewedPath);
-
-        if (versionedContentItem.versionExists()) {
-            throw new ConflictException("A previous version of this file already exists");
-        }
-
-        ContentItemVersion version = versionedContentItem.createVersion(versionSource);
         return version;
     }
 

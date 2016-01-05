@@ -3,8 +3,11 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.XlsToHtmlConverter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,34 +19,20 @@ import javax.ws.rs.POST;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
 @Api
 public class Table {
     @POST
     public void createTable(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ParserConfigurationException, TransformerException, BadRequestException, NotFoundException, UnauthorizedException {
+            throws IOException, ParserConfigurationException, TransformerException, ZebedeeException {
 
         Session session = Root.zebedee.sessions.get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
-
-        // Collection (null check before authorisation check)
-        if (collection == null) {
-            throw new BadRequestException("Please specify a collection");
-        }
-
-        // Authorisation
-        if (session == null
-                || !Root.zebedee.permissions.canView(session.email,
-                collection.description)) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
-        }
+        CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
 
         // Requested path
         if (StringUtils.isBlank(uri)) {
@@ -69,13 +58,12 @@ public class Table {
             response.setContentType(contentType);
         }
 
-        Node table = XlsToHtmlConverter.convertToTable(path.toFile());
+        Resource resource = collectionReader.getResource(uri);
+        Node table = XlsToHtmlConverter.convertToTable(resource.getData());
         String output = XlsToHtmlConverter.docToString(table);
 
         // Write the file to the response
-        try (InputStream input = Files.newInputStream(path)) {
-            org.apache.commons.io.IOUtils.copy(new StringReader(output),
-                    response.getOutputStream());
-        }
+        org.apache.commons.io.IOUtils.copy(new StringReader(output),
+                response.getOutputStream());
     }
 }

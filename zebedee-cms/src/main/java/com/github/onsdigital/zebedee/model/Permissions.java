@@ -54,6 +54,10 @@ public class Permissions {
      */
     public boolean isAdministrator(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        return isAdministrator(email, accessMapping);
+    }
+
+    private boolean isAdministrator(String email, AccessMapping accessMapping) {
         return accessMapping.administrators != null && accessMapping.administrators.contains(standardise(email));
     }
 
@@ -235,9 +239,6 @@ public class Permissions {
     /**
      * Determines whether a session has viewing rights.
      *
-     * If a collection has its encrypted flag set returns yes for any user with the key
-     * If not encrypted only gives view permission to publisher/admins
-     *
      * @param session               The user's session. Can be null.
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
@@ -245,20 +246,12 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted) {
-            return session != null && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
-        } else {
-            AccessMapping accessMapping = readAccessMapping();
-            return session != null && (canEdit(session) || canView(session.email, collectionDescription, accessMapping));
-        }
+        return session != null && canView(session.email, collectionDescription);
     }
 
     /**
      * Determines whether the specified user has viewing rights.
-     *
-     * If a collection has its encrypted flag set returns yes for any user with the key
-     * If not encrypted only gives view permission to publisher/admins
-     *
+     **
      * @param user               The user. Can be null.
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
@@ -266,12 +259,9 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted) {
-            return user != null && user.keyring.list().contains(collectionDescription.id);
-        } else {
-            AccessMapping accessMapping = readAccessMapping();
-            return user != null && (canEdit(user.email) || canView(user.email, collectionDescription, accessMapping));
-        }
+        AccessMapping accessMapping = readAccessMapping();
+        return user != null && (
+                canEdit(user.email, accessMapping) || canView(user.email, collectionDescription, accessMapping));
     }
 
     /**
@@ -313,6 +303,23 @@ public class Permissions {
         }
         collectionTeams.add(team.id);
         writeAccessMapping(accessMapping);
+    }
+
+    /**
+     * Provide a list of team ID's currently associated with a collection
+     * @param collectionDescription
+     * @param session
+     * @return
+     * @throws IOException
+     * @throws UnauthorizedException
+     */
+    public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws IOException, UnauthorizedException {
+        if (session == null || !canEdit(session.email)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        return java.util.Collections.unmodifiableSet(accessMapping.collections.get(collectionDescription.id));
     }
 
     /**
@@ -422,7 +429,7 @@ public class Permissions {
      */
     public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
 
-        if ((session == null) || !isAdministrator(session.email)) {
+        if ((session == null) || (!isAdministrator(session.email) && !session.email.equals(email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

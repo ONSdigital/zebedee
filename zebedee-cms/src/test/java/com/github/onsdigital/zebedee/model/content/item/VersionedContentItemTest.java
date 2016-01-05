@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.model.content.item;
 
+import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -14,15 +16,18 @@ public class VersionedContentItemTest {
     public void createVersionShouldCreateVersionDirectoryWithFilesCopied() throws Exception {
 
         // Given an instance of VersionedContentItem with a path to some content.
-        Path path = Files.createTempDirectory("VersionedContentItemTest");
-        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(""), path);
-        Files.createFile(versionedContentItem.getDataFilePath()); // create the data.json file in the content item directory
+        Path rootPath = Files.createTempDirectory("VersionedContentItemTest");
+        VersionedContentItem versionedContentItem = new VersionedContentItem("economy", new ContentWriter(rootPath));
+        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
+        FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
+        ContentReader contentReader = new ContentReader(rootPath);
         // When we create a new version with the root of the content as the source for the version.
-        ContentItemVersion version = versionedContentItem.createVersion(versionedContentItem.getPath());
+        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader);
 
         // Then a directory exists for the version and the version identifier is set as expected.
-        assertTrue(Files.exists(version.getDataFilePath()));
+        assertTrue(Files.exists(contentItemPath.resolve(VersionedContentItem.getVersionDirectoryName())));
+        assertTrue(Files.exists(rootPath.resolve(version.getUri())));
         assertEquals("v1", version.getIdentifier());
     }
 
@@ -30,17 +35,23 @@ public class VersionedContentItemTest {
     public void createVersionShouldCreateIncrementalVersionNumbers() throws Exception {
 
         // Given an existing version of some content.
-        Path path = Files.createTempDirectory("VersionedContentItemTest");
-        VersionedContentItem versionedContentItem = new VersionedContentItem(URI.create(""), path);
-        Files.createFile(versionedContentItem.getDataFilePath()); // create the data.json file in the content item directory
-        ContentItemVersion version = versionedContentItem.createVersion(versionedContentItem.getPath());
+        Path rootPath = Files.createTempDirectory("VersionedContentItemTest");
+        VersionedContentItem versionedContentItem = new VersionedContentItem("economy", new ContentWriter(rootPath));
+        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
+        FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
+
+        ContentReader contentReader = new ContentReader(rootPath);
+        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader);
 
         // When we create a new version with the root of the content as the source for the version.
-        ContentItemVersion version2 = versionedContentItem.createVersion(versionedContentItem.getPath());
-        ContentItemVersion version3 = versionedContentItem.createVersion(versionedContentItem.getPath());
+        ContentItemVersion version2 = versionedContentItem.createVersion(rootPath, contentReader);
+        ContentItemVersion version3 = versionedContentItem.createVersion(rootPath, contentReader);
 
         // Then a directory exists for the version and the version identifier is set as expected.
-        assertTrue(Files.exists(version.getDataFilePath()));
+        assertTrue(Files.exists(contentItemPath.resolve(VersionedContentItem.getVersionDirectoryName())));
+        assertTrue(Files.exists(rootPath.resolve(version.getUri())));
+        assertTrue(Files.exists(rootPath.resolve(version2.getUri())));
+        assertTrue(Files.exists(rootPath.resolve(version3.getUri())));
         assertEquals("v1", version.getIdentifier());
         assertEquals("v2", version2.getIdentifier());
         assertEquals("v3", version3.getIdentifier());

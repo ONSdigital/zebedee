@@ -9,6 +9,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.hwpf.converter.HtmlDocumentFacade;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,10 +23,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +52,29 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
      */
     public static Node convertToTable(File xlsFileIn) throws ParserConfigurationException, IOException {
         final HSSFWorkbook workbook = ExcelToHtmlUtils.loadXls(xlsFileIn);
+        return createTable(workbook);
+    }
+
+    /**
+     * Convert the given xls file as InputStream.
+     *
+     * @param xlsInputStream
+     * @return
+     * @throws ParserConfigurationException
+     * @throws IOException
+     */
+    public static Node convertToTable(InputStream xlsInputStream) throws ParserConfigurationException, IOException {
+        try {
+            final HSSFWorkbook workbook = new HSSFWorkbook(xlsInputStream);
+            return createTable(workbook);
+        } finally {
+            IOUtils.closeQuietly(xlsInputStream);
+        }
+    }
+
+    private static Node createTable(HSSFWorkbook workbook) throws ParserConfigurationException {
         XlsToHtmlConverter converter = createConverter();
-
         Element table = converter.createTableFromWorkbook(workbook);
-
         return table;
     }
 
@@ -247,8 +264,10 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         return style.toString();
     }
 
-    private void buildStyle_border(HSSFWorkbook workbook, StringBuilder style,
-                                   String type, short xlsBorder, short borderColor) {
+    private void buildStyle_border(
+            HSSFWorkbook workbook, StringBuilder style,
+            String type, short xlsBorder, short borderColor
+    ) {
         if (xlsBorder == HSSFCellStyle.BORDER_NONE)
             return;
 
@@ -267,8 +286,10 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         style.append("border-" + type + ":" + borderStyle + ";");
     }
 
-    void buildStyle_font(HSSFWorkbook workbook, StringBuilder style,
-                         HSSFFont font) {
+    void buildStyle_font(
+            HSSFWorkbook workbook, StringBuilder style,
+            HSSFFont font
+    ) {
         switch (font.getBoldweight()) {
             case HSSFFont.BOLDWEIGHT_BOLD:
                 style.append("font-weight:bold;");
@@ -363,8 +384,10 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         return table;
     }
 
-    protected boolean processCellContent(HSSFCell cell, Element tableCellElement,
-                                  int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt) {
+    protected boolean processCellContent(
+            HSSFCell cell, Element tableCellElement,
+            int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt
+    ) {
         final HSSFCellStyle cellStyle = cell.getCellStyle();
 
         String value;
@@ -463,8 +486,10 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         return StringUtils.isEmpty(value) && cellStyleIndex == 0;
     }
 
-    protected boolean processCell(HSSFCell cell, Element tableCellElement,
-                                  int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt) {
+    protected boolean processCell(
+            HSSFCell cell, Element tableCellElement,
+            int normalWidthPx, int maxSpannedWidthPx, float normalHeightPt
+    ) {
         boolean result = processCellContent(cell, tableCellElement, normalWidthPx, maxSpannedWidthPx, normalHeightPt);
 
         HSSFWorkbook workbook = cell.getRow().getSheet().getWorkbook();

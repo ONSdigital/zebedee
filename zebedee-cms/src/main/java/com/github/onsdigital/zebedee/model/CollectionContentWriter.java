@@ -6,12 +6,11 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
+import org.apache.commons.io.FileUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -38,25 +37,15 @@ public class CollectionContentWriter extends ContentWriter {
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
     }
 
-    /**
-     * Write the given input stream to file. Ensure the content is encrypted if the collection is marked as encrypted.
-     *
-     * @param input
-     * @param path
-     * @throws BadRequestException
-     * @throws IOException
-     */
     @Override
-    protected void write(InputStream input, Path path) throws BadRequestException, IOException {
+    public OutputStream getOutputStream(String uri) throws IOException, BadRequestException {
+        Path path = resolvePath(uri);
+        assertNotDirectory(path);
         if (collection.description.isEncrypted) {
             SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
-            try (OutputStream output = EncryptionUtils.encryptionOutputStream(path, key)) {
-                org.apache.commons.io.IOUtils.copy(input, output);
-            }
+            return EncryptionUtils.encryptionOutputStream(path, key);
         } else {
-            try (OutputStream output = Files.newOutputStream(path)) {
-                org.apache.commons.io.IOUtils.copy(input, output);
-            }
+            return FileUtils.openOutputStream(path.toFile());
         }
     }
 }

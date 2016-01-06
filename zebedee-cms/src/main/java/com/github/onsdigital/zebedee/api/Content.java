@@ -37,8 +37,9 @@ public class Content {
      */
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        Resource resource = RequestUtils.getResource(request);
-        ReaderResponseResponseUtils.sendResponse(resource, response);
+        try (Resource resource = RequestUtils.getResource(request)) {
+            ReaderResponseResponseUtils.sendResponse(resource, response);
+        }
     }
 
 

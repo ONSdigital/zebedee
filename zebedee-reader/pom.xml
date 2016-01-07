@@ -84,6 +84,17 @@
                         </goals>
                         <!-- Default output folder is ${project.build.directory}/dependency -->
                     </execution>
+                    <execution>
+                        <id>unpack-newrelic</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>com.newrelic.agent.java</includeGroupIds>
+                            <includeArtifactIds>newrelic-java</includeArtifactIds>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 

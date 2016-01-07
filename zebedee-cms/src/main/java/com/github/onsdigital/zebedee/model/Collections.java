@@ -544,7 +544,7 @@ public class Collections {
      * @throws UnauthorizedException
      */
     public void moveContent(Session session, Collection collection, String uri, String newUri) throws BadRequestException, IOException, UnauthorizedException {
-        // Collection (null check before authorisation check)
+
         if (collection == null) {
             throw new BadRequestException("Please specify a collection");
         }
@@ -562,13 +562,9 @@ public class Collections {
             throw new BadRequestException("Please provide a new URI");
         }
 
-        // Find the file if it exists
-        Path path = collection.find(uri);
-
-//        // Check we're writing a file:
-//        if (path != null && Files.isDirectory(path)) {
-//            throw new BadRequestException("Please provide a URI to a file");
-//        }
+        if (zebedee.published.exists(uri)) {
+            throw new BadRequestException("You cannot move or rename a file that is already published.");
+        }
 
         collection.moveContent(session.email, uri, newUri);
         collection.save();

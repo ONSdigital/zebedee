@@ -23,6 +23,16 @@ public abstract class BaseStaticPage extends Page {
      */
     private List<Link> links;
 
+    private List<Link> anchors;
+
+    public List<Link> getAnchors() {
+        return anchors;
+    }
+
+    public void setAnchors(List<Link> anchors) {
+        this.anchors = anchors;
+    }
+
     public List<String> getMarkdown() {
         return markdown;
     }

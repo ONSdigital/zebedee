@@ -268,7 +268,9 @@ public class Publisher {
         pool.submit(() -> {
             Log.print("Indexing publish report");
             PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
+                if(Configuration.isVerificationEnabled()) {
             zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
+}
         });
     }
 

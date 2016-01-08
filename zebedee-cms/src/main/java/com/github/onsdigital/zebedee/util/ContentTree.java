@@ -35,6 +35,7 @@ public class ContentTree {
         return publishedContentTree;
     }
 
+
     /**
      * Returns a content tree overlayed with the files of the given collection.
      *
@@ -42,7 +43,7 @@ public class ContentTree {
      * @param collection
      */
     public static ContentDetail getOverlayed(Collection collection, CollectionReader reader) throws IOException, ZebedeeException {
-        ContentDetail publishedDetails = get();
+        ContentDetail publishedDetails = get().clone();
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.inProgress, reader.getInProgress()));
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.complete, reader.getComplete()));
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed()));
@@ -53,5 +54,4 @@ public class ContentTree {
         Log.print("Clearing browser tree cache.");
         publishedContentTree = null;
     }
-
 }

@@ -153,4 +153,26 @@ public class ContentDetailTest {
         // Then the result is false
         assertFalse(containsDescendant);
     }
+
+    @Test
+    public void cloneShouldCreateCopyIncludingChildNodes() {
+
+        // Given a content detail instance with a child
+        ContentDetail detail = new ContentDetail("base content", "/", "home");
+        ContentDetail child = new ContentDetail("child content", "/child", "article");
+        detail.children = new ArrayList<>();
+        detail.children.add(child);
+
+        // When we clone it and add an overlay to the clone.
+        ContentDetail clone = detail.clone();
+
+        ContentDetail descendant = new ContentDetail("descendant content", "/child/descendant", "bulletin");
+        List<ContentDetail> toOverlay = new ArrayList<>();
+        toOverlay.add(descendant);
+        clone.overlayDetails(toOverlay);
+
+        // Then the item is added into the tree
+        assertTrue(clone.containsDescendant(descendant));
+        assertFalse(detail.containsDescendant(descendant));
+    }
 }

@@ -23,7 +23,7 @@ public class Configuration {
     }
 
     public static boolean isVerificationEnabled() {
-        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "true"));
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
     }
 
     public static String getFlorenceUrl() {

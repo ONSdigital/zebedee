@@ -264,7 +264,9 @@ public class Publisher {
             public void run() {
                 Log.print("Indexing publish report");
                 PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
-                zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath);
+                if(Configuration.isVerificationEnabled()) {
+                    zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath);
+                }
             }
         });
     }

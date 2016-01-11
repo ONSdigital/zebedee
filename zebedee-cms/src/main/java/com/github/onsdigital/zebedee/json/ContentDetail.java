@@ -32,6 +32,21 @@ public class ContentDetail {
         this.description = new ContentDetailDescription(title);
     }
 
+    /**
+     * Creates a deep copy of this content detail instance, including child items.
+     *
+     * @return
+     */
+    public ContentDetail clone() {
+        ContentDetail cloned = new ContentDetail(this.description.title, this.uri, this.type);
+
+        if (this.children != null) {
+            cloned.children = new ArrayList<>(this.children.size());
+            this.children.forEach(child -> cloned.children.add(child.clone()));
+        }
+
+        return cloned;
+    }
 
     /**
      * Return true if this content contains the given child item.
@@ -165,7 +180,9 @@ public class ContentDetail {
                 child = new ContentDetail(directoryName, "", null);
 
 
-                if(this.children == null) { this.children = new ArrayList<>(); }
+                if (this.children == null) {
+                    this.children = new ArrayList<>();
+                }
                 this.children.add(child);
             }
 

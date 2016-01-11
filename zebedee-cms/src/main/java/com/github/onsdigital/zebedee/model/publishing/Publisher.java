@@ -268,7 +268,9 @@ public class Publisher {
         pool.submit(() -> {
             Log.print("Indexing publish report");
             PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
-            zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
+            if (Configuration.isVerificationEnabled()) {
+                zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
+            }
         });
     }
 
@@ -309,7 +311,9 @@ public class Publisher {
         // publishbot requires a Slack token (which is generated for a specific team) and a channel name to publish to
         String slackToken = System.getenv("publishbot_token");
         String slackChannel = System.getenv("publishbot_channel");
-        if (slackToken == null || slackChannel == null) { return; }
+        if (slackToken == null || slackChannel == null) {
+            return;
+        }
 
         try (InputStream input = Files.newInputStream(collectionJsonPath)) {
             PublishedCollection publishedCollection = Serialiser.deserialise(input,
@@ -331,7 +335,7 @@ public class Publisher {
             Log.print("Failed to slack message for published collection with path %s", collectionJsonPath.toString());
         }
     }
-    
+
     private static Future<Exception> sendSlackMessage(
             final Host host,
             final String token, final String channel,
@@ -357,6 +361,7 @@ public class Publisher {
             }
         });
     }
+
     private static String publicationMessage(PublishedCollection publishedCollection) throws ParseException {
         Result result = publishedCollection.publishResults.get(0);
         String startDate = result.transaction.startDate;
@@ -368,7 +373,7 @@ public class Publisher {
         String timeTaken = String.format("%.1f", (endDateTime.getTime() - startDateTime.getTime()) / 1000.0);
 
         String exampleUri = "";
-        for (UriInfo info: result.transaction.uriInfos) {
+        for (UriInfo info : result.transaction.uriInfos) {
             if (info.uri.endsWith("data.json")) {
                 exampleUri = info.uri.substring(0, info.uri.length() - "data.json".length());
                 break;

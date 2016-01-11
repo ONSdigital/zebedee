@@ -22,6 +22,10 @@ public class Configuration {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
     }
 
+    public static boolean isVerificationEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
+    }
+
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
     }

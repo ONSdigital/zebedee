@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -83,7 +84,7 @@ public class Zebedee {
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
-        if (useVerificationAgent) {
+        if (useVerificationAgent && Configuration.isVerificationEnabled()) {
             this.verificationAgent = new VerificationAgent(this);
         } else {
             this.verificationAgent = null;

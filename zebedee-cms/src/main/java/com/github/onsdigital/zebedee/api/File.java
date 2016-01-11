@@ -21,10 +21,10 @@ import java.io.IOException;
 public class File {
     @GET
     public Object post(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException, ZebedeeException {
-
-        Resource resource = RequestUtils.getResource(request);
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + resource.getName() + "\"");
-        ReaderResponseResponseUtils.sendResponse(resource, response);
-        return null;
+        try(Resource resource = RequestUtils.getResource(request)) {
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + resource.getName() + "\"");
+            ReaderResponseResponseUtils.sendResponse(resource, response);
+            return null;
+        }
     }
 }

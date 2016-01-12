@@ -11,4 +11,16 @@ public class ContentDetailDescription {
     public ContentDetailDescription(String title) {
         this.title = title;
     }
+
+    /**
+     * Deep clone of object
+     *
+     * @return
+     */
+    public ContentDetailDescription clone() {
+        ContentDetailDescription contentDetailDescription = new ContentDetailDescription(this.title);
+        contentDetailDescription.edition = edition;
+        contentDetailDescription.language = language;
+        return contentDetailDescription;
+    }
 }

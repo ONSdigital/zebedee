@@ -33,12 +33,25 @@ public class ContentDetail {
     }
 
     /**
+     * Convenience constructor taking the typical parameters.
+     *
+     * @param description
+     * @param uri
+     * @param type
+     */
+    public ContentDetail(ContentDetailDescription description, String uri, String type) {
+        this.uri = uri;
+        this.type = type;
+        this.description = description;
+    }
+
+    /**
      * Creates a deep copy of this content detail instance, including child items.
      *
      * @return
      */
     public ContentDetail clone() {
-        ContentDetail cloned = new ContentDetail(this.description.title, this.uri, this.type);
+        ContentDetail cloned = new ContentDetail(this.description, this.uri, this.type);
 
         if (this.children != null) {
             cloned.children = new ArrayList<>(this.children.size());

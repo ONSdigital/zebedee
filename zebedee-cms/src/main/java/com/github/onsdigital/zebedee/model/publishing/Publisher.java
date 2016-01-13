@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
@@ -341,7 +342,8 @@ public class Publisher {
             final String token, final String channel,
             final String userName, final String emoji,
             final String text,
-            ExecutorService pool) {
+            ExecutorService pool
+    ) {
         return pool.submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
@@ -486,7 +488,8 @@ public class Publisher {
         Log.print("Moving collection files from %s to %s", collectionFilesSource, collectionFilesDestination);
         for (String uri : collection.reviewed.uris()) {
             Resource resource = collectionReader.getResource(uri);
-            FileUtils.copyInputStreamToFile(resource.getData(), collectionFilesDestination.toFile());
+            File destination = collectionFilesDestination.resolve(URIUtils.removeLeadingSlash(uri)).toFile();
+            FileUtils.copyInputStreamToFile(resource.getData(), destination);
         }
 
         return collectionJsonDestination;
@@ -532,7 +535,8 @@ public class Publisher {
             final boolean zipped,
             final Path source,
             final CollectionReader reader,
-            ExecutorService pool) {
+            ExecutorService pool
+    ) {
         return pool.submit(() -> {
             IOException result = null;
             try (Http http = new Http()) {

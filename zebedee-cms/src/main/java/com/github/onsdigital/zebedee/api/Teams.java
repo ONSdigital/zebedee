@@ -20,6 +20,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by thomasridd on 28/04/15.
@@ -74,7 +75,6 @@ public class Teams {
     public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException {
 
         Session session = Root.zebedee.sessions.get(request);
-
         String teamName = getTeamName(request);
 
         Root.zebedee.teams.createTeam(teamName, session);
@@ -152,9 +152,10 @@ public class Teams {
      * @throws NotFoundException
      * @throws BadRequestException
      */
-    private void evaluateCollectionKeys(Zebedee zebedee, Session session, Team team, String... emails) throws IOException, NotFoundException, BadRequestException {
+    private void evaluateCollectionKeys(Zebedee zebedee, Session session, Team team, String... emails) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
         for (Collection collection : zebedee.collections.list()) {
-            if (collection.description.teams != null && collection.description.teams.contains(team.name)) {
+            Set<Integer> teamIds = Root.zebedee.permissions.listViewerTeams(collection.description, session);
+            if (teamIds != null && teamIds.contains(team.id)) {
                 for (String memberEmail : emails) {
                     KeyManager.distributeKeyToUser(zebedee, collection, session, zebedee.users.get(memberEmail));
                 }

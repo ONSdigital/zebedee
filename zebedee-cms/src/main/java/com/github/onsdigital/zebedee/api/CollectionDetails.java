@@ -2,10 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDetail;
-import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
@@ -16,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Api
 public class CollectionDetails {
@@ -57,7 +55,6 @@ public class CollectionDetails {
         result.publishDate = collection.description.publishDate;
         result.teams = collection.description.teams;
 
-
         result.inProgress = ContentDetailUtil.resolveDetails(collection.inProgress, collectionReader.getInProgress());
         result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());
         result.reviewed = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
@@ -68,6 +65,10 @@ public class CollectionDetails {
         addEventsForDetails(result.inProgress, result, collection);
         addEventsForDetails(result.complete, result, collection);
         addEventsForDetails(result.reviewed, result, collection);
+
+        Set<Integer> teamIds = Root.zebedee.permissions.listViewerTeams(collection.description, session);
+        List<Team> teams = Root.zebedee.teams.resolveTeams(teamIds);
+        teams.forEach(team -> collection.description.teams.add(team.name));
 
         return result;
     }

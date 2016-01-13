@@ -503,13 +503,13 @@ public class Collection {
 
         if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
-
-
             if (this.isInCollection(uri)) {
                 Path destination = inProgress.toPath(uri);
                 PathUtils.moveFilesInDirectory(source, destination);
             } else {
-                collectionWriter.getInProgress().write(new FileInputStream(source.toFile()), uri);
+                try (InputStream inputStream = new FileInputStream(source.toFile())) {
+                    collectionWriter.getInProgress().write(inputStream, uri);
+                }
             }
 
             addEvent(uri, new Event(new Date(), EventType.EDITED, email));

@@ -11,14 +11,17 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.util.JsonUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -423,12 +426,35 @@ public class Collections {
                     "Somehow we weren't able to edit the requested URI");
         }
 
-
         // Detect whether this is a multipart request
         if (ServletFileUpload.isMultipartContent(request)) {
             postDataFile(request, uri, collectionWriter);
         } else {
-            collectionWriter.getInProgress().write(requestBody, uri);
+            try (InputStream inputStream = validateJsonStream(requestBody)) {
+                collectionWriter.getInProgress().write(inputStream, uri);
+            }
+        }
+    }
+
+    /**
+     * Take an input stream that contains json content and ensure its valid.
+     *
+     * @param inputStream
+     * @return
+     */
+    public InputStream validateJsonStream(InputStream inputStream) throws BadRequestException {
+        try {
+            byte[] bytes = IOUtils.toByteArray(inputStream);
+
+            try (ByteArrayInputStream validationInputStream = new ByteArrayInputStream(bytes)) {
+                if (!JsonUtils.isValidJson(validationInputStream)) {
+                    throw new BadRequestException("Operation failed: Json is not valid. Please try again");
+                }
+            }
+
+            return new ByteArrayInputStream(bytes);
+        } catch (IOException e) {
+            throw new BadRequestException("Operation failed: Failed to validate Json. Please try again");
         }
     }
 

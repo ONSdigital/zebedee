@@ -319,7 +319,10 @@ public class Permissions {
         }
 
         AccessMapping accessMapping = readAccessMapping();
-        return java.util.Collections.unmodifiableSet(accessMapping.collections.get(collectionDescription.id));
+        Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.id);
+        if (teamIds == null) teamIds = new HashSet<>();
+
+        return java.util.Collections.unmodifiableSet(teamIds);
     }
 
     /**

@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -55,6 +56,19 @@ public class Teams {
         }
 
         return result;
+    }
+
+    public List<Team> resolveTeams(Set<Integer> teamIds) throws IOException {
+        List<Team> teams = listTeams();
+        List<Team> resolvedTeams = new ArrayList<>();
+        for (Integer currentTeamId : teamIds) { // for each current team ID
+            for (Team team : teams) { // iterate the teams list to find the team object
+                if (currentTeamId.equals(team.id)) { // if the ID's match
+                    resolvedTeams.add(team);
+                }
+            }
+        }
+        return resolvedTeams;
     }
 
     public Team findTeam(String teamName) throws IOException, NotFoundException {

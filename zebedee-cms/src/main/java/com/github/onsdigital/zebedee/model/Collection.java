@@ -266,7 +266,6 @@ public class Collection {
         updateViewerTeams(collectionDescription, zebedee, session);
         KeyManager.distributeCollectionKey(zebedee, session, collection);
 
-
         return updatedCollection;
     }
 

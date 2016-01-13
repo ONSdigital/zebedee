@@ -314,7 +314,7 @@ public class Permissions {
      * @throws UnauthorizedException
      */
     public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !canEdit(session.email)) {
+        if (session == null || !canView(session, collectionDescription)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

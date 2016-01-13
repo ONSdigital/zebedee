@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -30,8 +31,10 @@ public class CollectionContentReader extends ContentReader {
     @Override
     protected long calculateContentLength(Path path) throws IOException {
         if (collection.description.isEncrypted) {
-            InputStream inputStream = EncryptionUtils.encryptionInputStream(path, key);
-            return IOUtils.copy(inputStream, new ByteArrayOutputStream());
+            try (InputStream inputStream = EncryptionUtils.encryptionInputStream(path, key);
+                 OutputStream outputStream = new ByteArrayOutputStream()) {
+                return IOUtils.copy(inputStream, outputStream);
+            }
         } else {
             return super.calculateContentLength(path);
         }
@@ -49,7 +52,6 @@ public class CollectionContentReader extends ContentReader {
 
     private InputStream getInputStream(Path path) throws IOException {
         InputStream inputStream;
-
         if (collection.description.isEncrypted) {
             inputStream = EncryptionUtils.encryptionInputStream(path, key);
         } else {

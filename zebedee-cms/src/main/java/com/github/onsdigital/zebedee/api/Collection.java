@@ -60,6 +60,7 @@ public class Collection {
         result.approvedStatus = collection.description.approvedStatus;
         result.type = collection.description.type;
         result.teams = collection.description.teams;
+        result.isEncrypted = collection.description.isEncrypted;
         return result;
     }
 

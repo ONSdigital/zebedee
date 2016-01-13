@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -90,7 +91,9 @@ public class VersionedContentItem extends ContentItem {
 
                     String filename = path.getFileName().toString();
                     Path versionPath = Paths.get(versionUri).resolve(filename);
-                    contentWriter.write(source.getData(), versionPath.toString());
+                    try (InputStream inputStream = source.getData()){
+                        contentWriter.write(inputStream, versionPath.toString());
+                    }
                 }
             }
         }

@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
@@ -243,7 +244,7 @@ public class Publisher {
             new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
 
             // move collection files to archive
-            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
+            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 
             // send a slack success message
             sendSlackMessageForCollection(collectionJsonPath);
@@ -341,7 +342,8 @@ public class Publisher {
             final String token, final String channel,
             final String userName, final String emoji,
             final String text,
-            ExecutorService pool) {
+            ExecutorService pool
+    ) {
         return pool.submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
@@ -441,15 +443,12 @@ public class Publisher {
     }
 
     private static void reIndexPublishingSearch(final String uri) throws IOException {
-        pool.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Indexer.getInstance().reloadContent(uri);
-                } catch (Exception e) {
-                    Log.print("Exception reloading search index:");
-                    ExceptionUtils.printRootCauseStackTrace(e);
-                }
+        pool.submit(() -> {
+            try {
+                Indexer.getInstance().reloadContent(uri);
+            } catch (Exception e) {
+                Log.print("Exception reloading search index:");
+                ExceptionUtils.printRootCauseStackTrace(e);
             }
         });
     }
@@ -465,7 +464,7 @@ public class Publisher {
         }
     }
 
-    public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
+    public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
 
         Log.print("Moving collection files to archive for collection: " + collection.description.name);
         String filename = PathUtils.toFilename(collection.description.name);
@@ -487,7 +486,11 @@ public class Publisher {
         Files.copy(collectionJsonSource, collectionJsonDestination);
 
         Log.print("Moving collection files from %s to %s", collectionFilesSource, collectionFilesDestination);
-        FileUtils.moveDirectoryToDirectory(collectionFilesSource.toFile(), collectionFilesDestination.toFile(), true);
+        for (String uri : collection.reviewed.uris()) {
+            Resource resource = collectionReader.getResource(uri);
+            File destination = collectionFilesDestination.resolve(URIUtils.removeLeadingSlash(uri)).toFile();
+            FileUtils.copyInputStreamToFile(resource.getData(), destination);
+        }
 
         return collectionJsonDestination;
     }
@@ -532,7 +535,8 @@ public class Publisher {
             final boolean zipped,
             final Path source,
             final CollectionReader reader,
-            ExecutorService pool) {
+            ExecutorService pool
+    ) {
         return pool.submit(() -> {
             IOException result = null;
             try (Http http = new Http()) {

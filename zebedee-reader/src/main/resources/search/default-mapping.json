@@ -18,6 +18,10 @@
             "type": "string",
             "analyzer": "ons_standard"
           },
+          "datasetId" : {
+            "type": "string",
+            "analyzer": "ons_standard"
+          },
           "title": {
             "type": "string",
             "analyzer" : "ons_detailed",

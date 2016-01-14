@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,19 +35,7 @@ public class Collections {
             collectionId = segments.get(1);
         }
 
-        return getCollection(collectionId);
-    }
-
-    /**
-     * Get the collection with the given collection ID.
-     *
-     * @param collectionId
-     * @return
-     * @throws IOException
-     */
-    public static Collection getCollection(String collectionId)
-            throws IOException {
-        return Root.zebedee.collections.list().getCollection(collectionId);
+        return Root.zebedee.collections.getCollection(collectionId);
     }
 
     /**

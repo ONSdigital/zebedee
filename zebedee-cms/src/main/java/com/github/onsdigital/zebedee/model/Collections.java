@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
@@ -69,6 +70,16 @@ public class Collections {
     }
 
     /**
+     * Trim the guid part of the collection ID to infer the name
+     *
+     * @return
+     */
+    private static String getCollectionNameFromId(String id) {
+        int guidLength = 65; // length of GUID plus the hyphen.
+        return id.substring(0, id.length() - guidLength);
+    }
+
+    /**
      * Mark a file in a collection as 'complete'
      *
      * @param collection
@@ -79,8 +90,10 @@ public class Collections {
      * @throws UnauthorizedException
      * @throws BadRequestException
      */
-    public void complete(Collection collection, String uri,
-                         Session session) throws IOException, NotFoundException,
+    public void complete(
+            Collection collection, String uri,
+            Session session
+    ) throws IOException, NotFoundException,
             UnauthorizedException, BadRequestException {
 
         // Check the collection
@@ -135,6 +148,28 @@ public class Collections {
     }
 
     /**
+     * Get the collection with the given collection ID.
+     *
+     * @param collectionId
+     * @return
+     * @throws IOException
+     */
+    public Collection getCollection(String collectionId)
+            throws IOException {
+        try {
+            String collectionName = getCollectionNameFromId(collectionId);
+            Collection collection = getCollectionByName(collectionName);
+            return collection;
+        } catch (CollectionNotFoundException e) {
+            return Root.zebedee.collections.list().getCollection(collectionId);
+        }
+    }
+
+    public Collection getCollectionByName(String collectionName) throws IOException, CollectionNotFoundException {
+        return new Collection(this.path.resolve(collectionName), this.zebedee);
+    }
+
+    /**
      * Approve the given collection.
      *
      * @param collection
@@ -182,7 +217,7 @@ public class Collections {
 
         // Do any processing of data files
         try {
-            uriList =  new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
+            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }
@@ -191,7 +226,7 @@ public class Collections {
         collection.description.approvedStatus = true;
         collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
 
-        boolean result =  collection.save();
+        boolean result = collection.save();
         new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
         return result;
     }
@@ -230,7 +265,7 @@ public class Collections {
         collection.description.approvedStatus = false;
         collection.description.AddEvent(new Event(new Date(), EventType.UNLOCKED, session.email));
 
-        boolean result =  collection.save();
+        boolean result = collection.save();
         new PublishNotification(collection).sendNotification(EventType.UNLOCKED);
         return result;
     }
@@ -238,8 +273,8 @@ public class Collections {
     /**
      * Publish the files
      *
-     * @param collection the collection to publish
-     * @param session    a session with editor priviledges
+     * @param collection       the collection to publish
+     * @param session          a session with editor priviledges
      * @param skipVerification
      * @return success
      * @throws IOException
@@ -278,8 +313,10 @@ public class Collections {
         return publishComplete;
     }
 
-    public DirectoryListing listDirectory(Collection collection, String uri,
-                                          Session session) throws NotFoundException, UnauthorizedException,
+    public DirectoryListing listDirectory(
+            Collection collection, String uri,
+            Session session
+    ) throws NotFoundException, UnauthorizedException,
             IOException, BadRequestException {
 
         if (collection == null) {
@@ -319,8 +356,10 @@ public class Collections {
      * @throws IOException
      * @throws BadRequestException
      */
-    public DirectoryListing listDirectoryOverlayed(Collection collection, String uri,
-                                                   Session session) throws NotFoundException, UnauthorizedException,
+    public DirectoryListing listDirectoryOverlayed(
+            Collection collection, String uri,
+            Session session
+    ) throws NotFoundException, UnauthorizedException,
             IOException, BadRequestException {
 
         DirectoryListing listing = listDirectory(collection, uri, session);
@@ -380,8 +419,10 @@ public class Collections {
         writeContent(collection, uri, session, request, requestBody);
     }
 
-    public void writeContent(Collection collection, String uri,
-                             Session session, HttpServletRequest request, InputStream requestBody)
+    public void writeContent(
+            Collection collection, String uri,
+            Session session, HttpServletRequest request, InputStream requestBody
+    )
             throws IOException, BadRequestException, UnauthorizedException,
             ConflictException, NotFoundException, FileUploadException {
 
@@ -465,8 +506,10 @@ public class Collections {
         }
     }
 
-    public boolean deleteContent(Collection collection, String uri,
-                                 Session session) throws IOException, BadRequestException,
+    public boolean deleteContent(
+            Collection collection, String uri,
+            Session session
+    ) throws IOException, BadRequestException,
             UnauthorizedException, NotFoundException {
 
         // Collection (null check before authorisation check)
@@ -508,6 +551,7 @@ public class Collections {
 
     /**
      * Save uploaded files.
+     *
      * @param request
      * @param uri
      * @param collectionWriter

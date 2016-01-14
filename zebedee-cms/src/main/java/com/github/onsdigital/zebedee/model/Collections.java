@@ -18,6 +18,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -430,8 +431,14 @@ public class Collections {
         if (ServletFileUpload.isMultipartContent(request)) {
             postDataFile(request, uri, collectionWriter);
         } else {
-            try (InputStream inputStream = validateJsonStream(requestBody)) {
-                collectionWriter.getInProgress().write(inputStream, uri);
+
+            Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
+            if (validateJson) {
+                try (InputStream inputStream = validateJsonStream(requestBody)) {
+                    collectionWriter.getInProgress().write(inputStream, uri);
+                }
+            } else {
+                collectionWriter.getInProgress().write(requestBody, uri);
             }
         }
     }

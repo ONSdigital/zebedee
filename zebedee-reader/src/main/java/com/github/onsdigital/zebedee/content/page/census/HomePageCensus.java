@@ -12,7 +12,7 @@ import java.util.List;
 public class HomePageCensus extends TaxonomyNode {
 
     private MarkdownSection intro = new MarkdownSection();
-    private List<HomePageCensus> sections;
+    private List<HomeSectionCensus> sections;
 
     @Override
     public PageType getType() {
@@ -27,11 +27,11 @@ public class HomePageCensus extends TaxonomyNode {
         this.intro = intro;
     }
 
-    public List<HomePageCensus> getSections() {
+    public List<HomeSectionCensus> getSections() {
         return sections;
     }
 
-    public void setSections(List<HomePageCensus> sections) {
+    public void setSections(List<HomeSectionCensus> sections) {
         this.sections = sections;
     }
 }

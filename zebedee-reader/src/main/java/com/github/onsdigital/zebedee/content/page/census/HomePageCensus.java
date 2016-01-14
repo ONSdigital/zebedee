@@ -13,6 +13,7 @@ public class HomePageCensus extends TaxonomyNode {
 
     private MarkdownSection intro = new MarkdownSection();
     private List<HomeSectionCensus> sections;
+    private List<Image> images;
 
     @Override
     public PageType getType() {
@@ -33,5 +34,13 @@ public class HomePageCensus extends TaxonomyNode {
 
     public void setSections(List<HomeSectionCensus> sections) {
         this.sections = sections;
+    }
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        this.images = images;
     }
 }

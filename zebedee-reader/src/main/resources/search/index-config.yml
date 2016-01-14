@@ -2,31 +2,22 @@ analysis :
   analyzer :
     #Overwriting default index analyzer
     #Makes all fields filterable with exact word matching, it is used to make filtering available on all fields by default
-    #Searchable fields uses ons_analyzer
+    #Searchable fields uses ons_standard_analyzer and ons_detailed_analyzer
     default_index :
       tokenizer : keyword
       filter :
         - trim
         - lowercase
-    #ONS analyzer is used when indexing fields are wanted to be searchable, set mappings for these fields in default-mapping.json file
-    default_search :
-          tokenizer : standard
-          char_filter : char_mapping
-          filter :
-            - lowercase
-            - standard
-            - stop
-            - porter_stem
-    #Porter stem does not work for some cdids (e.g. a4ae is tokenized as a4a when search.). Solution to this is to apply analysis on search term with no stemming.
-    #cdid_search analyzer is created for this purpose and only applied to search terms, cdid when indexed is analysed with default_index analyzer which does not apply stemming
-    cdid_search:
-          tokenizer : standard
-          char_filter : char_mapping
-          filter :
-            - lowercase
-            - standard
-            - stop
-    ons_index_analyzer :
+    #Used for analyzing fields that needs to be searcahable, does not include synonyms or stemming
+    ons_standard :
+      tokenizer : standard
+      char_filter : char_mapping
+      filter :
+        - lowercase
+        - standard
+        - stop
+    #Including detailed analysis like synonyms and stemming, currently only used on detail title field analysis
+    ons_detailed :
       tokenizer : standard
       char_filter : char_mapping
       filter :
@@ -35,7 +26,7 @@ analysis :
         - standard
         - stop
         - porter_stem
-    first_letter_analyzer :
+    first_letter :
       #Extracts first letter, elastic search does not seem to have a prefix aggregation, as a workaround first letter is indexed for a to z tool
       #Not that the pattern skips any non-letter character at the beginning
       tokenizer : keyword
@@ -57,51 +48,54 @@ analysis :
       # stores synonyms for search engine
       # there are 2 possible formats
       # 1. term => another term = items on lhs are mapped to items on rhs
-      # 2. term,another term,and another term = all terms are synonymous with each other
+      # 2. term,another term,and another term = all terms are synonymous with each other,
+      #careful with the second one, messes up relevancy by creating same words multiple times in the index, try direct mapping of abbreveation to what it stands for
       synonyms :
-        - "consumer price inflation,consumer price index,cpi"
-        - "rpi, retail price index"
-        - "gdp,gross domestic product"
-        - "ashe,annual survey of hours and earnings"
-        - "gva,gross value added"
-        - "awe,average weekly earnings"
-        - "lsoa,lower layer super output area"
-        - "ppi, producer price index"
-        - "sic, standard industrial classification"
-        - "ukea, uk economic accounts"
-        - "neet, young people not in education, employment or training"
-        - "fdi, foreign direct investment"
-        - "bop, balance of payments"
-        - "sme, small medium enterprises"
-        - "bres, business register and employment survey"
-        - "gdhi, gross disposable household income"
-        - "hpi, house price index"
-        - "idbr, inter departmental business register"
-        - "uk, united kingdom"
-        - "copd, chronic obstructive pulmonary disease"
-        - "lfs, labour force survey"
-        - "imd, index of multiple deprivation"
-        - "ccg, clinical commissioning group"
-        - "abs, annual business survey"
-        - "sppi, services producer price indices"
-        - "hiv, human immunodeficiency virus"
-        - "ips, international passenger survey"
-        - "msoa, middle layer super output areas"
-        - "aei, average earnings index"
-        - "soc, standard occupational classification"
-        - "jsa, jobseeskers allowance"
-        - "vat, value added tax"
-        - "hmrc, hm revenue and customs published"
-        - "ltim, long term international migration"
-        - "ns sec,nssec, national statistics socio economic classification"
-        - "topsi, turnover and orders in production and services industries"
-        - "r&d, research and development"
-        - "berd, business enterprise research and development"
-        - "iop, index of production"
-        - "ios, index of services"
-        - "rsi, retail sales index"
-        - "ict, information and communication technology"
-        - "gfcf, gross fixed capital formation"
-        - "esa, european system of accounts"
-        - "aps, annual poopulation survey"
-        - "eu, european union"
+        - "cpi, consumer price inflation, consumer price index"
+        - "rpi,  retail price index"
+        - "gdp,  gross domestic product"
+        - "ashe,  annual survey of hours and earnings"
+        - "gva,  gross value added"
+        - "awe,  average weekly earnings"
+        - "lsoa,  lower layer super output area"
+        - "ppi,  producer price inflation, producer price index"
+        - "sic,  standard industrial classification"
+        - "ukea,  uk economic accounts"
+        - "neet,  young people not in education"
+        - "neet,  employment or training"
+        - "fdi,  foreign direct investment"
+        - "bop,  balance of payments"
+        - "sme,  small medium enterprises"
+        - "bres,  business register and employment survey"
+        - "gdhi,  gross disposable household income"
+        - "hpi,  house price index"
+        - "idbr,  inter departmental business register"
+        - "uk,  united kingdom"
+        - "copd,  chronic obstructive pulmonary disease"
+        - "lfs,  labour force survey"
+        - "imd,  index of multiple deprivation"
+        - "ccg,  clinical commissioning group"
+        - "abs,  annual business survey"
+        - "sppi,  services producer price indices"
+        - "hiv,  human immunodeficiency virus"
+        - "ips,  international passenger survey"
+        - "msoa,  middle layer super output areas"
+        - "aei,  average earnings index"
+        - "soc,  standard occupational classification"
+        - "jsa,  jobseeskers allowance"
+        - "vat,  value added tax"
+        - "hmrc,  hm revenue and customs published"
+        - "ltim,  long term international migration"
+        - "ns sec,  national statistics socio economic classification"
+        - "nssec,  national statistics socio economic classification"
+        - "topsi,  turnover and orders in production and services industries"
+        - "r&d,  research and development"
+        - "berd,  business enterprise research and development"
+        - "iop,  index of production"
+        - "ios,  index of services"
+        - "rsi,  retail sales index"
+        - "ict,  information and communication technology"
+        - "gfcf,  gross fixed capital formation"
+        - "esa,  european system of accounts"
+        - "aps,  annual poopulation survey"
+        - "eu,  european union"

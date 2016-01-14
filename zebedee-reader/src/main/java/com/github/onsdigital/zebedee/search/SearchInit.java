@@ -23,19 +23,17 @@ public class SearchInit implements Startup {
 
     private void loadIndex() {
         final ExecutorService thread = Executors.newSingleThreadExecutor();
-        thread.submit(new Callable() {
-                          @Override
-                          public Object call() throws Exception {
-                              try {
-                                  Indexer.getInstance().reload();
-                                  return null;
-                              } catch (Exception e) {
-                                  throw new RuntimeException("Loading search index failed", e);
-                              } finally {
-                                  thread.shutdown();
-                              }
-                          }
-                      }
+        thread.submit(() -> {
+            try {
+                Indexer.getInstance().reload();
+                return null;
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Loading search index failed", e);
+            } finally {
+                thread.shutdown();
+            }
+        }
         );
     }
 }

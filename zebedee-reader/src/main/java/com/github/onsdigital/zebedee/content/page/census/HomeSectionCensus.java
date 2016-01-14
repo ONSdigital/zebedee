@@ -5,10 +5,11 @@ package com.github.onsdigital.zebedee.content.page.census;
  */
 public class HomeSectionCensus {
 
-    private Integer index; //Used for ordering of sections on homepage
     private String title;
-    private String uri;
     private String text;
+    private String uri;
+    private String image;
+
     private String size;
 
     public String getTitle() {
@@ -35,15 +36,19 @@ public class HomeSectionCensus {
         this.size = size;
     }
 
-    public Integer getIndex() {
-        return index;
-    }
-
     public String getUri() {
         return uri;
     }
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

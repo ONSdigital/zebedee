@@ -13,6 +13,7 @@ package com.github.onsdigital.zebedee.content.page.base;
 public enum PageType {
 
     home_page,
+    home_page_census,
     taxonomy_landing_page,
     product_page,
     bulletin,

@@ -7,6 +7,7 @@ public class HomeSectionCensus {
 
     private Integer index; //Used for ordering of sections on homepage
     private String title;
+    private String uri;
     private String text;
     private String size;
 
@@ -36,5 +37,13 @@ public class HomeSectionCensus {
 
     public Integer getIndex() {
         return index;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

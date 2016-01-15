@@ -647,6 +647,33 @@ public class Collections {
         collection.save();
     }
 
+    public void renameContent(Session session, Collection collection, String uri, String toUri) throws BadRequestException, IOException, UnauthorizedException {
+
+        if (collection == null) {
+            throw new BadRequestException("Please specify a collection");
+        }
+
+        // Authorisation
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        if (StringUtils.isBlank(uri)) {
+            throw new BadRequestException("Please provide a URI");
+        }
+
+        if (StringUtils.isBlank(toUri)) {
+            throw new BadRequestException("Please provide a new URI");
+        }
+
+        if (zebedee.published.exists(uri)) {
+            throw new BadRequestException("You cannot move or rename a file that is already published.");
+        }
+
+        collection.renameContent(session.email, uri, toUri);
+        collection.save();
+    }
+
     /**
      * Represents the list of all collections currently in the system. This adds
      * a couple of utility methods to {@link ArrayList}.

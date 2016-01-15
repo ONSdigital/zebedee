@@ -360,8 +360,8 @@ public class Permissions {
         Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
         if (teams != null) {
             for (Team team : zebedee.teams.listTeams()) {
-                if (teams.contains(team.id)) {
-                    return team.members.contains(standardise(email));
+                if (teams.contains(team.id) && team.members.contains(standardise(email))) {
+                    return true;
                 }
             }
         }

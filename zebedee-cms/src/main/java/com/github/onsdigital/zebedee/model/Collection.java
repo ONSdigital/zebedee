@@ -886,10 +886,6 @@ public class Collection {
 
         if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, email));
 
-
-        save();
-
-
         return hasMoved;
     }
 
@@ -952,6 +948,41 @@ public class Collection {
         content = content.replaceAll(oldUri + "/", newUri + "/");
 
         Files.write(file.toPath(), content.getBytes());
+    }
+
+    public boolean renameContent(String email, String fromUri, String toUri) throws IOException {
+        boolean hasRenamed = false;
+
+        if (inProgress.exists(fromUri)) {
+            hasRenamed = renameContent(inProgress, fromUri, toUri);
+        }
+        if (complete.exists(fromUri)) {
+            hasRenamed = renameContent(complete, fromUri, toUri);
+        }
+        if (reviewed.exists(fromUri)) {
+            hasRenamed = renameContent(reviewed, fromUri, toUri);
+        }
+
+        if (hasRenamed) addEvent(fromUri, new Event(new Date(), EventType.RENAMED, email));
+
+        return hasRenamed;
+    }
+
+    private boolean renameContent(Content content, String fromUri, String toUri) throws IOException {
+        File fromFile = content.toPath(fromUri).toFile();
+        File toFile = content.toPath(toUri).toFile();
+
+        if (!fromFile.getParent().equals(toFile.getParent())) {
+            return false;
+        }
+
+        if (fromFile.isDirectory()) {
+            return false;
+        }
+
+        toFile.delete(); // delete an existing file if it is to be overwritten.
+        FileUtils.moveFile(fromFile, toFile);
+        return true;
     }
 }
 

@@ -13,5 +13,6 @@ public enum EventType {
     UNLOCKED,
     PUBLISHED,
     VERSIONED,
-    MOVED
+    MOVED,
+    RENAMED,
 }

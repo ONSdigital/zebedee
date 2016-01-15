@@ -8,10 +8,6 @@
       "type": {
         "type": "string"
       },
-      "title_edition" : {
-        "type": "string",
-        "analyzer" : "ons_detailed"
-      },
       "description": {
         "properties": {
           "cdid": {
@@ -25,10 +21,13 @@
           "title": {
             "type": "string",
             "analyzer" : "ons_detailed",
-            "copy_to" : "title_edition",
             "fields": {
               "title_raw": {
                 "type": "string"
+              },
+              "title_no_dates" : {
+                "type" : "string",
+                "analyzer" : "ons_detailed_clear_dates"
               },
               "title_first_letter" : {
                 "type": "string",
@@ -38,8 +37,7 @@
           },
           "edition": {
             "type": "string",
-            "analyzer" : "ons_detailed",
-            "copy_to" : "title_edition"
+            "analyzer" : "ons_detailed"
           },
           "metaDescription": {
             "type": "string",

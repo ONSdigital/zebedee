@@ -11,7 +11,6 @@ analysis :
     #Used for analyzing fields that needs to be searcahable, does not include synonyms or stemming
     ons_standard :
       tokenizer : standard
-      char_filter : char_mapping
       filter :
         - lowercase
         - standard
@@ -19,7 +18,15 @@ analysis :
     #Including detailed analysis like synonyms and stemming, currently only used on detail title field analysis
     ons_detailed :
       tokenizer : standard
-      char_filter : char_mapping
+      filter :
+        - lowercase
+        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
+        - standard
+        - stop
+        - porter_stem
+    ons_detailed_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
+      tokenizer : standard
+      char_filter : clear_dates
       filter :
         - lowercase
         - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
@@ -34,10 +41,9 @@ analysis :
         - lowercase
         - first_letter
   char_filter :
-    char_mapping :
-      type: mapping
-      mappings :
-        - "&=>and"
+    clear_dates :
+      type: pattern_replace
+      pattern : "([1|2]\\d{3})|((?i)january|february|march|april|may|june|july|august|september|october|november|december)"
   filter :
     first_letter :
       type : pattern_replace

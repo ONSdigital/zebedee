@@ -18,6 +18,10 @@
             "type": "string",
             "analyzer": "ons_standard"
           },
+          "searchBoost" : {
+            "type" : "string",
+            "analyzer" : "ons_detailed"
+          },
           "title": {
             "type": "string",
             "analyzer" : "ons_detailed",

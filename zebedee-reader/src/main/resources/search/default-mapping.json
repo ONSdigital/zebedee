@@ -51,7 +51,7 @@
           },
           "keywords": {
             "type": "string",
-            "analyzer": "ons_standard",
+            "analyzer": "ons_detailed",
             "fields": {
               "keywords_raw": {
                 "type": "string"

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.data;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
@@ -1136,16 +1137,21 @@ public class DataPublisher {
     /**
      * Get the URL for the Brian ConvertCSDB endpoint
      *
-     * @return
+     * @return 
      */
     URI csdbURI() {
-        String cdsbURL = env.get("brian_url") + "/Services/ConvertCSDB";
+        String csdbURL = "";
+        if (env.containsKey("brian_url")) {
+            csdbURL = env.get("brian_url") + "/Services/ConvertCSDB";
+        } else {
+            csdbURL = Configuration.getBrianUrl();
+        }
         URI url = null;
         try {
-            URIBuilder uriBuilder = new URIBuilder(cdsbURL);
+            URIBuilder uriBuilder = new URIBuilder(csdbURL);
             url = uriBuilder.build();
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Data services URL not found: " + cdsbURL);
+            throw new RuntimeException("Data services URL not found: " + csdbURL);
         }
         return url;
     }

@@ -24,13 +24,16 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 public class DataLink {
+    // Store env (for tests)
     public Map<String, String> env = System.getenv();
 
     /**
      * Post a csdb file to the brian Services/ConvertCSDB endpoint
-     * @param uri
-     * @param collectionReader
-     * @return
+     *
+     * @param uri the path to the file that will be sent to brian
+     * @param collectionReader a collectionReader
+     *
+     * @return a list of TimeSeries objects found by Brian
      * @throws IOException
      */
     public TimeSerieses callBrianToProcessCSDB(String uri, CollectionContentReader collectionReader) throws IOException, ZebedeeException {
@@ -59,12 +62,12 @@ public class DataLink {
     }
 
 
-    private TimeSerieses callBrian(String fileUri, CollectionReader collectionReader, URI endpointUri) throws ZebedeeException, IOException {
+    private TimeSerieses callBrian(String fileUri, CollectionContentReader collectionContentReader, URI endpointUri) throws ZebedeeException, IOException {
         // Add csdb file as a binary
         HttpPost post = new HttpPost(endpointUri);
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
 
-        Resource resource = collectionReader.getResource(fileUri);
+        Resource resource = collectionContentReader.getResource(fileUri);
         InputStreamBody body = new InputStreamBody(resource.getData(), resource.getName());
         multipartEntityBuilder.addPart("file", body);
 
@@ -121,6 +124,7 @@ public class DataLink {
         } else {
             csdbURL = Configuration.getBrianUrl() + endpoint;
         }
+        
         URI url = null;
         try {
             URIBuilder uriBuilder = new URIBuilder(csdbURL);

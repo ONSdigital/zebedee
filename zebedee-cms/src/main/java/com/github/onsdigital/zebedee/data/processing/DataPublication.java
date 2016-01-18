@@ -43,8 +43,7 @@ public class DataPublication {
 
         // Process each returned timeseries
         for(TimeSeries series: serieses) {
-            TimeSeriesProcessor processor = new TimeSeriesProcessor(reviewedContentReader, reviewedContentWriter, details);
-            results.add(processor.process(series));
+            results.add(new TimeSeriesProcessor().process(publishedContentReader, reviewedContentReader, reviewedContentWriter, details, series));
         }
 
         // Generate data files

@@ -565,7 +565,9 @@ public class Collections {
 
         try {
             for (FileItem item : upload.parseRequest(request)) {
-                collectionWriter.getInProgress().write(item.getInputStream(), uri);
+                try (InputStream inputStream = item.getInputStream()) {
+                    collectionWriter.getInProgress().write(inputStream, uri);
+                }
             }
         } catch (Exception e) {
             throw new IOException("Error processing uploaded file", e);
@@ -644,6 +646,33 @@ public class Collections {
         }
 
         collection.moveContent(session.email, uri, newUri);
+        collection.save();
+    }
+
+    public void renameContent(Session session, Collection collection, String uri, String toUri) throws BadRequestException, IOException, UnauthorizedException {
+
+        if (collection == null) {
+            throw new BadRequestException("Please specify a collection");
+        }
+
+        // Authorisation
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        if (StringUtils.isBlank(uri)) {
+            throw new BadRequestException("Please provide a URI");
+        }
+
+        if (StringUtils.isBlank(toUri)) {
+            throw new BadRequestException("Please provide a new URI");
+        }
+
+        if (zebedee.published.exists(uri)) {
+            throw new BadRequestException("You cannot move or rename a file that is already published.");
+        }
+
+        collection.renameContent(session.email, uri, toUri);
         collection.save();
     }
 

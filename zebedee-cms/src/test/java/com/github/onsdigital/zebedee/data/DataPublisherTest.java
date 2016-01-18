@@ -21,6 +21,8 @@ import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
+import com.github.onsdigital.zebedee.configuration.Configuration;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -209,6 +211,21 @@ public class DataPublisherTest {
         // Then
         // we expect a standard response
         assertEquals("/csdbURIShouldComeFromEnvVariable/Services/ConvertCSDB", uri.toString());
+    }
+    @Test
+    public void urlForBrian_whenEnvVariablesNotSet_givesURIBasedOnConfigurationDefault() throws Exception {
+        // Given
+        // we set the env variable
+        DataPublisher dataPublisher = new DataPublisher();
+        dataPublisher.env = new HashMap<>();
+
+        // When
+        // we get the service csdbURI
+        URI uri = dataPublisher.csdbURI();
+
+        // Then
+        // we expect a standard response
+        assertEquals(Configuration.getBrianUrl() + "/Services/ConvertCSDB", uri.toString());
     }
 
     @Test

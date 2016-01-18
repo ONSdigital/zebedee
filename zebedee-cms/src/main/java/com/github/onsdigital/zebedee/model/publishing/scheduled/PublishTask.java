@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.publishing;
+package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 
 import java.io.IOException;
 import java.io.OutputStream;

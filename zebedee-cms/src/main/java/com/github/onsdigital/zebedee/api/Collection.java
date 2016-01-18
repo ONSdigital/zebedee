@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 

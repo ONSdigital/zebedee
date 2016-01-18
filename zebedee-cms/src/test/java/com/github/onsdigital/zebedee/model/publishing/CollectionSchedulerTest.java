@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
 import org.elasticsearch.common.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Assert;

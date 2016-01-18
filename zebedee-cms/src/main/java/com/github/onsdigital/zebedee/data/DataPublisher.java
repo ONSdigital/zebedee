@@ -1144,7 +1144,7 @@ public class DataPublisher {
         if (env.containsKey("brian_url")) {
             csdbURL = env.get("brian_url") + "/Services/ConvertCSDB";
         } else {
-            csdbURL = Configuration.getBrianUrl();
+            csdbURL = Configuration.getBrianUrl() + "/Services/ConvertCSDB";
         }
         URI url = null;
         try {

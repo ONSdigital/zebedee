@@ -1,7 +1,10 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +31,12 @@ public class ContentWriter {
             throw new NullPointerException("Root folder can not be null");
         }
         this.ROOT_FOLDER = rootFolder;
+    }
+
+    public void writeObject(Object object, String uri) throws IOException, BadRequestException {
+        try(InputStream stream = IOUtils.toInputStream(ContentUtil.serialise(object))) {
+            write(stream,uri);
+        }
     }
 
     /**

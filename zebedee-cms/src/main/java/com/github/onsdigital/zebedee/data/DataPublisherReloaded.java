@@ -16,25 +16,23 @@ import java.util.List;
 public class DataPublisherReloaded {
 
     /**
-     * Process a collection ready for data publication
      *
-     * @param collectionReader
-     * @param collectionWriter
-     * @param zebedee
+     * @param publishedContentReader reader
+     * @param reviewedContentReader
+     * @param collectionContentWriter
      * @param collection
-     * @param session
      * @throws IOException
      * @throws ZebedeeException
      * @throws URISyntaxException
      */
-    public void preprocessCollection(CollectionContentReader collectionReader, CollectionContentWriter collectionWriter, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
+    public void preprocessCollection(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection) throws IOException, ZebedeeException, URISyntaxException {
 
-        // Find all files that need  in the collection
-        List<DataPublication> dataPublications = new DataPublicationFinder().findPublications(collectionReader, collection);
+        // Find all files that need data preprocessing
+        List<DataPublication> dataPublications = new DataPublicationFinder().findPublications(publishedContentReader, reviewedContentReader, collection);
 
         // For each file in this collection
         for(DataPublication dataPublication: dataPublications) {
-            dataPublication.process(collectionReader, collectionWriter);
+            dataPublication.process(publishedContentReader, reviewedContentReader, collectionContentWriter);
         }
     }
 }

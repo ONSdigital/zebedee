@@ -10,9 +10,6 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 
 import java.io.IOException;
 
-/**
- * Created by thomasridd on 1/16/16.
- */
 public class DataPublication {
     private DataPublicationDetails details = null;
     private TimeSerieses serieses = null;
@@ -21,36 +18,37 @@ public class DataPublication {
     /**
      * Get a new Data publication
      *
-     * @param collectionReader a CollectionContentReader
+     * @param reviewedContentReader a CollectionContentReader
      * @param datasetPageUri a
      */
-    public DataPublication(CollectionContentReader collectionReader, String datasetPageUri) {
+    public DataPublication(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, String datasetPageUri) {
 
         // Setup the publication by backtracking from the dataset
-        details = new DataPublicationDetails(collectionReader, datasetPageUri);
+        details = new DataPublicationDetails(publishedContentReader, reviewedContentReader, datasetPageUri);
     }
 
     /**
-     * Run the full process operation for this data page
+     * Process a specified collection
      *
-     * @param collectionReader
-     * @param collectionWriter
+     * @param publishedContentReader
+     * @param reviewedContentReader
+     * @param reviewedContentWriter
      * @throws IOException
      * @throws ZebedeeException
      */
-    public void process(CollectionContentReader collectionReader, CollectionContentWriter collectionWriter) throws IOException, ZebedeeException {
+    public void process(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter reviewedContentWriter) throws IOException, ZebedeeException {
 
         // send the file for processing
-        callDataLink(collectionReader, details.fileUri);
+        callDataLink(reviewedContentReader, details.fileUri);
 
         // Process each returned timeseries
         for(TimeSeries series: serieses) {
-            TimeSeriesProcessor processor = new TimeSeriesProcessor(collectionReader, collectionWriter, details);
+            TimeSeriesProcessor processor = new TimeSeriesProcessor(reviewedContentReader, reviewedContentWriter, details);
             results.add(processor.process(series));
         }
 
         // Generate data files
-        DataFileGenerator generator = new DataFileGenerator(collectionWriter);
+        DataFileGenerator generator = new DataFileGenerator(reviewedContentWriter);
         generator.generateDataFiles(this.details, this.results);
     }
 

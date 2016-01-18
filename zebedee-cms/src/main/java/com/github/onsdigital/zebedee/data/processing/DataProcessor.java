@@ -7,8 +7,8 @@ import com.github.onsdigital.zebedee.model.CollectionContentWriter;
 /**
  * Created by thomasridd on 1/16/16.
  */
-public class TimeSeriesProcessor {
-    public TimeSeriesProcessor() {
+public class DataProcessor {
+    public DataProcessor() {
 
     }
 

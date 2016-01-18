@@ -31,7 +31,6 @@ import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -947,7 +946,7 @@ public class DataPublisher {
             versionTimeseries(zebedee, newPage, uri, correctionNotice, collection, collectionReader, collectionWriter);
 
         // Save the new page to reviewed
-        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(newPage)), uri + "/data.json");
+        collectionWriter.getReviewed().writeObject(newPage, uri + "/data.json");
 
         // Write csv and other files:
         return newPage;
@@ -1060,7 +1059,7 @@ public class DataPublisher {
         sections.add(csvSection);
         dataset.setDownloads(sections);
 
-        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(dataset)), datasetUri + "/data.json");
+        collectionWriter.getReviewed().writeObject(dataset, datasetUri + "/data.json");
     }
 
     private DownloadSection newDownloadSection(String title, String file) {

@@ -1,6 +1,6 @@
 {
   "_default_": {
-    "_all" : {"enabled" : false},
+    "_all": {"enabled": false},
     "dynamic_date_formats": [
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
     ],
@@ -14,34 +14,34 @@
             "type": "string",
             "analyzer": "ons_standard"
           },
-          "datasetId" : {
+          "datasetId": {
             "type": "string",
             "analyzer": "ons_standard"
           },
-          "searchBoost" : {
-            "type" : "string",
-            "analyzer" : "ons_detailed"
+          "searchBoost": {
+            "type": "string",
+            "analyzer": "ons_detailed"
           },
           "title": {
             "type": "string",
-            "analyzer" : "ons_detailed",
+            "analyzer": "ons_detailed",
             "fields": {
               "title_raw": {
                 "type": "string"
               },
-              "title_no_dates" : {
-                "type" : "string",
-                "analyzer" : "ons_detailed_clear_dates"
-              },
-              "title_first_letter" : {
+              "title_no_dates": {
                 "type": "string",
-                "index_analyzer" : "first_letter"
+                "analyzer": "ons_detailed_clear_dates"
+              },
+              "title_first_letter": {
+                "type": "string",
+                "analyzer": "first_letter"
               }
             }
           },
           "edition": {
             "type": "string",
-            "analyzer" : "ons_detailed"
+            "analyzer": "ons_detailed"
           },
           "metaDescription": {
             "type": "string",
@@ -59,6 +59,9 @@
                 "type": "string"
               }
             }
+          },
+          "releaseDate": {
+            "type": "date"
           }
         }
       }

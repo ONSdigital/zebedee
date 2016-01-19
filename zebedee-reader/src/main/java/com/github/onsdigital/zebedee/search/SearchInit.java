@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 
+import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,7 +17,12 @@ import java.util.concurrent.Executors;
 public class SearchInit implements Startup {
     @Override
     public void init() {
-        ElasticSearchClient.init();
+        try {
+            ElasticSearchClient.init();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed starting elastic searc client", e);
+        }
         loadIndex();
 
     }
@@ -24,16 +30,16 @@ public class SearchInit implements Startup {
     private void loadIndex() {
         final ExecutorService thread = Executors.newSingleThreadExecutor();
         thread.submit(() -> {
-            try {
-                Indexer.getInstance().reload();
-                return null;
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Loading search index failed", e);
-            } finally {
-                thread.shutdown();
-            }
-        }
+                    try {
+                        Indexer.getInstance().reload();
+                        return null;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new RuntimeException("Loading search index failed", e);
+                    } finally {
+                        thread.shutdown();
+                    }
+                }
         );
     }
 }

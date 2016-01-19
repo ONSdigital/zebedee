@@ -16,7 +16,6 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
@@ -185,7 +184,8 @@ public class Indexer {
     }
 
     private Settings getSettings() throws IOException {
-        ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder().loadFromUrl(Indexer.class.getResource("/search/index-config.yml"));
+        Settings.Builder settingsBuilder = Settings.builder().
+                loadFromStream("index-config.yml", Indexer.class.getResourceAsStream("/search/index-config.yml"));
         System.out.println("Index settings:\n" + settingsBuilder.internalMap());
         return settingsBuilder.build();
     }
@@ -202,7 +202,7 @@ public class Indexer {
     //acquires global lock
     private void lockGlobal() {
         IndexResponse lockResponse = searchUtils.createDocument("fs", "lock", "global", "{}");
-        if(!lockResponse.isCreated()) {
+        if (!lockResponse.isCreated()) {
             throw new IndexInProgressException();
         }
     }

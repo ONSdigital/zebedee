@@ -190,7 +190,7 @@ public class DataPagesGenerator {
         TimeSeriesDataset timeSeriesDataset = exampleTimeSeriesDataset("Dataset " + datasetId, "current", releaseDate);
 
         landingPage.setDatasets(new ArrayList<>());
-        landingPage.getDatasets().add(new Link(new URI(parentUri + "/datasets/" + datasetId + "/current")));
+        landingPage.getDatasets().add(new Link(new URI( "/" + parentUri + "/datasets/" + datasetId + "/current")));
 
         DownloadSection downloadSection = new DownloadSection();
         downloadSection.setTitle(datasetId + " time series dataset");
@@ -201,18 +201,18 @@ public class DataPagesGenerator {
 
             TimeSeries timeSeries = exampleTimeseries(datasetId + i, datasetId, releaseDate, true, true, true, 4, releaseYear - 1);
             downloadSection.getCdids().add(timeSeries.getCdid());
-            timeSeries.setUri(new URI(parentUri + "/timeseries/" + timeSeries.getCdid().toLowerCase()));
+            timeSeries.setUri(new URI( "/" + parentUri + "/timeseries/" + timeSeries.getCdid().toLowerCase()));
             dataPagesSet.timeSeriesList.add(timeSeries);
         }
 
         timeSeriesDataset.getDownloads().add(downloadSection);
-        timeSeriesDataset.setUri(new URI(parentUri + "/datasets/" + datasetId + "/current"));
+        timeSeriesDataset.setUri(new URI( "/" + parentUri + "/datasets/" + datasetId + "/current"));
         dataPagesSet.timeSeriesDataset = timeSeriesDataset;
 
-        landingPage.setUri(new URI(parentUri + "/datasets/" + datasetId));
+        landingPage.setUri(new URI( "/" + parentUri + "/datasets/" + datasetId));
         dataPagesSet.datasetLandingPage = landingPage;
 
-        dataPagesSet.fileUri = parentUri + "/datasets/" + datasetId + "/" + dataPagesSet.timeSeriesDataset.getDescription().getEdition() + "/" + fileName;
+        dataPagesSet.fileUri = "/" + parentUri + "/datasets/" + datasetId + "/" + dataPagesSet.timeSeriesDataset.getDescription().getEdition() + "/" + fileName;
         return dataPagesSet;
     }
 }

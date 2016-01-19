@@ -4,7 +4,8 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionContentReader;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class DataPublicationFinder {
      * @throws IOException
      * @throws ZebedeeException
      */
-    public List<DataPublication> findPublications(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, Collection collection) throws IOException, ZebedeeException {
+    public List<DataPublication> findPublications(ContentReader publishedContentReader, ContentReader reviewedContentReader, Collection collection) throws IOException, ZebedeeException {
 
         List<DataPublication> results = new ArrayList<>();
 
@@ -33,10 +34,13 @@ public class DataPublicationFinder {
             // Ignoring previous versions loop through the pages
             if (!reviewedUri.toLowerCase().contains("/previous/") && reviewedUri.toLowerCase().endsWith("data.json")) {
 
+                // Strip off data.json
+                String pageUri = reviewedUri.substring(0, reviewedUri.length() - "/data.json".length());
+
                 // Find all timeseries_datasets
-                Page page = reviewedContentReader.getContent(reviewedUri);
+                Page page = reviewedContentReader.getContent(pageUri);
                 if (page.getType() == PageType.timeseries_dataset) {
-                    DataPublication newPublication = new DataPublication(publishedContentReader, reviewedContentReader, reviewedUri);
+                    DataPublication newPublication = new DataPublication(publishedContentReader, reviewedContentReader, pageUri);
                     results.add(newPublication);
                 }
             }

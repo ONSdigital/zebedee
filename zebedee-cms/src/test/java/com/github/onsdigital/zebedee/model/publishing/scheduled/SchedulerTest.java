@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.publishing;
+package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
 import org.joda.time.DateTime;
 import org.junit.After;

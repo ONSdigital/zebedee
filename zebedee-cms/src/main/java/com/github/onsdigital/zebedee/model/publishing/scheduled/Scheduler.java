@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled;
 import com.github.onsdigital.zebedee.util.Log;
 
 import java.util.Date;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,11 +13,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class Scheduler {
 
-    ScheduledThreadPoolExecutor scheduledExecutorService;
+    ScheduledExecutorService scheduledExecutorService;
 
     public Scheduler() {
-        scheduledExecutorService = new ScheduledThreadPoolExecutor(10);
-        scheduledExecutorService.setRemoveOnCancelPolicy(true);
+        this(10); // default thread pool size of 10;
+    }
+
+    public Scheduler(int poolSize) {
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(poolSize);
+        executor.setRemoveOnCancelPolicy(true);
+        this.scheduledExecutorService = executor;
     }
 
     /**

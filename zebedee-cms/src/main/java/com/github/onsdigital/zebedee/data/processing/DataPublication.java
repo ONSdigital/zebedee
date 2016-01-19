@@ -19,7 +19,7 @@ public class DataPublication {
      * @param reviewedContentReader a CollectionContentReader
      * @param datasetPageUri a
      */
-    public DataPublication(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, String datasetPageUri) {
+    public DataPublication(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, String datasetPageUri) throws ZebedeeException, IOException {
 
         // Setup the publication by backtracking from the dataset
         details = new DataPublicationDetails(publishedContentReader, reviewedContentReader, datasetPageUri);
@@ -41,7 +41,7 @@ public class DataPublication {
 
         // Process each returned timeseries
         for(TimeSeries series: serieses) {
-            results.add(new DataProcessor().process(publishedContentReader, reviewedContentReader, reviewedContentWriter, details, series));
+            results.add(new DataProcessor().processTimeseries(publishedContentReader, reviewedContentReader, reviewedContentWriter, details, series));
         }
 
         // Generate data files

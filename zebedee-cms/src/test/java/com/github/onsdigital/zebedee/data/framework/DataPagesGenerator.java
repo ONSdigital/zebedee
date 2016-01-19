@@ -199,20 +199,20 @@ public class DataPagesGenerator {
 
         for (int i = 0; i < timeSeriesCount; i++) {
 
-            TimeSeries timeSeries = exampleTimeseries(datasetId + i, datasetId, releaseDate, true, true, true, 4, 2015);
+            TimeSeries timeSeries = exampleTimeseries(datasetId + i, datasetId, releaseDate, true, true, true, 4, releaseYear - 1);
             downloadSection.getCdids().add(timeSeries.getCdid());
-            timeSeries.setUri(new URI(parentUri + "/timeseries/" + timeSeries.getCdid().toLowerCase() + "/data.json"));
+            timeSeries.setUri(new URI(parentUri + "/timeseries/" + timeSeries.getCdid().toLowerCase()));
             dataPagesSet.timeSeriesList.add(timeSeries);
         }
 
         timeSeriesDataset.getDownloads().add(downloadSection);
-        timeSeriesDataset.setUri(new URI(parentUri + "/datasets/" + datasetId + "/current/data.json"));
+        timeSeriesDataset.setUri(new URI(parentUri + "/datasets/" + datasetId + "/current"));
         dataPagesSet.timeSeriesDataset = timeSeriesDataset;
 
-        landingPage.setUri(new URI(parentUri + "/datasets/" + datasetId + "/data.json"));
+        landingPage.setUri(new URI(parentUri + "/datasets/" + datasetId));
         dataPagesSet.datasetLandingPage = landingPage;
 
-        dataPagesSet.fileUri = parentUri + "/datasets/" + datasetId + "/" + fileName;
+        dataPagesSet.fileUri = parentUri + "/datasets/" + datasetId + "/" + dataPagesSet.timeSeriesDataset.getDescription().getEdition() + "/" + fileName;
         return dataPagesSet;
     }
 }

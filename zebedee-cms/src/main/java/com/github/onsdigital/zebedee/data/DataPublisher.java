@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.data;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
@@ -30,7 +31,6 @@ import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -946,7 +946,7 @@ public class DataPublisher {
             versionTimeseries(zebedee, newPage, uri, correctionNotice, collection, collectionReader, collectionWriter);
 
         // Save the new page to reviewed
-        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(newPage)), uri + "/data.json");
+        collectionWriter.getReviewed().writeObject(newPage, uri + "/data.json");
 
         // Write csv and other files:
         return newPage;
@@ -1059,7 +1059,7 @@ public class DataPublisher {
         sections.add(csvSection);
         dataset.setDownloads(sections);
 
-        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(dataset)), datasetUri + "/data.json");
+        collectionWriter.getReviewed().writeObject(dataset, datasetUri + "/data.json");
     }
 
     private DownloadSection newDownloadSection(String title, String file) {
@@ -1136,16 +1136,21 @@ public class DataPublisher {
     /**
      * Get the URL for the Brian ConvertCSDB endpoint
      *
-     * @return
+     * @return 
      */
     URI csdbURI() {
-        String cdsbURL = env.get("brian_url") + "/Services/ConvertCSDB";
+        String csdbURL = "";
+        if (env.containsKey("brian_url")) {
+            csdbURL = env.get("brian_url") + "/Services/ConvertCSDB";
+        } else {
+            csdbURL = Configuration.getBrianUrl() + "/Services/ConvertCSDB";
+        }
         URI url = null;
         try {
-            URIBuilder uriBuilder = new URIBuilder(cdsbURL);
+            URIBuilder uriBuilder = new URIBuilder(csdbURL);
             url = uriBuilder.build();
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Data services URL not found: " + cdsbURL);
+            throw new RuntimeException("Data services URL not found: " + csdbURL);
         }
         return url;
     }

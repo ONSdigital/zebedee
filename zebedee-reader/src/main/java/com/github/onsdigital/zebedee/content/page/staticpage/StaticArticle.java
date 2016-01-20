@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.content.page.staticpage;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureSection;
 import com.github.onsdigital.zebedee.content.partial.Alert;
 import com.github.onsdigital.zebedee.content.partial.Link;
@@ -19,6 +20,7 @@ public class StaticArticle extends Page {
     private List<Link> relatedDocuments;
     private List<Link> topics;
     private List<Link> links;
+    private List<DownloadSection> downloads;
 
     private List<MarkdownSection> sections = new ArrayList<>();
     private List<MarkdownSection> accordion = new ArrayList<>();
@@ -111,5 +113,13 @@ public class StaticArticle extends Page {
 
     public void setLinks(List<Link> links) {
         this.links = links;
+    }
+
+    public List<DownloadSection> getDownloads() {
+        return downloads;
+    }
+
+    public void setDownloads(List<DownloadSection> downloads) {
+        this.downloads = downloads;
     }
 }

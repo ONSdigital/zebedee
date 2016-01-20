@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.util.Log;
 
-import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
 public class DummyScheduledCollectionsTask extends ScheduledCollectionsTask {
@@ -27,9 +26,5 @@ public class DummyScheduledCollectionsTask extends ScheduledCollectionsTask {
 
     public ScheduledFuture<?> getFuture() {
         return this.future;
-    }
-
-    public Set<String> get() {
-        return this.collectionIds;
     }
 }

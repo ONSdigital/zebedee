@@ -14,19 +14,19 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class ZebedeePublishSchedulerTest {
+public class PublishSchedulerTest {
 
     private Builder builder;
     private Zebedee zebedee;
     private Session session;
-    private ZebedeePublishScheduler scheduler;
+    private PublishScheduler scheduler;
 
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
         session = zebedee.openSession(builder.administratorCredentials);
-        scheduler = new ZebedeePublishScheduler();
+        scheduler = new PublishScheduler(zebedee);
     }
 
     @After
@@ -45,5 +45,6 @@ public class ZebedeePublishSchedulerTest {
 
         scheduler.schedulePublish(collection);
 
+        scheduler.cancelPublish(collection);
     }
 }

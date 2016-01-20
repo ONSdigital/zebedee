@@ -9,13 +9,13 @@ import java.util.Date;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ScheduledCollectionTaskTest {
+public class ScheduledTaskTest {
 
     @Test
     public void testScheduleRunsTask() throws InterruptedException {
 
         // Given a new task.
-        DummyScheduledCollectionsTask task = new DummyScheduledCollectionsTask();
+        DummyScheduledTask task = new DummyScheduledTask();
         Date scheduledDate = new Date(); // now
 
         // When the task is scheduled with a scheduled date of now.
@@ -36,7 +36,7 @@ public class ScheduledCollectionTaskTest {
     public void testScheduleReturnsFalseIfAlreadyScheduled() throws InterruptedException {
 
         // Given a task that is already scheduled.
-        DummyScheduledCollectionsTask task = new DummyScheduledCollectionsTask();
+        DummyScheduledTask task = new DummyScheduledTask();
         Date scheduledDate = DateTime.now().plusSeconds(5).toDate();
         assertTrue(task.schedule(scheduledDate));
 
@@ -53,7 +53,7 @@ public class ScheduledCollectionTaskTest {
     public void testCancel() throws InterruptedException {
 
         // Given a scheduled task
-        DummyScheduledCollectionsTask task = new DummyScheduledCollectionsTask();
+        DummyScheduledTask task = new DummyScheduledTask();
         Date scheduledDate = DateTime.now().plusSeconds(5).toDate();
         task.schedule(scheduledDate);
 

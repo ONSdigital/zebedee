@@ -5,12 +5,12 @@ import com.github.onsdigital.zebedee.util.Log;
 
 import java.util.concurrent.ScheduledFuture;
 
-public class DummyScheduledCollectionsTask extends ScheduledCollectionsTask {
+public class DummyScheduledTask extends ScheduledTask {
 
     private boolean runComplete = false;
     final String id = Random.id();
 
-    public DummyScheduledCollectionsTask() {
+    public DummyScheduledTask() {
         super();
     }
 

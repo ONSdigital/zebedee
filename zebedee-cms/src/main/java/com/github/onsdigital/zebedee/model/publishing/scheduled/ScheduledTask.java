@@ -7,7 +7,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Abstract class representing a task that runs at a particular time for a number of collections.
  */
-public abstract class ScheduledCollectionsTask implements Runnable {
+public abstract class ScheduledTask implements Runnable {
 
     protected ScheduledFuture<?> future; // The reference to the future of the task.
     protected Date scheduledDate;

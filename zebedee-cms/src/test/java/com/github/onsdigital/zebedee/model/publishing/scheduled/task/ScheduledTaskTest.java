@@ -1,5 +1,6 @@
-package com.github.onsdigital.zebedee.model.publishing.scheduled;
+package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+import com.github.onsdigital.zebedee.model.publishing.scheduled.task.DummyScheduledTask;
 import com.github.onsdigital.zebedee.util.Log;
 import org.joda.time.DateTime;
 import org.junit.Test;

@@ -1,11 +1,15 @@
-package com.github.onsdigital.zebedee.model.publishing.scheduled;
+package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+
+import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 
 import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Abstract class representing a task that runs at a particular time for a number of collections.
+ * Abstract class representing a task that runs at a scheduled time.
+ * This class takes care of task execution allowing the extended class to just implement
+ * the actual job of the task.
  */
 public abstract class ScheduledTask implements Runnable {
 
@@ -15,7 +19,7 @@ public abstract class ScheduledTask implements Runnable {
     Scheduler scheduler = new Scheduler(1);
 
     /**
-     * Returns false if the task is already scheduled.
+     * Set the task to execute at the give date.
      *
      * @param scheduledDate
      * @return
@@ -30,10 +34,17 @@ public abstract class ScheduledTask implements Runnable {
         return true;
     }
 
+    /**
+     * Cancel this task.
+     */
     public void cancel() {
         future.cancel(false);
     }
 
+    /**
+     * Returns true if the task has been run / completed.
+     * @return
+     */
     public boolean isComplete() {
         return future != null && future.isDone();
     }

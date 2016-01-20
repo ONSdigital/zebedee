@@ -1,10 +1,13 @@
-package com.github.onsdigital.zebedee.model.publishing.scheduled;
+package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.util.Log;
 
 import java.util.concurrent.ScheduledFuture;
 
+/**
+ * ScheduledTask implementation that does nothing but track if it has been run.
+ */
 public class DummyScheduledTask extends ScheduledTask {
 
     private boolean runComplete = false;

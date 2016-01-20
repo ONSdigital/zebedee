@@ -49,4 +49,8 @@ public abstract class ScheduledCollectionsTask implements Runnable {
     public void cancel() {
         future.cancel(false);
     }
+
+    public boolean isComplete() {
+        return future != null && future.isDone();
+    }
 }

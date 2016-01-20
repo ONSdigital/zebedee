@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.CollectionContentReader;
 import com.github.onsdigital.zebedee.model.CollectionContentWriter;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
 
@@ -15,14 +17,18 @@ public class DataPublication {
 
     /**
      * Get a new Data publication
-     *
+     *  @param publishedContentReader
      * @param reviewedContentReader a CollectionContentReader
      * @param datasetPageUri a
      */
-    public DataPublication(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, String datasetPageUri) {
+    public DataPublication(ContentReader publishedContentReader, ContentReader reviewedContentReader, String datasetPageUri) throws ZebedeeException, IOException {
 
         // Setup the publication by backtracking from the dataset
         details = new DataPublicationDetails(publishedContentReader, reviewedContentReader, datasetPageUri);
+    }
+
+    public DataPublicationDetails getDetails() {
+        return details;
     }
 
     /**
@@ -41,7 +47,7 @@ public class DataPublication {
 
         // Process each returned timeseries
         for(TimeSeries series: serieses) {
-            results.add(new DataProcessor().process(publishedContentReader, reviewedContentReader, reviewedContentWriter, details, series));
+            results.add(new DataProcessor().processTimeseries(publishedContentReader, reviewedContentReader, reviewedContentWriter, details, series));
         }
 
         // Generate data files

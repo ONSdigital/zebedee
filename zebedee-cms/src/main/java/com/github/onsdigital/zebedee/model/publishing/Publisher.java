@@ -51,7 +51,7 @@ public class Publisher {
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
     }
 
-    public static boolean Publish(Zebedee zebedee, Collection collection, String email, boolean skipVerification, CollectionReader collectionReader) throws IOException {
+    public static boolean Publish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
         boolean publishComplete = false;
 
         // First get the in-memory (within-JVM) lock.
@@ -113,17 +113,6 @@ public class Publisher {
         } finally {
             writeLock.unlock();
             Log.print("Collection lock released: " + collection.description.id);
-        }
-
-        if (publishComplete) {
-            long onPublishCompleteStart = System.currentTimeMillis();
-            onPublishComplete(zebedee, collection, skipVerification, collectionReader);
-            Log.print("onPublishComplete process finished for collection %s time taken: %dms",
-                    collection.description.name,
-                    (System.currentTimeMillis() - onPublishCompleteStart));
-            Log.print("Publish complete for collection %s total time taken: %dms",
-                    collection.description.name,
-                    (System.currentTimeMillis() - publishStart));
         }
 
         return publishComplete;
@@ -243,7 +232,7 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    private static boolean onPublishComplete(Zebedee zebedee, Collection collection, boolean skipVerification, CollectionReader collectionReader) throws IOException {
+    public static boolean postPublish(Zebedee zebedee, Collection collection, boolean skipVerification, CollectionReader collectionReader) throws IOException {
 
         try {
 

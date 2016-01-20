@@ -309,7 +309,20 @@ public class Collections {
         System.out.println("Going ahead with publish");
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
-        boolean publishComplete = Publisher.Publish(zebedee, collection, session.email, skipVerification, collectionReader);
+        long publishStart = System.currentTimeMillis();
+        boolean publishComplete = Publisher.Publish(collection, session.email, collectionReader);
+
+        if (publishComplete) {
+            long onPublishCompleteStart = System.currentTimeMillis();
+            Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
+            Log.print("postPublish process finished for collection %s time taken: %dms",
+                    collection.description.name,
+                    (System.currentTimeMillis() - onPublishCompleteStart));
+            Log.print("Publish complete for collection %s total time taken: %dms",
+                    collection.description.name,
+                    (System.currentTimeMillis() - publishStart));
+        }
+
         return publishComplete;
     }
 

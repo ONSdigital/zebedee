@@ -13,14 +13,29 @@ import java.util.concurrent.ScheduledFuture;
  */
 public abstract class ScheduledCollectionsTask implements Runnable {
 
-    private final Set<String> collectionIds; // The list of collections ID's used in the task.
-    private final ScheduledFuture<?> future; // The reference to the future of the task.
+    protected Set<String> collectionIds; // The list of collections ID's used in the task.
+    protected ScheduledFuture<?> future; // The reference to the future of the task.
+    protected Date scheduledDate;
 
     Scheduler scheduler = new Scheduler(1);
 
-    public ScheduledCollectionsTask(Date scheduledDate) {
+    public ScheduledCollectionsTask() {
         this.collectionIds = new HashSet<>();
+    }
+
+    /**
+     * Returns false if the task is already scheduled.
+     * @param scheduledDate
+     * @return
+     */
+    public boolean schedule(Date scheduledDate) {
+        if (this.future != null && this.scheduledDate != null) {
+            return false;
+        }
+
+        this.scheduledDate = scheduledDate;
         future = scheduler.schedule(this, scheduledDate);
+        return true;
     }
 
     public void addCollection(Collection collection) {

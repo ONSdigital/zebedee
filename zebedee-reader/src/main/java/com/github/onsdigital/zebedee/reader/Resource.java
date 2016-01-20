@@ -14,7 +14,6 @@ import java.net.URI;
 public class Resource implements Closeable {
     private String name;
     private String mimeType;
-    private long size;//bytes
     private InputStream data;
     private URI uri;
 
@@ -51,16 +50,6 @@ public class Resource implements Closeable {
         if (data != null) {
             getData().close();
         }
-    }
-
-    //Get size in bytes
-    public long getSize() {
-        return size;
-    }
-
-    //set size in bytes
-    public void setSize(long size) {
-        this.size = size;
     }
 
     public URI getUri() {

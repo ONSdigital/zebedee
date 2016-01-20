@@ -1,14 +1,21 @@
 package com.github.onsdigital.zebedee.model.content.item;
 
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import org.apache.commons.io.FileUtils;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
+import com.github.onsdigital.zebedee.util.URIUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
 
 /**
  * A single content item that can contain previous versions.
@@ -22,8 +29,11 @@ public class VersionedContentItem extends ContentItem {
     private static final String VERSION_DIRECTORY = "previous";
     private static final String VERSION_PREFIX = "v";
 
-    public VersionedContentItem(URI uri, Path path) throws NotFoundException {
-        super(uri, path);
+    private final ContentWriter contentWriter;
+
+    public VersionedContentItem(String uri, ContentWriter contentWriter) throws NotFoundException {
+        super(uri);
+        this.contentWriter = contentWriter;
     }
 
     public static String getVersionDirectoryName() {
@@ -46,71 +56,54 @@ public class VersionedContentItem extends ContentItem {
      * Create a version from the given source path. The source path is typically the path to the published content, so
      * it cannot be assumed the current version is in the root path of this VersionedContentItem.
      *
-     * @param versionSourcePath
+     * @param contentRoot
      * @return
      */
-    public ContentItemVersion createVersion(Path versionSourcePath) throws IOException, NotFoundException {
+    public ContentItemVersion createVersion(Path contentRoot, ContentReader contentReader) throws IOException, ZebedeeException {
 
         // create a new directory for the version. e.g. edition/previous/v1
-        String versionIdentifier = createVersionIdentifier(versionSourcePath);
-        Path versionPath = getVersionDirectoryPath().resolve(versionIdentifier);
-        Files.createDirectories(versionPath);
+        Path absolutePath = contentRoot.resolve(URIUtils.removeLeadingSlash(getUri().toString()));
+        String versionIdentifier = createVersionIdentifier(absolutePath);
+        String versionUri = String.format("%s/%s/%s", getUri(), getVersionDirectoryName(), versionIdentifier);
 
-        URI versionUri = URI.create(String.format("%s/%s/%s", getUri(), getVersionDirectoryName(), versionIdentifier));
+        copyFilesIntoVersionDirectory(contentRoot, versionUri, contentReader);
 
-        copyFilesIntoVersionDirectory(versionSourcePath, versionPath);
-
-        return new ContentItemVersion(versionIdentifier, versionPath, this, versionUri);
+        return new ContentItemVersion(versionIdentifier, this, versionUri);
     }
 
     /**
-     * Return true if a previous version exists
+     * Copy only the files (not directories) from the given reader for the given uri.
      *
-     * @return
-     */
-    public boolean versionExists() {
-        if (Files.exists(getVersionDirectoryPath())
-                && getVersionDirectoryPath().toFile().listFiles().length > 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Copy only the files (not directories) from the given source path, into the version path.
-     *
-     * @param versionSourcePath
-     * @param versionPath
+     * @param contentRoot
+     * @param versionUri
+     * @param contentReader
      * @throws IOException
+     * @throws ZebedeeException
      */
-    private void copyFilesIntoVersionDirectory(Path versionSourcePath, Path versionPath) throws IOException {
-        File destinationFile = versionPath.toFile();
+    private void copyFilesIntoVersionDirectory(Path contentRoot, String versionUri, ContentReader contentReader) throws IOException, ZebedeeException {
 
         // Iterate the files in the source directory.
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(versionSourcePath)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri().toString())))) {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) { // ignore directories
-                    FileUtils.copyFileToDirectory(path.toFile(), destinationFile);
+                    String uri = contentRoot.relativize(path).toString();
+                    Resource source = contentReader.getResource(uri);
+
+                    String filename = path.getFileName().toString();
+                    Path versionPath = Paths.get(versionUri).resolve(filename);
+                    try (InputStream inputStream = source.getData()){
+                        contentWriter.write(inputStream, versionPath.toString());
+                    }
                 }
             }
         }
     }
 
     /**
-     * Get the path of the versions folder for this content.
-     *
-     * @return
-     */
-    public Path getVersionDirectoryPath() {
-        return this.getPath().resolve(getVersionDirectoryName());
-    }
-
-    /**
      * Determine the version identifier of the next version.
      *
-     * @return
      * @param versionSourcePath
+     * @return
      */
     private String createVersionIdentifier(Path versionSourcePath) {
 
@@ -125,16 +118,16 @@ public class VersionedContentItem extends ContentItem {
         return VERSION_PREFIX + version;
     }
 
-    /**
-     * Delete the versions directory from this versioned content item.
-     * <p>
-     * This is used for removing any versions from a collection for a particular content item.
-     */
-    public void deleteVersionDirectory() throws IOException {
-        Path versionDirectory = this.getPath().resolve(getVersionDirectoryName());
+    public boolean versionExists(Content content) {
 
-        if (Files.exists(versionDirectory)) {
-            FileUtils.deleteDirectory(versionDirectory.toFile());
+        Path path = content.get(getUri().toString());
+        if (path != null) {
+            Path destinationPath = path.resolve(VersionedContentItem.getVersionDirectoryName());
+
+            if (destinationPath != null && Files.exists(destinationPath) && destinationPath.toFile().listFiles().length > 0) {
+                return true;
+            }
         }
+        return false;
     }
 }

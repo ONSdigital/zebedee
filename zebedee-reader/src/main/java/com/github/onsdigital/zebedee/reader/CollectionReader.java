@@ -57,6 +57,17 @@ public abstract class CollectionReader {
         return findResource(path);
     }
 
+    public long getContentLength(String path) throws ZebedeeException, IOException {
+        long length = getContentLengthQuiet(path, inProgress);
+        if (length == 0) {
+            length = getContentLengthQuiet(path, complete);
+            if (length == 0) {
+                length = reviewed.getContentLength(path);
+            }
+        }
+        return length;
+    }
+
     /**
      * @param path
      * @return uri-node mapping
@@ -91,9 +102,9 @@ public abstract class CollectionReader {
     }
 
     private Page findContent(String path) throws IOException, ZebedeeException {
-        Page page = getContentQuite(path, inProgress);
+        Page page = getContentQuiet(path, inProgress);
         if (page == null) {
-            page = getContentQuite(path, complete);
+            page = getContentQuiet(path, complete);
             if (page == null) {
                 page = reviewed.getContent(path);
             }
@@ -101,11 +112,10 @@ public abstract class CollectionReader {
         return page;
     }
 
-
     private Resource findResource(String path) throws IOException, ZebedeeException {
-        Resource resource = getQuite(path, inProgress);
+        Resource resource = getQuiet(path, inProgress);
         if (resource == null) {
-            resource = getQuite(path, complete);
+            resource = getQuiet(path, complete);
             if (resource == null) {
                 resource = reviewed.getResource(path);
             }
@@ -114,7 +124,7 @@ public abstract class CollectionReader {
     }
 
     //If content not found with given reader do not shout
-    private Resource getQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+    private Resource getQuiet(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
             return contentReader.getResource(path);
         } catch (NotFoundException e) {
@@ -122,8 +132,15 @@ public abstract class CollectionReader {
         }
     }
 
+    private long getContentLengthQuiet(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+        try {
+            return contentReader.getContentLength(path);
+        } catch (NotFoundException e) {
+            return 0;
+        }
+    }
 
-    private Page getContentQuite(String path, ContentReader contentReader) throws ZebedeeException, IOException {
+    private Page getContentQuiet(String path, ContentReader contentReader) throws ZebedeeException, IOException {
         try {
             return contentReader.getContent(path);
         } catch (NotFoundException e) {
@@ -174,5 +191,4 @@ public abstract class CollectionReader {
         reviewed.setLanguage(language);
         complete.setLanguage(language);
     }
-
 }

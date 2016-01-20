@@ -3,11 +3,11 @@ package com.github.onsdigital.zebedee.model.publishing;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
-import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
@@ -16,16 +16,16 @@ import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
-import com.github.onsdigital.zebedee.util.ContentTree;
-import com.github.onsdigital.zebedee.util.Log;
-import com.github.onsdigital.zebedee.util.URIUtils;
-import com.github.onsdigital.zebedee.util.ZipUtils;
+import com.github.onsdigital.zebedee.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
@@ -51,7 +51,7 @@ public class Publisher {
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
     }
 
-    public static boolean Publish(Zebedee zebedee, Collection collection, String email, boolean skipVerification) throws IOException {
+    public static boolean Publish(Zebedee zebedee, Collection collection, String email, boolean skipVerification, CollectionReader collectionReader) throws IOException {
         boolean publishComplete = false;
 
         // First get the in-memory (within-JVM) lock.
@@ -92,7 +92,7 @@ public class Publisher {
                         return false;
                     }
 
-                    publishComplete = PublishFilesToWebsite(collection, email);
+                    publishComplete = PublishFilesToWebsite(collection, email, collectionReader);
 
                     long msTaken = (System.currentTimeMillis() - publishStart);
                     Log.print("Publish process finished for collection %s complete: %s time taken: %dms",
@@ -117,7 +117,7 @@ public class Publisher {
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();
-            onPublishComplete(zebedee, collection, skipVerification);
+            onPublishComplete(zebedee, collection, skipVerification, collectionReader);
             Log.print("onPublishComplete process finished for collection %s time taken: %dms",
                     collection.description.name,
                     (System.currentTimeMillis() - onPublishCompleteStart));
@@ -137,7 +137,7 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    private static boolean PublishFilesToWebsite(Collection collection, String email) throws IOException {
+    private static boolean PublishFilesToWebsite(Collection collection, String email, CollectionReader collectionReadereader) throws IOException {
 
         boolean publishComplete = false;
         String encryptionPassword = Random.password(100);
@@ -149,7 +149,7 @@ public class Publisher {
 
             // Publish each item of content:
             for (String uri : collection.reviewed.uris()) {
-                publishFile(collection, email, encryptionPassword, pool, results, uri);
+                publishFile(collection, email, encryptionPassword, pool, results, uri, collectionReadereader);
             }
 
             // Check the publishing results:
@@ -194,7 +194,15 @@ public class Publisher {
         return publishComplete;
     }
 
-    private static void publishFile(Collection collection, String email, String encryptionPassword, ExecutorService pool, List<Future<IOException>> results, String uri) {
+    private static void publishFile(
+            Collection collection,
+            String email,
+            String encryptionPassword,
+            ExecutorService pool,
+            List<Future<IOException>> results,
+            String uri,
+            CollectionReader reader
+    ) {
         Path source = collection.reviewed.get(uri);
         if (source != null) {
             boolean zipped = false;
@@ -207,7 +215,7 @@ public class Publisher {
                 publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
             }
 
-            results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, publishUri, zipped, source, pool));
+            results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, publishUri, zipped, source, reader, pool));
         }
 
         // Add an event to the event log
@@ -223,32 +231,31 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    private static boolean onPublishComplete(Zebedee zebedee, Collection collection, boolean skipVerification) throws IOException {
+    private static boolean onPublishComplete(Zebedee zebedee, Collection collection, boolean skipVerification, CollectionReader collectionReader) throws IOException {
 
         try {
 
-            unzipTimeseries(collection);
-
-            copyFilesToMaster(zebedee, collection);
+            unzipTimeseries(collection, collectionReader, zebedee);
+            copyFilesToMaster(zebedee, collection, collectionReader);
 
             Log.print("Reindexing search");
             reindexSearch(collection);
 
+            new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
+
             // move collection files to archive
-            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection);
+            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 
             // send a slack success message
             sendSlackMessageForCollection(collectionJsonPath);
 
             if (!skipVerification) {
                 // add to published collections list
-                indexPublishReport(zebedee, collectionJsonPath);
+                indexPublishReport(zebedee, collectionJsonPath, collectionReader);
             }
 
             collection.delete();
-
             ContentTree.dropCache();
-
             return true;
         } catch (Exception exception) {
             Log.print("An error occurred during the publish cleanupon collection %s: %s", collection.description.name, exception.getMessage());
@@ -258,15 +265,12 @@ public class Publisher {
         return false;
     }
 
-    private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath) {
-        pool.submit(new Runnable() {
-            @Override
-            public void run() {
-                Log.print("Indexing publish report");
-                PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
-                if(Configuration.isVerificationEnabled()) {
-                    zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath);
-                }
+    private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
+        pool.submit(() -> {
+            Log.print("Indexing publish report");
+            PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
+            if (Configuration.isVerificationEnabled()) {
+                zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
             }
         });
     }
@@ -276,18 +280,21 @@ public class Publisher {
      * on the publishing side
      *
      * @param collection
+     * @param zebedee
      * @throws IOException
      */
-    private static void unzipTimeseries(Collection collection) throws IOException {
+    private static void unzipTimeseries(Collection collection, CollectionReader collectionReader, Zebedee zebedee) throws IOException, ZebedeeException {
         Log.print("Unzipping files if required to move to master.");
         for (String uri : collection.reviewed.uris()) {
             Path source = collection.reviewed.get(uri);
             if (source != null) {
                 if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
                     String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
-                    Path publishPath = collection.reviewed.path.resolve(publishUri);
-                    Log.print("Unzipping %s to %s", source, publishPath);
-                    ZipUtils.unzip(source.toFile(), publishPath.toString());
+                    Path publishPath = zebedee.published.path.resolve(publishUri);
+                    Log.print("Unzipping %s to %s", source.toString(), publishPath.toString());
+
+                    Resource resource = collectionReader.getResource(uri);
+                    ZipUtils.unzip(resource.getData(), publishPath.toString());
                 }
             }
         }
@@ -305,7 +312,9 @@ public class Publisher {
         // publishbot requires a Slack token (which is generated for a specific team) and a channel name to publish to
         String slackToken = System.getenv("publishbot_token");
         String slackChannel = System.getenv("publishbot_channel");
-        if (slackToken == null || slackChannel == null) { return; }
+        if (slackToken == null || slackChannel == null) {
+            return;
+        }
 
         try (InputStream input = Files.newInputStream(collectionJsonPath)) {
             PublishedCollection publishedCollection = Serialiser.deserialise(input,
@@ -327,13 +336,14 @@ public class Publisher {
             Log.print("Failed to slack message for published collection with path %s", collectionJsonPath.toString());
         }
     }
-    
+
     private static Future<Exception> sendSlackMessage(
             final Host host,
             final String token, final String channel,
             final String userName, final String emoji,
             final String text,
-            ExecutorService pool) {
+            ExecutorService pool
+    ) {
         return pool.submit(new Callable<Exception>() {
             @Override
             public Exception call() throws Exception {
@@ -353,6 +363,7 @@ public class Publisher {
             }
         });
     }
+
     private static String publicationMessage(PublishedCollection publishedCollection) throws ParseException {
         Result result = publishedCollection.publishResults.get(0);
         String startDate = result.transaction.startDate;
@@ -364,7 +375,7 @@ public class Publisher {
         String timeTaken = String.format("%.1f", (endDateTime.getTime() - startDateTime.getTime()) / 1000.0);
 
         String exampleUri = "";
-        for (UriInfo info: result.transaction.uriInfos) {
+        for (UriInfo info : result.transaction.uriInfos) {
             if (info.uri.endsWith("data.json")) {
                 exampleUri = info.uri.substring(0, info.uri.length() - "data.json".length());
                 break;
@@ -392,7 +403,6 @@ public class Publisher {
                 if (isIndexedUri(uri)) {
                     String contentUri = URIUtils.removeLastSegment(uri);
                     reIndexPublishingSearch(contentUri);
-                    reIndexWebsiteSearch(contentUri);
                 }
             }
 
@@ -433,34 +443,28 @@ public class Publisher {
     }
 
     private static void reIndexPublishingSearch(final String uri) throws IOException {
-        pool.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Indexer.getInstance().reloadContent(uri);
-                } catch (Exception e) {
-                    Log.print("Exception reloading search index:");
-                    ExceptionUtils.printRootCauseStackTrace(e);
-                }
+        pool.submit(() -> {
+            try {
+                Indexer.getInstance().reloadContent(uri);
+            } catch (Exception e) {
+                Log.print("Exception reloading search index:");
+                ExceptionUtils.printRootCauseStackTrace(e);
             }
         });
     }
 
-    public static void copyFilesToMaster(Zebedee zebedee, Collection collection) throws IOException {
+    public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
 
         Log.print("Moving files from collection into master for collection: " + collection.description.name);
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
-
-            Path source = collection.reviewed.get(uri);
-            if (source != null) {
-                Path destination = zebedee.published.toPath(uri);
-                PathUtils.copyFilesInDirectory(source, destination);
-            }
+            Path destination = zebedee.published.toPath(uri);
+            Resource resource = collectionReader.getResource(uri);
+            FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
         }
     }
 
-    public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection) throws IOException {
+    public static Path moveCollectionToArchive(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
 
         Log.print("Moving collection files to archive for collection: " + collection.description.name);
         String filename = PathUtils.toFilename(collection.description.name);
@@ -482,7 +486,11 @@ public class Publisher {
         Files.copy(collectionJsonSource, collectionJsonDestination);
 
         Log.print("Moving collection files from %s to %s", collectionFilesSource, collectionFilesDestination);
-        FileUtils.moveDirectoryToDirectory(collectionFilesSource.toFile(), collectionFilesDestination.toFile(), true);
+        for (String uri : collection.reviewed.uris()) {
+            Resource resource = collectionReader.getResource(uri);
+            File destination = collectionFilesDestination.resolve(URIUtils.removeLeadingSlash(uri)).toFile();
+            FileUtils.copyInputStreamToFile(resource.getData(), destination);
+        }
 
         return collectionJsonDestination;
     }
@@ -523,26 +531,29 @@ public class Publisher {
             final String transactionId,
             final String encryptionPassword,
             final String uri,
+            final String publishUri,
             final boolean zipped,
             final Path source,
-            ExecutorService pool) {
-        return pool.submit(new Callable<IOException>() {
-            @Override
-            public IOException call() throws Exception {
-                IOException result = null;
-                try (Http http = new Http()) {
-                    Endpoint publish = new Endpoint(host, "publish")
-                            .setParameter("transactionId", transactionId)
-                            .setParameter("encryptionPassword", encryptionPassword)
-                            .setParameter("zip", Boolean.toString(zipped))
-                            .setParameter("uri", uri);
-                    Response<Result> response = http.postFile(publish, source, Result.class);
-                    checkResponse(response);
-                } catch (IOException e) {
-                    result = e;
-                }
-                return result;
+            final CollectionReader reader,
+            ExecutorService pool
+    ) {
+        return pool.submit(() -> {
+            IOException result = null;
+            try (Http http = new Http()) {
+                Endpoint publish = new Endpoint(host, "publish")
+                        .setParameter("transactionId", transactionId)
+                        .setParameter("encryptionPassword", encryptionPassword)
+                        .setParameter("zip", Boolean.toString(zipped))
+                        .setParameter("uri", publishUri);
+
+                Resource resource = reader.getResource(uri);
+                Response<Result> response = http.post(publish, resource.getData(), source.getFileName().toString(), Result.class);
+                checkResponse(response);
+
+            } catch (IOException e) {
+                result = e;
             }
+            return result;
         });
     }
 

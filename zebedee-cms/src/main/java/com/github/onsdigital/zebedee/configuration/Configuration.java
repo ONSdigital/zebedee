@@ -14,7 +14,6 @@ public class Configuration {
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
 
-    private static final String DEFAULT_VERIFICATION_URL = "http://localhost:8080";
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
 
@@ -39,7 +38,7 @@ public class Configuration {
     }
 
     public static String getDefaultVerificationUrl() {
-        return StringUtils.defaultIfBlank(getValue("verification_url"), DEFAULT_WEBSITE_URL);
+        return StringUtils.defaultIfBlank(getValue("verification_url"), getWebsiteUrl());
     }
 
     public static int getVerifyRetrtyDelay() {

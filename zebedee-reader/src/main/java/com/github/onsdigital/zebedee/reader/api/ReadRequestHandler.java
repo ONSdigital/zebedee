@@ -115,7 +115,28 @@ public class ReadRequestHandler {
             }
         }
         return reader.getPublishedResource(uri);
+    }
 
+    /**
+     * Finds requested resource , if a collection resource is required handles authorisation
+     *
+     * @param request
+     * @return
+     * @throws ZebedeeException
+     * @throws IOException
+     */
+    public long getContentLength(HttpServletRequest request) throws ZebedeeException, IOException {
+        String uri = extractUri(request);
+        String collectionId = getCollectionId(request);
+        if (collectionId != null) {
+            try {
+                String sessionId = RequestUtils.getSessionId(request);
+                return reader.getCollectionContentLength(collectionId, sessionId, uri);
+            } catch (NotFoundException e) {
+                System.out.println("Could not find " + uri + " under collection " + collectionId + ", trying published content");
+            }
+        }
+        return reader.getPublishedContentLength(uri);
     }
 
     public Collection<ContentNode> getTaxonomy(HttpServletRequest request, int depth) throws ZebedeeException, IOException {

@@ -2,9 +2,13 @@ package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,9 +56,11 @@ public class PublishTask implements Runnable {
 
                 // Publish the s
                 boolean skipVerification = false;
-                Publisher.Publish(zebedee, collection, "System", skipVerification);
+
+                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.keyringCache.schedulerCache.get(collectionId));
+                Publisher.Publish(zebedee, collection, "System", skipVerification, collectionReader);
             }
-        } catch (IOException e) {
+        } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
             System.out.println("Exception publishing collection for ID" + collectionId + " exception:" + e.getMessage());
         }
     }

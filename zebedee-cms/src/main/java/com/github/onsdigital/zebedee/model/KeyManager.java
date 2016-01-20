@@ -18,7 +18,7 @@ import java.util.Set;
 public class KeyManager {
 
     /**
-     * Distributes an encryption key
+     * Distributes an encryption key to all users
      *
      * @param session    session for a user that possesses the key
      * @param collection a collection
@@ -29,14 +29,33 @@ public class KeyManager {
 
         // Distribute to all users that should have access
         for (User user : zebedee.users.list()) {
-            if (userShouldAccessCollection(zebedee, user, collection)) {
-                // Add the key
-                assignKeyToUser(zebedee, user, collection, key);
-            }
+            distributeKeyToUser(zebedee, collection, key, user);
         }
 
         // Add to the cached scheduler keyring
         zebedee.keyringCache.schedulerCache.put(collection.description.id, key);
+    }
+
+    /**
+     * Determine if the user should have the key assigned or removed for the given collection.
+     * @param zebedee
+     * @param collection
+     * @param session
+     * @param user
+     * @throws IOException
+     */
+    public static void distributeKeyToUser(Zebedee zebedee, Collection collection, Session session, User user) throws IOException {
+        SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
+        distributeKeyToUser(zebedee, collection, key, user);
+    }
+
+    private static void distributeKeyToUser(Zebedee zebedee, Collection collection, SecretKey key, User user) throws IOException {
+        if (userShouldHaveKey(zebedee, user, collection)) {
+            // Add the key
+            assignKeyToUser(zebedee, user, collection, key);
+        } else {
+            removeKeyFromUser(zebedee, user, collection);
+        }
     }
 
     /**
@@ -54,13 +73,43 @@ public class KeyManager {
         user.keyring.put(collection.description.id, key);
         zebedee.users.updateKeyring(user);
 
-        // If the user is locked in assign the key to their cached keyring
+        // If the user is logged in assign the key to their cached keyring
         Session session = zebedee.sessions.find(user.email);
         if (session != null) {
             Keyring keyring = zebedee.keyringCache.get(session);
             try {
                 if (keyring != null)
                     keyring.put(collection.description.id, key);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Remove the collection key for the given user.
+     * This method is intentionally private as the distribute* methods should be used
+     * to re-evaluate whether a key should be removed instead of just removing it.
+     * @param zebedee
+     * @param user
+     * @param collection
+     * @throws IOException
+     */
+    private static void removeKeyFromUser(Zebedee zebedee, User user, Collection collection) throws IOException {
+        // Escape in case user keyring has not been generated
+        if (user.keyring == null) return;
+
+        // Remove the key from the users keyring and save
+        user.keyring.remove(collection.description.id);
+        zebedee.users.updateKeyring(user);
+
+        // If the user is logged in remove the key from their cached keyring
+        Session session = zebedee.sessions.find(user.email);
+        if (session != null) {
+            Keyring keyring = zebedee.keyringCache.get(session);
+            try {
+                if (keyring != null)
+                    keyring.remove(collection.description.id);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -101,10 +150,9 @@ public class KeyManager {
         transferKeyring(targetKeyring, sourceKeyring, collectionIds);
     }
 
-    private static boolean userShouldAccessCollection(Zebedee zebedee, User user, Collection collection) throws IOException {
-        if (zebedee.permissions.canEdit(user.email)) return true;
-
-        // TODO logic for team members
+    private static boolean userShouldHaveKey(Zebedee zebedee, User user, Collection collection) throws IOException {
+        if (zebedee.permissions.isAdministrator(user.email)
+                || zebedee.permissions.canView(user, collection.description)) return true;
         return false;
     }
 }

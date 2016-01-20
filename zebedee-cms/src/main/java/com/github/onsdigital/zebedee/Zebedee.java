@@ -19,7 +19,6 @@ import java.nio.file.Paths;
 
 public class Zebedee {
 
-
     public static final String PUBLISHED = "master";
     public static final String COLLECTIONS = "collections";
     static final String PUBLISHED_COLLECTIONS = "publish-log";
@@ -52,7 +51,6 @@ public class Zebedee {
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
         Path teams = path.resolve(TEAMS);
-        Path launchpad = path.resolve(LAUNCHPAD);
 
         if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(

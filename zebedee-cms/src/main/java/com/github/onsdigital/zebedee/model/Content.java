@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -258,7 +259,11 @@ public class Content {
         if (Files.exists(path)) {
             try (InputStream input = Files.newInputStream(path)) {
                 result = Serialiser.deserialise(input, ContentDetail.class);
-                result.uri = PathUtils.toUri(this.path.relativize(path.getParent()));
+                if (result != null) {
+                    result.uri = PathUtils.toUri(this.path.relativize(path.getParent()));
+                } else {
+                    Log.print("Failed to deserialise content details for path %s", PathUtils.toUri(this.path.relativize(path.getParent())).toString());
+                }
             }
         }
         return result;

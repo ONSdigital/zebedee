@@ -54,6 +54,10 @@ public class Permissions {
      */
     public boolean isAdministrator(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
+        return isAdministrator(email, accessMapping);
+    }
+
+    private boolean isAdministrator(String email, AccessMapping accessMapping) {
         return accessMapping.administrators != null && accessMapping.administrators.contains(standardise(email));
     }
 
@@ -235,9 +239,6 @@ public class Permissions {
     /**
      * Determines whether a session has viewing rights.
      *
-     * If a collection has its encrypted flag set returns yes for any user with the key
-     * If not encrypted only gives view permission to publisher/admins
-     *
      * @param session               The user's session. Can be null.
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
@@ -245,19 +246,12 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted) {
-            return session != null && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
-        } else {
-            return session != null && canEdit(session);
-        }
+        return session != null && canView(session.email, collectionDescription);
     }
 
     /**
      * Determines whether the specified user has viewing rights.
-     *
-     * If a collection has its encrypted flag set returns yes for any user with the key
-     * If not encrypted only gives view permission to publisher/admins
-     *
+     **
      * @param user               The user. Can be null.
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
@@ -265,11 +259,9 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
-        if (collectionDescription.isEncrypted) {
-            return user != null && user.keyring.list().contains(collectionDescription.id);
-        } else {
-            return user != null && canEdit(user.email);
-        }
+        AccessMapping accessMapping = readAccessMapping();
+        return user != null && (
+                canEdit(user.email, accessMapping) || canView(user.email, collectionDescription, accessMapping));
     }
 
     /**
@@ -289,20 +281,6 @@ public class Permissions {
             return false;
         }
     }
-
-    /**
-     * Determines whether the specified user has viewing rights.
-     *
-     * @param email                 The user's email.
-     * @param collectionDescription The collection to check access for.
-     * @return True if the user is a member of the Digital Publishing team or
-     * the user is a content owner with access to the given path or any parent path.
-     * @throws IOException If a filesystem error occurs.
-     */
-//    public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
-//        AccessMapping accessMapping = readAccessMapping();
-//        return collectionDescription != null && (canEdit(email, accessMapping) || canView(email, collectionDescription, accessMapping));
-//    }
 
     /**
      * Grants the given team access to the given collection.
@@ -325,6 +303,26 @@ public class Permissions {
         }
         collectionTeams.add(team.id);
         writeAccessMapping(accessMapping);
+    }
+
+    /**
+     * Provide a list of team ID's currently associated with a collection
+     * @param collectionDescription
+     * @param session
+     * @return
+     * @throws IOException
+     * @throws UnauthorizedException
+     */
+    public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws IOException, UnauthorizedException {
+        if (session == null || !canView(session, collectionDescription)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.id);
+        if (teamIds == null) teamIds = new HashSet<>();
+
+        return java.util.Collections.unmodifiableSet(teamIds);
     }
 
     /**
@@ -362,8 +360,8 @@ public class Permissions {
         Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
         if (teams != null) {
             for (Team team : zebedee.teams.listTeams()) {
-                if (teams.contains(team.id)) {
-                    return team.members.contains(standardise(email));
+                if (teams.contains(team.id) && team.members.contains(standardise(email))) {
+                    return true;
                 }
             }
         }
@@ -434,7 +432,7 @@ public class Permissions {
      */
     public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
 
-        if ((session == null) || !isAdministrator(session.email)) {
+        if ((session == null) || (!isAdministrator(session.email) && !session.email.equals(email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

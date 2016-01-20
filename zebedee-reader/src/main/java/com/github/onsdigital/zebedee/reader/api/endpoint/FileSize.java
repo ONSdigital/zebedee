@@ -28,8 +28,7 @@ public class FileSize {
      */
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        try (com.github.onsdigital.zebedee.reader.Resource resource = new ReadRequestHandler(getRequestedLanguage(request)).findResource(request)) {
-            ReaderResponseResponseUtils.sendResponse(new com.github.onsdigital.zebedee.reader.api.bean.FileSize(resource.getSize()), response);
-        }
+        long contentLength = new ReadRequestHandler(getRequestedLanguage(request)).getContentLength(request);
+        ReaderResponseResponseUtils.sendResponse(new com.github.onsdigital.zebedee.reader.api.bean.FileSize(contentLength), response);
     }
 }

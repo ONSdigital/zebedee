@@ -39,15 +39,6 @@ public class CollectionDescription extends CollectionBase {
     public List<Result> publishResults;
 
     /**
-     * TODO: Temporary property.
-     *
-     * This is only needed during migration to encrypted collections.
-     * Once all collections are encrypted this will become redundant.
-     *
-     */
-    public boolean encrypted;
-
-    /**
      * Default constuructor for serialisation.
      */
     public CollectionDescription() {

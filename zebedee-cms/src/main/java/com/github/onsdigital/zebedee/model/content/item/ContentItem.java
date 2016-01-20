@@ -2,10 +2,6 @@ package com.github.onsdigital.zebedee.model.content.item;
 
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 /**
  * Base class to represent a single item of content.
  * <p>
@@ -14,27 +10,17 @@ import java.nio.file.Path;
  */
 public class ContentItem {
 
-    private final URI uri;
-    private final Path path;
+    private final String uri;
 
-    public ContentItem(URI uri, Path path) throws NotFoundException {
+    public ContentItem(String uri) throws NotFoundException {
         this.uri = uri;
-        this.path = path;
-
-        if (!Files.exists(path)) {
-            throw new NotFoundException(String.format("The give path for this content item does not exist: %s", path.toString()));
-        }
     }
 
-    public URI getUri() {
+    /**
+     * The URI of the content path as shown in the data.json
+     * @return
+     */
+    public String getUri() {
         return uri;
-    }
-
-    public Path getPath() {
-        return path;
-    }
-
-    public Path getDataFilePath() {
-        return path.resolve("data.json");
     }
 }

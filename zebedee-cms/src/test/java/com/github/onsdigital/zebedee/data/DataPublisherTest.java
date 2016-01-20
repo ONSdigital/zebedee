@@ -13,10 +13,11 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.FakeCollectionReader;
+import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
@@ -47,6 +48,7 @@ public class DataPublisherTest {
     Session publisher;
     Collection collection;
     CollectionReader collectionReader;
+    CollectionWriter collectionWriter;
 
     String publishedTimeSeriesPath = "/themea/landinga/producta/timeseries/a4fk";
     String publishedTimeSeriesPathAlt = "/themea/landinga/producta/timeseries/a4vr";
@@ -92,6 +94,7 @@ public class DataPublisherTest {
         collection = zebedee.collections.list().getCollection("collection");
 
         collectionReader = new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id);
+        collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
 
         try (InputStream inputStream = getClass().getResourceAsStream(brianPath)) {
             serieses = ContentUtil.deserialise(inputStream, TimeSerieses.class);
@@ -243,7 +246,7 @@ public class DataPublisherTest {
 
         // When
         // we search for csdb datasets with a publisher
-        List<HashMap<String, Path>> datasetsInCollection = DataPublisher.csdbDatasetsInCollection(collection, publisher);
+        List<HashMap<String, String>> datasetsInCollection = DataPublisher.csdbDatasetsInCollection(collection);
 
         // Then
         // we expect two results
@@ -386,7 +389,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed
@@ -405,7 +408,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -423,7 +426,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -442,7 +445,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -463,7 +466,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // a version has been created
@@ -1129,7 +1132,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed
@@ -1150,7 +1153,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
 
         // Then
         // timeseries get created in reviewed
@@ -1162,7 +1165,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void writeXLSX_givenGridOfData_willCreateFile() throws IOException {
+    public void writeXLSX_givenGridOfData_willCreateFile() throws IOException, BadRequestException {
         // Given
         // random data
         List<Path> serieses = new ArrayList<>();
@@ -1175,8 +1178,9 @@ public class DataPublisherTest {
 
         // When
         // we generate an XLSX as a temp file
-        Path path = Files.createTempFile("temporary", ".xlsx");
-        DataPublisher.writeDataGridToXlsx(path, grid);
+        Path tempDirectory = Files.createTempDirectory("xls");
+        Path path = tempDirectory.resolve("temp.xls");
+        DataPublisher.writeDataGridToXlsx(path.toString(), grid, new ContentWriter(path));
 
         // Then
         // It will save a file
@@ -1184,7 +1188,7 @@ public class DataPublisherTest {
     }
 
     @Test
-    public void writeCSV_givenGridOfData_willCreateFile() throws IOException {
+    public void writeCSV_givenGridOfData_willCreateFile() throws IOException, BadRequestException {
         // Given
         // random data
         List<Path> serieses = new ArrayList<>();
@@ -1194,11 +1198,11 @@ public class DataPublisherTest {
         List<TimeSeries> timeSerieses = DataPublisher.timeSeriesesFromPathList(serieses);
         List<List<String>> grid = DataPublisher.gridOfAllDataInTimeSeriesList(timeSerieses);
 
-
         // When
         // we generate an XLSX as a temp file
-        Path path = Files.createTempFile("temporary", ".csv");
-        DataPublisher.writeDataGridToCsv(path, grid);
+        Path tempDirectory = Files.createTempDirectory("csv");
+        Path path = tempDirectory.resolve("temp.csv");
+        DataPublisher.writeDataGridToCsv(path.toString(), grid, new ContentWriter(path));
 
         // Then
         // It will save a file

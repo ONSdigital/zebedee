@@ -18,7 +18,6 @@ import com.github.onsdigital.zebedee.util.URIUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLConnection;
@@ -163,6 +162,24 @@ public class ContentReader {
     }
 
     /**
+     * Determine the content length of the file at the given path.
+     * @param path
+     * @return
+     * @throws ZebedeeException
+     * @throws IOException
+     */
+    public long getContentLength(String path) throws ZebedeeException, IOException {
+        Path resourcePath = resolvePath(path);
+        assertExists(resourcePath);
+        assertNotDirectory(resourcePath);
+        return calculateContentLength(resourcePath);
+    }
+
+    protected long calculateContentLength(Path path) throws IOException {
+        return size(path);
+    }
+
+    /**
      * get child contents under given path, directories with no data.json are returned with no type and directory name as title
      *
      * @param path
@@ -278,21 +295,11 @@ public class ContentReader {
         resource.setMimeType(determineMimeType(path));
         resource.setUri(toRelativeUri(path));
         resource.setData(newInputStream(path));
-        resource.setSize(size(path));
         return resource;
     }
 
     protected Page deserialize(Resource resource) {
         return ContentUtil.deserialiseContent(resource.getData());
-    }
-
-
-    protected void checkJsonMime(Resource resource, Path path) {
-        String mimeType = resource.getMimeType();
-        if (MediaType.APPLICATION_JSON.equals(mimeType) == false) {
-            System.err.println("Warning!!!!! " + path + " mime type is not json, found mime type is :" + mimeType);
-        }
-        return;
     }
 
     private void assertExists(Path path) throws ZebedeeException {

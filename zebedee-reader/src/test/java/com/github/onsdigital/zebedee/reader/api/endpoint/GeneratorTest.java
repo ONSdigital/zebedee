@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,7 +42,6 @@ public class GeneratorTest {
         try (Resource generated = generator.generateData(chart, "csv")) {
             assertNotNull(generated);
             assertNotNull(generated.getName());
-            assertNotEquals(0, generated.getSize());
         }
     }
 
@@ -64,7 +62,6 @@ public class GeneratorTest {
         try (Resource generated = generator.generateData(chart, "xls")) {
             assertNotNull(generated);
             assertNotNull(generated.getName());
-            assertNotEquals(0, generated.getSize());
         }
     }
 
@@ -74,7 +71,6 @@ public class GeneratorTest {
         try (Resource generated = generator.generateData(chart, "xlsx")) {
             assertNotNull(generated);
             assertNotNull(generated.getName());
-            assertNotEquals(0, generated.getSize());
         }
     }
 
@@ -85,16 +81,15 @@ public class GeneratorTest {
         when(request.getParameter("uri")).thenReturn("/employmentandlabourmarket/peopleinwork/earningsandworkinghours/timeseries/a2f8");
         Content content = readRequestHandler.findContent(request, null);
 
-            // When
-            // we generate a csv
-            try( Resource generated = generator.generateData((TimeSeries) content, "csv") ) {
+        // When
+        // we generate a csv
+        try (Resource generated = generator.generateData((TimeSeries) content, "csv")) {
 
-                // Then
-                // we should have a non null file with data in it
-                assertNotNull(generated);
-                assertNotNull(generated.getName());
-                assertNotEquals(0, generated.getSize());
-            }
+            // Then
+            // we should have a non null file with data in it
+            assertNotNull(generated);
+            assertNotNull(generated.getName());
+        }
     }
 
     @Test
@@ -106,13 +101,12 @@ public class GeneratorTest {
 
         // When
         // we generate a csv
-        try( Resource generated = generator.generateData((TimeSeries) content, "xlsx") ) {
+        try (Resource generated = generator.generateData((TimeSeries) content, "xlsx")) {
 
             // Then
             // we should have a non null file with data in it
             assertNotNull(generated);
             assertNotNull(generated.getName());
-            assertNotEquals(0, generated.getSize());
         }
     }
 
@@ -125,13 +119,12 @@ public class GeneratorTest {
 
         // When
         // we generate a csv
-        try( Resource generated = generator.generateData((TimeSeries) content, "xls") ) {
+        try (Resource generated = generator.generateData((TimeSeries) content, "xls")) {
 
             // Then
             // we should have a non null file with data in it
             assertNotNull(generated);
             assertNotNull(generated.getName());
-            assertNotEquals(0, generated.getSize());
         }
     }
 }

@@ -6,7 +6,9 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
+import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.net.URI;
@@ -21,6 +23,10 @@ import java.util.Date;
  */
 public class DataPagesGenerator {
 
+
+    public TimeSeries exampleTimeseries(String cdid, String datasetId) {
+        return exampleTimeseries(cdid, datasetId, new Date(), true, false, false, 10, 2015);
+    }
 
     /**
      * Build an example timeseries page
@@ -42,6 +48,7 @@ public class DataPagesGenerator {
         timeSeries.getDescription().setCdid(cdid);
         timeSeries.getDescription().setTitle(cdid);
         timeSeries.getDescription().setReleaseDate(releaseDate);
+        timeSeries.getDescription().setContact(dummy());
 
         String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
         String[] quarters = "Q1,Q2,Q3,Q4".split(",");
@@ -141,7 +148,7 @@ public class DataPagesGenerator {
         landingPage.getDescription().setTitle(title);
         landingPage.getDescription().setDatasetId(datasetId);
         landingPage.getDescription().setReleaseDate(releaseDate);
-
+        landingPage.getDescription().setContact(dummy());
         landingPage.setDatasets(new ArrayList<>());
 
         return landingPage;
@@ -162,7 +169,7 @@ public class DataPagesGenerator {
         timeSeriesDataset.getDescription().setTitle(title);
         timeSeriesDataset.getDescription().setEdition(edition);
         timeSeriesDataset.getDescription().setReleaseDate(releaseDate);
-
+        timeSeriesDataset.getDescription().setContact(dummy());
         timeSeriesDataset.setDownloads(new ArrayList<>());
 
         return timeSeriesDataset;
@@ -184,6 +191,8 @@ public class DataPagesGenerator {
 
         String dateAsString = releaseYear + "-01-01 00:00:00.0";
         Date releaseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateAsString);
+
+
 
         DatasetLandingPage landingPage = exampleDataLandingPage("Landing Page " + datasetId, datasetId, releaseDate);
 
@@ -212,7 +221,20 @@ public class DataPagesGenerator {
         landingPage.setUri(new URI( "/" + parentUri + "/datasets/" + datasetId));
         dataPagesSet.datasetLandingPage = landingPage;
 
-        dataPagesSet.fileUri = "/" + parentUri + "/datasets/" + datasetId + "/" + dataPagesSet.timeSeriesDataset.getDescription().getEdition() + "/" + fileName;
+        if (fileName.trim().length() == 0) {
+            dataPagesSet.fileUri = null;
+        } else {
+            dataPagesSet.fileUri = "/" + parentUri + "/datasets/" + datasetId + "/" + dataPagesSet.timeSeriesDataset.getDescription().getEdition() + "/" + fileName;
+        }
         return dataPagesSet;
+    }
+
+    Contact dummy() {
+        Contact contact = new Contact();
+        contact.setTelephone("0000000");
+        contact.setOrganisation("ONS");
+        contact.setName("Jukesie");
+        contact.setEmail("jukesie@ons.gov.uk");
+        return contact;
     }
 }

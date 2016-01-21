@@ -14,7 +14,7 @@ public class DataPublicationDetails {
     public String datasetUri;
     public String landingPageUri;
     public String fileUri;
-    private String parentFolderUri;
+    public String parentFolderUri;
 
     public DatasetLandingPage landingPage;
     public TimeSeriesDataset datasetPage;

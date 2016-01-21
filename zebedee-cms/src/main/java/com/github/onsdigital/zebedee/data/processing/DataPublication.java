@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class DataPublication {
     private DataPublicationDetails details = null;
@@ -16,13 +17,12 @@ public class DataPublication {
     private TimeSerieses results = new TimeSerieses();
 
     /**
-     * Get a new Data publication
+     * Setup a a new Data publication
      *  @param publishedContentReader
      * @param reviewedContentReader a CollectionContentReader
      * @param datasetPageUri a
      */
     public DataPublication(ContentReader publishedContentReader, ContentReader reviewedContentReader, String datasetPageUri) throws ZebedeeException, IOException {
-
         // Setup the publication by backtracking from the dataset
         details = new DataPublicationDetails(publishedContentReader, reviewedContentReader, datasetPageUri);
     }
@@ -40,7 +40,7 @@ public class DataPublication {
      * @throws IOException
      * @throws ZebedeeException
      */
-    public void process(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter reviewedContentWriter) throws IOException, ZebedeeException {
+    public void process(ContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter reviewedContentWriter) throws IOException, ZebedeeException, URISyntaxException {
 
         // send the file for processing
         callDataLink(reviewedContentReader, details.fileUri);
@@ -64,11 +64,13 @@ public class DataPublication {
      * @throws IOException
      * @throws ZebedeeException
      */
-    private void callDataLink(CollectionContentReader collectionReader, String fileUri) throws IOException, ZebedeeException {
+    private TimeSerieses callDataLink(CollectionContentReader collectionReader, String fileUri) throws IOException, ZebedeeException {
+        TimeSerieses results = null;
         if (fileUri.toLowerCase().endsWith("csdb")) {
-            serieses = new DataLink().callBrianToProcessCSDB(details.fileUri, collectionReader);
+            results = new DataLink().callBrianToProcessCSDB(details.fileUri, collectionReader);
         } else {
-            serieses = new DataLink().callBrianToProcessCSV(details.fileUri, collectionReader);
+            results = new DataLink().callBrianToProcessCSV(details.fileUri, collectionReader);
         }
+        return results;
     }
 }

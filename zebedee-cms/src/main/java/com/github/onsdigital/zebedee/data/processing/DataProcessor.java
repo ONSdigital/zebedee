@@ -1,31 +1,35 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
+import com.github.onsdigital.zebedee.content.partial.Contact;
+import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.CollectionContentReader;
 import com.github.onsdigital.zebedee.model.CollectionContentWriter;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.Times;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.sql.Time;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by thomasridd on 1/16/16.
  */
 public class DataProcessor {
+    public int updates = 0;
+    public int inserts = 0;
+    public TimeSeries timeSeries = null;
+
     public DataProcessor() {
 
     }
@@ -37,26 +41,160 @@ public class DataProcessor {
      * @param reviewedContentReader
      * @param reviewedContentWriter
      * @param details
-     * @param timeSeries
+     * @param newTimeSeries
      * @return
      */
-    public TimeSeries processTimeseries(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter reviewedContentWriter, DataPublicationDetails details, TimeSeries timeSeries) throws ZebedeeException, IOException {
+    public TimeSeries processTimeseries(ContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter reviewedContentWriter, DataPublicationDetails details, TimeSeries newTimeSeries) throws ZebedeeException, IOException, URISyntaxException {
 
-        // Get the uri to publish this timeseries to
-        String seriesUri = publishPathForTimeseries(timeSeries, details);
+        // Get current version of the time series
+        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details);
 
-        // Start building our processed version
-        TimeSeries processed = initialTimeseries(timeSeries, publishedContentReader, details);
+        // Add meta from the landing page and timeseries dataset page
+        syncLandingPageMetadata(this.timeSeries, details);
+        syncNewTimeSeriesMetadata(this.timeSeries, newTimeSeries);
 
-        // T
+        // Combine the time series values
+        mergeTimeseries(this.timeSeries, newTimeSeries, details);
 
-        // Check if updates have been made to the data
-        if(differencesExist(processed, seriesUri, publishedContentReader)) {
+        return this.timeSeries;
+    }
 
+    /**
+     *
+     *
+     * @param page
+     * @param details
+     * @return
+     * @throws URISyntaxException
+     */
+    TimeSeries syncLandingPageMetadata(TimeSeries page, DataPublicationDetails details) throws URISyntaxException {
+        PageDescription description = page.getDescription();
+        if (description == null) {
+            description = new PageDescription();
+            page.setDescription(description);
+        }
+        description.setNextRelease(details.landingPage.getDescription().getNextRelease());
+        description.setReleaseDate(details.landingPage.getDescription().getReleaseDate());
+
+        // Set some contact details
+        addContactDetails(page, details.landingPage);
+
+        // Add the dataset id to sources if necessary
+        checkDatasetId(page, details.landingPage);
+
+        // Add the dataset id to sources if necessary
+        checkRelatedDatasets(page, details.landingPageUri);
+
+        // Add stats bulletins
+        if (details.landingPage.getRelatedDocuments() != null) {
+            page.setRelatedDocuments(details.landingPage.getRelatedDocuments());
         }
 
-        return null;
+        return page;
     }
+
+    /**
+     * Check if datasetId is listed as a sourceDataset for the timeseries and if not add it
+     *
+     * @param timeSeries
+     * @param landingPage
+     */
+    private static void checkDatasetId(TimeSeries timeSeries, DatasetLandingPage landingPage) {
+        boolean datasetIsNew = true;
+
+        // Check
+        for (String datasetId : timeSeries.sourceDatasets) {
+            if (landingPage.getDescription().getDatasetId().equalsIgnoreCase(datasetId)) {
+                datasetIsNew = false;
+                break;
+            }
+        }
+
+        // Link
+        if (datasetIsNew) {
+            timeSeries.sourceDatasets.add(landingPage.getDescription().getDatasetId().toUpperCase());
+        }
+    }
+
+    /**
+     * Check if a landingPage is listed as a related dataset and if not add it
+     *
+     * @param page
+     * @param landingPageUri
+     * @throws URISyntaxException
+     */
+    private static void checkRelatedDatasets(TimeSeries page, String landingPageUri) throws URISyntaxException {
+        List<Link> relatedDatasets = page.getRelatedDatasets();
+        if (relatedDatasets == null) {
+            relatedDatasets = new ArrayList<>();
+        }
+
+        // Check
+        boolean datasetNotLinked = true;
+        for (Link relatedDataset : relatedDatasets) {
+            if (relatedDataset.getUri().toString().equalsIgnoreCase(landingPageUri)) {
+                datasetNotLinked = false;
+                break;
+            }
+        }
+
+        // Link if necessary
+        if (datasetNotLinked) {
+            relatedDatasets.add(new Link(new URI(landingPageUri)));
+            page.setRelatedDatasets(relatedDatasets);
+        }
+    }
+
+    /**
+     *
+     * @param page
+     * @param datasetPage
+     */
+    private static void addContactDetails(TimeSeries page, DatasetLandingPage datasetPage) {
+        if (datasetPage.getDescription().getContact() != null) {
+            Contact contact = new Contact();
+            if (datasetPage.getDescription().getContact().getName() != null) {
+                contact.setName(datasetPage.getDescription().getContact().getName());
+            }
+            if (datasetPage.getDescription().getContact().getTelephone() != null) {
+                contact.setTelephone(datasetPage.getDescription().getContact().getTelephone());
+            }
+            if (datasetPage.getDescription().getContact().getEmail() != null) {
+                contact.setEmail(datasetPage.getDescription().getContact().getEmail());
+            }
+            if (datasetPage.getDescription().getContact().getOrganisation() != null) {
+                contact.setOrganisation(datasetPage.getDescription().getContact().getOrganisation());
+            }
+            page.getDescription().setContact(contact);
+        }
+    }
+
+    /**
+     *
+     * @param inProgress
+     * @param newSeries
+     * @return
+     */
+    TimeSeries syncNewTimeSeriesMetadata(TimeSeries inProgress, TimeSeries newSeries) {
+        if (inProgress.getDescription() == null || newSeries.getDescription() == null) {
+            System.out.println("Error copying metadata in data publisher");
+        }
+        inProgress.getDescription().setSeasonalAdjustment(newSeries.getDescription().getSeasonalAdjustment());
+        inProgress.getDescription().setCdid(newSeries.getDescription().getCdid());
+
+        // Copy across the title if it is currently blank (equates to equalling Cdid)
+        if (inProgress.getDescription().getTitle() == null || inProgress.getDescription().getTitle().equalsIgnoreCase("")) {
+            inProgress.getDescription().setTitle(newSeries.getDescription().getTitle());
+        } else if (inProgress.getDescription().getTitle().equalsIgnoreCase(inProgress.getCdid())) {
+            inProgress.getDescription().setTitle(newSeries.getDescription().getTitle());
+        }
+
+        inProgress.getDescription().setDate(newSeries.getDescription().getDate());
+        inProgress.getDescription().setNumber(newSeries.getDescription().getNumber());
+
+        return inProgress;
+    }
+
 
     /**
      * Get the publish path for a timeseries
@@ -67,8 +205,8 @@ public class DataProcessor {
      * @param details
      * @return
      */
-    String publishPathForTimeseries(TimeSeries series, DataPublicationDetails details) {
-        return details.getTimeseriesFolder() + series.getCdid().toLowerCase() + "/data.json";
+    String publishUriForTimeseries(TimeSeries series, DataPublicationDetails details) {
+        return details.getTimeseriesFolder() + "/" + series.getCdid().toLowerCase();
     }
 
     /**
@@ -81,64 +219,32 @@ public class DataProcessor {
      * @throws ZebedeeException
      * @throws IOException
      */
-    TimeSeries initialTimeseries(TimeSeries series, CollectionContentReader publishedContentReader, DataPublicationDetails details) throws ZebedeeException, IOException {
+    TimeSeries initialTimeseries(TimeSeries series, ContentReader publishedContentReader, DataPublicationDetails details) throws ZebedeeException, IOException, URISyntaxException {
+
+        String publishUri = publishUriForTimeseries(series, details);
 
         // Try to get an existing timeseries
-        TimeSeries existing = (TimeSeries) publishedContentReader.getContent(publishPathForTimeseries(series, details));
-
-        // If it doesn't exist create a new empty one using the description
-        if (existing == null) {
+        try {
+            TimeSeries existing = (TimeSeries) publishedContentReader.getContent(publishUri);
+            return existing;
+        } catch (NotFoundException e) {
+            // If it doesn't exist create a new empty one using the description
             TimeSeries initial = new TimeSeries();
             initial.setDescription(series.getDescription());
+            initial.setUri(new URI(publishUri));
+
             return initial;
         }
-        return existing;
     }
 
-    /**
-     * Takes a part-built TimeSeries page and populates the {@link com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue} list using data gathered from a csdb file
-     *
-     * @param page   a part-built time series page
-     * @param series a time series returned by Brian by parsing a csdb file
-     * @return
-     */
-    TimeSeries populatePageFromTimeSeries(TimeSeries page, TimeSeries series, DatasetLandingPage landingPage) {
 
-        // Time series is a bit of an inelegant beast in that it splits data storage by time period
-        // We deal with this by
-        populatePageFromSetOfValues(page, page.years, series.years, landingPage);
-        populatePageFromSetOfValues(page, page.quarters, series.quarters, landingPage);
-        populatePageFromSetOfValues(page, page.months, series.months, landingPage);
-
-        if (page.getDescription() == null || series.getDescription() == null) {
-            System.out.println("Problem");
-        }
-        page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
-        page.getDescription().setCdid(series.getDescription().getCdid());
-
-        // Copy across the title if it is currently blank (equates to equalling Cdid)
-        if (page.getDescription().getTitle() == null || page.getDescription().getTitle().equalsIgnoreCase("")) {
-            page.getDescription().setTitle(series.getDescription().getTitle());
-        } else if (page.getDescription().getTitle().equalsIgnoreCase(page.getCdid())) {
-            page.getDescription().setTitle(series.getDescription().getTitle());
-        }
-
-        page.getDescription().setDate(series.getDescription().getDate());
-        page.getDescription().setNumber(series.getDescription().getNumber());
-
-        return page;
+    void mergeTimeseries(TimeSeries originalValues, TimeSeries newValues, DataPublicationDetails details) {
+        mergeTimeSeriesValues(originalValues.years, newValues.years, details);
+        mergeTimeSeriesValues(originalValues.months, newValues.months, details);
+        mergeTimeSeriesValues(originalValues.quarters, newValues.quarters, details);
     }
 
-    /**
-     * Add individual points to a set of points (yearly, monthly, quarterly)
-     *
-     * @param page          the page
-     * @param currentValues the current value list
-     * @param updateValues  the new value list
-     * @param landingPage   the landing page (used to get dataset id)
-     */
-    void populatePageFromSetOfValues(TimeSeries page, Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, DatasetLandingPage landingPage) {
-
+    void mergeTimeSeriesValues(Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, DataPublicationDetails details) {
         // Iterate through values
         for (TimeSeriesValue value : updateValues) {
             // Find the current value of the data point
@@ -150,81 +256,20 @@ public class DataProcessor {
 
                     // Update the point
                     current.value = value.value;
-                    current.sourceDataset = landingPage.getDescription().getDatasetId();
+                    current.sourceDataset = details.landingPage.getDescription().getDatasetId();
                     current.updateDate = new Date();
+
+                    this.updates += 1;
                 }
             } else {
-                value.sourceDataset = landingPage.getDescription().getDatasetId();
+                value.sourceDataset = details.landingPage.getDescription().getDatasetId();
                 value.updateDate = new Date();
 
-                page.add(value);
+                currentValues.add(value);
+
+                this.inserts += 1;
             }
         }
-    }
-
-
-
-
-
-
-
-
-    /**
-     * Check if our new page is a new version
-     *
-     * @param series
-     * @param seriesUri
-     * @param publishedContentReader
-     * @return
-     * @throws ZebedeeException
-     * @throws IOException
-     */
-    boolean differencesExist(TimeSeries series, String seriesUri, CollectionContentReader publishedContentReader) throws ZebedeeException, IOException {
-        TimeSeries content = (TimeSeries) publishedContentReader.getContent(seriesUri);
-        if (content == null)
-            return false;
-
-        return differencesExist(series, content);
-    }
-
-    /**
-     * Check if differences exist between two pages
-     *
-     * @param page1
-     * @param page2
-     * @return
-     */
-    boolean differencesExist(TimeSeries page1, TimeSeries page2) {
-
-        // Time series is a bit of an inelegant beast in that it splits data storage by time period
-        // We deal with this by being inelegant ourselves
-        if (differencesExist(page1.years, page2.years)) return true;
-        if (differencesExist(page1.quarters, page2.quarters)) return true;
-        if (differencesExist(page1.months, page2.months)) return true;
-
-        return false;
-    }
-
-    /**
-     * Check if differences exist between two sets of timeseries points
-     *
-     * @param currentValues
-     * @param updateValues
-     * @return
-     */
-    boolean differencesExist(Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues) {
-
-        // Iterate through values
-        for (TimeSeriesValue value : updateValues) {
-            // Find the current value of the data point
-
-            TimeSeriesValue current = getCurrentValue(currentValues, value);
-            if (current == null || !current.value.equalsIgnoreCase(value.value)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

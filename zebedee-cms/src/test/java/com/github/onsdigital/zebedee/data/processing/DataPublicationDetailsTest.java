@@ -133,7 +133,7 @@ public class DataPublicationDetailsTest {
 
         // Then
         // details landing page should be identified
-        assertEquals("mynode/timeseries", details.getTimeseriesFolder());
+        assertEquals("/mynode/timeseries", details.getTimeseriesFolder());
     }
 
     @Test

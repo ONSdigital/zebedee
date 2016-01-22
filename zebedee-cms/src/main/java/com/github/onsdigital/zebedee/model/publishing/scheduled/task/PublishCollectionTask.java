@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.util.Log;
 
 import java.util.concurrent.Callable;
 
@@ -11,9 +12,9 @@ import java.util.concurrent.Callable;
  */
 public class PublishCollectionTask implements Callable<Boolean> {
 
+    protected boolean published;
     private Collection collection;
     private ZebedeeCollectionReader collectionReader;
-    private boolean published;
 
     /**
      * Create a new task for a collection to be published.
@@ -32,6 +33,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws Exception {
+        Log.print("PUBLISH: Running publish task for collection: " + collection.description.name);
         published = Publisher.Publish(collection, "System", collectionReader);
         return published;
     }

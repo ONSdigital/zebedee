@@ -38,13 +38,14 @@ public class PrePublishCollectionsTask extends ScheduledTask {
 
     /**
      * The run method is called at the time this task has been scheduled for.
-     *
+     * <p>
      * Do everything possible before the publish so its ready to go with everything it needs.
      */
     @Override
     public void run() {
 
-        Log.print("Starting Pre-publish process...");
+        long startTime = System.currentTimeMillis();
+        Log.print("PRE-PUBLISH: Starting Pre-publish process.");
 
         // load collections into memory
         Set<Collection> collections = loadCollections();
@@ -52,25 +53,34 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         // create a publish task for each collection ready to publish.
         List<PublishCollectionTask> collectionPublishTasks = createCollectionPublishTasks(collections);
 
+        // create a post-publish task for each collection
+        List<PostPublishCollectionTask> postPublishCollectionTasks = createCollectionPostPublishTasks(collectionPublishTasks, zebedee);
+
+
         // create and schedule publish task if all is well.
         // pass loaded collections into publish task so that everything is ready ahead of time.
-        PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, zebedee);
+        Log.print("PRE-PUBLISH: Scheduling publish task for %s.", publishDate);
+        PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, postPublishCollectionTasks, zebedee);
         publishTask.schedule(publishDate);
+
+        Log.print("PRE-PUBLISH: Finished Pre-publish process total time taken: %dms", (System.currentTimeMillis() - startTime));
     }
+
 
     /**
      * Load all of the collection objects for each collection to be published in this task.
-     *
+     * <p>
      * Loading them into memory in the pre-publish step takes the overhead off of the publish process
+     *
      * @return
      */
     private Set<Collection> loadCollections() {
         Set<Collection> collections = new HashSet<>();
 
-        Log.print("Loading collections into memory.");
+        Log.print("PRE-PUBLISH: Loading collections into memory.");
         collectionIds.forEach(collectionId -> {
 
-            Log.print("Running scheduled job for collection id: " + collectionId);
+            Log.print("PRE-PUBLISH: Loading collection job for collection: " + collectionId);
             try {
                 Collection collection = zebedee.collections.getCollection(collectionId);
 
@@ -94,9 +104,10 @@ public class PrePublishCollectionsTask extends ScheduledTask {
 
     /**
      * Prepare a task object for each collection to be published.
-     *
+     * <p>
      * Doing this in the pre-publish step trims time off of the publish process and ensures everything that is
      * required is ready in memory as soon as the publish starts.
+     *
      * @param collections
      * @return
      */
@@ -107,10 +118,11 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         // creating the individual collection publish tasks here to do all the work ahead of the actual publish.
         collections.forEach(collection -> {
             try {
+                Log.print("PRE-PUBLISH: creating collection publish task for collection: " + collection.description.name);
                 SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
                 ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                 PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader);
-                Log.print("Adding publish task for collection %s", collection.description.name);
+                Log.print("PRE-PUBLISH: Adding publish task for collection %s", collection.description.name);
                 collectionPublishTasks.add(publishCollectionTask);
             } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {
                 Log.print(e);
@@ -120,6 +132,25 @@ public class PrePublishCollectionsTask extends ScheduledTask {
             // send versioned files / all files over to the train?
         });
         return collectionPublishTasks;
+    }
+
+    /**
+     * Prepare a post publish task for each collection ahead of the publish.
+     *
+     * @param collectionPublishTasks
+     * @param zebedee
+     * @return
+     */
+    private List<PostPublishCollectionTask> createCollectionPostPublishTasks(List<PublishCollectionTask> collectionPublishTasks, Zebedee zebedee) {
+        List<PostPublishCollectionTask> postPublishCollectionTasks = new ArrayList<>(collectionPublishTasks.size());
+
+        collectionPublishTasks.forEach(publishTask -> {
+            Log.print("PRE-PUBLISH: creating collection post-publish task for collection: " + publishTask.getCollection().description.name);
+            PostPublishCollectionTask postPublishCollectionTask = new PostPublishCollectionTask(zebedee, publishTask);
+            postPublishCollectionTasks.add(postPublishCollectionTask);
+        });
+
+        return postPublishCollectionTasks;
     }
 
     /**

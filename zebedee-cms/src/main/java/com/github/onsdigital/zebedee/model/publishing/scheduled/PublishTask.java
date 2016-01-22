@@ -35,7 +35,7 @@ public class PublishTask implements Runnable {
         System.out.println("Running scheduled job for collection id: " + collectionId);
 
         try {
-            Collection collection = zebedee.collections.list().getCollection(this.collectionId);
+            Collection collection = zebedee.collections.getCollection(this.collectionId);
 
             if (collection.description.approvedStatus == false) {
                 System.out.println("Scheduled collection has not been approved - switching to manual");

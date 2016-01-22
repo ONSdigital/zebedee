@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.util.Log;
 
 import java.util.List;
@@ -17,19 +16,16 @@ public class PublishCollectionsTask extends ScheduledTask {
     private final ExecutorService executorService; // Thread pool to publish each collection concurrently.
     private List<PublishCollectionTask> publishCollectionTasks; // A task object for each collection to publish.
     private List<PostPublishCollectionTask> postPublishCollectionTasks;
-    private Zebedee zebedee;
 
     /**
      * Create a new instance of the PublishCollectionsTask.
      * @param publishCollectionTasks A collection of tasks, one for each collection to publish.
-     * @param zebedee
      */
     public PublishCollectionsTask(List<PublishCollectionTask> publishCollectionTasks,
-                                  List<PostPublishCollectionTask> postPublishCollectionTasks,
-                                  Zebedee zebedee) {
+                                  List<PostPublishCollectionTask> postPublishCollectionTasks
+    ) {
         this.publishCollectionTasks = publishCollectionTasks;
         this.postPublishCollectionTasks = postPublishCollectionTasks;
-        this.zebedee = zebedee;
         this.executorService = Executors.newFixedThreadPool(publishCollectionTasks.size());
     }
 

@@ -7,12 +7,13 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import org.elasticsearch.common.joda.time.DateTime;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class PublishSchedulerTest {
 
@@ -34,16 +35,25 @@ public class PublishSchedulerTest {
         builder.delete();
     }
 
+    // when scheduled, check that the pre-publish task exists and there is no post publish
+
+    // after the pre-publish check the publish task is scheduled.
+
     @Test
-    public void scheduledPublish() throws IOException, ZebedeeException {
+    public void scheduledPublish() throws IOException, ZebedeeException, InterruptedException {
 
         // Given a scheduled collection
         CollectionDescription description = new CollectionDescription("collectionName");
         description.type = CollectionType.scheduled;
-        description.publishDate = DateTime.now().plusDays(1).toDate();
+        description.approvedStatus = true;
+        description.publishDate = DateTime.now().plusSeconds(2).withMillisOfSecond(0).toDate();
         Collection collection = Collection.create(description, zebedee, session);
 
-        scheduler.schedulePublish(collection);
+        Date startDate = description.publishDate;
+        Date prePublishStartDate = new DateTime(description.publishDate).minusSeconds(1).toDate();
+        scheduler.schedulePrePublish(collection, prePublishStartDate, startDate);
+
+        //Thread.sleep(4000);
 
         scheduler.cancelPublish(collection);
     }

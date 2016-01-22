@@ -4,13 +4,15 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PostPublishCollectionTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PrePublishCollectionsTask;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionsTask;
 import com.github.onsdigital.zebedee.util.Log;
-import org.joda.time.DateTime;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +20,7 @@ import java.util.Map;
  */
 public class PublishScheduler {
 
-    private static final int prePublishSecondsBeforePublish = 5; // how many seconds before a publish should the pre-publish process start
+    public static final int prePublishSecondsBeforePublish = 5; // how many seconds before a publish should the pre-publish process start
 
     private final Zebedee zebedee;
     private final Map<Date, PrePublishCollectionsTask> prePublishTasks = new HashMap<>();
@@ -30,18 +32,16 @@ public class PublishScheduler {
 
     /**
      * Validate and schedule the given collection to be published based on the publish date set in the collection.
-     * @param collection
+     * @param collection The collection to publish.
+     * @param prePublishStartDate The start date of the pre-publish date.
+     * @param publishStartDate The start date of the publish process.
      */
-    public void schedulePublish(Collection collection) {
+    public void schedulePrePublish(Collection collection, Date prePublishStartDate, Date publishStartDate) {
         if (Configuration.isSchedulingEnabled()) {
             try {
-                System.out.println("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
+                System.out.println("Attempting to schedule pre-publish for collection " + collection.description.name + " type=" + collection.description.type);
                 if (collection.description.type == CollectionType.scheduled) {
-                    if (collection.description.publishDate != null) {
-                        scheduleCollection(collection);
-                    } else {
-                        Log.print("Could not schedule publish for collection %s, the publish date is null", collection.description.name);
-                    }
+                    schedulePrePublishCollection(collection, prePublishStartDate, publishStartDate);
                 }
             } catch (Exception e) {
                 System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());
@@ -51,22 +51,38 @@ public class PublishScheduler {
         }
     }
 
-    private void scheduleCollection(Collection collection) {
+
+    public void schedulePublish(
+            List<PublishCollectionTask> collectionPublishTasks,
+            List<PostPublishCollectionTask> postPublishCollectionTasks,
+            Date publishDate
+    ) {
+        if (Configuration.isSchedulingEnabled()) {
+            try {
+                // create and schedule publish task if all is well.
+                // pass loaded collections into publish task so that everything is ready ahead of time.
+                PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, postPublishCollectionTasks);
+                publishTask.schedule(publishDate);
+            } catch (Exception e) {
+                System.out.println("Exception caught trying to schedule: " + e.getMessage());
+            }
+        } else {
+            Log.print("Not scheduling publish, scheduling is not enabled");
+        }
+    }
+
+    private void schedulePrePublishCollection(Collection collection, Date prePublishStartDate, Date publishStartDate) {
         // cancel existing publish for the collection
         prePublishTasks.values().forEach(task -> task.removeCollection(collection));
-        Date publishDate = collection.description.publishDate;
         PrePublishCollectionsTask task;
 
         // add a task for the publish date if there is not already one.
-        if (prePublishTasks.containsKey(publishDate)) {
-            task = prePublishTasks.get(publishDate);
+        if (prePublishTasks.containsKey(publishStartDate)) {
+            task = prePublishTasks.get(publishStartDate);
         } else {
-            task = new PrePublishCollectionsTask(zebedee, publishDate);
-
-            // take the defined number of seconds off the publish time to calculate when to start pre-publish.
-            Date prePublishDate = new DateTime(publishDate).minusSeconds(prePublishSecondsBeforePublish).toDate();
-            task.schedule(prePublishDate);
-            prePublishTasks.put(publishDate, task);
+            task = new PrePublishCollectionsTask(zebedee, publishStartDate, this);
+            task.schedule(prePublishStartDate);
+            prePublishTasks.put(publishStartDate, task);
         }
 
         task.addCollection(collection);
@@ -74,6 +90,7 @@ public class PublishScheduler {
 
     /**
      * Cancel a publish for the given collection.
+     *
      * @param collection
      */
     public void cancelPublish(Collection collection) {
@@ -82,6 +99,7 @@ public class PublishScheduler {
 
     /**
      * Remove the publish task once complete.
+     *
      * @param date
      * @return
      */
@@ -98,6 +116,7 @@ public class PublishScheduler {
 
     /**
      * Remove the publish task once complete.
+     *
      * @param date
      * @return
      */

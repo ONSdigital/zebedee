@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.util.Log;
 
 import javax.crypto.SecretKey;
@@ -23,6 +24,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     private final Set<String> collectionIds; // The list of collections ID's used in the task.
     private final Zebedee zebedee;
     private final Date publishDate; // the date of the actual publish, NOT the prepublish date associated with this task.
+    private PublishScheduler publishScheduler;
 
     /**
      * Create a new instance of the PrePublishCollectionsTask.
@@ -30,8 +32,9 @@ public class PrePublishCollectionsTask extends ScheduledTask {
      * @param zebedee     The instance of Zebedee this task will run under.
      * @param publishDate The date the actual publish is scheduled for.
      */
-    public PrePublishCollectionsTask(Zebedee zebedee, Date publishDate) {
+    public PrePublishCollectionsTask(Zebedee zebedee, Date publishDate, PublishScheduler publishScheduler) {
         this.publishDate = publishDate;
+        this.publishScheduler = publishScheduler;
         this.collectionIds = new HashSet<>();
         this.zebedee = zebedee;
     }
@@ -56,12 +59,8 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         // create a post-publish task for each collection
         List<PostPublishCollectionTask> postPublishCollectionTasks = createCollectionPostPublishTasks(collectionPublishTasks, zebedee);
 
-
-        // create and schedule publish task if all is well.
-        // pass loaded collections into publish task so that everything is ready ahead of time.
         Log.print("PRE-PUBLISH: Scheduling publish task for %s.", publishDate);
-        PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, postPublishCollectionTasks, zebedee);
-        publishTask.schedule(publishDate);
+        publishScheduler.schedulePublish(collectionPublishTasks, postPublishCollectionTasks, publishDate);
 
         Log.print("PRE-PUBLISH: Finished Pre-publish process total time taken: %dms", (System.currentTimeMillis() - startTime));
     }

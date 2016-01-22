@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import com.github.onsdigital.zebedee.Zebedee;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -26,9 +25,7 @@ public class PublishCollectionsTaskTest {
         postPublishCollectionTasks.add(postPublish1);
         DummyPostPublishCollectionTask postPublish2 = new DummyPostPublishCollectionTask(5);
         postPublishCollectionTasks.add(postPublish2);
-        Zebedee zebedee = null;
-
-        PublishCollectionsTask task = new PublishCollectionsTask(publishCollectionTasks, postPublishCollectionTasks, zebedee);
+        PublishCollectionsTask task = new PublishCollectionsTask(publishCollectionTasks, postPublishCollectionTasks);
 
         // When the publish task is run.
         task.run();

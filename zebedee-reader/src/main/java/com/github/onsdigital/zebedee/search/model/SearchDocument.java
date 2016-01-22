@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * Created by bren on 03/09/15.
@@ -12,6 +13,8 @@ public class SearchDocument {
     private URI uri;
     private PageType type;
     private PageDescription description;
+    private List<URI> topics;
+
 
     public PageDescription getDescription() {
         return description;
@@ -35,5 +38,13 @@ public class SearchDocument {
 
     public void setType(PageType type) {
         this.type = type;
+    }
+
+    public List<URI> getTopics() {
+        return topics;
+    }
+
+    public void setTopics(List<URI> topics) {
+        this.topics = topics;
     }
 }

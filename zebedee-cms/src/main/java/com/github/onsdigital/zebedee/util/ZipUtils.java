@@ -54,7 +54,7 @@ public class ZipUtils {
     }
 
     private static void zipFolder(final File folder, final OutputStream outputStream) throws IOException {
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+        try (ZipOutputStream zipOutputStream = getZipOutputStream(outputStream)) {
             zipFolder(folder, zipOutputStream, folder.getPath().length() + 1);
         }
     }
@@ -79,9 +79,15 @@ public class ZipUtils {
         zipFolderWithEncryption(folder, EncryptionUtils.encryptionOutputStream(zipFile.toPath(), key), key);
     }
     private static void zipFolderWithEncryption(final File folder, final OutputStream outputStream, SecretKey key) throws IOException {
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+        try (ZipOutputStream zipOutputStream = getZipOutputStream(outputStream)) {
             zipFolderWithEncryption(folder, zipOutputStream, key, folder.getPath().length() + 1);
         }
+    }
+
+    private static ZipOutputStream getZipOutputStream(OutputStream outputStream) {
+        ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+        zipOutputStream.setLevel(0); // minimal compression
+        return zipOutputStream;
     }
 
     private static void zipFolderWithEncryption(final File folder, final ZipOutputStream zipOutputStream, SecretKey key, final int prefixLength)

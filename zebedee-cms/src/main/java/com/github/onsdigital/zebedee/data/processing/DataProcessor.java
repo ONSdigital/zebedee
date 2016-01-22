@@ -2,32 +2,27 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.model.CollectionContentReader;
-import com.github.onsdigital.zebedee.model.CollectionContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Created by thomasridd on 1/16/16.
+ * The workhorse of the data-publisher
+ *
+ * Processes a single timeseries
  */
 public class DataProcessor {
-    public int updates = 0;
-    public int inserts = 0;
+    public int corrections = 0;
+    public int insertions = 0;
     public TimeSeries timeSeries = null;
 
     public DataProcessor() {
@@ -36,31 +31,32 @@ public class DataProcessor {
 
     /**
      * Take a timeseries as produced by Brian from an upload and combine it with current content
-     *
-     * @param publishedContentReader
-     * @param reviewedContentReader
-     * @param reviewedContentWriter
+     *  @param publishedContentReader
      * @param details
-     * @param newTimeSeries
-     * @return
-     */
-    public TimeSeries processTimeseries(ContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter reviewedContentWriter, DataPublicationDetails details, TimeSeries newTimeSeries) throws ZebedeeException, IOException, URISyntaxException {
+     * @param newTimeSeries   @return
+     * */
+    public TimeSeries processTimeseries(ContentReader publishedContentReader, DataPublicationDetails details, TimeSeries newTimeSeries) throws ZebedeeException, IOException, URISyntaxException {
 
-        // Get current version of the time series
+        // Get current version of the time series (persists any manually entered data)
         this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details);
 
         // Add meta from the landing page and timeseries dataset page
         syncLandingPageMetadata(this.timeSeries, details);
-        syncNewTimeSeriesMetadata(this.timeSeries, newTimeSeries);
+        syncTimeSeriesMetadata(this.timeSeries, newTimeSeries);
 
         // Combine the time series values
-        mergeTimeseries(this.timeSeries, newTimeSeries, details);
+        DataMerge dataMerge = new DataMerge();
+        this.timeSeries = dataMerge.merge(this.timeSeries, newTimeSeries, details.landingPage.getDescription().getDatasetId());
+
+        // Log corrections and insertions
+        corrections = dataMerge.corrections;
+        insertions = dataMerge.insertions;
 
         return this.timeSeries;
     }
 
     /**
-     *
+     * Copy metadata from the landing page
      *
      * @param page
      * @param details
@@ -175,14 +171,14 @@ public class DataProcessor {
      * @param newSeries
      * @return
      */
-    TimeSeries syncNewTimeSeriesMetadata(TimeSeries inProgress, TimeSeries newSeries) {
+    TimeSeries syncTimeSeriesMetadata(TimeSeries inProgress, TimeSeries newSeries) {
         if (inProgress.getDescription() == null || newSeries.getDescription() == null) {
             System.out.println("Error copying metadata in data publisher");
         }
         inProgress.getDescription().setSeasonalAdjustment(newSeries.getDescription().getSeasonalAdjustment());
         inProgress.getDescription().setCdid(newSeries.getDescription().getCdid());
 
-        // Copy across the title if it is currently blank (equates to equalling Cdid)
+        // Copy across the title if it is currently blank (so if it has been set manually do not overwrite)
         if (inProgress.getDescription().getTitle() == null || inProgress.getDescription().getTitle().equalsIgnoreCase("")) {
             inProgress.getDescription().setTitle(newSeries.getDescription().getTitle());
         } else if (inProgress.getDescription().getTitle().equalsIgnoreCase(inProgress.getCdid())) {
@@ -237,60 +233,5 @@ public class DataProcessor {
         }
     }
 
-
-    void mergeTimeseries(TimeSeries originalValues, TimeSeries newValues, DataPublicationDetails details) {
-        mergeTimeSeriesValues(originalValues.years, newValues.years, details);
-        mergeTimeSeriesValues(originalValues.months, newValues.months, details);
-        mergeTimeSeriesValues(originalValues.quarters, newValues.quarters, details);
-    }
-
-    void mergeTimeSeriesValues(Set<TimeSeriesValue> currentValues, Set<TimeSeriesValue> updateValues, DataPublicationDetails details) {
-        // Iterate through values
-        for (TimeSeriesValue value : updateValues) {
-            // Find the current value of the data point
-            TimeSeriesValue current = getCurrentValue(currentValues, value);
-
-            if (current != null) { // A point already exists for this data
-
-                if (!current.value.equalsIgnoreCase(value.value)) { // A point already exists for this data
-
-                    // Update the point
-                    current.value = value.value;
-                    current.sourceDataset = details.landingPage.getDescription().getDatasetId();
-                    current.updateDate = new Date();
-
-                    this.updates += 1;
-                }
-            } else {
-                value.sourceDataset = details.landingPage.getDescription().getDatasetId();
-                value.updateDate = new Date();
-
-                currentValues.add(value);
-
-                this.inserts += 1;
-            }
-        }
-    }
-
-    /**
-     * If a {@link TimeSeriesValue} for value.time exists in currentValues returns that.
-     * Otherwise null
-     *
-     * @param currentValues a set of {@link TimeSeriesValue}
-     * @param value         a {@link TimeSeriesValue}
-     * @return a {@link TimeSeriesValue} from currentValues
-     */
-    static TimeSeriesValue getCurrentValue(Set<TimeSeriesValue> currentValues, TimeSeriesValue value) {
-        if (currentValues == null) {
-            return null;
-        }
-
-        for (TimeSeriesValue current : currentValues) {
-            if (current.compareTo(value) == 0) {
-                return current;
-            }
-        }
-        return null;
-    }
 
 }

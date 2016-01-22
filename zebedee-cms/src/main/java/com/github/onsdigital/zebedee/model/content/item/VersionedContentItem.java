@@ -72,6 +72,18 @@ public class VersionedContentItem extends ContentItem {
     }
 
     /**
+     * Create a version from the given source path. The source path is typically the path to the published content, so
+     * it cannot be assumed the current version is in the root path of this VersionedContentItem.
+     *
+     * @param contentReader
+     * @return
+     */
+    public ContentItemVersion createVersion(ContentReader contentReader) throws IOException, ZebedeeException {
+
+       return createVersion(contentReader.getRootFolder(), contentReader);
+    }
+
+    /**
      * Copy only the files (not directories) from the given reader for the given uri.
      *
      * @param contentRoot

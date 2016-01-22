@@ -355,7 +355,7 @@ public class ContentReader {
     }
 
     /*Getters * Setters */
-    private Path getRootFolder() {
+    public Path getRootFolder() {
         return ROOT_FOLDER;
     }
 

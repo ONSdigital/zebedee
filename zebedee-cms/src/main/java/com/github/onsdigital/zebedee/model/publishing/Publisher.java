@@ -142,15 +142,25 @@ public class Publisher {
         boolean publishComplete = false;
         String encryptionPassword = Random.password(100);
         try {
+
+            Log.print("Start BeginPublish");
             collection.description.publishTransactionId = beginPublish(theTrainHost, encryptionPassword);
+            Log.print("End BeginPublish");
+
+            Log.print("Start CollectionSave");
             collection.save();
+            Log.print("End CollectionSave");
 
             List<Future<IOException>> results = new ArrayList<>();
 
+            Log.print("Start PublishFiles");
             // Publish each item of content:
             for (String uri : collection.reviewed.uris()) {
+                Log.print("Start PublishFile: %s", uri);
                 publishFile(collection, email, encryptionPassword, pool, results, uri, collectionReadereader);
+                Log.print("End PublishFile: %s", uri);
             }
+            Log.print("End PublishFiles");
 
             // Check the publishing results:
             for (Future<IOException> result : results) {
@@ -162,8 +172,10 @@ public class Publisher {
                 }
             }
 
+            Log.print("Start CommitPublish");
             // If all has gone well so far, commit the publishing transaction:
             Result result = commitPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
+            Log.print("End CommitPublish");
 
             if (!result.error) {
                 Date publishedDate = new Date();

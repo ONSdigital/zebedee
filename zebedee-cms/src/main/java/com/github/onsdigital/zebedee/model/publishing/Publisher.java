@@ -172,7 +172,7 @@ public class Publisher {
                 }
             }
 
-            Log.print("Start CommitPublish");
+            Log.print("Start CommitPublish.");
             // If all has gone well so far, commit the publishing transaction:
             Result result = commitPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
             Log.print("End CommitPublish");

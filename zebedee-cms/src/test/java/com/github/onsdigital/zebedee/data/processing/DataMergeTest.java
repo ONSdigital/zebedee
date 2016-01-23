@@ -37,31 +37,7 @@ public class DataMergeTest {
     @Before
     public void setUp() throws Exception {
 
-//        bob = new Builder(DataPublicationDetailsTest.class);
-//        zebedee = new Zebedee(bob.zebedee, false);
-//
-//        publisher = zebedee.openSession(bob.publisher1Credentials);
-//        reviewer = zebedee.openSession(bob.reviewer1Credentials);
-//
-//        dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
-//
-//        CollectionDescription collectionDescription = new CollectionDescription();
-//        collectionDescription.name = "DataPublicationDetails";
-//        collectionDescription.isEncrypted = true;
-//        collection = Collection.create(collectionDescription, zebedee, publisher);
-//
-//        publishedReader = new ContentReader(zebedee.published.path);
-//        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
-//        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
-//
-//        // add a set of data in a collection
-//        inReview = generator.generateDataPagesSet("dataprocessor", "inreview", 2015, 2, "");
-//        dataBuilder.addReviewedDataPagesSet(inReview, collection, collectionWriter);
-//
-//        // add a set of data to published
-//        published = generator.generateDataPagesSet("dataprocessor", "published", 2015, 2, "");
-//        dataBuilder.publishDataPagesSet(published);
     }
 
     @After

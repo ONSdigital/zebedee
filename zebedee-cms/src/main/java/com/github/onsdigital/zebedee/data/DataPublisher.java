@@ -308,7 +308,6 @@ public class DataPublisher {
     /**
      * Create a previous version page for a timeseries
      *
-     * @param savePath
      * @param newPage
      * @param uri
      * @param correctionNotice

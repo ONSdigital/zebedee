@@ -102,7 +102,7 @@ public class DataBuilder {
         if (dataPagesSet.timeSeriesDataset != null)
             addReviewedPage(dataPagesSet.timeSeriesDataset.getUri().toString(), dataPagesSet.timeSeriesDataset, collection, collectionWriter);
         if (dataPagesSet.fileUri != null)
-            addReviewedFile(dataPagesSet.fileUri, collection.find(dataPagesSet.timeSeriesDataset.getUri().toString()), collection, collectionWriter);
+            addReviewedFile(dataPagesSet.fileUri, collection.find(dataPagesSet.timeSeriesDataset.getUri().toString()).resolve("data.json"), collection, collectionWriter);
     }
 
     public void addReviewedPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException {

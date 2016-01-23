@@ -284,6 +284,7 @@ public class DataProcessorTest {
         dataBuilder.publishDataPagesSet(manual);
 
         DataPagesSet review = generator.generateDataPagesSet("dataprocessor", "manual", 2016, 2, "");
+        dataBuilder.addReviewedDataPagesSet(review, collection, collectionWriter);
         TimeSeries series = review.timeSeriesList.get(0);
 
         // When

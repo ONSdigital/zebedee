@@ -2,11 +2,11 @@ package com.github.onsdigital.zebedee.search.client;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.*;
 
@@ -15,9 +15,7 @@ import static com.github.onsdigital.zebedee.search.configuration.SearchConfigura
  */
 public class ElasticSearchClient {
 
-    static ExecutorService pool = Executors.newSingleThreadExecutor();
-
-    static Future<Client> client;
+    static Client client;
 
     /**
      * NB caching the client for the entire application to use is safe and
@@ -31,42 +29,32 @@ public class ElasticSearchClient {
      * @return
      */
     public static Client getClient() {
-        try {
-            return client.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Error getting Elasticsearch client - indexing may have failed", e);
-        }
+        return client;
     }
 
-    private static void startEmbeddedServer() {
+    private static void startEmbeddedServer() throws IOException {
         synchronized (EmbeddedElasticSearchServer.class) {
             if (client == null) {
-                client = pool.submit(new Callable<Client>() {
-                    @Override
-                    public Client call() throws Exception {
-                        long start;
+                long start;
 
-                        // Server
-                        start = System.currentTimeMillis();
-                        System.out.println("Elasticsearch: starting embedded server..");
-                        EmbeddedElasticSearchServer server = new EmbeddedElasticSearchServer();
-                        System.out.println("Elasticsearch: embedded server started (" + (System.currentTimeMillis() - start) + "ms)");
+                // Server
+                start = System.currentTimeMillis();
+                System.out.println("Elasticsearch: starting embedded server..");
+                EmbeddedElasticSearchServer server = new EmbeddedElasticSearchServer();
+                System.out.println("Elasticsearch: embedded server started (" + (System.currentTimeMillis() - start) + "ms)");
 
-                        // Client
-                        start = System.currentTimeMillis();
-                        System.out.println("Elasticsearch: creating client..");
-                        Client client = server.getClient();
-                        System.out.println("Elasticsearch: client set up (" + (System.currentTimeMillis() - start) + "ms)");
+                // Client
+                start = System.currentTimeMillis();
+                System.out.println("Elasticsearch: creating client..");
+                client = server.getClient();
+                System.out.println("Elasticsearch: client set up (" + (System.currentTimeMillis() - start) + "ms)");
 
-                        Runtime.getRuntime().addShutdownHook(new ShutDownNodeThread(client, server));
-                        return client;
-                    }
-                });
+                Runtime.getRuntime().addShutdownHook(new ShutDownNodeThread(client, server));
             }
         }
     }
 
-    public static void init() {
+    public static void init() throws IOException {
         if (isStartEmbeddedSearch()) {
             System.out.println("Starting embedded elastic search server");
             startEmbeddedServer();
@@ -78,20 +66,14 @@ public class ElasticSearchClient {
 
     private static void connect() {
         if (client == null) {
-            client = pool.submit(new Callable<Client>() {
-                @Override
-                public Client call() throws Exception {
+            Settings settings = Settings.builder()
+                    .put("cluster.name", getElasticSearchCluster()).build();
 
-                    Settings settings = ImmutableSettings.settingsBuilder()
-                            .put("cluster.name", getElasticSearchCluster()).build();
+            client = TransportClient.builder().
+                    settings(settings).build()
+                    .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(getElasticSearchServer(), getElasticSearchPort())));
 
-                    Client client = new TransportClient(settings)
-                            .addTransportAddress(new InetSocketTransportAddress(getElasticSearchServer(), getElasticSearchPort()));
-
-                    Runtime.getRuntime().addShutdownHook(new ShutDownNodeThread(client, null));
-                    return client;
-                }
-            });
+            Runtime.getRuntime().addShutdownHook(new ShutDownNodeThread(client, null));
         }
 
 

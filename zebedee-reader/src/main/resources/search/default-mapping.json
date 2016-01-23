@@ -1,59 +1,67 @@
 {
   "_default_": {
-    "_all" : {"enabled" : false},
+    "_all": {"enabled": false},
     "dynamic_date_formats": [
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
     ],
     "properties": {
       "type": {
-        "type": "string",
-        "index_analyzer": "ons_index_analyzer"
-      },
-      "title_edition": {
-        "type": "string",
-        "index_analyzer": "ons_index_analyzer"
+        "type": "string"
       },
       "description": {
         "properties": {
           "cdid": {
             "type": "string",
-            "search_analyzer": "cdid_search"
+            "analyzer": "ons_standard"
+          },
+          "datasetId": {
+            "type": "string",
+            "analyzer": "ons_standard"
+          },
+          "searchBoost": {
+            "type": "string",
+            "analyzer": "ons_detailed"
           },
           "title": {
             "type": "string",
-            "copy_to" : "title_edition",
-            "index_analyzer": "ons_index_analyzer",
+            "analyzer": "ons_detailed",
             "fields": {
               "title_raw": {
                 "type": "string"
               },
-              "title_first_letter" : {
+              "title_no_dates": {
                 "type": "string",
-                "index_analyzer" : "first_letter_analyzer"
+                "analyzer": "ons_detailed_clear_dates"
+              },
+              "title_first_letter": {
+                "type": "string",
+                "analyzer": "first_letter"
               }
             }
           },
           "edition": {
             "type": "string",
-            "copy_to" : "title_edition",
-            "index_analyzer": "ons_index_analyzer"
+            "analyzer": "ons_detailed"
           },
           "metaDescription": {
             "type": "string",
-            "index_analyzer": "ons_index_analyzer"
+            "analyzer": "ons_standard"
           },
           "summary": {
             "type": "string",
-            "index_analyzer": "ons_index_analyzer"
+            "analyzer": "ons_standard"
           },
           "keywords": {
             "type": "string",
-            "index_analyzer": "ons_index_analyzer",
+            "analyzer": "ons_detailed",
             "fields": {
               "keywords_raw": {
                 "type": "string"
               }
             }
+          },
+          "releaseDate": {
+            "type": "date"
           }
         }
       }

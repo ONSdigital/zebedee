@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.search.client;
 
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
@@ -25,7 +24,7 @@ class EmbeddedElasticSearchServer {
     public EmbeddedElasticSearchServer(Settings settings, String clusterName) throws IOException {
 
         this.dataDirectory = Files.createTempDirectory("searchindex");
-        ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder().put("cluster.name", clusterName).put("http.enabled", true).put("path.data", dataDirectory)
+        Settings.Builder settingsBuilder = Settings.builder().put("cluster.name", clusterName).put("http.enabled", true).put("path.home", dataDirectory)
                 .put("node.data", true);
         System.out.println("Creating index data in: " + this.dataDirectory);
 

@@ -42,6 +42,10 @@ public class VersionedContentItem extends ContentItem {
         return VERSION_DIRECTORY;
     }
 
+    public static String getVersionUri(String uri, int versionNumber) {
+        return uri + "/" + VERSION_DIRECTORY + "/" + VERSION_PREFIX + versionNumber;
+    }
+
     /**
      * Utility function to determine if a give uri is that of a previous version.
      * <p>
@@ -145,7 +149,7 @@ public class VersionedContentItem extends ContentItem {
         return false;
     }
 
-    public boolean versionExists(CollectionContentReader reader) {
+    public boolean versionExists(ContentReader reader) {
 
         Path pathToVersionsFolder = reader.getRootFolder().resolve(getUri().toString()).resolve(VersionedContentItem.getVersionDirectoryName());
 

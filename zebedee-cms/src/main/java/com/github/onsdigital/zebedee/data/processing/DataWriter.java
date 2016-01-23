@@ -1,38 +1,28 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Set;
 
 /**
  * Created by thomasridd on 1/21/16.
  */
 public class DataWriter {
-    private CollectionContentWriter collectionContentWriter;
-    private CollectionContentReader collectionContentReader;
+    private ContentWriter contentWriter;
+    private ContentReader contentReader;
     private ContentReader pubishedReader;
 
-    public DataWriter(CollectionContentWriter collectionContentWriter, CollectionContentReader collectionContentReader, ContentReader publishedReader) {
-        this.collectionContentWriter = collectionContentWriter;
-        this.collectionContentReader = collectionContentReader;
+    public DataWriter(ContentWriter contentWriter, ContentReader contentReader, ContentReader publishedReader) {
+        this.contentWriter = contentWriter;
+        this.contentReader = contentReader;
         this.pubishedReader = publishedReader;
     }
 
@@ -44,11 +34,11 @@ public class DataWriter {
         versionTimeseries(processor.timeSeries, details.getDatasetCorrectionsNotice());
 
         // Save the new page to reviewed
-        this.collectionContentWriter.writeObject(processor.timeSeries, processor.timeSeries.getUri().toString());
+        this.contentWriter.writeObject(processor.timeSeries, processor.timeSeries.getUri().toString() + "/data.json");
 
     }
 
-    public void versionTimeseries(
+    void versionTimeseries(
             TimeSeries timeSeries,
             String correctionNotice
     ) throws ZebedeeException, IOException {
@@ -63,10 +53,10 @@ public class DataWriter {
 
 
         // create directory in reviewed if it does not exist.
-        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, this.collectionContentWriter);
+        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, this.contentWriter);
 
         // build a version if it doesn't exist
-        if (versionedContentItem.versionExists(this.collectionContentReader) == false) {
+        if (versionedContentItem.versionExists(this.contentReader) == false) {
             ContentItemVersion contentItemVersion = versionedContentItem.createVersion(pubishedReader);
 
             Version version = new Version();

@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.CollectionContentReader;
 import com.github.onsdigital.zebedee.model.CollectionContentWriter;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
@@ -47,8 +46,18 @@ public class DataPublication {
 
         // Process each returned timeseries
         for(TimeSeries series: serieses) {
-            results.add(new DataProcessor().processTimeseries(publishedContentReader, reviewedContentReader, reviewedContentWriter, details, series));
+            // Build new timeseries
+            DataProcessor processor = new DataProcessor();
+            processor.processTimeseries(publishedContentReader, details, series);
+
+            // Save files
+            DataWriter writer = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
+            writer.versionAndSave(processor, details);
+
+            // Retain the result to be added to any generated spreadsheet
+            results.add(processor.timeSeries);
         }
+
 
         // Generate data files
         DataFileGenerator generator = new DataFileGenerator(reviewedContentWriter);

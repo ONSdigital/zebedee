@@ -48,4 +48,12 @@ public class DataPublicationDetails {
     public String getTimeseriesFolder() {
         return parentFolderUri + "/timeseries";
     }
+
+    public String getDatasetCorrectionsNotice() {
+            if (datasetPage.getVersions() == null || datasetPage.getVersions().size() == 0) {
+                return "";
+            } else {
+                return datasetPage.getVersions().get(datasetPage.getVersions().size() - 1).getCorrectionNotice();
+            }
+    }
 }

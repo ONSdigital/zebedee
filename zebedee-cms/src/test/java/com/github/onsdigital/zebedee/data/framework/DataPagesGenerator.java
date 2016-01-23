@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data.framework;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
@@ -46,7 +47,7 @@ public class DataPagesGenerator {
         timeSeries.setDescription(new PageDescription());
 
         timeSeries.getDescription().setCdid(cdid);
-        timeSeries.getDescription().setTitle(cdid);
+        timeSeries.getDescription().setTitle(Random.id());
         timeSeries.getDescription().setReleaseDate(releaseDate);
         timeSeries.getDescription().setContact(dummy());
 

@@ -2,8 +2,10 @@ package com.github.onsdigital.zebedee.model.content.item;
 
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.CollectionContentReader;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -140,6 +142,17 @@ public class VersionedContentItem extends ContentItem {
                 return true;
             }
         }
+        return false;
+    }
+
+    public boolean versionExists(CollectionContentReader reader) {
+
+        Path pathToVersionsFolder = reader.getRootFolder().resolve(getUri().toString()).resolve(VersionedContentItem.getVersionDirectoryName());
+
+        if (pathToVersionsFolder != null && Files.exists(pathToVersionsFolder) && pathToVersionsFolder.toFile().listFiles().length > 0) {
+            return true;
+        }
+
         return false;
     }
 }

@@ -86,7 +86,7 @@ public class ZipUtils {
 
     private static ZipOutputStream getZipOutputStream(OutputStream outputStream) {
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
-        //zipOutputStream.setLevel(0); // minimal compression
+        zipOutputStream.setLevel(0); // minimal compression
         return zipOutputStream;
     }
 

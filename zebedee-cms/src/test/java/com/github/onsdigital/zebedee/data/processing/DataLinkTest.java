@@ -1,10 +1,8 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.data.DataPublisher;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +24,7 @@ public class DataLinkTest {
         Map<String, String> envNew = new HashMap<>();
         envNew.put("brian_url", "/csdbURIShouldComeFromEnvVariable");
 
-        DataLink dataLink = new DataLink();
+        DataLinkBrian dataLink = new DataLinkBrian();
         dataLink.env = envNew;
 
 
@@ -42,7 +40,7 @@ public class DataLinkTest {
     public void csdbUri_whenEnvVariablesNotSet_givesURIBasedOnConfigurationDefault() throws Exception {
         // Given
         // we set no brian_url
-        DataLink dataLink = new DataLink();
+        DataLinkBrian dataLink = new DataLinkBrian();
         dataLink.env = new HashMap<>();
 
         // When
@@ -60,7 +58,7 @@ public class DataLinkTest {
         Map<String, String> envNew = new HashMap<>();
         envNew.put("brian_url", "/csvURIShouldComeFromEnvVariable");
 
-        DataLink dataLink = new DataLink();
+        DataLinkBrian dataLink = new DataLinkBrian();
         dataLink.env = envNew;
 
 
@@ -76,7 +74,7 @@ public class DataLinkTest {
     public void csvUri_whenEnvVariablesNotSet_givesURIBasedOnConfigurationDefault() throws Exception {
         // Given
         // we set no brian_url
-        DataLink dataLink = new DataLink();
+        DataLinkBrian dataLink = new DataLinkBrian();
         dataLink.env = new HashMap<>();
 
         // When

@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.data.framework;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
+import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.data.processing.DataPublicationDetails;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -22,5 +23,12 @@ public class DataPagesSet {
 
     public DataPublicationDetails getDetails(ContentReader publishedReader, ContentReader reviewed) throws ZebedeeException, IOException {
         return new DataPublicationDetails(publishedReader, reviewed, timeSeriesDataset.getUri().toString());
+    }
+
+    public TimeSerieses getTimeSerieses() {
+        TimeSerieses timeSerieses = new TimeSerieses();
+        for (TimeSeries timeSeries: timeSeriesList)
+            timeSerieses.add(timeSeries);
+        return timeSerieses;
     }
 }

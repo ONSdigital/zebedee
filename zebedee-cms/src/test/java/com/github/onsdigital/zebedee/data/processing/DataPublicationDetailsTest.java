@@ -160,6 +160,26 @@ public class DataPublicationDetailsTest {
         assertEquals(reviewed.timeSeriesDataset.getUri().toString(), details.datasetUri);
 
     }
+
+    @Test
+    public void initialiser_ifCSDBFilePresent_setsFileUri() throws IOException, ZebedeeException, ParseException, URISyntaxException {
+        // Given
+        // a set of data pages in review
+        String filename = "mydata.csdb";
+        DataPagesSet reviewed = generator.generateDataPagesSet("mynode", "mydata", 2016, 2, filename);
+        dataBuilder.addReviewedDataPagesSet(reviewed, collection, collectionWriter);
+
+        // When
+        // we initialise details
+        DataPublicationDetails details = new DataPublicationDetails(publishedReader,
+                collectionReader.getReviewed(),
+                reviewed.timeSeriesDataset.getUri().toString());
+
+        // Then
+        // we expect the uri for the csdb file to be set
+        assertNotNull(details.fileUri);
+        assertEquals(reviewed.timeSeriesDataset.getUri().toString() + "/" + filename, details.fileUri);
+    }
 }
 
 

@@ -192,6 +192,15 @@ public class ContentReader {
         return resolveChildren(node);
     }
 
+    public DirectoryStream<Path> getDirectoryStream(String path) throws BadRequestException, IOException {
+        Path node = resolvePath(path);
+        return newDirectoryStream(node);
+    }
+    public DirectoryStream<Path> getDirectoryStream(String path, String filter) throws BadRequestException, IOException {
+        Path node = resolvePath(path);
+        return newDirectoryStream(node, filter);
+    }
+
     /**
      * get parent contents of given path, directories are skipped, only contents upper in the hierarchy are returned
      *

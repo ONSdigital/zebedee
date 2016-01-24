@@ -19,6 +19,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
@@ -96,7 +97,7 @@ public class ContentIOUtilsTest {
         // a reader for
         ContentWriter writer = new ContentWriter(copy);
         ContentReader reader = publishedReader;
-        Path example = copy.resolve(published.datasetLandingPage.getUri().toString()).resolve("data.json");
+        String example = published.datasetLandingPage.getUri().toString() + "/data.json";
 
         // When
         // we run the copy
@@ -104,7 +105,7 @@ public class ContentIOUtilsTest {
 
         // Then
         // we expect the uri's from our published set to have been copied
-        assertTrue(Files.exists(example));
+        assertTrue(Files.exists(uriResolve(copy, example)));
     }
 
     @Test
@@ -113,7 +114,7 @@ public class ContentIOUtilsTest {
         // a reader for
         ContentWriter writer = new ContentWriter(copy);
         ContentReader reader = collectionReader.getReviewed();
-        Path example = copy.resolve(encrypted.datasetLandingPage.getUri().toString()).resolve("data.json");
+        String example = encrypted.datasetLandingPage.getUri().toString() + "/data.json";
 
         // When
         // we run the copy
@@ -121,6 +122,14 @@ public class ContentIOUtilsTest {
 
         // Then
         // we expect the uri's from our published set to have been copied
-        assertTrue(Files.exists(example));
+        assertTrue(Files.exists(uriResolve(copy, example)));
+    }
+
+    private Path uriResolve(Path root, String uri) {
+        if (uri.startsWith("/")) {
+            return root.resolve(uri.substring(1, uri.length()));
+        } else {
+            return root.resolve(uri);
+        }
     }
 }

@@ -84,9 +84,17 @@ public class DataPublicationDetails {
         return null;
     }
 
+    /**
+     * Check if name adhere's to either of the file upload conventions
+     *
+     * [datasetid].csdb
+     * upload.[datasetId].csv
+     *
+     * @param path
+     * @return
+     */
     boolean isAnUploadFile(Path path) {
         String fileName = path.getFileName().toString().toLowerCase();
-
 
         if (fileName.endsWith(".csdb")) {
             return true;

@@ -16,11 +16,12 @@ import java.util.List;
 public class DataPublisherReloaded {
 
     /**
+     * Run the preprocess routine that processes csdb uploads
      *
-     * @param publishedContentReader reader
-     * @param reviewedContentReader
-     * @param collectionContentWriter
-     * @param collection
+     * @param publishedContentReader reader for the master content
+     * @param reviewedContentReader reader for this publications collection content
+     * @param collectionContentWriter reader for this publications collection content
+     * @param collection the collection being processed
      * @throws IOException
      * @throws ZebedeeException
      * @throws URISyntaxException
@@ -32,7 +33,14 @@ public class DataPublisherReloaded {
 
         // For each file in this collection
         for(DataPublication dataPublication: dataPublications) {
-            dataPublication.process(publishedContentReader, reviewedContentReader, collectionContentWriter);
+            // If a file upload exists
+            if (dataPublication.hasUpload())
+                dataPublication.process(publishedContentReader, reviewedContentReader, collectionContentWriter);
         }
+
+    }
+
+    private void compressFiles() {
+
     }
 }

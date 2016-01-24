@@ -11,20 +11,20 @@ import java.io.IOException;
  */
 public class DataLinkMock implements DataLink{
     TimeSerieses returnThis;
-    String lastUri = "";
+    public String lastCall = "";
 
     public DataLinkMock(TimeSerieses returnValues) {
         this.returnThis = returnValues;
     }
     @Override
     public TimeSerieses callCSDBProcessor(String uri, ContentReader collectionReader) throws IOException, ZebedeeException {
-        lastUri = uri;
+        lastCall = "csdb";
         return returnThis;
     }
 
     @Override
     public TimeSerieses callCSVProcessor(String uri, ContentReader collectionReader) throws IOException, ZebedeeException {
-        lastUri = uri;
+        lastCall = "csv";
         return returnThis;
     }
 }

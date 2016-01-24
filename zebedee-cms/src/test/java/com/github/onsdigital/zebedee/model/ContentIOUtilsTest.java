@@ -1,0 +1,126 @@
+package com.github.onsdigital.zebedee.model;
+
+import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.data.framework.DataBuilder;
+import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
+import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
+import com.github.onsdigital.zebedee.data.processing.DataPublicationDetailsTest;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.junit.Assert.*;
+
+/**
+ * Created by thomasridd on 1/24/16.
+ */
+public class ContentIOUtilsTest {
+    Zebedee zebedee;
+    Builder bob;
+    Session publisher;
+    Session reviewer;
+
+    Path copy;
+
+    Collection collection;
+    ContentReader publishedReader;
+    CollectionReader collectionReader;
+    CollectionWriter collectionWriter;
+    DataBuilder dataBuilder;
+    DataPagesGenerator generator;
+
+    DataPagesSet published;
+    DataPagesSet encrypted;
+
+    /**
+     * Setup generates an instance of zebedee, a collection, and various DataPagesSet objects (that are test framework generators)
+     *
+     * @throws Exception
+     */
+    @Before
+    public void setUp() throws Exception {
+
+        bob = new Builder(DataPublicationDetailsTest.class);
+        zebedee = new Zebedee(bob.zebedee, false);
+
+        publisher = zebedee.openSession(bob.publisher1Credentials);
+        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+
+        // create a copy destination
+        copy = Files.createTempDirectory("ContentIOUtils");
+
+        // I'm using dataBuilder to speed up generation but this could use any files
+        dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
+        generator = new DataPagesGenerator();
+
+        CollectionDescription collectionDescription = new CollectionDescription();
+        collectionDescription.name = "ContentIOUtils";
+        collectionDescription.isEncrypted = true;
+        collection = Collection.create(collectionDescription, zebedee, publisher);
+
+        publishedReader = new ContentReader(zebedee.published.path);
+        collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
+        collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
+
+        // add a set of data in a collection
+        encrypted = generator.generateDataPagesSet("dataprocessor", "encrypted", 2015, 2, "inreview.csdb");
+        dataBuilder.addReviewedDataPagesSet(encrypted, collection, collectionWriter);
+
+        // add a set of data to published
+        published = generator.generateDataPagesSet("dataprocessor", "published", 2015, 2, "");
+        dataBuilder.publishDataPagesSet(published);
+
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        bob.delete();
+        FileUtils.deleteDirectory(copy.toFile());
+
+    }
+
+    @Test
+    public void copyContent_givenPlainContent_doesRunCopy() throws IOException, ZebedeeException {
+        // Given
+        // a reader for
+        ContentWriter writer = new ContentWriter(copy);
+        ContentReader reader = publishedReader;
+        Path example = copy.resolve(published.datasetLandingPage.getUri().toString()).resolve("data.json");
+
+        // When
+        // we run the copy
+        ContentIOUtils.copy(reader, writer);
+
+        // Then
+        // we expect the uri's from our published set to have been copied
+        assertTrue(Files.exists(example));
+    }
+
+    @Test
+    public void copyContent_givenCollectionContent_doesRunCopy() throws IOException, ZebedeeException {
+        // Given
+        // a reader for
+        ContentWriter writer = new ContentWriter(copy);
+        ContentReader reader = collectionReader.getReviewed();
+        Path example = copy.resolve(encrypted.datasetLandingPage.getUri().toString()).resolve("data.json");
+
+        // When
+        // we run the copy
+        ContentIOUtils.copy(reader, writer);
+
+        // Then
+        // we expect the uri's from our published set to have been copied
+        assertTrue(Files.exists(example));
+    }
+}

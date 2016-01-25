@@ -88,12 +88,25 @@ public class DataPublication {
     }
 
     /**
-     * Check the landingpage datasetId and update if necessary
+     * Process a specified collection
      *
-     * @param contentWriter
+     * @param publishedContentReader
+     * @param reviewedContentReader
+     * @param reviewedContentWriter
      * @throws IOException
-     * @throws BadRequestException
+     * @throws ZebedeeException
      */
+    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter) throws IOException, ZebedeeException, URISyntaxException {
+        process(publishedContentReader, reviewedContentReader, reviewedContentWriter, true);
+    }
+
+        /**
+         * Check the landingpage datasetId and update if necessary
+         *
+         * @param contentWriter
+         * @throws IOException
+         * @throws BadRequestException
+         */
     void checkLandingPageDatasetId(ContentWriter contentWriter) throws IOException, BadRequestException {
 
         String currentId = details.landingPage.getDescription().getDatasetId();

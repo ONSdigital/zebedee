@@ -1,0 +1,19 @@
+#uri-term mapping; terms are indexed as SearchBoost field for the document with the given uri and sub-uris.
+#When a search containing mapped terms are performed , the document corresponding to these search terms will be boosted to be shown as priority results.
+
+#Separate search terms with commas(,). Using phrases separated by space (e.g. preliminary estimates) has the same effect ( almost! ), prefer not using phrases
+
+#Use following example formats for mapping
+
+#1. To map all documents starting with a uri ( including the base uri ), use the following
+# /economy/grossdomesticproductgdp/bulletins/* => gross, domestic, product
+
+#2. To map a single uri to search terms
+# /economy/grossdomesticproductgdp/bulletins/grossdomesticproductpreliminaryestimate/2015-10-27 => preliminary, estimates
+
+
+##########MAPPING#############
+
+/economy/grossdomesticproductgdp/bulletins/* => gross, domestic, product
+/economy/grossdomesticproductgdp/bulletins/grossdomesticproductpreliminaryestimate/2015-10-27/ => preliminary, estimates,
+

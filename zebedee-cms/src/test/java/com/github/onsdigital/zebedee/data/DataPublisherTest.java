@@ -21,6 +21,8 @@ import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
+import com.github.onsdigital.zebedee.configuration.Configuration;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -210,7 +212,21 @@ public class DataPublisherTest {
         // we expect a standard response
         assertEquals("/csdbURIShouldComeFromEnvVariable/Services/ConvertCSDB", uri.toString());
     }
+    @Test
+    public void urlForBrian_whenEnvVariablesNotSet_givesURIBasedOnConfigurationDefault() throws Exception {
+        // Given
+        // we set the env variable
+        DataPublisher dataPublisher = new DataPublisher();
+        dataPublisher.env = new HashMap<>();
 
+        // When
+        // we get the service csdbURI
+        URI uri = dataPublisher.csdbURI();
+
+        // Then
+        // we expect a standard response
+        assertEquals(Configuration.getBrianUrl() + "/Services/ConvertCSDB", uri.toString());
+    }
     @Test
     public void contentUtil_givenFileReturnedByBrian_shouldDeserialiseTimeSeries() throws IOException {
         // Given
@@ -619,17 +635,17 @@ public class DataPublisherTest {
     @Test
     public void populatePageFromTimeSeries_givenFreshTimeSeries_shouldTransferDetails() throws IOException {
         // Given
-        // the time series that hadn't previously been published (
+        // data for a time series that hasn't previously been published
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = unpublishedTimeSeries;
         DatasetLandingPage publishThisDataset = unpublishedLandingPage;
 
         // When
-        // we populate the page
+        // we populate the new page
         TimeSeries newPage = dataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
 
         // Then
-        // we expect the newPage to have copied details from the
+        // we expect the new page to take metadata from the
         assertEquals(newPage.getCdid(), publishThisPage.getCdid());
         assertEquals(newPage.getDescription().getTitle(), publishThisPage.getDescription().getTitle());
         assertEquals(newPage.getDescription().getSeasonalAdjustment(), publishThisPage.getDescription().getSeasonalAdjustment());

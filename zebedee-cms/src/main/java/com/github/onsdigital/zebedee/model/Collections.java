@@ -565,7 +565,9 @@ public class Collections {
 
         try {
             for (FileItem item : upload.parseRequest(request)) {
-                collectionWriter.getInProgress().write(item.getInputStream(), uri);
+                try (InputStream inputStream = item.getInputStream()) {
+                    collectionWriter.getInProgress().write(inputStream, uri);
+                }
             }
         } catch (Exception e) {
             throw new IOException("Error processing uploaded file", e);

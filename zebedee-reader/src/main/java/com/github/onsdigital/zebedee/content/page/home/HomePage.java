@@ -20,6 +20,8 @@ public class HomePage extends TaxonomyNode {
 
     private List<HomeSection> sections;
 
+    private String serviceMessage;
+
     public HomePage() {
         intro = new MarkdownSection();
         intro.setTitle(ContentConstants.HOMEPAGE_INTRO_TITLE);
@@ -44,5 +46,13 @@ public class HomePage extends TaxonomyNode {
 
     public void setIntro(MarkdownSection intro) {
         this.intro = intro;
+    }
+
+    public String getServiceMessage() {
+        return serviceMessage;
+    }
+
+    public void setServiceMessage(String serviceMessage) {
+        this.serviceMessage = serviceMessage;
     }
 }

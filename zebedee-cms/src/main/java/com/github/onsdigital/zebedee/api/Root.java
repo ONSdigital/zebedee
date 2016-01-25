@@ -14,7 +14,7 @@ import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
-import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.IOUtils;

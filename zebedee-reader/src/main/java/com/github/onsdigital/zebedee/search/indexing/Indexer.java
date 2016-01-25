@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.search.indexing;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
+import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
@@ -16,14 +17,15 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -180,12 +182,26 @@ public class Indexer {
         SearchDocument indexDocument = new SearchDocument();
         indexDocument.setUri(page.getUri());
         indexDocument.setDescription(page.getDescription());
+        indexDocument.setTopics(getTopics(page.getTopics()));
         indexDocument.setType(page.getType());
         return indexDocument;
     }
 
+    private ArrayList<URI> getTopics(List<Link> topics) {
+        if (topics == null) {
+            return null;
+        }
+        ArrayList<URI> uriList = new ArrayList<>();
+        for (Link topic : topics) {
+            uriList.add(topic.getUri());
+        }
+
+        return uriList;
+    }
+
     private Settings getSettings() throws IOException {
-        ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder().loadFromUrl(Indexer.class.getResource("/search/index-config.yml"));
+        Settings.Builder settingsBuilder = Settings.builder().
+                loadFromStream("index-config.yml", Indexer.class.getResourceAsStream("/search/index-config.yml"));
         System.out.println("Index settings:\n" + settingsBuilder.internalMap());
         return settingsBuilder.build();
     }
@@ -202,7 +218,7 @@ public class Indexer {
     //acquires global lock
     private void lockGlobal() {
         IndexResponse lockResponse = searchUtils.createDocument("fs", "lock", "global", "{}");
-        if(!lockResponse.isCreated()) {
+        if (!lockResponse.isCreated()) {
             throw new IndexInProgressException();
         }
     }

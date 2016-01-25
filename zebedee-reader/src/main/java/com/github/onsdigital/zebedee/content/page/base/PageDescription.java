@@ -30,6 +30,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     //These fields won't be serialised into json if empty
     private String summary;
     private List<String> keywords; //Used for search engines to read ?
+    private List<String> searchBoost;
     private String metaDescription;
     /*Statistics Description*/
     private Boolean nationalStatistic;
@@ -424,5 +425,13 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     public void setVersionLabel(String versionLabel) {
         this.versionLabel = versionLabel;
+    }
+
+    public List<String> getSearchBoost() {
+        return searchBoost;
+    }
+
+    public void setSearchBoost(List<String> searchBoost) {
+        this.searchBoost = searchBoost;
     }
 }

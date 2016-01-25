@@ -10,14 +10,13 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.model.publishing.CollectionScheduler;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ReleasePopulator;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -317,7 +316,7 @@ public class Collection {
         }
 
         release = ReleasePopulator.populate(release, this, reader);
-        collectionWriter.getReviewed().write(IOUtils.toInputStream(ContentUtil.serialise(release)), uri);
+        collectionWriter.getReviewed().writeObject(release, uri);
 
         return release;
     }
@@ -795,7 +794,7 @@ public class Collection {
         }
 
         release.getDescription().setPublished(true);
-        collectionWriter.getInProgress().write(IOUtils.toInputStream(ContentUtil.serialise(release)), uri);
+        collectionWriter.getInProgress().writeObject(release, uri);
         return release;
     }
 

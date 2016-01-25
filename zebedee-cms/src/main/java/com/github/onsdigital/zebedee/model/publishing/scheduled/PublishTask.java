@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.publishing;
+package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,7 +35,7 @@ public class PublishTask implements Runnable {
         System.out.println("Running scheduled job for collection id: " + collectionId);
 
         try {
-            Collection collection = zebedee.collections.list().getCollection(this.collectionId);
+            Collection collection = zebedee.collections.getCollection(this.collectionId);
 
             if (collection.description.approvedStatus == false) {
                 System.out.println("Scheduled collection has not been approved - switching to manual");

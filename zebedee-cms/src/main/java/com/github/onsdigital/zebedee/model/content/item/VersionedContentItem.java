@@ -2,8 +2,10 @@ package com.github.onsdigital.zebedee.model.content.item;
 
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.CollectionContentReader;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -40,6 +42,10 @@ public class VersionedContentItem extends ContentItem {
         return VERSION_DIRECTORY;
     }
 
+    public static String getVersionUri(String uri, int versionNumber) {
+        return uri + "/" + VERSION_DIRECTORY + "/" + VERSION_PREFIX + versionNumber;
+    }
+
     /**
      * Utility function to determine if a give uri is that of a previous version.
      * <p>
@@ -69,6 +75,18 @@ public class VersionedContentItem extends ContentItem {
         copyFilesIntoVersionDirectory(contentRoot, versionUri, contentReader);
 
         return new ContentItemVersion(versionIdentifier, this, versionUri);
+    }
+
+    /**
+     * Create a version from the given source path. The source path is typically the path to the published content, so
+     * it cannot be assumed the current version is in the root path of this VersionedContentItem.
+     *
+     * @param contentReader
+     * @return
+     */
+    public ContentItemVersion createVersion(ContentReader contentReader) throws IOException, ZebedeeException {
+
+       return createVersion(contentReader.getRootFolder(), contentReader);
     }
 
     /**
@@ -128,6 +146,17 @@ public class VersionedContentItem extends ContentItem {
                 return true;
             }
         }
+        return false;
+    }
+
+    public boolean versionExists(ContentReader reader) {
+
+        Path pathToVersionsFolder = reader.getRootFolder().resolve(getUri().toString()).resolve(VersionedContentItem.getVersionDirectoryName());
+
+        if (pathToVersionsFolder != null && Files.exists(pathToVersionsFolder) && pathToVersionsFolder.toFile().listFiles().length > 0) {
+            return true;
+        }
+
         return false;
     }
 }

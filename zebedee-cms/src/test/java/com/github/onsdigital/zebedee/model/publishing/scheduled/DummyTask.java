@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.publishing;
+package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.util.Log;

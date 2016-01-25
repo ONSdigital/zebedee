@@ -4,7 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Response;
-import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.davidcarboni.httpino.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -35,19 +35,22 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
 public class Publisher {
 
     private static final Host websiteHost = new Host(Configuration.getWebsiteUrl());
-    private static final Host theTrainHost = new Host(Configuration.getTheTrainUrl());
+    private static final List<Host> theTrainHosts;
     private static final ExecutorService pool = Executors.newFixedThreadPool(50);
 
     static {
+        String[] theTrainUrls = Configuration.getTheTrainUrl();
+        theTrainHosts = new ArrayList<>();
+        for (String theTrainUrl : theTrainUrls) {
+            theTrainHosts.add(new Host(theTrainUrl));
+        }
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
     }
 
@@ -100,7 +103,6 @@ public class Publisher {
                             publishComplete,
                             msTaken);
 
-
                 } else {
                     Log.print("Collection is already locked for publishing. Halting publish attempt on: " + collection.description.id);
                 }
@@ -132,10 +134,10 @@ public class Publisher {
     /**
      * Submit all files in the collection to the train destination - the website.
      *
-     * @param collection
-     * @param email
-     * @return
-     * @throws IOException
+     * @param collection The collection to be published.
+     * @param email An identifier for the publishing user.
+     * @return If publishing succeeded, true.
+     * @throws IOException If a general error occurs.
      */
     private static boolean PublishFilesToWebsite(Collection collection, String email, CollectionReader collectionReadereader) throws IOException {
 
@@ -144,7 +146,7 @@ public class Publisher {
         try {
 
             Log.print("Start BeginPublish");
-            collection.description.publishTransactionId = beginPublish(theTrainHost, encryptionPassword);
+            collection.description.publishTransactionIds = beginPublish(theTrainHosts, encryptionPassword);
             Log.print("End BeginPublish");
 
             Log.print("Start CollectionSave");
@@ -174,10 +176,14 @@ public class Publisher {
 
             Log.print("Start CommitPublish.");
             // If all has gone well so far, commit the publishing transaction:
-            Result result = commitPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
+            boolean success = true;
+            for (Result result : commitPublish(collection.description.publishTransactionIds, encryptionPassword)) {
+                success&=!result.error;
+                collection.description.AddPublishResult(result);
+            }
             Log.print("End CommitPublish");
 
-            if (!result.error) {
+            if (success) {
                 Date publishedDate = new Date();
                 collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
                 collection.description.publishDate = publishedDate;
@@ -185,17 +191,15 @@ public class Publisher {
                 publishComplete = true;
             }
 
-            collection.description.AddPublishResult(result);
-
-
         } catch (IOException e) {
 
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
             System.out.println(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
-            if (collection.description.publishTransactionId != null) {
+            Map<Host, String> transactionIds = collection.description.publishTransactionIds;
+            if (transactionIds != null && transactionIds.size()>0) {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
-                rollbackPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
+                rollbackPublish(collection.description.publishTransactionIds, encryptionPassword);
             }
 
         } finally {
@@ -227,7 +231,11 @@ public class Publisher {
                 publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
             }
 
-            results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, publishUri, zipped, source, reader, pool));
+            for (Map.Entry<Host, String> entry : collection.description.publishTransactionIds.entrySet()) {
+                Host theTrainHost = entry.getKey();
+                String transactionId = entry.getValue();
+                results.add(publishFile(theTrainHost, transactionId, encryptionPassword, uri, publishUri, zipped, source, reader, pool));
+            }
         }
 
         // Add an event to the event log
@@ -257,6 +265,7 @@ public class Publisher {
 
             // move collection files to archive
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
+            //zebedee.publishedCollections.add(collectionJsonPath);
 
             // send a slack success message
             sendSlackMessageForCollection(collectionJsonPath);
@@ -510,18 +519,20 @@ public class Publisher {
     /**
      * Starts a publishing transaction.
      *
-     * @param host               The Train {@link Host}
+     * @param hosts               The list of target Train {@link Host}s
      * @param encryptionPassword The password used to encrypt files during publishing.
      * @return The new transaction ID.
      * @throws IOException If any errors are encountered in making the request or reported in the {@link com.github.onsdigital.zebedee.json.publishing.Result}.
      */
-    static String beginPublish(Host host, String encryptionPassword) throws IOException {
-        String result = null;
+    static Map<Host, String> beginPublish(List<Host> hosts, String encryptionPassword) throws IOException {
+        Map<Host, String> result = new HashMap<>();
         try (Http http = new Http()) {
-            Endpoint begin = new Endpoint(host, "begin").setParameter("encryptionPassword", encryptionPassword);
-            Response<Result> response = http.post(begin, Result.class);
-            checkResponse(response);
-            result = response.body.transaction.id;
+            for (Host host : hosts) {
+                Endpoint begin = new Endpoint(host, "begin").setParameter("encryptionPassword", encryptionPassword);
+                Response<Result> response = http.post(begin, Result.class);
+                checkResponse(response);
+                result.put(host, response.body.transaction.id);
+            }
         }
         return result;
     }
@@ -572,26 +583,34 @@ public class Publisher {
     /**
      * Commits a publishing transaction.
      *
-     * @param host               The Train {@link Host}
-     * @param transactionId      The transaction to publish to.
+     * @param transactionIds      The {@link Host}s and transactions to publish to.
      * @param encryptionPassword The password used to encrypt files during publishing.
      * @return The {@link Result} returned by The Train
      * @throws IOException If any errors are encountered in making the request or reported in the {@link Result}.
      */
-    static Result commitPublish(Host host, String transactionId, String encryptionPassword) throws IOException {
-        return endPublish(host, "commit", transactionId, encryptionPassword);
+    static List<Result> commitPublish(Map<Host, String> transactionIds, String encryptionPassword) throws IOException {
+        List<Result> results = new ArrayList<>();
+        for (Map.Entry<Host, String> entry : transactionIds.entrySet()) {
+            Host host = entry.getKey();
+            String transactionId = entry.getValue();
+            results.add( endPublish(host, "commit", transactionId, encryptionPassword));
+        }
+        return results;
     }
 
     /**
      * Rolls back a publishing transaction, suppressing any {@link IOException} and printing it out to the console instead.
      *
-     * @param host               The Train {@link Host}
-     * @param transactionId      The transaction to publish to.
+     * @param transactionIds      The {@link Host}s and transactions we are attempting to publish to.
      * @param encryptionPassword The password used to encrypt files during publishing.
      */
-    static void rollbackPublish(Host host, String transactionId, String encryptionPassword) {
+    static void rollbackPublish(Map<Host, String> transactionIds, String encryptionPassword) {
         try {
-            endPublish(host, "rollback", transactionId, encryptionPassword);
+            for (Map.Entry<Host, String> entry : transactionIds.entrySet()) {
+                Host host = entry.getKey();
+                String transactionId = entry.getValue();
+                endPublish(host, "rollback", transactionId, encryptionPassword);
+            }
         } catch (IOException e) {
             System.out.println("Error rolling back publish transaction:");
             System.out.println(ExceptionUtils.getStackTrace(e));

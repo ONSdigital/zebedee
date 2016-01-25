@@ -30,8 +30,8 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
     }
 
-    public static String getTheTrainUrl() {
-        return StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL);
+    public static String[] getTheTrainUrl() {
+        return StringUtils.split(StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL),",");
     }
 
     public static String getBrianUrl() {
@@ -92,6 +92,5 @@ public class Configuration {
         public String name;
         public String password;
     }
-
 
 }

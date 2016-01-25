@@ -53,7 +53,7 @@ public class DataPublication {
      * @throws IOException
      * @throws ZebedeeException
      */
-    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter) throws IOException, ZebedeeException, URISyntaxException {
+    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter, boolean saveTimeSeries) throws IOException, ZebedeeException, URISyntaxException {
 
         // check this landingpage has a datasetId and generate if necessary
         checkLandingPageDatasetId(reviewedContentWriter);
@@ -68,8 +68,10 @@ public class DataPublication {
             processor.processTimeseries(publishedContentReader, details, series);
 
             // Save files
-            DataWriter writer = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
-            writer.versionAndSave(processor, details);
+            if (saveTimeSeries) {
+                DataWriter writer = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
+                writer.versionAndSave(processor, details);
+            }
 
             // Retain the result to be added to any generated spreadsheet
             results.add(processor.timeSeries);

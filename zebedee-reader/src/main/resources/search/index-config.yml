@@ -128,7 +128,7 @@ analysis :
         - "snpp, sub national population projections"
         - "suid, sudden unexpected/unexplained infant deaths"
         - "drd, drug related deaths"
-        - "c diff,	clostridium difficile"
+        - "c diff, clostridium difficile"
         - "eolc, end of life care"
         - "mb1, cancer registrations"
         - "imd, index of multiple deprivation"

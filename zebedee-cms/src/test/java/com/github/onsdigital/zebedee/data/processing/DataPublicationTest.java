@@ -10,10 +10,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import org.junit.After;
@@ -22,6 +19,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 
 import static org.junit.Assert.*;
@@ -122,6 +121,7 @@ public class DataPublicationTest {
 
         // Then
         // we expect it to be not null
+        Path idiotCheck = generateIdiotCheck(collectionReader.getReviewed());
         assertNotNull(publication);
     }
 
@@ -211,4 +211,9 @@ public class DataPublicationTest {
         assertEquals("csv", mock.lastCall);
     }
 
+    private Path generateIdiotCheck(ContentReader contentReader) throws IOException, ZebedeeException {
+        Path temp = Files.createTempDirectory("temp");
+        ContentIOUtils.copy(contentReader, new ContentWriter(temp));
+        return temp;
+    }
 }

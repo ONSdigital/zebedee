@@ -118,14 +118,13 @@ public class DataGrid {
      * @param column     the column of each DataGridRow to fill
      */
     void fillTimeSeriesValuesInMap(Map<String, DataGridRow> map, TimeSeries timeSeries, int column) {
-        Set<TimeSeriesValue> allValues = new HashSet<>();
-        allValues.addAll(timeSeries.years);
-        allValues.addAll(timeSeries.quarters);
-        allValues.addAll(timeSeries.months);
 
-        for (TimeSeriesValue value : allValues) {
+        for (TimeSeriesValue value : timeSeries.years)
             map.get(value.date).cells.set(column, value.value);
-        }
+        for (TimeSeriesValue value : timeSeries.months)
+            map.get(value.date).cells.set(column, value.value);
+        for (TimeSeriesValue value : timeSeries.quarters)
+            map.get(value.date).cells.set(column, value.value);
     }
 
     /**

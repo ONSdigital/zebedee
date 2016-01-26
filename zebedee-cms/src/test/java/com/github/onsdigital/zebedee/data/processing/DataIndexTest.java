@@ -5,13 +5,8 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import org.junit.After;
 import org.junit.Before;
@@ -67,29 +62,19 @@ public class DataIndexTest {
     }
 
     @Test
-    public void dataIndex_givenContent_buildsIndex() throws IOException, InterruptedException {
+    public void dataIndex_givenContent_buildsIndex() throws IOException, InterruptedException, BadRequestException {
         // Given
         // content
         ContentReader contentReader = publishedReader;
 
         // When
         // we build a DataIndex
-        DataIndex dataIndex = new DataIndex();
-        dataIndex.buildIndex(contentReader);
+        DataIndex dataIndex = new DataIndex(contentReader);
+        dataIndex.pauseUntilComplete(60);
 
         // Then
-        //
-        assertTrue(pauseUntilComplete(dataIndex));
+        // indexing should complete with the published timeseries referenced
         assertTrue(dataIndex.cdids().size() > 0);
     }
 
-    private boolean pauseUntilComplete(DataIndex dataIndex) throws InterruptedException {
-        int tries = 0;
-        while (!dataIndex.indexBuilt) {
-            wait(100);
-            if (tries++ > 1000)
-                return false;
-        }
-        return true;
-    }
 }

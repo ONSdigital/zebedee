@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -9,6 +10,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -40,6 +42,8 @@ public class Zebedee {
     public final Teams teams;
     public final VerificationAgent verificationAgent;
 
+    public final DataIndex dataIndex;
+
     public Zebedee(Path path, boolean useVerificationAgent) {
 
         // Validate the directory:
@@ -61,6 +65,7 @@ public class Zebedee {
 
         // Create published and ensure redirect
         this.published = new Content(published);
+        this.dataIndex = new DataIndex(new ContentReader(this.published.path));
 
         Path redirectPath = this.published.path.resolve(Content.REDIRECT);
         if (!Files.exists(redirectPath)) {
@@ -87,6 +92,7 @@ public class Zebedee {
         } else {
             this.verificationAgent = null;
         }
+
     }
 
     public Zebedee(Path path) {

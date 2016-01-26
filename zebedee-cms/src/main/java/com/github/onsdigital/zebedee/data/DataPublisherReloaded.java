@@ -1,10 +1,10 @@
 package com.github.onsdigital.zebedee.data;
 
-import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.data.processing.DataPublication;
 import com.github.onsdigital.zebedee.data.processing.DataPublicationFinder;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionContentReader;
 import com.github.onsdigital.zebedee.model.CollectionContentWriter;
@@ -27,7 +27,7 @@ public class DataPublisherReloaded {
      * @throws ZebedeeException
      * @throws URISyntaxException
      */
-    public void preprocessCollection(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, boolean saveTimeSeries) throws IOException, ZebedeeException, URISyntaxException {
+    public void preprocessCollection(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, boolean saveTimeSeries, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
 
         // Find all files that need data preprocessing
         List<DataPublication> dataPublications = new DataPublicationFinder().findPublications(publishedContentReader, reviewedContentReader, collection);
@@ -36,7 +36,7 @@ public class DataPublisherReloaded {
         for(DataPublication dataPublication: dataPublications) {
             // If a file upload exists
             if (dataPublication.hasUpload())
-                dataPublication.process(publishedContentReader, reviewedContentReader, collectionContentWriter, saveTimeSeries);
+                dataPublication.process(publishedContentReader, reviewedContentReader, collectionContentWriter, saveTimeSeries, dataIndex);
         }
 
     }
@@ -52,9 +52,9 @@ public class DataPublisherReloaded {
      * @throws ZebedeeException
      * @throws URISyntaxException
      */
-    public void preprocessCollection(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection) throws IOException, ZebedeeException, URISyntaxException
+    public void preprocessCollection(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException
     {
-        preprocessCollection(publishedContentReader, reviewedContentReader, collectionContentWriter, collection, true);
+        preprocessCollection(publishedContentReader, reviewedContentReader, collectionContentWriter, collection, true, dataIndex);
     }
 
     private void compressFiles() {

@@ -27,7 +27,7 @@ public class PublishSchedulerTest {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
         session = zebedee.openSession(builder.administratorCredentials);
-        scheduler = new PublishScheduler(zebedee);
+        scheduler = new PublishScheduler();
     }
 
     @After
@@ -51,10 +51,10 @@ public class PublishSchedulerTest {
 
         Date startDate = description.publishDate;
         Date prePublishStartDate = new DateTime(description.publishDate).minusSeconds(1).toDate();
-        scheduler.schedulePrePublish(collection, prePublishStartDate, startDate);
+        scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
 
         //Thread.sleep(4000);
 
-        scheduler.cancelPublish(collection);
+        scheduler.cancel(collection);
     }
 }

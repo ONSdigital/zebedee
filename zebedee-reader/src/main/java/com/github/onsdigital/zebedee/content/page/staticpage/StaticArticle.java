@@ -18,7 +18,6 @@ public class StaticArticle extends Page {
 
     private List<Link> relatedData;
     private List<Link> relatedDocuments;
-    private List<Link> topics;
     private List<Link> links;
     private List<DownloadSection> downloads;
 
@@ -99,12 +98,12 @@ public class StaticArticle extends Page {
         this.alerts = alerts;
     }
 
-    public List<Link> getTopics() {
-        return topics;
+    public List<DownloadSection> getDownloads() {
+        return downloads;
     }
 
-    public void setTopics(List<Link> topics) {
-        this.topics = topics;
+    public void setDownloads(List<DownloadSection> downloads) {
+        this.downloads = downloads;
     }
 
     public List<Link> getLinks() {
@@ -113,13 +112,5 @@ public class StaticArticle extends Page {
 
     public void setLinks(List<Link> links) {
         this.links = links;
-    }
-
-    public List<DownloadSection> getDownloads() {
-        return downloads;
-    }
-
-    public void setDownloads(List<DownloadSection> downloads) {
-        this.downloads = downloads;
     }
 }

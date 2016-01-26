@@ -59,6 +59,10 @@ public class DataBuilder {
         for(TimeSeries timeSeries: dataPagesSet.timeSeriesList) {
             publishPage(timeSeries, timeSeries.getUri().toString());
         }
+
+        // We have added pages directly to the master so need to reindex
+        zebedee.dataIndex.reindex();
+        zebedee.dataIndex.pauseUntilComplete(60);
     }
 
     /**

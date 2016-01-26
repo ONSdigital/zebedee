@@ -19,7 +19,6 @@ public class StaticArticle extends Page {
     private List<Link> relatedData;
     private List<Link> relatedDocuments;
     private List<Link> topics;
-    private List<Link> links;
     private List<DownloadSection> downloads;
 
     private List<MarkdownSection> sections = new ArrayList<>();
@@ -105,14 +104,6 @@ public class StaticArticle extends Page {
 
     public void setTopics(List<Link> topics) {
         this.topics = topics;
-    }
-
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<Link> links) {
-        this.links = links;
     }
 
     public List<DownloadSection> getDownloads() {

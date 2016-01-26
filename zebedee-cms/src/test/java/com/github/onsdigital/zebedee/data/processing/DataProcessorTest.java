@@ -110,7 +110,7 @@ public class DataProcessorTest {
 
         // When
         // we get the publish uri for a timeseries
-        String publishUri = new DataProcessor().publishUriForTimeseries(series, details);
+        String publishUri = new DataProcessor().publishUriForTimeseries(series, details, zebedee.dataIndex);
 
         // Then
         // we expect it to be the cdid at the same root
@@ -132,7 +132,7 @@ public class DataProcessorTest {
 
         // When
         // we get the initialTimeseries
-        TimeSeries initial = new DataProcessor().initialTimeseries(timeSeries, publishedReader, details);
+        TimeSeries initial = new DataProcessor().initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
 
         // Then
         // we expect it to be a skeleton timeseries
@@ -154,7 +154,7 @@ public class DataProcessorTest {
 
         // When
         // we get the initialTimeseries
-        TimeSeries initial = new DataProcessor().initialTimeseries(timeSeries, publishedReader, details);
+        TimeSeries initial = new DataProcessor().initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
 
         // Then
         // we expect it to be the published timeseries complete with existing data
@@ -180,7 +180,7 @@ public class DataProcessorTest {
         TimeSeries timeSeries = inReview.timeSeriesList.get(0);
 
         DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details);
+        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
 
         // If
         // we randomise contacts
@@ -211,7 +211,7 @@ public class DataProcessorTest {
         TimeSeries timeSeries = inReview.timeSeriesList.get(0);
 
         DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details);
+        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
 
         // When
         // we sync details
@@ -235,7 +235,7 @@ public class DataProcessorTest {
         TimeSeries timeSeries = republish.timeSeriesList.get(0);
 
         DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details);
+        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
         initial.getDescription().setTitle("");
 
         // When
@@ -260,7 +260,7 @@ public class DataProcessorTest {
         TimeSeries publishedTimeseries = published.timeSeriesList.get(0);
 
         DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details);
+        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
 
         // When
         // we sync details
@@ -289,7 +289,7 @@ public class DataProcessorTest {
 
         // When
         // we sync details
-        TimeSeries processed = new DataProcessor().processTimeseries(publishedReader, review.getDetails(publishedReader, collectionReader.getReviewed()), series);
+        TimeSeries processed = new DataProcessor().processTimeseries(publishedReader, review.getDetails(publishedReader, collectionReader.getReviewed()), series, zebedee.dataIndex);
 
         // Then
         // we expect the manual data to be persisted

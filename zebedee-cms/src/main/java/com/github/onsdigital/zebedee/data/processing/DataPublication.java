@@ -68,7 +68,7 @@ public class DataPublication {
         for(TimeSeries series: serieses) {
             // Build new timeseries
             DataProcessor processor = new DataProcessor();
-            processor.processTimeseries(publishedContentReader, details, series);
+            processor.processTimeseries(publishedContentReader, details, series, dataIndex);
 
             // Save files
             if (saveTimeSeries) {

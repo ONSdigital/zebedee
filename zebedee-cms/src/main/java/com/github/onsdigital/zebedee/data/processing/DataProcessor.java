@@ -35,10 +35,10 @@ public class DataProcessor {
      * @param details
      * @param newTimeSeries   @return
      * */
-    public TimeSeries processTimeseries(ContentReader publishedContentReader, DataPublicationDetails details, TimeSeries newTimeSeries) throws ZebedeeException, IOException, URISyntaxException {
+    public TimeSeries processTimeseries(ContentReader publishedContentReader, DataPublicationDetails details, TimeSeries newTimeSeries, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
 
         // Get current version of the time series (persists any manually entered data)
-        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details);
+        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details, dataIndex);
 
         // Add meta from the landing page and timeseries dataset page
         syncLandingPageMetadata(this.timeSeries, details);
@@ -195,14 +195,20 @@ public class DataProcessor {
     /**
      * Get the publish path for a timeseries
      *
-     * (TODO: This is currently based on datasetUri and cdid only but will update when code goes unique)
-     *
      * @param series
      * @param details
      * @return
      */
-    String publishUriForTimeseries(TimeSeries series, DataPublicationDetails details) {
-        return details.getTimeseriesFolder() + "/" + series.getCdid().toLowerCase();
+    String publishUriForTimeseries(TimeSeries series, DataPublicationDetails details, DataIndex dataIndex) {
+        String cdid = series.getCdid().toLowerCase();
+        String indexed = dataIndex.getUriForCdid(cdid);
+        if (indexed != null) {
+            return indexed;
+        } else {
+            String unindexed = details.getTimeseriesFolder() + "/" + series.getCdid().toLowerCase();
+            dataIndex.setUriForCdid(cdid, unindexed);
+            return unindexed;
+        }
     }
 
     /**
@@ -215,9 +221,9 @@ public class DataProcessor {
      * @throws ZebedeeException
      * @throws IOException
      */
-    TimeSeries initialTimeseries(TimeSeries series, ContentReader publishedContentReader, DataPublicationDetails details) throws ZebedeeException, IOException, URISyntaxException {
+    TimeSeries initialTimeseries(TimeSeries series, ContentReader publishedContentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
 
-        String publishUri = publishUriForTimeseries(series, details);
+        String publishUri = publishUriForTimeseries(series, details, dataIndex);
 
         // Try to get an existing timeseries
         try {

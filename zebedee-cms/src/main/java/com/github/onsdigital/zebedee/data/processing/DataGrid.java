@@ -97,7 +97,7 @@ public class DataGrid {
      *
      * @param range           the DataTimeRange we are referring to
      * @param timeSeriesCount the number of columns required per DataGridRow
-     * @return
+     * @return a template map to fill in grid rows
      */
     Map<String, DataGridRow> emptyRowsWithRange(DataTimeRange range, int timeSeriesCount) {
         Map<String, DataGridRow> rows = new HashMap<>();

@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
@@ -80,15 +81,16 @@ public class DataIndex {
             // Get the uri
             String uri = "/" + this.contentReader.getRootFolder().relativize(file).toString();
 
-            // Quick check
-            if (uri.endsWith("data.json") && uri.toString().contains("/timeseries/")) {
-                uri = uri.substring(0, uri.length() - "data.json".length());
+            // Check json files in timeseries directories (excluding versions)
+            if (uri.endsWith("data.json") && uri.toString().contains("/timeseries/") && !uri.toString().contains("/" + VersionedContentItem.getVersionDirectoryName() + "/")) {
+                uri = uri.substring(0, uri.length() - "/data.json".length());
 
                 TimeSeries timeSeries = null;
                 try {
                     timeSeries = (TimeSeries) this.contentReader.getContent(uri);
                     if (timeSeries.getCdid() != null) {
-                        this.index.put(timeSeries.getCdid(), "/" + this.contentReader.getRootFolder().relativize(file).toString());
+
+                        this.index.put(timeSeries.getCdid(), uri);
                     }
                 } catch (ZebedeeException | IOException e) {
                     e.printStackTrace();

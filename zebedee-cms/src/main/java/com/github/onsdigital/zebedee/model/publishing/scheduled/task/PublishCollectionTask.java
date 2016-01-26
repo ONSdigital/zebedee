@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.util.Log;
 
@@ -35,6 +37,9 @@ public class PublishCollectionTask implements Callable<Boolean> {
     public Boolean call() throws Exception {
         Log.print("PUBLISH: Running publish task for collection: " + collection.description.name);
         published = Publisher.Publish(collection, "System", collectionReader);
+
+        new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
+
         return published;
     }
 

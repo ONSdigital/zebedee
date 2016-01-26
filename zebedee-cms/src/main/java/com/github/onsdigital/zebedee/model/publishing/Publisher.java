@@ -246,8 +246,6 @@ public class Publisher {
             Log.print("Reindexing search");
             reindexSearch(collection);
 
-            new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
-
             // move collection files to archive
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 

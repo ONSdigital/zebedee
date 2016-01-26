@@ -314,6 +314,9 @@ public class Collections {
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();
+
+            new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
+
             Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
             Log.print("postPublish process finished for collection %s time taken: %dms",
                     collection.description.name,

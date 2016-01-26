@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 
-import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.RunnableScheduler;
 
 import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
@@ -16,7 +16,7 @@ public abstract class ScheduledTask implements Runnable {
     protected ScheduledFuture<?> future; // The reference to the future of the task.
     protected Date scheduledDate;
 
-    Scheduler scheduler = new Scheduler(1);
+    RunnableScheduler runnableScheduler = new RunnableScheduler(1);
 
     /**
      * Set the task to execute at the give date.
@@ -30,7 +30,7 @@ public abstract class ScheduledTask implements Runnable {
         }
 
         this.scheduledDate = scheduledDate;
-        future = scheduler.schedule(this, scheduledDate);
+        future = runnableScheduler.schedule(this, scheduledDate);
         return true;
     }
 

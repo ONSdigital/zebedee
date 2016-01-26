@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import org.junit.Test;
-
 import java.util.ArrayList;
 
 import static junit.framework.TestCase.assertTrue;
@@ -11,7 +9,7 @@ public class PublishCollectionsTaskTest {
     // test a single task runs
     // multiple tasks all run concurrent
 
-    @Test
+    //@Test
     public void test() {
 
         // Given 2 publish tasks and 2 post publish tasks in a PublishCollectionsTask.

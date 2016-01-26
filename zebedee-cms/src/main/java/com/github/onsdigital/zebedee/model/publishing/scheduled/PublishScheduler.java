@@ -2,13 +2,13 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PostPublishCollectionTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PrePublishCollectionsTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionsTask;
 import com.github.onsdigital.zebedee.util.Log;
+import org.joda.time.DateTime;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,8 +20,6 @@ import java.util.Map;
  */
 public class PublishScheduler extends Scheduler {
 
-    public static final int prePublishSecondsBeforePublish = 5; // how many seconds before a publish should the pre-publish process start
-
     private final Map<Date, PrePublishCollectionsTask> prePublishTasks = new HashMap<>();
     private final Map<Date, PublishCollectionsTask> publishTasks = new HashMap<>();
 
@@ -32,18 +30,20 @@ public class PublishScheduler extends Scheduler {
      * @param publishStartDate The start date of the publish process.
      */
     void schedulePrePublish(Collection collection, Zebedee zebedee, Date prePublishStartDate, Date publishStartDate) {
-        if (Configuration.isSchedulingEnabled()) {
-            try {
-                System.out.println("Attempting to schedule pre-publish for collection " + collection.description.name + " type=" + collection.description.type);
-                if (collection.description.type == CollectionType.scheduled) {
-                    schedulePrePublishCollection(collection, zebedee, prePublishStartDate, publishStartDate);
-                }
-            } catch (Exception e) {
-                System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());
-            }
+        // cancel existing publish for the collection
+        prePublishTasks.values().forEach(task -> task.removeCollection(collection));
+        PrePublishCollectionsTask task;
+
+        // add a task for the publish date if there is not already one.
+        if (prePublishTasks.containsKey(publishStartDate)) {
+            task = prePublishTasks.get(publishStartDate);
         } else {
-            Log.print("Not scheduling collection %s, scheduling is not enabled", collection.description.name);
+            task = new PrePublishCollectionsTask(zebedee, publishStartDate, this);
+            task.schedule(prePublishStartDate);
+            prePublishTasks.put(publishStartDate, task);
         }
+
+        task.addCollection(collection);
     }
 
 
@@ -64,23 +64,6 @@ public class PublishScheduler extends Scheduler {
         } else {
             Log.print("Not scheduling publish, scheduling is not enabled");
         }
-    }
-
-    private void schedulePrePublishCollection(Collection collection, Zebedee zebedee, Date prePublishStartDate, Date publishStartDate) {
-        // cancel existing publish for the collection
-        prePublishTasks.values().forEach(task -> task.removeCollection(collection));
-        PrePublishCollectionsTask task;
-
-        // add a task for the publish date if there is not already one.
-        if (prePublishTasks.containsKey(publishStartDate)) {
-            task = prePublishTasks.get(publishStartDate);
-        } else {
-            task = new PrePublishCollectionsTask(zebedee, publishStartDate, this);
-            task.schedule(prePublishStartDate);
-            prePublishTasks.put(publishStartDate, task);
-        }
-
-        task.addCollection(collection);
     }
 
     /**
@@ -119,7 +102,13 @@ public class PublishScheduler extends Scheduler {
 
     @Override
     protected void schedule(Collection collection, Zebedee zebedee) {
+        Log.print("Scheduling collection using optimised publisher: %s", collection.description.name);
+        Date publishStartDate = collection.description.publishDate;
+        int getPreProcessSecondsBeforePublish = Configuration.getPreProcessSecondsBeforePublish();
+        Date prePublishStartDate = new DateTime(publishStartDate).minusSeconds(getPreProcessSecondsBeforePublish).toDate();
 
+        Log.print("Scheduling collection %s prepublish: %s, publish %s", collection.description.name, prePublishStartDate, publishStartDate);
+        schedulePrePublish(collection, zebedee, prePublishStartDate, publishStartDate);
     }
 
     @Override

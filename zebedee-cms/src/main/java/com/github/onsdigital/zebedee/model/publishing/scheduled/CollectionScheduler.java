@@ -64,7 +64,8 @@ public class CollectionScheduler extends Scheduler {
 
     @Override
     protected void schedule(Collection collection, Zebedee zebedee) {
-
+        Log.print("Scheduling collection using original publisher: %s", collection.description.name);
+        schedule(collection, new PublishTask(zebedee, collection));
     }
 
     /**

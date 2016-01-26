@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.publishing;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
+import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
@@ -19,7 +20,10 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
-import com.github.onsdigital.zebedee.util.*;
+import com.github.onsdigital.zebedee.util.ContentTree;
+import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.ZipUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -51,7 +55,7 @@ public class Publisher {
         Runtime.getRuntime().addShutdownHook(new ShutDownPublisherThread(pool));
     }
 
-    public static boolean Publish(Zebedee zebedee, Collection collection, String email, boolean skipVerification, CollectionReader collectionReader) throws IOException {
+    public static boolean Publish(Collection collection, String email, CollectionReader collectionReader) throws IOException {
         boolean publishComplete = false;
 
         // First get the in-memory (within-JVM) lock.
@@ -113,17 +117,6 @@ public class Publisher {
         } finally {
             writeLock.unlock();
             Log.print("Collection lock released: " + collection.description.id);
-        }
-
-        if (publishComplete) {
-            long onPublishCompleteStart = System.currentTimeMillis();
-            onPublishComplete(zebedee, collection, skipVerification, collectionReader);
-            Log.print("onPublishComplete process finished for collection %s time taken: %dms",
-                    collection.description.name,
-                    (System.currentTimeMillis() - onPublishCompleteStart));
-            Log.print("Publish complete for collection %s total time taken: %dms",
-                    collection.description.name,
-                    (System.currentTimeMillis() - publishStart));
         }
 
         return publishComplete;
@@ -243,7 +236,7 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    private static boolean onPublishComplete(Zebedee zebedee, Collection collection, boolean skipVerification, CollectionReader collectionReader) throws IOException {
+    public static boolean postPublish(Zebedee zebedee, Collection collection, boolean skipVerification, CollectionReader collectionReader) throws IOException {
 
         try {
 
@@ -252,8 +245,6 @@ public class Publisher {
 
             Log.print("Reindexing search");
             reindexSearch(collection);
-
-            new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
 
             // move collection files to archive
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);

@@ -130,6 +130,33 @@ public class Indexer {
     }
 
 
+    /**
+     * Resolves search terms for a single document
+     */
+    private List<String> resolveSearchTerms(String uri) throws IOException {
+        if (uri == null) {
+            return null;
+        }
+
+        SearchBoostTermsResolver resolver = SearchBoostTermsResolver.getSearchTermResolver();
+        List<String> terms = new ArrayList<>();
+        addTerms(terms, resolver.getTerms(uri));
+
+        String[] segments = uri.split("/");
+        for (String segment : segments) {
+            String documentUri = "/" + segment;
+            addTerms(terms, resolver.getTermsForPrefix(documentUri));
+        }
+        return terms;
+    }
+
+    private void addTerms(List<String> termsList, List<String> terms) {
+        if (terms == null) {
+            return;
+        }
+        termsList.addAll(terms);
+    }
+
     private void indexDocuments(String indexName) throws IOException {
         index(indexName, new FileScanner().scan());
     }
@@ -138,12 +165,12 @@ public class Indexer {
      * Recursively indexes contents and their child contents
      *
      * @param indexName
-     * @param fileNames
+     * @param documents
      * @throws IOException
      */
-    private void index(String indexName, List<String> fileNames) throws IOException {
+    private void index(String indexName, List<Document> documents) throws IOException {
         try (BulkProcessor bulkProcessor = getBulkProcessor()) {
-            for (String path : fileNames) {
+            for (Document path : documents) {
                 try {
                     IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, path);
                     if (indexRequestBuilder == null) {
@@ -163,27 +190,29 @@ public class Indexer {
         return zebedeeReader.getPublishedContent(uri);
     }
 
-    private IndexRequestBuilder prepareIndexRequest(String indexName, String uri) throws ZebedeeException, IOException {
-        Page page = getPage(uri);
+    private IndexRequestBuilder prepareIndexRequest(String indexName, Document document) throws ZebedeeException, IOException {
+        Page page = getPage(document.getUri());
         if (page != null && page.getType() != null) {
             IndexRequestBuilder indexRequestBuilder = searchUtils.prepareIndex(indexName, page.getType().name(), page.getUri().toString());
-            indexRequestBuilder.setSource(serialise(toSearchDocument(page)));
+            indexRequestBuilder.setSource(serialise(toSearchDocument(page, document.getSearchTerms())));
             return indexRequestBuilder;
         }
         return null;
     }
 
-    private void indexSingleContent(String indexName, Page page) {
-        searchUtils.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page)));
+    private void indexSingleContent(String indexName, Page page) throws IOException {
+        List<String> terms = resolveSearchTerms(page.getUri().toString());
+        searchUtils.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page, terms)));
     }
 
 
-    private SearchDocument toSearchDocument(Page page) {
+    private SearchDocument toSearchDocument(Page page, List<String> searchTerms) {
         SearchDocument indexDocument = new SearchDocument();
         indexDocument.setUri(page.getUri());
         indexDocument.setDescription(page.getDescription());
         indexDocument.setTopics(getTopics(page.getTopics()));
         indexDocument.setType(page.getType());
+        indexDocument.setSearchBoost(searchTerms);
         return indexDocument;
     }
 

@@ -17,6 +17,7 @@ public class Configuration {
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
+    private static final int DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH = 10;
 
     public static boolean isSchedulingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
@@ -24,6 +25,18 @@ public class Configuration {
 
     public static boolean isVerificationEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
+    }
+
+    public static boolean isOptimisedPublishingEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("optimised_publish_enabled"), "true"));
+    }
+
+    public static int getPreProcessSecondsBeforePublish() {
+        try {
+            return Integer.parseInt(getValue("pre_publish_seconds_before_publish"));
+        } catch (Exception e) {
+            return DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH;
+        }
     }
 
     public static String getFlorenceUrl() {
@@ -92,6 +105,4 @@ public class Configuration {
         public String name;
         public String password;
     }
-
-
 }

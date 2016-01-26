@@ -59,4 +59,12 @@ public class Log {
     public static void main(String[] args) {
         print("Hi %s", "there");
     }
+
+    /**
+     * Print exception details.
+     * @param e
+     */
+    public static void print(Exception e) {
+        print(e, "");
+    }
 }

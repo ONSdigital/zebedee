@@ -6,8 +6,6 @@ import static com.github.onsdigital.zebedee.util.VariableUtils.getVariableValue;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 /**
- * Created by bren on 29/07/15.
- * <p>
  * Content reader configuration
  */
 public class ReaderConfiguration {

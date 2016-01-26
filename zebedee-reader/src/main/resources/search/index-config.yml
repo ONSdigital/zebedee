@@ -16,7 +16,7 @@ analysis :
         - standard
         - stop
     #Including detailed analysis like synonyms and stemming, currently only used on detail title field analysis
-    ons_detailed :
+    ons_synonym_stem :
       tokenizer : standard
       filter :
         - lowercase
@@ -24,7 +24,14 @@ analysis :
         - standard
         - stop
         - porter_stem
-    ons_detailed_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
+    ons_synonym :
+      tokenizer : standard
+      filter :
+        - lowercase
+        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
+        - standard
+        - stop
+    ons_synonym_stem_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
       tokenizer : standard
       char_filter : clear_dates
       filter :

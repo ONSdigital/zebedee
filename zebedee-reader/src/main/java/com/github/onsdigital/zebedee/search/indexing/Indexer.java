@@ -170,15 +170,15 @@ public class Indexer {
      */
     private void index(String indexName, List<Document> documents) throws IOException {
         try (BulkProcessor bulkProcessor = getBulkProcessor()) {
-            for (Document path : documents) {
+            for (Document document : documents) {
                 try {
-                    IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, path);
+                    IndexRequestBuilder indexRequestBuilder = prepareIndexRequest(indexName, document);
                     if (indexRequestBuilder == null) {
                         continue;
                     }
                     bulkProcessor.add(indexRequestBuilder.request());
                 } catch (Exception e) {
-                    System.err.println("!!!!!!!!!Failed preparing index for " + path + " skipping...");
+                    System.err.println("!!!!!!!!!Failed preparing index for " + document.getUri() + " skipping...");
                     e.printStackTrace();
                 }
             }

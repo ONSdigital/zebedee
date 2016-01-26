@@ -10,7 +10,7 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
@@ -232,7 +232,7 @@ public class Collection {
     public static Collection update(Collection collection,
                                     CollectionDescription collectionDescription,
                                     Zebedee zebedee,
-                                    CollectionScheduler scheduler,
+                                    Scheduler scheduler,
                                     Session session) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
 
         if (collection == null) {
@@ -254,7 +254,7 @@ public class Collection {
         if (updatedCollection.description.type == CollectionType.scheduled) {
             if (collectionDescription.publishDate != null) {
                 updatedCollection.description.publishDate = collectionDescription.publishDate;
-                CollectionScheduler.schedulePublish(scheduler, updatedCollection, zebedee);
+                scheduler.schedulePublish(updatedCollection, zebedee);
             }
         } else { // the type is now manual so cancel it
             scheduler.cancel(collection);

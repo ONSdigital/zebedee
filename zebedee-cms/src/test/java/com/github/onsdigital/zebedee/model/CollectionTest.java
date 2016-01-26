@@ -193,7 +193,7 @@ public class CollectionTest {
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         CollectionScheduler scheduler = new CollectionScheduler();
-        CollectionScheduler.schedulePublish(scheduler, collection, zebedee);
+        scheduler.schedulePublish(collection, zebedee);
 
         // When the collection is updated with a new release time
         String newName = "Economy Release";

@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
@@ -15,6 +14,8 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.IOUtils;
@@ -36,9 +37,8 @@ public class Root {
     // Environment variables are stored as a static variable so if necessary we can hijack them for testing
     public static Map<String, String> env = System.getenv();
     public static Zebedee zebedee;
-    public static CollectionScheduler scheduler = new CollectionScheduler();
-
     static Path root;
+    private static Scheduler scheduler;
 
     /**
      * Recursively lists all files within this {@link Content}.
@@ -103,6 +103,14 @@ public class Root {
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty("zebedee_root", root.toString());
 
+        if (Configuration.isOptimisedPublishingEnabled()) {
+            Log.print("Optimised publishing is enabled. Using new scheduler.");
+            scheduler = new PublishScheduler(); // use new publisher if its enabled;
+        } else {
+            Log.print("Optimised publishing is NOT enabled. Using old scheduler.");
+            scheduler = new CollectionScheduler(); // old scheduler todo: remove this when using new scheduler.
+        }
+
         loadExistingCollectionsIntoScheduler();
         indexPublishedCollections();
 
@@ -144,20 +152,18 @@ public class Root {
             }
 
             for (Collection collection : collections) {
-
-                CollectionScheduler.schedulePublish(scheduler, collection, zebedee);
+                schedulePublish(collection);
             }
         } else {
             Log.print("Scheduled publishing is disabled - not reading collections");
         }
     }
 
+
     public static void cancelPublish(Collection collection) {
         try {
             System.out.println("Attempting to cancel publish for collection " + collection.description.name + " type=" + collection.description.type);
-            if (collection.description.type == CollectionType.scheduled) {
                 scheduler.cancel(collection);
-            }
         } catch (Exception e) {
             System.out.println("Exception caught trying to cancel scheduled publish of collection: " + e.getMessage());
         }
@@ -190,6 +196,14 @@ public class Root {
         System.out.println("Zebedee root is at: " + root.toAbsolutePath());
     }
 
+    public static void schedulePublish(Collection collection) {
+        scheduler.schedulePublish(collection, zebedee);
+    }
+
+    public static Scheduler getScheduler() {
+        return scheduler;
+    }
+
     /**
      * Cleans up
      */
@@ -197,5 +211,4 @@ public class Root {
     protected void finalize() throws Throwable {
 
     }
-
 }

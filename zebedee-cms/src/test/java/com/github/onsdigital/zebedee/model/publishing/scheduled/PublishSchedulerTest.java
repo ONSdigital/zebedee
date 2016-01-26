@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.model.Collection;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Date;
@@ -39,7 +38,7 @@ public class PublishSchedulerTest {
 
     // after the pre-publish check the publish task is scheduled.
 
-    @Test
+    //@Test
     public void scheduledPublish() throws IOException, ZebedeeException, InterruptedException {
 
         // Given a scheduled collection

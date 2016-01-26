@@ -82,13 +82,14 @@ public class DataIndex {
 
             // Quick check
             if (uri.endsWith("data.json") && uri.toString().contains("/timeseries/")) {
-                uri = uri.substring(0, uri.length() - "data.json".length());
+                uri = uri.substring(0, uri.length() - "/data.json".length());
 
                 TimeSeries timeSeries = null;
                 try {
                     timeSeries = (TimeSeries) this.contentReader.getContent(uri);
                     if (timeSeries.getCdid() != null) {
-                        this.index.put(timeSeries.getCdid(), "/" + this.contentReader.getRootFolder().relativize(file).toString());
+
+                        this.index.put(timeSeries.getCdid(), uri);
                     }
                 } catch (ZebedeeException | IOException e) {
                     e.printStackTrace();

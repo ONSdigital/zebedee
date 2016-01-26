@@ -23,6 +23,22 @@ public class PublishScheduler extends Scheduler {
     private final Map<Date, PrePublishCollectionsTask> prePublishTasks = new HashMap<>();
     private final Map<Date, PublishCollectionsTask> publishTasks = new HashMap<>();
 
+    @Override
+    protected void schedule(Collection collection, Zebedee zebedee) {
+        Log.print("Scheduling collection using optimised publisher: %s", collection.description.name);
+        Date publishStartDate = collection.description.publishDate;
+        int getPreProcessSecondsBeforePublish = Configuration.getPreProcessSecondsBeforePublish();
+        Date prePublishStartDate = new DateTime(publishStartDate).minusSeconds(getPreProcessSecondsBeforePublish).toDate();
+
+        Log.print("Scheduling collection %s prepublish: %s, publish %s", collection.description.name, prePublishStartDate, publishStartDate);
+        schedulePrePublish(collection, zebedee, prePublishStartDate, publishStartDate);
+    }
+
+    @Override
+    public void cancel(Collection collection) {
+        prePublishTasks.values().forEach(task -> task.removeCollection(collection));
+    }
+
     /**
      * Validate and schedule the given collection to be published based on the publish date set in the collection.
      * @param collection The collection to publish.
@@ -98,21 +114,5 @@ public class PublishScheduler extends Scheduler {
 
         prePublishTasks.remove(date);
         return true;
-    }
-
-    @Override
-    protected void schedule(Collection collection, Zebedee zebedee) {
-        Log.print("Scheduling collection using optimised publisher: %s", collection.description.name);
-        Date publishStartDate = collection.description.publishDate;
-        int getPreProcessSecondsBeforePublish = Configuration.getPreProcessSecondsBeforePublish();
-        Date prePublishStartDate = new DateTime(publishStartDate).minusSeconds(getPreProcessSecondsBeforePublish).toDate();
-
-        Log.print("Scheduling collection %s prepublish: %s, publish %s", collection.description.name, prePublishStartDate, publishStartDate);
-        schedulePrePublish(collection, zebedee, prePublishStartDate, publishStartDate);
-    }
-
-    @Override
-    public void cancel(Collection collection) {
-        prePublishTasks.values().forEach(task -> task.removeCollection(collection));
     }
 }

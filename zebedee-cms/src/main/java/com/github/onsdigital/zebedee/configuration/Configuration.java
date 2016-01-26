@@ -28,7 +28,7 @@ public class Configuration {
     }
 
     public static boolean isOptimisedPublishingEnabled() {
-        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("optimised_publish_enabled"), "false"));
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("optimised_publish_enabled"), "true"));
     }
 
     public static int getPreProcessSecondsBeforePublish() {

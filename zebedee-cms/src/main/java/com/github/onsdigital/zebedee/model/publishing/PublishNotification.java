@@ -2,20 +2,15 @@ package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
+import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.util.Http;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.util.Date;
 import java.util.List;
@@ -50,9 +45,9 @@ public class PublishNotification {
             Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
             String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
             if (response.statusLine.getStatusCode() > 302) {
-                System.err.println("Error response from website for publish notification: " + responseMessage  + " for collection id:" + payload.collectionId);
+                System.err.println("Error response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
             } else {
-                System.out.println("Response from website for publish notification: " + responseMessage  + " for collection id:" + payload.collectionId);
+                System.out.println("Response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
             }
 
         } catch (Exception e) {

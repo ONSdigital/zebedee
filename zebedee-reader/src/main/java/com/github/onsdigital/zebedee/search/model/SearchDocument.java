@@ -14,6 +14,7 @@ public class SearchDocument {
     private PageType type;
     private PageDescription description;
     private List<URI> topics;
+    private List<String> searchBoost;
 
 
     public PageDescription getDescription() {
@@ -46,5 +47,13 @@ public class SearchDocument {
 
     public void setTopics(List<URI> topics) {
         this.topics = topics;
+    }
+
+    public List<String> getSearchBoost() {
+        return searchBoost;
+    }
+
+    public void setSearchBoost(List<String> searchBoost) {
+        this.searchBoost = searchBoost;
     }
 }

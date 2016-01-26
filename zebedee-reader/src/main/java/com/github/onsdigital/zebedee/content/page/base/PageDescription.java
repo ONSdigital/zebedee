@@ -56,6 +56,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String preUnit = "";
     private String source = ""; // Where a statistic comes from. Typically "Office for National Statistics"
     private String seasonalAdjustment;
+    private String monthLabelStyle;
     //Below fields appear on references to time series on other content types
     private String date;
     private String number;
@@ -131,6 +132,14 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     public void setNationalStatistic(boolean nationalStatistic) {
         this.nationalStatistic = nationalStatistic;
+    }
+
+    public String getMonthLabelStyle() {
+        return monthLabelStyle;
+    }
+
+    public void setMonthLabelStyle(String monthLabelStyle) {
+        this.monthLabelStyle = monthLabelStyle;
     }
 
     public Boolean isLatestRelease() { return latestRelease == null ? false:latestRelease; }

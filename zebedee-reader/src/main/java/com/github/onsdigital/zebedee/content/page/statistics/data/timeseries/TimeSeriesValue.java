@@ -14,6 +14,7 @@ public class TimeSeriesValue implements Comparable<TimeSeriesValue> {
 
 	public String date;
 	public String value;
+	public String label;
 
 	// Values split out into explicit components:
 

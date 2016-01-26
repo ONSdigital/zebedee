@@ -26,6 +26,10 @@ public class Configuration {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
     }
 
+    public static boolean isOptimisedPublishingEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_optimised_enabled"), "false"));
+    }
+
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
     }
@@ -92,6 +96,4 @@ public class Configuration {
         public String name;
         public String password;
     }
-
-
 }

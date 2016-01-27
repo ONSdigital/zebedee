@@ -90,6 +90,9 @@ public class PublishNotification {
     }
 
     private String format(Date date) {
+        if (date == null) {
+            return null;
+        }
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(date);
     }
 }

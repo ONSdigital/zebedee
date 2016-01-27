@@ -92,8 +92,8 @@ public class DataIndex {
 
                         this.index.put(timeSeries.getCdid(), uri);
                     }
-                } catch (ZebedeeException | IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    System.out.println("Error indexing " + uri);
                 }
 
             }

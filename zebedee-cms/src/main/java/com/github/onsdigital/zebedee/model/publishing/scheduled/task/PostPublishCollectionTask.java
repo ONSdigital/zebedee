@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.util.Log;
 
@@ -26,6 +28,8 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
     @Override
     public Boolean call() throws Exception {
         if (publishCollectionTask.isPublished()) {
+
+            new PublishNotification(publishCollectionTask.getCollection()).sendNotification(EventType.PUBLISHED);
             return doPostPublish(publishCollectionTask.getCollection(), publishCollectionTask.getCollectionReader());
         }
 

@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * http client to a single host with connection pool and  cache functionality.
  */
-//TODO: SSL support for https? not needed currently, configure java for ssl
 //Add post,put,etc. functionality if needed
 public class PooledHttpClient {
 

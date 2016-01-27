@@ -44,6 +44,28 @@ public class ZipUtilsTest {
     }
 
     @Test
+    public void zipFolderWithFilterShouldCreateZipFileOfFolder() throws IOException {
+
+        File folderToZip = Files.createDirectory(rootPath.resolve("folderToZip")).toFile();
+        Files.copy(ResourceUtils.getFile("/xls/example-table.xls").toPath(), folderToZip.toPath().resolve("example-table.xls"));
+        Files.copy(ResourceUtils.getFile("/xls/example-table.xls").toPath(), folderToZip.toPath().resolve("FILTER-ME.xls"));
+        File zipFile = rootPath.resolve(Random.id() + ".zip").toFile();
+
+        Assert.assertFalse(zipFile.exists());
+
+        ZipUtils.zipFolder(folderToZip, zipFile, uri -> uri.contains("FILTER-ME")); // apply a filter that always returns false, preventing any files being included.
+
+        Assert.assertTrue(zipFile.exists());
+
+        Path unzippedFolder = rootPath.resolve("unzipped");
+        ZipUtils.unzip(zipFile, unzippedFolder.toString());
+
+        Assert.assertTrue(unzippedFolder.toFile().exists());
+        Assert.assertTrue(unzippedFolder.resolve("example-table.xls").toFile().exists());
+        Assert.assertFalse(unzippedFolder.resolve("FILTER-ME.xls").toFile().exists());
+    }
+
+    @Test
     public void unzipShouldUnzipAsExpected() throws IOException {
 
         File folderToZip = Files.createDirectory(rootPath.resolve("folderToZip")).toFile();

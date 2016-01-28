@@ -46,6 +46,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
         Log.print("PUBLISH: Running publish task for collection: " + collection.description.name);
 
         try {
+            Publisher.PublishAllCollectionFiles(collection, collectionReader, encryptionPassword);
             published = Publisher.CommitPublish(collection, publisherSystemEmail, encryptionPassword);
         } catch (IOException e) {
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());

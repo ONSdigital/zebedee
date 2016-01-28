@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.util.Log;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -551,6 +552,8 @@ public class Users {
                     try (InputStream input = Files.newInputStream(path)) {
                         User user = Serialiser.deserialise(input, User.class);
                         result.add(user);
+                    } catch(JsonSyntaxException e) {
+                        System.out.println("Error deserialising user at path " + path);
                     }
                 }
             }

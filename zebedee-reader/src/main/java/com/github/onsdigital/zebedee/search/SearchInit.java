@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.search;
 import com.github.davidcarboni.restolino.framework.Startup;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
+import com.github.onsdigital.zebedee.search.indexing.SearchBoostTermsResolver;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -31,6 +32,7 @@ public class SearchInit implements Startup {
         final ExecutorService thread = Executors.newSingleThreadExecutor();
         thread.submit(() -> {
                     try {
+                        SearchBoostTermsResolver.loadTerms();
                         Indexer.getInstance().reload();
                         return null;
                     } catch (Exception e) {

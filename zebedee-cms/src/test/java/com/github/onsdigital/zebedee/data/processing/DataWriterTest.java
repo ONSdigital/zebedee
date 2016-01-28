@@ -104,7 +104,7 @@ public class DataWriterTest {
         TimeSeries timeSeries = unpublished.timeSeriesList.get(0);
 
         DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries);
+        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
 
         // When
         // we version and save
@@ -133,7 +133,7 @@ public class DataWriterTest {
         DataPublicationDetails details = published.getDetails(publishedReader, collectionReader.getReviewed());
 
         DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries);
+        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
 
         // When
         // we version and save
@@ -153,7 +153,7 @@ public class DataWriterTest {
         TimeSeries timeSeries = republish.timeSeriesList.get(0);
 
         DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries);
+        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
 
         // When
         // we version and save
@@ -173,7 +173,7 @@ public class DataWriterTest {
         DataPublicationDetails details = unpublished.getDetails(publishedReader, collectionReader.getReviewed());
 
         DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries);
+        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
 
         // When
         // we version and save
@@ -194,7 +194,7 @@ public class DataWriterTest {
         DataPublicationDetails details = published.getDetails(publishedReader, collectionReader.getReviewed());
 
         DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries);
+        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
 
         // When
         // we version and save
@@ -215,7 +215,7 @@ public class DataWriterTest {
         DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
 
         DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries);
+        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
 
         // When
         // we version and save
@@ -246,7 +246,7 @@ public class DataWriterTest {
         DataPublicationDetails details = corrected.getDetails(publishedReader, collectionReader.getReviewed());
 
         DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries);
+        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
 
         // When
         // we version and save

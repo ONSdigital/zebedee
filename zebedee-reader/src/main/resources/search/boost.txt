@@ -14,7 +14,6 @@
 
 ##########MAPPING#############
 
-/economy/grossdomesticproductgdp/bulletins/* => gross, domestic, product
-/economy/grossdomesticproductgdp/bulletins/grossdomesticproductpreliminaryestimate/2015-10-27 => preliminary, estimates
+/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections/* => poopulation, projection, age
 
 

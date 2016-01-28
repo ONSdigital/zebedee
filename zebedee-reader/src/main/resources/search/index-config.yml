@@ -16,7 +16,7 @@ analysis :
         - standard
         - stop
     #Including detailed analysis like synonyms and stemming, currently only used on detail title field analysis
-    ons_detailed :
+    ons_synonym_stem :
       tokenizer : standard
       filter :
         - lowercase
@@ -24,7 +24,14 @@ analysis :
         - standard
         - stop
         - porter_stem
-    ons_detailed_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
+    ons_synonym :
+      tokenizer : standard
+      filter :
+        - lowercase
+        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
+        - standard
+        - stop
+    ons_synonym_stem_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
       tokenizer : standard
       char_filter : clear_dates
       filter :
@@ -105,3 +112,34 @@ analysis :
         - "esa,  european system of accounts"
         - "aps,  annual poopulation survey"
         - "eu,  european union"
+        - "m&a, mergers and acquisitions"
+        - "itis, international trade in services"
+        - "imr, infant mortality rate"
+        - "tfr, total fertility rate"
+        - "evo, estimates of the very old"
+        - "asdr, age specific death rate"
+        - "asmr, age standardised mortality rate or ratio"
+        - "etb, etbhi, effects of taxes & benefits on household income"
+        - "lcf, lcfs, living costs & food survey"
+        - "eu-silc, eusilc, silc, eu-statistics on income & living condition"
+        - "esspros, european system of social protections statistics"
+        - "sdg, sustainable development goals"
+        - "sdi, sustainable development indicators"
+        - "pwb, personal well-being"
+        - "ghg, greenhouse gas emissions"
+        - "wfj, workforce jobs"
+        - "was, wealth and assets survey"
+        - "oa, output area"
+        - "wz, workplace zone"
+        - "npp, national population projections"
+        - "snpp, sub national population projections"
+        - "suid, sudden unexpected/unexplained infant deaths"
+        - "drd, drug related deaths"
+        - "c diff, clostridium difficile"
+        - "eolc, end of life care"
+        - "mb1, cancer registrations"
+        - "imd, index of multiple deprivation"
+        - "utla, upper tier local authority"
+        - "sep, socioeconomic position"
+        - "hi, health inequality"
+        - "wellbeing => well being"

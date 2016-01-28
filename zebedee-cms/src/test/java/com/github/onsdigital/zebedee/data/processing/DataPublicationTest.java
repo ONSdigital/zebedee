@@ -2,18 +2,13 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import org.junit.After;
@@ -22,7 +17,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
+import com.github.onsdigital.zebedee.data.processing.DataLinkMock;
+
 
 import static org.junit.Assert.*;
 
@@ -48,6 +47,7 @@ public class DataPublicationTest {
     DataPagesSet published;
     DataPagesSet unpublished;
     DataPagesSet republish;
+
 
     /**
      * Setup generates an instance of zebedee, a collection, and various DataPagesSet objects (that are test framework generators)
@@ -85,6 +85,7 @@ public class DataPublicationTest {
 
         // generate a set of data that will replace the data in published
         republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
+
     }
 
     @After
@@ -102,7 +103,6 @@ public class DataPublicationTest {
         // we initialise publication
         DataPublication publication = new DataPublication(publishedReader, collectionReader.getReviewed(), details.datasetUri);
 
-
         // Then
         // we expect it to be not null
         assertNotNull(publication);
@@ -118,11 +118,14 @@ public class DataPublicationTest {
 
         // When
         // we initialise publication
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed());
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
 
         // Then
         // we expect it to be not null
         assertNotNull(publication);
+
+        // generate the files uncoded for checking
+        Path idiotCheck = generateIdiotCheck(collectionReader.getReviewed());
     }
 
     @Test
@@ -139,7 +142,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed());
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
 
         // Then
         // we expect datasetId to be extracted using the [datasetId].csdb pattern
@@ -161,7 +164,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed());
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
 
         // Then
         // we expect datasetId to be extracted using the upload.[datasetId].csv pattern
@@ -182,7 +185,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed());
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
 
         // Then
         // we expect the csdb datalink to be called
@@ -203,7 +206,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed());
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
 
         // Then
         // we expect the csv datalink to be called
@@ -211,4 +214,9 @@ public class DataPublicationTest {
         assertEquals("csv", mock.lastCall);
     }
 
+    private Path generateIdiotCheck(ContentReader contentReader) throws IOException, ZebedeeException {
+        Path temp = Files.createTempDirectory("temp");
+        ContentIOUtils.copy(contentReader, new ContentWriter(temp));
+        return temp;
+    }
 }

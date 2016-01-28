@@ -6,10 +6,13 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,7 +62,20 @@ public class PublishTask implements Runnable {
                 boolean skipVerification = false;
 
                 ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.keyringCache.schedulerCache.get(collectionId));
-                Publisher.Publish(zebedee, collection, "System", skipVerification, collectionReader);
+                long publishStart = System.currentTimeMillis();
+                boolean publishComplete = Publisher.Publish(collection, "System", collectionReader);
+
+                if (publishComplete) {
+                    long onPublishCompleteStart = System.currentTimeMillis();
+                    new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
+                    Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
+                    Log.print("postPublish process finished for collection %s time taken: %dms",
+                            collection.description.name,
+                            (System.currentTimeMillis() - onPublishCompleteStart));
+                    Log.print("Publish complete for collection %s total time taken: %dms",
+                            collection.description.name,
+                            (System.currentTimeMillis() - publishStart));
+                }
             }
         } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
             System.out.println("Exception publishing collection for ID" + collectionId + " exception:" + e.getMessage());

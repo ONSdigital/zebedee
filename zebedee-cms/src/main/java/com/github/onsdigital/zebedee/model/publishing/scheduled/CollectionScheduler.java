@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.Log;
@@ -13,25 +12,10 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * A scheduler that maintains tasks based on collections.
  */
-public class CollectionScheduler {
+public class CollectionScheduler extends Scheduler {
 
-    private final Scheduler scheduler = new Scheduler();
+    private final RunnableScheduler runnableScheduler = new RunnableScheduler();
     private final Map<String, ScheduledFuture<?>> collectionIdToTask = new ConcurrentHashMap<>();
-
-    public static void schedulePublish(CollectionScheduler scheduler, Collection collection, Zebedee zebedee) {
-        if (Configuration.isSchedulingEnabled()) {
-            try {
-                System.out.println("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
-                if (collection.description.type == CollectionType.scheduled) {
-                    scheduler.schedule(collection, new PublishTask(zebedee, collection));
-                }
-            } catch (Exception e) {
-                System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());
-            }
-        } else {
-            Log.print("Not scheduling collection %s, scheduling is not enabled", collection.description.name);
-        }
-    }
 
     /**
      * Schedule a task related to a collection.
@@ -39,7 +23,7 @@ public class CollectionScheduler {
      * @param collection
      * @param task
      */
-    public boolean schedule(Collection collection, Runnable task) {
+    protected boolean schedule(Collection collection, Runnable task) {
 
         // throw exception if a manual collection is given.
         if (collection.description.type == CollectionType.manual) {
@@ -53,7 +37,7 @@ public class CollectionScheduler {
         }
 
         Log.print("Scheduling task for collection: " + collection.description.id);
-        ScheduledFuture<?> future = scheduler.schedule(task, collection.description.publishDate);
+        ScheduledFuture<?> future = runnableScheduler.schedule(task, collection.description.publishDate);
         collectionIdToTask.put(collection.description.id, future);
         return true;
     }
@@ -78,11 +62,18 @@ public class CollectionScheduler {
         return collectionIdToTask.get(collection.description.id);
     }
 
+    @Override
+    protected void schedule(Collection collection, Zebedee zebedee) {
+        Log.print("Scheduling collection using original publisher: %s", collection.description.name);
+        schedule(collection, new PublishTask(zebedee, collection));
+    }
+
     /**
      * Cancel and remove the task for the given collection.
      *
      * @param collection
      */
+    @Override
     public void cancel(Collection collection) {
 
         System.out.println("Attempting to cancel task for collection " + collection.description.name);
@@ -100,6 +91,6 @@ public class CollectionScheduler {
      */
     public void shutdown() {
         System.out.println("Shutdown called on CollectionScheduler.");
-        scheduler.shutdown();
+        runnableScheduler.shutdown();
     }
 }

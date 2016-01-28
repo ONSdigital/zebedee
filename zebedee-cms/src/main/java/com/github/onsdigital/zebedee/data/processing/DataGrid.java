@@ -97,7 +97,7 @@ public class DataGrid {
      *
      * @param range           the DataTimeRange we are referring to
      * @param timeSeriesCount the number of columns required per DataGridRow
-     * @return
+     * @return a template map to fill in grid rows
      */
     Map<String, DataGridRow> emptyRowsWithRange(DataTimeRange range, int timeSeriesCount) {
         Map<String, DataGridRow> rows = new HashMap<>();
@@ -118,14 +118,13 @@ public class DataGrid {
      * @param column     the column of each DataGridRow to fill
      */
     void fillTimeSeriesValuesInMap(Map<String, DataGridRow> map, TimeSeries timeSeries, int column) {
-        Set<TimeSeriesValue> allValues = new HashSet<>();
-        allValues.addAll(timeSeries.years);
-        allValues.addAll(timeSeries.quarters);
-        allValues.addAll(timeSeries.months);
 
-        for (TimeSeriesValue value : allValues) {
+        for (TimeSeriesValue value : timeSeries.years)
             map.get(value.date).cells.set(column, value.value);
-        }
+        for (TimeSeriesValue value : timeSeries.months)
+            map.get(value.date).cells.set(column, value.value);
+        for (TimeSeriesValue value : timeSeries.quarters)
+            map.get(value.date).cells.set(column, value.value);
     }
 
     /**

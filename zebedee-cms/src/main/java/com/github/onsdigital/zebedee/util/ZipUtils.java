@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 
 import javax.crypto.SecretKey;
 import java.io.*;
+import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -49,20 +50,20 @@ public class ZipUtils {
      * @param zipFile
      * @throws IOException
      */
-    public static void zipFolder(final File folder, final File zipFile) throws IOException {
-        zipFolder(folder, new FileOutputStream(zipFile));
+    public static void zipFolder(final File folder, final File zipFile, Function<String, Boolean>... filters) throws IOException {
+        zipFolder(folder, new FileOutputStream(zipFile), filters);
     }
 
-    private static void zipFolder(final File folder, final OutputStream outputStream) throws IOException {
+    private static void zipFolder(final File folder, final OutputStream outputStream, Function<String, Boolean>... filters) throws IOException {
         try (ZipOutputStream zipOutputStream = getZipOutputStream(outputStream)) {
-            zipFolder(folder, zipOutputStream, folder.getPath().length() + 1);
+            zipFolder(folder, zipOutputStream, folder.getPath().length() + 1, filters);
         }
     }
 
-    private static void zipFolder(final File folder, final ZipOutputStream zipOutputStream, final int prefixLength)
+    private static void zipFolder(final File folder, final ZipOutputStream zipOutputStream, final int prefixLength, Function<String, Boolean>... filters)
             throws IOException {
         for (final File file : folder.listFiles()) {
-            if (file.isFile()) {
+            if (file.isFile() && !shouldBeFiltered(filters, file.toString())) {
                 final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
                 zipOutputStream.putNextEntry(zipEntry);
                 try (FileInputStream inputStream = new FileInputStream(file)) {
@@ -70,15 +71,31 @@ public class ZipUtils {
                 }
                 zipOutputStream.closeEntry();
             } else if (file.isDirectory()) {
-                zipFolder(file, zipOutputStream, prefixLength);
+                zipFolder(file, zipOutputStream, prefixLength, filters);
             }
         }
     }
 
-    public static void zipFolderWithEncryption(final File folder, final File zipFile, SecretKey key) throws IOException {
-        zipFolderWithEncryption(folder, EncryptionUtils.encryptionOutputStream(zipFile.toPath(), key), key);
+    /**
+     * If any of the given filters return true, the uri should be filtered
+     *
+     * @param filters
+     * @param uri
+     * @return
+     */
+    private static boolean shouldBeFiltered(Function<String, Boolean>[] filters, String uri) {
+        for (Function<String, Boolean> filter : filters) {
+            if (filter.apply(uri))
+                return true;
+        }
+        return false;
     }
-    private static void zipFolderWithEncryption(final File folder, final OutputStream outputStream, SecretKey key) throws IOException {
+
+    public static void zipFolderWithEncryption(final File folder, final File zipFile, SecretKey key, Function<String, Boolean>... filters) throws IOException {
+        zipFolderWithEncryption(folder, EncryptionUtils.encryptionOutputStream(zipFile.toPath(), key), key, filters);
+    }
+
+    private static void zipFolderWithEncryption(final File folder, final OutputStream outputStream, SecretKey key, Function<String, Boolean>... filters) throws IOException {
         try (ZipOutputStream zipOutputStream = getZipOutputStream(outputStream)) {
             zipFolderWithEncryption(folder, zipOutputStream, key, folder.getPath().length() + 1);
         }

@@ -18,20 +18,20 @@
             "type": "string",
             "analyzer": "ons_standard"
           },
-          "searchBoost": {
-            "type": "string",
-            "analyzer": "ons_detailed"
-          },
           "title": {
             "type": "string",
-            "analyzer": "ons_detailed",
+            "analyzer": "ons_synonym_stem",
             "fields": {
               "title_raw": {
                 "type": "string"
               },
+              "title_no_stem" : {
+                "type" : "string",
+                "analyzer" : "ons_synonym"
+              },
               "title_no_dates": {
                 "type": "string",
-                "analyzer": "ons_detailed_clear_dates"
+                "analyzer": "ons_synonym_stem_clear_dates"
               },
               "title_first_letter": {
                 "type": "string",
@@ -41,7 +41,7 @@
           },
           "edition": {
             "type": "string",
-            "analyzer": "ons_detailed"
+            "analyzer": "ons_synonym_stem"
           },
           "metaDescription": {
             "type": "string",
@@ -53,7 +53,7 @@
           },
           "keywords": {
             "type": "string",
-            "analyzer": "ons_detailed",
+            "analyzer": "ons_synonym_stem",
             "fields": {
               "keywords_raw": {
                 "type": "string"
@@ -62,6 +62,35 @@
           },
           "releaseDate": {
             "type": "date"
+          }
+        }
+      },
+      "searchBoost": {
+        "type": "string",
+        "analyzer": "ons_synonym_stem"
+      }
+    }
+  },
+  "timeseries" : {
+    "properties" : {
+      "description" : {
+        "properties" : {
+          "title": {
+            "norms": {
+              "enabled": false
+            },
+            "fields": {
+              "title_no_stem" : {
+                "norms": {
+                  "enabled": false
+                }
+              },
+              "title_no_dates": {
+                "norms": {
+                  "enabled": false
+                }
+              }
+            }
           }
         }
       }

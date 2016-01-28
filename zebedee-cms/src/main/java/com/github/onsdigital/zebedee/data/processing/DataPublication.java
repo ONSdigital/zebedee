@@ -15,6 +15,7 @@ import java.util.List;
 
 public class DataPublication {
     public static final String DEFAULT_DATASET_ID = "data";
+    public static final int MAX_SECONDS = 60;
     DataLink dataLink = new DataLinkBrian();
     private DataPublicationDetails details = null;
     private TimeSerieses serieses = null;
@@ -53,7 +54,9 @@ public class DataPublication {
      * @throws IOException
      * @throws ZebedeeException
      */
-    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter) throws IOException, ZebedeeException, URISyntaxException {
+    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter, boolean saveTimeSeries, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
+        // Wait for dataIndex to complete progress
+        dataIndex.pauseUntilComplete(MAX_SECONDS);
 
         // check this landingpage has a datasetId and generate if necessary
         checkLandingPageDatasetId(reviewedContentWriter);
@@ -65,11 +68,13 @@ public class DataPublication {
         for(TimeSeries series: serieses) {
             // Build new timeseries
             DataProcessor processor = new DataProcessor();
-            processor.processTimeseries(publishedContentReader, details, series);
+            processor.processTimeseries(publishedContentReader, details, series, dataIndex);
 
             // Save files
-            DataWriter writer = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
-            writer.versionAndSave(processor, details);
+            if (saveTimeSeries) {
+                DataWriter writer = new DataWriter(reviewedContentWriter, reviewedContentReader, publishedContentReader);
+                writer.versionAndSave(processor, details);
+            }
 
             // Retain the result to be added to any generated spreadsheet
             results.add(processor.timeSeries);
@@ -86,12 +91,25 @@ public class DataPublication {
     }
 
     /**
-     * Check the landingpage datasetId and update if necessary
+     * Process a specified collection
      *
-     * @param contentWriter
+     * @param publishedContentReader
+     * @param reviewedContentReader
+     * @param reviewedContentWriter
      * @throws IOException
-     * @throws BadRequestException
+     * @throws ZebedeeException
      */
+    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
+        process(publishedContentReader, reviewedContentReader, reviewedContentWriter, true, dataIndex);
+    }
+
+        /**
+         * Check the landingpage datasetId and update if necessary
+         *
+         * @param contentWriter
+         * @throws IOException
+         * @throws BadRequestException
+         */
     void checkLandingPageDatasetId(ContentWriter contentWriter) throws IOException, BadRequestException {
 
         String currentId = details.landingPage.getDescription().getDatasetId();

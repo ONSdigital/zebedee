@@ -59,6 +59,10 @@ public class DataBuilder {
         for(TimeSeries timeSeries: dataPagesSet.timeSeriesList) {
             publishPage(timeSeries, timeSeries.getUri().toString());
         }
+
+        // We have added pages directly to the master so need to reindex
+        zebedee.dataIndex.reindex();
+        zebedee.dataIndex.pauseUntilComplete(60);
     }
 
     /**
@@ -69,7 +73,7 @@ public class DataBuilder {
      * @throws IOException
      * @throws BadRequestException
      */
-    private void publishPage(Page page, String uri) throws IOException, BadRequestException {
+    public void publishPage(Page page, String uri) throws IOException, BadRequestException {
         String publishTo = uri;
         if (publishTo.startsWith("/"))
             publishTo = publishTo.substring(1);
@@ -108,6 +112,18 @@ public class DataBuilder {
     public void addReviewedPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException {
 
         collectionWriter.getReviewed().writeObject(page, uri + "/data.json");
+        addReviewEventsToCollectionJson(uri, collection);
+    }
+
+    public void addInProgressPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+
+        collectionWriter.getInProgress().writeObject(page, uri + "/data.json");
+        addReviewEventsToCollectionJson(uri, collection);
+    }
+
+    public void addCompletedPage(String uri, Page page, Collection collection, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+
+        collectionWriter.getComplete().writeObject(page, uri + "/data.json");
         addReviewEventsToCollectionJson(uri, collection);
     }
 

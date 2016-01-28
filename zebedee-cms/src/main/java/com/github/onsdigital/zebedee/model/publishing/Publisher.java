@@ -1,11 +1,7 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.davidcarboni.httpino.Endpoint;
-import com.github.davidcarboni.httpino.Host;
-import com.github.davidcarboni.httpino.Http;
-import com.github.davidcarboni.httpino.Response;
-import com.github.davidcarboni.httpino.Serialiser;
+import com.github.davidcarboni.httpino.*;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -140,7 +136,7 @@ public class Publisher {
 
             BeginPublish(collection, encryptionPassword);
 
-            PublishAllCollectionFiles(collection, email, collectionReader, encryptionPassword);
+            PublishAllCollectionFiles(collection, collectionReader, encryptionPassword);
 
             publishComplete = CommitPublish(collection, email, encryptionPassword);
 
@@ -175,16 +171,14 @@ public class Publisher {
 
         long start = System.currentTimeMillis();
 
-        Log.print("Start BeginPublish for collection %s", collection.description.name);
+        Log.print("BeginPublish start for collection %s", collection.description.name);
         Map<Host, String> hostToTransactionId = beginPublish(theTrainHosts, encryptionPassword);
         collection.description.publishTransactionIds = hostToTransactionId;
-        Log.print("End BeginPublish for collection %s", collection.description.name);
+        Log.print("BeginPublish End for collection %s", collection.description.name);
 
-        Log.print("Start CollectionSave for collection %s", collection.description.name);
         collection.save();
-        Log.print("End CollectionSave for collection %s", collection.description.name);
 
-        Log.print("Time taken in BeginPublish %sms", (System.currentTimeMillis() - start));
+        Log.print("BeginPublish Time taken: %sms", (System.currentTimeMillis() - start));
 
         return hostToTransactionId;
     }
@@ -194,14 +188,13 @@ public class Publisher {
         boolean publishComplete = false;
         long start = System.currentTimeMillis();
 
-        Log.print("Start CommitPublish.");
+        Log.print("CommitPublish start for collection %s", collection.description.name);
         // If all has gone well so far, commit the publishing transaction:
         boolean success = true;
         for (Result result : commitPublish(collection.description.publishTransactionIds, encryptionPassword)) {
             success&=!result.error;
             collection.description.AddPublishResult(result);
         }
-        Log.print("End CommitPublish");
 
         if (success) {
             Date publishedDate = new Date();
@@ -211,19 +204,19 @@ public class Publisher {
             publishComplete = true;
         }
 
-        Log.print("End CommitPublish: Time taken: %sms", (System.currentTimeMillis() - start));
+        Log.print("CommitPublish end for collection %s: Time taken: %sms", collection.description.name, (System.currentTimeMillis() - start));
         return publishComplete;
     }
 
-    public static void PublishAllCollectionFiles(Collection collection, String email, CollectionReader collectionReader, String encryptionPassword) throws IOException {
+    public static void PublishAllCollectionFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword) throws IOException {
         List<Future<IOException>> results = new ArrayList<>();
         long start = System.currentTimeMillis();
 
-        Log.print("Start PublishFiles");
+        Log.print("PublishFiles start");
         // Publish each item of content:
         for (String uri : collection.reviewed.uris()) {
             //Log.print("Start PublishFile: %s", uri);
-            publishFile(collection, email, encryptionPassword, pool, results, uri, collectionReader);
+            publishFile(collection, encryptionPassword, pool, results, uri, collectionReader);
             //Log.print("End PublishFile: %s", uri);
         }
 
@@ -237,12 +230,11 @@ public class Publisher {
             }
         }
 
-        Log.print("End PublishFiles: Time taken: %sms", (System.currentTimeMillis() - start));
+        Log.print("PublishFiles end: Time taken: %sms", (System.currentTimeMillis() - start));
     }
 
     private static void publishFile(
             Collection collection,
-            String email,
             String encryptionPassword,
             ExecutorService pool,
             List<Future<IOException>> results,
@@ -553,10 +545,12 @@ public class Publisher {
         Map<Host, String> result = new HashMap<>();
         try (Http http = new Http()) {
             for (Host host : hosts) {
+                Log.print("BeginPublish start for host: %s", host.toString());
                 Endpoint begin = new Endpoint(host, "begin").setParameter("encryptionPassword", encryptionPassword);
                 Response<Result> response = http.post(begin, Result.class);
                 checkResponse(response);
                 result.put(host, response.body.transaction.id);
+                Log.print("BeginPublish end for host: %s", host.toString());
             }
         }
         return result;
@@ -618,7 +612,9 @@ public class Publisher {
         for (Map.Entry<Host, String> entry : transactionIds.entrySet()) {
             Host host = entry.getKey();
             String transactionId = entry.getValue();
-            results.add( endPublish(host, "commit", transactionId, encryptionPassword));
+            Log.print("CommitPublish start for host %s", host.toString());
+            results.add(endPublish(host, "commit", transactionId, encryptionPassword));
+            Log.print("CommitPublish end for host %s", host.toString());
         }
         return results;
     }

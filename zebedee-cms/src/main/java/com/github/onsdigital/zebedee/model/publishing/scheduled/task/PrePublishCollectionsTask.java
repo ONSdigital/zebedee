@@ -128,7 +128,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
 
                 // begin the publish ahead of time. This creates the transaction on the train.
                 Map<Host, String> hostToTransactionIdMap = Publisher.BeginPublish(collection, encryptionPassword);
-                Publisher.PublishAllCollectionFiles(collection, "System", collectionReader, encryptionPassword);
+                Publisher.PublishAllCollectionFiles(collection, collectionReader, encryptionPassword);
 
                 PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
 

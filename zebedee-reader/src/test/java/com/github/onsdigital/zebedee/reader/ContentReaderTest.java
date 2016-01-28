@@ -14,6 +14,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -179,6 +181,21 @@ public class ContentReaderTest {
         assertEquals(56320, contentLength);
     }
 
+    @Test
+    public void listTimeseries_whereWeHaveTimeSeries_returnsTimeseriesDirectories() throws IOException {
+        // Given
+        //
+        ContentReader reader = new ContentReader("target/test-content/zebedee/master/employmentandlabourmarket");
+
+        // When
+        //
+        List<Path> timeSeriesDirectories = reader.listTimeSeriesDirectories();
+
+        // Then
+        //
+        assertEquals(1, timeSeriesDirectories.size());
+        assertTrue(timeSeriesDirectories.get(0).endsWith("timeseries"));
+    }
 //    @Test
 //    public void mimeTypeShouldNotBeEmptyForXls() throws IOException {
 //        String mimeType = ContentReader.determineMimeType(Paths.get("/some/path/data.xls"));

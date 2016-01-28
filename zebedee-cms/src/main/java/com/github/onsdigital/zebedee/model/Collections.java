@@ -223,8 +223,8 @@ public class Collections {
             CollectionContentReader reviewedReader = (CollectionContentReader) collectionReader.getReviewed();
             CollectionContentWriter reviewedWriter = (CollectionContentWriter) collectionWriter.getReviewed();
 
-//            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, reviewedReader, reviewedWriter, collection, true, zebedee.dataIndex);
-            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
+            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, reviewedReader, reviewedWriter, collection, true, zebedee.dataIndex);
+//            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
 
 
         } catch (URISyntaxException e) {

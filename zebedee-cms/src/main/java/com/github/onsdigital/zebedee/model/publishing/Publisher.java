@@ -35,7 +35,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
@@ -523,7 +526,7 @@ public class Publisher {
      * @throws IOException If any errors are encountered in making the request or reported in the {@link com.github.onsdigital.zebedee.json.publishing.Result}.
      */
     private static Map<String, String> beginPublish(List<Host> hosts, String encryptionPassword) throws IOException {
-        Map<String, String> hostToTransactionIdMap = new HashMap<>();
+        Map<String, String> hostToTransactionIdMap = new ConcurrentHashMap<>();
         try (Http http = new Http()) {
 
             List<Future<IOException>> results = new ArrayList<>();

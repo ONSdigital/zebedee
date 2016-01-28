@@ -17,12 +17,12 @@ public class DummyPublishCollectionTask extends PublishCollectionTask {
      * Dummy publish task which does nothing other than set that the publish is complete.
      */
     public DummyPublishCollectionTask() {
-        super(null, null);
+        super(null, null, "", "");
         duration = 0;
     }
 
     public DummyPublishCollectionTask(int durationMillis) {
-        super(null, null);
+        super(null, null, "", "");
         this.duration = durationMillis;
     }
 

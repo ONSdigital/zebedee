@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -7,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.util.Log;
 
@@ -120,7 +122,15 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                 Log.print("PRE-PUBLISH: creating collection publish task for collection: " + collection.description.name);
                 SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
                 ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
-                PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader);
+
+                String encryptionPassword = Random.password(100);
+
+                // begin the publish ahead of time. This creates the transaction on the train.
+                String transactionId = Publisher.BeginPublish(collection, encryptionPassword);
+                Publisher.PublishAllCollectionFiles(collection, "System", collectionReader, encryptionPassword);
+
+                PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, transactionId);
+
                 Log.print("PRE-PUBLISH: Adding publish task for collection %s", collection.description.name);
                 collectionPublishTasks.add(publishCollectionTask);
             } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {

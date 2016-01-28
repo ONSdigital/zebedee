@@ -130,56 +130,17 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    private static boolean PublishFilesToWebsite(Collection collection, String email, CollectionReader collectionReadereader) throws IOException {
+    public static boolean PublishFilesToWebsite(Collection collection, String email, CollectionReader collectionReader) throws IOException {
 
         boolean publishComplete = false;
         String encryptionPassword = Random.password(100);
         try {
 
-            Log.print("Start BeginPublish");
-            collection.description.publishTransactionId = beginPublish(theTrainHost, encryptionPassword);
-            Log.print("End BeginPublish");
+            BeginPublish(collection, encryptionPassword);
 
-            Log.print("Start CollectionSave");
-            collection.save();
-            Log.print("End CollectionSave");
+            PublishAllCollectionFiles(collection, email, collectionReader, encryptionPassword);
 
-            List<Future<IOException>> results = new ArrayList<>();
-
-            Log.print("Start PublishFiles");
-            // Publish each item of content:
-            for (String uri : collection.reviewed.uris()) {
-                Log.print("Start PublishFile: %s", uri);
-                publishFile(collection, email, encryptionPassword, pool, results, uri, collectionReadereader);
-                Log.print("End PublishFile: %s", uri);
-            }
-            Log.print("End PublishFiles");
-
-            // Check the publishing results:
-            for (Future<IOException> result : results) {
-                try {
-                    IOException exception = result.get();
-                    if (exception != null) throw exception;
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new IOException("Error in file publish", e);
-                }
-            }
-
-            Log.print("Start CommitPublish.");
-            // If all has gone well so far, commit the publishing transaction:
-            Result result = commitPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
-            Log.print("End CommitPublish");
-
-            if (!result.error) {
-                Date publishedDate = new Date();
-                collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
-                collection.description.publishDate = publishedDate;
-                collection.description.publishComplete = true;
-                publishComplete = true;
-            }
-
-            collection.description.AddPublishResult(result);
-
+            publishComplete = CommitPublish(collection, email, encryptionPassword);
 
         } catch (IOException e) {
 
@@ -188,7 +149,7 @@ public class Publisher {
             // If an error was caught, attempt to roll back the transaction:
             if (collection.description.publishTransactionId != null) {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
-                rollbackPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
+                rollbackPublish(collection.description.publishTransactionId, encryptionPassword);
             }
 
         } finally {
@@ -197,6 +158,84 @@ public class Publisher {
         }
 
         return publishComplete;
+    }
+
+    public static void rollbackPublish(String transactionId, String encryptionPassword) {
+        rollbackPublish(theTrainHost, transactionId, encryptionPassword);
+    }
+
+    /**
+     * Start a new transaction on the train and save the transaction ID to the collection.
+     *
+     * @param collection
+     * @param encryptionPassword
+     * @return
+     * @throws IOException
+     */
+    public static String BeginPublish(Collection collection, String encryptionPassword) throws IOException {
+
+        long start = System.currentTimeMillis();
+
+        Log.print("Start BeginPublish for collection %s", collection.description.name);
+        String transactionId = beginPublish(theTrainHost, encryptionPassword);
+        collection.description.publishTransactionId = transactionId;
+        Log.print("End BeginPublish for collection %s", collection.description.name);
+
+        Log.print("Start CollectionSave for collection %s", collection.description.name);
+        collection.save();
+        Log.print("End CollectionSave for collection %s", collection.description.name);
+
+        Log.print("Time taken in BeginPublish %sms", (System.currentTimeMillis() - start));
+
+        return transactionId;
+    }
+
+    public static boolean CommitPublish(Collection collection, String email, String encryptionPassword) throws IOException {
+
+        boolean publishComplete = false;
+        long start = System.currentTimeMillis();
+
+        Log.print("Start CommitPublish.");
+        // If all has gone well so far, commit the publishing transaction:
+        Result result = commitPublish(theTrainHost, collection.description.publishTransactionId, encryptionPassword);
+
+        if (!result.error) {
+            Date publishedDate = new Date();
+            collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
+            collection.description.publishDate = publishedDate;
+            collection.description.publishComplete = true;
+            publishComplete = true;
+        }
+
+        collection.description.AddPublishResult(result);
+
+        Log.print("End CommitPublish: Time taken: %sms", (System.currentTimeMillis() - start));
+        return publishComplete;
+    }
+
+    public static void PublishAllCollectionFiles(Collection collection, String email, CollectionReader collectionReader, String encryptionPassword) throws IOException {
+        List<Future<IOException>> results = new ArrayList<>();
+        long start = System.currentTimeMillis();
+
+        Log.print("Start PublishFiles");
+        // Publish each item of content:
+        for (String uri : collection.reviewed.uris()) {
+            //Log.print("Start PublishFile: %s", uri);
+            publishFile(collection, email, encryptionPassword, pool, results, uri, collectionReader);
+            //Log.print("End PublishFile: %s", uri);
+        }
+
+        // Check the publishing results:
+        for (Future<IOException> result : results) {
+            try {
+                IOException exception = result.get();
+                if (exception != null) throw exception;
+            } catch (InterruptedException | ExecutionException e) {
+                throw new IOException("Error in file publish", e);
+            }
+        }
+
+        Log.print("End PublishFiles: Time taken: %sms", (System.currentTimeMillis() - start));
     }
 
     private static void publishFile(
@@ -222,9 +261,6 @@ public class Publisher {
 
             results.add(publishFile(theTrainHost, collection.description.publishTransactionId, encryptionPassword, uri, publishUri, zipped, source, reader, pool));
         }
-
-        // Add an event to the event log
-        collection.addEvent(uri, new Event(new Date(), EventType.PUBLISHED, email));
     }
 
     /**

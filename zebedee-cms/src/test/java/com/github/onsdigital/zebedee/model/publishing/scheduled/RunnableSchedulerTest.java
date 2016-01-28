@@ -109,14 +109,21 @@ public class RunnableSchedulerTest {
     @Test
     public void scheduleShouldTakeMillisecondsIntoAccount() throws InterruptedException, ExecutionException {
 
+        System.out.println("scheduleShouldTakeMillisecondsIntoAccount start");
         // Given a scheduled task that fails with an exception.
         DummyTask task = new DummyTask();
         Date now = new Date(System.currentTimeMillis() + 1333);
         ScheduledFuture<?> future = runnableScheduler.schedule(task, now);
 
+        if (future == null) {
+            System.out.println("scheduleShouldTakeMillisecondsIntoAccount - future is null");
+        }
+
         // When the time for the task passes.
         long delayInMs = future.getDelay(TimeUnit.MILLISECONDS);
         assertTrue(delayInMs > 1300);
+
+        System.out.println("scheduleShouldTakeMillisecondsIntoAccount end");
     }
 }
 

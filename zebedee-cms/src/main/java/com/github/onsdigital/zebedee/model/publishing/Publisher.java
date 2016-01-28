@@ -144,7 +144,7 @@ public class Publisher {
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
             System.out.println(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
-            Map<Host, String> transactionIds = collection.description.publishTransactionIds;
+            Map<String, String> transactionIds = collection.description.publishTransactionIds;
             if (transactionIds != null && transactionIds.size() > 0) {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
                 rollbackPublish(collection.description.publishTransactionIds, encryptionPassword);
@@ -166,12 +166,12 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    public static Map<Host, String> BeginPublish(Collection collection, String encryptionPassword) throws IOException {
+    public static Map<String, String> BeginPublish(Collection collection, String encryptionPassword) throws IOException {
 
         long start = System.currentTimeMillis();
 
         Log.print("BeginPublish start for collection %s", collection.description.name);
-        Map<Host, String> hostToTransactionId = beginPublish(theTrainHosts, encryptionPassword);
+        Map<String, String> hostToTransactionId = beginPublish(theTrainHosts, encryptionPassword);
         collection.description.publishTransactionIds = hostToTransactionId;
         Log.print("BeginPublish End for collection %s", collection.description.name);
 
@@ -252,8 +252,8 @@ public class Publisher {
                 publishUri = StringUtils.removeEnd(uri, "-to-publish.zip");
             }
 
-            for (Map.Entry<Host, String> entry : collection.description.publishTransactionIds.entrySet()) {
-                Host theTrainHost = entry.getKey();
+            for (Map.Entry<String, String> entry : collection.description.publishTransactionIds.entrySet()) {
+                Host theTrainHost = new Host(entry.getKey());
                 String transactionId = entry.getValue();
                 results.add(publishFile(theTrainHost, transactionId, encryptionPassword, uri, publishUri, zipped, source, reader, pool));
             }
@@ -522,8 +522,8 @@ public class Publisher {
      * @return The new transaction ID.
      * @throws IOException If any errors are encountered in making the request or reported in the {@link com.github.onsdigital.zebedee.json.publishing.Result}.
      */
-    private static Map<Host, String> beginPublish(List<Host> hosts, String encryptionPassword) throws IOException {
-        Map<Host, String> hostToTransactionIdMap = new HashMap<>();
+    private static Map<String, String> beginPublish(List<Host> hosts, String encryptionPassword) throws IOException {
+        Map<String, String> hostToTransactionIdMap = new HashMap<>();
         try (Http http = new Http()) {
 
             List<Future<IOException>> results = new ArrayList<>();
@@ -537,7 +537,7 @@ public class Publisher {
                         Endpoint begin = new Endpoint(host, "begin").setParameter("encryptionPassword", encryptionPassword);
                         Response<Result> response = http.post(begin, Result.class);
                         checkResponse(response);
-                        hostToTransactionIdMap.put(host, response.body.transaction.id);
+                        hostToTransactionIdMap.put(host.toString(), response.body.transaction.id);
                         Log.print("BeginPublish end for host: %s", host.toString());
                     } catch (IOException e) {
                         result = e;
@@ -611,13 +611,13 @@ public class Publisher {
      * @return The {@link Result} returned by The Train
      * @throws IOException If any errors are encountered in making the request or reported in the {@link Result}.
      */
-    static List<Result> commitPublish(Map<Host, String> transactionIds, String encryptionPassword) throws IOException {
+    static List<Result> commitPublish(Map<String, String> transactionIds, String encryptionPassword) throws IOException {
         List<Result> results = new ArrayList<>();
 
         List<Future<IOException>> futures = new ArrayList<>();
 
-        for (Map.Entry<Host, String> entry : transactionIds.entrySet()) {
-            Host host = entry.getKey();
+        for (Map.Entry<String, String> entry : transactionIds.entrySet()) {
+            Host host = new Host(entry.getKey());
             String transactionId = entry.getValue();
 
             futures.add(pool.submit(() -> {
@@ -653,9 +653,9 @@ public class Publisher {
      * @param transactionIds     The {@link Host}s and transactions we are attempting to publish to.
      * @param encryptionPassword The password used to encrypt files during publishing.
      */
-    public static void rollbackPublish(Map<Host, String> transactionIds, String encryptionPassword) {
-        for (Map.Entry<Host, String> entry : transactionIds.entrySet()) {
-            Host host = entry.getKey();
+    public static void rollbackPublish(Map<String, String> transactionIds, String encryptionPassword) {
+        for (Map.Entry<String, String> entry : transactionIds.entrySet()) {
+            Host host = new Host(entry.getKey());
             String transactionId = entry.getValue();
             try {
                 endPublish(host, "rollback", transactionId, encryptionPassword);

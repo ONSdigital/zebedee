@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
-import com.github.davidcarboni.httpino.Host;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
@@ -21,7 +20,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
     private Collection collection;
     private ZebedeeCollectionReader collectionReader;
     private String encryptionPassword;
-    private Map<Host, String> hostToTransactionIdMap;
+    private Map<String, String> hostToTransactionIdMap;
 
     /**
      * Create a new task for a collection to be published.
@@ -29,7 +28,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
      * @param collectionReader - The collection reader to read collection content.
      * @param encryptionPassword
      */
-    public PublishCollectionTask(Collection collection, ZebedeeCollectionReader collectionReader, String encryptionPassword, Map<Host, String> hostToTransactionIdMap) {
+    public PublishCollectionTask(Collection collection, ZebedeeCollectionReader collectionReader, String encryptionPassword, Map<String, String> hostToTransactionIdMap) {
         this.collection = collection;
         this.collectionReader = collectionReader;
         this.encryptionPassword = encryptionPassword;

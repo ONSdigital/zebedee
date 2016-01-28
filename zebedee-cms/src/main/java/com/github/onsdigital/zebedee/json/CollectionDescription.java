@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.json;
 
-import com.github.davidcarboni.httpino.Host;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class CollectionDescription extends CollectionBase {
     public List<String> reviewedUris;
     public boolean approvedStatus;
     public boolean publishComplete;
-    public Map<Host, String> publishTransactionIds;
+    public Map<String, String> publishTransactionIds;
     public boolean isEncrypted;
 
     /**

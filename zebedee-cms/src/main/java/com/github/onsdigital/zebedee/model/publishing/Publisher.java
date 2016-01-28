@@ -123,7 +123,7 @@ public class Publisher {
      * Submit all files in the collection to the train destination - the website.
      *
      * @param collection The collection to be published.
-     * @param email An identifier for the publishing user.
+     * @param email      An identifier for the publishing user.
      * @return If publishing succeeded, true.
      * @throws IOException If a general error occurs.
      */
@@ -145,7 +145,7 @@ public class Publisher {
             System.out.println(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
             Map<Host, String> transactionIds = collection.description.publishTransactionIds;
-            if (transactionIds != null && transactionIds.size()>0) {
+            if (transactionIds != null && transactionIds.size() > 0) {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
                 rollbackPublish(collection.description.publishTransactionIds, encryptionPassword);
             }
@@ -166,7 +166,7 @@ public class Publisher {
      * @return
      * @throws IOException
      */
-    public static Map<Host, String>  BeginPublish(Collection collection, String encryptionPassword) throws IOException {
+    public static Map<Host, String> BeginPublish(Collection collection, String encryptionPassword) throws IOException {
 
         long start = System.currentTimeMillis();
 
@@ -191,7 +191,7 @@ public class Publisher {
         // If all has gone well so far, commit the publishing transaction:
         boolean success = true;
         for (Result result : commitPublish(collection.description.publishTransactionIds, encryptionPassword)) {
-            success&=!result.error;
+            success &= !result.error;
             collection.description.AddPublishResult(result);
         }
 
@@ -517,24 +517,47 @@ public class Publisher {
     /**
      * Starts a publishing transaction.
      *
-     * @param hosts               The list of target Train {@link Host}s
+     * @param hosts              The list of target Train {@link Host}s
      * @param encryptionPassword The password used to encrypt files during publishing.
      * @return The new transaction ID.
      * @throws IOException If any errors are encountered in making the request or reported in the {@link com.github.onsdigital.zebedee.json.publishing.Result}.
      */
-    static Map<Host, String> beginPublish(List<Host> hosts, String encryptionPassword) throws IOException {
-        Map<Host, String> result = new HashMap<>();
+    private static Map<Host, String> beginPublish(List<Host> hosts, String encryptionPassword) throws IOException {
+        Map<Host, String> hostToTransactionIdMap = new HashMap<>();
         try (Http http = new Http()) {
+
+            List<Future<IOException>> results = new ArrayList<>();
+
+            // submit a beginPublish call for each host to the thread pool.
             for (Host host : hosts) {
-                Log.print("BeginPublish start for host: %s", host.toString());
-                Endpoint begin = new Endpoint(host, "begin").setParameter("encryptionPassword", encryptionPassword);
-                Response<Result> response = http.post(begin, Result.class);
-                checkResponse(response);
-                result.put(host, response.body.transaction.id);
-                Log.print("BeginPublish end for host: %s", host.toString());
+                results.add(pool.submit(() -> {
+                    IOException result = null;
+                    try {
+                        Log.print("BeginPublish start for host: %s", host.toString());
+                        Endpoint begin = new Endpoint(host, "begin").setParameter("encryptionPassword", encryptionPassword);
+                        Response<Result> response = http.post(begin, Result.class);
+                        checkResponse(response);
+                        hostToTransactionIdMap.put(host, response.body.transaction.id);
+                        Log.print("BeginPublish end for host: %s", host.toString());
+                    } catch (IOException e) {
+                        result = e;
+                    }
+
+                    return result;
+                }));
+            }
+
+            // wait for all results to return, checking if an exception has occurred
+            for (Future<IOException> result : results) {
+                try {
+                    IOException exception = result.get();
+                    if (exception != null) throw exception;
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new IOException("Error in BeginPublish", e);
+                }
             }
         }
-        return result;
+        return hostToTransactionIdMap;
     }
 
     /**
@@ -583,39 +606,63 @@ public class Publisher {
     /**
      * Commits a publishing transaction.
      *
-     * @param transactionIds      The {@link Host}s and transactions to publish to.
+     * @param transactionIds     The {@link Host}s and transactions to publish to.
      * @param encryptionPassword The password used to encrypt files during publishing.
      * @return The {@link Result} returned by The Train
      * @throws IOException If any errors are encountered in making the request or reported in the {@link Result}.
      */
     static List<Result> commitPublish(Map<Host, String> transactionIds, String encryptionPassword) throws IOException {
         List<Result> results = new ArrayList<>();
+
+        List<Future<IOException>> futures = new ArrayList<>();
+
         for (Map.Entry<Host, String> entry : transactionIds.entrySet()) {
             Host host = entry.getKey();
             String transactionId = entry.getValue();
-            Log.print("CommitPublish start for host %s", host.toString());
-            results.add(endPublish(host, "commit", transactionId, encryptionPassword));
-            Log.print("CommitPublish end for host %s", host.toString());
+
+            futures.add(pool.submit(() -> {
+                IOException result = null;
+                try {
+                    Log.print("CommitPublish start for host %s", host.toString());
+                    results.add(endPublish(host, "commit", transactionId, encryptionPassword));
+                    Log.print("CommitPublish end for host %s", host.toString());
+                } catch (IOException e) {
+                    result = e;
+                }
+
+                return result;
+            }));
         }
+
+        // wait for all results to return, checking if an exception has occurred
+        for (Future<IOException> future : futures) {
+            try {
+                IOException exception = future.get();
+                if (exception != null) throw exception;
+            } catch (InterruptedException | ExecutionException e) {
+                throw new IOException("Error in commitPublish", e);
+            }
+        }
+
         return results;
     }
 
     /**
      * Rolls back a publishing transaction, suppressing any {@link IOException} and printing it out to the console instead.
      *
-     * @param transactionIds      The {@link Host}s and transactions we are attempting to publish to.
+     * @param transactionIds     The {@link Host}s and transactions we are attempting to publish to.
      * @param encryptionPassword The password used to encrypt files during publishing.
      */
     public static void rollbackPublish(Map<Host, String> transactionIds, String encryptionPassword) {
-        try {
-            for (Map.Entry<Host, String> entry : transactionIds.entrySet()) {
-                Host host = entry.getKey();
-                String transactionId = entry.getValue();
+        for (Map.Entry<Host, String> entry : transactionIds.entrySet()) {
+            Host host = entry.getKey();
+            String transactionId = entry.getValue();
+            try {
                 endPublish(host, "rollback", transactionId, encryptionPassword);
+            } catch (IOException e) {
+                System.out.println("Error rolling back publish transaction:");
+                System.out.println(ExceptionUtils.getStackTrace(e));
             }
-        } catch (IOException e) {
-            System.out.println("Error rolling back publish transaction:");
-            System.out.println(ExceptionUtils.getStackTrace(e));
         }
     }
 

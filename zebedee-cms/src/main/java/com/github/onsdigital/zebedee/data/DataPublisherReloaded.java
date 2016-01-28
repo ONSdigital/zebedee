@@ -44,7 +44,7 @@ public class DataPublisherReloaded {
      * @throws ZebedeeException
      * @throws URISyntaxException
      */
-    public void preprocessCollection(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, boolean saveTimeSeries, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
+    public List<String> preprocessCollection(ContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, boolean saveTimeSeries, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
 
         // Find all files that need data preprocessing
         List<DataPublication> dataPublications = new DataPublicationFinder().findPublications(publishedContentReader, reviewedContentReader, collection);
@@ -56,9 +56,14 @@ public class DataPublisherReloaded {
                 dataPublication.process(publishedContentReader, reviewedContentReader, collectionContentWriter, saveTimeSeries, dataIndex);
         }
 
+        // Get the list of uris in reviewed
+        List<String> uris = reviewedContentReader.listUris();
+
         // Run compression
         if (!doNotCompress)
             compressFiles(reviewedContentReader, collectionContentWriter);
+
+        return uris;
     }
 
     /**
@@ -72,9 +77,9 @@ public class DataPublisherReloaded {
      * @throws ZebedeeException
      * @throws URISyntaxException
      */
-    public void preprocessCollection(CollectionContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException
+    public List<String> preprocessCollection(ContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException
     {
-        preprocessCollection(publishedContentReader, reviewedContentReader, collectionContentWriter, collection, true, dataIndex);
+        return preprocessCollection(publishedContentReader, reviewedContentReader, collectionContentWriter, collection, true, dataIndex);
     }
 
     /**

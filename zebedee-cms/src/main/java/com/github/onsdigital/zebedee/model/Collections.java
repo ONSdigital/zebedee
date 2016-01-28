@@ -4,6 +4,7 @@ import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.DataPublisher;
+import com.github.onsdigital.zebedee.data.DataPublisherReloaded;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Event;
@@ -12,6 +13,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.JsonUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
@@ -217,7 +219,14 @@ public class Collections {
 
         // Do any processing of data files
         try {
+            ContentReader publishedReader = new ContentReader(zebedee.published.path);
+            CollectionContentReader reviewedReader = (CollectionContentReader) collectionReader.getReviewed();
+            CollectionContentWriter reviewedWriter = (CollectionContentWriter) collectionWriter.getReviewed();
+
+//            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, reviewedReader, reviewedWriter, collection, true, zebedee.dataIndex);
             uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
+
+
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }

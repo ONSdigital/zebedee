@@ -409,6 +409,26 @@ public class ContentReader {
         }
     }
 
+    public List<String> listUris() {
+        List<String> uris = new ArrayList<>();
+        Path root = this.getRootFolder();
+
+        try {
+            Files.walkFileTree(this.getRootFolder(), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file,
+                                                 BasicFileAttributes attrs)
+                        throws IOException {
+                   uris.add(PathUtils.toRelativeUri(root, file).toString());
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return uris;
+    }
     public List<Path> listTimeSeriesDirectories() {
         List<Path> directories = new ArrayList<>();
 

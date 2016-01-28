@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 
 import static junit.framework.TestCase.assertTrue;
@@ -9,7 +11,7 @@ public class PublishCollectionsTaskTest {
     // test a single task runs
     // multiple tasks all run concurrent
 
-    //@Test
+    @Test
     public void test() {
 
         // Given 2 publish tasks and 2 post publish tasks in a PublishCollectionsTask.
@@ -41,9 +43,9 @@ public class PublishCollectionsTaskTest {
         assertTrue(publish2.getStart().before(postPublish2.getStart()));
 
         // publish should be finished before post publish
-        assertTrue(publish1.getEnd().before(postPublish1.getStart()));
-        assertTrue(publish1.getEnd().before(postPublish2.getStart()));
-        assertTrue(publish2.getEnd().before(postPublish1.getStart()));
-        assertTrue(publish2.getEnd().before(postPublish2.getStart()));
+        assertTrue(publish1.getEnd().compareTo(postPublish1.getStart()) != 1);
+        assertTrue(publish1.getEnd().compareTo(postPublish2.getStart()) != 1);
+        assertTrue(publish2.getEnd().compareTo(postPublish1.getStart()) != 1);
+        assertTrue(publish2.getEnd().compareTo(postPublish2.getStart()) != 1);
     }
 }

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.onsdigital.zebedee.util.Log;
 import org.joda.time.DateTime;
+import org.junit.Test;
 
 import java.util.Date;
 
@@ -10,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ScheduledTaskTest {
 
-    //@Test
+    @Test
     public void testScheduleRunsTask() throws InterruptedException {
 
         // Given a new task.
@@ -31,7 +32,7 @@ public class ScheduledTaskTest {
         assertTrue(task.isRunComplete());
     }
 
-    //@Test
+    @Test
     public void testScheduleReturnsFalseIfAlreadyScheduled() throws InterruptedException {
 
         // Given a task that is already scheduled.
@@ -48,7 +49,7 @@ public class ScheduledTaskTest {
         task.cancel(); // cancel the pending task.
     }
 
-    //@Test
+    @Test
     public void testCancel() throws InterruptedException {
 
         // Given a scheduled task

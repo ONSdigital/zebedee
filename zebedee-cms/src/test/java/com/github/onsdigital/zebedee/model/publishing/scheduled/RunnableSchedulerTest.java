@@ -106,7 +106,7 @@ public class RunnableSchedulerTest {
         }
     }
 
-    @Test
+    //@Test
     public void scheduleShouldTakeMillisecondsIntoAccount() throws InterruptedException, ExecutionException {
 
         System.out.println("scheduleShouldTakeMillisecondsIntoAccount start");

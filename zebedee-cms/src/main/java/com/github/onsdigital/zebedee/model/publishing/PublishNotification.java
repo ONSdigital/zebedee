@@ -9,9 +9,11 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -76,14 +78,21 @@ public class PublishNotification {
 
     class NotificationPayload {
         public String collectionId;
-        public Date publishDate;
+        public String publishDate;
         public List<String> uriList;
         public String key = Configuration.getReindexKey();
 
         NotificationPayload(String collectionId, List<String> uriList, Date publishDate) {
             this.collectionId = collectionId;
             this.uriList = uriList;
-            this.publishDate = publishDate;
+            this.publishDate = format(publishDate);
         }
+    }
+
+    private String format(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(date);
     }
 }

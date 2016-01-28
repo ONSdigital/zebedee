@@ -10,8 +10,8 @@ import java.util.ArrayList;
 public class Configuration {
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
-    private static final String DEFAULT_TRAIN_URL = "http://localhost:8083";
-    private static final String DEFAULT_BRIAN_URL = "http://localhost:8084";
+    private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
+    private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
 

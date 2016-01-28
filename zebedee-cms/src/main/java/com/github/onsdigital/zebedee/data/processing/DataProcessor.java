@@ -48,6 +48,9 @@ public class DataProcessor {
         DataMerge dataMerge = new DataMerge();
         this.timeSeries = dataMerge.merge(this.timeSeries, newTimeSeries, details.landingPage.getDescription().getDatasetId());
 
+        // Ensure time series labels are up to date
+        new TimeSeriesLabeller().applyLabels(this.timeSeries);
+
         // Log corrections and insertions
         corrections = dataMerge.corrections;
         insertions = dataMerge.insertions;
@@ -165,6 +168,8 @@ public class DataProcessor {
         }
     }
 
+
+
     /**
      *
      * @param inProgress
@@ -190,6 +195,7 @@ public class DataProcessor {
 
         return inProgress;
     }
+
 
 
     /**
@@ -238,6 +244,7 @@ public class DataProcessor {
             return initial;
         }
     }
+
 
 
 }

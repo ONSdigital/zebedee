@@ -45,7 +45,7 @@ public class PublishCollectionsTask extends ScheduledTask {
         // all tasks should be completed now so cleanup the executorService.
         executorService.shutdown();
 
-        Log.print("POST-PUBLISH: Publish complete total time taken: %dms", (System.currentTimeMillis() - publishStart));
+        Log.print("POST-PUBLISH: Publish complete total time taken for publish and post-publish: %dms", (System.currentTimeMillis() - publishStart));
     }
 
     /**
@@ -53,6 +53,8 @@ public class PublishCollectionsTask extends ScheduledTask {
      */
     protected void publishCollections() {
         Log.print("PUBLISH: Publishing %d collections.", publishCollectionTasks.size());
+        long start = System.currentTimeMillis();
+
         // run concurrently if there is more than one collection to publish
         if (publishCollectionTasks.size() > 1) {
 
@@ -72,7 +74,9 @@ public class PublishCollectionsTask extends ScheduledTask {
                 }
             });
         }
-        Log.print("PUBLISH: Finished publishing collections.", publishCollectionTasks.size());
+        Log.print("PUBLISH: Finished publishing %s collections. total time taken: %dms",
+                publishCollectionTasks.size(),
+                (System.currentTimeMillis() - start));
     }
 
 

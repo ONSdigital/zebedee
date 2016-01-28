@@ -54,7 +54,7 @@ public class ZipUtils {
         zipFolder(folder, new FileOutputStream(zipFile), filters);
     }
 
-    private static void zipFolder(final File folder, final OutputStream outputStream, Function<String, Boolean>... filters) throws IOException {
+    public static void zipFolder(final File folder, final OutputStream outputStream, Function<String, Boolean>... filters) throws IOException {
         try (ZipOutputStream zipOutputStream = getZipOutputStream(outputStream)) {
             zipFolder(folder, zipOutputStream, folder.getPath().length() + 1, filters);
         }

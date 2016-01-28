@@ -14,6 +14,20 @@
 
 ##########MAPPING#############
 
-/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections/* => poopulation, projection, age
-
+#/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections/* => poopulation, projection, age
+/census=>census
+/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/*=>Flow of funds
+/economy/inflationandpriceindices/bulletins/consumerpriceinflation/*=>RPI
+/economy/inflationandpriceindices/bulletins/producerpriceinflation/*=>Producer Price Indices
+/economy/inflationandpriceindices/timeseries/chmk=>rpix
+/economy/inflationandpriceindices/timeseries/cdkq=>rpix
+/economy/inflationandpriceindices/datasets/consumerpriceinflation=>RPI
+/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/*=>average earnings index,Labour Force Survey,unemployment,labour market statistics,employment,Claimant Count,average weekly earnings
+/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/summaryoflabourmarketstatistics=>unemployment,employment
+/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearningsearn01=>average earnings index
+/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/lifeexpectancyatbirthandatage65bylocalareasinenglandandwales/*=>life expectancy
+/peoplepopulationandcommunity/culturalidentity/sexuality/bulletins/integratedhouseholdsurvey/*=>smoking
+/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/*=>population,annual population survey,AGE
+/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland=>population
+/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/keystatisticsandquickstatisticsforlocalauthoritiesintheunitedkingdom/2013-10-11=>ethnicity
 

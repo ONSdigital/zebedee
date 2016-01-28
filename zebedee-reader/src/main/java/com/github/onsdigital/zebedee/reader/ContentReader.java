@@ -21,9 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLConnection;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
@@ -408,5 +407,49 @@ public class ContentReader {
         if (language != null) {
             this.language = language;
         }
+    }
+
+    public List<String> listUris() {
+        List<String> uris = new ArrayList<>();
+        Path root = this.getRootFolder();
+
+        try {
+            Files.walkFileTree(this.getRootFolder(), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file,
+                                                 BasicFileAttributes attrs)
+                        throws IOException {
+                   uris.add(PathUtils.toRelativeUri(root, file).toString());
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return uris;
+    }
+    public List<Path> listTimeSeriesDirectories() {
+        List<Path> directories = new ArrayList<>();
+
+        try {
+            Files.walkFileTree(this.getRootFolder(), new SimpleFileVisitor<Path>(){
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir,
+                                                          IOException exc) {
+                    if(dir.endsWith("timeseries")){
+                        directories.add(dir);
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return directories;
     }
 }

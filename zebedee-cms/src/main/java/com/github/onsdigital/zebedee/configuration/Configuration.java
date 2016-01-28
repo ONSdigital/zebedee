@@ -43,21 +43,20 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
     }
 
-    public static String[] getTheTrainUrl() {
-        return StringUtils.split(StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL),",");
+    public static String[] getTheTrainUrls() {
+        return StringUtils.split(StringUtils.defaultIfBlank(getValue("publish_url"), DEFAULT_TRAIN_URL), ",");
+    }
+
+    public static String[] getWebsiteUrls() {
+        return StringUtils.split(StringUtils.defaultIfBlank(getValue("website_url"), DEFAULT_WEBSITE_URL), ",");
     }
 
     public static String getBrianUrl() {
         return StringUtils.defaultIfBlank(getValue("brian_url"), DEFAULT_BRIAN_URL);
     }
 
-
-    public static String getWebsiteUrl() {
-        return StringUtils.defaultIfBlank(getValue("website_url"), DEFAULT_WEBSITE_URL);
-    }
-
     public static String getDefaultVerificationUrl() {
-        return StringUtils.defaultIfBlank(getValue("verification_url"), getWebsiteUrl());
+        return StringUtils.defaultIfBlank(getValue("verification_url"), DEFAULT_WEBSITE_URL);
     }
 
     public static int getVerifyRetrtyDelay() {

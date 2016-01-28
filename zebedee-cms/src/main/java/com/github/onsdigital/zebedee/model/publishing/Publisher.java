@@ -41,12 +41,11 @@ import java.util.concurrent.locks.Lock;
 
 public class Publisher {
 
-    private static final Host websiteHost = new Host(Configuration.getWebsiteUrl());
     private static final List<Host> theTrainHosts;
     private static final ExecutorService pool = Executors.newFixedThreadPool(50);
 
     static {
-        String[] theTrainUrls = Configuration.getTheTrainUrl();
+        String[] theTrainUrls = Configuration.getTheTrainUrls();
         theTrainHosts = new ArrayList<>();
         for (String theTrainUrl : theTrainUrls) {
             theTrainHosts.add(new Host(theTrainUrl));
@@ -460,24 +459,6 @@ public class Publisher {
      */
     static boolean isIndexedUri(String uri) {
         return !VersionedContentItem.isVersionedUri(uri);
-    }
-
-    /**
-     * Post to the website to reindex search.
-     */
-    private static void reIndexWebsiteSearch(final String uri) {
-        pool.submit(new Runnable() {
-            @Override
-            public void run() {
-                try (Http http = new Http()) {
-                    Endpoint begin = new Endpoint(websiteHost, "reindex").setParameter("key", Configuration.getReindexKey()).setParameter("uri", uri);
-                    Response<String> response = http.post(begin, String.class);
-                } catch (Exception e) {
-                    Log.print("Exception reloading website search index:");
-                    ExceptionUtils.printRootCauseStackTrace(e);
-                }
-            }
-        });
     }
 
     private static void reIndexPublishingSearch(final String uri) throws IOException {

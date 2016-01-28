@@ -6,14 +6,13 @@ import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,12 +22,20 @@ import java.util.List;
  */
 public class PublishNotification {
 
+    private static final List<Host> websiteHosts;
+
+    static {
+        String[] websiteUrls = Configuration.getWebsiteUrls();
+        websiteHosts = new ArrayList<>();
+        for (String websiteUrl : websiteUrls) {
+            websiteHosts.add(new Host(websiteUrl));
+        }
+    }
+
     private NotificationPayload payload;
-    private Boolean manual;
 
     public PublishNotification(Collection collection, List<String> uriList) {
         this.payload = new NotificationPayload(collection.description.id, uriList, collection.description.publishDate);
-        this.manual = CollectionType.manual.equals(collection.description.type);
     }
 
     public PublishNotification(Collection collection) {
@@ -36,22 +43,19 @@ public class PublishNotification {
     }
 
     public void sendNotification(EventType eventType) {
-        if (manual) {
-            System.out.println("Skipped sending notification for manual collection, id:" + payload.collectionId);
-            return;
-        }
 
         System.out.println("Sending publish notification to website for " + eventType.name());
         try (Http http = new Http()) {
-            Endpoint endpoint = new Endpoint(new Host(Configuration.getWebsiteUrl()), getEndPointName(eventType));
-            Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
-            String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
-            if (response.statusLine.getStatusCode() > 302) {
-                System.err.println("Error response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
-            } else {
-                System.out.println("Response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+            for (Host host : websiteHosts) {
+                Endpoint endpoint = new Endpoint(host, getEndPointName(eventType));
+                Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
+                String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
+                if (response.statusLine.getStatusCode() > 302) {
+                    System.err.println("Error response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                } else {
+                    System.out.println("Response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                }
             }
-
         } catch (Exception e) {
             Log.print("Failed sending publish notification to website fo " + eventType);
             ExceptionUtils.printRootCauseStackTrace(e);
@@ -76,6 +80,13 @@ public class PublishNotification {
         }
     }
 
+    private String format(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(date);
+    }
+
     class NotificationPayload {
         public String collectionId;
         public String publishDate;
@@ -87,12 +98,5 @@ public class PublishNotification {
             this.uriList = uriList;
             this.publishDate = format(publishDate);
         }
-    }
-
-    private String format(Date date) {
-        if (date == null) {
-            return null;
-        }
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(date);
     }
 }

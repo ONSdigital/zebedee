@@ -31,6 +31,13 @@ analysis :
         - ons_synonyms
         - standard
         - stop
+    ons_stem :
+      tokenizer : standard
+      filter :
+        - lowercase
+        - standard
+        - stop
+        - porter_stem
     ons_synonym_stem_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
       tokenizer : standard
       char_filter : clear_dates

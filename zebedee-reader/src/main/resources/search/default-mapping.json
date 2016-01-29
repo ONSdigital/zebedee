@@ -67,7 +67,10 @@
       },
       "searchBoost": {
         "type": "string",
-        "analyzer": "ons_synonym_stem"
+        "analyzer": "ons_stem",
+        "norms": {
+          "enabled": false
+        }
       }
     }
   },

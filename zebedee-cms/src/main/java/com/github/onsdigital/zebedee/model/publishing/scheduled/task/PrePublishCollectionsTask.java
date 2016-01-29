@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.davidcarboni.httpino.Host;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -127,9 +126,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                 String encryptionPassword = Random.password(100);
 
                 // begin the publish ahead of time. This creates the transaction on the train.
-                Map<Host, String> hostToTransactionIdMap = Publisher.BeginPublish(collection, encryptionPassword);
-                Publisher.PublishAllCollectionFiles(collection, collectionReader, encryptionPassword);
-
+                Map<String, String> hostToTransactionIdMap = Publisher.BeginPublish(collection, encryptionPassword);
                 PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
 
                 Log.print("PRE-PUBLISH: Adding publish task for collection %s", collection.description.name);

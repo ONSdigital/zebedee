@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.json.publishing;
 
 import com.github.onsdigital.zebedee.json.CollectionBase;
 
+import java.util.Date;
 import java.util.List;
 
 public class PublishedCollection extends CollectionBase {
@@ -9,6 +10,9 @@ public class PublishedCollection extends CollectionBase {
     public int verifiedCount;
     public int verifyFailedCount;
     public int verifyInprogressCount;
+
+    public Date publishStartDate; // The date the publish process was actually started
+    public Date publishEndDate; // The date the publish process ended.
 
     /**
      * A list of {@link com.github.onsdigital.zebedee.json.publishing.Result} for

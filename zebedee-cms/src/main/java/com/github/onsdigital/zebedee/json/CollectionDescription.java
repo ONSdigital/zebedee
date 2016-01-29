@@ -20,6 +20,8 @@ public class CollectionDescription extends CollectionBase {
     public boolean approvedStatus;
     public boolean publishComplete;
     public Map<String, String> publishTransactionIds;
+    public Date publishStartDate; // The date the publish process was actually started
+    public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
 
     /**

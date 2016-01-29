@@ -20,7 +20,7 @@ analysis :
       tokenizer : standard
       filter :
         - lowercase
-        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
+        - ons_synonyms
         - standard
         - stop
         - porter_stem
@@ -28,7 +28,7 @@ analysis :
       tokenizer : standard
       filter :
         - lowercase
-        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
+        - ons_synonyms
         - standard
         - stop
     ons_synonym_stem_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
@@ -36,7 +36,7 @@ analysis :
       char_filter : clear_dates
       filter :
         - lowercase
-        - ons_synonyms #Disable ons synonyms if no synonyms are defined at the end of the file
+        - ons_synonyms
         - standard
         - stop
         - porter_stem

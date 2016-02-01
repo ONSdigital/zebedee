@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -45,8 +46,10 @@ public class PublishCollectionTask implements Callable<Boolean> {
         Log.print("PUBLISH: Running publish task for collection: " + collection.description.name);
 
         try {
+            collection.description.publishStartDate = new Date();
             Publisher.PublishAllCollectionFiles(collection, collectionReader, encryptionPassword);
             published = Publisher.CommitPublish(collection, publisherSystemEmail, encryptionPassword);
+            collection.description.publishEndDate = new Date();
         } catch (IOException e) {
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
             System.out.println(ExceptionUtils.getStackTrace(e));

@@ -15,9 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-/**
- * Created by bren on 03/08/15.
- */
 public class FilterUtil {
 
 
@@ -109,6 +106,7 @@ public class FilterUtil {
         return series;
     }
 
+    //applies filter, migrated code from the Alpha
     private static Set<TimeSeriesValue> applyRange(Set<TimeSeriesValue> set, Date from, Date to) {
         if (from == null && to == null) {
             return set;
@@ -120,7 +118,7 @@ public class FilterUtil {
         for (TimeSeriesValue timeSeriesValue : set) {
             Date date = timeSeriesValue.toDate();
             // Start adding if no from date has been specified:
-            if ((!add && from == null) || date.equals(from)) {
+            if ((!add && from == null) || date.equals(from) || date.after(from)) {
                 System.out.println("Starting range at " + date);
                 add = true;
             }

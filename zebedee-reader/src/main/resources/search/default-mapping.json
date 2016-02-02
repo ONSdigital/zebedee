@@ -29,6 +29,10 @@
                 "type" : "string",
                 "analyzer" : "ons_synonym"
               },
+              "title_no_synonym_no_stem" : {
+                "type" : "string",
+                "analyzer" : "ons_standard"
+              },
               "title_no_dates": {
                 "type": "string",
                 "analyzer": "ons_synonym_stem_clear_dates"

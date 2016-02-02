@@ -97,7 +97,7 @@ public class ZipUtils {
 
     private static void zipFolderWithEncryption(final File folder, final OutputStream outputStream, SecretKey key, Function<String, Boolean>... filters) throws IOException {
         try (ZipOutputStream zipOutputStream = getZipOutputStream(outputStream)) {
-            zipFolderWithEncryption(folder, zipOutputStream, key, folder.getPath().length() + 1);
+            zipFolderWithEncryption(folder, zipOutputStream, key, folder.getPath().length() + 1, filters);
         }
     }
 
@@ -107,10 +107,16 @@ public class ZipUtils {
         return zipOutputStream;
     }
 
-    private static void zipFolderWithEncryption(final File folder, final ZipOutputStream zipOutputStream, SecretKey key, final int prefixLength)
+    private static void zipFolderWithEncryption(
+            final File folder,
+            final ZipOutputStream zipOutputStream,
+            SecretKey key,
+            final int prefixLength,
+            Function<String, Boolean>... filters
+    )
             throws IOException {
         for (final File file : folder.listFiles()) {
-            if (file.isFile()) {
+            if (file.isFile() && !shouldBeFiltered(filters, file.toString())) {
                 final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
                 zipOutputStream.putNextEntry(zipEntry);
                 try (InputStream inputStream = EncryptionUtils.encryptionInputStream(file.toPath(), key)) {

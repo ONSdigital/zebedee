@@ -101,12 +101,18 @@ public class DataGrid {
      */
     Map<String, DataGridRow> emptyRowsWithRange(DataTimeRange range, int timeSeriesCount) {
         Map<String, DataGridRow> rows = new HashMap<>();
-        for (String year : range.years)
-            rows.put(year, new DataGridRow(year, timeSeriesCount));
-        for (String quarter : range.quarters)
-            rows.put(quarter, new DataGridRow(quarter, timeSeriesCount));
-        for (String month : range.months)
-            rows.put(month, new DataGridRow(month, timeSeriesCount));
+        if(range.years != null) {
+            for (String year : range.years)
+                rows.put(year, new DataGridRow(year, timeSeriesCount));
+        }
+        if(range.quarters != null) {
+            for (String quarter : range.quarters)
+                rows.put(quarter, new DataGridRow(quarter, timeSeriesCount));
+        }
+        if(range.months != null) {
+            for (String month : range.months)
+                rows.put(month, new DataGridRow(month, timeSeriesCount));
+        }
         return rows;
     }
 

@@ -2,13 +2,12 @@ package com.github.onsdigital.zebedee.model.content.item;
 
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.model.CollectionContentReader;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.URIUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +55,31 @@ public class VersionedContentItem extends ContentItem {
      */
     public static boolean isVersionedUri(String uri) {
         return uri.contains(String.format("/%s/%s", getVersionDirectoryName(), VERSION_PREFIX));
+    }
+
+
+    /**
+     * Given a versioned uri, remove the version related part of the uri and return the result.
+     *
+     * @param uri
+     * @return
+     */
+    public static String resolveBaseUri(String uri) {
+        if (!isVersionedUri(uri))
+            return uri;
+
+        Path path = Paths.get(uri);
+
+        // if there is no file extension, just jump up two levels. i.e /economy/gdp/previous/v1/ -> /economy/gdp
+        if (FilenameUtils.getExtension(uri).length() == 0) {
+            return path.getParent().getParent().toString();
+        }
+
+        // if there is a file extension, we are refering specifically to a file, so add that filename onto the end of the base
+        // i.e /economy/gdp/previous/v1/data.json -> /economy/gdp/data.json
+        Path fileName = path.getFileName();
+        Path basePath = path.getParent().getParent().getParent().resolve(fileName);
+        return basePath.toString();
     }
 
     /**

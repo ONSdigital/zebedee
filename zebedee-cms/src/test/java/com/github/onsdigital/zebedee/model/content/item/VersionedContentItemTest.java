@@ -81,4 +81,39 @@ public class VersionedContentItemTest {
         // Then the result should be true
         assertTrue(isVersioned);
     }
+
+    @Test
+    public void resolveBaseUriShouldReturnSameUriForNonVersionedUri() {
+        // Given a URI that is not versioned (does not live under the "previous" versions directory)
+        String uri = "/some/content/not/versioned";
+
+        // When the static resolveBaseUri method is called
+        String baseUri = VersionedContentItem.resolveBaseUri(uri);
+
+        // Then the result should be the same
+        assertEquals(baseUri, uri);
+    }
+
+    @Test
+    public void resolveBaseUriShouldReturnBaseUriForVersionedUri() {
+        String expectedBaseUri = "/some/content";
+        String uri = expectedBaseUri + "/previous/v1";
+
+        String baseUri = VersionedContentItem.resolveBaseUri(uri);
+
+        // Then the result should be the same
+        assertEquals(expectedBaseUri, baseUri);
+    }
+
+    @Test
+    public void resolveBaseUriShouldReturnBaseUriWithFileExtensionForVersionedUri() {
+        String basePath = "/some/content";
+        String expectedBaseUri = basePath + "/data.json";
+        String uri = basePath + "/previous/v1/data.json";
+
+        String baseUri = VersionedContentItem.resolveBaseUri(uri);
+
+        // Then the result should be the same
+        assertEquals(expectedBaseUri, baseUri);
+    }
 }

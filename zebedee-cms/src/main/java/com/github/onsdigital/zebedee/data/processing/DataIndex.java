@@ -94,7 +94,7 @@ public class DataIndex {
                     timeSeries = (TimeSeries) this.contentReader.getContent(uri);
                     if (timeSeries.getCdid() != null) {
 
-                        this.index.put(timeSeries.getCdid(), uri);
+                        this.index.put(timeSeries.getCdid().toLowerCase(), uri);
                     }
                 } catch (Exception e) {
                     System.out.println("Error indexing " + uri);
@@ -115,7 +115,7 @@ public class DataIndex {
     private boolean waitWhileIncomplete(int maxSeconds) throws InterruptedException {
         int tries = 0;
         while (!indexBuilt) {
-            wait(100);
+            Thread.sleep(100);
             if (tries++ > 10 * maxSeconds)
                 return false;
         }

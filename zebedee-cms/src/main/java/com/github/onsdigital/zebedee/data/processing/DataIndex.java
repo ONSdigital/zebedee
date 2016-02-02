@@ -14,6 +14,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A hashmap storing a mapping from cdid
@@ -22,6 +24,7 @@ public class DataIndex {
     Map<String, String> index = new HashMap<>();
     ContentReader contentReader = null;
     boolean indexBuilt = false;
+    private static final ExecutorService pool = Executors.newSingleThreadExecutor();
 
     public String getUriForCdid(String cdid) {
         return index.get(cdid);
@@ -57,10 +60,11 @@ public class DataIndex {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                System.out.println("Data index built with " + index.size() + " entries");
                 indexBuilt = true;
             }
         };
-        build.run();
+        pool.submit(build);
     }
 
     /**

@@ -922,7 +922,7 @@ public class DataPublisher {
      * @return the completed timeseries page
      * @throws IOException
      * @throws URISyntaxException
-     * @throws NotFoundExceptiongit m
+     * @throws NotFoundException
      */
     private TimeSeries preprocessTimeseries(
             Zebedee zebedee,

@@ -47,7 +47,8 @@ public class PublishScheduler extends Scheduler {
      */
     void schedulePrePublish(Collection collection, Zebedee zebedee, Date prePublishStartDate, Date publishStartDate) {
         // cancel existing publish for the collection
-        prePublishTasks.values().forEach(task -> task.removeCollection(collection));
+        cancel(collection);
+
         PrePublishCollectionsTask task;
 
         // add a task for the publish date if there is not already one.

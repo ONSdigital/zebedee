@@ -26,6 +26,12 @@ public class DummyPostPublishCollectionTask extends PostPublishCollectionTask {
         this.duration = 0;
     }
 
+    public DummyPostPublishCollectionTask(DummyPublishCollectionTask publish1) {
+        super(null, publish1);
+        this.duration = 0;
+    }
+
+
     @Override
     public Boolean call() throws Exception {
         this.start = new Date();

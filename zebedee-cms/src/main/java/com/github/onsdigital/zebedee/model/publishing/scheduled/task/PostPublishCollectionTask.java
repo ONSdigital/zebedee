@@ -62,6 +62,10 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
         return result;
     }
 
+    public PublishCollectionTask getPublishCollectionTask() {
+        return publishCollectionTask;
+    }
+
     public boolean isDone() {
         return done;
     }

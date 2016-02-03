@@ -1,7 +1,9 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -105,5 +107,33 @@ public class PublishCollectionsTask extends ScheduledTask {
             });
         }
         Log.print("POST-PUBLISH: Finished post publish process");
+    }
+
+    /**
+     * Remove any tasks associated with the given collection.
+     *
+     * @param collection
+     */
+    public void removeCollection(Collection collection) {
+
+        List<PublishCollectionTask> publishTasksToRemove = new ArrayList<>();
+        // remove the publish tasks for that collection
+        for (PublishCollectionTask task : publishCollectionTasks) {
+            if (task.getCollection().equals(collection))
+                publishTasksToRemove.add(task);
+        }
+        for (PublishCollectionTask task : publishTasksToRemove) {
+            publishCollectionTasks.remove(task);
+        }
+
+        List<PostPublishCollectionTask> postPublishTasksToRemove = new ArrayList<>();
+        // remove the post-publish tasks for that collection
+        for (PostPublishCollectionTask task : postPublishCollectionTasks) {
+            if (task.getPublishCollectionTask().getCollection().equals(collection))
+                postPublishTasksToRemove.add(task);
+        }
+        for (PostPublishCollectionTask task : postPublishTasksToRemove) {
+            postPublishCollectionTasks.remove(task);
+        }
     }
 }

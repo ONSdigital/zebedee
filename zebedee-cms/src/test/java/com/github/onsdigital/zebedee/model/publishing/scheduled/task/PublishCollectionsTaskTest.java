@@ -1,18 +1,66 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
+import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.Collection;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
 public class PublishCollectionsTaskTest {
 
-    // test a single task runs
-    // multiple tasks all run concurrent
+    Zebedee zebedee;
+    Builder builder;
+    Session session;
+
+    @Before
+    public void setUp() throws Exception {
+        builder = new Builder(this.getClass());
+        zebedee = new Zebedee(builder.zebedee, false);
+        session = zebedee.openSession(builder.administratorCredentials);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        builder.delete();
+    }
 
     @Test
-    public void test() {
+    public void shouldCancelTask() throws IOException, ZebedeeException {
+
+        Collection collection = Collection.create(
+                new CollectionDescription("FirstCollection"), zebedee, session);
+
+        ArrayList<PublishCollectionTask> publishCollectionTasks = new ArrayList<>();
+        DummyPublishCollectionTask publish1 = new DummyPublishCollectionTask(collection);
+        publishCollectionTasks.add(publish1);
+
+        ArrayList<PostPublishCollectionTask> postPublishCollectionTasks = new ArrayList<>();
+        DummyPostPublishCollectionTask postPublish1 = new DummyPostPublishCollectionTask(publish1);
+        postPublishCollectionTasks.add(postPublish1);
+
+        PublishCollectionsTask task = new PublishCollectionsTask(publishCollectionTasks, postPublishCollectionTasks);
+
+        assertTrue(publishCollectionTasks.contains(publish1));
+        assertTrue(postPublishCollectionTasks.contains(postPublish1));
+
+        task.removeCollection(collection);
+
+        assertFalse(publishCollectionTasks.contains(publish1));
+        assertFalse(postPublishCollectionTasks.contains(postPublish1));
+    }
+
+    @Test
+    public void shouldRunInTheCorrectOrder() {
 
         // Given 2 publish tasks and 2 post publish tasks in a PublishCollectionsTask.
         ArrayList<PublishCollectionTask> publishCollectionTasks = new ArrayList<>();

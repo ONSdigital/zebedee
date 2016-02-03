@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.Log;
 
 import java.util.Date;
@@ -24,6 +25,11 @@ public class DummyPublishCollectionTask extends PublishCollectionTask {
     public DummyPublishCollectionTask(int durationMillis) {
         super(null, null, "", null);
         this.duration = durationMillis;
+    }
+
+    public DummyPublishCollectionTask(Collection collection) {
+        super(collection, null, "", null);
+        duration = 0;
     }
 
     @Override

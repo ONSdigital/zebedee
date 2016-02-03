@@ -37,6 +37,7 @@ public class PublishScheduler extends Scheduler {
     @Override
     public void cancel(Collection collection) {
         prePublishTasks.values().forEach(task -> task.removeCollection(collection));
+        publishTasks.values().forEach(task -> task.removeCollection(collection));
     }
 
     /**

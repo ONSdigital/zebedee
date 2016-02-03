@@ -15,6 +15,10 @@ import com.github.onsdigital.zebedee.util.Log;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * A scheduled task to run the pre-publish process for a number of collections.
@@ -114,30 +118,51 @@ public class PrePublishCollectionsTask extends ScheduledTask {
      */
     private List<PublishCollectionTask> createCollectionPublishTasks(Set<Collection> collections) {
         List<PublishCollectionTask> collectionPublishTasks = new ArrayList<>(collections.size());
+        List<Future<Boolean>> futures = new ArrayList<>();
+        ExecutorService pool = Executors.newFixedThreadPool(collections.size()); // thread per collection
 
         // create a publish task for each collection that will publish the content to the website.
         // creating the individual collection publish tasks here to do all the work ahead of the actual publish.
-        collections.forEach(collection -> {
+        try {
+            for (Collection collection : collections) {
+                futures.add(pool.submit(() -> {
+                    try {
+                        Log.print("PRE-PUBLISH: creating collection publish task for collection: " + collection.description.name);
+                        SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
+                        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
+
+                        String encryptionPassword = Random.password(100);
+
+                        // begin the publish ahead of time. This creates the transaction on the train.
+                        Map<String, String> hostToTransactionIdMap = Publisher.BeginPublish(collection, encryptionPassword);
+
+                        // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
+                        Publisher.SendManifest(collection, encryptionPassword);
+
+                        PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
+
+                        Log.print("PRE-PUBLISH: Adding publish task for collection %s", collection.description.name);
+                        collectionPublishTasks.add(publishCollectionTask);
+                        return true;
+                    } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {
+                        Log.print(e);
+                        return false;
+                    }
+                }));
+
+            }
+        } finally {
+            if (pool != null) pool.shutdown();
+        }
+
+        for (Future<Boolean> future : futures) {
             try {
-                Log.print("PRE-PUBLISH: creating collection publish task for collection: " + collection.description.name);
-                SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
-                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
-
-                String encryptionPassword = Random.password(100);
-
-                // begin the publish ahead of time. This creates the transaction on the train.
-                Map<String, String> hostToTransactionIdMap = Publisher.BeginPublish(collection, encryptionPassword);
-                PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
-
-                Log.print("PRE-PUBLISH: Adding publish task for collection %s", collection.description.name);
-                collectionPublishTasks.add(publishCollectionTask);
-            } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {
+                future.get().booleanValue();
+            } catch (InterruptedException | ExecutionException e) {
                 Log.print(e);
             }
+        }
 
-            // start transaction for each collection?
-            // send versioned files / all files over to the train?
-        });
         return collectionPublishTasks;
     }
 

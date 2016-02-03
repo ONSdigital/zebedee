@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 /**
  * A wrapper around the publish process of a single collection, allowing it to be executed on its own thread.
@@ -47,7 +49,12 @@ public class PublishCollectionTask implements Callable<Boolean> {
 
         try {
             collection.description.publishStartDate = new Date();
-            Publisher.PublishAllCollectionFiles(collection, collectionReader, encryptionPassword);
+
+            // We do not want to send versioned files. They have already been taken care of via the manifest.
+            // Pass the function to filter files into the publish method.
+            Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
+            Publisher.PublishCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter);
+
             published = Publisher.CommitPublish(collection, publisherSystemEmail, encryptionPassword);
             collection.description.publishEndDate = new Date();
         } catch (IOException e) {

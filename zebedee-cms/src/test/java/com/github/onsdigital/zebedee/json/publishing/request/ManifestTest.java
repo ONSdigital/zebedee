@@ -48,7 +48,7 @@ public class ManifestTest {
 
         // Given a new manifest
         Manifest manifest = new Manifest();
-        manifest.addMove("from/here", "to/there");
+        manifest.addFileCopy("from/here", "to/there");
 
         // When the save method is called
         boolean saved = Manifest.save(manifest, collection);
@@ -57,8 +57,8 @@ public class ManifestTest {
         Manifest loadedManifest = Manifest.load(collection);
 
         assertTrue(saved);
-        assertEquals(manifest.moves.size(), loadedManifest.moves.size());
-        assertEquals(manifest.moves.get(0).source, loadedManifest.moves.get(0).source);
-        assertEquals(manifest.moves.get(0).target, loadedManifest.moves.get(0).target);
+        assertEquals(manifest.filesToFileCopy.size(), loadedManifest.filesToFileCopy.size());
+        assertEquals(manifest.filesToFileCopy.get(0).source, loadedManifest.filesToFileCopy.get(0).source);
+        assertEquals(manifest.filesToFileCopy.get(0).target, loadedManifest.filesToFileCopy.get(0).target);
     }
 }

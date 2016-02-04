@@ -14,16 +14,15 @@ import java.util.List;
 
 /**
  * A manifest is a list of files to process for a collection when publishing.
- * Moves - files that we can just move on the web server instead of transferring them from publishing.
  */
 public class Manifest {
 
     public static final String filename = "manifest.json";
 
-    public List<MoveDetail> moves = new ArrayList<>();
+    public List<FileCopy> filesToFileCopy = new ArrayList<>();
 
     /**
-     * Create a new move manifest for the given collection.
+     * Create a new manifest for the given collection.
      *
      * @param collection
      * @return
@@ -34,7 +33,7 @@ public class Manifest {
 
         for (String uri : collection.reviewed.uris()) {
             if (VersionedContentItem.isVersionedUri(uri)) {
-                manifest.addMove(VersionedContentItem.resolveBaseUri(uri), uri);
+                manifest.addFileCopy(VersionedContentItem.resolveBaseUri(uri), uri);
             }
         }
 
@@ -80,7 +79,7 @@ public class Manifest {
         return collection.path.resolve(filename);
     }
 
-    public void addMove(String from, String to) {
-        this.moves.add(new MoveDetail(from, to));
+    public void addFileCopy(String from, String to) {
+        this.filesToFileCopy.add(new FileCopy(from, to));
     }
 }

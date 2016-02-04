@@ -4,11 +4,16 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeBuilder;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.*;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * Starts an {@link EmbeddedElasticSearchServer} when a client requested
@@ -16,6 +21,7 @@ import static com.github.onsdigital.zebedee.search.configuration.SearchConfigura
 public class ElasticSearchClient {
 
     static Client client;
+    private static Path searchHome;
 
     /**
      * NB caching the client for the entire application to use is safe and
@@ -64,15 +70,20 @@ public class ElasticSearchClient {
         }
     }
 
-    private static void connect() {
+    private static void connect() throws IOException {
         if (client == null) {
-            Settings settings = Settings.builder()
-                    .put("cluster.name", getElasticSearchCluster()).build();
+            searchHome = Files.createTempDirectory("zebedee_search_client");
+            Settings settings = Settings.builder().put("http.enabled", false)
+                    .put("cluster.name", getElasticSearchCluster())
+                    .put("discovery.zen.ping.multicast.enabled", true)
+                    .put("path.home", searchHome).build();
+            Node node =
+                    nodeBuilder()
+                            .settings(settings)
+                            .client(true)
+                            .node();
 
-            client = TransportClient.builder().
-                    settings(settings).build()
-                    .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(getElasticSearchServer(), getElasticSearchPort())));
-
+            client = node.client();
             Runtime.getRuntime().addShutdownHook(new ShutDownNodeThread(client, null));
         }
 
@@ -98,6 +109,15 @@ public class ElasticSearchClient {
             // is guaranteed to have been created:
             if (server != null) {
                 server.shutdown();
+            }
+
+            if (searchHome != null) {
+                try {
+                    Files.deleteIfExists(searchHome);
+                } catch (IOException e) {
+                    System.err.println("Falied cleaning temporary search client directory");
+                    e.printStackTrace();
+                }
             }
         }
     }

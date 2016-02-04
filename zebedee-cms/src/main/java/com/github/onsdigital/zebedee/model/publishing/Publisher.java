@@ -281,7 +281,7 @@ public class Publisher {
         // Publish each item of content:
         for (String uri : collection.reviewed.uris()) {
             if (!shouldBeFiltered(filters, uri)) {
-                Log.print("Start PublishFile: %s", uri);
+                //Log.print("Start PublishFile: %s", uri);
                 publishFile(collection, encryptionPassword, pool, results, uri, collectionReader);
                 //Log.print("End PublishFile: %s", uri);
             }

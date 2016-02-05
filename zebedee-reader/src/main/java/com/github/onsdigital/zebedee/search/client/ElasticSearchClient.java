@@ -80,7 +80,7 @@ public class ElasticSearchClient {
             Node node =
                     nodeBuilder()
                             .settings(settings)
-                            .client(true)
+                            .data(false)
                             .node();
 
             client = node.client();

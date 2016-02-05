@@ -57,8 +57,8 @@ public class ManifestTest {
         Manifest loadedManifest = Manifest.load(collection);
 
         assertTrue(saved);
-        assertEquals(manifest.filesToFileCopy.size(), loadedManifest.filesToFileCopy.size());
-        assertEquals(manifest.filesToFileCopy.get(0).source, loadedManifest.filesToFileCopy.get(0).source);
-        assertEquals(manifest.filesToFileCopy.get(0).target, loadedManifest.filesToFileCopy.get(0).target);
+        assertEquals(manifest.filesToCopy.size(), loadedManifest.filesToCopy.size());
+        assertEquals(manifest.filesToCopy.get(0).source, loadedManifest.filesToCopy.get(0).source);
+        assertEquals(manifest.filesToCopy.get(0).target, loadedManifest.filesToCopy.get(0).target);
     }
 }

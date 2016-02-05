@@ -10,11 +10,14 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
+import com.github.onsdigital.zebedee.json.publishing.request.FileCopy;
 import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
@@ -356,6 +359,11 @@ public class Publisher {
 
         try {
 
+            ContentReader contentReader = new ContentReader(zebedee.published.path);
+            ContentWriter contentWriter = new ContentWriter(zebedee.published.path);
+
+            processManifestForMaster(collection, contentReader, contentWriter);
+
             unzipTimeseries(collection, collectionReader, zebedee);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
@@ -383,6 +391,18 @@ public class Publisher {
         }
 
         return false;
+    }
+
+    private static void processManifestForMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
+        Manifest manifest = Manifest.load(collection);
+
+        for (FileCopy fileCopy : manifest.filesToCopy) {
+            try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
+                contentWriter.write(inputStream, fileCopy.target);
+            } catch (ZebedeeException | IOException e) {
+                Log.print(e);
+            }
+        }
     }
 
     private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
@@ -415,6 +435,8 @@ public class Publisher {
 
                     Resource resource = collectionReader.getResource(uri);
                     ZipUtils.unzip(resource.getData(), publishPath.toString());
+
+                    Files.delete(source); // delete the zip file now its done with.
                 }
             }
         }

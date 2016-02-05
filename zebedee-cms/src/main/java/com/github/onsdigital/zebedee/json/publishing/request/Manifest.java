@@ -19,7 +19,7 @@ public class Manifest {
 
     public static final String filename = "manifest.json";
 
-    public List<FileCopy> filesToFileCopy = new ArrayList<>();
+    public List<FileCopy> filesToCopy = new ArrayList<>();
 
     /**
      * Create a new manifest for the given collection.
@@ -80,6 +80,6 @@ public class Manifest {
     }
 
     public void addFileCopy(String from, String to) {
-        this.filesToFileCopy.add(new FileCopy(from, to));
+        this.filesToCopy.add(new FileCopy(from, to));
     }
 }

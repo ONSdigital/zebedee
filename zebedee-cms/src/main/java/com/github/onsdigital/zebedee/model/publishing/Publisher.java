@@ -582,9 +582,11 @@ public class Publisher {
         Log.print("Moving files from collection into master for collection: " + collection.description.name);
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
-            Path destination = zebedee.published.toPath(uri);
-            Resource resource = collectionReader.getResource(uri);
-            FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
+            if (!VersionedContentItem.isVersionedUri(uri)) {
+                Path destination = zebedee.published.toPath(uri);
+                Resource resource = collectionReader.getResource(uri);
+                FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
+            }
         }
     }
 

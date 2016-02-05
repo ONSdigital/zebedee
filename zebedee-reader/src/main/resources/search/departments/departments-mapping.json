@@ -1,0 +1,28 @@
+{
+  "departments" : {
+    "properties": {
+      "code" : {
+        "type":"string",
+        "analyzer" : "trim_lowercase",
+        "norms": {
+          "enabled": false
+        }
+      },
+      "name" : {
+        "type":"string",
+        "index" : "not_analyzed"
+      },
+      "url" : {
+        "type":"string",
+        "index" : "not_analyzed"
+      },
+      "terms": {
+        "type": "string",
+        "analyzer" : "standard",
+        "norms": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

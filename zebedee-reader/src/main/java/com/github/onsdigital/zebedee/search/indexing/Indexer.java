@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.search.indexing;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
@@ -21,8 +22,10 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
@@ -32,6 +35,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.serialise;
 import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getSearchAlias;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 public class Indexer {
     private static Indexer instance = new Indexer();
@@ -41,6 +46,9 @@ public class Indexer {
     private final Client client = ElasticSearchClient.getClient();
     private ElasticSearchUtils searchUtils = new ElasticSearchUtils(client);
     private ZebedeeReader zebedeeReader = new ZebedeeReader();
+
+    private final static String DEPARTMENTS_INDEX = "departments";
+    private final static String DEPARTMENT_TYPE = "departments";
 
     private Indexer() {
     }
@@ -88,11 +96,51 @@ public class Indexer {
     }
 
     private void doLoad(String indexName) throws IOException {
+        loadContent(indexName);
+        loadDepartments();
+    }
+
+    private void loadContent(String indexName) throws IOException {
         long start = System.currentTimeMillis();
         System.out.println("Triggering re-indexing on index:" + indexName);
         indexDocuments(indexName);
         long end = System.currentTimeMillis();
         System.out.println("Elasticsearch: indexing complete in " + (end - start) + " ms");
+    }
+
+    private void loadDepartments() throws IOException {
+
+        if (!searchUtils.isIndexAvailable(DEPARTMENTS_INDEX)) {
+            searchUtils.createIndex(DEPARTMENTS_INDEX, getDepartmentsSetting(), DEPARTMENT_TYPE, getDepartmentsMapping());
+        }
+
+        System.out.printf("Indexing departments...");
+        long start = System.currentTimeMillis();
+        InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream("/search/departments/departments.txt");
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))) {
+            for (String line; (line = br.readLine()) != null; ) {
+                processDepartment(line);
+            }
+        }
+        System.out.println("Finished indexing departments in " + (System.currentTimeMillis() - start) + " ms");
+    }
+
+    private void processDepartment(String line) {
+        if (isEmpty(line) || startsWith(line, "#")) {
+            return; // skip comments
+        }
+
+        String[] split = line.split(" *=> *");
+        if (split.length != 4) {
+            System.out.println("Skipping invalid external department. line: " + line);
+        }
+        String[] terms = split[3].split(" *, *");
+        if (terms == null || terms.length == 0) {
+            return;
+        }
+
+        Department department = new Department(split[0], split[1], split[2], terms);
+        searchUtils.createDocument(DEPARTMENTS_INDEX, DEPARTMENT_TYPE, split[0], ContentUtil.serialise(department));
     }
 
     /**
@@ -235,13 +283,25 @@ public class Indexer {
         return settingsBuilder.build();
     }
 
+    private Settings getDepartmentsSetting() {
+        Settings.Builder settingsBuilder = Settings.builder().
+                loadFromStream("departments-index-config.yml", Indexer.class.getResourceAsStream("/search/departments/departments-index-config.yml"));
+        return settingsBuilder.build();
+    }
+
 
     private String getDefaultMapping() throws IOException {
         InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json");
         String mappingSource = IOUtils.toString(mappingSourceStream);
         System.out.println(mappingSource);
         return mappingSource;
+    }
 
+    private String getDepartmentsMapping() throws IOException {
+        InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/departments/departments-mapping.json");
+        String mappingSource = IOUtils.toString(mappingSourceStream);
+        System.out.println(mappingSource);
+        return mappingSource;
     }
 
     //acquires global lock

@@ -38,11 +38,39 @@ class ElasticSearchUtils {
     }
 
 
+    /**
+     * Creates index with default mapping
+     *
+     * @param index
+     * @param settings
+     * @param defaultMappingSource
+     * @return
+     * @throws IOException
+     */
     public CreateIndexResponse createIndex(String index, Settings settings, String defaultMappingSource) throws IOException {
+        return createIndex(index, settings, null, defaultMappingSource);
+    }
+
+    /**
+     *
+     * Create index with given type mapping
+     *
+     * @param index
+     * @param settings
+     * @param type
+     * @param mappingSource
+     * @return
+     * @throws IOException
+     */
+    public CreateIndexResponse createIndex(String index, Settings settings, String type, String mappingSource) throws IOException {
         System.out.println("Creating index " + index);
         CreateIndexRequestBuilder createIndexRequest = getIndicesClient().prepareCreate(index);
         createIndexRequest.setSettings(settings);
-        createIndexRequest.addMapping(DEFAULT_TYPE, defaultMappingSource);
+        if (type == null) {
+            createIndexRequest.addMapping(DEFAULT_TYPE, mappingSource);
+        } else {
+            createIndexRequest.addMapping(type, mappingSource);
+        }
         return createIndexRequest.get();
     }
 

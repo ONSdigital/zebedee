@@ -96,8 +96,8 @@ public class Indexer {
     }
 
     private void doLoad(String indexName) throws IOException {
-        loadContent(indexName);
         loadDepartments();
+        loadContent(indexName);
     }
 
     private void loadContent(String indexName) throws IOException {

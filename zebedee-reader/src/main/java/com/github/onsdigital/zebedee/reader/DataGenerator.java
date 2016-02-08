@@ -614,7 +614,7 @@ public class DataGenerator {
         } else if (format.equalsIgnoreCase("xlsx")) {
             writeDataGridToXls(filePath, grid);
         } else if (format.equalsIgnoreCase("csv")) {
-            writeDataGridToXls(filePath, grid);
+            writeDataGridToCsv(filePath, grid);
         }
 
         return buildResource(filePath);
@@ -639,7 +639,7 @@ public class DataGenerator {
         } else if (format.equalsIgnoreCase("xlsx")) {
             writeDataGridToXls(filePath, grid);
         } else if (format.equalsIgnoreCase("csv")) {
-            writeDataGridToXls(filePath, grid);
+            writeDataGridToCsv(filePath, grid);
         }
 
         return buildResource(filePath);

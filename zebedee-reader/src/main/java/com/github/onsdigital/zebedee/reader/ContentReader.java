@@ -310,10 +310,19 @@ public class ContentReader {
         return ContentUtil.deserialiseContent(resource.getData());
     }
 
-    private void assertExists(Path path) throws ZebedeeException {
-        if (!exists(path)) {
+    private void assertExists(Path path) throws ZebedeeException, IOException {
+        if (!exists(path) || !isChild(path) ) {
             throw new NotFoundException("Could not find requested content, path:" + path.toUri().toString());
         }
+    }
+
+    /**
+     *
+     * Checks whether given path is a child of root folder or not to limit access to files outside content folder using relative paths
+     * @return
+     */
+    private boolean isChild(Path path) throws IOException {
+        return path.toFile().getCanonicalPath().startsWith(getRootFolder().toFile().getCanonicalPath());
     }
 
     private void assertNotDirectory(Path path) throws BadRequestException {
@@ -328,7 +337,7 @@ public class ContentReader {
         }
     }
 
-    private void assertIsEditionsFolder(Path path) throws ZebedeeException {
+    private void assertIsEditionsFolder(Path path) throws ZebedeeException, IOException {
         assertExists(path);
         assertIsDirectory(path);
         String fileName = path.getFileName().toString();
@@ -359,7 +368,19 @@ public class ContentReader {
         if (!exists(dataFilePath)) {
             dataFilePath = path.resolve(ContentLanguage.en.getDataFileName());
         }
+        assertReleative(dataFilePath);
         return dataFilePath;
+    }
+
+    /**
+     *
+     * Asserts requested file is under content folder
+     *
+     * @param dataFilePath
+     */
+    private void assertReleative(Path dataFilePath) {
+        dataFilePath.normalize();
+
     }
 
     /*Getters * Setters */

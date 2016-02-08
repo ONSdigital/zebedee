@@ -149,7 +149,7 @@ public class Collection {
 
         // Encryption
         // assign a key for the collection to the session user
-        KeyManager.assignKeyToUser(zebedee, zebedee.users.get(session.email), collection, Keys.newSecretKey());
+        KeyManager.assignKeyToUser(zebedee, zebedee.users.get(session.email), collection.description.id, Keys.newSecretKey());
         // get the session user to distribute the key to all
         KeyManager.distributeCollectionKey(zebedee, session, collection);
 

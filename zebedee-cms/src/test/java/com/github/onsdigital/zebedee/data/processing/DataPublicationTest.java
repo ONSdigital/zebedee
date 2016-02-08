@@ -154,7 +154,7 @@ public class DataPublicationTest {
     public void publication_givenLandingPageWithoutDatasetId_generatesFromCSVFileName() throws IOException, ParseException, URISyntaxException, ZebedeeException {
         // Given
         // we generate a publish with a fresh csv upload
-        DataPagesSet pagesSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "upload.abcd.csv");
+        DataPagesSet pagesSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "upload-abcd.csv");
         pagesSet.datasetLandingPage.getDescription().setDatasetId("");
         dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
 
@@ -197,7 +197,7 @@ public class DataPublicationTest {
     public void publication_givenCSVFile_callsCSVDataLink() throws IOException, ParseException, URISyntaxException, ZebedeeException {
         // Given
         // we generate a publish with a csv upload
-        DataPagesSet pagesSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "upload.abcd.csv");
+        DataPagesSet pagesSet = generator.generateDataPagesSet("datasetIds", "temp", 2015, 2, "upload-abcd.csv");
         dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
 
         DataPublicationDetails details = pagesSet.getDetails(publishedReader, collectionReader.getReviewed());

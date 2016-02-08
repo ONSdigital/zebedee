@@ -36,6 +36,26 @@ public class KeyManager {
         zebedee.keyringCache.schedulerCache.put(collection.description.id, key);
     }
 
+    public static void disributeApplicationKey(Zebedee zebedee, String application, SecretKey secretKey) throws IOException {
+        for (User user : zebedee.users.list()) {
+            distributeApplicationKeyToUser(zebedee, application, secretKey, user);
+        }
+    }
+
+    private static void distributeApplicationKeyToUser(Zebedee zebedee, String application, SecretKey secretKey, User user) throws IOException {
+        if (userShouldHaveApplicationKey(zebedee, user)) {
+            // Add the key
+            assignKeyToUser(zebedee, user, application, secretKey);
+        } else {
+            removeKeyFromUser(zebedee, user, application);
+        }
+    }
+
+
+    private static boolean userShouldHaveApplicationKey(Zebedee zebedee, User user) throws IOException {
+        return zebedee.permissions.isAdministrator(user.email) || zebedee.permissions.canEdit(user.email);
+    }
+
     /**
      * Determine if the user should have the key assigned or removed for the given collection.
      * @param zebedee
@@ -52,25 +72,24 @@ public class KeyManager {
     private static void distributeKeyToUser(Zebedee zebedee, Collection collection, SecretKey key, User user) throws IOException {
         if (userShouldHaveKey(zebedee, user, collection)) {
             // Add the key
-            assignKeyToUser(zebedee, user, collection, key);
+            assignKeyToUser(zebedee, user, collection.description.id, key);
         } else {
-            removeKeyFromUser(zebedee, user, collection);
+            removeKeyFromUser(zebedee, user, collection.description.id);
         }
     }
 
     /**
      * @param zebedee
      * @param user
-     * @param collection
      * @param key
      * @throws IOException
      */
-    public static void assignKeyToUser(Zebedee zebedee, User user, Collection collection, SecretKey key) throws IOException {
+    public static void assignKeyToUser(Zebedee zebedee, User user, String keyIdentifier, SecretKey key) throws IOException {
         // Escape in case user keyring has not been generated
         if (user.keyring == null) return;
 
         // Add the key to the user keyring and save
-        user.keyring.put(collection.description.id, key);
+        user.keyring.put(keyIdentifier, key);
         zebedee.users.updateKeyring(user);
 
         // If the user is logged in assign the key to their cached keyring
@@ -79,7 +98,7 @@ public class KeyManager {
             Keyring keyring = zebedee.keyringCache.get(session);
             try {
                 if (keyring != null)
-                    keyring.put(collection.description.id, key);
+                    keyring.put(keyIdentifier, key);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -92,15 +111,14 @@ public class KeyManager {
      * to re-evaluate whether a key should be removed instead of just removing it.
      * @param zebedee
      * @param user
-     * @param collection
      * @throws IOException
      */
-    private static void removeKeyFromUser(Zebedee zebedee, User user, Collection collection) throws IOException {
+    private static void removeKeyFromUser(Zebedee zebedee, User user, String keyIdentifier) throws IOException {
         // Escape in case user keyring has not been generated
         if (user.keyring == null) return;
 
         // Remove the key from the users keyring and save
-        user.keyring.remove(collection.description.id);
+        user.keyring.remove(keyIdentifier);
         zebedee.users.updateKeyring(user);
 
         // If the user is logged in remove the key from their cached keyring
@@ -109,7 +127,7 @@ public class KeyManager {
             Keyring keyring = zebedee.keyringCache.get(session);
             try {
                 if (keyring != null)
-                    keyring.remove(collection.description.id);
+                    keyring.remove(keyIdentifier);
             } catch (Exception e) {
                 e.printStackTrace();
             }

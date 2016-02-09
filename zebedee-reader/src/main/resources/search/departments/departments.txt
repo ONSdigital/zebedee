@@ -11,7 +11,7 @@
 
 
 ##########MAPPING#############
-dfe => The Department for Education and Pensions => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-education => dfe,education,a level,degree,nvq,school,college,university,qualification,teacher training,pupil absence,exclusions,school workforce,key stage
+dfe => The Department for Education and Pensions => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-education => dfe,education,a level,degree,nvq,school,college,university,curriculum,qualification,teacher training,pupil absence,exclusions,school workforce,key stage
 
 bis => The Department for Business Innovation & Skills => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-business-innovation-skills => bis,business,apprenticeship,building,construction,higher education,trade union,enterprise
 

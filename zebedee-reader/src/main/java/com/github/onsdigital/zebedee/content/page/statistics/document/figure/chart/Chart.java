@@ -28,6 +28,7 @@ public class Chart extends FigureBase {
     private Map<String, String> chartTypes;
     private List<List<String>> groups;
     private Boolean startFromZero;
+    private Boolean finishAtHundred;
 
     @Override
     public PageType getType() {
@@ -184,5 +185,13 @@ public class Chart extends FigureBase {
 
     public void setStartFromZero(Boolean startFromZero) {
         this.startFromZero = startFromZero;
+    }
+
+    public Boolean getFinishAtHundred() {
+        return finishAtHundred;
+    }
+
+    public void setFinishAtHundred(Boolean finishAtHundred) {
+        this.finishAtHundred = finishAtHundred;
     }
 }

@@ -119,9 +119,13 @@ public class Users {
             for (String key : user.keyring.list()) {
                 boolean keyIsValid = false;
 
-                for (Collection collection : collections) {
-                    if (collection.description.id.equals(key)) {
-                        keyIsValid = true;
+                if (zebedee.applicationKeys.containsKey(key)) {
+                    keyIsValid = true;
+                } else {
+                    for (Collection collection : collections) {
+                        if (collection.description.id.equals(key)) {
+                            keyIsValid = true;
+                        }
                     }
                 }
 

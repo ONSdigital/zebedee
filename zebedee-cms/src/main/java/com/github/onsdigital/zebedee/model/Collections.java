@@ -174,6 +174,8 @@ public class Collections {
     /**
      * Approve the given collection.
      *
+     * Uses the environment variable use_beta_publisher to choose publisher
+     *
      * @param collection
      * @param session
      * @return
@@ -223,8 +225,7 @@ public class Collections {
             CollectionContentReader reviewedReader = (CollectionContentReader) collectionReader.getReviewed();
             CollectionContentWriter reviewedWriter = (CollectionContentWriter) collectionWriter.getReviewed();
 
-            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, reviewedReader, reviewedWriter, collection, true, zebedee.dataIndex);
-//            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
+            uriList = preprocessTimeseries(collection, session, collectionReader, collectionWriter, publishedReader, reviewedReader, reviewedWriter);
 
 
         } catch (URISyntaxException e) {
@@ -238,6 +239,36 @@ public class Collections {
         boolean result = collection.save();
         new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
         return result;
+    }
+
+    /**
+     * Run the preprocess process using either datapublisher or datapublisher reloaded
+     *
+     * Has a lot of arguments because the alternative processes have different signatures
+     *
+     * @param collection
+     * @param session
+     * @param collectionReader to read all collection content (beta datapublisher)
+     * @param collectionWriter to write to collection content (beta datapublisher)
+     * @param publishedReader to read published content (reloaded datapublisher)
+     * @param reviewedReader to read reviewed content (reloaded datapublisher)
+     * @param reviewedWriter to write to reviewed content (reloaded datapublisher)
+     * @return
+     * @throws IOException
+     * @throws ZebedeeException
+     * @throws URISyntaxException
+     */
+    private List<String> preprocessTimeseries(Collection collection, Session session, CollectionReader collectionReader, CollectionWriter collectionWriter, ContentReader publishedReader, CollectionContentReader reviewedReader, CollectionContentWriter reviewedWriter) throws IOException, ZebedeeException, URISyntaxException {
+        List<String> uriList;
+
+        // Use environment variable to determine whether to use the BetaPublisher
+        String useBetaPublisher = System.getenv("use_beta_publisher");
+        if (useBetaPublisher != null && useBetaPublisher.equalsIgnoreCase("true")) {
+            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
+        } else {
+            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, reviewedReader, reviewedWriter, collection, true, zebedee.dataIndex);
+        }
+        return uriList;
     }
 
     /**

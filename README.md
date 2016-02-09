@@ -11,3 +11,4 @@ David
 #### Example environment variables
 zebedee_root    /Users/thomasridd/Documents/onswebsite
 brian_url   http://localhost:8083/
+use_beta_publisher   false

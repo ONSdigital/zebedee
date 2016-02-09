@@ -15,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 public class FilterUtil {
 
 
@@ -101,7 +103,7 @@ public class FilterUtil {
         series.getDescription().setCdid(page.getDescription().getCdid());
         series.getDescription().setTitle(page.getDescription().getTitle());
         for (TimeSeriesValue timeSeriesValue : set) {
-            series.add(new Point(timeSeriesValue.date, timeSeriesValue.value));
+            series.add(new Point(isNotEmpty(timeSeriesValue.label) ? timeSeriesValue.label : timeSeriesValue.date, timeSeriesValue.value));
         }
         return series;
     }

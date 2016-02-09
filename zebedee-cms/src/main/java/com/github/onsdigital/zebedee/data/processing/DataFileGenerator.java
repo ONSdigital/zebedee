@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +46,7 @@ public class DataFileGenerator {
 
         // get the correct place to save data files
         String root = fileRoot(details);
+
 
         // write the files
         List<DownloadSection> sections = new ArrayList<>();
@@ -136,8 +138,10 @@ public class DataFileGenerator {
 
     private DownloadSection newDownloadSection(String title, String file) {
         DownloadSection section = new DownloadSection();
+        String filename = Paths.get(file).getFileName().toString();
+
         section.setTitle(title);
-        section.setFile(file);
+        section.setFile(filename);
         return section;
     }
 }

@@ -21,7 +21,7 @@ public class ApplicationKeysTest {
 
     @Before
     public void setUp() throws Exception {
-        path = Files.createTempDir().toPath();
+        path = Files.createTempDir().toPath().resolve("application-keys");
         applicationKeys = new ApplicationKeys(path);
     }
 

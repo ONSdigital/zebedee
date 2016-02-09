@@ -147,6 +147,7 @@ public class ApplicationKeys {
     }
 
     private synchronized void write(StoredApplicationKeys applicationKeys) throws IOException {
+        Files.createDirectories(applicationKeysPath);
         try (OutputStream output = Files.newOutputStream(getFilePath())) {
             Serialiser.serialise(output, applicationKeys);
         }

@@ -12,10 +12,8 @@ import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -98,8 +96,6 @@ public class Zebedee {
         } else {
             this.verificationAgent = null;
         }
-
-        InitialiseCsdbImportKeys();
     }
 
     public Zebedee(Path path) {
@@ -159,25 +155,6 @@ public class Zebedee {
         Users.createSystemUser(zebedee, user, password);
 
         return zebedee;
-    }
-
-    /**
-     * If we have not previously generated a key for CSDB import, generate one and distribute it.
-     */
-    private void InitialiseCsdbImportKeys() {
-        // if there is no key previously stored for CSDB import, generate a new one.
-        if (!applicationKeys.containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
-            // create new key pair
-            Log.print("No key pair found for CSDB import. Generating and saving a new key.");
-            try {
-                SecretKey secretKey = applicationKeys.generateNewKey(CsdbImporter.APPLICATION_KEY_ID);
-
-                // distribute private key to all users.
-                KeyManager.disributeApplicationKey(this, CsdbImporter.APPLICATION_KEY_ID, secretKey);
-            } catch (IOException e) {
-                Log.print(e, "Failed to generate and save new application key for CSDB import.");
-            }
-        }
     }
 
     /**

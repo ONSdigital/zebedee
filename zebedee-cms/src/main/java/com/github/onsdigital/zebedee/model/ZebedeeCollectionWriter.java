@@ -31,6 +31,10 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
      */
     public ZebedeeCollectionWriter(Zebedee zebedee, Collection collection, Session session) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
 
+        if (collection == null) {
+            throw new NotFoundException("Please specify a collection");
+        }
+
         // Authorisation
         if (session == null
                 || !zebedee.permissions.canEdit(session.email,

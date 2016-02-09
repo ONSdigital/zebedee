@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
@@ -20,6 +21,7 @@ import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.IOUtils;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -112,9 +114,28 @@ public class Root {
         }
 
         loadExistingCollectionsIntoScheduler();
+        initialiseCsdbImportKeys();
         indexPublishedCollections();
-
         cleanupStaleCollectionKeys();
+    }
+
+    /**
+     * If we have not previously generated a key for CSDB import, generate one and distribute it.
+     */
+    public static void initialiseCsdbImportKeys() {
+        // if there is no key previously stored for CSDB import, generate a new one.
+        if (!zebedee.applicationKeys.containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
+            // create new key pair
+            Log.print("No key pair found for CSDB import. Generating and saving a new key.");
+            try {
+                SecretKey secretKey = zebedee.applicationKeys.generateNewKey(CsdbImporter.APPLICATION_KEY_ID);
+
+                // distribute private key to all users.
+                KeyManager.disributeApplicationKey(zebedee, CsdbImporter.APPLICATION_KEY_ID, secretKey);
+            } catch (IOException e) {
+                Log.print(e, "Failed to generate and save new application key for CSDB import.");
+            }
+        }
     }
 
     private static void cleanupStaleCollectionKeys() {

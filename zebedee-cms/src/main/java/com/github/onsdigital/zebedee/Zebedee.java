@@ -9,10 +9,13 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -30,6 +33,7 @@ public class Zebedee {
     static final String PERMISSIONS = "permissions";
     static final String TEAMS = "teams";
     static final String LAUNCHPAD = "launchpad";
+    static final String APPLICATION_KEYS = "application-keys";
 
     public final Path path;
     public final Content published;
@@ -37,6 +41,7 @@ public class Zebedee {
     public final PublishedCollections publishedCollections;
     public final Users users;
     public final KeyringCache keyringCache;
+    public final ApplicationKeys applicationKeys;
     public final Sessions sessions;
     public final Permissions permissions;
     public final Teams teams;
@@ -55,6 +60,7 @@ public class Zebedee {
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
         Path teams = path.resolve(TEAMS);
+        Path applicationKeysPath = path.resolve(APPLICATION_KEYS);
 
         if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
@@ -79,11 +85,11 @@ public class Zebedee {
             this.published.redirect = new RedirectTablePartialMatch(this.published, redirectPath);
         }
 
-
         this.collections = new Collections(collections, this);
         this.publishedCollections = new PublishedCollections(publishedCollections, this);
         this.users = new Users(users, this);
         this.keyringCache = new KeyringCache(this);
+        this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
@@ -93,6 +99,7 @@ public class Zebedee {
             this.verificationAgent = null;
         }
 
+        InitialiseCsdbImportKeys();
     }
 
     public Zebedee(Path path) {
@@ -152,6 +159,25 @@ public class Zebedee {
         Users.createSystemUser(zebedee, user, password);
 
         return zebedee;
+    }
+
+    /**
+     * If we have not previously generated a key for CSDB import, generate one and distribute it.
+     */
+    private void InitialiseCsdbImportKeys() {
+        // if there is no key previously stored for CSDB import, generate a new one.
+        if (!applicationKeys.containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
+            // create new key pair
+            Log.print("No key pair found for CSDB import. Generating and saving a new key.");
+            try {
+                SecretKey secretKey = applicationKeys.generateNewKey(CsdbImporter.APPLICATION_KEY_ID);
+
+                // distribute private key to all users.
+                KeyManager.disributeApplicationKey(this, CsdbImporter.APPLICATION_KEY_ID, secretKey);
+            } catch (IOException e) {
+                Log.print(e, "Failed to generate and save new application key for CSDB import.");
+            }
+        }
     }
 
     /**
@@ -274,6 +300,7 @@ public class Zebedee {
 
         // Unlock and cache keyring
         user.keyring.unlock(credentials.password);
+        applicationKeys.populateCacheFromUserKeyring(user.keyring);
         keyringCache.put(user, session);
 
         // Return a session

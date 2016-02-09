@@ -1,9 +1,14 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import org.apache.commons.io.IOUtils;
 
 import javax.crypto.SecretKey;
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -125,6 +130,35 @@ public class ZipUtils {
                 zipOutputStream.closeEntry();
             } else if (file.isDirectory()) {
                 zipFolderWithEncryption(file, zipOutputStream, key, prefixLength);
+            }
+        }
+    }
+
+    public static void zipFolderWithEncryption(final ContentReader contentReader, final ContentWriter contentWriter, String folderPath, String saveUri, Function<String, Boolean>... filters) throws IOException, ZebedeeException {
+        try (ZipOutputStream zipOutputStream = getZipOutputStream(contentWriter.getOutputStream(saveUri))) {
+
+            File folder = Paths.get(folderPath).toFile();
+            zipFolderWithEncryption(contentReader, folderPath, zipOutputStream, folderPath.length() + 1);
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void zipFolderWithEncryption(final ContentReader contentReader, String folderUri, final ZipOutputStream zipOutputStream, final int prefixLength)
+            throws IOException, ZebedeeException {
+
+        File folder = Paths.get(folderUri).toFile();
+        for (final File file : folder.listFiles()) {
+            String fileUri = contentReader.getRootFolder().relativize(file.toPath()).toString();
+            if (file.isFile()) {
+                final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
+                zipOutputStream.putNextEntry(zipEntry);
+                try (InputStream inputStream = contentReader.getResource(fileUri).getData()) {
+                    IOUtils.copy(inputStream, zipOutputStream);
+                }
+                zipOutputStream.closeEntry();
+            } else if (file.isDirectory()) {
+                zipFolderWithEncryption(contentReader, contentReader.getRootFolder().resolve(fileUri).toString(), zipOutputStream, prefixLength);
             }
         }
     }

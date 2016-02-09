@@ -67,6 +67,9 @@ public class ApplicationKeys {
         applicationKeyPairs.put(application, storedKeyPair);
         write(applicationKeyPairs);
 
+        privateKeyCache.put(application, keyPair.getPrivate());
+        publicKeyCache.put(application, keyPair.getPublic());
+
         return secretKey;
     }
 
@@ -123,7 +126,11 @@ public class ApplicationKeys {
         return privateKeyCache.get(application);
     }
 
-    private boolean isPrivateKeyCached(String application) {
+    public boolean isPublicKeyCached(String application) {
+        return publicKeyCache.containsKey(application);
+    }
+
+    public boolean isPrivateKeyCached(String application) {
         return privateKeyCache.containsKey(application);
     }
 

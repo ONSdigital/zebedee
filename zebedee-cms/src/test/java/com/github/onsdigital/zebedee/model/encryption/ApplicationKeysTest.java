@@ -36,10 +36,12 @@ public class ApplicationKeysTest {
         // Then the key returned is not null
         assertNotNull(secretKey);
 
-        // The key is available from the application keys instance.
+        // The key is available from the application keys instance, and is cached.
+        assertTrue(applicationKeys.isPublicKeyCached(APPLICATION_NAME));
+        assertTrue(applicationKeys.isPrivateKeyCached(APPLICATION_NAME));
         assertTrue(applicationKeys.containsKey(APPLICATION_NAME));
         assertNotNull(applicationKeys.getPublicKey(APPLICATION_NAME));
-        assertNotNull(applicationKeys.getPublicKey(APPLICATION_NAME));
+        assertNotNull(applicationKeys.getPrivateKeyFromCache(APPLICATION_NAME));
     }
 
     @Test

@@ -8,6 +8,8 @@ public class Table extends FigureBase {
     private String title;
     private String html;
     private String filename;
+    private Boolean firstLineTitle;
+    private String headerRows;
 
     @Override
     public PageType getType() {
@@ -36,5 +38,21 @@ public class Table extends FigureBase {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public Boolean getFirstLineTitle() {
+        return firstLineTitle;
+    }
+
+    public void setFirstLineTitle(Boolean firstLineTitle) {
+        this.firstLineTitle = firstLineTitle;
+    }
+
+    public String getHeaderRows() {
+        return headerRows;
+    }
+
+    public void setHeaderRows(String headerRows) {
+        this.headerRows = headerRows;
     }
 }

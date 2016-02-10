@@ -43,7 +43,7 @@ public class DataTimeRange {
         }
 
         if (min == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         Calendar cal = Calendar.getInstance();
@@ -81,7 +81,7 @@ public class DataTimeRange {
         }
 
         if (min == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         Calendar cal = Calendar.getInstance();
@@ -137,7 +137,7 @@ public class DataTimeRange {
         }
 
         if (min == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         Calendar cal = Calendar.getInstance();

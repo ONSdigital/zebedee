@@ -36,7 +36,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * <p>
  * ContentReader reads content and resource files from file system with given paths under a root content folder.
  * <p>
- * ContentReader will find file relative to root folder. Paths might start with forward slash or not.
+ * ContentReader will find file relative to root folder. Paths may start with forward slash or not.
  * <p>
  */
 public class ContentReader {

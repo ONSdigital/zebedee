@@ -161,8 +161,10 @@ public class DataPublication {
      */
     private DownloadSection newDownloadSection(String title, String file) {
         DownloadSection section = new DownloadSection();
+        String filename = Paths.get(file).getFileName().toString();
+
         section.setTitle(title);
-        section.setFile(file);
+        section.setFile(filename);
         return section;
     }
 
@@ -182,11 +184,11 @@ public class DataPublication {
         String filename = Paths.get(uri).getFileName().toString().trim().toLowerCase();
         if (filename.endsWith(".csdb")) {
             return filename.substring(0, filename.length() - ".csdb".length());
-        } else if (filename.startsWith("upload.") && filename.endsWith(".csv")) {
+        } else if (filename.startsWith("upload-") && filename.endsWith(".csv")) {
             if (filename.equalsIgnoreCase("upload.csv")) {
                 return DEFAULT_DATASET_ID;
             } else {
-                return filename.substring("upload.".length(), filename.length() - ".csv".length());
+                return filename.substring("upload-".length(), filename.length() - ".csv".length());
             }
         }
         return DEFAULT_DATASET_ID;

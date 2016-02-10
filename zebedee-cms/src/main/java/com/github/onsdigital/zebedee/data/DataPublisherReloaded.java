@@ -61,7 +61,7 @@ public class DataPublisherReloaded {
 
         // Run compression
         if (!doNotCompress)
-            compressFiles(reviewedContentReader, collectionContentWriter);
+            compressFiles(reviewedContentReader, collectionContentWriter, collection);
 
         return uris;
     }
@@ -92,18 +92,22 @@ public class DataPublisherReloaded {
      * @throws BadRequestException
      * @throws IOException
      */
-    private void compressFiles(ContentReader contentReader, ContentWriter contentWriter) throws BadRequestException, IOException {
+    private void compressFiles(ContentReader contentReader, ContentWriter contentWriter, Collection collection) throws ZebedeeException, IOException {
         Log.print("Compressing time series directories...");
 
         List<Path> timeSeriesDirectories = contentReader.listTimeSeriesDirectories();
 
         for (Path timeSeriesDirectory : timeSeriesDirectories) {
             Log.print("Compressing time series directory %s", timeSeriesDirectory.toString());
+            String saveUri = contentReader.getRootFolder().relativize(timeSeriesDirectory).toString() + "-to-publish.zip";
 
-            try (OutputStream outputStream = contentWriter.getOutputStream(timeSeriesDirectory.toString() + "-to-publish.zip")) {
-                ZipUtils.zipFolder(timeSeriesDirectory.toFile(), outputStream);
+            if (!collection.description.isEncrypted) {
+                try (OutputStream outputStream = contentWriter.getOutputStream(saveUri)) {
+                    ZipUtils.zipFolder(timeSeriesDirectory.toFile(), outputStream);
+                }
+            } else {
+                ZipUtils.zipFolderWithEncryption(contentReader, contentWriter, timeSeriesDirectory.toFile().toString(), saveUri);
             }
-
             Log.print("Deleting directory after compression %s", timeSeriesDirectory);
             FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
         }

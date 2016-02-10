@@ -15,9 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-/**
- * Created by bren on 03/08/15.
- */
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 public class FilterUtil {
 
 
@@ -104,11 +103,12 @@ public class FilterUtil {
         series.getDescription().setCdid(page.getDescription().getCdid());
         series.getDescription().setTitle(page.getDescription().getTitle());
         for (TimeSeriesValue timeSeriesValue : set) {
-            series.add(new Point(timeSeriesValue.date, timeSeriesValue.value));
+            series.add(new Point(isNotEmpty(timeSeriesValue.label) ? timeSeriesValue.label : timeSeriesValue.date, timeSeriesValue.value));
         }
         return series;
     }
 
+    //applies filter, migrated code from the Alpha
     private static Set<TimeSeriesValue> applyRange(Set<TimeSeriesValue> set, Date from, Date to) {
         if (from == null && to == null) {
             return set;
@@ -120,7 +120,7 @@ public class FilterUtil {
         for (TimeSeriesValue timeSeriesValue : set) {
             Date date = timeSeriesValue.toDate();
             // Start adding if no from date has been specified:
-            if ((!add && from == null) || date.equals(from)) {
+            if ((!add && from == null) || date.equals(from) || date.after(from)) {
                 System.out.println("Starting range at " + date);
                 add = true;
             }

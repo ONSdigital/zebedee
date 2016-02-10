@@ -19,6 +19,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
@@ -921,7 +922,7 @@ public class DataPublisher {
      * @return the completed timeseries page
      * @throws IOException
      * @throws URISyntaxException
-     * @throws NotFoundExceptiongit m
+     * @throws NotFoundException
      */
     private TimeSeries preprocessTimeseries(
             Zebedee zebedee,
@@ -980,6 +981,10 @@ public class DataPublisher {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
         }
 
+        // Generate and save the manifest file that defines move operations.
+        Manifest manifest = Manifest.create(collection);
+        Manifest.save(manifest, collection);
+
         List<String> uriList =collection.reviewedUris();
         if (!doNotCompress) CompressTimeseries(zebedee, session, collection);
         return uriList;
@@ -998,9 +1003,16 @@ public class DataPublisher {
 
             Log.print("Compressing time series directory %s", timeSeriesDirectory.toString());
             if (collection.description.isEncrypted) {
-                ZipUtils.zipFolderWithEncryption(timeSeriesDirectory.toFile(), new File(timeSeriesDirectory.toString() + "-to-publish.zip"), zebedee.keyringCache.get(session).get(collection.description.id));
+                ZipUtils.zipFolderWithEncryption(
+                        timeSeriesDirectory.toFile(),
+                        new File(timeSeriesDirectory.toString() + "-to-publish.zip"),
+                        zebedee.keyringCache.get(session).get(collection.description.id),
+                        url -> VersionedContentItem.isVersionedUri(url));
             } else {
-                ZipUtils.zipFolder(timeSeriesDirectory.toFile(), new File(timeSeriesDirectory.toString() + "-to-publish.zip"));
+                ZipUtils.zipFolder(
+                        timeSeriesDirectory.toFile(),
+                        new File(timeSeriesDirectory.toString() + "-to-publish.zip"),
+                        url -> VersionedContentItem.isVersionedUri(url));
             }
 
             Log.print("Deleting directory after compression %s", timeSeriesDirectory);

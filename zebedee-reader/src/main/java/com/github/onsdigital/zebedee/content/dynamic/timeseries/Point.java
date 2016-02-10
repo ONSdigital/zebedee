@@ -9,10 +9,11 @@ public class Point {
 
     private String name;
     private Double y;
-
+    private String stringY;
 
     public Point(String name, String y) {
         this.name = name;
+        stringY = y;
         try {
             this.y = Double.parseDouble(y);
         } catch (NumberFormatException e) {
@@ -28,4 +29,6 @@ public class Point {
     public Double getY() {
         return y;
     }
+
+    public String getStringY() { return stringY; }
 }

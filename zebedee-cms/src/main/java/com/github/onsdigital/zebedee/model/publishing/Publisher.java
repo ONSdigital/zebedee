@@ -10,10 +10,14 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
+import com.github.onsdigital.zebedee.json.publishing.request.FileCopy;
+import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.ContentTree;
@@ -41,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
 
 public class Publisher {
 
@@ -138,7 +143,12 @@ public class Publisher {
 
             BeginPublish(collection, encryptionPassword);
 
-            PublishAllCollectionFiles(collection, collectionReader, encryptionPassword);
+            SendManifest(collection, encryptionPassword);
+
+            // We do not want to send versioned files. They have already been taken care of via the manifest.
+            // Pass the function to filter files into the publish method.
+            Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
+            PublishCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter);
 
             publishComplete = CommitPublish(collection, email, encryptionPassword);
 
@@ -160,6 +170,57 @@ public class Publisher {
 
         return publishComplete;
     }
+
+    public static void SendManifest(Collection collection, String encryptionPassword) throws IOException {
+
+        Path manifestPath = Manifest.getManifestPath(collection);
+        Manifest manifest;
+
+        if (!Files.exists(manifestPath)) {
+            manifest = Manifest.create(collection);
+            Manifest.save(manifest, collection);
+        } else {
+            manifest = Manifest.load(collection);
+        }
+
+        Log.print("sendManifest start");
+        long start = System.currentTimeMillis();
+        List<Future<IOException>> futures = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : collection.description.publishTransactionIds.entrySet()) {
+            Host theTrainHost = new Host(entry.getKey());
+            String transactionId = entry.getValue();
+
+            futures.add(pool.submit(() -> {
+                IOException result = null;
+                try (Http http = new Http()) {
+                    Endpoint publish = new Endpoint(theTrainHost, "CommitManifest")
+                            .setParameter("transactionId", transactionId)
+                            .setParameter("encryptionPassword", encryptionPassword);
+
+                    Response<Result> response = http.postJson(publish, manifest, Result.class);
+                    checkResponse(response);
+
+                } catch (IOException e) {
+                    result = e;
+                }
+                return result;
+            }));
+        }
+
+        // wait for all results to return, checking if an exception has occurred
+        for (Future<IOException> future : futures) {
+            try {
+                IOException exception = future.get();
+                if (exception != null) throw exception;
+            } catch (InterruptedException | ExecutionException e) {
+                throw new IOException("Error in sendManifest", e);
+            }
+        }
+
+        Log.print("sendManifest end: Time taken: %sms", (System.currentTimeMillis() - start));
+    }
+
 
     /**
      * Start a new transaction on the train and save the transaction ID to the collection.
@@ -209,16 +270,24 @@ public class Publisher {
         return publishComplete;
     }
 
-    public static void PublishAllCollectionFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword) throws IOException {
+    public static void PublishCollectionFiles(
+            Collection collection,
+            CollectionReader collectionReader,
+            String encryptionPassword,
+            Function<String, Boolean>... filters
+    ) throws IOException {
+
         List<Future<IOException>> results = new ArrayList<>();
         long start = System.currentTimeMillis();
 
         Log.print("PublishFiles start");
         // Publish each item of content:
         for (String uri : collection.reviewed.uris()) {
-            //Log.print("Start PublishFile: %s", uri);
-            publishFile(collection, encryptionPassword, pool, results, uri, collectionReader);
-            //Log.print("End PublishFile: %s", uri);
+            if (!shouldBeFiltered(filters, uri)) {
+                //Log.print("Start PublishFile: %s", uri);
+                publishFile(collection, encryptionPassword, pool, results, uri, collectionReader);
+                //Log.print("End PublishFile: %s", uri);
+            }
         }
 
         // Check the publishing results:
@@ -232,6 +301,21 @@ public class Publisher {
         }
 
         Log.print("PublishFiles end: Time taken: %sms", (System.currentTimeMillis() - start));
+    }
+
+    /**
+     * If any of the given filters return true, the uri should be filtered
+     *
+     * @param filters
+     * @param uri
+     * @return
+     */
+    private static boolean shouldBeFiltered(Function<String, Boolean>[] filters, String uri) {
+        for (Function<String, Boolean> filter : filters) {
+            if (filter.apply(uri))
+                return true;
+        }
+        return false;
     }
 
     private static void publishFile(
@@ -275,6 +359,11 @@ public class Publisher {
 
         try {
 
+            ContentReader contentReader = new ContentReader(zebedee.published.path);
+            ContentWriter contentWriter = new ContentWriter(zebedee.published.path);
+
+            processManifestForMaster(collection, contentReader, contentWriter);
+
             unzipTimeseries(collection, collectionReader, zebedee);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
@@ -302,6 +391,18 @@ public class Publisher {
         }
 
         return false;
+    }
+
+    private static void processManifestForMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
+        Manifest manifest = Manifest.load(collection);
+
+        for (FileCopy fileCopy : manifest.filesToCopy) {
+            try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
+                contentWriter.write(inputStream, fileCopy.target);
+            } catch (ZebedeeException | IOException e) {
+                Log.print(e);
+            }
+        }
     }
 
     private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
@@ -334,6 +435,8 @@ public class Publisher {
 
                     Resource resource = collectionReader.getResource(uri);
                     ZipUtils.unzip(resource.getData(), publishPath.toString());
+
+                    Files.delete(source); // delete the zip file now its done with.
                 }
             }
         }
@@ -479,9 +582,11 @@ public class Publisher {
         Log.print("Moving files from collection into master for collection: " + collection.description.name);
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
-            Path destination = zebedee.published.toPath(uri);
-            Resource resource = collectionReader.getResource(uri);
-            FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
+            if (!VersionedContentItem.isVersionedUri(uri)) {
+                Path destination = zebedee.published.toPath(uri);
+                Resource resource = collectionReader.getResource(uri);
+                FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
+            }
         }
     }
 

@@ -76,7 +76,6 @@ public abstract class CollectionReader {
      */
     public Map<URI, ContentNode> getChildren(String path) throws ZebedeeException, IOException {
         Map<URI, ContentNode> children = new HashMap<>();
-        //TODO: Same document should not be in two different state, it should be safe to overwrite if it appears in multiple places?.
         // Is there a validation mechanism ? Might be needed
         children.putAll(getChildrenQuite(path, reviewed));
         children.putAll(getChildrenQuite(path, complete));//overwrites reviewed content if appears in both places
@@ -93,7 +92,6 @@ public abstract class CollectionReader {
      */
     public Map<URI, ContentNode> getParents(String path) throws ZebedeeException, IOException {
         Map<URI, ContentNode> parents = new HashMap<>();
-        //TODO: Same document should not be in two different state, it should be safe to overwrite if it appears in multiple places?.
         // Is there a validation mechanism ? Might be needed
         parents.putAll(getParentsQuite(path, reviewed));
         parents.putAll(getParentsQuite(path, complete));//overwrites reviewed content if appears in both places

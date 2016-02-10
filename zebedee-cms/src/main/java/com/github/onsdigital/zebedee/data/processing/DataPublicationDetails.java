@@ -98,7 +98,7 @@ public class DataPublicationDetails {
 
         if (fileName.endsWith(".csdb")) {
             return true;
-        } else if (fileName.startsWith("upload.") && fileName.endsWith(".csv")) {
+        } else if (fileName.startsWith("upload-") && fileName.endsWith(".csv")) {
             return true;
         }
         return false;

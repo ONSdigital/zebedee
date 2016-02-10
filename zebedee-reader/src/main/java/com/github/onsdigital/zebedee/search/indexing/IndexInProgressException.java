@@ -5,4 +5,13 @@ package com.github.onsdigital.zebedee.search.indexing;
  */
 public class IndexInProgressException extends IndexingException {
 
+    public IndexInProgressException() {
+
+    }
+
+    public IndexInProgressException(String message) {
+        super(message);
+    }
+
+
 }

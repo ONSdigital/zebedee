@@ -9,10 +9,11 @@ import java.util.ArrayList;
 
 public class Configuration {
 
-    private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
-    private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
-    private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
     private static final String DEFAULT_WEBSITE_URL = "http://localhost:8080";
+    private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081";
+    private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
+    private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
+    private static final String DEFAULT_DYLAN_URL = "http://localhost:8085";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
@@ -57,6 +58,10 @@ public class Configuration {
 
     public static String getDefaultVerificationUrl() {
         return StringUtils.defaultIfBlank(getValue("verification_url"), DEFAULT_WEBSITE_URL);
+    }
+
+    public static String getDylanUrl() {
+        return StringUtils.defaultIfBlank(getValue("dylan_url"), DEFAULT_DYLAN_URL);
     }
 
     public static int getVerifyRetrtyDelay() {

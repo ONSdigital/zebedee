@@ -1,22 +1,18 @@
 package com.github.onsdigital.zebedee.data;
 
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.data.processing.DataPublication;
 import com.github.onsdigital.zebedee.data.processing.DataPublicationFinder;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionContentReader;
-import com.github.onsdigital.zebedee.model.CollectionContentWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
@@ -25,9 +21,11 @@ import java.util.List;
 
 public class DataPublisherReloaded {
     public boolean doNotCompress = false;
+
     public DataPublisherReloaded(boolean doNotCompress) {
         this.doNotCompress = doNotCompress;
     }
+
     public DataPublisherReloaded() {
         this(false);
     }
@@ -35,11 +33,11 @@ public class DataPublisherReloaded {
     /**
      * Run the preprocess routine that processes csdb uploads with the option of skipping timeseries filesaves
      *
-     * @param publishedContentReader reader for the master content
-     * @param reviewedContentReader reader for this publications collection content
+     * @param publishedContentReader  reader for the master content
+     * @param reviewedContentReader   reader for this publications collection content
      * @param collectionContentWriter reader for this publications collection content
-     * @param collection the collection being processed
-     * @param saveTimeSeries the option to skip saving the individual timeseries
+     * @param collection              the collection being processed
+     * @param saveTimeSeries          the option to skip saving the individual timeseries
      * @throws IOException
      * @throws ZebedeeException
      * @throws URISyntaxException
@@ -50,7 +48,7 @@ public class DataPublisherReloaded {
         List<DataPublication> dataPublications = new DataPublicationFinder().findPublications(publishedContentReader, reviewedContentReader, collection);
 
         // For each file in this collection
-        for(DataPublication dataPublication: dataPublications) {
+        for (DataPublication dataPublication : dataPublications) {
             // If a file upload exists
             if (dataPublication.hasUpload())
                 dataPublication.process(publishedContentReader, reviewedContentReader, collectionContentWriter, saveTimeSeries, dataIndex);
@@ -67,24 +65,8 @@ public class DataPublisherReloaded {
     }
 
     /**
-     * Run the preprocess routine that processes csdb uploads
-     *
-     * @param publishedContentReader reader for the master content
-     * @param reviewedContentReader reader for this publications collection content
-     * @param collectionContentWriter reader for this publications collection content
-     * @param collection the collection being processed
-     * @throws IOException
-     * @throws ZebedeeException
-     * @throws URISyntaxException
-     */
-    public List<String> preprocessCollection(ContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException
-    {
-        return preprocessCollection(publishedContentReader, reviewedContentReader, collectionContentWriter, collection, true, dataIndex);
-    }
-
-    /**
      * Compress timeseries
-     *
+     * <p>
      * Uses content
      *
      * @param contentReader
@@ -103,14 +85,15 @@ public class DataPublisherReloaded {
 
             if (!collection.description.isEncrypted) {
                 try (OutputStream outputStream = contentWriter.getOutputStream(saveUri)) {
-                    ZipUtils.zipFolder(timeSeriesDirectory.toFile(), outputStream);
+                    ZipUtils.zipFolder(timeSeriesDirectory.toFile(), outputStream,
+                            url -> VersionedContentItem.isVersionedUri(url));
                 }
             } else {
-                ZipUtils.zipFolderWithEncryption(contentReader, contentWriter, timeSeriesDirectory.toFile().toString(), saveUri);
+                ZipUtils.zipFolderWithEncryption(contentReader, contentWriter, timeSeriesDirectory.toFile().toString(), saveUri,
+                        url -> VersionedContentItem.isVersionedUri(url));
             }
             Log.print("Deleting directory after compression %s", timeSeriesDirectory);
             FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
         }
     }
-
 }

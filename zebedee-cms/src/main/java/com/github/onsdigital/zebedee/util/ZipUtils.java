@@ -117,8 +117,7 @@ public class ZipUtils {
             final ZipOutputStream zipOutputStream,
             SecretKey key,
             final int prefixLength,
-            Function<String, Boolean>... filters
-    )
+            Function<String, Boolean>... filters)
             throws IOException {
         for (final File file : folder.listFiles()) {
             if (file.isFile() && !shouldBeFiltered(filters, file.toString())) {
@@ -134,23 +133,31 @@ public class ZipUtils {
         }
     }
 
-    public static void zipFolderWithEncryption(final ContentReader contentReader, final ContentWriter contentWriter, String folderPath, String saveUri, Function<String, Boolean>... filters) throws IOException, ZebedeeException {
+    public static void zipFolderWithEncryption(
+            final ContentReader contentReader,
+            final ContentWriter contentWriter,
+            String folderPath,
+            String saveUri,
+            Function<String, Boolean>... filters) throws IOException, ZebedeeException {
         try (ZipOutputStream zipOutputStream = getZipOutputStream(contentWriter.getOutputStream(saveUri))) {
-
-            File folder = Paths.get(folderPath).toFile();
-            zipFolderWithEncryption(contentReader, folderPath, zipOutputStream, folderPath.length() + 1);
+            zipFolderWithEncryption(contentReader, folderPath, zipOutputStream, folderPath.length() + 1, filters);
         } catch (BadRequestException e) {
             e.printStackTrace();
         }
     }
 
-    private static void zipFolderWithEncryption(final ContentReader contentReader, String folderUri, final ZipOutputStream zipOutputStream, final int prefixLength)
+    private static void zipFolderWithEncryption(
+            final ContentReader contentReader,
+            String folderUri,
+            final ZipOutputStream zipOutputStream,
+            final int prefixLength,
+            Function<String, Boolean>... filters)
             throws IOException, ZebedeeException {
 
         File folder = Paths.get(folderUri).toFile();
         for (final File file : folder.listFiles()) {
             String fileUri = contentReader.getRootFolder().relativize(file.toPath()).toString();
-            if (file.isFile()) {
+            if (file.isFile() && !shouldBeFiltered(filters, file.toString())) {
                 final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
                 zipOutputStream.putNextEntry(zipEntry);
                 try (InputStream inputStream = contentReader.getResource(fileUri).getData()) {

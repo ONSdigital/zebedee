@@ -242,6 +242,9 @@ public class DataProcessor {
             initial.setUri(new URI(publishUri));
 
             return initial;
+        } catch (IllegalStateException e) {
+            System.out.println("Error with timeseries " + series.getCdid() + " at " + publishUri);
+            throw e;
         }
     }
 

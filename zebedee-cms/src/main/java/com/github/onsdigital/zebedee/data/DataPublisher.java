@@ -787,7 +787,7 @@ public class DataPublisher {
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    void preprocessCsdbFiles(CollectionReader collectionReader, CollectionWriter collectionWriter, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
+    void preprocessCsdbFiles(CollectionReader collectionReader, CollectionWriter collectionWriter, Zebedee zebedee, Collection collection) throws IOException, ZebedeeException, URISyntaxException {
 
         // First find all csdb files in the collection
         List<HashMap<String, String>> csdbDatasetPages = csdbDatasetsInCollection(collection);
@@ -975,7 +975,7 @@ public class DataPublisher {
         insertions = 0;
         corrections = 0;
 
-        preprocessCsdbFiles(collectionReader, collectionWriter, zebedee, collection, session);
+        preprocessCsdbFiles(collectionReader, collectionWriter, zebedee, collection);
 
         if (insertions + corrections > 0) {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
@@ -986,7 +986,7 @@ public class DataPublisher {
         Manifest.save(manifest, collection);
 
         List<String> uriList =collection.reviewedUris();
-        if (!doNotCompress) CompressTimeseries(zebedee, session, collection);
+        if (!doNotCompress) CompressTimeseries(zebedee, collection);
         return uriList;
     }
 
@@ -996,7 +996,7 @@ public class DataPublisher {
      * @param collection the collection being published
      * @throws IOException
      */
-    private void CompressTimeseries(Zebedee zebedee, Session session, Collection collection) throws IOException {
+    private void CompressTimeseries(Zebedee zebedee, Collection collection) throws IOException {
         Log.print("Compressing time series directories...");
         List<Path> timeSeriesDirectories = collection.reviewed.listTimeSeriesDirectories();
         for (Path timeSeriesDirectory : timeSeriesDirectories) {
@@ -1006,7 +1006,7 @@ public class DataPublisher {
                 ZipUtils.zipFolderWithEncryption(
                         timeSeriesDirectory.toFile(),
                         new File(timeSeriesDirectory.toString() + "-to-publish.zip"),
-                        zebedee.keyringCache.get(session).get(collection.description.id),
+                        zebedee.keyringCache.schedulerCache.get(collection.description.id),
                         url -> VersionedContentItem.isVersionedUri(url));
             } else {
                 ZipUtils.zipFolder(

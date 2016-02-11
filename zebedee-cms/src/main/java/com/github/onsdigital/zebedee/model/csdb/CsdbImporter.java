@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -15,8 +16,10 @@ import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -58,6 +61,7 @@ public class CsdbImporter {
     /**
      * Once a CSDB file has been inserted into a collection, the timeseries files must be regenerated.
      * Generate the files and then publish the updated uri list to babbage for cache notification.
+     *
      * @param collection
      * @throws IOException
      * @throws ZebedeeException
@@ -80,6 +84,7 @@ public class CsdbImporter {
 
     /**
      * Save the CSDB file into the collection that it should be inserted into.
+     *
      * @param csdbIdentifier
      * @param collections
      * @param keyCache
@@ -110,6 +115,7 @@ public class CsdbImporter {
     /**
      * Given a CSDB file identifier and a collection, find the path the CSDB should be added to. If the CSDB file
      * does not belong to the collection then null is returned.
+     *
      * @param csdbIdentifier
      * @param collectionReader
      * @return
@@ -123,18 +129,22 @@ public class CsdbImporter {
             // deserialise only the uris that are datasets
             if (uri.contains("/datasets/")) {
                 try {
-                    Page page = collectionReader.getReviewed().getContent(uri);
 
-                    // if the page is a landing page then check the CSDB ID and put the csdb in the right place
-                    if (page.getType().equals(PageType.timeseries_dataset)) {
+                    if (FilenameUtils.getExtension(uri).equals("json")) {
+                        try (Resource resource = collectionReader.getReviewed().getResource(uri)) {
+                            Page page = ContentUtil.deserialiseContent(resource.getData());
 
-                        String filename = csdbIdentifier + ".csdb";
-                        Dataset datasetPage = (Dataset) page;
+                            if (page.getType().equals(PageType.timeseries_dataset)) {
 
-                        for (DownloadSection downloadSection : datasetPage.getDownloads()) {
-                            if (downloadSection.getFile().equals(filename)) {
-                                // work out what the URI of the CSDB file should be from the URI of the dataset page it belongs to.
-                                return Paths.get(datasetPage.getUri().toString()).resolve(filename);
+                                String filename = csdbIdentifier + ".csdb";
+                                Dataset datasetPage = (Dataset) page;
+
+                                for (DownloadSection downloadSection : datasetPage.getDownloads()) {
+                                    if ((downloadSection.getCdids() != null && downloadSection.getCdids().contains(csdbIdentifier))
+                                            || (downloadSection.getFile() != null && downloadSection.getFile().equals(filename))) {
+                                        return Paths.get(uri).getParent().resolve(filename);
+                                    }
+                                }
                             }
                         }
                     }

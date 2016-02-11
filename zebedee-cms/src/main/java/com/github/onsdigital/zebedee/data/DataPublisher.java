@@ -958,14 +958,13 @@ public class DataPublisher {
      * @param collectionReader
      * @param zebedee          a zebedee instance
      * @param collection       the collection being published
-     * @param session          a user session (required for some permissions)
      * @throws IOException
      * @throws BadRequestException
      * @throws UnauthorizedException
      * @throws URISyntaxException
      * @return list of all uris, including uris in the compressed files
      */
-    public List<String> preprocessCollection(CollectionReader collectionReader, CollectionWriter collectionWriter, Zebedee zebedee, Collection collection, Session session) throws IOException, ZebedeeException, URISyntaxException {
+    public List<String> preprocessCollection(CollectionReader collectionReader, CollectionWriter collectionWriter, Zebedee zebedee, Collection collection) throws IOException, ZebedeeException, URISyntaxException {
 
         if (brianTestFiles.size() == 0 && (env.get(BRIAN_KEY) == null || env.get(BRIAN_KEY).length() == 0)) {
             System.out.println("Environment variable brian_url not set. Preprocessing step for " + collection.description.name + " skipped");

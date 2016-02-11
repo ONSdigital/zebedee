@@ -405,7 +405,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
 
         // Then
         // timeseries get created in reviewed
@@ -424,7 +424,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
 
         // Then
         // a version has been created
@@ -442,7 +442,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
 
         // Then
         // a version has been created
@@ -461,7 +461,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
 
         // Then
         // a version has been created
@@ -482,7 +482,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
 
         // Then
         // a version has been created
@@ -1148,7 +1148,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
 
         // Then
         // timeseries get created in reviewed
@@ -1169,7 +1169,7 @@ public class DataPublisherTest {
 
         // When
         // we run the publish
-        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection, publisher);
+        dataPublisher.preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
 
         // Then
         // timeseries get created in reviewed

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.model.csdb;
 
 import com.github.davidcarboni.cryptolite.KeyExchange;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
@@ -9,14 +10,18 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
@@ -32,55 +37,68 @@ public class CsdbImporter {
             String csdbIdentifier,
             DylanClient dylan,
             Collections collections,
-            Map<String, SecretKey> keyCache
-    ) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
+            Map<String, SecretKey> keyCache) throws IOException, ZebedeeException {
 
+        Collection collection;
         try (InputStream csdbData = getDylanData(privateCsdbImportKey, csdbIdentifier, dylan)) {
-            processCollections(csdbIdentifier, collections, keyCache, csdbData);
+            collection = addCsdbToCollectionWithCorrectDataset(csdbIdentifier, collections, keyCache, csdbData);
+        }
+
+        if (collection != null && collection.description.approvedStatus == true) {
+            preProcessCollection(collection);
+        } else {
+            Log.print("The collection %s is not approved.", collection.description.name);
         }
     }
 
-    private static void processCollections(String csdbIdentifier, Collections collections, Map<String, SecretKey> keyCache, InputStream csdbData) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
-        for (Collection collection : collections.list()) {
-            ProcessCollection(csdbIdentifier, keyCache, csdbData, collection);
-        }
-    }
-
-    private static void ProcessCollection(String csdbIdentifier, Map<String, SecretKey> keyCache, InputStream csdbData, Collection collection) throws BadRequestException, IOException, UnauthorizedException, NotFoundException {
-        SecretKey collectionKey = keyCache.get(collection.description.id);
+    public static void preProcessCollection(Collection collection) throws IOException, ZebedeeException {
+        SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
+        ContentReader publishedReader = new ContentReader(Root.zebedee.published.path);
 
-        Path csdbFileUri = findCsdbUri(csdbIdentifier, collectionReader);
+        List<String> uriList;
+        try {
+            uriList = Collections.preprocessTimeseries(Root.zebedee, collection, collectionReader, collectionWriter, publishedReader);
+        } catch (URISyntaxException e) {
+            throw new BadRequestException("Brian could not process this collection");
+        }
 
-        if (csdbFileUri != null) {
+//      collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
+//      boolean result = collection.save();
+        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
+    }
 
-            CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
-
-            collectionWriter.getReviewed().write(csdbData, csdbFileUri.toString());
-
-            // todo if its approved - add a task to a queue to generate
-            if (collection.description.approvedStatus == true) {
-
-            } else {
-                Log.print("The collection %s is not approved.", collection.description.name);
+    private static Collection addCsdbToCollectionWithCorrectDataset(String csdbIdentifier,
+                                                                    Collections collections,
+                                                                    Map<String, SecretKey> keyCache,
+                                                                    InputStream csdbData) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+        for (Collection collection : collections.list()) {
+            SecretKey collectionKey = keyCache.get(collection.description.id);
+            CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
+            Path csdbFileUri = getCsdbPathFromCollection(csdbIdentifier, collectionReader);
+            if (csdbFileUri != null) {
+                CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
+                collectionWriter.getReviewed().write(csdbData, csdbFileUri.toString());
+                return collection;
             }
         }
+        return null; // if no collection is found.
     }
 
     /**
-     * For a given collection return the CSDB URI if the dataset is found.
-     *
+     * Given a CSDB file identifier and a collection, find the path the CSDB should be added to. If the CSDB file
+     * does not belong to the collection then null is returned.
      * @param csdbIdentifier
      * @param collectionReader
      * @return
      * @throws IOException
      */
-    private static Path findCsdbUri(String csdbIdentifier, CollectionReader collectionReader) throws IOException {
+    static Path getCsdbPathFromCollection(String csdbIdentifier, CollectionReader collectionReader) throws IOException {
         List<String> uris = collectionReader.getReviewed().listUris();
 
         // for each uri in the collection
         for (String uri : uris) {
-
             // deserialise only the uris that are datasets
             if (uri.contains("/datasets/")) {
                 try {
@@ -99,7 +117,6 @@ public class CsdbImporter {
                             }
                         }
                     }
-
                 } catch (ZebedeeException e) {
                     Log.print(e);
                 }

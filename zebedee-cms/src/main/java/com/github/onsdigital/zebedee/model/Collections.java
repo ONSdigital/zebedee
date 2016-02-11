@@ -222,8 +222,7 @@ public class Collections {
         // Do any processing of data files
         try {
             ContentReader publishedReader = new ContentReader(zebedee.published.path);
-            uriList = preprocessTimeseries(zebedee, collection, session, collectionReader, collectionWriter, publishedReader);
-
+            uriList = preprocessTimeseries(zebedee, collection, collectionReader, collectionWriter, publishedReader);
 
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
@@ -244,7 +243,6 @@ public class Collections {
      * Has a lot of arguments because the alternative processes have different signatures
      *
      * @param collection
-     * @param session
      * @param collectionReader to read all collection content (beta datapublisher)
      * @param collectionWriter to write to collection content (beta datapublisher)
      * @param publishedReader to read published content (reloaded datapublisher)
@@ -256,7 +254,6 @@ public class Collections {
     public static List<String> preprocessTimeseries(
             Zebedee zebedee,
             Collection collection,
-            Session session,
             CollectionReader collectionReader,
             CollectionWriter collectionWriter,
             ContentReader publishedReader) throws IOException, ZebedeeException, URISyntaxException {
@@ -265,7 +262,7 @@ public class Collections {
         // Use environment variable to determine whether to use the BetaPublisher
         String useBetaPublisher = System.getenv("use_beta_publisher");
         if (useBetaPublisher != null && useBetaPublisher.equalsIgnoreCase("true")) {
-            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
+            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
         } else {
             uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), collection, true, zebedee.dataIndex);
         }

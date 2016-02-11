@@ -28,7 +28,7 @@ import java.util.List;
 @Api
 public class CsdbNotify {
 
-    // Hold only one instance of DylanClient.
+    // Hold a single instance of DylanClient.
     private static final DylanClient dylanClient = new HttpDylanClient(Configuration.getDylanUrl());
 
     /**
@@ -49,8 +49,5 @@ public class CsdbNotify {
                 dylanClient,
                 Root.zebedee.collections,
                 Root.zebedee.keyringCache.schedulerCache);
-
-
-
     }
 }

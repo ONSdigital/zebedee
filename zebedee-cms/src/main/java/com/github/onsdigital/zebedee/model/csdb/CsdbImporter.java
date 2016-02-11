@@ -28,6 +28,10 @@ import java.security.PrivateKey;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Handles a notification when a new CSDB file is available to zebedee.
+ * This class handles the retrieval of the CSDB data and saving it into the premade collection.
+ */
 public class CsdbImporter {
 
     public static final String APPLICATION_KEY_ID = "csdb-import";
@@ -51,6 +55,13 @@ public class CsdbImporter {
         }
     }
 
+    /**
+     * Once a CSDB file has been inserted into a collection, the timeseries files must be regenerated.
+     * Generate the files and then publish the updated uri list to babbage for cache notification.
+     * @param collection
+     * @throws IOException
+     * @throws ZebedeeException
+     */
     public static void preProcessCollection(Collection collection) throws IOException, ZebedeeException {
         SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
@@ -64,11 +75,21 @@ public class CsdbImporter {
             throw new BadRequestException("Brian could not process this collection");
         }
 
-//      collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
-//      boolean result = collection.save();
         new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
     }
 
+    /**
+     * Save the CSDB file into the collection that it should be inserted into.
+     * @param csdbIdentifier
+     * @param collections
+     * @param keyCache
+     * @param csdbData
+     * @return
+     * @throws IOException
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     * @throws NotFoundException
+     */
     private static Collection addCsdbToCollectionWithCorrectDataset(String csdbIdentifier,
                                                                     Collections collections,
                                                                     Map<String, SecretKey> keyCache,

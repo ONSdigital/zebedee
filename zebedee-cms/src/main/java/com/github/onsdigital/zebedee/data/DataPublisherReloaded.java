@@ -44,7 +44,7 @@ public class DataPublisherReloaded {
      * @throws ZebedeeException
      * @throws URISyntaxException
      */
-    public List<String> preprocessCollection(ContentReader publishedContentReader, CollectionContentReader reviewedContentReader, CollectionContentWriter collectionContentWriter, Collection collection, boolean saveTimeSeries, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
+    public List<String> preprocessCollection(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter collectionContentWriter, Collection collection, boolean saveTimeSeries, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
 
         // Find all files that need data preprocessing
         List<DataPublication> dataPublications = new DataPublicationFinder().findPublications(publishedContentReader, reviewedContentReader, collection);

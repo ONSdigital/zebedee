@@ -222,10 +222,7 @@ public class Collections {
         // Do any processing of data files
         try {
             ContentReader publishedReader = new ContentReader(zebedee.published.path);
-            CollectionContentReader reviewedReader = (CollectionContentReader) collectionReader.getReviewed();
-            CollectionContentWriter reviewedWriter = (CollectionContentWriter) collectionWriter.getReviewed();
-
-            uriList = preprocessTimeseries(collection, session, collectionReader, collectionWriter, publishedReader, reviewedReader, reviewedWriter);
+            uriList = preprocessTimeseries(zebedee, collection, session, collectionReader, collectionWriter, publishedReader);
 
 
         } catch (URISyntaxException e) {
@@ -251,14 +248,18 @@ public class Collections {
      * @param collectionReader to read all collection content (beta datapublisher)
      * @param collectionWriter to write to collection content (beta datapublisher)
      * @param publishedReader to read published content (reloaded datapublisher)
-     * @param reviewedReader to read reviewed content (reloaded datapublisher)
-     * @param reviewedWriter to write to reviewed content (reloaded datapublisher)
      * @return
      * @throws IOException
      * @throws ZebedeeException
      * @throws URISyntaxException
      */
-    private List<String> preprocessTimeseries(Collection collection, Session session, CollectionReader collectionReader, CollectionWriter collectionWriter, ContentReader publishedReader, CollectionContentReader reviewedReader, CollectionContentWriter reviewedWriter) throws IOException, ZebedeeException, URISyntaxException {
+    public static List<String> preprocessTimeseries(
+            Zebedee zebedee,
+            Collection collection,
+            Session session,
+            CollectionReader collectionReader,
+            CollectionWriter collectionWriter,
+            ContentReader publishedReader) throws IOException, ZebedeeException, URISyntaxException {
         List<String> uriList;
 
         // Use environment variable to determine whether to use the BetaPublisher
@@ -266,7 +267,7 @@ public class Collections {
         if (useBetaPublisher != null && useBetaPublisher.equalsIgnoreCase("true")) {
             uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection, session);
         } else {
-            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, reviewedReader, reviewedWriter, collection, true, zebedee.dataIndex);
+            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), collection, true, zebedee.dataIndex);
         }
         return uriList;
     }

@@ -75,9 +75,12 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     }
 
     private void preProcessCollectionsForPublish(Set<Collection> collections) {
+        Log.print("PRE-PUBLISH: Preprocessing collections...");
         for (Collection collection : collections) {
+            Log.print("PRE-PUBLISH: Preprocessing collection: " + collection.description.name);
             SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
             CollectionPublishPreprocessor.preProcessCollectionForPublish(collection, key);
+            Log.print("PRE-PUBLISH: Preprocessing finished for collection: " + collection.description.name);
         }
     }
 

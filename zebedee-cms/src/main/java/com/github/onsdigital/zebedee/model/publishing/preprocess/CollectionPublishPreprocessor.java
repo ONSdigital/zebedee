@@ -16,9 +16,11 @@ public class CollectionPublishPreprocessor {
 
     public static void preProcessCollectionForPublish(Collection collection, SecretKey key) {
         try {
+            Log.print("PRE-PUBLISH: creating manifest for collection: " + collection.description.name);
             Manifest manifest = Manifest.create(collection);
             Manifest.save(manifest, collection);
 
+            Log.print("PRE-PUBLISH: compressing timeseries for collection: " + collection.description.name);
             CollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
             CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, key);
             TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection);

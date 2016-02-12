@@ -25,6 +25,7 @@ import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -142,14 +143,8 @@ public class Publisher {
         try {
 
             BeginPublish(collection, encryptionPassword);
-
             SendManifest(collection, encryptionPassword);
-
-            // We do not want to send versioned files. They have already been taken care of via the manifest.
-            // Pass the function to filter files into the publish method.
-            Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
-            PublishCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter);
-
+            PublishFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
             publishComplete = CommitPublish(collection, email, encryptionPassword);
 
         } catch (IOException e) {
@@ -169,6 +164,22 @@ public class Publisher {
         }
 
         return publishComplete;
+    }
+
+    /**
+     * Publish collection files with required filters applied.
+     *
+     * @param collection
+     * @param collectionReader
+     * @param encryptionPassword
+     * @throws IOException
+     */
+    public static void PublishFilteredCollectionFiles(Collection collection, CollectionReader collectionReader, String encryptionPassword) throws IOException {
+        // We do not want to send versioned files. They have already been taken care of via the manifest.
+        // Pass the function to filter files into the publish method.
+        Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
+        Function<String, Boolean> timeseriesUriFilter = uri -> uri.toString().contains("/timeseries/");
+        Publisher.PublishCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter, timeseriesUriFilter);
     }
 
     public static void SendManifest(Collection collection, String encryptionPassword) throws IOException {
@@ -284,7 +295,7 @@ public class Publisher {
         // Publish each item of content:
         for (String uri : collection.reviewed.uris()) {
             if (!shouldBeFiltered(filters, uri)) {
-                //Log.print("Start PublishFile: %s", uri);
+                Log.print("Start PublishFile: %s", uri);
                 publishFile(collection, encryptionPassword, pool, results, uri, collectionReader);
                 //Log.print("End PublishFile: %s", uri);
             }
@@ -435,8 +446,6 @@ public class Publisher {
 
                     Resource resource = collectionReader.getResource(uri);
                     ZipUtils.unzip(resource.getData(), publishPath.toString());
-
-                    Files.delete(source); // delete the zip file now its done with.
                 }
             }
         }
@@ -580,9 +589,11 @@ public class Publisher {
     public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
 
         Log.print("Moving files from collection into master for collection: " + collection.description.name);
+
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
-            if (!VersionedContentItem.isVersionedUri(uri)) {
+            if (!VersionedContentItem.isVersionedUri(uri)
+                    && !FilenameUtils.getName(uri).equals("timeseries-to-publish.zip")) {
                 Path destination = zebedee.published.toPath(uri);
                 Resource resource = collectionReader.getResource(uri);
                 FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
@@ -610,6 +621,10 @@ public class Publisher {
 
         Log.print("Moving collection json from %s to %s", collectionJsonSource, collectionJsonDestination);
         Files.copy(collectionJsonSource, collectionJsonDestination);
+
+        Path manifestDestination = collectionFilesDestination.resolve(Manifest.filename);
+        Log.print("Moving manifest json from %s to %s", Manifest.getManifestPath(collection), manifestDestination);
+        FileUtils.copyFile(Manifest.getManifestPath(collection).toFile(), manifestDestination.toFile());
 
         Log.print("Moving collection files from %s to %s", collectionFilesSource, collectionFilesDestination);
         for (String uri : collection.reviewed.uris()) {

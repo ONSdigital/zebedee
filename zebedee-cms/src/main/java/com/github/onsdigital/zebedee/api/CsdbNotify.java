@@ -2,28 +2,16 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.model.csdb.DylanClient;
 import com.github.onsdigital.zebedee.model.csdb.HttpDylanClient;
-import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.util.Log;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.security.PrivateKey;
-import java.util.List;
 
 @Api
 public class CsdbNotify {

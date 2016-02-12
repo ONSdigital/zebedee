@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,8 +44,8 @@ public class TimeSeriesCompressor {
                 ZipUtils.zipFolderWithEncryption(contentReader, contentWriter, timeSeriesDirectory.toFile().toString(), saveUri,
                         url -> VersionedContentItem.isVersionedUri(url));
             }
-            Log.print("Deleting directory after compression %s", timeSeriesDirectory);
-            FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
+            //Log.print("Deleting directory after compression %s", timeSeriesDirectory);
+            //FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
         }
     }
 

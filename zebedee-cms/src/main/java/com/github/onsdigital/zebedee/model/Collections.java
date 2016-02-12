@@ -9,9 +9,11 @@ import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.JsonUtils;
@@ -24,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -79,6 +82,39 @@ public class Collections {
     private static String getCollectionNameFromId(String id) {
         int guidLength = 65; // length of GUID plus the hyphen.
         return id.substring(0, id.length() - guidLength);
+    }
+
+    /**
+     * Run the preprocess process using either datapublisher or datapublisher reloaded
+     *
+     * Has a lot of arguments because the alternative processes have different signatures
+     *
+     * @param collection
+     * @param collectionReader to read all collection content (beta datapublisher)
+     * @param collectionWriter to write to collection content (beta datapublisher)
+     * @param publishedReader to read published content (reloaded datapublisher)
+     * @return
+     * @throws IOException
+     * @throws ZebedeeException
+     * @throws URISyntaxException
+     */
+    public static List<String> preprocessTimeseries(
+            Zebedee zebedee,
+            Collection collection,
+            CollectionReader collectionReader,
+            CollectionWriter collectionWriter,
+            ContentReader publishedReader
+    ) throws IOException, ZebedeeException, URISyntaxException {
+        List<String> uriList;
+
+        // Use environment variable to determine whether to use the BetaPublisher
+        String useBetaPublisher = System.getenv("use_beta_publisher");
+        if (useBetaPublisher != null && useBetaPublisher.equalsIgnoreCase("true")) {
+            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
+        } else {
+            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), collection, true, zebedee.dataIndex);
+        }
+        return uriList;
     }
 
     /**
@@ -238,38 +274,6 @@ public class Collections {
     }
 
     /**
-     * Run the preprocess process using either datapublisher or datapublisher reloaded
-     *
-     * Has a lot of arguments because the alternative processes have different signatures
-     *
-     * @param collection
-     * @param collectionReader to read all collection content (beta datapublisher)
-     * @param collectionWriter to write to collection content (beta datapublisher)
-     * @param publishedReader to read published content (reloaded datapublisher)
-     * @return
-     * @throws IOException
-     * @throws ZebedeeException
-     * @throws URISyntaxException
-     */
-    public static List<String> preprocessTimeseries(
-            Zebedee zebedee,
-            Collection collection,
-            CollectionReader collectionReader,
-            CollectionWriter collectionWriter,
-            ContentReader publishedReader) throws IOException, ZebedeeException, URISyntaxException {
-        List<String> uriList;
-
-        // Use environment variable to determine whether to use the BetaPublisher
-        String useBetaPublisher = System.getenv("use_beta_publisher");
-        if (useBetaPublisher != null && useBetaPublisher.equalsIgnoreCase("true")) {
-            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
-        } else {
-            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), collection, true, zebedee.dataIndex);
-        }
-        return uriList;
-    }
-
-    /**
      * Unlock the given collection.
      *
      * @param collection
@@ -346,6 +350,11 @@ public class Collections {
         }
         System.out.println("Going ahead with publish");
 
+        Keyring keyring = zebedee.keyringCache.get(session);
+        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
+        SecretKey key = keyring.get(collection.description.id);
+        CollectionPublishPreprocessor.preProcessCollectionForPublish(collection, key);
+
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
         long publishStart = System.currentTimeMillis();
         boolean publishComplete = Publisher.Publish(collection, session.email, collectionReader);
@@ -356,6 +365,7 @@ public class Collections {
             new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
 
             Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
+
             Log.print("postPublish process finished for collection %s time taken: %dms",
                     collection.description.name,
                     (System.currentTimeMillis() - onPublishCompleteStart));

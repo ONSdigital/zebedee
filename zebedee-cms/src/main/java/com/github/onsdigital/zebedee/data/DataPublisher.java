@@ -18,8 +18,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
@@ -28,8 +26,6 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.util.Log;
-import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -47,7 +43,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -980,43 +979,8 @@ public class DataPublisher {
             System.out.println(collection.description.name + " processed. Insertions: " + insertions + "      Corrections: " + corrections);
         }
 
-        // Generate and save the manifest file that defines move operations.
-        Manifest manifest = Manifest.create(collection);
-        Manifest.save(manifest, collection);
-
         List<String> uriList =collection.reviewedUris();
-        if (!doNotCompress) CompressTimeseries(zebedee, collection);
         return uriList;
-    }
-
-    /**
-     * Zip up timeseries to be transferred by the train
-     *
-     * @param collection the collection being published
-     * @throws IOException
-     */
-    private void CompressTimeseries(Zebedee zebedee, Collection collection) throws IOException {
-        Log.print("Compressing time series directories...");
-        List<Path> timeSeriesDirectories = collection.reviewed.listTimeSeriesDirectories();
-        for (Path timeSeriesDirectory : timeSeriesDirectories) {
-
-            Log.print("Compressing time series directory %s", timeSeriesDirectory.toString());
-            if (collection.description.isEncrypted) {
-                ZipUtils.zipFolderWithEncryption(
-                        timeSeriesDirectory.toFile(),
-                        new File(timeSeriesDirectory.toString() + "-to-publish.zip"),
-                        zebedee.keyringCache.schedulerCache.get(collection.description.id),
-                        url -> VersionedContentItem.isVersionedUri(url));
-            } else {
-                ZipUtils.zipFolder(
-                        timeSeriesDirectory.toFile(),
-                        new File(timeSeriesDirectory.toString() + "-to-publish.zip"),
-                        url -> VersionedContentItem.isVersionedUri(url));
-            }
-
-            Log.print("Deleting directory after compression %s", timeSeriesDirectory);
-            FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
-        }
     }
 
     /**

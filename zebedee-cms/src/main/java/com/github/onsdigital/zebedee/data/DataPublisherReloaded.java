@@ -3,20 +3,13 @@ package com.github.onsdigital.zebedee.data;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.data.processing.DataPublication;
 import com.github.onsdigital.zebedee.data.processing.DataPublicationFinder;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.util.Log;
-import com.github.onsdigital.zebedee.util.ZipUtils;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.util.List;
 
 public class DataPublisherReloaded {
@@ -56,44 +49,6 @@ public class DataPublisherReloaded {
 
         // Get the list of uris in reviewed
         List<String> uris = reviewedContentReader.listUris();
-
-        // Run compression
-        if (!doNotCompress)
-            compressFiles(reviewedContentReader, collectionContentWriter, collection);
-
         return uris;
-    }
-
-    /**
-     * Compress timeseries
-     * <p>
-     * Uses content
-     *
-     * @param contentReader
-     * @param contentWriter
-     * @throws BadRequestException
-     * @throws IOException
-     */
-    private void compressFiles(ContentReader contentReader, ContentWriter contentWriter, Collection collection) throws ZebedeeException, IOException {
-        Log.print("Compressing time series directories...");
-
-        List<Path> timeSeriesDirectories = contentReader.listTimeSeriesDirectories();
-
-        for (Path timeSeriesDirectory : timeSeriesDirectories) {
-            Log.print("Compressing time series directory %s", timeSeriesDirectory.toString());
-            String saveUri = contentReader.getRootFolder().relativize(timeSeriesDirectory).toString() + "-to-publish.zip";
-
-            if (!collection.description.isEncrypted) {
-                try (OutputStream outputStream = contentWriter.getOutputStream(saveUri)) {
-                    ZipUtils.zipFolder(timeSeriesDirectory.toFile(), outputStream,
-                            url -> VersionedContentItem.isVersionedUri(url));
-                }
-            } else {
-                ZipUtils.zipFolderWithEncryption(contentReader, contentWriter, timeSeriesDirectory.toFile().toString(), saveUri,
-                        url -> VersionedContentItem.isVersionedUri(url));
-            }
-            Log.print("Deleting directory after compression %s", timeSeriesDirectory);
-            FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
-        }
     }
 }

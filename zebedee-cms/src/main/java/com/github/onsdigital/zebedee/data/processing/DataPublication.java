@@ -161,8 +161,10 @@ public class DataPublication {
      */
     private DownloadSection newDownloadSection(String title, String file) {
         DownloadSection section = new DownloadSection();
+        String filename = Paths.get(file).getFileName().toString();
+
         section.setTitle(title);
-        section.setFile(file);
+        section.setFile(filename);
         return section;
     }
 

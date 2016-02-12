@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.util.Log;
 
@@ -59,6 +60,8 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         // load collections into memory
         Set<Collection> collections = loadCollections();
 
+        preProcessCollectionsForPublish(collections);
+
         // create a publish task for each collection ready to publish.
         List<PublishCollectionTask> collectionPublishTasks = createCollectionPublishTasks(collections);
 
@@ -71,6 +74,12 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         Log.print("PRE-PUBLISH: Finished Pre-publish process total time taken: %dms", (System.currentTimeMillis() - startTime));
     }
 
+    private void preProcessCollectionsForPublish(Set<Collection> collections) {
+        for (Collection collection : collections) {
+            SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
+            CollectionPublishPreprocessor.preProcessCollectionForPublish(collection, key);
+        }
+    }
 
     /**
      * Load all of the collection objects for each collection to be published in this task.

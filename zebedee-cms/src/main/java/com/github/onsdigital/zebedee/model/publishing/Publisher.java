@@ -375,7 +375,7 @@ public class Publisher {
 
             processManifestForMaster(collection, contentReader, contentWriter);
 
-            unzipTimeseries(collection, collectionReader, zebedee);
+            //unzipTimeseries(collection, collectionReader, zebedee);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
             Log.print("Reindexing search");

@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -36,11 +37,16 @@ public class ContentDetailUtil {
 
                 Page page = null;
                 try (Resource resource = reader.getResource(uri)) {
-                    page = ContentUtil.deserialiseContent(resource.getData());
+                    try {
+                        page = ContentUtil.deserialiseContent(resource.getData());
 
-                    String pageUri = resource.getUri().toString();
-                    page.setUri(resolveUri(pageUri, page));
-                    PageDescription description = page.getDescription();
+                        String pageUri = resource.getUri().toString();
+                        page.setUri(resolveUri(pageUri, page));
+                        PageDescription description = page.getDescription();
+                    } catch (JsonSyntaxException e) {
+                        System.out.println("Failed to deserialise " + resource.getUri());
+                        throw e;
+                    }
                 }
 
                 if (page != null) { //Contents without type is null when deserialised. There should not be no such data

@@ -307,7 +307,12 @@ public class ContentReader {
     }
 
     protected Page deserialize(Resource resource) {
-        return ContentUtil.deserialiseContent(resource.getData());
+        try {
+            return ContentUtil.deserialiseContent(resource.getData());
+        } catch (JsonSyntaxException e) {
+            System.out.println("Failed to deserialise " + resource.getUri());
+            throw e;
+        }
     }
 
     private void assertExists(Path path) throws ZebedeeException, IOException {

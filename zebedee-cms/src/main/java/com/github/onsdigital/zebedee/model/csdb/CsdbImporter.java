@@ -167,7 +167,8 @@ public class CsdbImporter {
      */
     static InputStream getDylanData(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan) throws IOException {
         // get key from dylan
-        String dylanKey = dylan.getEncryptedSecretKey();
+        // TODO FIX THIS.
+        String dylanKey = dylan.getEncryptedSecretKey("");
 
         // decrypt it using the private key
         SecretKey secretKey = new KeyExchange().decryptKey(dylanKey, privateCsdbImportKey);

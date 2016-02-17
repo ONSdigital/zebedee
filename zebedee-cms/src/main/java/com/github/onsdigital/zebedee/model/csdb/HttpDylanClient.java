@@ -34,10 +34,10 @@ public class HttpDylanClient implements DylanClient {
      * @throws IOException
      */
     @Override
-    public String getEncryptedSecretKey() throws IOException {
+    public String getEncryptedSecretKey(String keyName) throws IOException {
         try (Http http = new Http()) {
-            Endpoint endpoint = new Endpoint(dylanHost, "getKey");
-            Response<String> response = http.post(endpoint, String.class);
+            Endpoint endpoint = new Endpoint(dylanHost, "key").setParameter("name", keyName);
+            Response<String> response = http.getJson(endpoint, String.class);
             return response.body;
         }
     }
@@ -53,8 +53,7 @@ public class HttpDylanClient implements DylanClient {
     @Override
     public InputStream getEncryptedCsdbData(String csdbIdentifier) throws IOException {
         try (Http http = new Http()) {
-            Endpoint endpoint = new Endpoint(dylanHost, "getData");
-            Response<Path> response = http.getFile(endpoint);
+            Response<Path> response = http.getFile(new Endpoint(dylanHost, "file").setParameter("name", csdbIdentifier));
             Path path = response.body;
             return Files.newInputStream(path);
         }

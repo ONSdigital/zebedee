@@ -24,7 +24,7 @@ public class DummyDylanClient implements DylanClient {
     }
 
     @Override
-    public String getEncryptedSecretKey() throws IOException {
+    public String getEncryptedSecretKey(String s) throws IOException {
         return new KeyExchange().encryptKey(secretKey, publicKey);
     }
 

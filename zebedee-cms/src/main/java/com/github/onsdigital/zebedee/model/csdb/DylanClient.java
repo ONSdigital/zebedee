@@ -15,7 +15,7 @@ public interface DylanClient {
      * @return
      * @throws IOException
      */
-    String getEncryptedSecretKey() throws IOException;
+    String getEncryptedSecretKey(String keyName) throws IOException;
 
     /**
      * Get the encrypted CSDB data from Dylan. The data will be encrypted using the secret key provided from dylan.

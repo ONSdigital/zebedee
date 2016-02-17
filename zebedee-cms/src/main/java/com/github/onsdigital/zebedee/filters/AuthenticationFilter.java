@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Filter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.CsdbKey;
+import com.github.onsdigital.zebedee.api.CsdbNotify;
 import com.github.onsdigital.zebedee.api.Login;
 import com.github.onsdigital.zebedee.api.Password;
 import com.github.onsdigital.zebedee.api.Root;
@@ -25,6 +26,7 @@ public class AuthenticationFilter implements Filter {
 			.add(Login.class)
 			.add(Password.class)
 			.add(CsdbKey.class)
+			.add(CsdbNotify.class)
 			.build();
 
 	/**
@@ -82,7 +84,7 @@ public class AuthenticationFilter implements Filter {
 	public boolean noAuthorisationRequired(Path path) {
 		return NO_AUTH_REQUIRED
 				.stream()
-				.filter(clazzName -> clazzName.getSimpleName().toLowerCase().equals(path.lastSegment()))
+				.filter(clazzName -> clazzName.getSimpleName().toLowerCase().equals(path.lastSegment().toLowerCase()))
 				.findFirst()
 				.isPresent();
 	}

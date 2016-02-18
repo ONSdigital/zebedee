@@ -13,6 +13,7 @@ import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -127,8 +128,9 @@ public class PublishedCollections {
 
             SearchResponse response = client.prepareSearch(index)
                     .setTypes(type)
+                    .setSearchType(SearchType.QUERY_THEN_FETCH)
                     .setFrom(0)
-                    .setSize(50)
+                    .setSize(20)
                     .addSort(new FieldSortBuilder("publishDate").order(SortOrder.DESC))
                             //.setExplain(true)
                     .execute()

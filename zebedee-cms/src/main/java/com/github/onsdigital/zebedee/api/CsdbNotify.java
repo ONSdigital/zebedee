@@ -1,17 +1,13 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.davidcarboni.cryptolite.Crypto;
-import com.github.davidcarboni.cryptolite.KeyExchange;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.model.csdb.DylanClient;
 import com.github.onsdigital.zebedee.model.csdb.HttpDylanClient;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
@@ -39,39 +35,16 @@ public class CsdbNotify {
 
         System.out.println(String.format("\n\tReceived csdb file notification: filename='%s'.\n", csdbId));
 
-        try {
-            // get key from dylan
-            String encryptedDylanKey = dylanClient.getEncryptedSecretKey(FilenameUtils.getBaseName(csdbId) + ".key");
-
-            PrivateKey pk = Root.zebedee.applicationKeys.getPrivateKeyFromCache(CsdbImporter.APPLICATION_KEY_ID);
-
-            // get the csdb data
-            InputStream encryptedCsdbData = dylanClient.getEncryptedCsdbData(csdbId);
-            dylanSays(encryptedCsdbData);
-
-            // stream is consumed get it again.
-            encryptedCsdbData = dylanClient.getEncryptedCsdbData(csdbId);
-
-            // decrypt it using the private key
-            SecretKey secretKey = new KeyExchange().decryptKey(encryptedDylanKey, pk);
-
-            InputStream unencryptedDylan = new Crypto().decrypt(encryptedCsdbData, secretKey);
-            dylanSays(unencryptedDylan);
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        // TODO this needs to be wired into the collections publishing.
-/*
         PrivateKey privateKey = Root.zebedee.applicationKeys.getPrivateKeyFromCache(CsdbImporter.APPLICATION_KEY_ID);
+
+        if (privateKey == null) throw new IOException("An administrator needs to login to unlock the CSDB import key.");
 
         CsdbImporter.processNotification(
                 privateKey,
                 csdbId,
                 dylanClient,
                 Root.zebedee.collections,
-                Root.zebedee.keyringCache.schedulerCache);*/
+                Root.zebedee.keyringCache.schedulerCache);
     }
 
     private void dylanSays(InputStream in) throws IOException {

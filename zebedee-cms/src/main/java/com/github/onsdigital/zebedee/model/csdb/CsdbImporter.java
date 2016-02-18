@@ -46,15 +46,25 @@ public class CsdbImporter {
             Collections collections,
             Map<String, SecretKey> keyCache) throws IOException, ZebedeeException {
 
+
+        Log.print("Processing notification for CSDB %s", csdbIdentifier);
+
         Collection collection;
         try (InputStream csdbData = getDylanData(privateCsdbImportKey, csdbIdentifier, dylan)) {
             collection = addCsdbToCollectionWithCorrectDataset(csdbIdentifier, collections, keyCache, csdbData);
         }
 
-        if (collection != null && collection.description.approvedStatus == true) {
-            preProcessCollection(collection);
+        if (collection != null) {
+
+            Log.print("Collection %s found for CSDB %s.", collection.description.name, csdbIdentifier);
+
+            if (collection.description.approvedStatus == true) {
+                preProcessCollection(collection);
+            } else {
+                Log.print("The collection %s is not approved.", collection.description.name);
+            }
         } else {
-            Log.print("The collection %s is not approved.", collection.description.name);
+            Log.print("No collection found for CSDB file with ID %s", csdbIdentifier);
         }
     }
 
@@ -167,8 +177,7 @@ public class CsdbImporter {
      */
     static InputStream getDylanData(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan) throws IOException {
         // get key from dylan
-        // TODO FIX THIS.
-        String dylanKey = dylan.getEncryptedSecretKey("");
+        String dylanKey = dylan.getEncryptedSecretKey(csdbIdentifier);
 
         // decrypt it using the private key
         SecretKey secretKey = new KeyExchange().decryptKey(dylanKey, privateCsdbImportKey);

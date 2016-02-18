@@ -6,14 +6,11 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.model.csdb.DylanClient;
 import com.github.onsdigital.zebedee.model.csdb.HttpDylanClient;
-import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.security.PrivateKey;
 
 @Api
@@ -32,7 +29,6 @@ public class CsdbNotify {
      */
     @POST
     public void csdbNotify(HttpServletRequest request, HttpServletResponse response, String csdbId) throws IOException, ZebedeeException {
-
         System.out.println(String.format("\n\tReceived csdb file notification: filename='%s'.\n", csdbId));
 
         PrivateKey privateKey = Root.zebedee.applicationKeys.getPrivateKeyFromCache(CsdbImporter.APPLICATION_KEY_ID);
@@ -45,11 +41,5 @@ public class CsdbNotify {
                 dylanClient,
                 Root.zebedee.collections,
                 Root.zebedee.keyringCache.schedulerCache);
-    }
-
-    private void dylanSays(InputStream in) throws IOException {
-        StringWriter writer = new StringWriter();
-        IOUtils.copy(in, writer);
-        System.out.println(String.format("\nDylan says:\n%s", writer.toString()));
     }
 }

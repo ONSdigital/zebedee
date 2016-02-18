@@ -30,6 +30,8 @@ import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Handles a notification when a new CSDB file is available to zebedee.
@@ -37,34 +39,55 @@ import java.util.Map;
  */
 public class CsdbImporter {
 
+    // The key that is used to store the public / private keys
     public static final String APPLICATION_KEY_ID = "csdb-import";
 
+    // Single threaded pool to process a single CSDB at a time.
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    /**
+     * When processing the notification, add a task to a single threaded executor to process the CSDB.
+     * This ensures only one CSDB file is processed at a time.
+     *
+     * @param privateCsdbImportKey
+     * @param csdbIdentifier
+     * @param dylan
+     * @param collections
+     * @param keyCache
+     * @throws IOException
+     * @throws ZebedeeException
+     */
     public static void processNotification(
             PrivateKey privateCsdbImportKey,
             String csdbIdentifier,
             DylanClient dylan,
             Collections collections,
-            Map<String, SecretKey> keyCache) throws IOException, ZebedeeException {
+            Map<String, SecretKey> keyCache
+    ) throws IOException, ZebedeeException {
+        executorService.submit(() -> processCsdb(privateCsdbImportKey, csdbIdentifier, dylan, collections, keyCache));
+    }
 
-
+    private static void processCsdb(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan, Collections collections, Map<String, SecretKey> keyCache) {
         Log.print("Processing notification for CSDB %s", csdbIdentifier);
 
         Collection collection;
         try (InputStream csdbData = getDylanData(privateCsdbImportKey, csdbIdentifier, dylan)) {
             collection = addCsdbToCollectionWithCorrectDataset(csdbIdentifier, collections, keyCache, csdbData);
-        }
 
-        if (collection != null) {
+            if (collection != null) {
 
-            Log.print("Collection %s found for CSDB %s.", collection.description.name, csdbIdentifier);
+                Log.print("Collection %s found for CSDB %s.", collection.description.name, csdbIdentifier);
 
-            if (collection.description.approvedStatus == true) {
-                preProcessCollection(collection);
+                if (collection.description.approvedStatus == true) {
+                    preProcessCollection(collection);
+                } else {
+                    Log.print("The collection %s is not approved.", collection.description.name);
+                }
             } else {
-                Log.print("The collection %s is not approved.", collection.description.name);
+                Log.print("No collection found for CSDB file with ID %s", csdbIdentifier);
             }
-        } else {
-            Log.print("No collection found for CSDB file with ID %s", csdbIdentifier);
+        } catch (ZebedeeException | IOException e) {
+            Log.print(e);
         }
     }
 
@@ -105,10 +128,12 @@ public class CsdbImporter {
      * @throws UnauthorizedException
      * @throws NotFoundException
      */
-    private static Collection addCsdbToCollectionWithCorrectDataset(String csdbIdentifier,
-                                                                    Collections collections,
-                                                                    Map<String, SecretKey> keyCache,
-                                                                    InputStream csdbData) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    private static Collection addCsdbToCollectionWithCorrectDataset(
+            String csdbIdentifier,
+            Collections collections,
+            Map<String, SecretKey> keyCache,
+            InputStream csdbData
+    ) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
         for (Collection collection : collections.list()) {
             SecretKey collectionKey = keyCache.get(collection.description.id);
             CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);

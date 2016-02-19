@@ -141,11 +141,12 @@ public class Publisher {
         boolean publishComplete = false;
         String encryptionPassword = Random.password(100);
         try {
-
+            collection.description.publishStartDate = new Date();
             BeginPublish(collection, encryptionPassword);
             SendManifest(collection, encryptionPassword);
             PublishFilteredCollectionFiles(collection, collectionReader, encryptionPassword);
             publishComplete = CommitPublish(collection, email, encryptionPassword);
+            collection.description.publishEndDate = new Date();
 
         } catch (IOException e) {
 

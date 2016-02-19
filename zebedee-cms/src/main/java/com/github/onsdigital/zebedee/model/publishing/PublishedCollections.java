@@ -131,7 +131,7 @@ public class PublishedCollections {
                     .setSearchType(SearchType.QUERY_THEN_FETCH)
                     .setFrom(0)
                     .setSize(20)
-                    .addSort(new FieldSortBuilder("publishDate").order(SortOrder.DESC))
+                    .addSort(new FieldSortBuilder("publishStartDate").order(SortOrder.DESC))
                             //.setExplain(true)
                     .execute()
                     .actionGet();

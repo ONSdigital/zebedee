@@ -18,7 +18,13 @@ public class Configuration {
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
+
+    // how many seconds before the actual publish time should we run the preprocess
     private static final int DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH = 30;
+
+    // how many additional seconds after the publish
+    private static final int DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH = 30;
+
 
     public static boolean isSchedulingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
@@ -32,11 +38,25 @@ public class Configuration {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("optimised_publish_enabled"), "true"));
     }
 
+    /**
+     * how many seconds before the actual publish time should we run the preprocess.
+     */
     public static int getPreProcessSecondsBeforePublish() {
         try {
             return Integer.parseInt(getValue("pre_publish_seconds_before_publish"));
         } catch (Exception e) {
             return DEFAULT_PREPROCESS_SECONDS_BEFORE_PUBLISH;
+        }
+    }
+
+    /**
+     * how many additional seconds after the publish should content be cached.
+     */
+    public static int getSecondsToCacheAfterScheduledPublish() {
+        try {
+            return Integer.parseInt(getValue("seconds_to_cache_after_scheduled_publish"));
+        } catch (Exception e) {
+            return DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH;
         }
     }
 

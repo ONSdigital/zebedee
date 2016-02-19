@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,7 +36,12 @@ public class PublishNotification {
     private NotificationPayload payload;
 
     public PublishNotification(Collection collection, List<String> uriList) {
-        this.payload = new NotificationPayload(collection.description.id, uriList, collection.description.publishDate);
+
+        // Delay the clearing of the cache after publish to minimise load on the server while publishing.
+        Date clearCacheDate = new DateTime(collection.description.publishDate)
+                .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
+
+        this.payload = new NotificationPayload(collection.description.id, uriList, clearCacheDate);
     }
 
     public PublishNotification(Collection collection) {

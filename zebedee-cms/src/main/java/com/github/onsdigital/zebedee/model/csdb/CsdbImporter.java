@@ -175,8 +175,8 @@ public class CsdbImporter {
                                 Dataset datasetPage = (Dataset) page;
 
                                 for (DownloadSection downloadSection : datasetPage.getDownloads()) {
-                                    if ((downloadSection.getCdids() != null && downloadSection.getCdids().contains(csdbIdentifier))
-                                            || (downloadSection.getFile() != null && downloadSection.getFile().equals(filename))) {
+                                    if ((downloadSection.getCdids() != null && containsIgnoreCase(downloadSection.getCdids(), csdbIdentifier))
+                                            || (downloadSection.getFile() != null && downloadSection.getFile().equalsIgnoreCase(filename))) {
                                         return Paths.get(uri).getParent().resolve(filename);
                                     }
                                 }
@@ -189,6 +189,14 @@ public class CsdbImporter {
             }
         }
         return null;
+    }
+
+    private static boolean containsIgnoreCase(List<String> list, String toCompare){
+        for (String item : list) {
+            if (item.equalsIgnoreCase(toCompare));
+                return true;
+        }
+        return false;
     }
 
     /**

@@ -80,8 +80,12 @@ public class Collections {
      * @return
      */
     private static String getCollectionNameFromId(String id) {
-        int guidLength = 65; // length of GUID plus the hyphen.
-        return id.substring(0, id.length() - guidLength);
+        try {
+            int guidLength = 65; // length of GUID plus the hyphen.
+            return id.substring(0, id.length() - guidLength);
+        } catch (StringIndexOutOfBoundsException e) {
+            return id;
+        }
     }
 
     /**
@@ -489,6 +493,10 @@ public class Collections {
     )
             throws IOException, BadRequestException, UnauthorizedException,
             ConflictException, NotFoundException, FileUploadException {
+
+        if (collection.description.approvedStatus == true) {
+            throw new BadRequestException("This collection has been approved and cannot be saved to.");
+        }
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 

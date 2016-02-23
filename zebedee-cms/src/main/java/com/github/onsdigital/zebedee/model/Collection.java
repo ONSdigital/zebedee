@@ -257,6 +257,7 @@ public class Collection {
                 scheduler.schedulePublish(updatedCollection, zebedee);
             }
         } else { // the type is now manual so cancel it
+            updatedCollection.description.publishDate = null;
             scheduler.cancel(collection);
         }
 

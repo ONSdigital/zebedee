@@ -494,11 +494,11 @@ public class Collections {
             throws IOException, BadRequestException, UnauthorizedException,
             ConflictException, NotFoundException, FileUploadException {
 
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
+
         if (collection.description.approvedStatus == true) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
         }
-
-        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
         // Requested path
         if (StringUtils.isBlank(uri)) {

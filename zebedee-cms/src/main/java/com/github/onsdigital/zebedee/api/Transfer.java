@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.TransferRequest;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -71,9 +72,10 @@ public class Transfer {
             return false;
         }
 
-
-
         PathUtils.moveFilesInDirectory(sourcePath, destinationPath);
+
+        Audit.log(request, "Collection %s transferred to %s by %s", params.uri, params.destination, session.email);
+
         return true;
     }
 

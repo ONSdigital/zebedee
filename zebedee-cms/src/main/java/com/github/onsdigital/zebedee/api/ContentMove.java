@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
@@ -29,6 +30,8 @@ public class ContentMove {
         String toUri = request.getParameter("toUri");
 
         Root.zebedee.collections.moveContent(session, collection, uri, toUri);
+
+        Audit.log(request, "Collection %s content %s moved to %s by %s", collection.path, uri, toUri, session.email);
 
         return true;
     }

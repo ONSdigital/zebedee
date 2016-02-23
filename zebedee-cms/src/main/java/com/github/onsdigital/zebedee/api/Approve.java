@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import org.eclipse.jetty.http.HttpStatus;
@@ -35,6 +36,12 @@ public class Approve {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         Session session = Root.zebedee.sessions.get(request);
-        return Root.zebedee.collections.approve(collection, session);
+
+        boolean result = Root.zebedee.collections.approve(collection, session);
+        if(result) {
+            Audit.log(request, "Collection %s approved by %s", collection.path, session.email);
+        }
+
+        return result;
     }
 }

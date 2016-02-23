@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -49,6 +50,12 @@ public class Publish {
 
 		boolean doBreakBeforeFileTransfer = BooleanUtils.toBoolean(breakBeforePublish);
 		boolean doSkipVerification = BooleanUtils.toBoolean(skipVerification);
-		return Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer, doSkipVerification);
+
+		boolean result = Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer, doSkipVerification);
+		if (result) {
+			Audit.log(request, "Collection %s published by %s", collection.path, session.email);
+		}
+
+		return result;
 	}
 }

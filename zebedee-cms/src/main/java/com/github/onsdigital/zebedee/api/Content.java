@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -75,8 +76,10 @@ public class Content {
 
         if (overwriteExisting) {
             Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
+            Audit.log(request, "Collection %s content %s overwritten by %s", collection.path, uri, session.email);
         } else {
             Root.zebedee.collections.createContent(collection, uri, session, request, requestBody);
+            Audit.log(request, "Collection %s content %s created by %s", collection.path, uri, session.email);
         }
 
         return true;
@@ -102,6 +105,11 @@ public class Content {
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
-        return Root.zebedee.collections.deleteContent(collection, uri, session);
+        boolean result = Root.zebedee.collections.deleteContent(collection, uri, session);
+        if(result) {
+            Audit.log(request, "Collection %s content %s deleted by %s", collection.path, uri, session.email);
+        }
+
+        return result;
     }
 }

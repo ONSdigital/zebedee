@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
@@ -45,6 +46,7 @@ public class Login {
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            Audit.log(request, "User login failed for %s", credentials.email);
             return "Authentication failed.";
         }
 
@@ -59,8 +61,10 @@ public class Login {
             // This isn't what 417 is intended for, but a 4xx variation on 401 seems sensible.
             // I guess we could use 418 just for fun and to avoid confusion.
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
+            Audit.log(request, "User login for %s, password change required", credentials.email);
             return "Password change required";
         } else {
+            Audit.log(request, "User login for %s", credentials.email);
             response.setStatus(HttpStatus.OK_200);
         }
 

@@ -46,6 +46,16 @@ public class ReleasePopulator {
             Log.print("Adding dataset: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
             addRelatedDataset(release, contentDetail);
         }
+
+        if (contentDetail.type.equals(PageType.static_qmi.toString())) {
+            Log.print("Adding qmi: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
+            addRelatedQMI(release, contentDetail);
+        }
+        if (contentDetail.type.equals(PageType.static_methodology.toString())
+                || contentDetail.type.equals(PageType.static_methodology_download.toString())) {
+            Log.print("Adding methodology article: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
+            addRelatedMethodologyArticle(release, contentDetail);
+        }
     }
 
     private static void addRelatedDataset(Release release, ContentDetail contentDetail) {
@@ -63,6 +73,22 @@ public class ReleasePopulator {
             release.setRelatedDocuments(new ArrayList<Link>());
         }
         release.getRelatedDocuments().add(link);
+    }
+
+    private static void addRelatedMethodologyArticle(Release release, ContentDetail contentDetail) {
+        Link link = createLink(contentDetail);
+        if (release.getRelatedMethodologyArticle() == null) {
+            release.setRelatedMethodologyArticle(new ArrayList<Link>());
+        }
+        release.getRelatedMethodologyArticle().add(link);
+    }
+
+    private static void addRelatedQMI(Release release, ContentDetail contentDetail) {
+        Link link = createLink(contentDetail);
+        if (release.getRelatedMethodology() == null) {
+            release.setRelatedMethodology(new ArrayList<Link>());
+        }
+        release.getRelatedMethodology().add(link);
     }
 
     private static Link createLink(ContentDetail contentDetail) {

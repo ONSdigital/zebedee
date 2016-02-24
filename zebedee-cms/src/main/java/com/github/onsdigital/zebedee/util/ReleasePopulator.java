@@ -42,8 +42,7 @@ public class ReleasePopulator {
             addRelatedDocument(release, contentDetail);
         }
 
-        if (contentDetail.type.equals(PageType.dataset.toString())
-                || contentDetail.type.equals(PageType.timeseries_dataset.toString())) {
+        if (contentDetail.type.equals(PageType.dataset_landing_page.toString())) {
             Log.print("Adding dataset: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
             addRelatedDataset(release, contentDetail);
         }

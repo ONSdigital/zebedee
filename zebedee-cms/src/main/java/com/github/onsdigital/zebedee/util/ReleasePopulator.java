@@ -26,6 +26,8 @@ public class ReleasePopulator {
 
         release.setRelatedDatasets(new ArrayList<>());
         release.setRelatedDocuments(new ArrayList<>());
+        release.setRelatedMethodology(new ArrayList<>());
+        release.setRelatedMethodologyArticle(new ArrayList<>());
 
         for (ContentDetail contentDetail : ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed())) {
             addPageDetailToRelease(release, contentDetail);

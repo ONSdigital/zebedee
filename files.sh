@@ -7,7 +7,6 @@ export PORT="8082"
 export RESTOLINO_STATIC="src/main/resources/files"
 export RESTOLINO_CLASSES="zebedee-cms/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee
-export zebedee_root="/Users/dave/Desktop/content"
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -65,5 +66,7 @@ public class Table {
         // Write the file to the response
         org.apache.commons.io.IOUtils.copy(new StringReader(output),
                 response.getOutputStream());
+
+        Audit.log(request, "Collection %s table %s created by %s", collection.path, uri, session.email);
     }
 }

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -52,8 +53,10 @@ public class Password {
 
         // Attempt to change or reset the password:
         if (Root.zebedee.users.setPassword(session, credentials)) {
+            Audit.log(request, "Password changed for %s", session.email);
             return "Password updated for " + credentials.email;
         } else {
+            Audit.log(request, "Password change attempt failed for %s", credentials.email);
             return "Password not updated for " + credentials.email + " (there may be an issue with the user's keyring password).";
         }
     }

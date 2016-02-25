@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -44,6 +45,9 @@ public class Version {
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
         ContentItemVersion version = collection.version(session.email, uri, collectionWriter);
+
+        Audit.log(request, "Collection %s version %s created by %s", collection.path, version.getIdentifier(), session.email);
+
         return version.getUri();
     }
 
@@ -69,6 +73,9 @@ public class Version {
         String uri = request.getParameter("uri");
 
         collection.deleteVersion(uri);
+
+        Audit.log(request, "Collection %s version %s deleted by %s", collection.path, uri, session.email);
+
         return true;
     }
 }

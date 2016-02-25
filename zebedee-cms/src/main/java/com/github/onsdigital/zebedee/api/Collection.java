@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
@@ -111,6 +112,8 @@ public class Collection {
             Root.schedulePublish(collection);
         }
 
+        Audit.log(request, "Collection %s created by %s", collection.path, session.email);
+
         return collection.description;
     }
 
@@ -133,6 +136,8 @@ public class Collection {
                 Root.zebedee,
                 Root.getScheduler(),
                 session);
+
+        Audit.log(request, "Collection %s updated by %s",collection.path, session.email);
 
         return updatedCollection.description;
     }
@@ -159,6 +164,8 @@ public class Collection {
         Root.zebedee.collections.delete(collection, session);
 
         Root.cancelPublish(collection);
+
+        Audit.log(request, "Collection %s deleted by %s", collection.path, session.email);
 
         return true;
     }

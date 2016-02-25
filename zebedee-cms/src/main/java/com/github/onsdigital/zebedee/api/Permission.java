@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -45,15 +46,19 @@ public class Permission {
             Root.zebedee.permissions.addAdministrator(permissionDefinition.email, session);
             // Admins must be publishers so update the permissions accordingly
             permissionDefinition.editor = true;
+            Audit.log(request, "Administrator permission added for %s by %s", permissionDefinition.email, session.email);
         } else if (BooleanUtils.isFalse(permissionDefinition.admin)) {
             Root.zebedee.permissions.removeAdministrator(permissionDefinition.email, session);
+            Audit.log(request, "Administrator permission removed from %s by %s", permissionDefinition.email, session.email);
         }
 
         // Digital publishing
         if (BooleanUtils.isTrue(permissionDefinition.editor)) {
             Root.zebedee.permissions.addEditor(permissionDefinition.email, session);
+            Audit.log(request, "Publisher permission added for %s by %s", permissionDefinition.email, session.email);
         } else if (BooleanUtils.isFalse(permissionDefinition.editor)) {
             Root.zebedee.permissions.removeEditor(permissionDefinition.email, session);
+            Audit.log(request, "Publisher permission removed from %s by %s", permissionDefinition.email, session.email);
         }
 
         return "Permissions updated for " + permissionDefinition.email;

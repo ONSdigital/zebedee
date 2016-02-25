@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -38,6 +39,8 @@ public class Complete {
         String uri = request.getParameter("uri");
 
         Root.zebedee.collections.complete(collection, uri, session);
+
+        Audit.log(request, "Collection %s reviewed by %s", collection.path, session.email);
 
         return new ResultMessage("URI reviewed.");
     }

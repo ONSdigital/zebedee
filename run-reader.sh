@@ -6,7 +6,8 @@ export PORT="8082"
 # Restolino configuration
 export RESTOLINO_CLASSES="zebedee-reader/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee.reader.api
-export CONTENT_DIR="content"
+#export CONTENT_DIR="content"
+export CONTENT_DIR="/Users/dave/Desktop/content/zebedee_2016-01-15/master"
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \

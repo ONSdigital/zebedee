@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
@@ -41,5 +42,7 @@ public class CsdbNotify {
                 dylanClient,
                 Root.zebedee.collections,
                 Root.zebedee.keyringCache.schedulerCache);
+
+        Audit.log(request, "CSDB file notification received for %s", csdbId);
     }
 }

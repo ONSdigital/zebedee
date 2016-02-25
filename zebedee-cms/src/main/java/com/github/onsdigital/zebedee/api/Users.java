@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.httpino.Serialiser;
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -80,6 +81,8 @@ public class Users {
         Session session = Root.zebedee.sessions.get(request);
         User created = Root.zebedee.users.create(session, user);
 
+        Audit.log(request, "User %s created by %s", user.email, session.email);
+
         return sanitise(created);
     }
 
@@ -100,6 +103,8 @@ public class Users {
 
         User updated = Root.zebedee.users.update(session, user);
 
+        Audit.log(request, "User %s updated by %s", user.email, session.email);
+
         return sanitise(updated);
     }
 
@@ -117,7 +122,12 @@ public class Users {
         Session session = Root.zebedee.sessions.get(request);
         String email = request.getParameter("email");
         User user = Root.zebedee.users.get(email);
-        return Root.zebedee.users.delete(session, user);
+        boolean result = Root.zebedee.users.delete(session, user);
+        if(result) {
+            Audit.log(request, "User %s deleted by %s", user.email, session.email);
+        }
+
+        return result;
     }
 
     // Methods to sanitise user account records going outside the system.

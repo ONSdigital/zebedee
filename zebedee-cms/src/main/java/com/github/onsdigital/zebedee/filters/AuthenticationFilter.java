@@ -3,12 +3,9 @@ package com.github.onsdigital.zebedee.filters;
 import com.github.davidcarboni.restolino.framework.Filter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.api.CsdbKey;
-import com.github.onsdigital.zebedee.api.CsdbNotify;
-import com.github.onsdigital.zebedee.api.Login;
-import com.github.onsdigital.zebedee.api.Password;
-import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.api.*;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -27,6 +24,7 @@ public class AuthenticationFilter implements Filter {
 			.add(Password.class)
 			.add(CsdbKey.class)
 			.add(CsdbNotify.class)
+			.add(ReIndex.class)
 			.build();
 
 	/**

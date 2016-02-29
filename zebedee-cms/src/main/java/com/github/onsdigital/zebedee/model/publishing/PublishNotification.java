@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.Log;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
@@ -49,22 +48,22 @@ public class PublishNotification {
     }
 
     public void sendNotification(EventType eventType) {
-
         System.out.println("Sending publish notification to website for " + eventType.name());
         try (Http http = new Http()) {
             for (Host host : websiteHosts) {
-                Endpoint endpoint = new Endpoint(host, getEndPointName(eventType));
-                Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
-                String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
-                if (response.statusLine.getStatusCode() > 302) {
-                    System.err.println("Error response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
-                } else {
-                    System.out.println("Response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                try {
+                    Endpoint endpoint = new Endpoint(host, getEndPointName(eventType));
+                    Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
+                    String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
+                    if (response.statusLine.getStatusCode() > 302) {
+                        System.err.println("Error response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                    } else {
+                        System.out.println("Response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                    }
+                } catch (Exception e) {
+                    Log.print("Failed sending publish notification to website for " + eventType);
                 }
             }
-        } catch (Exception e) {
-            Log.print("Failed sending publish notification to website fo " + eventType);
-            ExceptionUtils.printRootCauseStackTrace(e);
         }
     }
 

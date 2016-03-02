@@ -61,11 +61,6 @@ public class SlackNotification {
 
         // send the message
         Future<Exception> exceptionFuture = sendSlackMessage(slackHost, slackToken, slackChannel, slackUsername, slackEmoji, message, pool);
-        try {
-            exceptionFuture.get();
-        } catch (Exception e) {
-            Log.print(e);
-        }
     }
 
     private static Future<Exception> sendSlackMessage(
@@ -88,6 +83,7 @@ public class SlackNotification {
                 System.out.println("response.statusLine = " + response.statusLine);
             } catch (Exception e) {
                 result = e;
+                Log.print(e);
             }
             return result;
         });

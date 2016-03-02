@@ -20,6 +20,7 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.io.IOUtils;
 
 import javax.crypto.SecretKey;
@@ -113,6 +114,8 @@ public class Root {
             Log.print("Optimised publishing is NOT enabled. Using old scheduler.");
             scheduler = new CollectionScheduler(); // old scheduler todo: remove this when using new scheduler.
         }
+
+        SlackNotification.alarm("Zebedee has just started. Ensure an administrator has logged in.");
 
         loadExistingCollectionsIntoScheduler();
         initialiseCsdbImportKeys();

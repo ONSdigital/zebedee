@@ -150,6 +150,7 @@ public class Publisher {
         } catch (IOException e) {
 
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
+            SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.description.name, e.getMessage()));
             System.out.println(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
             Map<String, String> transactionIds = collection.description.publishTransactionIds;

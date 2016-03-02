@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
@@ -62,6 +63,7 @@ public class PublishNotification {
                     }
                 } catch (Exception e) {
                     Log.print("Failed sending publish notification to website for " + eventType);
+                    SlackNotification.alarm("Failed sending publish notification to website for " + eventType + " host:" + host.toString());
                 }
             }
         }

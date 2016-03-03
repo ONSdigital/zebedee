@@ -409,7 +409,6 @@ public class DataPublisher {
         putCombination(series.getCdid(), "Title", series.getDescription().getTitle(), map);
         putCombination(series.getCdid(), "CDID", series.getDescription().getCdid(), map);
         putCombination(series.getCdid(), "National Statistic", (series.getDescription().isNationalStatistic() ? "Y" : "N"), map);
-        putCombination(series.getCdid(), "Seasonally Adjusted", (series.getDescription().getSeasonalAdjustment()), map);
         putCombination(series.getCdid(), "PreUnit", series.getDescription().getPreUnit(), map);
         putCombination(series.getCdid(), "Unit", series.getDescription().getUnit(), map);
 
@@ -519,8 +518,6 @@ public class DataPublisher {
         cdidRow.add("CDID");
         List<String> nationalStatistic = new ArrayList<>();
         nationalStatistic.add("National Statistic");
-        List<String> seasonallyAdjusted = new ArrayList<>();
-        seasonallyAdjusted.add("Seasonally Adjusted");
         List<String> preunit = new ArrayList<>();
         preunit.add("PreUnit");
         List<String> unit = new ArrayList<>();
@@ -536,7 +533,6 @@ public class DataPublisher {
             titleRow.add(mapOfData.get("Title").get(cdid));
             cdidRow.add(cdid);
             nationalStatistic.add(mapOfData.get("National Statistic").get(cdid));
-            seasonallyAdjusted.add(mapOfData.get("Seasonally Adjusted").get(cdid));
             preunit.add(mapOfData.get("PreUnit").get(cdid));
             unit.add(mapOfData.get("Unit").get(cdid));
             releaseDate.add(mapOfData.get("Release date").get(cdid));
@@ -546,7 +542,6 @@ public class DataPublisher {
         rows.add(titleRow);
         rows.add(cdidRow);
         rows.add(nationalStatistic);
-        rows.add(seasonallyAdjusted);
         rows.add(preunit);
         rows.add(unit);
         rows.add(releaseDate);

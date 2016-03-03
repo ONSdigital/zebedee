@@ -6,7 +6,10 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by thomasridd on 1/23/16.
@@ -31,7 +34,6 @@ public class DataGrid {
         DataGridRow title = new DataGridRow("Title");
         DataGridRow cdid = new DataGridRow("CDID");
         DataGridRow nationalStatistic = new DataGridRow("National Statistic");
-        DataGridRow seasonallyAdjusted = new DataGridRow("Seasonally Adjusted");
         DataGridRow preunit = new DataGridRow("PreUnit");
         DataGridRow unit = new DataGridRow("Unit");
         DataGridRow releaseDate = new DataGridRow("Release Date");
@@ -42,7 +44,6 @@ public class DataGrid {
             title.cells.add(timeSeries.getDescription().getTitle());
             cdid.cells.add(timeSeries.getDescription().getCdid());
             nationalStatistic.cells.add(timeSeries.getDescription().isNationalStatistic() ? "Y" : "N");
-            seasonallyAdjusted.add(timeSeries.getDescription().getSeasonalAdjustment());
             preunit.add(timeSeries.getDescription().getPreUnit());
             unit.add(timeSeries.getDescription().getUnit());
 
@@ -61,7 +62,6 @@ public class DataGrid {
         results.add(title);
         results.add(cdid);
 //        results.add(nationalStatistic); - removed until we have sufficient data to back it up
-        results.add(seasonallyAdjusted);
         results.add(preunit);
         results.add(unit);
         results.add(releaseDate);

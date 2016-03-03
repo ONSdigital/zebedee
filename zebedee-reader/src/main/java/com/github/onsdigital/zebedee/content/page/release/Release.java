@@ -22,6 +22,7 @@ public class Release extends Page{
     private List<Link> relatedDatasets;
     private List<Link> relatedMethodology;
     private List<Link> relatedMethodologyArticle;
+    private List<Link> links;
 
     private List<ReleaseDateChange> dateChanges;
 
@@ -140,5 +141,13 @@ public class Release extends Page{
 
     public void setRelatedMethodologyArticle(List<Link> relatedMethodologyArticle) {
         this.relatedMethodologyArticle = relatedMethodologyArticle;
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
     }
 }

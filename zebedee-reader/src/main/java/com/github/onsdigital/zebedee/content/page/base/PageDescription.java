@@ -282,15 +282,6 @@ public class PageDescription extends Content implements Comparable<PageDescripti
         this.source = source;
     }
 
-
-    public String getSeasonalAdjustment() {
-        return seasonalAdjustment;
-    }
-
-    public void setSeasonalAdjustment(String seasonalAdjustment) {
-        this.seasonalAdjustment = seasonalAdjustment;
-    }
-
     public String getDate() {
         return date;
     }

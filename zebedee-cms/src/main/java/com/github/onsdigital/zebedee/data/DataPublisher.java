@@ -1166,7 +1166,6 @@ public class DataPublisher {
         if (page.getDescription() == null || series.getDescription() == null) {
             System.out.println("Problem");
         }
-        page.getDescription().setSeasonalAdjustment(series.getDescription().getSeasonalAdjustment());
         page.getDescription().setCdid(series.getDescription().getCdid());
 
         // Copy across the title if it is currently blank (equates to equalling Cdid)

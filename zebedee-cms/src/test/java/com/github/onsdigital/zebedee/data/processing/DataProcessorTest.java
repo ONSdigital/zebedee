@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
@@ -29,13 +28,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * DataProcessor is the workhorse of the Data Publisher
@@ -264,7 +261,6 @@ public class DataProcessorTest {
         // Then
         // we expect the newPage to have copied details from the
         assertEquals(timeSeries.getCdid(), synced.getCdid());
-        assertEquals(timeSeries.getDescription().getSeasonalAdjustment(), synced.getDescription().getSeasonalAdjustment());
     }
 
     @Test

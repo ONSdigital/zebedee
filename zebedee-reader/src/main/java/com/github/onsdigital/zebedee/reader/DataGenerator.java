@@ -228,7 +228,6 @@ public class DataGenerator {
             putCombination(series.getCdid(), "Title", series.getDescription().getTitle(), map);
             putCombination(series.getCdid(), "CDID", series.getDescription().getCdid(), map);
             putCombination(series.getCdid(), "National Statistic", (series.getDescription().isNationalStatistic() ? "Y" : "N"), map);
-            putCombination(series.getCdid(), "Seasonally Adjusted", (series.getDescription().getSeasonalAdjustment()), map);
             putCombination(series.getCdid(), "PreUnit", series.getDescription().getPreUnit(), map);
             putCombination(series.getCdid(), "Unit", series.getDescription().getUnit(), map);
 
@@ -653,7 +652,6 @@ public class DataGenerator {
         grid.add(rowFromPair("Title", description.getTitle()));
         grid.add(rowFromPair("CDID", description.getCdid()));
         grid.add(rowFromPair("National Statistic", (description.isNationalStatistic() ? "Y" : "N")));
-        grid.add(rowFromPair("Seasonally Adjusted", (description.getSeasonalAdjustment())));
         grid.add(rowFromPair("PreUnit", description.getPreUnit()));
         grid.add(rowFromPair("Unit", description.getUnit()));
 

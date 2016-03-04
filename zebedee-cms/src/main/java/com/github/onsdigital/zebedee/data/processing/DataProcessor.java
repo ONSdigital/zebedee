@@ -30,69 +30,6 @@ public class DataProcessor {
     }
 
     /**
-     * Take a timeseries as produced by Brian from an upload and combine it with current content
-     *  @param publishedContentReader
-     * @param details
-     * @param newTimeSeries   @return
-     * */
-    public TimeSeries processTimeseries(ContentReader publishedContentReader, DataPublicationDetails details, TimeSeries newTimeSeries, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
-
-        // Get current version of the time series (persists any manually entered data)
-        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details, dataIndex);
-
-        // Add meta from the landing page and timeseries dataset page
-        syncLandingPageMetadata(this.timeSeries, details);
-        syncTimeSeriesMetadata(this.timeSeries, newTimeSeries);
-
-        // Combine the time series values
-        DataMerge dataMerge = new DataMerge();
-        this.timeSeries = dataMerge.merge(this.timeSeries, newTimeSeries, details.landingPage.getDescription().getDatasetId());
-
-        // Ensure time series labels are up to date
-        new TimeSeriesLabeller().applyLabels(this.timeSeries);
-
-        // Log corrections and insertions
-        corrections = dataMerge.corrections;
-        insertions = dataMerge.insertions;
-
-        return this.timeSeries;
-    }
-
-    /**
-     * Copy metadata from the landing page
-     *
-     * @param page
-     * @param details
-     * @return
-     * @throws URISyntaxException
-     */
-    TimeSeries syncLandingPageMetadata(TimeSeries page, DataPublicationDetails details) throws URISyntaxException {
-        PageDescription description = page.getDescription();
-        if (description == null) {
-            description = new PageDescription();
-            page.setDescription(description);
-        }
-        description.setNextRelease(details.landingPage.getDescription().getNextRelease());
-        description.setReleaseDate(details.landingPage.getDescription().getReleaseDate());
-
-        // Set some contact details
-        addContactDetails(page, details.landingPage);
-
-        // Add the dataset id to sources if necessary
-        checkDatasetId(page, details.landingPage);
-
-        // Add the dataset id to sources if necessary
-        checkRelatedDatasets(page, details.landingPageUri);
-
-        // Add stats bulletins
-        if (details.landingPage.getRelatedDocuments() != null) {
-            page.setRelatedDocuments(details.landingPage.getRelatedDocuments());
-        }
-
-        return page;
-    }
-
-    /**
      * Check if datasetId is listed as a sourceDataset for the timeseries and if not add it
      *
      * @param timeSeries
@@ -168,7 +105,68 @@ public class DataProcessor {
         }
     }
 
+    /**
+     * Take a timeseries as produced by Brian from an upload and combine it with current content
+     *  @param publishedContentReader
+     * @param details
+     * @param newTimeSeries   @return
+     * */
+    public TimeSeries processTimeseries(ContentReader publishedContentReader, DataPublicationDetails details, TimeSeries newTimeSeries, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
 
+        // Get current version of the time series (persists any manually entered data)
+        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details, dataIndex);
+
+        // Add meta from the landing page and timeseries dataset page
+        syncLandingPageMetadata(this.timeSeries, details);
+        syncTimeSeriesMetadata(this.timeSeries, newTimeSeries);
+
+        // Combine the time series values
+        DataMerge dataMerge = new DataMerge();
+        this.timeSeries = dataMerge.merge(this.timeSeries, newTimeSeries, details.landingPage.getDescription().getDatasetId());
+
+        // Ensure time series labels are up to date
+        new TimeSeriesLabeller().applyLabels(this.timeSeries);
+
+        // Log corrections and insertions
+        corrections = dataMerge.corrections;
+        insertions = dataMerge.insertions;
+
+        return this.timeSeries;
+    }
+
+    /**
+     * Copy metadata from the landing page
+     *
+     * @param page
+     * @param details
+     * @return
+     * @throws URISyntaxException
+     */
+    TimeSeries syncLandingPageMetadata(TimeSeries page, DataPublicationDetails details) throws URISyntaxException {
+        PageDescription description = page.getDescription();
+        if (description == null) {
+            description = new PageDescription();
+            page.setDescription(description);
+        }
+        description.setNextRelease(details.landingPage.getDescription().getNextRelease());
+        description.setReleaseDate(details.landingPage.getDescription().getReleaseDate());
+
+        // Set some contact details
+        addContactDetails(page, details.landingPage);
+
+        // Add the dataset id to sources if necessary
+        checkDatasetId(page, details.landingPage);
+
+        // Add the dataset id to sources if necessary
+        checkRelatedDatasets(page, details.landingPageUri);
+
+        // Add stats bulletins
+        if (details.landingPage.getRelatedDocuments() != null) {
+            page.setRelatedDocuments(details.landingPage.getRelatedDocuments());
+        }
+
+        return page;
+    }
 
     /**
      *
@@ -180,7 +178,6 @@ public class DataProcessor {
         if (inProgress.getDescription() == null || newSeries.getDescription() == null) {
             System.out.println("Error copying metadata in data publisher");
         }
-        inProgress.getDescription().setSeasonalAdjustment(newSeries.getDescription().getSeasonalAdjustment());
         inProgress.getDescription().setCdid(newSeries.getDescription().getCdid());
 
         // Copy across the title if it is currently blank (so if it has been set manually do not overwrite)

@@ -4,6 +4,7 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
@@ -21,8 +22,6 @@ import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
-import com.github.onsdigital.zebedee.configuration.Configuration;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -648,7 +647,6 @@ public class DataPublisherTest {
         // we expect the new page to take metadata from the
         assertEquals(newPage.getCdid(), publishThisPage.getCdid());
         assertEquals(newPage.getDescription().getTitle(), publishThisPage.getDescription().getTitle());
-        assertEquals(newPage.getDescription().getSeasonalAdjustment(), publishThisPage.getDescription().getSeasonalAdjustment());
     }
 
     @Test
@@ -698,17 +696,12 @@ public class DataPublisherTest {
         TimeSeries startPage = DataPublisher.startPageForSeriesWithPublishedPath(zebedee, unpublishedTimeSeriesPath, unpublishedTimeSeries);
         TimeSeries publishThisPage = publishedTimeSeries;
         DatasetLandingPage publishThisDataset = publishedLandingPage;
-
-        publishThisPage.getDescription().setSeasonalAdjustment("SA to publish");
-        startPage.getDescription().setSeasonalAdjustment("SA existing");
-
         // When
         // we populate the page
         TimeSeries newPage = dataPublisher.populatePageFromTimeSeries(startPage, publishThisPage, publishThisDataset);
 
         // Then
         // we expect the newPage to have copied limited details from the published page
-        assertEquals(publishThisPage.getDescription().getSeasonalAdjustment(), newPage.getDescription().getSeasonalAdjustment());
         assertEquals(publishThisPage.getCdid(), newPage.getCdid());
     }
 
@@ -721,14 +714,12 @@ public class DataPublisherTest {
         series1.years.add(quickTimeSeriesValue("2000", "1"));
         series1.years.add(quickTimeSeriesValue("2001", "2"));
         series1.years.add(quickTimeSeriesValue("2002", "3"));
-        series1.getDescription().setSeasonalAdjustment("YES");
         series1.getDescription().setTitle("Series1");
 
         series2.years = new TreeSet<>();
         series2.years.add(quickTimeSeriesValue("2000", "1"));
         series2.years.add(quickTimeSeriesValue("2002", "4"));
         series2.years.add(quickTimeSeriesValue("2003", "5"));
-        series2.getDescription().setSeasonalAdjustment("NO");
         series2.getDescription().setTitle("Series2");
 
     }

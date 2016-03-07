@@ -172,7 +172,6 @@ public class DataGenerator {
         List<String> titleRow = newRow("Title");
         List<String> cdidRow = newRow("CDID");
         List<String> nationalStatistic = newRow("National Statistic");
-        List<String> seasonallyAdjusted = newRow("Seasonally Adjusted");
         List<String> preunit = newRow("PreUnit");
         List<String> unit = newRow("Unit");
         List<String> releaseDate = newRow("Release date");
@@ -184,7 +183,6 @@ public class DataGenerator {
             titleRow.add(mapOfData.get("Title").get(cdid));
             cdidRow.add(cdid);
             nationalStatistic.add(mapOfData.get("National Statistic").get(cdid));
-            seasonallyAdjusted.add(mapOfData.get("Seasonally Adjusted").get(cdid));
             preunit.add(mapOfData.get("PreUnit").get(cdid));
             unit.add(mapOfData.get("Unit").get(cdid));
             releaseDate.add(mapOfData.get("Release date").get(cdid));
@@ -195,7 +193,6 @@ public class DataGenerator {
         rows.add(titleRow);
         rows.add(cdidRow);
         rows.add(nationalStatistic);
-        rows.add(seasonallyAdjusted);
         rows.add(preunit);
         rows.add(unit);
         rows.add(releaseDate);

@@ -860,11 +860,11 @@ public class Collection {
     /**
      * Move the given Uri to the given newUri.
      *
-     * @param email   - The email of the user moving the content.
+     * @param session - The session of the user moving the content.
      * @param fromUri - The current URI of the content to be moved.
      * @param toUri   - The URI to move the content to.
      */
-    public boolean moveContent(String email, String fromUri, String toUri) throws IOException {
+    public boolean moveContent(Session session, String fromUri, String toUri) throws IOException, ZebedeeException {
 
         boolean hasMoved = false;
 
@@ -882,9 +882,9 @@ public class Collection {
         }
 
         // Fix up links within the content
-        //if (hasMoved) replaceLinksWithinCollection(email, fromUri, toUri);
+        if (hasMoved) replaceLinksWithinCollection(session, fromUri, toUri);
 
-        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, email));
+        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.email));
 
         return hasMoved;
     }
@@ -901,53 +901,61 @@ public class Collection {
     }
 
     /**
-     * Replace all uri references within a collection
+     * Replace all uri references within a collection.
      *
-     * @param email  user email
-     * @param oldUri the uri we are moving from
-     * @param newUri the uri we are moving to
-     * @throws IOException if we encounter file problems
+     * @param session
+     * @param oldUri
+     * @param newUri
+     * @throws IOException
+     * @throws NotFoundException
+     * @throws BadRequestException
+     * @throws UnauthorizedException
      */
-    private void replaceLinksWithinCollection(String email, String oldUri, String newUri) throws IOException {
+    private void replaceLinksWithinCollection(Session session, String oldUri, String newUri) throws IOException, ZebedeeException {
+
+        CollectionReader collectionReader = new ZebedeeCollectionReader(this.zebedee, this, session);
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(this.zebedee, this, session);
+
         for (String uri : inProgressUris()) {
-            File file = inProgress.toPath(uri).toFile();
-            if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
-                replaceLinksInFile(file, email, oldUri, newUri);
-            }
+            replaceLinksInFile(uri, oldUri, newUri, collectionReader.getInProgress(), collectionWriter.getInProgress());
         }
         for (String uri : completeUris()) {
-            File file = complete.toPath(uri).toFile();
-            if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
-                replaceLinksInFile(file, email, oldUri, newUri);
-            }
+            replaceLinksInFile(uri, oldUri, newUri, collectionReader.getComplete(), collectionWriter.getComplete());
         }
         for (String uri : reviewedUris()) {
-            File file = reviewed.toPath(uri).toFile();
-            if (file.isFile() && file.toString().toLowerCase().endsWith(".json")) {
-                replaceLinksInFile(file, email, oldUri, newUri);
-            }
+            replaceLinksInFile(uri, oldUri, newUri, collectionReader.getReviewed(), collectionWriter.getReviewed());
         }
     }
 
     /**
      * Replace uri references within a file
      *
-     * @param file   a file
-     * @param email  email of the user replacing links
-     * @param oldUri the uri we are moving from
-     * @param newUri the uri we are moving to
+     * @param uri          the uri to update the links in
+     * @param oldUri        the uri we are moving from
+     * @param newUri        the uri we are moving to
+     * @param contentReader
      * @throws IOException if we encounter file problems
+     * @ param contentWriter
      */
-    private void replaceLinksInFile(File file, String email, String oldUri, String newUri) throws IOException {
-        String content;
-        try (Scanner scanner = new Scanner(file)) {
-            content = scanner.useDelimiter("//Z").next();
+    private void replaceLinksInFile(String uri, String oldUri, String newUri, ContentReader contentReader, ContentWriter contentWriter) throws IOException, ZebedeeException {
+        try {
+            if (!uri.toLowerCase().endsWith(".json")) {
+                return;
+            }
+
+            String content;
+            try (Scanner scanner = new Scanner(contentReader.getResource(uri).getData())) {
+                content = scanner.useDelimiter("//Z").next();
+            }
+
+            content = content.replaceAll("\"" + oldUri + "\"", "\"" + newUri + "\"");
+            content = content.replaceAll(oldUri + "/", newUri + "/");
+
+            contentWriter.write(new ByteArrayInputStream(content.getBytes()), uri);
+
+        } catch (NoSuchElementException e) {
+            // do nothing if its not found.
         }
-
-        content = content.replaceAll("\"" + oldUri + "\"", "\"" + newUri + "\"");
-        content = content.replaceAll(oldUri + "/", newUri + "/");
-
-        Files.write(file.toPath(), content.getBytes());
     }
 
     public boolean renameContent(String email, String fromUri, String toUri) throws IOException {

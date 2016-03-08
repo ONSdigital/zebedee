@@ -2,8 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 
@@ -21,7 +20,7 @@ public class ContentMove {
      * does not involve re-uploading the content so is more efficient in terms of network IO
      */
     @POST
-    public boolean MoveContent(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, UnauthorizedException {
+    public boolean MoveContent(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
         Session session = Root.zebedee.sessions.get(request);
         Collection collection = Collections.getCollection(request);

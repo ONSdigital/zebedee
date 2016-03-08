@@ -226,8 +226,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnMoveContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given a null collection
         Collection collection = null;
@@ -243,8 +242,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForBlankUriOnMoveContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given an empty URI.
         Collection collection = new Collection(builder.collections.get(0), zebedee);
@@ -260,8 +258,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForBlankToUriOnMoveContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given an empty to URI.
         Collection collection = new Collection(builder.collections.get(0), zebedee);
@@ -392,8 +389,7 @@ public class CollectionsTest {
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnMoveContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given a null session
         Session session = null;

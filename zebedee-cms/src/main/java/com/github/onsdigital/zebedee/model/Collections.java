@@ -694,7 +694,7 @@ public class Collections {
      * @throws IOException
      * @throws UnauthorizedException
      */
-    public void moveContent(Session session, Collection collection, String uri, String newUri) throws BadRequestException, IOException, UnauthorizedException {
+    public void moveContent(Session session, Collection collection, String uri, String newUri) throws ZebedeeException, IOException {
 
         if (collection == null) {
             throw new BadRequestException("Please specify a collection");
@@ -717,7 +717,7 @@ public class Collections {
             throw new BadRequestException("You cannot move or rename a file that is already published.");
         }
 
-        collection.moveContent(session.email, uri, newUri);
+        collection.moveContent(session, uri, newUri);
         collection.save();
     }
 

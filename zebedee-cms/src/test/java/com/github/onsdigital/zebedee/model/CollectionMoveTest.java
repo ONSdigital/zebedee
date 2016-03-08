@@ -8,12 +8,10 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.article.Ar
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -39,14 +37,15 @@ public class CollectionMoveTest {
     Article martin;
     Article bedford;
     Article bedfordshire;
+    Session session;
 
     @Before
     public void setUp() throws Exception {
         builder = new Builder(this.getClass());
         zebedee = new Zebedee(builder.zebedee);
-        Session session = zebedee.openSession(builder.publisher1Credentials);
+        session = zebedee.openSession(builder.publisher1Credentials);
 
-        collection = Collection.create(new CollectionDescription("Collection"), zebedee, session);
+        collection = new Collection(builder.collections.get(1), zebedee);
         martin = createArticle("/people/martin", "Martin");
         bedford = createArticle("/places/bedford", "Bedford");
         bedfordshire = createArticle("/places/bedfordshire", "Bedfordshire");
@@ -61,8 +60,7 @@ public class CollectionMoveTest {
 
 
     @Test
-    @Ignore
-    public void shouldChangeReferencesInFileOnMoveContent() throws URISyntaxException, IOException, CollectionNotFoundException {
+    public void shouldChangeReferencesInFileOnMoveContent() throws URISyntaxException, IOException, ZebedeeException {
         // Given
         // an item of content that references something
         martin.getRelatedArticles().add(new Link(bedford.getUri()));
@@ -70,7 +68,7 @@ public class CollectionMoveTest {
 
         // When
         // we run the move
-        collection.moveContent(builder.publisher1.email, "/places/bedford", "/places/london");
+        collection.moveContent(session, "/places/bedford", "/places/london");
 
         // Then
         // the link should be updated;
@@ -80,7 +78,7 @@ public class CollectionMoveTest {
     }
 
     @Test
-    public void shouldNotChangeExtendedReferencesInFileOnMoveContent() throws URISyntaxException, IOException, CollectionNotFoundException {
+    public void shouldNotChangeExtendedReferencesInFileOnMoveContent() throws URISyntaxException, IOException, ZebedeeException {
         // Given
         // an item of content that references something
         martin.getRelatedArticles().add(new Link(new URI("/places/bedfordshire")));
@@ -88,7 +86,7 @@ public class CollectionMoveTest {
 
         // When
         // we run the move
-        collection.moveContent(builder.publisher1.email, "/places/bedford", "/places/london");
+        collection.moveContent(session, "/places/bedford", "/places/london");
 
         // Then
         // the link should not be updated;
@@ -98,8 +96,7 @@ public class CollectionMoveTest {
     }
 
     @Test
-    @Ignore
-    public void shouldChangeSubReferencesInFileOnMoveContent() throws URISyntaxException, IOException, CollectionNotFoundException {
+    public void shouldChangeSubReferencesInFileOnMoveContent() throws URISyntaxException, IOException, ZebedeeException {
         // Given
         // an item of content that references a sub page
         martin.getRelatedArticles().add(new Link(new URI("/places/bedford/central")));
@@ -107,7 +104,7 @@ public class CollectionMoveTest {
 
         // When
         // we run the move on the upper
-        collection.moveContent(builder.publisher1.email, "/places/bedford", "/places/london");
+        collection.moveContent(session, "/places/bedford", "/places/london");
 
         // Then
         // the link should be updated on the lower level

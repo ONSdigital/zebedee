@@ -1237,7 +1237,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void moveContentShouldRenameInprogressFile() throws IOException {
+    public void moveContentShouldRenameInprogressFile() throws IOException, ZebedeeException {
 
         // Given the content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
@@ -1245,7 +1245,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When we move content
-        boolean edited = collection.moveContent(publisher1Email, uri, toUri);
+        boolean edited = collection.moveContent(publisherSession, uri, toUri);
 
         // Then the file should exist only in the new location.
         assertTrue(edited);
@@ -1258,7 +1258,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void moveContentShouldRenameCompletedFiles() throws IOException {
+    public void moveContentShouldRenameCompletedFiles() throws IOException, ZebedeeException {
 
         // Given the content already exists:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
@@ -1266,7 +1266,7 @@ public class CollectionTest {
         builder.createCompleteFile(uri);
 
         // When we move content
-        boolean edited = collection.moveContent(publisher1Email, uri, toUri);
+        boolean edited = collection.moveContent(publisherSession, uri, toUri);
 
         // Then the file should exist only in the new location.
         assertTrue(edited);
@@ -1279,7 +1279,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void moveContentShouldOverwriteExistingFiles() throws IOException {
+    public void moveContentShouldOverwriteExistingFiles() throws IOException, ZebedeeException {
 
         // Given some existing content in progress.
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
@@ -1288,7 +1288,7 @@ public class CollectionTest {
         builder.createInProgressFile(toUri);
 
         // When we move content to a URI where some content already exists.
-        boolean edited = collection.moveContent(publisher1Email, uri, toUri);
+        boolean edited = collection.moveContent(publisherSession, uri, toUri);
 
         // Then the existing content should be overwritten.
         assertTrue(edited);

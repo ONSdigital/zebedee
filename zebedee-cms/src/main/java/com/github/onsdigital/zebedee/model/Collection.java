@@ -882,7 +882,7 @@ public class Collection {
         }
 
         // Fix up links within the content
-        if (hasMoved) replaceLinksWithinCollection(email, fromUri, toUri);
+        //if (hasMoved) replaceLinksWithinCollection(email, fromUri, toUri);
 
         if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, email));
 

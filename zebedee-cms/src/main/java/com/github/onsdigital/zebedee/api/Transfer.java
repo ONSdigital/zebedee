@@ -74,8 +74,11 @@ public class Transfer {
 
         PathUtils.moveFilesInDirectory(sourcePath, destinationPath);
 
-        Audit.log(request, "Collection %s transferred to %s by %s", params.uri, params.destination, session.email);
-
+        Audit.Event.COLLECTION_TRANSFERRED.parameters()
+                .host(request)
+                .fromTo(params.uri, params.destination)
+                .user(session.email)
+                .log();
         return true;
     }
 

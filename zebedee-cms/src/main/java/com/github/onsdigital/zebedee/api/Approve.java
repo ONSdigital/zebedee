@@ -38,8 +38,13 @@ public class Approve {
         Session session = Root.zebedee.sessions.get(request);
 
         boolean result = Root.zebedee.collections.approve(collection, session);
-        if(result) {
-            Audit.log(request, "Collection %s approved by %s", collection.path, session.email);
+        if (result) {
+            Audit.Event.COLLECTION_APPROVED
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .actionedBy(session.email)
+                    .log();
         }
 
         return result;

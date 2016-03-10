@@ -43,6 +43,10 @@ public class CsdbNotify {
                 Root.zebedee.collections,
                 Root.zebedee.keyringCache.schedulerCache);
 
-        Audit.log(request, "CSDB file notification received for %s", csdbId);
+        Audit.Event.CSDB_NEW_FILE_NOTIFICATION
+                .parameters()
+                .host(request)
+                .fileName(csdbId)
+                .log();
     }
 }

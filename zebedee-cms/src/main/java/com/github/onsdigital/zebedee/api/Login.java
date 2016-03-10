@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
@@ -15,6 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.audit.Audit.Event.LOGIN_AUTHENTICATION_FAILURE;
+import static com.github.onsdigital.zebedee.audit.Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED;
+import static com.github.onsdigital.zebedee.audit.Audit.Event.LOGIN_SUCCESS;
+
 /**
  * API for processing login requests.
  */
@@ -23,12 +26,13 @@ public class Login {
 
     /**
      * Authenticates with Zebedee.
-     * @param request This should contain a {@link Credentials} Json object.
-     * @param response <ul>
-     *                      <li>If authentication succeeds: a new or existing session ID.</li>
-     *                      <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
-     *                      <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
-     *                      </ul>
+     *
+     * @param request     This should contain a {@link Credentials} Json object.
+     * @param response    <ul>
+     *                    <li>If authentication succeeds: a new or existing session ID.</li>
+     *                    <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
+     *                    <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
+     *                    </ul>
      * @param credentials The user email and password.
      * @return A session ID to be passed in the {@value com.github.onsdigital.zebedee.model.Sessions#TOKEN_HEADER} header.
      * @throws IOException
@@ -42,11 +46,14 @@ public class Login {
         }
 
         User user = Root.zebedee.users.get(credentials.email);
-        boolean result =  user.authenticate(credentials.password);
+        boolean result = user.authenticate(credentials.password);
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            Audit.log(request, "User login failed for %s", credentials.email);
+            //Audit.LOGIN_AUTHENTICATION_FAILURE.log(request, credentials.email);
+            LOGIN_AUTHENTICATION_FAILURE.parameters().host(request).user(credentials.email).log();
+
+
             return "Authentication failed.";
         }
 
@@ -56,15 +63,16 @@ public class Login {
         com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
 
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
-            
+
             // Let Florence know that this user needs to change their password.
             // This isn't what 417 is intended for, but a 4xx variation on 401 seems sensible.
             // I guess we could use 418 just for fun and to avoid confusion.
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
-            Audit.log(request, "User login for %s, password change required", credentials.email);
+
+            LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.email).log();
             return "Password change required";
         } else {
-            Audit.log(request, "User login for %s", credentials.email);
+            LOGIN_SUCCESS.parameters().host(request).user(credentials.email).log();
             response.setStatus(HttpStatus.OK_200);
         }
 

@@ -26,6 +26,7 @@ import java.nio.file.Path;
 
 @Api
 public class Table {
+
     @POST
     public void createTable(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ParserConfigurationException, TransformerException, ZebedeeException {
@@ -67,6 +68,11 @@ public class Table {
         org.apache.commons.io.IOUtils.copy(new StringReader(output),
                 response.getOutputStream());
 
-        Audit.log(request, "Collection %s table %s created by %s", collection.path, uri, session.email);
+        Audit.Event.COLLECTION_TABLE_CREATED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .user(session.email)
+                .log();
     }
 }

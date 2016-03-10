@@ -12,8 +12,8 @@ import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 public class Init implements Startup {
     @Override
     public void init() {
-        Audit.log(null, "Zebedee started");
         Root.init();
         ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
+        Audit.Event.ZEBEDEE_STARTUP.logWithoutParameters();
     }
 }

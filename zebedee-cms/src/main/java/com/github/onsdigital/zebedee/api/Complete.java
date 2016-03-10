@@ -40,7 +40,12 @@ public class Complete {
 
         Root.zebedee.collections.complete(collection, uri, session);
 
-        Audit.log(request, "Collection %s reviewed by %s", collection.path, session.email);
+        Audit.Event.COLLECTION_MOVED_TO_REVIEWED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .user(session.email)
+                .log();
 
         return new ResultMessage("URI reviewed.");
     }

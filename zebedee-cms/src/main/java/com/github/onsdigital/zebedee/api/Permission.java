@@ -46,19 +46,35 @@ public class Permission {
             Root.zebedee.permissions.addAdministrator(permissionDefinition.email, session);
             // Admins must be publishers so update the permissions accordingly
             permissionDefinition.editor = true;
-            Audit.log(request, "Administrator permission added for %s by %s", permissionDefinition.email, session.email);
+            Audit.Event.ADMIN_PERMISSION_ADDED
+                    .parameters()
+                    .host(request)
+                    .actionedByEffecting(session.email, permissionDefinition.email)
+                    .log();
         } else if (BooleanUtils.isFalse(permissionDefinition.admin)) {
             Root.zebedee.permissions.removeAdministrator(permissionDefinition.email, session);
-            Audit.log(request, "Administrator permission removed from %s by %s", permissionDefinition.email, session.email);
+            Audit.Event.ADMIN_PERMISSION_REMOVED
+                    .parameters()
+                    .host(request)
+                    .actionedByEffecting(session.email, permissionDefinition.email)
+                    .log();
         }
 
         // Digital publishing
         if (BooleanUtils.isTrue(permissionDefinition.editor)) {
             Root.zebedee.permissions.addEditor(permissionDefinition.email, session);
-            Audit.log(request, "Publisher permission added for %s by %s", permissionDefinition.email, session.email);
+            Audit.Event.PUBLISHER_PERMISSION_ADDED
+                    .parameters()
+                    .host(request)
+                    .actionedByEffecting(session.email, permissionDefinition.email)
+                    .log();
         } else if (BooleanUtils.isFalse(permissionDefinition.editor)) {
             Root.zebedee.permissions.removeEditor(permissionDefinition.email, session);
-            Audit.log(request, "Publisher permission removed from %s by %s", permissionDefinition.email, session.email);
+            Audit.Event.PUBLISHER_PERMISSION_REMOVED
+                    .parameters()
+                    .host(request)
+                    .actionedByEffecting(session.email, permissionDefinition.email)
+                    .log();
         }
 
         return "Permissions updated for " + permissionDefinition.email;

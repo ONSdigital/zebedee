@@ -33,9 +33,13 @@ public class ContentRename {
         String toUri = request.getParameter("toUri");
 
         Root.zebedee.collections.renameContent(session, collection, uri, toUri);
-
-        Audit.log(request, "Collection %s content %s renamed to %s by %s", collection.path, uri, toUri, session.email);
-
+        Audit.Event.CONTENT_RENAMED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .fromTo(uri, toUri)
+                .actionedBy(session.email)
+                .log();
         return true;
     }
 }

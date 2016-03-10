@@ -25,9 +25,9 @@ import java.util.Set;
 
 /**
  * Created by thomasridd on 28/04/15.
- *
+ * <p>
  * Endpoint that handles team membership
- *
+ * <p>
  * <p>Calls are made to one of
  * <ul><li>{@code /teams}</li>
  * <li>{@code /teams/[teamname]}</li>
@@ -58,9 +58,9 @@ public class Teams {
      * @param response
      * @return
      * @throws IOException
-     * @throws ConflictException        {@value org.eclipse.jetty.http.HttpStatus#CONFLICT_409} if team already exists
-     * @throws UnauthorizedException    {@value org.eclipse.jetty.http.HttpStatus#UNAUTHORIZED_401} if user does not have permission
-     * @throws NotFoundException        {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if team can not be found/created
+     * @throws ConflictException     {@value org.eclipse.jetty.http.HttpStatus#CONFLICT_409} if team already exists
+     * @throws UnauthorizedException {@value org.eclipse.jetty.http.HttpStatus#UNAUTHORIZED_401} if user does not have permission
+     * @throws NotFoundException     {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if team can not be found/created
      */
     @POST
     public boolean post(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException, BadRequestException {
@@ -80,8 +80,12 @@ public class Teams {
 
         Root.zebedee.teams.createTeam(teamName, session);
 
-        Audit.log(request, "Team %s created by %s", teamName, session.email);
-
+        Audit.Event.TEAM_CREATED
+                .parameters()
+                .host(request)
+                .team(teamName)
+                .actionedBy(session.email)
+                .log();
         return true;
     }
 
@@ -97,8 +101,13 @@ public class Teams {
         Root.zebedee.teams.addTeamMember(email, team, session);
         evaluateCollectionKeys(zebedee, session, team, email);
 
-        Audit.log(request, "Team %s member %s added by %s", teamName, email, session.email);
-
+        Audit.Event.TEAM_MEMBER_ADDED
+                .parameters()
+                .host(request)
+                .team(teamName)
+                .teamMember(email)
+                .actionedBy(session.email)
+                .log();
         return true;
     }
 
@@ -110,9 +119,9 @@ public class Teams {
      * @param response
      * @return
      * @throws IOException
-     * @throws UnauthorizedException    {@value org.eclipse.jetty.http.HttpStatus#UNAUTHORIZED_401} if user doesn't have delete permissions
-     * @throws NotFoundException        {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if the team doesn't exist / user doesn't exist/ user isn't in this team
-     * @throws BadRequestException      {@value org.eclipse.jetty.http.HttpStatus#CONFLICT_409} if the team cannot be deleted for some other reason
+     * @throws UnauthorizedException {@value org.eclipse.jetty.http.HttpStatus#UNAUTHORIZED_401} if user doesn't have delete permissions
+     * @throws NotFoundException     {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if the team doesn't exist / user doesn't exist/ user isn't in this team
+     * @throws BadRequestException   {@value org.eclipse.jetty.http.HttpStatus#CONFLICT_409} if the team cannot be deleted for some other reason
      */
     @DELETE
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
@@ -136,8 +145,12 @@ public class Teams {
 
         evaluateCollectionKeys(zebedee, session, team, team.members.toArray(new String[team.members.size()]));
 
-        Audit.log(request, "Team %s deleted by %s", teamName, session.email);
-
+        Audit.Event.TEAM_DELETED
+                .parameters()
+                .host(request)
+                .team(teamName)
+                .actionedBy(session.email)
+                .log();
         return true;
     }
 
@@ -153,13 +166,19 @@ public class Teams {
         zebedee.teams.removeTeamMember(email, team, session);
         evaluateCollectionKeys(zebedee, session, team, email);
 
-        Audit.log(request, "Team %s member %s removed by %s", teamName, email, session.email);
-
+        Audit.Event.TEAM_MEMBER_REMOVED
+                .parameters()
+                .host(request)
+                .team(teamName)
+                .teamMember(email)
+                .actionedBy(session.email)
+                .log();
         return true;
     }
 
     /**
      * For a given list of user emails, evaluate if they should have keys added or removed.
+     *
      * @param zebedee
      * @param session
      * @param team
@@ -187,12 +206,12 @@ public class Teams {
      * @param response
      * @return {@link Teams} or {@link List<Team>} object
      * @throws IOException
-     * @throws NotFoundException        {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if the team doesn't exist
+     * @throws NotFoundException {@value org.eclipse.jetty.http.HttpStatus#NOT_FOUND_404} if the team doesn't exist
      */
     @GET
     public Object get(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException {
         Object result = null;
-        if(getTeamName(request) != null) {
+        if (getTeamName(request) != null) {
             result = Root.zebedee.teams.findTeam(getTeamName(request));
         } else {
             result = new TeamList(Root.zebedee.teams.listTeams());

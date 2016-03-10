@@ -31,8 +31,13 @@ public class ContentMove {
 
         Root.zebedee.collections.moveContent(session, collection, uri, toUri);
 
-        Audit.log(request, "Collection %s content %s moved to %s by %s", collection.path, uri, toUri, session.email);
-
+        Audit.Event.CONTENT_MOVED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .fromTo(uri, toUri)
+                .actionedBy(session.email)
+                .log();
         return true;
     }
 }

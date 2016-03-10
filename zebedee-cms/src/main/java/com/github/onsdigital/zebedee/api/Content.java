@@ -2,7 +2,11 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -76,10 +80,20 @@ public class Content {
 
         if (overwriteExisting) {
             Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
-            Audit.log(request, "Collection %s content %s overwritten by %s", collection.path, uri, session.email);
+            Audit.Event.CONTENT_OVERWRITTEN
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .content(uri)
+                    .user(session.email).log();
         } else {
             Root.zebedee.collections.createContent(collection, uri, session, request, requestBody);
-            Audit.log(request, "Collection %s content %s created by %s", collection.path, uri, session.email);
+            Audit.Event.CONTENT_SAVED
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .content(uri)
+                    .user(session.email).log();
         }
 
         return true;
@@ -107,7 +121,12 @@ public class Content {
 
         boolean result = Root.zebedee.collections.deleteContent(collection, uri, session);
         if(result) {
-            Audit.log(request, "Collection %s content %s deleted by %s", collection.path, uri, session.email);
+            Audit.Event.CONTENT_DELETED
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .content(uri)
+                    .user(session.email).log();
         }
 
         return result;

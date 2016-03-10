@@ -53,7 +53,12 @@ public class Publish {
 
 		boolean result = Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer, doSkipVerification);
 		if (result) {
-			Audit.log(request, "Collection %s published by %s", collection.path, session.email);
+			Audit.Event.COLLECTION_PUBLISHED
+					.parameters()
+					.host(request)
+					.collection(collection)
+					.actionedBy(session.email)
+					.log();
 		}
 
 		return result;

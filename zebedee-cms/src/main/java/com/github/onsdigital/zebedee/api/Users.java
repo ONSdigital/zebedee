@@ -81,8 +81,11 @@ public class Users {
         Session session = Root.zebedee.sessions.get(request);
         User created = Root.zebedee.users.create(session, user);
 
-        Audit.log(request, "User %s created by %s", user.email, session.email);
-
+        Audit.Event.USER_CREATED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.email, user.email)
+                .log();
         return sanitise(created);
     }
 
@@ -103,8 +106,11 @@ public class Users {
 
         User updated = Root.zebedee.users.update(session, user);
 
-        Audit.log(request, "User %s updated by %s", user.email, session.email);
-
+        Audit.Event.USER_UPDATED
+                .parameters()
+                .host(request)
+                .actionedByEffecting(session.email, user.email)
+                .log();
         return sanitise(updated);
     }
 
@@ -124,7 +130,11 @@ public class Users {
         User user = Root.zebedee.users.get(email);
         boolean result = Root.zebedee.users.delete(session, user);
         if(result) {
-            Audit.log(request, "User %s deleted by %s", user.email, session.email);
+            Audit.Event.USER_DELETED
+                    .parameters()
+                    .host(request)
+                    .actionedByEffecting(session.email, user.email)
+                    .log();
         }
 
         return result;

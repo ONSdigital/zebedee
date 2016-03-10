@@ -46,8 +46,13 @@ public class Version {
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
         ContentItemVersion version = collection.version(session.email, uri, collectionWriter);
 
-        Audit.log(request, "Collection %s version %s created by %s", collection.path, version.getIdentifier(), session.email);
-
+        Audit.Event.COLLECTION_VERSION_CREATED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .version(version.getIdentifier())
+                .user(session.email)
+                .log();
         return version.getUri();
     }
 
@@ -74,8 +79,13 @@ public class Version {
 
         collection.deleteVersion(uri);
 
-        Audit.log(request, "Collection %s version %s deleted by %s", collection.path, uri, session.email);
-
+        Audit.Event.COLLECTION_VERSION_DELETED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .version(uri)
+                .user(session.email)
+                .log();
         return true;
     }
 }

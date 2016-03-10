@@ -2,7 +2,11 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -66,7 +70,7 @@ public class Collection {
 
     /**
      * Creates or updates collection details the endpoint /Collection/
-     * <p/>
+     * <p>
      * Checks if a collection exists using {@link CollectionDescription#name}
      *
      * @param request               This should contain a X-Florence-Token header for the current session
@@ -112,7 +116,12 @@ public class Collection {
             Root.schedulePublish(collection);
         }
 
-        Audit.log(request, "Collection %s created by %s", collection.path, session.email);
+        Audit.Event.COLLECTION_CREATED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .actionedBy(session.email)
+                .log();
 
         return collection.description;
     }
@@ -137,7 +146,12 @@ public class Collection {
                 Root.getScheduler(),
                 session);
 
-        Audit.log(request, "Collection %s updated by %s",collection.path, session.email);
+        Audit.Event.COLLECTION_UPDATED
+                .parameters()
+                .host(request)
+                .fromTo(collection.path.toString(), updatedCollection.path.toString())
+                .actionedBy(session.email)
+                .log();
 
         return updatedCollection.description;
     }
@@ -165,7 +179,12 @@ public class Collection {
 
         Root.cancelPublish(collection);
 
-        Audit.log(request, "Collection %s deleted by %s", collection.path, session.email);
+        Audit.Event.COLLECTION_DELETED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .actionedBy(session.email)
+                .log();
 
         return true;
     }

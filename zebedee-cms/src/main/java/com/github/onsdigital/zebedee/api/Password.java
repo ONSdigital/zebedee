@@ -53,10 +53,18 @@ public class Password {
 
         // Attempt to change or reset the password:
         if (Root.zebedee.users.setPassword(session, credentials)) {
-            Audit.log(request, "Password changed for %s", session.email);
+            Audit.Event.PASSWORD_CHANGED_SUCCESS
+                    .parameters()
+                    .host(request)
+                    .user(session.email)
+                    .log();
             return "Password updated for " + credentials.email;
         } else {
-            Audit.log(request, "Password change attempt failed for %s", credentials.email);
+            Audit.Event.PASSWORD_CHANGED_FAILURE
+                    .parameters()
+                    .host(request)
+                    .user(session.email)
+                    .log();
             return "Password not updated for " + credentials.email + " (there may be an issue with the user's keyring password).";
         }
     }

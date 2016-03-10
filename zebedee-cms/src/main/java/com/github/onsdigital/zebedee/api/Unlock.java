@@ -33,7 +33,12 @@ public class Unlock {
         Session session = Root.zebedee.sessions.get(request);
         boolean result = Root.zebedee.collections.unlock(collection, session);
         if (result) {
-            Audit.log(request, "Collection %s unlocked by %s", collection.path, session.email);
+            Audit.Event.COLLECTION_UNLOCKED
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .actionedBy(session.email)
+                    .log();
         }
 
         return result;

@@ -65,6 +65,7 @@ public class Collection {
         result.type = collection.description.type;
         result.teams = collection.description.teams;
         result.isEncrypted = collection.description.isEncrypted;
+        result.releaseUri = collection.description.releaseUri;
         return result;
     }
 

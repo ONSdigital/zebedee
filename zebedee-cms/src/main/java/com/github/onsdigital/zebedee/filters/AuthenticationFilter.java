@@ -25,6 +25,7 @@ public class AuthenticationFilter implements Filter {
 			.add(CsdbKey.class)
 			.add(CsdbNotify.class)
 			.add(ReIndex.class)
+			.add(Ping.class)
 			.build();
 
 	/**

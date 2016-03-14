@@ -64,7 +64,7 @@ public class Ping {
 
             if (pingRequest.lastPingTime != null && pingRequest.lastPingTime > 0) {
 
-                InfluxDB influxDB = InfluxDBFactory.connect("http://influxdb", "root", "root");
+                InfluxDB influxDB = InfluxDBFactory.connect("http://influxdb:8086", "root", "root");
                 String dbName = "ping";
                 influxDB.createDatabase(dbName);
 

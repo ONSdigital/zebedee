@@ -58,6 +58,11 @@ public class Ping {
      */
     @POST
     public boolean ping(HttpServletRequest request, HttpServletResponse response, PingRequest pingRequest) throws IOException {
+        //sendDataToInflux(pingRequest);
+        return true;
+    }
+
+    public void sendDataToInflux(PingRequest pingRequest) {
         pool.submit(() -> {
 
             System.out.println("lastPingTime = " + pingRequest.lastPingTime);
@@ -83,7 +88,5 @@ public class Ping {
                 influxDB.write(batchPoints);
             }
         });
-
-        return true;
     }
 }

@@ -12,8 +12,8 @@ import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.FakeCollectionReader;
 import com.github.onsdigital.zebedee.model.FakeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
-import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

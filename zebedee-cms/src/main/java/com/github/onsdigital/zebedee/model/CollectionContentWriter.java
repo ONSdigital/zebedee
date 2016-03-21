@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
+import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.io.FileUtils;
 
 import javax.crypto.SecretKey;
@@ -35,6 +37,10 @@ public class CollectionContentWriter extends ContentWriter {
         if (collection.description.isEncrypted) {
             return EncryptionUtils.encryptionOutputStream(path, key);
         } else {
+            String logMessage = String.format("Writing unencrypted content in collection %s for URI %s", collection.description.name, uri);
+            SlackNotification.send(logMessage);
+            Log.print(logMessage);
+
             return FileUtils.openOutputStream(path.toFile());
         }
     }

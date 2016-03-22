@@ -144,7 +144,7 @@ public class Content {
      * {@link Content}. The {@link Path} is generated whether or not a file
      * actually exists, so this method is suitable for use when creating new
      * content.
-     * <p/>
+     * <p>
      * toPath does not redirect uri's
      *
      * @param uri The URI of the item.
@@ -229,6 +229,11 @@ public class Content {
         try {
             if (detail.children.size() > 1) {
                 java.util.Collections.sort(detail.children, (o1, o2) -> {
+
+                    if ((o1.description == null || o1.description.title == null) && (o2.description == null || o2.description.title == null)) {
+                        return 0; // if both are null
+                    }
+
                     if (o1.description == null || o1.description.title == null) {
                         return 1;//nulls last
                     }
@@ -319,6 +324,7 @@ public class Content {
      * Note: this method was made specifically for time series as when it finds
      * a time series folder it does not recurse into it. This saves on unnecessary crawling
      * of the filesystem when we know there will be no time series folders nested under an existing one.
+     *
      * @return
      * @throws IOException
      */

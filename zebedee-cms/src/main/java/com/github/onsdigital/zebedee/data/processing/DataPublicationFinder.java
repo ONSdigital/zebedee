@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class DataPublicationFinder {
 
                 // Find all timeseries_datasets
                 Page page = reviewedContentReader.getContent(pageUri);
-                if (page.getType() == PageType.timeseries_dataset) {
+                if (page != null && page.getType() == PageType.timeseries_dataset) {
                     DataPublication newPublication = new DataPublication(publishedContentReader, reviewedContentReader, pageUri);
                     results.add(newPublication);
                 }

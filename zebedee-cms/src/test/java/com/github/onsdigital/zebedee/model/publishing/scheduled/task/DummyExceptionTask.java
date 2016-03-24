@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.publishing.scheduled;
+package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 /**
  * Runnable that throws an exception to test error handling.

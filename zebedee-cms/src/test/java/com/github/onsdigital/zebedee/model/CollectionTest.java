@@ -12,7 +12,7 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -155,8 +155,7 @@ public class CollectionTest {
         CollectionDescription updatedDescription = new CollectionDescription(newName);
         updatedDescription.type = CollectionType.scheduled;
         updatedDescription.publishDate = new DateTime(collectionDescription.publishDate).plusHours(1).toDate();
-        Collection.update(collection, updatedDescription, zebedee, new CollectionScheduler(), publisherSession);
-
+        Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
         Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
@@ -192,7 +191,7 @@ public class CollectionTest {
         collectionDescription.type = CollectionType.scheduled;
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
-        CollectionScheduler scheduler = new CollectionScheduler();
+        DummyScheduler scheduler = new DummyScheduler();
         scheduler.schedulePublish(collection, zebedee);
 
         // When the collection is updated with a new release time
@@ -214,7 +213,7 @@ public class CollectionTest {
         Collection collection = null;
 
         // When we call the static update method
-        Collection.update(collection, new CollectionDescription("name"), zebedee, new CollectionScheduler(), publisherSession);
+        Collection.update(collection, new CollectionDescription("name"), zebedee, new DummyScheduler(), publisherSession);
 
         // Then the expected exception is thrown.
     }

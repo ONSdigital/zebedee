@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
+import com.github.onsdigital.zebedee.model.publishing.scheduled.task.DummyExceptionTask;
+import com.github.onsdigital.zebedee.model.publishing.scheduled.task.DummyTask;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;

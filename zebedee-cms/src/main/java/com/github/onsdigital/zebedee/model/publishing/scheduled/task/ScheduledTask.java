@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.RunnableSchedule
 
 import java.util.Date;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Abstract class representing a task that runs at a scheduled time.
@@ -43,9 +44,21 @@ public abstract class ScheduledTask implements Runnable {
 
     /**
      * Returns true if the task has been run / completed.
+     *
      * @return
      */
     public boolean isComplete() {
         return future != null && future.isDone();
+    }
+
+    /**
+     * Get the delay between now and the time the task is scheduled to run.
+     * The delay is provided in the format specified by the time unit parameter.
+     *
+     * @param timeUnit
+     * @return
+     */
+    public long getDelay(TimeUnit timeUnit) {
+        return future.getDelay(timeUnit);
     }
 }

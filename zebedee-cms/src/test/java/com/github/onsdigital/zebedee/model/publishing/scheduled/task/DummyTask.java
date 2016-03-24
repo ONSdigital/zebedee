@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.publishing.scheduled;
+package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.util.Log;
@@ -8,8 +8,8 @@ import com.github.onsdigital.zebedee.util.Log;
  */
 public class DummyTask implements Runnable {
 
-    final String id = Random.id();
-    boolean hasRun = false;
+    public final String id = Random.id();
+    public boolean hasRun = false;
 
     public DummyTask() {
         Log.print("Created dummy task with ID %s", id);

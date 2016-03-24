@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -25,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
@@ -86,7 +88,7 @@ public class CsdbImporter {
             } else {
                 Log.print("No collection found for CSDB file with ID %s", csdbIdentifier);
             }
-        } catch (ZebedeeException | IOException e) {
+        } catch (ZebedeeException | IOException | URISyntaxException e) {
             Log.print(e);
         }
     }
@@ -99,16 +101,22 @@ public class CsdbImporter {
      * @throws IOException
      * @throws ZebedeeException
      */
-    public static void preProcessCollection(Collection collection) throws IOException, ZebedeeException {
+    public static void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
+        List<String> uriList = generateTimeseries(collection);
+        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
+    }
+
+    private static List<String> generateTimeseries(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
         SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
         ContentReader publishedReader = new ContentReader(Root.zebedee.published.path);
         DataIndex dataIndex = Root.zebedee.dataIndex;
 
-        List<String> uriList = Collections.preprocessTimeseries(collection, collectionReader, collectionWriter, publishedReader, dataIndex);
-
-        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
+        return new DataPublisher().preprocessCollection(
+                publishedReader,
+                collectionReader.getReviewed(),
+                collectionWriter.getReviewed(), collection, true, dataIndex);
     }
 
     /**

@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.data.DataPublisherReloaded;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.*;
@@ -11,6 +10,8 @@ import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
+import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
@@ -31,13 +32,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
@@ -86,19 +85,6 @@ public class Collections {
         } catch (StringIndexOutOfBoundsException e) {
             return id;
         }
-    }
-
-    public static List<String> preprocessTimeseries(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex) throws IOException, ZebedeeException {
-        List<String> uriList;// Do any processing of data files
-        try {
-            uriList = new DataPublisherReloaded().preprocessCollection(
-                    publishedReader,
-                    collectionReader.getReviewed(),
-                    collectionWriter.getReviewed(), collection, true, dataIndex);
-        } catch (URISyntaxException e) {
-            throw new BadRequestException("Brian could not process this collection");
-        }
-        return uriList;
     }
 
     /**
@@ -227,28 +213,13 @@ public class Collections {
         CollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
-        // if the collection is release related - get the release page and add links to other pages in release
-        if (collection.isRelease()) {
-            Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
-            try {
-                collection.populateRelease(collectionReader, collectionWriter);
-            } catch (ZebedeeException e) {
-                Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
-            }
-        }
-
-        List<String> uriList;
         ContentReader publishedReader = new ContentReader(zebedee.published.path);
         DataIndex dataIndex = zebedee.dataIndex;
-        uriList = preprocessTimeseries(collection, collectionReader, collectionWriter, publishedReader, dataIndex);
 
-        // Go ahead
-        collection.description.approvedStatus = true;
-        collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
+        ApprovalQueue.add(
+                new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex));
 
-        boolean result = collection.save();
-        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
-        return result;
+        return true;
     }
 
     /**

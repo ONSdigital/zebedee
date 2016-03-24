@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.net.URI;
 import java.util.ArrayList;
 
 public class ReleasePopulator {
+
+
 
     /**
      * Add the pages of a collection to a release.
@@ -98,5 +101,16 @@ public class ReleasePopulator {
         Link link = new Link(URI.create(contentDetail.uri));
         link.setTitle(contentDetail.description.title);
         return link;
+    }
+
+    public static void populateQuietly(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws IOException {
+        if (collection.isRelease()) {
+            Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
+            try {
+                collection.populateRelease(collectionReader, collectionWriter);
+            } catch (ZebedeeException e) {
+                Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
+            }
+        }
     }
 }

@@ -18,8 +18,9 @@ public class DummyScheduler extends Scheduler {
 
     @Override
     protected void schedule(Collection collection, Zebedee zebedee) {
-        scheduledCollections.put(collection, new DummyScheduledTask());
-
+        DummyScheduledTask dummyScheduledTask = new DummyScheduledTask();
+        dummyScheduledTask.schedule(collection.description.publishDate);
+        scheduledCollections.put(collection, dummyScheduledTask);
     }
 
     @Override

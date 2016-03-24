@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.DataPublisherReloaded;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
@@ -86,39 +85,6 @@ public class Collections {
         } catch (StringIndexOutOfBoundsException e) {
             return id;
         }
-    }
-
-    /**
-     * Run the preprocess process using either datapublisher or datapublisher reloaded
-     *
-     * Has a lot of arguments because the alternative processes have different signatures
-     *
-     * @param collection
-     * @param collectionReader to read all collection content (beta datapublisher)
-     * @param collectionWriter to write to collection content (beta datapublisher)
-     * @param publishedReader to read published content (reloaded datapublisher)
-     * @return
-     * @throws IOException
-     * @throws ZebedeeException
-     * @throws URISyntaxException
-     */
-    public static List<String> preprocessTimeseries(
-            Zebedee zebedee,
-            Collection collection,
-            CollectionReader collectionReader,
-            CollectionWriter collectionWriter,
-            ContentReader publishedReader
-    ) throws IOException, ZebedeeException, URISyntaxException {
-        List<String> uriList;
-
-        // Use environment variable to determine whether to use the BetaPublisher
-        String useBetaPublisher = System.getenv("use_beta_publisher");
-        if (useBetaPublisher != null && useBetaPublisher.equalsIgnoreCase("true")) {
-            uriList = new DataPublisher().preprocessCollection(collectionReader, collectionWriter, zebedee, collection);
-        } else {
-            uriList = new DataPublisherReloaded().preprocessCollection(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), collection, true, zebedee.dataIndex);
-        }
-        return uriList;
     }
 
     /**
@@ -258,12 +224,14 @@ public class Collections {
         }
 
         List<String> uriList;
-
         // Do any processing of data files
         try {
             ContentReader publishedReader = new ContentReader(zebedee.published.path);
-            uriList = preprocessTimeseries(zebedee, collection, collectionReader, collectionWriter, publishedReader);
-
+            uriList = new DataPublisherReloaded().preprocessCollection(
+                    publishedReader,
+                    collectionReader.getReviewed(),
+                    collectionWriter.getReviewed(),
+                    collection, true, zebedee.dataIndex);
         } catch (URISyntaxException e) {
             throw new BadRequestException("Brian could not process this collection");
         }

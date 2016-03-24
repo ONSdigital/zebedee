@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.DataPublisherReloaded;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
+import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
@@ -85,6 +86,19 @@ public class Collections {
         } catch (StringIndexOutOfBoundsException e) {
             return id;
         }
+    }
+
+    public static List<String> preprocessTimeseries(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter, ContentReader publishedReader, DataIndex dataIndex) throws IOException, ZebedeeException {
+        List<String> uriList;// Do any processing of data files
+        try {
+            uriList = new DataPublisherReloaded().preprocessCollection(
+                    publishedReader,
+                    collectionReader.getReviewed(),
+                    collectionWriter.getReviewed(), collection, true, dataIndex);
+        } catch (URISyntaxException e) {
+            throw new BadRequestException("Brian could not process this collection");
+        }
+        return uriList;
     }
 
     /**
@@ -224,17 +238,9 @@ public class Collections {
         }
 
         List<String> uriList;
-        // Do any processing of data files
-        try {
-            ContentReader publishedReader = new ContentReader(zebedee.published.path);
-            uriList = new DataPublisherReloaded().preprocessCollection(
-                    publishedReader,
-                    collectionReader.getReviewed(),
-                    collectionWriter.getReviewed(),
-                    collection, true, zebedee.dataIndex);
-        } catch (URISyntaxException e) {
-            throw new BadRequestException("Brian could not process this collection");
-        }
+        ContentReader publishedReader = new ContentReader(zebedee.published.path);
+        DataIndex dataIndex = zebedee.dataIndex;
+        uriList = preprocessTimeseries(collection, collectionReader, collectionWriter, publishedReader, dataIndex);
 
         // Go ahead
         collection.description.approvedStatus = true;

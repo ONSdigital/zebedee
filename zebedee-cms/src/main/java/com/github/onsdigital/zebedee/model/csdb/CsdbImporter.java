@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -24,7 +25,6 @@ import org.apache.commons.io.FilenameUtils;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
@@ -104,13 +104,9 @@ public class CsdbImporter {
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
         ContentReader publishedReader = new ContentReader(Root.zebedee.published.path);
+        DataIndex dataIndex = Root.zebedee.dataIndex;
 
-        List<String> uriList;
-        try {
-            uriList = Collections.preprocessTimeseries(Root.zebedee, collection, collectionReader, collectionWriter, publishedReader);
-        } catch (URISyntaxException e) {
-            throw new BadRequestException("Brian could not process this collection");
-        }
+        List<String> uriList = Collections.preprocessTimeseries(collection, collectionReader, collectionWriter, publishedReader, dataIndex);
 
         new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
     }

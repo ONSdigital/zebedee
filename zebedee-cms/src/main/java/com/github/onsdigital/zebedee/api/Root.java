@@ -15,7 +15,6 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
-import com.github.onsdigital.zebedee.model.publishing.scheduled.CollectionScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
@@ -42,7 +41,7 @@ public class Root {
     public static Map<String, String> env = System.getenv();
     public static Zebedee zebedee;
     static Path root;
-    private static Scheduler scheduler;
+    private static Scheduler scheduler = new PublishScheduler();
 
     /**
      * Recursively lists all files within this {@link Content}.
@@ -106,14 +105,6 @@ public class Root {
 
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
         System.setProperty("zebedee_root", root.toString());
-
-        if (Configuration.isOptimisedPublishingEnabled()) {
-            Log.print("Optimised publishing is enabled. Using new scheduler.");
-            scheduler = new PublishScheduler(); // use new publisher if its enabled;
-        } else {
-            Log.print("Optimised publishing is NOT enabled. Using old scheduler.");
-            scheduler = new CollectionScheduler(); // old scheduler todo: remove this when using new scheduler.
-        }
 
         SlackNotification.alarm("Zebedee has just started. Ensure an administrator has logged in.");
 
@@ -188,7 +179,7 @@ public class Root {
     public static void cancelPublish(Collection collection) {
         try {
             System.out.println("Attempting to cancel publish for collection " + collection.description.name + " type=" + collection.description.type);
-                scheduler.cancel(collection);
+            scheduler.cancel(collection);
         } catch (Exception e) {
             System.out.println("Exception caught trying to cancel scheduled publish of collection: " + e.getMessage());
         }

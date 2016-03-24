@@ -34,10 +34,6 @@ public class Configuration {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
     }
 
-    public static boolean isOptimisedPublishingEnabled() {
-        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("optimised_publish_enabled"), "true"));
-    }
-
     /**
      * how many seconds before the actual publish time should we run the preprocess.
      */

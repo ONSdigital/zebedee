@@ -1,31 +1,16 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.data.DataPublisher;
-import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
-import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.reader.ContentReader;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.TreeSet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by thomasridd on 1/21/16.
@@ -33,20 +18,11 @@ import static org.junit.Assert.*;
 public class DataMergeTest {
     DataPagesGenerator generator;
 
-
     @Before
     public void setUp() throws Exception {
 
         generator = new DataPagesGenerator();
     }
-
-    @After
-    public void tearDown() throws IOException {
-//        bob.delete();
-    }
-
-
-
 
     @Test
     public void mergeValues_overEmptyTimeSeries_shouldFillValues() {
@@ -132,15 +108,11 @@ public class DataMergeTest {
     }
 
 
-
-
-
-
     private void assertTimeSeriesPointsMatch(TreeSet<TimeSeriesValue> values1, TreeSet<TimeSeriesValue> values2) {
         assertEquals(values1.size(), values2.size());
-        for (TimeSeriesValue value1: values1) {
+        for (TimeSeriesValue value1 : values1) {
             boolean found = false;
-            for (TimeSeriesValue value2: values2) {
+            for (TimeSeriesValue value2 : values2) {
                 if (value1.value.equalsIgnoreCase(value2.value) && value1.toDate().compareTo(value2.toDate()) == 0) {
                     found = true;
                 }
@@ -158,7 +130,6 @@ public class DataMergeTest {
         series.years.add(quickTimeSeriesValue("2002", "3"));
 
         return series;
-
     }
 
     private TimeSeries clearTimeSeries(TimeSeries series) {
@@ -167,10 +138,11 @@ public class DataMergeTest {
         series.quarters = new TreeSet<>();
         return series;
     }
+
     /**
      * Get a simple timeseries value for a year with a value
      *
-     * @param year any year as a string
+     * @param year  any year as a string
      * @param value any value
      * @return
      */
@@ -185,7 +157,7 @@ public class DataMergeTest {
     /**
      * Get a value for a given year in a timeseries
      *
-     * @param year any year as a string
+     * @param year   any year as a string
      * @param series a series
      * @return
      */
@@ -197,5 +169,4 @@ public class DataMergeTest {
         }
         return null;
     }
-
 }

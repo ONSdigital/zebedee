@@ -12,14 +12,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-public class DataPublisherReloaded {
+public class DataPublisher {
     public boolean doNotCompress = false;
 
-    public DataPublisherReloaded(boolean doNotCompress) {
+    public DataPublisher(boolean doNotCompress) {
         this.doNotCompress = doNotCompress;
     }
 
-    public DataPublisherReloaded() {
+    public DataPublisher() {
         this(false);
     }
 

@@ -37,16 +37,15 @@ public class Approve {
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         Session session = Root.zebedee.sessions.get(request);
 
-        boolean result = Root.zebedee.collections.approve(collection, session);
-        if (result) {
-            Audit.Event.COLLECTION_APPROVED
-                    .parameters()
-                    .host(request)
-                    .collection(collection)
-                    .actionedBy(session.email)
-                    .log();
-        }
+        Root.zebedee.collections.approve(collection, session);
 
-        return result;
+        Audit.Event.COLLECTION_APPROVED
+                .parameters()
+                .host(request)
+                .collection(collection)
+                .actionedBy(session.email)
+                .log();
+
+        return true;
     }
 }

@@ -22,8 +22,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -544,7 +546,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldApproveCollection()
-            throws IOException, ZebedeeException {
+            throws IOException, ZebedeeException, ExecutionException, InterruptedException {
 
         // Given
         // A collection that's ready to approve
@@ -553,7 +555,8 @@ public class CollectionsTest {
 
         // When
         // We attempt to approve
-        zebedee.collections.approve(collection, session);
+        Future<Boolean> future = zebedee.collections.approve(collection, session);
+        future.get();
 
         // Then
         // The collection should be approved (reloading to make sure it's saved)
@@ -563,13 +566,14 @@ public class CollectionsTest {
 
     @Test
     public void shouldUnlockCollection()
-            throws IOException, ZebedeeException {
+            throws IOException, ZebedeeException, ExecutionException, InterruptedException {
 
         // Given
         // A collection that's approved.
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
-        zebedee.collections.approve(collection, session);
+        Future<Boolean> future = zebedee.collections.approve(collection, session);
+        future.get();
 
         // When
         // We attempt to unlock

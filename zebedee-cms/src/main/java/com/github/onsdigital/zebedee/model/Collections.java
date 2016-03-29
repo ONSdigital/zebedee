@@ -37,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Future;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 
@@ -190,7 +191,7 @@ public class Collections {
      * @throws BadRequestException
      * @throws ConflictException
      */
-    public boolean approve(Collection collection, Session session)
+    public Future<Boolean> approve(Collection collection, Session session)
             throws IOException, ZebedeeException {
 
         // Collection exists
@@ -216,10 +217,10 @@ public class Collections {
         ContentReader publishedReader = new ContentReader(zebedee.published.path);
         DataIndex dataIndex = zebedee.dataIndex;
 
-        ApprovalQueue.add(
+        Future<Boolean> future = ApprovalQueue.add(
                 new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex));
 
-        return true;
+        return future;
     }
 
     /**

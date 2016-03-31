@@ -4,17 +4,17 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by thomasridd on 1/23/16.
  */
 public class DataGrid {
+    // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
+    private static FastDateFormat formatter = FastDateFormat.getInstance("dd-MM-yyyy", TimeZone.getTimeZone("Europe/London"));
+
     public List<DataGridRow> metadata;
     public List<DataGridRow> rows;
 
@@ -47,7 +47,6 @@ public class DataGrid {
             preunit.add(timeSeries.getDescription().getPreUnit());
             unit.add(timeSeries.getDescription().getUnit());
 
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
             if (timeSeries.getDescription().getReleaseDate() == null) {
                 releaseDate.add("");
             } else {

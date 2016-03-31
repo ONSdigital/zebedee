@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,7 +21,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.nio.file.Files.newInputStream;
@@ -30,6 +30,9 @@ import static java.nio.file.Files.probeContentType;
  * Created by thomasridd on 07/10/15.
  */
 public class DataGenerator {
+
+    // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
+    private static FastDateFormat format = FastDateFormat.getInstance("dd-MM-yyyy", TimeZone.getTimeZone("Europe/London"));
 
     /**
      * Output a grid of strings to XLSX
@@ -228,7 +231,6 @@ public class DataGenerator {
             putCombination(series.getCdid(), "PreUnit", series.getDescription().getPreUnit(), map);
             putCombination(series.getCdid(), "Unit", series.getDescription().getUnit(), map);
 
-            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
             if (series.getDescription().getReleaseDate() == null) {
                 putCombination(series.getCdid(), "Release date", "", map);
             } else {
@@ -652,7 +654,6 @@ public class DataGenerator {
         grid.add(rowFromPair("PreUnit", description.getPreUnit()));
         grid.add(rowFromPair("Unit", description.getUnit()));
 
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         if (description.getReleaseDate() == null) {
             grid.add(rowFromPair("Release date", ""));
         } else {

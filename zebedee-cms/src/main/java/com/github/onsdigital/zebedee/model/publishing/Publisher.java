@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
@@ -51,6 +48,9 @@ public class Publisher {
 
     private static final List<Host> theTrainHosts;
     private static final ExecutorService pool = Executors.newFixedThreadPool(50);
+
+    // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
+    private static FastDateFormat format = FastDateFormat.getInstance("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("Europe/London"));
 
     static {
         String[] theTrainUrls = Configuration.getTheTrainUrls();
@@ -527,7 +527,6 @@ public class Publisher {
         }
 
         Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
         String directoryName = format.format(date) + "-" + filename;
         Path collectionFilesDestination = logPath.resolve(directoryName);
         Path collectionJsonDestination = logPath.resolve(directoryName + ".json");

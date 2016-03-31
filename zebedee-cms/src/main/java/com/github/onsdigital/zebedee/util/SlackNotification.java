@@ -10,12 +10,13 @@ import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -34,6 +35,7 @@ public class SlackNotification {
     private static final Host slackHost = new Host(slackBaseUri);
     private static final ExecutorService pool = Executors.newFixedThreadPool(1);
 
+    private static FastDateFormat format = FastDateFormat.getInstance("HH:mm", TimeZone.getTimeZone("Europe/London"));
 
     public static void alarm(String message) {
         String slackUsername = "Alarm";
@@ -128,7 +130,6 @@ public class SlackNotification {
             }
         }
 
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         String message = "Collection " + publishedCollection.name +
                 " was published at " + format.format(publishedCollection.publishStartDate) +
                 " with " + result.transaction.uriInfos.size() + " files " +

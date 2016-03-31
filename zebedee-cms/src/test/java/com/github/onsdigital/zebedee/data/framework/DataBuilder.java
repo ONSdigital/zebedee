@@ -3,10 +3,6 @@ package com.github.onsdigital.zebedee.data.framework;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
-import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -19,15 +15,11 @@ import com.github.onsdigital.zebedee.model.ContentWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-
 
 
 /**
@@ -45,7 +37,6 @@ public class DataBuilder {
     }
 
     /**
-     *
      * @param dataPagesSet a generated set of pages for the data publisher
      * @throws URISyntaxException
      * @throws IOException
@@ -56,7 +47,7 @@ public class DataBuilder {
 
         publishPage(dataPagesSet.datasetLandingPage, dataPagesSet.datasetLandingPage.getUri().toString());
         publishPage(dataPagesSet.timeSeriesDataset, dataPagesSet.timeSeriesDataset.getUri().toString());
-        for(TimeSeries timeSeries: dataPagesSet.timeSeriesList) {
+        for (TimeSeries timeSeries : dataPagesSet.timeSeriesList) {
             publishPage(timeSeries, timeSeries.getUri().toString());
         }
 
@@ -69,7 +60,7 @@ public class DataBuilder {
      * Publish a page object
      *
      * @param page any zebedee page
-     * @param uri the uri to publish to
+     * @param uri  the uri to publish to
      * @throws IOException
      * @throws BadRequestException
      */
@@ -94,8 +85,8 @@ public class DataBuilder {
     /**
      * Add a dataset upload to a collection plus dummy upload file
      *
-     * @param dataPagesSet a dataPagesSet to upload
-     * @param collection a collection to load into
+     * @param dataPagesSet     a dataPagesSet to upload
+     * @param collection       a collection to load into
      * @param collectionWriter a collection writer with permissions for the collection
      * @throws IOException
      * @throws BadRequestException

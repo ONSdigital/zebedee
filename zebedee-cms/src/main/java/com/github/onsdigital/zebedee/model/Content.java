@@ -206,6 +206,7 @@ public class Content {
 
         ContentDetail detail = details(path.resolve("data.json"));
 
+        // if the folder is empty put in an empty node with just a name.
         if (detail == null) {
             detail = new ContentDetail();
             detail.description = new ContentDetailDescription(path.getFileName().toString());

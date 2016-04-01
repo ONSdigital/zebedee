@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.PingRequest;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
@@ -23,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 public class Ping {
 
     ExecutorService pool = Executors.newSingleThreadExecutor();
+
+    protected static InfluxDB influxDB;
+    protected static String dbName = "ping";
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -58,21 +62,25 @@ public class Ping {
      */
     @POST
     public boolean ping(HttpServletRequest request, HttpServletResponse response, PingRequest pingRequest) throws IOException {
-        //sendDataToInflux(pingRequest);
+        if (Configuration.isInfluxReportingEnabled()) sendDataToInflux(pingRequest);
         return true;
     }
 
     public void sendDataToInflux(PingRequest pingRequest) {
+        if (influxDB == null) {
+            synchronized (influxDB) {
+                if (influxDB == null) {
+                    influxDB = InfluxDBFactory.connect("http://influxdb:8086", "root", "root");
+                    influxDB.createDatabase(dbName);
+                }
+            }
+        }
+
         pool.submit(() -> {
 
             System.out.println("lastPingTime = " + pingRequest.lastPingTime);
 
             if (pingRequest.lastPingTime != null && pingRequest.lastPingTime > 0) {
-
-                InfluxDB influxDB = InfluxDBFactory.connect("http://influxdb:8086", "root", "root");
-                String dbName = "ping";
-                influxDB.createDatabase(dbName);
-
                 BatchPoints batchPoints = BatchPoints
                         .database(dbName)
                         .tag("async", "true")

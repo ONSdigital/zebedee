@@ -25,13 +25,16 @@ public class Configuration {
     // how many additional seconds after the publish
     private static final int DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH = 30;
 
-
     public static boolean isSchedulingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
     }
 
     public static boolean isVerificationEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
+    }
+
+    public static boolean isInfluxReportingEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("enable_influx_reporting"), "false"));
     }
 
     /**

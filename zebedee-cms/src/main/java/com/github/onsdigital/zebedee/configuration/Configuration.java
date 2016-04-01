@@ -15,6 +15,7 @@ public class Configuration {
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
     private static final String DEFAULT_DYLAN_URL = "http://localhost:8085";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
+    private static final String INFLUXDB_URL = "http://influxdb:8086";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -35,6 +36,10 @@ public class Configuration {
 
     public static boolean isInfluxReportingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("enable_influx_reporting"), "false"));
+    }
+
+    public static String getInfluxDBHost() {
+        return StringUtils.defaultIfBlank(getValue("influxdb_url"), INFLUXDB_URL);
     }
 
     /**

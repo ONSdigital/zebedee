@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -10,7 +9,6 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -49,6 +47,10 @@ public class DataPublicationDetails {
         }
 
         this.fileUri = findFileUri(collectionReader, datasetPageUri);
+
+        // if the CSDB file is not found in the collection, see if it can be found in the published content.
+        if (fileUri == null)
+            this.fileUri = findFileUri(publishedReader, datasetPageUri);
     }
 
     public String getTimeseriesFolder() {

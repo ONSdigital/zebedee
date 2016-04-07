@@ -47,10 +47,6 @@ public class DataPublicationDetails {
         }
 
         this.fileUri = findFileUri(collectionReader, datasetPageUri);
-
-        // if the CSDB file is not found in the collection, see if it can be found in the published content.
-        if (fileUri == null)
-            this.fileUri = findFileUri(publishedReader, datasetPageUri);
     }
 
     public String getTimeseriesFolder() {

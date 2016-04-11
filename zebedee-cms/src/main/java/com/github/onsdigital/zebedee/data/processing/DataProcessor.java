@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
@@ -122,11 +123,8 @@ public class DataProcessor {
         syncLandingPageMetadata(this.timeSeries, details);
         syncTimeSeriesMetadata(this.timeSeries, newTimeSeries);
 
-        // check if the title has been updated.
-        if (!newTimeSeries.getDescription().getTitle().equals(this.timeSeries.getDescription().getTitle())) {
-            this.timeSeries.getDescription().setTitle(newTimeSeries.getDescription().getTitle());
-            this.titleUpdated = true;
-            Log.print("The title for timeseries %s updated to %s", this.timeSeries.getDescription().getTitle(), newTimeSeries.getDescription().getTitle());
+        if (Configuration.isTimeseriesTitleUpdateEnabled()) {
+            syncTimeseriesTitle(newTimeSeries);
         }
 
         // Combine the time series values
@@ -141,6 +139,15 @@ public class DataProcessor {
         insertions = dataMerge.insertions;
 
         return this.timeSeries;
+    }
+
+    public void syncTimeseriesTitle(TimeSeries newTimeSeries) {
+        // check if the title has been updated.
+        if (!newTimeSeries.getDescription().getTitle().equals(this.timeSeries.getDescription().getTitle())) {
+            this.timeSeries.getDescription().setTitle(newTimeSeries.getDescription().getTitle());
+            this.titleUpdated = true;
+            Log.print("The title for timeseries %s updated to %s", this.timeSeries.getDescription().getTitle(), newTimeSeries.getDescription().getTitle());
+        }
     }
 
     /**

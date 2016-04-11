@@ -38,6 +38,10 @@ public class Configuration {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("enable_influx_reporting"), "false"));
     }
 
+    public static boolean isTimeseriesTitleUpdateEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("enable_timeseries_title_update"), "false"));
+    }
+
     public static String getInfluxDBHost() {
         return StringUtils.defaultIfBlank(getValue("influxdb_url"), INFLUXDB_URL);
     }

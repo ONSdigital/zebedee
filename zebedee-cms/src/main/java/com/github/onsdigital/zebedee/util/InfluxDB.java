@@ -18,10 +18,16 @@ public class InfluxDB {
     protected static ExecutorService pool = Executors.newSingleThreadExecutor();
 
     static {
-        System.out.println("creating influxdb instance");
-        influxDB = InfluxDBFactory.connect(Configuration.getInfluxDBHost(), "root", "root");
+        try {
+            System.out.println("creating influxdb instance");
+            influxDB = InfluxDBFactory.connect(Configuration.getInfluxDBHost(), "root", "root");
 
-        influxDB.createDatabase(pingDBName);
+            influxDB.createDatabase(pingDBName);
+        } catch (Exception e) {
+            System.out.println("error initialising InfluxDB class:");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
 

@@ -31,9 +31,7 @@ public class InfluxDB {
             throw e;
         }
     }
-
-
-
+    
     public static void Ping(long ms) {
         if (!Configuration.isInfluxReportingEnabled()) return;
 

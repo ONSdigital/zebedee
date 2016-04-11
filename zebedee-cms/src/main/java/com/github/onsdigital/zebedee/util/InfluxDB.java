@@ -19,10 +19,12 @@ public class InfluxDB {
 
     static {
         try {
-            System.out.println("creating influxdb instance");
-            influxDB = InfluxDBFactory.connect(Configuration.getInfluxDBHost(), "root", "root");
+            if (Configuration.isInfluxReportingEnabled()) {
+                System.out.println("creating influxdb instance");
+                influxDB = InfluxDBFactory.connect(Configuration.getInfluxDBHost(), "root", "root");
 
-            influxDB.createDatabase(pingDBName);
+                influxDB.createDatabase(pingDBName);
+            }
         } catch (Exception e) {
             System.out.println("error initialising InfluxDB class:");
             e.printStackTrace();

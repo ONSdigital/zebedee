@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model.approval;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
@@ -11,8 +12,8 @@ import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.Log;
-import com.github.onsdigital.zebedee.util.ReleasePopulator;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
 import java.io.IOException;
@@ -53,14 +54,15 @@ public class ApproveTask implements Callable<Boolean> {
     public Boolean call() {
 
         try {
-            // If the collection is associated with a release then populate the release page.
-            ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter);
 
-            // Generate timeseries if required.
-            List<String> uriList = new DataPublisher().preprocessCollection(
-                    publishedReader,
-                    collectionReader.getReviewed(),
-                    collectionWriter.getReviewed(), collection, true, dataIndex);
+            List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+
+            // If the collection is associated with a release then populate the release page.
+            ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
+
+            List<String> uriList = generateTimeseries();
+
+
 
             // set the approved state on the collection
             collection.description.approvedStatus = true;
@@ -77,5 +79,13 @@ public class ApproveTask implements Callable<Boolean> {
             SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
             return false;
         }
+    }
+
+    public List<String> generateTimeseries() throws IOException, ZebedeeException, URISyntaxException {
+        // Generate timeseries if required.
+        return new DataPublisher().preprocessCollection(
+                publishedReader,
+                collectionReader.getReviewed(),
+                collectionWriter.getReviewed(), collection, true, dataIndex);
     }
 }

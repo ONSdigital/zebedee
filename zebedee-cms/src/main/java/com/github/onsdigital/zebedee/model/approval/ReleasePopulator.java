@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.util;
+package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
@@ -8,10 +8,12 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ReleasePopulator {
 
@@ -21,18 +23,16 @@ public class ReleasePopulator {
      * Add the pages of a collection to a release.
      *
      * @param release
-     * @param collection
-     * @param reader
      * @return
      */
-    public static Release populate(Release release, Collection collection, CollectionReader reader) throws IOException, ZebedeeException {
+    public static Release populate(Release release, List<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
         release.setRelatedDatasets(new ArrayList<>());
         release.setRelatedDocuments(new ArrayList<>());
         release.setRelatedMethodology(new ArrayList<>());
         release.setRelatedMethodologyArticle(new ArrayList<>());
 
-        for (ContentDetail contentDetail : ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed())) {
+        for (ContentDetail contentDetail : collectionContent) {
             addPageDetailToRelease(release, contentDetail);
         }
 
@@ -103,11 +103,14 @@ public class ReleasePopulator {
         return link;
     }
 
-    public static void populateQuietly(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws IOException {
+    public static void populateQuietly(Collection collection,
+                                       CollectionReader collectionReader,
+                                       CollectionWriter collectionWriter,
+                                       List<ContentDetail> collectionContent) throws IOException {
         if (collection.isRelease()) {
             Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
             try {
-                collection.populateRelease(collectionReader, collectionWriter);
+                collection.populateRelease(collectionReader, collectionWriter, collectionContent);
             } catch (ZebedeeException e) {
                 Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
             }

@@ -15,7 +15,7 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
-import com.github.onsdigital.zebedee.util.ReleasePopulator;
+import com.github.onsdigital.zebedee.model.approval.ReleasePopulator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -302,7 +302,7 @@ public class Collection {
         return release;
     }
 
-    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter) throws IOException, ZebedeeException {
+    public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, List<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
         if (StringUtils.isEmpty(this.description.releaseUri)) {
             throw new BadRequestException("This collection is not associated with a release.");
@@ -316,7 +316,7 @@ public class Collection {
             throw new BadRequestException("This collection is not associated with a release.");
         }
 
-        release = ReleasePopulator.populate(release, this, reader);
+        release = ReleasePopulator.populate(release, collectionContent);
         collectionWriter.getReviewed().writeObject(release, uri);
 
         return release;

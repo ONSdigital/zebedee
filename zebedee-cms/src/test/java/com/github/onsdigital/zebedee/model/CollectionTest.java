@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
+import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -1061,10 +1062,16 @@ public class CollectionTest {
         ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());
         FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));
 
+
         // When we attempt to populate the release from the collection.
+        FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id);
+        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
+        List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+
         Release result = collection.populateRelease(
-                new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id),
-                new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id));
+                collectionReader,
+                collectionWriter,
+                collectionContent);
 
         // Then the release is now in progress for the collection and the published flag is set to true
         assertEquals(1, result.getRelatedDocuments().size());

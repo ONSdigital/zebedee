@@ -1,34 +1,47 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import org.apache.commons.cli.*;
 
 public class Cli {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
-        if (args == null || args.length < 1) {
-            System.out.println("Please provide the name of the command you wish to run.");
-            return;
+        Options options = new Options();
+        options.addOption(Option.builder("createcollection")
+                .desc("create a new unencrypted collection.")
+                .argName("collections directory> <collection name")
+                .numberOfArgs(2)
+                .build());
+        options.addOption(Option.builder("updatetimeseries")
+                .desc("update timeseries metadata from the given CSV.")
+                .argName("source directory> <destination directory> <csv file")
+                .numberOfArgs(1)
+                .build());
+
+
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine line = parser.parse(options, args);
+
+            if (line.hasOption("createcollection")) {
+                CollectionCreator.createCollection(args);
+                return;
+            }
+
+            if (line.hasOption("updatetimeseries")) {
+                TimeseriesUpdater.updateTimeseriesData(args);
+                return;
+            }
+
+        } catch (ParseException exp) {
+            System.err.println("Parsing failed.  Reason: " + exp.getMessage());
         }
 
-        String command = args[0];
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.setWidth(150);
+        formatter.printHelp("zebedee-cli", options);
 
-        if (command.equalsIgnoreCase("updateTimeseries")) {
-            updateTimeseriesData(args);
-        }
     }
 
-    private static void updateTimeseriesData(String[] args) {
 
-        // args[1] - source data directory
-        // args[2] - destination directory to save the updated timeseries (can be a collection or master)
-        // args[3] - path to the CSV file containing the names
-
-        Path source = Paths.get(args[1]);
-        Path destination = Paths.get(args[2]);
-        Path csvInput = Paths.get(args[3]);
-
-        TimeseriesUpdater.UpdateTimeseries(source, destination, csvInput);
-    }
 }

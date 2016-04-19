@@ -119,20 +119,18 @@ public class Collection {
         collectionDescription.isEncrypted = true; // force encryption on new collections.
 
         Release release = checkForRelease(collectionDescription, zebedee);
+
         String filename = PathUtils.toFilename(collectionDescription.name);
         collectionDescription.id = filename + "-" + Random.id();
 
         // Create the folders:
-        Path collectionPath = zebedee.collections.path.resolve(filename);
-        Files.createDirectory(collectionPath);
-        Files.createDirectory(collectionPath.resolve(REVIEWED));
-        Files.createDirectory(collectionPath.resolve(COMPLETE));
-        Files.createDirectory(collectionPath.resolve(IN_PROGRESS));
+        Path rootCollectionsPath = zebedee.collections.path;
+
+        CreateCollectionFolders(filename, rootCollectionsPath);
 
         collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, session.email));
-
         // Create the description:
-        Path collectionDescriptionPath = zebedee.collections.path.resolve(filename
+        Path collectionDescriptionPath = rootCollectionsPath.resolve(filename
                 + ".json");
         try (OutputStream output = Files.newOutputStream(collectionDescriptionPath)) {
             Serialiser.serialise(output, collectionDescription);
@@ -159,6 +157,14 @@ public class Collection {
         }
 
         return collection;
+    }
+
+    public static void CreateCollectionFolders(String filename, Path rootCollectionsPath) throws IOException {
+        Path collectionPath = rootCollectionsPath.resolve(filename);
+        Files.createDirectory(collectionPath);
+        Files.createDirectory(collectionPath.resolve(REVIEWED));
+        Files.createDirectory(collectionPath.resolve(COMPLETE));
+        Files.createDirectory(collectionPath.resolve(IN_PROGRESS));
     }
 
     private static Release checkForRelease(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, ZebedeeException {

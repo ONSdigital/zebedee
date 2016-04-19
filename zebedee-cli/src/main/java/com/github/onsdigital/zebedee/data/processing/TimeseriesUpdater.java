@@ -1,6 +1,29 @@
 package com.github.onsdigital.zebedee.data.processing;
 
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
+import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.util.Log;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Given as CSV indexed with the timeseries CDID, update each timeseries with the given data.
@@ -8,14 +31,236 @@ import java.nio.file.Path;
 public class TimeseriesUpdater {
 
 
-    public static void UpdateTimeseries(Path source, Path destination, Path csvInput) {
-        // read the CSV
+    public static void updateTimeseriesData(String[] args) throws Exception {
 
-        // if headers are defined then use them, else just use defaults: CDID,Title
+        // args[1] - source data directory
+        // args[2] - destination directory to save the updated timeseries (can be a collection or master)
+        // args[3] - path to the CSV file containing the names
 
-        // read the timeseries file from the root location.
+        Path source = Paths.get(args[1]);
+        Path destination = Paths.get(args[2]);
+        Path csvInput = Paths.get(args[3]);
 
-        // update the fields and write the timeseries file to the destination location
+        UpdateTimeseries(source, destination, csvInput);
+    }
 
+    public static void UpdateTimeseries(Path source, Path destination, Path csvInput) throws IOException, InterruptedException {
+
+        // build the data index so we know where to find timeseries files given the CDID
+        ContentReader contentReader = new ContentReader(source);
+        ContentWriter contentWriter = new ContentWriter(destination);
+
+        DataIndex dataIndex = buildDataIndex(contentReader);
+
+        // read the CSV and update the timeseries titles.
+        TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
+        ArrayList<TimeseriesUpdateCommand> updateCommands = importer.importData();
+        updateTimeseriesMetadata(contentReader, contentWriter, dataIndex, updateCommands);
+
+        // find all available CSDB files.
+        List<TimeseriesDatasetDownloads> datasetDownloads = findCsdbFiles(source);
+
+        // work out which CSDB files need their download files updated
+        Set<TimeseriesDatasetDownloads> datasetDownloadsToUpdate = determineWhatDownloadsNeedUpdating(updateCommands, datasetDownloads);
+
+        // loop over each CSDB files that needs updated download files.
+        for (TimeseriesDatasetDownloads timeseriesDatasetDownloads : datasetDownloadsToUpdate) {
+
+            try {
+                // get all the update commands for this particular CSDB
+                Set<TimeseriesUpdateCommand> commandsForThisDataset = getCommandsForDataset(updateCommands, timeseriesDatasetDownloads);
+
+                // populate the column indexes for each command so we know what column to update the title for.
+                populateCsvColumnIndexesToUpdate(timeseriesDatasetDownloads, commandsForThisDataset, source);
+                generateCsv(source, destination, timeseriesDatasetDownloads, commandsForThisDataset);
+                generateXlsx(source, destination, timeseriesDatasetDownloads, commandsForThisDataset);
+
+            } catch (Exception e) {
+                Log.print(e);
+            }
+        }
+    }
+
+    public static void generateXlsx(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
+        int rowIndex = 0;
+        File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
+        System.out.println("inputCsv = " + inputCsv);
+        File outputCsv = destination.resolve(timeseriesDatasetDownloads.getXlsTempPath()).toFile();
+        Files.createDirectories(outputCsv.toPath().getParent());
+        System.out.println("outputXls = " + outputCsv);
+
+        try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(inputCsv), Charset.forName("UTF8")), ',')) {
+
+            Workbook wb = new SXSSFWorkbook(30);
+            Sheet sheet = wb.createSheet("data");
+
+            int rownum = 0;
+            String[] strings = reader.readNext();
+            //System.out.println("strings.length = " + strings.length);
+
+            while (strings != null) {
+
+                if (rowIndex == 0) { // the row with all the titles in
+                    // set the updated titles
+                    for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+                        strings[command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId())] = command.title;
+                    }
+                }
+
+                Row row = sheet.createRow(rownum++);
+
+                int colnum = 0;
+                for (String gridCell : strings) {
+                    row.createCell(colnum).setCellValue(gridCell);
+                    colnum++;
+                }
+
+                strings = reader.readNext();
+                rowIndex++;
+            }
+
+            try (OutputStream stream = new FileOutputStream(outputCsv)) {
+                wb.write(stream);
+            }
+        }
+    }
+
+    public static void generateCsv(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
+        int rowIndex = 0;
+        File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
+        System.out.println("inputCsv = " + inputCsv);
+        File outputCsv = destination.resolve(timeseriesDatasetDownloads.getCsvTempPath()).toFile();
+        Files.createDirectories(outputCsv.toPath().getParent());
+        System.out.println("outputCsv = " + outputCsv);
+
+        try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(inputCsv), Charset.forName("UTF8")), ',')) {
+            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(outputCsv), Charset.forName("UTF8")), ',')) {
+
+                String[] strings = reader.readNext();
+
+                while (strings != null) {
+
+                    if (rowIndex == 0) { // the row with all the titles in
+                        // set the updated titles
+                        for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+                            strings[command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId())] = command.title;
+                        }
+                    }
+
+                    writer.writeNext(strings);
+                    strings = reader.readNext();
+                    rowIndex++;
+                }
+            }
+        }
+    }
+
+    public static void populateCsvColumnIndexesToUpdate(TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset, Path source) throws IOException {
+        File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
+        try (CSVReader reader = new CSVReader(new InputStreamReader(
+                new FileInputStream(inputCsv), Charset.forName("UTF8")), ',')) {
+
+            String[] strings = reader.readNext(); // first row - titles
+            strings = reader.readNext(); // second row - CDID's
+
+            int columnIndex = 0;
+            for (String cdid : strings) {
+                for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+                    if (command.cdid.equalsIgnoreCase(cdid)) {
+                        for (String sourceDataset : command.sourceDatasets) {
+                            if (sourceDataset.equalsIgnoreCase(timeseriesDatasetDownloads.getCsdbId())) {
+
+                                System.out.println("CSV index for command :" + command.cdid);
+                                System.out.println("csdb id: " + timeseriesDatasetDownloads.getCsdbId());
+                                System.out.println("column index: " + columnIndex);
+                                command.datasetCsvColumn.put(timeseriesDatasetDownloads.getCsdbId(), columnIndex);
+                            }
+                        }
+                    }
+                }
+
+                columnIndex++;
+            }
+        }
+    }
+
+    public static Set<TimeseriesUpdateCommand> getCommandsForDataset(ArrayList<TimeseriesUpdateCommand> updateCommands, TimeseriesDatasetDownloads timeseriesDatasetDownloads) {
+        Set<TimeseriesUpdateCommand> commandsForThisDataset = new HashSet<>();
+        for (TimeseriesUpdateCommand updateCommand : updateCommands) {
+            for (String sourceDataset : updateCommand.sourceDatasets) {
+                if (sourceDataset.equalsIgnoreCase(timeseriesDatasetDownloads.getCsdbId())) {
+                    System.out.println("updateCommand " + updateCommand.cdid + " added to dataset " + timeseriesDatasetDownloads.getCsdbId());
+                    commandsForThisDataset.add(updateCommand);
+                }
+            }
+        }
+        return commandsForThisDataset;
+    }
+
+    public static Set<TimeseriesDatasetDownloads> determineWhatDownloadsNeedUpdating(ArrayList<TimeseriesUpdateCommand> updateCommands, List<TimeseriesDatasetDownloads> datasetDownloads) {
+        Set<TimeseriesDatasetDownloads> datasetDownloadsToUpdate = new HashSet<>();
+        for (TimeseriesUpdateCommand command : updateCommands) {
+            for (String sourceDataset : command.sourceDatasets) {
+                for (TimeseriesDatasetDownloads datasetDownload : datasetDownloads) {
+                    if (sourceDataset.equalsIgnoreCase(datasetDownload.getCsdbId())) {
+                        System.out.println("datasetDownload to update = " + datasetDownload.getCsdbId());
+                        datasetDownloadsToUpdate.add(datasetDownload);
+                    }
+                }
+            }
+        }
+        return datasetDownloadsToUpdate;
+    }
+
+    public static List<TimeseriesDatasetDownloads> findCsdbFiles(Path source) {
+        CsdbFinder csdbFinder = new CsdbFinder();
+        csdbFinder.find(source);
+        List<TimeseriesDatasetDownloads> datasetDownloads = new ArrayList<>();
+        for (String uri : csdbFinder.uris) {
+            datasetDownloads.add(new TimeseriesDatasetDownloads(Paths.get(uri)));
+        }
+        return datasetDownloads;
+    }
+
+    public static void updateTimeseriesMetadata(ContentReader contentReader, ContentWriter contentWriter, DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
+        for (TimeseriesUpdateCommand command : updateCommands) {
+            String uri = dataIndex.getUriForCdid(command.cdid);
+
+            try {
+                boolean updated = false;
+                TimeSeries page = (TimeSeries) contentReader.getContent(uri);
+
+                System.out.println("command.title = " + command.title);
+                for (String sourceDataset : page.sourceDatasets) {
+                    System.out.println("sourceDataset = " + sourceDataset);
+                }
+
+                command.sourceDatasets = page.sourceDatasets;
+
+                if (command.title != null && command.title.length() > 0) {
+                    page.getDescription().setTitle(command.title);
+                    updated = true;
+                }
+
+                if (updated) {
+                    contentWriter.writeObject(page, uri);
+                }
+
+            } catch (ZebedeeException e) {
+                System.out.println("Failed to read timeseries page for uri: " + uri);
+            }
+        }
+    }
+
+
+    public static DataIndex buildDataIndex(ContentReader contentReader) throws InterruptedException {
+        DataIndex dataIndex = new DataIndex(contentReader);
+
+        while (!dataIndex.indexBuilt) {
+            Thread.sleep(1000);
+            System.out.print(".");
+        }
+        System.out.println("");
+        return dataIndex;
     }
 }

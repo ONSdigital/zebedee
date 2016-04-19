@@ -15,9 +15,8 @@ public class Cli {
         options.addOption(Option.builder("updatetimeseries")
                 .desc("update timeseries metadata from the given CSV.")
                 .argName("source directory> <destination directory> <csv file")
-                .numberOfArgs(1)
+                .numberOfArgs(3)
                 .build());
-
 
         CommandLineParser parser = new DefaultParser();
         try {

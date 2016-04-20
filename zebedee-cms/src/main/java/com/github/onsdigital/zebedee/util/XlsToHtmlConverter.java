@@ -1,13 +1,22 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.onsdigital.zebedee.exceptions.TableBuilderException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.converter.ExcelToHtmlConverter;
 import org.apache.poi.hssf.converter.ExcelToHtmlUtils;
-import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.hwpf.converter.HtmlDocumentFacade;
 import org.apache.poi.ss.formula.eval.ErrorEval;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
 import org.w3c.dom.Document;
@@ -23,7 +32,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +103,30 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         final HSSFWorkbook workbook = ExcelToHtmlUtils.loadXls(xlsFileIn);
         XlsToHtmlConverter converter = createConverter();
 
+        converter.processWorkbook(workbook);
+        Document document = converter.getDocument();
+        return document;
+    }
+
+    public static Node convertToHtmlPageAndExclude(InputStream stream, List<Integer> exclusions)
+            throws IOException, ParserConfigurationException, TableBuilderException {
+        final HSSFWorkbook workbook = new HSSFWorkbook(stream);
+
+        if (exclusions != null && !exclusions.isEmpty()) {
+            Sheet masterSheet = workbook.getSheetAt(0);
+            int rowCount = masterSheet.getPhysicalNumberOfRows();
+            List<Row> targets = new ArrayList<>();
+
+            for (int rowIndex : exclusions) {
+                if (rowIndex > rowCount) {
+                    throw new TableBuilderException(TableBuilderException.ErrorType.ROW_INDEX_OUT_OF_BOUNDS, rowIndex, rowCount);
+                }
+                targets.add(masterSheet.getRow(rowIndex));
+            }
+            targets.stream().forEach(row -> masterSheet.removeRow(row));
+        }
+
+        XlsToHtmlConverter converter = createConverter();
         converter.processWorkbook(workbook);
         Document document = converter.getDocument();
         return document;

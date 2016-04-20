@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -85,9 +86,10 @@ public class TimeseriesUpdater {
         int rowIndex = 0;
         File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
         System.out.println("inputCsv = " + inputCsv);
-        File outputCsv = destination.resolve(timeseriesDatasetDownloads.getXlsTempPath()).toFile();
-        Files.createDirectories(outputCsv.toPath().getParent());
-        System.out.println("outputXls = " + outputCsv);
+        File outputTempXls = destination.resolve(timeseriesDatasetDownloads.getXlsTempPath()).toFile();
+        File outputFinalXls = destination.resolve(timeseriesDatasetDownloads.getXlsPath()).toFile();
+        Files.createDirectories(outputTempXls.toPath().getParent());
+        System.out.println("outputXls = " + outputTempXls);
 
         try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(inputCsv), Charset.forName("UTF8")), ',')) {
 
@@ -119,22 +121,25 @@ public class TimeseriesUpdater {
                 rowIndex++;
             }
 
-            try (OutputStream stream = new FileOutputStream(outputCsv)) {
+            try (OutputStream stream = new FileOutputStream(outputTempXls)) {
                 wb.write(stream);
             }
         }
+
+        Files.move(outputTempXls.toPath(), outputFinalXls.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     public static void generateCsv(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
         int rowIndex = 0;
         File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
         System.out.println("inputCsv = " + inputCsv);
-        File outputCsv = destination.resolve(timeseriesDatasetDownloads.getCsvTempPath()).toFile();
-        Files.createDirectories(outputCsv.toPath().getParent());
-        System.out.println("outputCsv = " + outputCsv);
+        File outputTempCsv = destination.resolve(timeseriesDatasetDownloads.getCsvTempPath()).toFile();
+        File outputFinalCsv = destination.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
+        Files.createDirectories(outputTempCsv.toPath().getParent());
+        System.out.println("outputTempCsv = " + outputTempCsv);
 
         try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(inputCsv), Charset.forName("UTF8")), ',')) {
-            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(outputCsv), Charset.forName("UTF8")), ',')) {
+            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(outputTempCsv), Charset.forName("UTF8")), ',')) {
 
                 String[] strings = reader.readNext();
 
@@ -153,6 +158,8 @@ public class TimeseriesUpdater {
                 }
             }
         }
+
+        Files.move(outputTempCsv.toPath(), outputFinalCsv.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     public static void populateCsvColumnIndexesToUpdate(TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset, Path source) throws IOException {

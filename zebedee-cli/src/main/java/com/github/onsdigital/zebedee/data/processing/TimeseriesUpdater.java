@@ -127,7 +127,10 @@ public class TimeseriesUpdater {
                 if (rowIndex == 0) { // the row with all the titles in
                     // set the updated titles
                     for (TimeseriesUpdateCommand command : commandsForThisDataset) {
-                        strings[command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId())] = command.title;
+                        Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
+                        if (index != null) {
+                            strings[index] = command.title;
+                        }
                     }
                 }
 

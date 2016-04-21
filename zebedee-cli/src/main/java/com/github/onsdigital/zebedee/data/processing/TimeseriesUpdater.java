@@ -234,7 +234,7 @@ public class TimeseriesUpdater {
 
     public static void updateTimeseriesMetadata(ContentReader contentReader, ContentWriter contentWriter, DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
         for (TimeseriesUpdateCommand command : updateCommands) {
-            String uri = dataIndex.getUriForCdid(command.cdid);
+            String uri = dataIndex.getUriForCdid(command.cdid.toLowerCase());
 
             try {
                 boolean updated = false;

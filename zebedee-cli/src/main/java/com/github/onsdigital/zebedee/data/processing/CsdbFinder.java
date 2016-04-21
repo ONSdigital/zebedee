@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -44,7 +43,7 @@ public class CsdbFinder extends SimpleFileVisitor<Path> {
 
             //uri = uri.substring(0, uri.length() - "/data.json".length());
 
-            Log.print("Adding file with uri: %s and path %s", uri, path.toString());
+            //Log.print("Adding file with uri: %s and path %s", uri, path.toString());
             this.files.add(path);
             this.uris.add(uri);
         }

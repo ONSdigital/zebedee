@@ -54,16 +54,20 @@ public class TimeseriesUpdater {
 
         // read the CSV and update the timeseries titles.
         TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
+
+        System.out.println("Importing CSV file...");
         ArrayList<TimeseriesUpdateCommand> updateCommands = importer.importData();
+
+        System.out.println("Updating timeseries with new metadata...");
         updateTimeseriesMetadata(contentReader, contentWriter, dataIndex, updateCommands);
 
-        // find all available CSDB files.
+        System.out.println("Finding all CSDB files...");
         List<TimeseriesDatasetDownloads> datasetDownloads = findCsdbFiles(source);
 
-        // work out which CSDB files need their download files updated
+        System.out.println("Working out which CSDB files need their download files updated...");
         Set<TimeseriesDatasetDownloads> datasetDownloadsToUpdate = determineWhatDownloadsNeedUpdating(updateCommands, datasetDownloads);
 
-        // loop over each CSDB files that needs updated download files.
+        System.out.println("Generating new downloads...");
         for (TimeseriesDatasetDownloads timeseriesDatasetDownloads : datasetDownloadsToUpdate) {
 
             try {
@@ -235,6 +239,11 @@ public class TimeseriesUpdater {
     public static void updateTimeseriesMetadata(ContentReader contentReader, ContentWriter contentWriter, DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
         for (TimeseriesUpdateCommand command : updateCommands) {
             String uri = dataIndex.getUriForCdid(command.cdid.toLowerCase());
+
+            if (uri == null) {
+                System.out.println("CDID " + command.cdid + " not found in the data index.");
+                continue;
+            }
 
             try {
                 boolean updated = false;

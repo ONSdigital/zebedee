@@ -206,14 +206,18 @@ public class TimeseriesUpdater {
     public static Set<TimeseriesDatasetDownloads> determineWhatDownloadsNeedUpdating(ArrayList<TimeseriesUpdateCommand> updateCommands, List<TimeseriesDatasetDownloads> datasetDownloads) {
         Set<TimeseriesDatasetDownloads> datasetDownloadsToUpdate = new HashSet<>();
         for (TimeseriesUpdateCommand command : updateCommands) {
-            for (String sourceDataset : command.sourceDatasets) {
-                for (TimeseriesDatasetDownloads datasetDownload : datasetDownloads) {
-                    if (sourceDataset.equalsIgnoreCase(datasetDownload.getCsdbId())) {
-                        System.out.println("datasetDownload to update = " + datasetDownload.getCsdbId());
-                        datasetDownloadsToUpdate.add(datasetDownload);
+
+            if (command.sourceDatasets != null) {
+                for (String sourceDataset : command.sourceDatasets) {
+                    for (TimeseriesDatasetDownloads datasetDownload : datasetDownloads) {
+                        if (sourceDataset.equalsIgnoreCase(datasetDownload.getCsdbId())) {
+                            System.out.println("datasetDownload to update = " + datasetDownload.getCsdbId());
+                            datasetDownloadsToUpdate.add(datasetDownload);
+                        }
                     }
                 }
             }
+
         }
         return datasetDownloadsToUpdate;
     }

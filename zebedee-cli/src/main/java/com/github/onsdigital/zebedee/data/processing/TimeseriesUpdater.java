@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.Log;
@@ -253,7 +252,7 @@ public class TimeseriesUpdater {
                     contentWriter.writeObject(page, uri);
                 }
 
-            } catch (ZebedeeException e) {
+            } catch (Exception e) {
                 System.out.println("Failed to read timeseries page for uri: " + uri);
             }
         }

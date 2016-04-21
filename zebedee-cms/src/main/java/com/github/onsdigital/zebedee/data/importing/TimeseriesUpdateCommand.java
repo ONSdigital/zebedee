@@ -13,6 +13,8 @@ public class TimeseriesUpdateCommand {
 
     public String title; // The title to update to.
 
+    public String uri;
+
     public List<String> sourceDatasets;
 
     public Map<String, Integer> datasetCsvColumn = new HashMap<>(); // the csv column to update for each dataset.

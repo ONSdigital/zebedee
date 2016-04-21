@@ -56,7 +56,9 @@ public class TimeseriesUpdater {
         TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
         System.out.println("Importing CSV file...");
-        ArrayList<TimeseriesUpdateCommand> updateCommands = importer.importData();
+        ArrayList<TimeseriesUpdateCommand> updateCommandsImported = importer.importData();
+
+        ArrayList<TimeseriesUpdateCommand> updateCommands = filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
 
         System.out.println("Updating timeseries with new metadata...");
         updateTimeseriesMetadata(contentReader, contentWriter, dataIndex, updateCommands);
@@ -83,6 +85,23 @@ public class TimeseriesUpdater {
                 Log.print(e);
             }
         }
+    }
+
+    public static ArrayList<TimeseriesUpdateCommand> filterTimeseriesThatDoNotExist(DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommandsImported) {
+        ArrayList<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
+
+        for (TimeseriesUpdateCommand command : updateCommandsImported) {
+            String uri = dataIndex.getUriForCdid(command.cdid.toLowerCase());
+
+            if (uri == null) {
+                System.out.println("CDID " + command.cdid + " not found in the data index.");
+                continue;
+            } else {
+                command.uri = uri;
+                updateCommands.add(command);
+            }
+        }
+        return updateCommands;
     }
 
     public static void generateXlsx(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
@@ -252,16 +271,10 @@ public class TimeseriesUpdater {
 
     public static void updateTimeseriesMetadata(ContentReader contentReader, ContentWriter contentWriter, DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
         for (TimeseriesUpdateCommand command : updateCommands) {
-            String uri = dataIndex.getUriForCdid(command.cdid.toLowerCase());
-
-            if (uri == null) {
-                System.out.println("CDID " + command.cdid + " not found in the data index.");
-                continue;
-            }
 
             try {
                 boolean updated = false;
-                TimeSeries page = (TimeSeries) contentReader.getContent(uri);
+                TimeSeries page = (TimeSeries) contentReader.getContent(command.uri);
 
                 System.out.println("command.title = " + command.title);
                 for (String sourceDataset : page.sourceDatasets) {
@@ -276,11 +289,11 @@ public class TimeseriesUpdater {
                 }
 
                 if (updated) {
-                    contentWriter.writeObject(page, uri + "/data.json");
+                    contentWriter.writeObject(page, command.uri + "/data.json");
                 }
 
             } catch (Exception e) {
-                System.out.println("Failed to read timeseries page for uri: " + uri);
+                System.out.println("Failed to read timeseries page for uri: " + command.uri);
             }
         }
     }

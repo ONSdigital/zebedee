@@ -262,7 +262,7 @@ public class TimeseriesUpdater {
                 }
 
                 if (updated) {
-                    contentWriter.writeObject(page, uri);
+                    contentWriter.writeObject(page, uri + "/data.json");
                 }
 
             } catch (Exception e) {

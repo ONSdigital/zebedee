@@ -177,15 +177,21 @@ public class TimeseriesUpdater {
             for (String cdid : strings) {
                 for (TimeseriesUpdateCommand command : commandsForThisDataset) {
                     if (command.cdid.equalsIgnoreCase(cdid)) {
-                        for (String sourceDataset : command.sourceDatasets) {
-                            if (sourceDataset.equalsIgnoreCase(timeseriesDatasetDownloads.getCsdbId())) {
 
-                                System.out.println("CSV index for command :" + command.cdid);
-                                System.out.println("csdb id: " + timeseriesDatasetDownloads.getCsdbId());
-                                System.out.println("column index: " + columnIndex);
-                                command.datasetCsvColumn.put(timeseriesDatasetDownloads.getCsdbId(), columnIndex);
-                            }
-                        }
+//                        for (String sourceDataset : command.sourceDatasets) {
+//                            if (sourceDataset.equalsIgnoreCase(timeseriesDatasetDownloads.getCsdbId())) {
+//
+//                                System.out.println("CSV index for command :" + command.cdid);
+//                                System.out.println("csdb id: " + timeseriesDatasetDownloads.getCsdbId());
+//                                System.out.println("column index: " + columnIndex);
+//                                command.datasetCsvColumn.put(timeseriesDatasetDownloads.getCsdbId(), columnIndex);
+//                            }
+//                        }
+
+                        System.out.println("CSV index for command :" + command.cdid);
+                        System.out.println("csdb id: " + timeseriesDatasetDownloads.getCsdbId());
+                        System.out.println("column index: " + columnIndex);
+                        command.datasetCsvColumn.put(timeseriesDatasetDownloads.getCsdbId(), columnIndex);
                     }
                 }
 
@@ -197,12 +203,20 @@ public class TimeseriesUpdater {
     public static Set<TimeseriesUpdateCommand> getCommandsForDataset(ArrayList<TimeseriesUpdateCommand> updateCommands, TimeseriesDatasetDownloads timeseriesDatasetDownloads) {
         Set<TimeseriesUpdateCommand> commandsForThisDataset = new HashSet<>();
         for (TimeseriesUpdateCommand updateCommand : updateCommands) {
-            for (String sourceDataset : updateCommand.sourceDatasets) {
-                if (sourceDataset.equalsIgnoreCase(timeseriesDatasetDownloads.getCsdbId())) {
-                    System.out.println("updateCommand " + updateCommand.cdid + " added to dataset " + timeseriesDatasetDownloads.getCsdbId());
-                    commandsForThisDataset.add(updateCommand);
+
+            if (updateCommand.sourceDatasets != null) {
+                for (String sourceDataset : updateCommand.sourceDatasets) {
+                    if (sourceDataset.equalsIgnoreCase(timeseriesDatasetDownloads.getCsdbId())) {
+                        System.out.println("updateCommand " + updateCommand.cdid + " added to dataset " + timeseriesDatasetDownloads.getCsdbId());
+                        commandsForThisDataset.add(updateCommand);
+                    }
                 }
+            } else {
+                System.out.println("There are no source datasets defined for CDID: " + updateCommand.cdid);
+
+                commandsForThisDataset.add(updateCommand);
             }
+
         }
         return commandsForThisDataset;
     }

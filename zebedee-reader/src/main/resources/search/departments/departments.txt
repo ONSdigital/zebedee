@@ -41,7 +41,7 @@ nhs => The NHS => https://www.gov.uk/government/statistics?departments%5B%5D=nat
 
 tis => The Insolvency Service => https://www.gov.uk/government/statistics?departments%5B%5D=insolvency-service => tis, insolvency
 
-wg => The Welsh Government => http://wales.gov.uk => wg,wales,welsh
+wg => The Welsh Government => http://wales.gov.uk => wg,Wales,welsh
 
 sg => The Scottish Government => http://www.scotland.gov.uk/Topics/Statistics => sg,scotland,scottish
 

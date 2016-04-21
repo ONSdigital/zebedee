@@ -24,22 +24,20 @@ public class Cli {
 
             if (line.hasOption("createcollection")) {
                 CollectionCreator.createCollection(args);
-                return;
-            }
-
-            if (line.hasOption("updatetimeseries")) {
+            } else if (line.hasOption("updatetimeseries")) {
                 TimeseriesUpdater.updateTimeseriesData(args);
-                return;
+            } else {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.setWidth(150);
+                formatter.printHelp("zebedee-cli", options);
             }
 
         } catch (ParseException exp) {
             System.err.println("Parsing failed.  Reason: " + exp.getMessage());
+            System.exit(1);
         }
 
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.setWidth(150);
-        formatter.printHelp("zebedee-cli", options);
-
+        System.exit(0);
     }
 
 

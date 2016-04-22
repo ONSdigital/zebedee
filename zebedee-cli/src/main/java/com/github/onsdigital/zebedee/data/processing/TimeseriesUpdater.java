@@ -176,7 +176,7 @@ public class TimeseriesUpdater {
                             Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
                             if (index != null) {
                                 System.out.println("Setting CSV title to " + command.title + " index: " + index + " cdid: " + command.cdid + " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
-                                strings[index] = command.title;
+                                strings[index] = "\"" + command.title + "\"";
                             }
                         }
                     }
@@ -214,9 +214,9 @@ public class TimeseriesUpdater {
 //                            }
 //                        }
 
-                        System.out.println("CSV index for command :" + command.cdid);
-                        System.out.println("csdb id: " + timeseriesDatasetDownloads.getCsdbId());
-                        System.out.println("column index: " + columnIndex);
+//                        System.out.println("CSV index for command :" + command.cdid);
+//                        System.out.println("csdb id: " + timeseriesDatasetDownloads.getCsdbId());
+//                        System.out.println("column index: " + columnIndex);
                         command.datasetCsvColumn.put(timeseriesDatasetDownloads.getCsdbId(), columnIndex);
                     }
                 }

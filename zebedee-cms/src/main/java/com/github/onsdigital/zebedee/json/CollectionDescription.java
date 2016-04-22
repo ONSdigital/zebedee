@@ -24,6 +24,8 @@ public class CollectionDescription extends CollectionBase {
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
 
+    public List<String> timeseriesImportFiles;
+
     /**
      * events related to this collection
      */

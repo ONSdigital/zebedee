@@ -59,7 +59,7 @@ public class ApproveTask implements Callable<Boolean> {
             // Generate timeseries if required.
             List<String> uriList = new DataPublisher().preprocessCollection(
                     publishedReader,
-                    collectionReader.getReviewed(),
+                    collectionReader,
                     collectionWriter.getReviewed(), collection, true, dataIndex);
 
             // set the approved state on the collection

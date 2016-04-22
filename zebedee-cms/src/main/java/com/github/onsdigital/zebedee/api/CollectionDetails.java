@@ -62,6 +62,7 @@ public class CollectionDetails {
 
         result.approvedStatus = collection.description.approvedStatus;
         result.events = collection.description.events;
+        result.timeseriesImportFiles = collection.description.timeseriesImportFiles;
 
         addEventsForDetails(result.inProgress, result, collection);
         addEventsForDetails(result.complete, result, collection);

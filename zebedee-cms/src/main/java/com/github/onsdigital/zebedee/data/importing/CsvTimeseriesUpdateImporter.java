@@ -2,12 +2,11 @@ package com.github.onsdigital.zebedee.data.importing;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.ArrayList;
 
 /**
@@ -15,16 +14,16 @@ import java.util.ArrayList;
  */
 public class CsvTimeseriesUpdateImporter implements TimeseriesUpdateImporter {
 
-    private final Path csvPath;
+    private final InputStream inputStream;
 
     /**
      * Initialise a new data import for the given CSV file path.
-     *
-     * @param csvPath
+     * @param inputStream
      */
-    public CsvTimeseriesUpdateImporter(Path csvPath) {
-        this.csvPath = csvPath;
+    public CsvTimeseriesUpdateImporter(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
+
 
     /**
      * Import data and return as a collection of timeseries update commands.
@@ -35,7 +34,7 @@ public class CsvTimeseriesUpdateImporter implements TimeseriesUpdateImporter {
     public ArrayList<TimeseriesUpdateCommand> importData() throws IOException {
         ArrayList<TimeseriesUpdateCommand> commands = new ArrayList<>();
 
-        try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(csvPath.toFile()), Charset.forName("UTF8")), ',')) {
+        try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream, Charset.forName("UTF8")), ',')) {
             String[] strings = reader.readNext();
 
             while (strings != null) {

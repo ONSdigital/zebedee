@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.TimeseriesUpdater;
@@ -54,7 +55,7 @@ public class ExistingTimeseriesUpdater {
         DataIndex dataIndex = buildDataIndex(contentReader);
 
         // read the CSV and update the timeseries titles.
-        TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
+        TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(new FileInputStream(csvInput.toFile()));
 
         System.out.println("Importing CSV file...");
         ArrayList<TimeseriesUpdateCommand> updateCommandsImported = importer.importData();
@@ -62,7 +63,7 @@ public class ExistingTimeseriesUpdater {
         ArrayList<TimeseriesUpdateCommand> updateCommands = TimeseriesUpdater.filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
 
         System.out.println("Updating timeseries with new metadata...");
-        TimeseriesUpdater.updateTimeseriesMetadata(contentReader, contentWriter, dataIndex, updateCommands);
+        TimeseriesUpdater.updateTimeseriesMetadata(new CompoundContentReader(contentReader), contentWriter, dataIndex, updateCommands);
 
         System.out.println("Finding all CSDB files...");
         List<TimeseriesDatasetDownloads> datasetDownloads = findCsdbFiles(source);

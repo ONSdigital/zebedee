@@ -6,10 +6,10 @@ import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class TimeseriesUpdater {
 
-    public static void UpdateTimeseries(ContentReader contentReader, ContentWriter contentWriter, Path csvInput, DataIndex dataIndex) throws IOException, InterruptedException {
+    public static void updateTimeseries(CompoundContentReader contentReader, ContentWriter contentWriter, InputStream csvInput, DataIndex dataIndex) throws IOException {
 
         // read the CSV and update the timeseries titles.
         TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
@@ -29,7 +29,6 @@ public class TimeseriesUpdater {
 
         System.out.println("Updating timeseries with new metadata...");
         updateTimeseriesMetadata(contentReader, contentWriter, dataIndex, updateCommands);
-
     }
 
     public static ArrayList<TimeseriesUpdateCommand> filterTimeseriesThatDoNotExist(DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommandsImported) {
@@ -49,7 +48,7 @@ public class TimeseriesUpdater {
         return updateCommands;
     }
 
-    public static void updateTimeseriesMetadata(ContentReader contentReader, ContentWriter contentWriter, DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
+    public static void updateTimeseriesMetadata(CompoundContentReader contentReader, ContentWriter contentWriter, DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
         for (TimeseriesUpdateCommand command : updateCommands) {
 
             try {

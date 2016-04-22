@@ -12,8 +12,8 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.TimeseriesUpdater;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class DataPublisher {
@@ -31,7 +31,6 @@ public class DataPublisher {
      * Run the preprocess routine that processes csdb uploads with the option of skipping timeseries filesaves
      *
      * @param publishedContentReader  reader for the master content
-     * @param reviewedContentReader   reader for this publications collection content
      * @param collectionContentWriter reader for this publications collection content
      * @param collection              the collection being processed
      * @param saveTimeSeries          the option to skip saving the individual timeseries
@@ -63,7 +62,9 @@ public class DataPublisher {
             for (String importFile : collection.description.timeseriesImportFiles) {
                 CompoundContentReader compoundContentReader = new CompoundContentReader(publishedContentReader);
                 compoundContentReader.add(collectionReader.getReviewed());
-                TimeseriesUpdater.UpdateTimeseries(compoundContentReader, collectionContentWriter, Paths.get(importFile), dataIndex);
+
+                InputStream csvInput = collectionReader.getRoot().getResource(importFile).getData();
+                TimeseriesUpdater.updateTimeseries(compoundContentReader, collectionContentWriter, csvInput, dataIndex);
             }
 
         }

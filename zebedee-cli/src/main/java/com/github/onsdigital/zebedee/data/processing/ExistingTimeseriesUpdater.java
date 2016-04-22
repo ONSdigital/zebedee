@@ -2,13 +2,13 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.TimeseriesUpdater;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -26,9 +26,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Given as CSV indexed with the timeseries CDID, update each timeseries with the given data.
+ * Given as CSV indexed with the timeseries CDID, update each timeseries with the given data
+ * and update any CSV / XLS download files with the new titles.
  */
-public class TimeseriesUpdater {
+public class ExistingTimeseriesUpdater {
 
 
     public static void updateTimeseriesData(String[] args) throws Exception {
@@ -41,10 +42,10 @@ public class TimeseriesUpdater {
         Path destination = Paths.get(args[2]);
         Path csvInput = Paths.get(args[3]);
 
-        UpdateTimeseries(source, destination, csvInput);
+        updateTimeseries(source, destination, csvInput);
     }
 
-    public static void UpdateTimeseries(Path source, Path destination, Path csvInput) throws IOException, InterruptedException {
+    public static void updateTimeseries(Path source, Path destination, Path csvInput) throws IOException, InterruptedException {
 
         // build the data index so we know where to find timeseries files given the CDID
         ContentReader contentReader = new ContentReader(source);
@@ -58,10 +59,10 @@ public class TimeseriesUpdater {
         System.out.println("Importing CSV file...");
         ArrayList<TimeseriesUpdateCommand> updateCommandsImported = importer.importData();
 
-        ArrayList<TimeseriesUpdateCommand> updateCommands = filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
+        ArrayList<TimeseriesUpdateCommand> updateCommands = TimeseriesUpdater.filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
 
         System.out.println("Updating timeseries with new metadata...");
-        updateTimeseriesMetadata(contentReader, contentWriter, dataIndex, updateCommands);
+        TimeseriesUpdater.updateTimeseriesMetadata(contentReader, contentWriter, dataIndex, updateCommands);
 
         System.out.println("Finding all CSDB files...");
         List<TimeseriesDatasetDownloads> datasetDownloads = findCsdbFiles(source);
@@ -85,23 +86,6 @@ public class TimeseriesUpdater {
                 Log.print(e);
             }
         }
-    }
-
-    public static ArrayList<TimeseriesUpdateCommand> filterTimeseriesThatDoNotExist(DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommandsImported) {
-        ArrayList<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-
-        for (TimeseriesUpdateCommand command : updateCommandsImported) {
-            String uri = dataIndex.getUriForCdid(command.cdid.toLowerCase());
-
-            if (uri == null) {
-                System.out.println("CDID " + command.cdid + " not found in the data index.");
-                continue;
-            } else {
-                command.uri = uri;
-                updateCommands.add(command);
-            }
-        }
-        return updateCommands;
     }
 
     public static void generateXlsx(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
@@ -279,36 +263,6 @@ public class TimeseriesUpdater {
         }
         return datasetDownloads;
     }
-
-    public static void updateTimeseriesMetadata(ContentReader contentReader, ContentWriter contentWriter, DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
-        for (TimeseriesUpdateCommand command : updateCommands) {
-
-            try {
-                boolean updated = false;
-                TimeSeries page = (TimeSeries) contentReader.getContent(command.uri);
-
-                System.out.println("command.title = " + command.title);
-                for (String sourceDataset : page.sourceDatasets) {
-                    System.out.println("sourceDataset = " + sourceDataset);
-                }
-
-                command.sourceDatasets = page.sourceDatasets;
-
-                if (command.title != null && command.title.length() > 0) {
-                    page.getDescription().setTitle(command.title);
-                    updated = true;
-                }
-
-                if (updated) {
-                    contentWriter.writeObject(page, command.uri + "/data.json");
-                }
-
-            } catch (Exception e) {
-                System.out.println("Failed to read timeseries page for uri: " + command.uri);
-            }
-        }
-    }
-
 
     public static DataIndex buildDataIndex(ContentReader contentReader) throws InterruptedException {
         DataIndex dataIndex = new DataIndex(contentReader);

@@ -25,7 +25,7 @@ public class Cli {
             if (line.hasOption("createcollection")) {
                 CollectionCreator.createCollection(args);
             } else if (line.hasOption("updatetimeseries")) {
-                TimeseriesUpdater.updateTimeseriesData(args);
+                ExistingTimeseriesUpdater.updateTimeseriesData(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

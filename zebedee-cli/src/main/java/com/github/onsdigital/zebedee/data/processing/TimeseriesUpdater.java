@@ -175,6 +175,7 @@ public class TimeseriesUpdater {
                         for (TimeseriesUpdateCommand command : commandsForThisDataset) {
                             Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
                             if (index != null) {
+                                System.out.println("Setting CSV title to " + command.title + " index: " + index + " cdid: " + command.cdid + " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
                                 strings[index] = command.title;
                             }
                         }

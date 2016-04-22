@@ -74,5 +74,6 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
         inProgress = new CollectionContentWriter(collection, key, collection.path.resolve(config.getInProgressFolderName()));
         complete = new CollectionContentWriter(collection, key, collection.path.resolve(config.getCompleteFolderName()));
         reviewed = new CollectionContentWriter(collection, key, collection.path.resolve(config.getReviewedFolderName()));
+        root = new CollectionContentWriter(collection, key, collection.path);
     }
 }

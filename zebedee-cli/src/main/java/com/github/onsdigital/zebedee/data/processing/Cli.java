@@ -32,7 +32,7 @@ public class Cli {
                 CollectionCreator.createCollection(args);
             } else if (line.hasOption("updatetimeseries")) {
                 ExistingTimeseriesUpdater.updateTimeseriesData(args);
-            } else if (line.hasOption("removeTimeseriesData")) {
+            } else if (line.hasOption("removetimeseriesdata")) {
                 TimeseriesDataRemover.removeTimeseriesData(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();

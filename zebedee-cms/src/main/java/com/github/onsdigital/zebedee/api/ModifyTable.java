@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.TableModifications;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -24,7 +25,8 @@ import org.w3c.dom.Node;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
@@ -47,20 +49,19 @@ import static com.github.onsdigital.zebedee.exceptions.TableBuilderException.Err
  * Created by dave on 4/15/16.
  */
 @Api
-public class TableMetadata {
+public class ModifyTable {
 
     private static final String HTML_FILE_EXT = ".html";
     private static final String JSON_FILE_EXT = ".json";
     private static final String XLS_FILE_EXT = ".xls";
     private static final String CURRENT_URI = "currentUri";
     private static final String NEW_URI = "newUri";
-    private static final String EXCLUDED_ROWS_PARAM_NAME = "rowsExcluded";
 
     /**
      * Update/Create XLS table metadata - i.e rows to be excluded from the generated HTML table.
      */
-    @PUT
-    public void updateMetadata(HttpServletRequest request, HttpServletResponse response)
+    @POST
+    public void modifyTable(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException, ParserConfigurationException, TransformerException, FileUploadException {
 
         Session session = Root.zebedee.sessions.get(request);
@@ -69,17 +70,21 @@ public class TableMetadata {
 
         String currentUri = request.getParameter(CURRENT_URI);
         String newUri = request.getParameter(NEW_URI);
-        List<Integer> exclusions = exclusions(request);
+
+        com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table newTable =
+                ContentUtil.deserialise(request.getInputStream(),
+                        com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table.class);
 
         validate(response, collection, currentUri + XLS_FILE_EXT);
 
         com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table tableJson
-                = getTable(request, collectionReader, currentUri + JSON_FILE_EXT);
+                = getCurrentTable(request, collectionReader, currentUri + JSON_FILE_EXT);
+        tableJson.setModifications(newTable.getModifications());
 
-        tableJson.setExcludeRows(exclusions);
-        String htmlTableStr = generateXlsTable(request, collectionReader, currentUri + XLS_FILE_EXT, exclusions);
+        String htmlTableStr = generateXlsTable(request, collectionReader, currentUri + XLS_FILE_EXT, tableJson.getModifications());
 
         writeData(request, session, collectionReader, collection, currentUri, newUri, htmlTableStr, tableJson);
+        response.setStatus(Response.Status.CREATED.getStatusCode());
         Audit.Event.COLLECTION_TABLE_METADATA_MODIFIED
                 .parameters()
                 .host(request)
@@ -96,11 +101,11 @@ public class TableMetadata {
             ZebedeeException {
         Session session = Root.zebedee.sessions.get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
 
-        String uri = request.getParameter(NEW_URI) + JSON_FILE_EXT;
-        com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table table = getTable(request, collectionReader, uri);
-        table.sortExcludedRows();
+        String uri = request.getParameter("uri");
+        com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table table = getCurrentTable(request, collectionReader, uri);
         IOUtils.copy(toInputStream(table), response.getOutputStream());
     }
 
@@ -149,23 +154,32 @@ public class TableMetadata {
         }
     }
 
-    private String generateXlsTable(HttpServletRequest request, CollectionReader collectionReader, String resourceUri, List<Integer> exclusions)
-            throws ZebedeeException, IOException, TransformerException, ParserConfigurationException {
+    private String generateXlsTable(HttpServletRequest request, CollectionReader collectionReader, String resourceUri,
+                                    TableModifications modifications) throws ZebedeeException, IOException,
+            TransformerException, ParserConfigurationException {
+
         try (Resource currentXlsResource = collectionReader.getResource(resourceUri)) {
-            return generateTableWithExclusions(currentXlsResource.getData(), exclusions);
+            return generateModifiedTable(currentXlsResource.getData(), modifications);
         } catch (Exception ex) {
             // Ignore error and try to get published content.
         }
 
         try (Resource publishedResource = RequestUtils.getZebedeeReader(request).getPublishedResource(resourceUri)) {
-            return generateTableWithExclusions(publishedResource.getData(), exclusions);
+            return generateModifiedTable(publishedResource.getData(), modifications);
         }
     }
 
-    private String generateTableWithExclusions(InputStream inputStream, List<Integer> exclusions)
+    private String generateModifiedTable(InputStream inputStream, TableModifications modifications)
             throws ParserConfigurationException, TableBuilderException, IOException, TransformerException {
-        Node updatedHtmlTable = XlsToHtmlConverter.convertToHtmlPageAndExclude(inputStream, exclusions);
-        return XlsToHtmlConverter.docToString(updatedHtmlTable);
+
+        if (modifications == null || modifications.getRowsExcluded().isEmpty()
+                && modifications.getHeaderColumns().isEmpty() && modifications.getHeaderRows().isEmpty()) {
+            modifications = null;
+        }
+        Node updatedHtmlTable = XlsToHtmlConverter.convertToHtmlPageWithModifications(inputStream, modifications);
+        String result = XlsToHtmlConverter.docToString(updatedHtmlTable);
+        System.out.println(result);
+        return result;
     }
 
     private InputStream toInputStream(Page page) {
@@ -176,14 +190,13 @@ public class TableMetadata {
         return new ByteArrayInputStream(value.getBytes());
     }
 
-    private com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table getTable(
+    private com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table getCurrentTable(
             HttpServletRequest request, CollectionReader collectionReader, String uri)
             throws ZebedeeException, IOException {
         com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table table;
 
         table = (com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table)
                 deserialiseContent(getResource(request, collectionReader, uri).getData());
-        table.sortExcludedRows();
         return table;
     }
 
@@ -197,9 +210,13 @@ public class TableMetadata {
         return RequestUtils.getZebedeeReader(request).getPublishedResource(resourceUri);
     }
 
-    private List<Integer> exclusions(HttpServletRequest request) throws TableBuilderException {
+    private com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table getNewTable(HttpServletRequest request) throws TableBuilderException, IOException {
+        return ContentUtil.deserialise(request.getInputStream(), com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table.class);
+    }
+
+    private List<Integer> getParam(HttpServletRequest request, String paramName) throws TableBuilderException {
         Set<Integer> exclusionsSet = new HashSet<>();
-        String raw = request.getParameter(EXCLUDED_ROWS_PARAM_NAME);
+        String raw = request.getParameter(paramName);
 
         if (StringUtils.isNotEmpty(raw)) {
             for (String data : raw.split(",")) {

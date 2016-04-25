@@ -16,7 +16,7 @@ public class Table extends FigureBase {
     private String filename;
     private Boolean firstLineTitle;
     private String headerRows;
-    private List<Integer> excludeRows = new ArrayList<>();
+    private TableModifications modifications;
 
     @Override
     public PageType getType() {
@@ -63,19 +63,11 @@ public class Table extends FigureBase {
         this.headerRows = headerRows;
     }
 
-    public List<Integer> getExcludeRows() {
-        return excludeRows;
+    public TableModifications getModifications() {
+        return modifications;
     }
 
-    public void setExcludeRows(List<Integer> excludeRows) {
-        this.excludeRows = excludeRows;
-        sortExcludedRows();
-    }
-
-    public void sortExcludedRows() {
-        if (excludeRows != null & !excludeRows.isEmpty()) {
-            Collections.sort(excludeRows);
-            Collections.reverse(excludeRows);
-        }
+    public void setModifications(TableModifications modifications) {
+        this.modifications = modifications;
     }
 }

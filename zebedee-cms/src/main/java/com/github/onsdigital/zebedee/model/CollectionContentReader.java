@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import org.apache.commons.io.IOUtils;
@@ -17,7 +17,7 @@ import java.nio.file.Path;
 /**
  * A content reader that handles encrypted files.
  */
-public class CollectionContentReader extends ContentReader {
+public class CollectionContentReader extends FileSystemContentReader {
 
     private Collection collection;
     private SecretKey key;

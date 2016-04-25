@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.data.processing.setup.DataIndexBuilder;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.TimeseriesUpdater;
 import org.apache.poi.ss.usermodel.Row;
@@ -50,7 +51,7 @@ public class ExistingTimeseriesUpdater {
     public static void updateTimeseries(Path source, Path destination, Path csvInput) throws IOException, InterruptedException {
 
         // build the data index so we know where to find timeseries files given the CDID
-        ContentReader contentReader = new ContentReader(source);
+        ContentReader contentReader = new FileSystemContentReader(source);
         ContentWriter contentWriter = new ContentWriter(destination);
 
         DataIndex dataIndex = DataIndexBuilder.buildDataIndex(contentReader);

@@ -17,6 +17,7 @@ import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.util.JsonUtils;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
@@ -214,7 +215,7 @@ public class Collections {
         CollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
-        ContentReader publishedReader = new ContentReader(zebedee.published.path);
+        ContentReader publishedReader = new FileSystemContentReader(zebedee.published.path);
         DataIndex dataIndex = zebedee.dataIndex;
 
         Future<Boolean> future = ApprovalQueue.add(

@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +24,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by thomasridd on 1/19/16.
@@ -58,7 +59,7 @@ public class DataPublicationFinderTest {
         collectionDescription.name = "DataPublicationFinder";
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
-        publishedReader = new ContentReader(zebedee.published.path);
+        publishedReader = new FileSystemContentReader(zebedee.published.path);
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
     }

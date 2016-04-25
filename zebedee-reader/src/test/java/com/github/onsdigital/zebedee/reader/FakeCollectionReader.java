@@ -56,6 +56,6 @@ public class FakeCollectionReader extends CollectionReader {
     }
 
     private ContentReader getContentReader(Path collectionPath, String folderName) {
-        return new ContentReader(collectionPath.resolve(folderName));
+        return new FileSystemContentReader(collectionPath.resolve(folderName));
     }
 }

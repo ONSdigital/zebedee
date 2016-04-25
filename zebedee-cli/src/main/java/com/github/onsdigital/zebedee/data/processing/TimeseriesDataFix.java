@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -37,7 +38,7 @@ public class TimeseriesDataFix {
         String inputPath = args[0];
         Log.print("Running data fix in %s", inputPath);
 
-        ContentReader contentReader = new ContentReader(Paths.get(inputPath));
+        ContentReader contentReader = new FileSystemContentReader(Paths.get(inputPath));
         DataIndex dataIndex = new DataIndex(contentReader);
 
         System.out.println("Data indexing...");

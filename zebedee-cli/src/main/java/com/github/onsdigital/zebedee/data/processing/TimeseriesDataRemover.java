@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,11 +41,11 @@ public class TimeseriesDataRemover {
     private static void removeTimeseriesData(Path source, Path destination, DataResoltion dataResoltion, Set<String> cdids) throws InterruptedException, ZebedeeException, IOException {
 
         // build the data index so we know where to find timeseries files given the CDID
-        ContentReader contentReader = new ContentReader(source);
+        ContentReader contentReader = new FileSystemContentReader(source);
 
         // create a compound reader to check if the file already exists in the destination before reading it from the source.
         CompoundContentReader compoundContentReader = new CompoundContentReader(contentReader);
-        compoundContentReader.add(new ContentReader(destination));
+        compoundContentReader.add(new FileSystemContentReader(destination));
 
         ContentWriter contentWriter = new ContentWriter(destination);
 

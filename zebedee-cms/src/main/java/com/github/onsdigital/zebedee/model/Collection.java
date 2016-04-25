@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.model.approval.ReleasePopulator;
@@ -829,7 +830,7 @@ public class Collection {
             throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
         }
 
-        ContentReader contentReader = new ContentReader(zebedee.published.path);
+        ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
 
         VersionedContentItem versionedContentItem = new VersionedContentItem(uri, collectionWriter.getReviewed());
 

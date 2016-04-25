@@ -36,7 +36,7 @@ public class ContentReaderTest {
 
     @Before
     public void createContentReader() {
-        this.contentReader = new ContentReader("target/test-content/zebedee/master");
+        this.contentReader = new FileSystemContentReader("target/test-content/zebedee/master");
     }
 
     @Test
@@ -185,7 +185,7 @@ public class ContentReaderTest {
     public void listTimeseries_whereWeHaveTimeSeries_returnsTimeseriesDirectories() throws IOException {
         // Given
         //
-        ContentReader reader = new ContentReader("target/test-content/zebedee/master/employmentandlabourmarket");
+        ContentReader reader = new FileSystemContentReader("target/test-content/zebedee/master/employmentandlabourmarket");
 
         // When
         //

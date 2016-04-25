@@ -36,13 +36,13 @@ public class ZebedeeReader {
     }
 
     public ZebedeeReader(ContentLanguage language) {
-        publishedContentReader = new ContentReader(getConfiguration().getContentDir());
+        publishedContentReader = new FileSystemContentReader(getConfiguration().getContentDir());
         publishedContentReader.setLanguage(language);
         this.language = language;
     }
 
     public ZebedeeReader(String rootFolder, ContentLanguage language) {
-        publishedContentReader = new ContentReader(rootFolder);
+        publishedContentReader = new FileSystemContentReader(rootFolder);
         this.language = language;
     }
 

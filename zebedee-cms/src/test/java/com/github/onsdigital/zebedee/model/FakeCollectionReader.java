@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,6 +57,6 @@ public class FakeCollectionReader extends CollectionReader {
     }
 
     private ContentReader getContentReader(Path collectionPath, String folderName) {
-        return new ContentReader(collectionPath.resolve(folderName));
+        return new FileSystemContentReader(collectionPath.resolve(folderName));
     }
 }

@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,10 +21,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
-import com.github.onsdigital.zebedee.data.processing.DataLinkMock;
 
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by thomasridd on 1/24/16.
@@ -71,7 +71,7 @@ public class DataPublicationTest {
         collectionDescription.isEncrypted = true;
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
-        publishedReader = new ContentReader(zebedee.published.path);
+        publishedReader = new FileSystemContentReader(zebedee.published.path);
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
 

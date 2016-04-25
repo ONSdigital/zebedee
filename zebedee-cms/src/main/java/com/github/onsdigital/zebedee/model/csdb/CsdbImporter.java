@@ -18,6 +18,7 @@ import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
 import com.github.onsdigital.zebedee.util.Log;
@@ -110,7 +111,7 @@ public class CsdbImporter {
         SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
-        ContentReader publishedReader = new ContentReader(Root.zebedee.published.path);
+        ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.published.path);
         DataIndex dataIndex = Root.zebedee.dataIndex;
 
         return new DataPublisher().preprocessCollection(

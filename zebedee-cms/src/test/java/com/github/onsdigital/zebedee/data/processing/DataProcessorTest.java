@@ -19,6 +19,7 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -87,7 +88,7 @@ public class DataProcessorTest {
         collectionDescription.isEncrypted = true;
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
-        publishedReader = new ContentReader(zebedee.published.path);
+        publishedReader = new FileSystemContentReader(zebedee.published.path);
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
 

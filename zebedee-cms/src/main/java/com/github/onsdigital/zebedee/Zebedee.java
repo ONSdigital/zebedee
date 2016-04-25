@@ -11,7 +11,7 @@ import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
-import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class Zebedee {
 
         // Create published and ensure redirect
         this.published = new Content(published);
-        this.dataIndex = new DataIndex(new ContentReader(this.published.path));
+        this.dataIndex = new DataIndex(new FileSystemContentReader(this.published.path));
 
         Path redirectPath = this.published.path.resolve(Content.REDIRECT);
         if (!Files.exists(redirectPath)) {

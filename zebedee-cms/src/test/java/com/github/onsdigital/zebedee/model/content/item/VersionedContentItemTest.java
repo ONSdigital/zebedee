@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.content.item;
 
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ public class VersionedContentItemTest {
         Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
         FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
-        ContentReader contentReader = new ContentReader(rootPath);
+        ContentReader contentReader = new FileSystemContentReader(rootPath);
         // When we create a new version with the root of the content as the source for the version.
         ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader);
 
@@ -40,7 +41,7 @@ public class VersionedContentItemTest {
         Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
         FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
-        ContentReader contentReader = new ContentReader(rootPath);
+        ContentReader contentReader = new FileSystemContentReader(rootPath);
         ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader);
 
         // When we create a new version with the root of the content as the source for the version.

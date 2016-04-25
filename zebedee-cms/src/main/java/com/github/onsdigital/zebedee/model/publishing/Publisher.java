@@ -21,6 +21,7 @@ import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.*;
@@ -371,7 +372,7 @@ public class Publisher {
 
         try {
 
-            ContentReader contentReader = new ContentReader(zebedee.published.path);
+            ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
             ContentWriter contentWriter = new ContentWriter(zebedee.published.path);
 
             processManifestForMaster(collection, contentReader, contentWriter);

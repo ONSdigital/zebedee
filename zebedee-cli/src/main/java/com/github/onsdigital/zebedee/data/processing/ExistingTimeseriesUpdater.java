@@ -5,6 +5,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
+import com.github.onsdigital.zebedee.data.processing.setup.DataIndexBuilder;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -52,7 +53,7 @@ public class ExistingTimeseriesUpdater {
         ContentReader contentReader = new ContentReader(source);
         ContentWriter contentWriter = new ContentWriter(destination);
 
-        DataIndex dataIndex = buildDataIndex(contentReader);
+        DataIndex dataIndex = DataIndexBuilder.buildDataIndex(contentReader);
 
         // read the CSV and update the timeseries titles.
         TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(new FileInputStream(csvInput.toFile()));
@@ -263,16 +264,5 @@ public class ExistingTimeseriesUpdater {
             datasetDownloads.add(new TimeseriesDatasetDownloads(Paths.get(uri)));
         }
         return datasetDownloads;
-    }
-
-    public static DataIndex buildDataIndex(ContentReader contentReader) throws InterruptedException {
-        DataIndex dataIndex = new DataIndex(contentReader);
-
-        while (!dataIndex.indexBuilt) {
-            Thread.sleep(1000);
-            System.out.print(".");
-        }
-        System.out.println("");
-        return dataIndex;
     }
 }

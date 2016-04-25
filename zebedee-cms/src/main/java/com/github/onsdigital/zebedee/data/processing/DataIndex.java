@@ -1,15 +1,15 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,21 +21,10 @@ import java.util.concurrent.Executors;
  * A hashmap storing a mapping from cdid
  */
 public class DataIndex {
+    private static final ExecutorService pool = Executors.newSingleThreadExecutor();
     Map<String, String> index = new HashMap<>();
     ContentReader contentReader = null;
     boolean indexBuilt = false;
-    private static final ExecutorService pool = Executors.newSingleThreadExecutor();
-
-    public String getUriForCdid(String cdid) {
-        return index.get(cdid);
-    }
-    public void setUriForCdid(String cdid, String uri) {
-        index.put(cdid, uri);
-    }
-
-    public Set<String> cdids() {
-        return index.keySet();
-    }
 
     /**
      * Set up the data index based on a content reader
@@ -45,6 +34,18 @@ public class DataIndex {
     public DataIndex(ContentReader contentReader) {
         this.contentReader = contentReader;
         reindex();
+    }
+
+    public String getUriForCdid(String cdid) {
+        return index.get(cdid);
+    }
+
+    public void setUriForCdid(String cdid, String uri) {
+        index.put(cdid, uri);
+    }
+
+    public Set<String> cdids() {
+        return index.keySet();
     }
 
     /**
@@ -65,6 +66,43 @@ public class DataIndex {
             }
         };
         pool.submit(build);
+    }
+
+    /**
+     * Wait until complete with return value
+     *
+     * @param maxSeconds max wait time
+     * @return build is completed
+     * @throws InterruptedException
+     */
+    private boolean waitWhileIncomplete(int maxSeconds) throws InterruptedException {
+        int tries = 0;
+        while (!indexBuilt) {
+            Thread.sleep(100);
+            if (tries++ > 10 * maxSeconds)
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Wait until data indexing is complete
+     *
+     * @param maxSeconds timeout in seconds before an error is thrown
+     * @throws BadRequestException if the pause takes too long or is interupted
+     */
+    public void pauseUntilComplete(int maxSeconds) throws BadRequestException {
+        try {
+            if (!waitWhileIncomplete(maxSeconds)) {
+                throw new BadRequestException("DataIndex build in progress");
+            }
+        } catch (InterruptedException e) {
+            throw new BadRequestException("DataIndex build in progress");
+        }
+    }
+
+    public boolean isIndexBuilt() {
+        return indexBuilt;
     }
 
     /**
@@ -102,39 +140,6 @@ public class DataIndex {
 
             }
             return FileVisitResult.CONTINUE;
-        }
-    }
-
-    /**
-     * Wait until complete with return value
-     *
-     * @param maxSeconds max wait time
-     * @return build is completed
-     * @throws InterruptedException
-     */
-    private boolean waitWhileIncomplete(int maxSeconds) throws InterruptedException {
-        int tries = 0;
-        while (!indexBuilt) {
-            Thread.sleep(100);
-            if (tries++ > 10 * maxSeconds)
-                return false;
-        }
-        return true;
-    }
-
-    /**
-     * Wait until data indexing is complete
-     *
-     * @param maxSeconds timeout in seconds before an error is thrown
-     * @throws BadRequestException if the pause takes too long or is interupted
-     */
-    public void pauseUntilComplete(int maxSeconds) throws BadRequestException {
-        try {
-            if (!waitWhileIncomplete(maxSeconds)) {
-                throw new BadRequestException("DataIndex build in progress");
-            }
-        } catch (InterruptedException e) {
-            throw new BadRequestException("DataIndex build in progress");
         }
     }
 }

@@ -18,6 +18,12 @@ public class Cli {
                 .numberOfArgs(3)
                 .build());
 
+        options.addOption(Option.builder("removetimeseriesdata")
+                .desc("Remove timeseries data entries for the given resolution ( months | quarters | years )")
+                .argName("source directory> <destination directory> <resolution> <CDID...")
+                .hasArgs()
+                .build());
+
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine line = parser.parse(options, args);
@@ -26,6 +32,8 @@ public class Cli {
                 CollectionCreator.createCollection(args);
             } else if (line.hasOption("updatetimeseries")) {
                 ExistingTimeseriesUpdater.updateTimeseriesData(args);
+            } else if (line.hasOption("removeTimeseriesData")) {
+                TimeseriesDataRemover.removeTimeseriesData(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

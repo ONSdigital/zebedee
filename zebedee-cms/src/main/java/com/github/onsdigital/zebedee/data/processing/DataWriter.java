@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.data.processing;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -28,14 +28,16 @@ public class DataWriter {
 
     public void versionAndSave(DataProcessor processor, DataPublicationDetails details) throws ZebedeeException, IOException {
         // If no change then don't update anything
-        if (processor.insertions + processor.corrections == 0) return;
+        int dataChanges = processor.insertions + processor.corrections;
+        if (dataChanges == 0 && !processor.titleUpdated) return;
 
-        // Version the timeseries
-        versionTimeseries(processor.timeSeries, details.getDatasetCorrectionsNotice());
+        if (dataChanges > 0) {
+            // Version the timeseries
+            versionTimeseries(processor.timeSeries, details.getDatasetCorrectionsNotice());
+        }
 
         // Save the new page to reviewed
         this.contentWriter.writeObject(processor.timeSeries, processor.timeSeries.getUri().toString() + "/data.json");
-
     }
 
     void versionTimeseries(

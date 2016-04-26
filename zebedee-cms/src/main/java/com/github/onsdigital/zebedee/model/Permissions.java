@@ -35,6 +35,33 @@ public class Permissions {
     }
 
     /**
+     * Determines whether the specified user has publisher permissions/
+     *
+     * @param session The user's login session.
+     * @return If the user is a publisher, true.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean isPublisher(Session session) throws IOException {
+        return session != null && isPublisher(session.email);
+    }
+
+    /**
+     * Determines whether the specified user has publisher permissions.
+     *
+     * @param email The user's email.
+     * @return If the user is an publisher, true.
+     * @throws IOException If a filesystem error occurs.
+     */
+    public boolean isPublisher(String email) throws IOException {
+        AccessMapping accessMapping = readAccessMapping();
+        return isPublisher(email, accessMapping);
+    }
+
+    private boolean isPublisher(String email, AccessMapping accessMapping) {
+        return accessMapping.digitalPublishingTeam != null && accessMapping.digitalPublishingTeam.contains(standardise(email));
+    }
+
+    /**
      * Determines whether the specified user has administator permissions.
      *
      * @param session The user's login session.
@@ -428,11 +455,11 @@ public class Permissions {
      * @return a {@link PermissionDefinition} object
      * @throws IOException
      * @throws NotFoundException     If the user cannot be found
-     * @throws UnauthorizedException If the request is not from an admin
+     * @throws UnauthorizedException If the request is not from an admin or publisher
      */
     public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
 
-        if ((session == null) || (!isAdministrator(session.email) && !session.email.equals(email))) {
+        if ((session == null) || (!isAdministrator(session.email) && !isPublisher(session.email) && !session.email.equals(email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

@@ -3,6 +3,12 @@ package com.github.onsdigital.zebedee.content.page.statistics.document.figure.ta
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureBase;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class Table extends FigureBase {
 
     private String title;
@@ -10,6 +16,7 @@ public class Table extends FigureBase {
     private String filename;
     private Boolean firstLineTitle;
     private String headerRows;
+    private TableModifications modifications;
 
     @Override
     public PageType getType() {
@@ -54,5 +61,13 @@ public class Table extends FigureBase {
 
     public void setHeaderRows(String headerRows) {
         this.headerRows = headerRows;
+    }
+
+    public TableModifications getModifications() {
+        return modifications;
+    }
+
+    public void setModifications(TableModifications modifications) {
+        this.modifications = modifications;
     }
 }

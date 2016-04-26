@@ -115,7 +115,7 @@ public class CsdbImporter {
 
         return new DataPublisher().preprocessCollection(
                 publishedReader,
-                collectionReader.getReviewed(),
+                collectionReader,
                 collectionWriter.getReviewed(), collection, true, dataIndex);
     }
 

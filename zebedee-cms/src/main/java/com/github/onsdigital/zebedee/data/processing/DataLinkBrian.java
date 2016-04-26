@@ -62,12 +62,17 @@ public class DataLinkBrian implements DataLink {
 
 
     private TimeSerieses callBrian(String fileUri, ContentReader contentReader, URI endpointUri) throws ZebedeeException, IOException {
+        Resource resource = contentReader.getResource(fileUri);
+        try (InputStream input = resource.getData()) {
+            return getTimeSeries(endpointUri, input, resource.getName());
+        }
+    }
+
+    public TimeSerieses getTimeSeries(URI endpointUri, InputStream input, String name) throws IOException {
         // Add csdb file as a binary
         HttpPost post = new HttpPost(endpointUri);
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
-
-        Resource resource = contentReader.getResource(fileUri);
-        InputStreamBody body = new InputStreamBody(resource.getData(), resource.getName());
+        InputStreamBody body = new InputStreamBody(input, name);
         multipartEntityBuilder.addPart("file", body);
 
         post.setEntity(multipartEntityBuilder.build());
@@ -123,7 +128,7 @@ public class DataLinkBrian implements DataLink {
         } else {
             csdbURL = Configuration.getBrianUrl() + endpoint;
         }
-        
+
         URI url = null;
         try {
             URIBuilder uriBuilder = new URIBuilder(csdbURL);

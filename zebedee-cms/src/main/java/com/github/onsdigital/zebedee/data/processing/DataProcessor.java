@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
@@ -8,6 +9,7 @@ import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,6 +25,7 @@ import java.util.List;
 public class DataProcessor {
     public int corrections = 0;
     public int insertions = 0;
+    public boolean titleUpdated = false;
     public TimeSeries timeSeries = null;
 
     public DataProcessor() {
@@ -120,6 +123,10 @@ public class DataProcessor {
         syncLandingPageMetadata(this.timeSeries, details);
         syncTimeSeriesMetadata(this.timeSeries, newTimeSeries);
 
+        if (Configuration.isTimeseriesTitleUpdateEnabled()) {
+            syncTimeseriesTitle(newTimeSeries);
+        }
+
         // Combine the time series values
         DataMerge dataMerge = new DataMerge();
         this.timeSeries = dataMerge.merge(this.timeSeries, newTimeSeries, details.landingPage.getDescription().getDatasetId());
@@ -132,6 +139,15 @@ public class DataProcessor {
         insertions = dataMerge.insertions;
 
         return this.timeSeries;
+    }
+
+    public void syncTimeseriesTitle(TimeSeries newTimeSeries) {
+        // check if the title has been updated.
+        if (!newTimeSeries.getDescription().getTitle().equals(this.timeSeries.getDescription().getTitle())) {
+            this.timeSeries.getDescription().setTitle(newTimeSeries.getDescription().getTitle());
+            this.titleUpdated = true;
+            Log.print("The title for timeseries %s updated to %s", this.timeSeries.getDescription().getTitle(), newTimeSeries.getDescription().getTitle());
+        }
     }
 
     /**

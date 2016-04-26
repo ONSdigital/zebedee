@@ -17,6 +17,7 @@ public abstract class CollectionReader {
     protected ContentReader inProgress;
     protected ContentReader complete;
     protected ContentReader reviewed;
+    protected ContentReader root;
 
     protected boolean isEncrypted = false;
 
@@ -37,6 +38,10 @@ public abstract class CollectionReader {
 
     public ContentReader getReviewed() {
         return reviewed;
+    }
+
+    public ContentReader getRoot() {
+        return root;
     }
 
     /**

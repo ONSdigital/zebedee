@@ -597,7 +597,7 @@ public class Collections {
      *
      * @return an upload object
      */
-    private ServletFileUpload getServletFileUpload() {
+    public ServletFileUpload getServletFileUpload() {
         // Set up the objects that do all the heavy lifting
         // PrintWriter out = response.getWriter();
         EncryptedFileItemFactory factory = new EncryptedFileItemFactory();

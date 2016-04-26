@@ -62,8 +62,6 @@ public class ApproveTask implements Callable<Boolean> {
 
             List<String> uriList = generateTimeseries();
 
-
-
             // set the approved state on the collection
             collection.description.approvedStatus = true;
             collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
@@ -85,7 +83,7 @@ public class ApproveTask implements Callable<Boolean> {
         // Generate timeseries if required.
         return new DataPublisher().preprocessCollection(
                 publishedReader,
-                collectionReader.getReviewed(),
+                collectionReader,
                 collectionWriter.getReviewed(), collection, true, dataIndex);
     }
 }

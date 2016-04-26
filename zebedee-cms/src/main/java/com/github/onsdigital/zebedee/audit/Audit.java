@@ -68,6 +68,8 @@ public class Audit {
 
         COLLECTION_TABLE_CREATED("Collection Table created"),
 
+        COLLECTION_TABLE_METADATA_MODIFIED("Collection table metadata modified"),
+
         COLLECTION_TRANSFERRED("Collection transferred"),
 
         COLLECTION_UNLOCKED("Collection unlocked"),

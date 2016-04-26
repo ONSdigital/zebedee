@@ -1,19 +1,27 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.TableModifications;
+import com.github.onsdigital.zebedee.exceptions.TableBuilderException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.converter.ExcelToHtmlConverter;
 import org.apache.poi.hssf.converter.ExcelToHtmlUtils;
-import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.hwpf.converter.HtmlDocumentFacade;
 import org.apache.poi.ss.formula.eval.ErrorEval;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,10 +31,15 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Helper class to convert an xls file to a html table.
@@ -35,11 +48,13 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
     protected final HtmlDocumentFacade htmlDocument;
     protected final Document document;
+    protected Optional<TableModifications> tableModifications;
 
     private XlsToHtmlConverter(Document document, HtmlDocument htmlDocument) {
         super(htmlDocument);
         this.htmlDocument = htmlDocument;
         this.document = document;
+        this.tableModifications = Optional.empty();
     }
 
     /**
@@ -93,6 +108,15 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         converter.processWorkbook(workbook);
         Document document = converter.getDocument();
         return document;
+    }
+
+    public static Node convertToHtmlPageWithModifications(InputStream stream, TableModifications modifications)
+            throws IOException, ParserConfigurationException, TableBuilderException {
+        final HSSFWorkbook workbook = new HSSFWorkbook(stream);
+        XlsToHtmlConverter converter = createConverter();
+        converter.addTableModifications(modifications);
+        converter.processWorkbook(workbook);
+        return converter.getDocument();
     }
 
     /**
@@ -192,6 +216,10 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         Element table = createTable(sheet);
         return table;
         //htmlDocument.updateStylesheet();
+    }
+
+    public void addTableModifications(TableModifications modifications) {
+        this.tableModifications = Optional.ofNullable(modifications);
     }
 
     @Override
@@ -480,9 +508,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
             value = builder.toString();
         }
 
-        Text text = htmlDocument.createText(value);
-        tableCellElement.appendChild(text);
-
+        tableCellElement.setTextContent(value);
         return StringUtils.isEmpty(value) && cellStyleIndex == 0;
     }
 
@@ -592,6 +618,124 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
 
         return result;
+    }
+
+    @Override
+    protected int processRow(CellRangeAddress[][] mergedRanges, HSSFRow row,
+                             Element tableRowElement) {
+        if (tableModifications.isPresent() && tableModifications.get().getRowsExcluded().contains(row.getRowNum())) {
+            // if this row is listed in the row exclusions skip completely.
+            return 0;
+        }
+
+        final HSSFSheet sheet = row.getSheet();
+        final short maxColIx = row.getLastCellNum();
+        if (maxColIx <= 0)
+            return 0;
+
+        final List<Element> emptyCells = new ArrayList<Element>(maxColIx);
+
+        if (isOutputRowNumbers()) {
+            Element tableRowNumberCellElement = htmlDocument
+                    .createTableHeaderCell();
+            processRowNumber(row, tableRowNumberCellElement);
+            emptyCells.add(tableRowNumberCellElement);
+        }
+
+        int maxRenderedColumn = 0;
+        for (int columnIndex = 0; columnIndex < maxColIx; columnIndex++) {
+            if (!isOutputHiddenColumns() && sheet.isColumnHidden(columnIndex))
+                continue;
+
+            CellRangeAddress range = ExcelToHtmlUtils.getMergedRange(
+                    mergedRanges, row.getRowNum(), columnIndex);
+
+            if (range != null
+                    && (range.getFirstColumn() != columnIndex || range.getFirstRow() != row
+                    .getRowNum()))
+                continue;
+
+            HSSFCell cell = row.getCell(columnIndex);
+
+            int divWidthPx = 0;
+            if (isUseDivsToSpan()) {
+                divWidthPx = getColumnWidth(sheet, columnIndex);
+
+                boolean hasBreaks = false;
+                for (int nextColumnIndex = columnIndex + 1; nextColumnIndex < maxColIx; nextColumnIndex++) {
+                    if (!isOutputHiddenColumns()
+                            && sheet.isColumnHidden(nextColumnIndex))
+                        continue;
+
+                    if (row.getCell(nextColumnIndex) != null
+                            && !isTextEmpty(row.getCell(nextColumnIndex))) {
+                        hasBreaks = true;
+                        break;
+                    }
+
+                    divWidthPx += getColumnWidth(sheet, nextColumnIndex);
+                }
+
+                if (!hasBreaks)
+                    divWidthPx = Integer.MAX_VALUE;
+            }
+
+            Element tableElement = getTableCell(row, cell, columnIndex);
+
+            if (range != null) {
+                if (range.getFirstColumn() != range.getLastColumn())
+                    tableElement.setAttribute(
+                            "colspan",
+                            String.valueOf(range.getLastColumn()
+                                    - range.getFirstColumn() + 1));
+                if (range.getFirstRow() != range.getLastRow())
+                    tableElement.setAttribute(
+                            "rowspan",
+                            String.valueOf(range.getLastRow()
+                                    - range.getFirstRow() + 1));
+            }
+
+            boolean emptyCell;
+            if (cell != null) {
+                emptyCell = processCell(cell, tableElement,
+                        getColumnWidth(sheet, columnIndex), divWidthPx,
+                        row.getHeight() / 20f);
+            } else {
+                emptyCell = true;
+            }
+
+            if (emptyCell) {
+                emptyCells.add(tableElement);
+            } else {
+                for (Element emptyCellElement : emptyCells) {
+                    tableRowElement.appendChild(emptyCellElement);
+                }
+                emptyCells.clear();
+
+                tableRowElement.appendChild(tableElement);
+                maxRenderedColumn = columnIndex;
+            }
+        }
+
+        return maxRenderedColumn + 1;
+    }
+
+    /**
+     * Determines the table element type of this cell.
+     *
+     * If {@link TableModifications#headerRows} contains the row index of this cell and the cell has a value then returns 'th'.
+     * If {@link TableModifications#headerColumns} contains the cell index of this cell and the cell has a value then returns 'th'.
+     * 'td' is returned in all other cases.
+     */
+    private Element getTableCell(Row row, HSSFCell cell, int columnIndex) {
+        boolean isHeader = false;
+        if (tableModifications.isPresent()) {
+            isHeader = tableModifications.get().getHeaderRows().contains(row.getRowNum());
+            if (!isHeader && tableModifications.get().getHeaderColumns().contains(columnIndex) && StringUtils.isNotEmpty(cell.getStringCellValue())) {
+                isHeader = true;
+            }
+        }
+        return isHeader ? this.htmlDocument.createTableHeaderCell() : this.htmlDocument.createTableCell();
     }
 
     static class HtmlDocument extends HtmlDocumentFacade {

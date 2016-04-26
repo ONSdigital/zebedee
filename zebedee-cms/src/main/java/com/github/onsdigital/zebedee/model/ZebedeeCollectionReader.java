@@ -50,6 +50,7 @@ public class ZebedeeCollectionReader extends CollectionReader {
         inProgress = getContentReader(collection, key, collection.path, getConfiguration().getInProgressFolderName());
         complete = getContentReader(collection, key, collection.path, getConfiguration().getCompleteFolderName());
         reviewed = getContentReader(collection, key, collection.path, getConfiguration().getReviewedFolderName());
+        root = new CollectionContentReader(collection, key, collection.path);
     }
 
     private ContentReader getContentReader(Collection collection, SecretKey key, Path collectionPath, String folderName) throws UnauthorizedException, IOException {

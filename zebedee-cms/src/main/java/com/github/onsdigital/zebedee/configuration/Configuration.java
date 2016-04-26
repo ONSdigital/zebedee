@@ -15,6 +15,7 @@ public class Configuration {
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
     private static final String DEFAULT_DYLAN_URL = "http://localhost:8085";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
+    private static final String INFLUXDB_URL = "http://influxdb:8086";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -25,13 +26,24 @@ public class Configuration {
     // how many additional seconds after the publish
     private static final int DEFAULT_SECONDS_TO_CACHE_AFTER_SCHEDULED_PUBLISH = 30;
 
-
     public static boolean isSchedulingEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("scheduled_publishing_enabled"), "true"));
     }
 
     public static boolean isVerificationEnabled() {
         return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("publish_verification_enabled"), "false"));
+    }
+
+    public static boolean isInfluxReportingEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("enable_influx_reporting"), "false"));
+    }
+
+    public static boolean isTimeseriesTitleUpdateEnabled() {
+        return BooleanUtils.toBoolean(StringUtils.defaultIfBlank(getValue("enable_timeseries_title_update"), "false"));
+    }
+
+    public static String getInfluxDBHost() {
+        return StringUtils.defaultIfBlank(getValue("influxdb_url"), INFLUXDB_URL);
     }
 
     /**

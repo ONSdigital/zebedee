@@ -21,7 +21,6 @@ public class CollectionPdfGenerator {
 
     private final PdfService pdfService;
 
-
     static {
         pagesWithPdf = new ArrayList<>();
         pagesWithPdf.add(PageType.article);

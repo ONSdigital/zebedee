@@ -1,11 +1,16 @@
 package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.FakeCollectionWriter;
+import com.github.onsdigital.zebedee.model.DummyCollectionReader;
+import com.github.onsdigital.zebedee.model.DummyCollectionWriter;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.DummyPdfService;
 import org.junit.Test;
 
@@ -26,18 +31,27 @@ public class CollectionPdfGeneratorTest {
         Path collectionDirectory = tempDirectory.resolve("collectionId");
         Files.createDirectory(collectionDirectory);
         Files.createFile(tempDirectory.resolve("collectionId.json"));
-        CollectionWriter collectionWriter =  new FakeCollectionWriter(tempDirectory.toString(), id);
+        CollectionWriter collectionWriter =  new DummyCollectionWriter(tempDirectory);
 
         generator.generatePdfsInCollection(collectionWriter, new ArrayList<>());
     }
 
-    public void shouldGeneratePdfForArticle() throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
+    @Test
+    public void shouldGeneratePdfForArticle() throws IOException, ZebedeeException {
 
-        String id = Random.id();
-        Path tempDirectory = Files.createTempDirectory(id);
-        CollectionWriter collectionWriter =  new FakeCollectionWriter(tempDirectory.toString(), id);
+        // given a faked collection with an article
+        Path tempDirectory = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        CollectionWriter collectionWriter =  new DummyCollectionWriter(tempDirectory);
+        ArrayList<ContentDetail> collectionContent = new ArrayList<>();
+        String uri = "/the/uri";
+        collectionContent.add(new ContentDetail("Some article", uri, PageType.article.toString()));
 
-        generator.generatePdfsInCollection(collectionWriter, new ArrayList<>());
+        // when the generate PDF method is called.
+        generator.generatePdfsInCollection(collectionWriter, collectionContent);
+
+        // the expected file is generated in the reviewed section of the collection
+        CollectionReader collectionReader = new DummyCollectionReader(tempDirectory);
+        collectionReader.getResource(uri + "/page.pdf"); // would throw not found exception if not there.
     }
 
 }

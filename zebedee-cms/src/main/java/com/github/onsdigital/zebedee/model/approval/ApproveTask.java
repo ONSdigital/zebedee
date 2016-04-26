@@ -35,8 +35,6 @@ public class ApproveTask implements Callable<Boolean> {
     private final ContentReader publishedReader;
     private final DataIndex dataIndex;
 
-    private static CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService());
-
     public ApproveTask(
             Collection collection,
             Session session,
@@ -65,6 +63,7 @@ public class ApproveTask implements Callable<Boolean> {
 
             List<String> uriList = generateTimeseries();
 
+            CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
             pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
 
             // set the approved state on the collection

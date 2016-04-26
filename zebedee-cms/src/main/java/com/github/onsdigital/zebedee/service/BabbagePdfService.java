@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -16,7 +17,7 @@ import java.io.InputStream;
  */
 public class BabbagePdfService implements PdfService {
 
-    private static final String babbageUri = "http://localhost:8080/"; // only ever reading from local babbage instance
+    private static final String babbageUri = "http://localhost:8081/"; // only ever reading from local babbage instance
     private static final String pdfEndpoint = "/pdf-new"; // only ever reading from local babbage instance
 
     private final Session session;
@@ -47,7 +48,7 @@ public class BabbagePdfService implements PdfService {
         // if the url is absolute, go get it using HTTP client.
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(src);
-        httpGet.addHeader("Cookie", "access_token=" + session.id);
+        httpGet.addHeader("Cookie", RequestUtils.TOKEN_HEADER + "=" + session.id);
         httpGet.addHeader("Cookie", "collection=" + collection.description.id);
         HttpResponse response = client.execute(httpGet);
 

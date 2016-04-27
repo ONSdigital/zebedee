@@ -1,12 +1,15 @@
 package com.github.onsdigital.zebedee.data.importing;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.github.onsdigital.zebedee.content.util.ContentConstants;
+import com.github.onsdigital.zebedee.content.util.IsoDateSerializer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 /**
@@ -14,6 +17,7 @@ import java.util.ArrayList;
  */
 public class CsvTimeseriesUpdateImporter implements TimeseriesUpdateImporter {
 
+    private static final IsoDateSerializer dateSerializer = new IsoDateSerializer(ContentConstants.JSON_DATE_PATTERN);
     private final InputStream inputStream;
 
     /**
@@ -44,7 +48,7 @@ public class CsvTimeseriesUpdateImporter implements TimeseriesUpdateImporter {
                     command.cdid = strings[0];
 
                     if (strings.length > 1)
-                        command.title = strings[1];
+                        command.releaseDate = dateSerializer.deserialize(strings[1]); //command.title = strings[1];
 
                     commands.add(command);
                 }
@@ -53,6 +57,8 @@ public class CsvTimeseriesUpdateImporter implements TimeseriesUpdateImporter {
             }
         } catch (FileNotFoundException e) {
             throw new IOException("File not found.", e);
+        } catch (ParseException e) {
+            throw new IOException("Failed to parse release date", e);
         }
 
         return commands;

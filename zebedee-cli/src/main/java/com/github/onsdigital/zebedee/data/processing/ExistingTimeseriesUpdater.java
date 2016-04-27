@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.TimeseriesUpdater;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -23,10 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Given as CSV indexed with the timeseries CDID, update each timeseries with the given data
@@ -34,6 +32,7 @@ import java.util.Set;
  */
 public class ExistingTimeseriesUpdater {
 
+    private static FastDateFormat outputDateFormat = FastDateFormat.getInstance("dd-MM-yyyy", TimeZone.getTimeZone("Europe/London"));
 
     public static void updateTimeseriesData(String[] args) throws Exception {
 
@@ -111,12 +110,27 @@ public class ExistingTimeseriesUpdater {
 
             while (strings != null) {
 
-                if (rowIndex == 0) { // the row with all the titles in
+//                if (rowIndex == 0) { // the row with all the titles in
+//                    // set the updated titles
+//                    for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+//                        Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
+//                        if (index != null) {
+//                            strings[index] = command.title;
+//                        }
+//                    }
+//                }
+
+                if (rowIndex == 4) { // the row with all the release dates in
                     // set the updated titles
                     for (TimeseriesUpdateCommand command : commandsForThisDataset) {
                         Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
                         if (index != null) {
-                            strings[index] = command.title;
+                            System.out.println("Setting CSV date from " + strings[index] +
+                                    " to: " + command.releaseDate +
+                                    " index: " + index +
+                                    " cdid: " + command.cdid +
+                                    " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
+                            strings[index] = outputDateFormat.format(command.releaseDate);
                         }
                     }
                 }
@@ -157,17 +171,32 @@ public class ExistingTimeseriesUpdater {
 
                 while (strings != null) {
 
-                    if (rowIndex == 0) { // the row with all the titles in
+//                    if (rowIndex == 0) { // the row with all the titles in
+//                        // set the updated titles
+//                        for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+//                            Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
+//                            if (index != null) {
+//                                System.out.println("Setting CSV title from " + strings[index] +
+//                                        " to: " + command.title +
+//                                        " index: " + index +
+//                                        " cdid: " + command.cdid +
+//                                        " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
+//                                strings[index] = command.title;
+//                            }
+//                        }
+//                    }
+
+                    if (rowIndex == 4) { // the row with all the release dates in
                         // set the updated titles
                         for (TimeseriesUpdateCommand command : commandsForThisDataset) {
                             Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
                             if (index != null) {
-                                System.out.println("Setting CSV title from " + strings[index] +
-                                        " to: " + command.title +
+                                System.out.println("Setting CSV date from " + strings[index] +
+                                        " to: " + command.releaseDate +
                                         " index: " + index +
                                         " cdid: " + command.cdid +
                                         " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
-                                strings[index] = command.title;
+                                strings[index] = outputDateFormat.format(command.releaseDate);
                             }
                         }
                     }

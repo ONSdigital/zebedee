@@ -44,6 +44,8 @@ public class BabbagePdfService implements PdfService {
         String trimmedUri = URIUtils.removeTrailingSlash(URIUtils.removeLeadingSlash(uri));
         String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
 
+        System.out.println("Reading PDF from: " + src);
+
         // if the url is absolute, go get it using HTTP client.
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(src);

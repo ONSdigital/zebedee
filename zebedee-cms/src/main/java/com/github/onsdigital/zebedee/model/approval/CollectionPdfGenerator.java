@@ -19,14 +19,14 @@ public class CollectionPdfGenerator {
 
     private static final List<PageType> pagesWithPdf;
 
-    private final PdfService pdfService;
-
     static {
         pagesWithPdf = new ArrayList<>();
         pagesWithPdf.add(PageType.article);
         pagesWithPdf.add(PageType.bulletin);
         pagesWithPdf.add(PageType.compendium_chapter);
     }
+
+    private final PdfService pdfService;
 
     /**
      * Create a new instance to use the provided PdfService.
@@ -47,7 +47,7 @@ public class CollectionPdfGenerator {
                     collectionWriter.getReviewed().write(inputStream, pdfUri);
 
                 } catch (IOException | BadRequestException e) {
-                    Log.print("Failed to generate PDF for uri %s", e, contentDetail.uri);
+                    Log.print("Failed to generate PDF for uri %s", contentDetail.uri, e);
                 }
             }
         }

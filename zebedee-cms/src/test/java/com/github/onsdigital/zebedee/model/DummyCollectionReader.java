@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,6 +26,6 @@ public class DummyCollectionReader extends CollectionReader {
     }
 
     private ContentReader getContentReader(Path collectionPath, String folderName) {
-        return new ContentReader(collectionPath.resolve(folderName));
+        return new FileSystemContentReader(collectionPath.resolve(folderName));
     }
 }

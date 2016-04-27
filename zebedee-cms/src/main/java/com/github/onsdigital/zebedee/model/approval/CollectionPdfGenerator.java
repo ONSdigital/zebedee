@@ -47,7 +47,7 @@ public class CollectionPdfGenerator {
                     collectionWriter.getReviewed().write(inputStream, pdfUri);
 
                 } catch (IOException | BadRequestException e) {
-                    Log.print("Failed to generate PDF for uri %s", contentDetail.uri, e);
+                    Log.print(e.toString());
                 }
             }
         }

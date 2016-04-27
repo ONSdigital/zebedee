@@ -53,8 +53,6 @@ public class BabbagePdfService implements PdfService {
         httpGet.addHeader("Cookie", "collection=" + collection.description.id);
         HttpResponse response = client.execute(httpGet);
 
-        System.out.println("response.getStatusLine().getStatusCode() = " + response.getStatusLine().getStatusCode());
-
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new IOException("Failed to generate PDF for URI " + uri +
                     ". Response: " + response.getStatusLine().getStatusCode() +

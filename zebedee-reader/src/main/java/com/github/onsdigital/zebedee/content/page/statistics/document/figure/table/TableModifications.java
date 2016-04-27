@@ -47,4 +47,8 @@ public class TableModifications {
         }
         return target;
     }
+
+    public boolean modificationsExist() {
+        return this.rowsExcluded.size() > 0 || this.headerRows.size() > 0 || this.headerColumns.size() > 0;
+    }
 }

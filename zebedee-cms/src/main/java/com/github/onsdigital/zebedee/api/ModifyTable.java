@@ -177,9 +177,7 @@ public class ModifyTable {
             modifications = null;
         }
         Node updatedHtmlTable = XlsToHtmlConverter.convertToHtmlPageWithModifications(inputStream, modifications);
-        String result = XlsToHtmlConverter.docToString(updatedHtmlTable);
-        System.out.println(result);
-        return result;
+        return XlsToHtmlConverter.docToString(updatedHtmlTable);
     }
 
     private InputStream toInputStream(Page page) {

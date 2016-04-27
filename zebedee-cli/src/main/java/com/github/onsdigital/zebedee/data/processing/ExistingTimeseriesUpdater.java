@@ -110,30 +110,30 @@ public class ExistingTimeseriesUpdater {
 
             while (strings != null) {
 
-//                if (rowIndex == 0) { // the row with all the titles in
-//                    // set the updated titles
-//                    for (TimeseriesUpdateCommand command : commandsForThisDataset) {
-//                        Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
-//                        if (index != null) {
-//                            strings[index] = command.title;
-//                        }
-//                    }
-//                }
-
-                if (rowIndex == 4) { // the row with all the release dates in
+                if (rowIndex == 0) { // the row with all the titles in
                     // set the updated titles
                     for (TimeseriesUpdateCommand command : commandsForThisDataset) {
                         Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
                         if (index != null) {
-                            System.out.println("Setting CSV date from " + strings[index] +
-                                    " to: " + command.releaseDate +
-                                    " index: " + index +
-                                    " cdid: " + command.cdid +
-                                    " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
-                            strings[index] = outputDateFormat.format(command.releaseDate);
+                            strings[index] = command.title;
                         }
                     }
                 }
+
+//                if (rowIndex == 4) { // the row with all the release dates in
+//                    // set the updated titles
+//                    for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+//                        Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
+//                        if (index != null) {
+//                            System.out.println("Setting CSV date from " + strings[index] +
+//                                    " to: " + command.releaseDate +
+//                                    " index: " + index +
+//                                    " cdid: " + command.cdid +
+//                                    " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
+//                            strings[index] = outputDateFormat.format(command.releaseDate);
+//                        }
+//                    }
+//                }
 
                 Row row = sheet.createRow(rownum++);
 
@@ -171,35 +171,35 @@ public class ExistingTimeseriesUpdater {
 
                 while (strings != null) {
 
-//                    if (rowIndex == 0) { // the row with all the titles in
-//                        // set the updated titles
-//                        for (TimeseriesUpdateCommand command : commandsForThisDataset) {
-//                            Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
-//                            if (index != null) {
-//                                System.out.println("Setting CSV title from " + strings[index] +
-//                                        " to: " + command.title +
-//                                        " index: " + index +
-//                                        " cdid: " + command.cdid +
-//                                        " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
-//                                strings[index] = command.title;
-//                            }
-//                        }
-//                    }
-
-                    if (rowIndex == 4) { // the row with all the release dates in
+                    if (rowIndex == 0) { // the row with all the titles in
                         // set the updated titles
                         for (TimeseriesUpdateCommand command : commandsForThisDataset) {
                             Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
                             if (index != null) {
-                                System.out.println("Setting CSV date from " + strings[index] +
-                                        " to: " + command.releaseDate +
+                                System.out.println("Setting CSV title from " + strings[index] +
+                                        " to: " + command.title +
                                         " index: " + index +
                                         " cdid: " + command.cdid +
                                         " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
-                                strings[index] = outputDateFormat.format(command.releaseDate);
+                                strings[index] = command.title;
                             }
                         }
                     }
+
+//                    if (rowIndex == 4) { // the row with all the release dates in
+//                        // set the updated titles
+//                        for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+//                            Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
+//                            if (index != null) {
+//                                System.out.println("Setting CSV date from " + strings[index] +
+//                                        " to: " + command.releaseDate +
+//                                        " index: " + index +
+//                                        " cdid: " + command.cdid +
+//                                        " CSDB: " + timeseriesDatasetDownloads.getCsdbId());
+//                                strings[index] = outputDateFormat.format(command.releaseDate);
+//                            }
+//                        }
+//                    }
 
                     writer.writeNext(strings);
                     strings = reader.readNext();

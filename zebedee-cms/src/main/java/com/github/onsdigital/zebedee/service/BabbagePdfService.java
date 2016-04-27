@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.service;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -16,7 +17,6 @@ import java.io.InputStream;
  */
 public class BabbagePdfService implements PdfService {
 
-    private static final String babbageUri = "http://babbage-publishing-develop:8080"; //"http://localhost:8080/"; // only ever reading from local babbage instance
     private static final String pdfEndpoint = "/pdf-new"; // only ever reading from local babbage instance
 
     private final Session session;
@@ -42,7 +42,7 @@ public class BabbagePdfService implements PdfService {
         // loop back to babbage to render PDF until we break out the HTML rendering / PDF generation into its own service.
 
         String trimmedUri = URIUtils.removeTrailingSlash(URIUtils.removeLeadingSlash(uri));
-        String src = babbageUri + trimmedUri + pdfEndpoint;
+        String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
 
         // if the url is absolute, go get it using HTTP client.
         HttpClient client = HttpClientBuilder.create().build();
@@ -50,6 +50,14 @@ public class BabbagePdfService implements PdfService {
         httpGet.addHeader("Cookie", "access_token=" + session.id);
         httpGet.addHeader("Cookie", "collection=" + collection.description.id);
         HttpResponse response = client.execute(httpGet);
+
+        System.out.println("response.getStatusLine().getStatusCode() = " + response.getStatusLine().getStatusCode());
+
+        if (response.getStatusLine().getStatusCode() != 200) {
+            throw new IOException("Failed to generate PDF for URI " + uri +
+                    ". Response: " + response.getStatusLine().getStatusCode() +
+                    " " + response.toString());
+        }
 
         return response.getEntity().getContent();
     }

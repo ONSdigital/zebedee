@@ -27,6 +27,10 @@ public class IsoDateSerializer implements JsonSerializer<Date>, JsonDeserializer
         return new JsonPrimitive(dateFormatAsString);
     }
 
+    public Date deserialize(String date) throws ParseException {
+        return iso8601Format.parse(date);
+    }
+
     public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
         if (!(json instanceof JsonPrimitive)) {

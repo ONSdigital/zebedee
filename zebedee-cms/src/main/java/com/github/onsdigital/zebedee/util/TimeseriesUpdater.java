@@ -67,6 +67,11 @@ public class TimeseriesUpdater {
                     updated = true;
                 }
 
+                if (command.releaseDate != null) {
+                    page.getDescription().setReleaseDate(command.releaseDate);
+                    updated = true;
+                }
+
                 if (updated) {
                     contentWriter.writeObject(page, command.uri + "/data.json");
                 }

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data.importing;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ public class TimeseriesUpdateCommand {
     public String cdid; // The CDID to define the timeseries to update.
 
     public String title; // The title to update to.
+
+    public Date releaseDate;
 
     public String uri;
 

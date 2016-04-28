@@ -12,12 +12,18 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.util.*;
 
+
 public class CompositeContentReader implements ContentReader {
 
     List<ContentReader> readers = new ArrayList<>();
 
     public CompositeContentReader(ContentReader reader) {
         add(reader);
+    }
+
+    public CompositeContentReader(ContentReader primaryReader, ContentReader secondaryReader) {
+        add(primaryReader);
+        add(secondaryReader);
     }
 
     public void add(ContentReader reader) {

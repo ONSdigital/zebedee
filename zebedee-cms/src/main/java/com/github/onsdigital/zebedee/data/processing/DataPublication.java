@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.reader.CompositeContentReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
@@ -30,6 +31,28 @@ public class DataPublication {
     public DataPublication(ContentReader publishedContentReader, ContentReader reviewedContentReader, String datasetPageUri) throws ZebedeeException, IOException {
         // Setup the publication by backtracking from the dataset
         details = new DataPublicationDetails(publishedContentReader, reviewedContentReader, datasetPageUri);
+    }
+
+    /**
+     * Get the dataset id from a file
+     *
+     * Filename should be of the form [datasetId].csdb or upload.[datasetId].csv
+     *
+     * @param uri the uri of the data upload
+     * @return
+     */
+    static String getDatasetIdFromFile(String uri) {
+        String filename = Paths.get(uri).getFileName().toString().trim().toLowerCase();
+        if (filename.endsWith(".csdb")) {
+            return filename.substring(0, filename.length() - ".csdb".length());
+        } else if (filename.startsWith("upload-") && filename.endsWith(".csv")) {
+            if (filename.equalsIgnoreCase("upload.csv")) {
+                return DEFAULT_DATASET_ID;
+            } else {
+                return filename.substring("upload-".length(), filename.length() - ".csv".length());
+            }
+        }
+        return DEFAULT_DATASET_ID;
     }
 
     /**
@@ -64,11 +87,13 @@ public class DataPublication {
         // send the file for processing
         this.serieses = callDataLink(reviewedContentReader, details.fileUri);
 
+        CompositeContentReader compositeContentReader = new CompositeContentReader(reviewedContentReader, publishedContentReader);
+
         // Process each returned timeseries
         for(TimeSeries series: serieses) {
             // Build new timeseries
             DataProcessor processor = new DataProcessor();
-            processor.processTimeseries(publishedContentReader, details, series, dataIndex);
+            processor.processTimeseries(compositeContentReader, details, series, dataIndex);
 
             // Save files
             if (saveTimeSeries) {
@@ -134,7 +159,6 @@ public class DataPublication {
         contentWriter.writeObject(details.datasetPage, details.datasetPage.getUri().toString() + "/data.json");
     }
 
-
     /**
      * Call Brian with the appropriate file
      *
@@ -170,27 +194,5 @@ public class DataPublication {
 
     public void setDataLink(DataLink dataLink) {
         this.dataLink = dataLink;
-    }
-
-    /**
-     * Get the dataset id from a file
-     *
-     * Filename should be of the form [datasetId].csdb or upload.[datasetId].csv
-     *
-     * @param uri the uri of the data upload
-     * @return
-     */
-    static String getDatasetIdFromFile(String uri) {
-        String filename = Paths.get(uri).getFileName().toString().trim().toLowerCase();
-        if (filename.endsWith(".csdb")) {
-            return filename.substring(0, filename.length() - ".csdb".length());
-        } else if (filename.startsWith("upload-") && filename.endsWith(".csv")) {
-            if (filename.equalsIgnoreCase("upload.csv")) {
-                return DEFAULT_DATASET_ID;
-            } else {
-                return filename.substring("upload-".length(), filename.length() - ".csv".length());
-            }
-        }
-        return DEFAULT_DATASET_ID;
     }
 }

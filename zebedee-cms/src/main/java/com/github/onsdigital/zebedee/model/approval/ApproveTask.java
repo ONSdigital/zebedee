@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -16,8 +17,10 @@ import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.TimeseriesUpdater;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
@@ -84,6 +87,17 @@ public class ApproveTask implements Callable<Boolean> {
     }
 
     public List<String> generateTimeseries() throws IOException, ZebedeeException, URISyntaxException {
+
+        // process any data import files
+        if (collection.description.timeseriesImportFiles != null) {
+            for (String importFile : collection.description.timeseriesImportFiles) {
+                CompoundContentReader compoundContentReader = new CompoundContentReader(publishedReader);
+                compoundContentReader.add(collectionReader.getReviewed());
+                InputStream csvInput = collectionReader.getRoot().getResource(importFile).getData();
+                TimeseriesUpdater.updateTimeseries(compoundContentReader, collectionWriter.getReviewed(), csvInput, dataIndex);
+            }
+        }
+
         // Generate timeseries if required.
         return new DataPublisher().preprocessCollection(
                 publishedReader,

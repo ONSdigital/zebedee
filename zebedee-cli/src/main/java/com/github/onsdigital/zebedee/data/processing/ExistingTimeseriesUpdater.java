@@ -64,7 +64,7 @@ public class ExistingTimeseriesUpdater {
         ArrayList<TimeseriesUpdateCommand> updateCommands = TimeseriesUpdater.filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
 
         System.out.println("Updating timeseries with new metadata...");
-        TimeseriesUpdater.updateTimeseriesMetadata(new CompoundContentReader(contentReader), contentWriter, dataIndex, updateCommands);
+        TimeseriesUpdater.updateTimeseriesMetadata(new CompoundContentReader(contentReader), contentWriter, updateCommands);
 
         System.out.println("Finding all CSDB files...");
         List<TimeseriesDatasetDownloads> datasetDownloads = findCsdbFiles(source);

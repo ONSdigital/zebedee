@@ -6,13 +6,10 @@ import com.github.onsdigital.zebedee.data.processing.DataPublicationFinder;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.util.TimeseriesUpdater;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -55,18 +52,6 @@ public class DataPublisher {
             // If a file upload exists
             if (dataPublication.hasUpload())
                 dataPublication.process(publishedContentReader, collectionReader.getReviewed(), collectionContentWriter, saveTimeSeries, dataIndex);
-        }
-
-        // process any data import files
-        if (collection.description.timeseriesImportFiles != null) {
-            for (String importFile : collection.description.timeseriesImportFiles) {
-                CompoundContentReader compoundContentReader = new CompoundContentReader(publishedContentReader);
-                compoundContentReader.add(collectionReader.getReviewed());
-
-                InputStream csvInput = collectionReader.getRoot().getResource(importFile).getData();
-                TimeseriesUpdater.updateTimeseries(compoundContentReader, collectionContentWriter, csvInput, dataIndex);
-            }
-
         }
 
         // Get the list of uris in reviewed

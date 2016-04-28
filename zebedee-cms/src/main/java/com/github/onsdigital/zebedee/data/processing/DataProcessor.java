@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
@@ -9,7 +8,6 @@ import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.net.URI;
@@ -110,22 +108,18 @@ public class DataProcessor {
 
     /**
      * Take a timeseries as produced by Brian from an upload and combine it with current content
-     *  @param publishedContentReader
+     *  @param contentReader
      * @param details
      * @param newTimeSeries   @return
      * */
-    public TimeSeries processTimeseries(ContentReader publishedContentReader, DataPublicationDetails details, TimeSeries newTimeSeries, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
+    public TimeSeries processTimeseries(ContentReader contentReader, DataPublicationDetails details, TimeSeries newTimeSeries, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
 
         // Get current version of the time series (persists any manually entered data)
-        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details, dataIndex);
+        this.timeSeries = initialTimeseries(newTimeSeries, contentReader, details, dataIndex);
 
         // Add meta from the landing page and timeseries dataset page
         syncLandingPageMetadata(this.timeSeries, details);
         syncTimeSeriesMetadata(this.timeSeries, newTimeSeries);
-
-        if (Configuration.isTimeseriesTitleUpdateEnabled()) {
-            syncTimeseriesTitle(newTimeSeries);
-        }
 
         // Combine the time series values
         DataMerge dataMerge = new DataMerge();
@@ -139,15 +133,6 @@ public class DataProcessor {
         insertions = dataMerge.insertions;
 
         return this.timeSeries;
-    }
-
-    public void syncTimeseriesTitle(TimeSeries newTimeSeries) {
-        // check if the title has been updated.
-        if (!newTimeSeries.getDescription().getTitle().equals(this.timeSeries.getDescription().getTitle())) {
-            this.timeSeries.getDescription().setTitle(newTimeSeries.getDescription().getTitle());
-            this.titleUpdated = true;
-            Log.print("The title for timeseries %s updated to %s", this.timeSeries.getDescription().getTitle(), newTimeSeries.getDescription().getTitle());
-        }
     }
 
     /**
@@ -234,19 +219,19 @@ public class DataProcessor {
      * Get the starting point for our timeseries by loading a
      *
      * @param series
-     * @param publishedContentReader
+     * @param contentReader
      * @param details
      * @return
      * @throws ZebedeeException
      * @throws IOException
      */
-    TimeSeries initialTimeseries(TimeSeries series, ContentReader publishedContentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
+    TimeSeries initialTimeseries(TimeSeries series, ContentReader contentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
 
         String publishUri = publishUriForTimeseries(series, details, dataIndex);
 
         // Try to get an existing timeseries
         try {
-            TimeSeries existing = (TimeSeries) publishedContentReader.getContent(publishUri);
+            TimeSeries existing = (TimeSeries) contentReader.getContent(publishUri);
             return existing;
         } catch (NotFoundException e) {
             // If it doesn't exist create a new empty one using the description

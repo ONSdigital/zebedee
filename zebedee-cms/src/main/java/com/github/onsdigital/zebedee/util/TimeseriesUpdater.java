@@ -28,7 +28,7 @@ public class TimeseriesUpdater {
         ArrayList<TimeseriesUpdateCommand> updateCommands = filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
 
         System.out.println("Updating timeseries with new metadata...");
-        updateTimeseriesMetadata(contentReader, contentWriter, dataIndex, updateCommands);
+        updateTimeseriesMetadata(contentReader, contentWriter, updateCommands);
     }
 
     public static ArrayList<TimeseriesUpdateCommand> filterTimeseriesThatDoNotExist(DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommandsImported) {
@@ -48,17 +48,12 @@ public class TimeseriesUpdater {
         return updateCommands;
     }
 
-    public static void updateTimeseriesMetadata(CompoundContentReader contentReader, ContentWriter contentWriter, DataIndex dataIndex, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
+    public static void updateTimeseriesMetadata(CompoundContentReader contentReader, ContentWriter contentWriter, ArrayList<TimeseriesUpdateCommand> updateCommands) throws IOException {
         for (TimeseriesUpdateCommand command : updateCommands) {
 
             try {
                 boolean updated = false;
                 TimeSeries page = (TimeSeries) contentReader.getContent(command.uri);
-
-                System.out.println("command.title = " + command.title);
-                for (String sourceDataset : page.sourceDatasets) {
-                    System.out.println("sourceDataset = " + sourceDataset);
-                }
 
                 command.sourceDatasets = page.sourceDatasets;
 

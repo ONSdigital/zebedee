@@ -64,6 +64,9 @@ public class Table extends FigureBase {
     }
 
     public TableModifications getModifications() {
+        if (this.modifications == null) {
+            this.modifications = new TableModifications();
+        }
         return modifications;
     }
 

@@ -16,6 +16,8 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.util.XlsToHtmlConverter;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -35,14 +37,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.deserialiseContent;
-import static com.github.onsdigital.zebedee.exceptions.TableBuilderException.ErrorType.NEGATIVE_ROW_INDEX;
-import static com.github.onsdigital.zebedee.exceptions.TableBuilderException.ErrorType.NUMBER_PARSE_ERROR;
 import static com.github.onsdigital.zebedee.exceptions.TableBuilderException.ErrorType.UNEXPECTED_ERROR;
 
 /**
@@ -67,22 +63,19 @@ public class ModifyTable {
         Session session = Root.zebedee.sessions.get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
-
         String currentUri = request.getParameter(CURRENT_URI);
         String newUri = request.getParameter(NEW_URI);
 
-        com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table newTable =
-                ContentUtil.deserialise(request.getInputStream(),
-                        com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table.class);
-
         validate(response, collection, currentUri + XLS_FILE_EXT);
+
+        com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table newTable
+                = getNewTable(request);
 
         com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table tableJson
                 = getCurrentTable(request, collectionReader, currentUri + JSON_FILE_EXT);
         tableJson.setModifications(newTable.getModifications());
 
         String htmlTableStr = generateXlsTable(request, collectionReader, currentUri + XLS_FILE_EXT, tableJson.getModifications());
-
         writeData(request, session, collectionReader, collection, currentUri, newUri, htmlTableStr, tableJson);
         response.setStatus(Response.Status.CREATED.getStatusCode());
         Audit.Event.COLLECTION_TABLE_METADATA_MODIFIED
@@ -195,6 +188,7 @@ public class ModifyTable {
 
         table = (com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table)
                 deserialiseContent(getResource(request, collectionReader, uri).getData());
+        table.getModifications().sorted();
         return table;
     }
 
@@ -208,33 +202,15 @@ public class ModifyTable {
         return RequestUtils.getZebedeeReader(request).getPublishedResource(resourceUri);
     }
 
-    private com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table getNewTable(HttpServletRequest request) throws TableBuilderException, IOException {
-        return ContentUtil.deserialise(request.getInputStream(), com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table.class);
-    }
-
-    private List<Integer> getParam(HttpServletRequest request, String paramName) throws TableBuilderException {
-        Set<Integer> exclusionsSet = new HashSet<>();
-        String raw = request.getParameter(paramName);
-
-        if (StringUtils.isNotEmpty(raw)) {
-            for (String data : raw.split(",")) {
-                exclusionsSet.add(parseAndValidate(data));
-            }
-        }
-        List<Integer> exclusionsList = new ArrayList<>(exclusionsSet);
-        java.util.Collections.sort(exclusionsList);
-        return exclusionsList;
-    }
-
-    private int parseAndValidate(String raw) throws TableBuilderException {
+    private com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table getNewTable(HttpServletRequest request)
+            throws TableBuilderException, IOException {
         try {
-            int value = Integer.parseInt(raw.trim());
-            if (value < 0) {
-                throw new TableBuilderException(NEGATIVE_ROW_INDEX);
-            }
-            return value;
-        } catch (NumberFormatException nfx) {
-            throw new TableBuilderException(NUMBER_PARSE_ERROR, raw);
+            com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table newTable
+                    = ContentUtil.deserialise(request.getInputStream(), com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table.class);
+            newTable.getModifications().sorted();
+            return newTable;
+        } catch (JsonSyntaxException | JsonIOException ex) {
+            throw new TableBuilderException(TableBuilderException.ErrorType.INVALID_JSON_ERROR, ex.getMessage());
         }
     }
 }

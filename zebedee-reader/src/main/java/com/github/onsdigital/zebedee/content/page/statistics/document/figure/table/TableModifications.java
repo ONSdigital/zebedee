@@ -13,39 +13,48 @@ public class TableModifications {
     private List<Integer> headerRows = new ArrayList<>();
     private List<Integer> headerColumns = new ArrayList<>();
 
-    public List<Integer> getRowsExcluded() {
-        return rowsExcluded;
-    }
-
-    public TableModifications setRowsExcluded(List<Integer> rowsExcluded) {
-        this.rowsExcluded = sort(rowsExcluded);
-        return this;
-    }
-
     public List<Integer> getHeaderRows() {
         return headerRows;
-    }
-
-    public TableModifications setHeaderRows(List<Integer> headerRows) {
-        this.headerRows = sort(headerRows);
-        return this;
     }
 
     public List<Integer> getHeaderColumns() {
         return headerColumns;
     }
 
-    public TableModifications setHeaderColumns(List<Integer> headerColumns) {
-        this.headerColumns = sort(headerColumns);
-        return this;
+    public List<Integer> getRowsExcluded() {
+        return rowsExcluded;
     }
 
-    private List<Integer> sort(List<Integer> target) {
+    public void setRowsExcluded(List<Integer> rowsExcluded) {
+        if (rowsExcluded != null) {
+            this.rowsExcluded = rowsExcluded;
+        }
+    }
+
+    public void setHeaderRows(List<Integer> headerRows) {
+        if (headerRows != null) {
+            this.headerRows = headerRows;
+        }
+    }
+
+    public void setHeaderColumns(List<Integer> headerColumns) {
+        if (headerColumns != null) {
+            this.headerColumns = headerColumns;
+        }
+    }
+
+    private List<Integer> sortAscending(List<Integer> target) {
         if (target != null & !target.isEmpty()) {
             Collections.sort(target);
             Collections.reverse(target);
         }
         return target;
+    }
+
+    public void sorted() {
+        this.rowsExcluded = sortAscending(rowsExcluded);
+        this.headerRows = sortAscending(headerRows);
+        this.headerColumns = sortAscending(headerColumns);
     }
 
     public boolean modificationsExist() {

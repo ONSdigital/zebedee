@@ -46,6 +46,9 @@ import java.util.Optional;
  */
 public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
+    private static final String ROW = "row";
+    private static final String COL = "col";
+    private static final String SCOPE_ATTR = "scope";
     protected final HtmlDocumentFacade htmlDocument;
     protected final Document document;
     protected Optional<TableModifications> tableModifications;
@@ -722,20 +725,37 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
     /**
      * Determines the table element type of this cell.
-     *
+     * <p>
      * If {@link TableModifications#headerRows} contains the row index of this cell and the cell has a value then returns 'th'.
      * If {@link TableModifications#headerColumns} contains the cell index of this cell and the cell has a value then returns 'th'.
      * 'td' is returned in all other cases.
      */
     private Element getTableCell(Row row, HSSFCell cell, int columnIndex) {
         boolean isHeader = false;
+        String scope = null;
+        Element tableElement;
+
         if (tableModifications.isPresent()) {
-            isHeader = tableModifications.get().getHeaderRows().contains(row.getRowNum());
-            if (!isHeader && tableModifications.get().getHeaderColumns().contains(columnIndex) && StringUtils.isNotEmpty(cell.getStringCellValue())) {
+            if (tableModifications.get().getHeaderRows().contains(row.getRowNum())
+                    && StringUtils.isNotEmpty(cell.getStringCellValue())) {
                 isHeader = true;
+                // If row is defined as header and this column is also a header then col scope takes priority.
+                scope = tableModifications.get().getHeaderColumns().contains(columnIndex) ? COL : ROW;
+
+            } else if (tableModifications.get().getHeaderColumns().contains(columnIndex)
+                    && StringUtils.isNotEmpty(cell.getStringCellValue())) {
+                isHeader = true;
+                scope = COL;
             }
         }
-        return isHeader ? this.htmlDocument.createTableHeaderCell() : this.htmlDocument.createTableCell();
+
+        if (isHeader) {
+            tableElement = this.htmlDocument.createTableHeaderCell();
+            tableElement.setAttribute(SCOPE_ATTR, scope);
+        } else {
+            tableElement = this.htmlDocument.createTableCell();
+        }
+        return tableElement;
     }
 
     static class HtmlDocument extends HtmlDocumentFacade {

@@ -16,7 +16,9 @@ public class TableBuilderException extends ZebedeeException {
 
         ROW_INDEX_OUT_OF_BOUNDS("Invalid row index: {0}. The max row index for this file is: {1}."),
 
-        UNEXPECTED_ERROR("Unexpected error occurred: {0}");
+        UNEXPECTED_ERROR("Unexpected error occurred: {0}"),
+
+        INVALID_JSON_ERROR("Unexpected error while attempting to deserialise JSON: {0}");
 
         private final String message;
 

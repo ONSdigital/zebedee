@@ -19,8 +19,13 @@ public class Cli {
                 .build());
 
         options.addOption(Option.builder("removetimeseriesdata")
-                .desc("Remove timeseries data entries for the given resolution ( months | quarters | years )")
+                .desc("Remove all timeseries data entries for the given resolution ( months | quarters | years )")
                 .argName("source directory> <destination directory> <resolution> <CDID...")
+                .hasArgs()
+                .build());
+        options.addOption(Option.builder("removetimeseriesentries")
+                .desc("Remove specific timeseries entries for the given CDID")
+                .argName("source directory> <destination directory> <CDID> <labels...")
                 .hasArgs()
                 .build());
 
@@ -34,6 +39,8 @@ public class Cli {
                 ExistingTimeseriesUpdater.updateTimeseriesData(args);
             } else if (line.hasOption("removetimeseriesdata")) {
                 TimeseriesDataRemover.removeTimeseriesData(args);
+            } else if (line.hasOption("removetimeseriesentries")) {
+                TimeseriesDataRemover.removeTimeseriesEntries(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

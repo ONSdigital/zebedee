@@ -48,7 +48,7 @@ public class DataPublisher {
     ) throws IOException, ZebedeeException, URISyntaxException {
 
         // Find all files that need data preprocessing
-        List<DataPublication> dataPublications = new DataPublicationFinder().findPublications(publishedContentReader, collectionReader.getReviewed(), collection);
+        List<DataPublication> dataPublications = new DataPublicationFinder().findPublications(publishedContentReader, collectionReader.getReviewed());
 
         // For each file in this collection
         for (DataPublication dataPublication : dataPublications) {

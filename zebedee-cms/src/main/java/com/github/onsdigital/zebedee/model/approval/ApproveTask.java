@@ -1,6 +1,9 @@
 package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.onsdigital.zebedee.data.DataPublisher;
+import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
@@ -17,11 +20,11 @@ import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.SlackNotification;
-import com.github.onsdigital.zebedee.util.TimeseriesUpdater;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -88,13 +91,20 @@ public class ApproveTask implements Callable<Boolean> {
 
     public List<String> generateTimeseries() throws IOException, ZebedeeException, URISyntaxException {
 
-        // process any data import files
+        // Import any timeseries update CSV file
+        List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
         if (collection.description.timeseriesImportFiles != null) {
             for (String importFile : collection.description.timeseriesImportFiles) {
                 CompoundContentReader compoundContentReader = new CompoundContentReader(publishedReader);
                 compoundContentReader.add(collectionReader.getReviewed());
+
                 InputStream csvInput = collectionReader.getRoot().getResource(importFile).getData();
-                TimeseriesUpdater.updateTimeseries(compoundContentReader, collectionWriter.getReviewed(), csvInput, dataIndex);
+
+                // read the CSV and update the timeseries titles.
+                TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
+
+                System.out.println("Importing CSV file: " + importFile);
+                updateCommands.addAll(importer.importData());
             }
         }
 
@@ -102,6 +112,6 @@ public class ApproveTask implements Callable<Boolean> {
         return new DataPublisher().preprocessCollection(
                 publishedReader,
                 collectionReader,
-                collectionWriter.getReviewed(), collection, true, dataIndex);
+                collectionWriter.getReviewed(), collection, true, dataIndex, updateCommands);
     }
 }

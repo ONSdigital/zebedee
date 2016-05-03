@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.partial.Link;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -14,10 +15,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The workhorse of the data-publisher
- *
+ * <p>
  * Processes a single timeseries
  */
 public class DataProcessor {
@@ -83,7 +85,6 @@ public class DataProcessor {
     }
 
     /**
-     *
      * @param page
      * @param datasetPage
      */
@@ -106,20 +107,37 @@ public class DataProcessor {
         }
     }
 
+    public TimeSeries processTimeseries(
+            ContentReader publishedContentReader,
+            DataPublicationDetails details,
+            TimeSeries newTimeSeries,
+            DataIndex dataIndex
+    ) throws ZebedeeException, IOException, URISyntaxException {
+        return processTimeseries(publishedContentReader, details, newTimeSeries, dataIndex, Optional.<TimeseriesUpdateCommand>empty());
+    }
+
     /**
      * Take a timeseries as produced by Brian from an upload and combine it with current content
-     *  @param contentReader
+     *
+     * @param publishedContentReader
      * @param details
-     * @param newTimeSeries   @return
-     * */
-    public TimeSeries processTimeseries(ContentReader contentReader, DataPublicationDetails details, TimeSeries newTimeSeries, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
+     * @param newTimeSeries          @return
+     */
+    public TimeSeries processTimeseries(
+            ContentReader publishedContentReader,
+            DataPublicationDetails details,
+            TimeSeries newTimeSeries,
+            DataIndex dataIndex,
+            Optional<TimeseriesUpdateCommand> command
+    ) throws ZebedeeException, IOException, URISyntaxException {
 
         // Get current version of the time series (persists any manually entered data)
-        this.timeSeries = initialTimeseries(newTimeSeries, contentReader, details, dataIndex);
+        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details, dataIndex);
 
         // Add meta from the landing page and timeseries dataset page
         syncLandingPageMetadata(this.timeSeries, details);
         syncTimeSeriesMetadata(this.timeSeries, newTimeSeries);
+        applyUpdateCommand(command);
 
         // Combine the time series values
         DataMerge dataMerge = new DataMerge();
@@ -133,6 +151,13 @@ public class DataProcessor {
         insertions = dataMerge.insertions;
 
         return this.timeSeries;
+    }
+
+    public void applyUpdateCommand(Optional<TimeseriesUpdateCommand> updateCommand) {
+        if (updateCommand.isPresent() && !updateCommand.get().title.equals(this.timeSeries.getDescription().getTitle())) {
+            this.timeSeries.getDescription().setTitle(updateCommand.get().title);
+            this.titleUpdated = true;
+        }
     }
 
     /**
@@ -170,7 +195,6 @@ public class DataProcessor {
     }
 
     /**
-     *
      * @param inProgress
      * @param newSeries
      * @return
@@ -193,7 +217,6 @@ public class DataProcessor {
 
         return inProgress;
     }
-
 
 
     /**
@@ -219,19 +242,19 @@ public class DataProcessor {
      * Get the starting point for our timeseries by loading a
      *
      * @param series
-     * @param contentReader
+     * @param publishedContentReader
      * @param details
      * @return
      * @throws ZebedeeException
      * @throws IOException
      */
-    TimeSeries initialTimeseries(TimeSeries series, ContentReader contentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
+    TimeSeries initialTimeseries(TimeSeries series, ContentReader publishedContentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
 
         String publishUri = publishUriForTimeseries(series, details, dataIndex);
 
         // Try to get an existing timeseries
         try {
-            TimeSeries existing = (TimeSeries) contentReader.getContent(publishUri);
+            TimeSeries existing = (TimeSeries) publishedContentReader.getContent(publishUri);
             return existing;
         } catch (NotFoundException e) {
             // If it doesn't exist create a new empty one using the description
@@ -245,7 +268,6 @@ public class DataProcessor {
             throw e;
         }
     }
-
 
 
 }

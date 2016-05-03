@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.data;
 
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.data.processing.DataPublication;
 import com.github.onsdigital.zebedee.data.processing.DataPublicationFinder;
@@ -31,6 +32,7 @@ public class DataPublisher {
      * @param collectionContentWriter reader for this publications collection content
      * @param collection              the collection being processed
      * @param saveTimeSeries          the option to skip saving the individual timeseries
+     * @param updateCommands
      * @throws IOException
      * @throws ZebedeeException
      * @throws URISyntaxException
@@ -41,7 +43,8 @@ public class DataPublisher {
             ContentWriter collectionContentWriter,
             Collection collection,
             boolean saveTimeSeries,
-            DataIndex dataIndex
+            DataIndex dataIndex,
+            List<TimeseriesUpdateCommand> updateCommands
     ) throws IOException, ZebedeeException, URISyntaxException {
 
         // Find all files that need data preprocessing
@@ -51,7 +54,16 @@ public class DataPublisher {
         for (DataPublication dataPublication : dataPublications) {
             // If a file upload exists
             if (dataPublication.hasUpload())
-                dataPublication.process(publishedContentReader, collectionReader.getReviewed(), collectionContentWriter, saveTimeSeries, dataIndex);
+                dataPublication.process(publishedContentReader, collectionReader.getReviewed(), collectionContentWriter, saveTimeSeries, dataIndex, updateCommands);
+        }
+
+        for (TimeseriesUpdateCommand updateCommand : updateCommands) {
+
+            // see if the timeseries is already in the reviewed section
+
+            // if it is then ignore it, its already been updated.
+
+            // if its not then update the title and write it
         }
 
         // Get the list of uris in reviewed

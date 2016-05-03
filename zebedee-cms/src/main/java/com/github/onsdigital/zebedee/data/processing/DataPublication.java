@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 public class DataPublication {
     public static final String DEFAULT_DATASET_ID = "data";
@@ -77,7 +79,14 @@ public class DataPublication {
      * @throws IOException
      * @throws ZebedeeException
      */
-    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter, boolean saveTimeSeries, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
+    public void process(
+            ContentReader publishedContentReader,
+            ContentReader reviewedContentReader,
+            ContentWriter reviewedContentWriter,
+            boolean saveTimeSeries,
+            DataIndex dataIndex,
+            List<TimeseriesUpdateCommand> updateCommands
+    ) throws IOException, ZebedeeException, URISyntaxException {
         // Wait for dataIndex to complete progress
         dataIndex.pauseUntilComplete(MAX_SECONDS);
 
@@ -91,9 +100,15 @@ public class DataPublication {
 
         // Process each returned timeseries
         for(TimeSeries series: serieses) {
+
+            // see if there is an update command for this timeseries.
+            Optional<TimeseriesUpdateCommand> command = updateCommands.stream()
+                    .filter(updateCommand -> updateCommand.cdid.equalsIgnoreCase(series.getCdid()))
+                    .findFirst();
+
             // Build new timeseries
             DataProcessor processor = new DataProcessor();
-            processor.processTimeseries(compositeContentReader, details, series, dataIndex);
+            processor.processTimeseries(compositeContentReader, details, series, dataIndex, command);
 
             // Save files
             if (saveTimeSeries) {
@@ -105,7 +120,6 @@ public class DataPublication {
             results.add(processor.timeSeries);
         }
 
-
         // Generate data files
         DataFileGenerator generator = new DataFileGenerator(reviewedContentWriter);
         List<DownloadSection> downloadSections = generator.generateDataDownloads(this.details, this.results);
@@ -115,17 +129,18 @@ public class DataPublication {
         writeDatasetPage(reviewedContentWriter, details, downloadSections);
     }
 
+
     /**
      * Process a specified collection
      *
      * @param publishedContentReader
      * @param reviewedContentReader
      * @param reviewedContentWriter
-     * @throws IOException
+     *@param updateCommands @throws IOException
      * @throws ZebedeeException
      */
-    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter, DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
-        process(publishedContentReader, reviewedContentReader, reviewedContentWriter, true, dataIndex);
+    public void process(ContentReader publishedContentReader, ContentReader reviewedContentReader, ContentWriter reviewedContentWriter, DataIndex dataIndex, List<TimeseriesUpdateCommand> updateCommands) throws IOException, ZebedeeException, URISyntaxException {
+        process(publishedContentReader, reviewedContentReader, reviewedContentWriter, true, dataIndex, updateCommands);
     }
 
         /**

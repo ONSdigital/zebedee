@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.DataPublisher;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -31,6 +32,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -114,10 +116,11 @@ public class CsdbImporter {
         ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.published.path);
         DataIndex dataIndex = Root.zebedee.dataIndex;
 
+        List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
         return new DataPublisher().preprocessCollection(
                 publishedReader,
                 collectionReader,
-                collectionWriter.getReviewed(), collection, true, dataIndex);
+                collectionWriter.getReviewed(), collection, true, dataIndex, updateCommands);
     }
 
     /**

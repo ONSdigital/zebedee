@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
@@ -31,6 +32,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -431,6 +433,36 @@ public class DataProcessorTest {
 
         assertEquals(originalTimeSeriesValues - 1, valuesFromOriginal);
         assertEquals(1, valuesFromUpdate);
+    }
+
+    @Test
+    public void processTimeseries_withUpdateCommands_updatesTitles() throws IOException, ZebedeeException, URISyntaxException, ParseException {
+        // Given
+        // We publish a timeseries with update commands to update the title.
+        String cdid = "abcd";
+        String title = "The new title from update command.";
+        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", "original", 2015, 0, "file.csdb");
+
+        TimeSeries timeSeries = generator.exampleTimeseries(cdid, "original");
+        timeSeries.setUri(new URI("pages/timeseries/" + timeSeries.getCdid().toLowerCase()));
+        timeSeries.years.stream().forEach(value -> value.value = "original");
+
+        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
+
+        Optional<TimeseriesUpdateCommand> command = Optional.of(new TimeseriesUpdateCommand(cdid, title));
+
+        // When
+        // we run a process
+        DataProcessor processor = new DataProcessor();
+        processor.processTimeseries(publishedReader,
+                pagesSet.getDetails(publishedReader, collectionReader.getReviewed()),
+                timeSeries,
+                zebedee.dataIndex,
+                command);
+
+        // Then
+        // we expect the title to be that of the update command.
+        assertEquals(title, processor.timeSeries.getDescription().getTitle());
     }
 
     /**

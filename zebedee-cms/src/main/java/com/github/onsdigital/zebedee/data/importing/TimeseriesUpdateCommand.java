@@ -11,14 +11,17 @@ import java.util.Map;
 public class TimeseriesUpdateCommand {
 
     public String cdid; // The CDID to define the timeseries to update.
-
     public String title; // The title to update to.
-
     public Date releaseDate;
-
     public String uri;
-
     public List<String> sourceDatasets;
-
     public Map<String, Integer> datasetCsvColumn = new HashMap<>(); // the csv column to update for each dataset.
+
+    public TimeseriesUpdateCommand(String cdid, String title) {
+        this.cdid = cdid;
+        this.title = title;
+    }
+
+    public TimeseriesUpdateCommand() {
+    }
 }

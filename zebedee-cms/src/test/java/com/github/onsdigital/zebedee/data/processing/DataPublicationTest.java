@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
+import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
@@ -21,6 +22,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -32,22 +35,20 @@ import static org.junit.Assert.assertNotNull;
  */
 public class DataPublicationTest {
 
+    final List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
     Zebedee zebedee;
     Builder bob;
     Session publisher;
     Session reviewer;
-
     Collection collection;
     ContentReader publishedReader;
     CollectionReader collectionReader;
     CollectionWriter collectionWriter;
     DataBuilder dataBuilder;
     DataPagesGenerator generator;
-
     DataPagesSet published;
     DataPagesSet unpublished;
     DataPagesSet republish;
-
 
     /**
      * Setup generates an instance of zebedee, a collection, and various DataPagesSet objects (that are test framework generators)
@@ -118,7 +119,7 @@ public class DataPublicationTest {
 
         // When
         // we initialise publication
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
 
         // Then
         // we expect it to be not null
@@ -142,7 +143,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
 
         // Then
         // we expect datasetId to be extracted using the [datasetId].csdb pattern
@@ -164,7 +165,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
 
         // Then
         // we expect datasetId to be extracted using the upload.[datasetId].csv pattern
@@ -185,7 +186,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
 
         // Then
         // we expect the csdb datalink to be called
@@ -206,7 +207,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
 
         // Then
         // we expect the csv datalink to be called

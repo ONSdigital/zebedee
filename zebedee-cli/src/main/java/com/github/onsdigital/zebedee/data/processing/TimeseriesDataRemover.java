@@ -14,10 +14,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TimeseriesDataRemover {
@@ -32,15 +29,19 @@ public class TimeseriesDataRemover {
         Path source = Paths.get(args[1]);
         Path destination = Paths.get(args[2]);
 
-        String cdid = args[3];
+        Set<String> cdids = new TreeSet<>(Arrays.asList(args[3].split(",")));
         Set<String> dates = new HashSet<>();
+
+        for (String cdid : cdids) {
+            System.out.println("Adding CDID: " + cdid);
+        }
 
         for (int i = 4; i < args.length; i++) {
             dates.add(args[i]);
             System.out.println("Adding date: " + args[i]);
         }
 
-        removeTimeseriesEntries(source, destination, cdid, dates);
+        removeTimeseriesEntries(source, destination, cdids, dates);
     }
 
     public static void removeTimeseriesData(String[] args) throws Exception {
@@ -64,7 +65,7 @@ public class TimeseriesDataRemover {
         removeTimeseriesData(source, destination, dataResoltion, cdids);
     }
 
-    private static void removeTimeseriesEntries(Path source, Path destination, String cdid, Set<String> dates) throws InterruptedException, NotFoundException, IOException, BadRequestException {
+    private static void removeTimeseriesEntries(Path source, Path destination, Set<String> cdids, Set<String> dates) throws InterruptedException, NotFoundException, IOException, BadRequestException {
 // build the data index so we know where to find timeseries files given the CDID
         ContentReader contentReader = new FileSystemContentReader(source);
 
@@ -76,24 +77,30 @@ public class TimeseriesDataRemover {
 
         DataIndex dataIndex = DataIndexBuilder.buildDataIndex(contentReader);
 
-        String uri = dataIndex.getUriForCdid(cdid.toLowerCase());
+        for (String cdid : cdids) {
+            if (cdid == null || cdid.length() == 0)
+                continue;
 
-        if (uri == null) {
-            System.out.println("CDID " + cdid + " not found in the data index.");
-            return;
+            String uri = dataIndex.getUriForCdid(cdid.toLowerCase());
+
+            if (uri == null) {
+                System.out.println("CDID " + cdid + " not found in the data index.");
+                return;
+            }
+
+            TimeSeries page = (TimeSeries) compoundContentReader.getContent(uri);
+
+            System.out.println("removing entries from uri: " + uri);
+
+            for (String date : dates) {
+                removeLabel(date, page.years);
+                removeLabel(date, page.quarters);
+                removeLabel(date, page.months);
+            }
+
+            contentWriter.writeObject(page, uri + "/data.json");
         }
 
-        TimeSeries page = (TimeSeries) compoundContentReader.getContent(uri);
-
-        System.out.println("removing entries from uri: " + uri);
-
-        for (String date : dates) {
-            removeLabel(date, page.years);
-            removeLabel(date, page.quarters);
-            removeLabel(date, page.months);
-        }
-
-        contentWriter.writeObject(page, uri + "/data.json");
     }
 
     private static void removeLabel(String date, TreeSet<TimeSeriesValue> values) {

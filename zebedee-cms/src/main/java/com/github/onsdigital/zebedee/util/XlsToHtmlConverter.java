@@ -736,14 +736,12 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         Element tableElement;
 
         if (tableModifications.isPresent()) {
-            if (tableModifications.get().getHeaderRows().contains(row.getRowNum())
-                    && StringUtils.isNotEmpty(cell.getStringCellValue())) {
+            if (tableModifications.get().getHeaderRows().contains(row.getRowNum()) && !isEmptyCell(cell)) {
                 isHeader = true;
                 // If row is defined as header and this column is also a header then col scope takes priority.
                 scope = tableModifications.get().getHeaderColumns().contains(columnIndex) ? COL : ROW;
 
-            } else if (tableModifications.get().getHeaderColumns().contains(columnIndex)
-                    && StringUtils.isNotEmpty(cell.getStringCellValue())) {
+            } else if (tableModifications.get().getHeaderColumns().contains(columnIndex) && !isEmptyCell(cell)) {
                 isHeader = true;
                 scope = COL;
             }
@@ -758,8 +756,18 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         return tableElement;
     }
 
-    static class HtmlDocument extends HtmlDocumentFacade {
+    private static boolean isEmptyCell(HSSFCell cell) {
+        switch (cell.getCellType()) {
+            case (HSSFCell.CELL_TYPE_STRING) :
+                return StringUtils.isEmpty(cell.getStringCellValue());
+            case (HSSFCell.CELL_TYPE_BLANK) :
+                return true;
+            default:
+                return false;
+        }
+    }
 
+    static class HtmlDocument extends HtmlDocumentFacade {
         HtmlDocument(Document document) {
             super(document);
         }

@@ -112,6 +112,6 @@ public class ApproveTask implements Callable<Boolean> {
         return new DataPublisher().preprocessCollection(
                 publishedReader,
                 collectionReader,
-                collectionWriter.getReviewed(), collection, true, dataIndex, updateCommands);
+                collectionWriter.getReviewed(), true, dataIndex, updateCommands);
     }
 }

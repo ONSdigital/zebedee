@@ -77,7 +77,7 @@ public class DataPublicationFinderTest {
 
         // When
         // we search for publications
-        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed(), collection);
+        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed());
 
         // Then
         // no data turns up
@@ -93,7 +93,7 @@ public class DataPublicationFinderTest {
 
         // When
         // we search for publications
-        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed(), collection);
+        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed());
 
         // Then
         // the publication is identified
@@ -114,7 +114,7 @@ public class DataPublicationFinderTest {
 
         // When
         // we search for publications
-        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed(), collection);
+        List<DataPublication> publications = new DataPublicationFinder().findPublications(publishedReader, collectionReader.getReviewed());
 
         // Then
         // the publication is identified

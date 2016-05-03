@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.data.processing.DataPublication;
 import com.github.onsdigital.zebedee.data.processing.DataPublicationFinder;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -30,7 +29,6 @@ public class DataPublisher {
      *
      * @param publishedContentReader  reader for the master content
      * @param collectionContentWriter reader for this publications collection content
-     * @param collection              the collection being processed
      * @param saveTimeSeries          the option to skip saving the individual timeseries
      * @param updateCommands
      * @throws IOException
@@ -41,7 +39,6 @@ public class DataPublisher {
             ContentReader publishedContentReader,
             CollectionReader collectionReader,
             ContentWriter collectionContentWriter,
-            Collection collection,
             boolean saveTimeSeries,
             DataIndex dataIndex,
             List<TimeseriesUpdateCommand> updateCommands

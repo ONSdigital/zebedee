@@ -120,7 +120,7 @@ public class CsdbImporter {
         return new DataPublisher().preprocessCollection(
                 publishedReader,
                 collectionReader,
-                collectionWriter.getReviewed(), collection, true, dataIndex, updateCommands);
+                collectionWriter.getReviewed(), true, dataIndex, updateCommands);
     }
 
     /**

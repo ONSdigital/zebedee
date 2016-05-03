@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
@@ -22,7 +23,12 @@ public class DummyCollectionWriter extends CollectionWriter {
         reviewed = getContentWriter(collectionsPath, getConfiguration().getReviewedFolderName());
     }
 
-    private ContentWriter getContentWriter(Path collectionPath, String folderName) {
+    private ContentWriter getContentWriter(Path collectionPath, String folderName) throws IOException {
+
+        if (!Files.exists(collectionPath.resolve(folderName))) {
+            Files.createDirectory(collectionPath.resolve(folderName));
+        }
+
         return new ContentWriter(collectionPath.resolve(folderName));
     }
 

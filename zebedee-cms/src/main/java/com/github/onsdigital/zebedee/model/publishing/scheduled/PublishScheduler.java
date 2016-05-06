@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
  * Public interface to schedule publishes in Zebedee
@@ -80,7 +80,7 @@ public class PublishScheduler extends Scheduler {
                 PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, postPublishCollectionTasks);
                 publishTask.schedule(publishDate);
             } catch (Exception e) {
-                logError("Exception caught trying to schedule: " + e.getMessage());
+                logError(e).errorContext("Exception caught trying to schedule").log();
             }
         } else {
             Log.print("Not scheduling publish, scheduling is not enabled");

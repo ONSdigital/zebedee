@@ -4,14 +4,14 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.util.Log;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
  * A wrapper around the publish process of a single collection, allowing it to be executed on its own thread.
@@ -56,11 +56,10 @@ public class PublishCollectionTask implements Callable<Boolean> {
             published = Publisher.CommitPublish(collection, publisherSystemEmail, encryptionPassword);
             collection.description.publishEndDate = new Date();
         } catch (IOException e) {
-            Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
-            logError(ExceptionUtils.getStackTrace(e));
+            logError(e).errorContext("Exception publishing collection").collectionName(collection).log();
             // If an error was caught, attempt to roll back the transaction:
             if (collection.description.publishTransactionIds != null) {
-                Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);
+                debugMessage("Attempting rollback of publishing transaction").collectionName(collection).log();
                 Publisher.rollbackPublish(hostToTransactionIdMap, encryptionPassword);
             }
         } finally {

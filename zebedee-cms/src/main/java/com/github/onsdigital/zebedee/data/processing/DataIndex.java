@@ -17,8 +17,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
  * A hashmap storing a mapping from cdid
@@ -62,9 +62,9 @@ public class DataIndex {
                 try {
                     Files.walkFileTree(contentReader.getRootFolder(), new IndexBuilder(index, contentReader));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logError(e);
                 }
-                logMessage("Data index built with " + index.size() + " entries");
+                debugMessage("Data index built.").addParameter("entries", index.size()).log();
                 indexBuilt = true;
             }
         };
@@ -138,7 +138,7 @@ public class DataIndex {
                         this.index.put(timeSeries.getCdid().toLowerCase(), uri);
                     }
                 } catch (Exception e) {
-                    logError("Error indexing " + uri);
+                    logError(e).addParameter("message", "Error indexing uri").addParameter("uri", uri).log();
                 }
 
             }

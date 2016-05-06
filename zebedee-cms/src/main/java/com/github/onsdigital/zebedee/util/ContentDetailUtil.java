@@ -19,7 +19,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
@@ -45,7 +45,7 @@ public class ContentDetailUtil {
                         page.setUri(resolveUri(pageUri, page));
                         PageDescription description = page.getDescription();
                     } catch (JsonSyntaxException e) {
-                        logError("Failed to deserialise " + resource.getUri());
+                        logError(e).errorContext("Failed to deserialise json").addParameter("resourceUri", resource.getUri()).log();
                         throw e;
                     }
                 }

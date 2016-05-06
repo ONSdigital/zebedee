@@ -19,8 +19,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 public class PublishTask implements Runnable {
 
@@ -38,13 +38,15 @@ public class PublishTask implements Runnable {
      */
     @Override
     public void run() {
-        logMessage("Running scheduled job for collection id: " + collectionId);
+        debugMessage("Running scheduled job for collection")
+                .addParameter("collectionId", collectionId).log();
 
         try {
             Collection collection = zebedee.collections.getCollection(this.collectionId);
 
             if (collection.description.approvedStatus == false) {
-                logMessage("Scheduled collection has not been approved - switching to manual");
+                debugMessage("Scheduled collection has not been approved - switching to manual")
+                        .addParameter("collectionId", collectionId).log();
 
                 // Switch to manual
                 collection.description.type = CollectionType.manual;
@@ -54,7 +56,6 @@ public class PublishTask implements Runnable {
                 // and save
                 String filename = PathUtils.toFilename(collection.description.name) + ".json";
                 Path collectionPath = zebedee.collections.path.resolve(filename);
-                logMessage(collectionPath.toString());
                 try (OutputStream output = Files.newOutputStream(collectionPath)) {
                     Serialiser.serialise(output, collection.description);
                 }
@@ -81,7 +82,7 @@ public class PublishTask implements Runnable {
                 }
             }
         } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
-            logError("Exception publishing collection for ID" + collectionId + " exception:" + e.getMessage());
+            logError(e).errorContext("Exception publishing collection").addParameter("collectionId", collectionId).log();
         }
     }
 }

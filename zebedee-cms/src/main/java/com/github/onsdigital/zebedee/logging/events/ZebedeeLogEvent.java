@@ -4,6 +4,17 @@ package com.github.onsdigital.zebedee.logging.events;
  * Created by dave on 5/4/16.
  */
 public enum ZebedeeLogEvent {
+
+    /**
+     * Any Exception thrown in Zebedee.
+     */
+    EXCEPTION("Zebedee exception"),
+
+    /**
+     * For any general debug message.
+     */
+    DEBUG_MESSAGE("Debug message"),
+
     /**
      * Zebedee start up.
      */

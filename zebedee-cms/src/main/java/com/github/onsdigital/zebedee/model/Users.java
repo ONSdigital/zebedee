@@ -22,8 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
  * Created by david on 12/03/2015.
@@ -106,7 +107,10 @@ public class Users {
             }
         }
 
-        logMessage(users.size() + " users in the system: " + withKeyring + " of them have keyrings and " + withoutKeyring + " ");
+        debugMessage("User info")
+                .addParameter("numberOfUsers", users.size())
+                .addParameter("withKeyRing", withKeyring)
+                .addParameter("withoutKeyRing", withoutKeyring).log();
     }
 
     /**
@@ -162,12 +166,10 @@ public class Users {
             // The keyring has not been generated yet,
             // so reset the password to the current password
             // in order to generate a keyring and associated key pair:
-            logMessage("Generating keyring for " + user.name + " (" + user.email + ")..");
+            debugMessage("Generating keyring").addParameter("user", user.email).log();
             user.resetPassword(password);
 
             zebedee.users.update(user, "Encryption migration");
-
-           logMessage("Done.");
         }
         return result;
     }
@@ -560,7 +562,7 @@ public class Users {
                         User user = Serialiser.deserialise(input, User.class);
                         result.add(user);
                     } catch(JsonSyntaxException e) {
-                        logError("Error deserialising user at path " + path);
+                        logError(e).errorContext("Error deserialising user").addParameter("path", path.toString()).log();
                     }
                 }
             }

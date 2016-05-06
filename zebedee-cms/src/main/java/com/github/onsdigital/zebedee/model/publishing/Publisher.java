@@ -57,7 +57,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
 
 public class Publisher {
 
@@ -81,7 +82,7 @@ public class Publisher {
 
         // First get the in-memory (within-JVM) lock.
         // This will block attempts to write to the collection during the publishing process
-        Log.print("Attempting to lock collection before publish: " + collection.description.id);
+        debugMessage("Attempting to lock collection before publish.").addParameter("collectionId", collection.description.id).log();
         Lock writeLock = collection.getWriteLock();
         writeLock.lock();
 
@@ -164,9 +165,8 @@ public class Publisher {
 
         } catch (IOException e) {
 
-            Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
             SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.description.name, e.getMessage()));
-            logError(ExceptionUtils.getStackTrace(e));
+            logError(e).errorContext("Exception publishing collection").collectionName(collection).log();
             // If an error was caught, attempt to roll back the transaction:
             Map<String, String> transactionIds = collection.description.publishTransactionIds;
             if (transactionIds != null && transactionIds.size() > 0) {
@@ -709,8 +709,7 @@ public class Publisher {
             try {
                 endPublish(host, "rollback", transactionId, encryptionPassword);
             } catch (IOException e) {
-                logError("Error rolling back publish transaction:");
-                logError(ExceptionUtils.getStackTrace(e));
+                logError(e).errorContext("Error rolling back publish transaction:").log();
             }
         }
     }

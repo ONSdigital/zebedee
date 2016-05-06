@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReaderFactory;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logEvent;
 import static com.github.onsdigital.zebedee.logging.events.ZebedeeLogEvent.ZEBEDEE_STARTUP;
 
 /**
@@ -16,6 +16,6 @@ public class Init implements Startup {
     public void init() {
         Root.init();
         ZebedeeReader.setCollectionReaderFactory(new ZebedeeCollectionReaderFactory(Root.zebedee));
-        logMessage(ZEBEDEE_STARTUP.getDescription());
+        logEvent(ZEBEDEE_STARTUP).log();
     }
 }

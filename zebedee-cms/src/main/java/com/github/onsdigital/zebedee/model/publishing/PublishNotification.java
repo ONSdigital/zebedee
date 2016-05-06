@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
 
 /**
  * Created by bren on 16/12/15.
@@ -52,7 +51,7 @@ public class PublishNotification {
     }
 
     public void sendNotification(EventType eventType) {
-        logMessage("Sending publish notification to website for " + eventType.name());
+        debugMessage("Sending publish notification to website").addParameter("eventType", eventType.name()).log();
         try (Http http = new Http()) {
             for (Host host : websiteHosts) {
                 try {
@@ -60,9 +59,15 @@ public class PublishNotification {
                     Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
                     String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
                     if (response.statusLine.getStatusCode() > 302) {
-                        logError("Error response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                        debugMessage("Error response from website for publish notification")
+                                .addParameter("responseMessage", responseMessage)
+                                .addParameter("collectionId", payload.collectionId)
+                                .log();
                     } else {
-                        logError("Response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                        debugMessage("Response from website for publish notification")
+                                .addParameter("responseMessage", responseMessage)
+                                .addParameter("collectionId", payload.collectionId)
+                                .log();
                     }
                 } catch (Exception e) {
                     Log.print("Failed sending publish notification to website for " + eventType);

@@ -35,7 +35,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 public class Root {
     static final String ZEBEDEE_ROOT = "zebedee_root";
@@ -67,7 +68,7 @@ public class Root {
 
     public static void init() {
 
-        logMessage("zebedee init: ");
+        debugMessage("zebedee init").log();
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
@@ -93,7 +94,7 @@ public class Root {
                 // Create a Zebedee folder:
                 root = Files.createTempDirectory("zebedee");
                 zebedee = Zebedee.create(root);
-                logMessage("zebedee root: " + root.toString());
+                debugMessage("zebedee root created").addParameter("uri", root.toString()).log();
                 ReaderConfiguration.init(root.toString());
 
                 // Initialise content folders from bundle
@@ -159,13 +160,13 @@ public class Root {
     private static void loadExistingCollectionsIntoScheduler() {
         if (Configuration.isSchedulingEnabled()) {
 
-            logMessage("Adding existing collections to the scheduler.");
+            debugMessage("Adding existing collections to the scheduler.").log();
 
             Collections.CollectionList collections;
             try {
                 collections = zebedee.collections.list();
             } catch (IOException e) {
-                logMessage("*** Failed to load collections list to schedule publishes ***");
+                logError(e).addParameter("message", "Failed to load collections list to schedule publishes").log();
                 return;
             }
 
@@ -173,17 +174,20 @@ public class Root {
                 schedulePublish(collection);
             }
         } else {
-            Log.print("Scheduled publishing is disabled - not reading collections");
+            debugMessage("Scheduled publishing is disabled - not reading collections").log();
         }
     }
 
 
     public static void cancelPublish(Collection collection) {
         try {
-            logMessage("Attempting to cancel publish for collection " + collection.description.name + " type=" + collection.description.type);
+            debugMessage("Attempting to cancel collection publish.")
+                    .collectionName(collection)
+                    .addParameter("type", collection.description.type)
+                    .log();
             scheduler.cancel(collection);
         } catch (Exception e) {
-            logMessage("Exception caught trying to cancel scheduled publish of collection: " + e.getMessage());
+            logError(e).addParameter("message", "Exception caught trying to cancel scheduled publish of collection").log();
         }
     }
 
@@ -210,7 +214,7 @@ public class Root {
                 IOUtils.copy(input, output);
             }
         }
-        logMessage("Zebedee root is at: " + root.toAbsolutePath());
+        debugMessage("Zebedee root").addParameter("uri", root.toAbsolutePath()).log();
     }
 
     public static void schedulePublish(Collection collection) {

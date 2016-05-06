@@ -12,7 +12,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
 
 /**
  * Endpoint to be called when a publish takes place.
@@ -28,14 +28,14 @@ public class OnPublishComplete {
      */
     public static void main(String[] args) {
         String key = Random.password(64);
-        logMessage("Key (add to environment): " + key);
-        logMessage("Key hash (for REINDEX_KEY_HASH)" + Password.hash(key));
+        debugMessage("Key added to environment").addParameter("key", key).log();
+        debugMessage("Key hash (for REINDEX_KEY_HASH)").addParameter("keyHash", Password.hash(key)).log();
     }
 
     @POST
     public Object onPublishComplete(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
 
-        logMessage("Clearing browser tree cache");
+        debugMessage("Clearing browser tree cache").log();
         ContentTree.dropCache();
         response.setStatus(HttpStatus.OK_200);
         return "OnPublishComplete handler finished";

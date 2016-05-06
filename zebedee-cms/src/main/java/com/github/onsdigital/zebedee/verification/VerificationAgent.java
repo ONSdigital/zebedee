@@ -28,9 +28,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static java.util.Arrays.asList;
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
 
 /**
  * Created by bren on 16/11/15.
@@ -45,7 +45,7 @@ public class VerificationAgent {
     public VerificationAgent(Zebedee zebedee) {
         this.zebedee = zebedee;
         String defaultVerificationUrl = Configuration.getDefaultVerificationUrl();
-        logMessage("Initializing verification agent with url " + defaultVerificationUrl);
+        debugMessage("Initializing verification agent").addParameter("url", defaultVerificationUrl).log();
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setMaxTotalConnection(100);
         clientConfiguration.setDisableRedirectHandling(true);
@@ -54,7 +54,7 @@ public class VerificationAgent {
     }
 
     public void submitForVerification(PublishedCollection publishedCollection, Path jsonPath, CollectionReader reader) {
-        logMessage("Submitting collection " + publishedCollection.name + " for external verification");
+        debugMessage("Submitting collection for external verification").addParameter("collectionName", publishedCollection.name).log();
         List<Result> publishResults = publishedCollection.publishResults;
         for (Result publishResult : publishResults) {
             Set<UriInfo> uriInfos = publishResult.transaction.uriInfos;
@@ -78,7 +78,7 @@ public class VerificationAgent {
             try {
                 Thread.sleep(Configuration.getVerifyRetrtyDelay());
             } catch (InterruptedException e) {
-                logError("Warning! Retry delay failed, continues with verification retry ");
+                logError(e).errorContext("Retry delay failed, continuing with verification retry").log();
             }
             uriInfo.verificationStatus = UriInfo.VERIFY_RETRYING;
             submit(publishedCollection, jsonPath, uriInfo);
@@ -108,14 +108,14 @@ public class VerificationAgent {
                 onVerifyFailed("Verification agent error code:" + e.getStatusCode());
             } catch (IOException e) {
                 String errorMessage = "Failed verifying " + e.getMessage();
-                logError(errorMessage + " " + uriInfo.uri + "\n" + e.getMessage());
+                logError(e).errorContext("Failed verifying").addParameter("uri", uriInfo.uri).log();
                 onVerifyFailed(errorMessage);
             }
 
         }
 
         private void onVerified() {
-            logMessage("Succesfully verified " + uriInfo.uri);
+            debugMessage("Succesfully verified").addParameter("uri", uriInfo.uri).log();
             publishedCollection.incrementVerified();
             publishedCollection.decrementVerifyInProgressCount();
             uriInfo.verificationStatus = UriInfo.VERIFIED;
@@ -164,7 +164,7 @@ public class VerificationAgent {
                 uriInfo.sha = ContentUtil.hash(resource.getData());
             }
         } catch (Exception e) {
-            logError("Failed resolving hash for content " + uri);
+            logError(e).errorContext("Failed resolving hash for content").addParameter("uri", uri).log();
             e.printStackTrace();
         }
     }

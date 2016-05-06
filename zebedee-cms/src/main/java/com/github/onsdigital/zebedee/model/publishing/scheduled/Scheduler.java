@@ -5,25 +5,30 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 
-import java.text.MessageFormat;
-
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 public abstract class Scheduler {
 
     public void schedulePublish(Collection collection, Zebedee zebedee) {
         if (Configuration.isSchedulingEnabled()) {
             try {
-                logMessage("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
+                debugMessage("Attempting collection schedule publish")
+                        .collectionName(collection)
+                        .addParameter("collectionType", collection.description.type)
+                        .log();
                 if (collection.description.type == CollectionType.scheduled) {
                     schedule(collection, zebedee);
                 }
             } catch (Exception e) {
-                logError("Exception caught trying to schedule existing collection: " + e.getMessage());
+                logError(e).errorContext("Exception caught trying to schedule existing collection")
+                        .collectionName(collection)
+                        .log();
             }
         } else {
-            logMessage(MessageFormat.format("Not scheduling collection {0}, scheduling is not enabled", collection.description.name));
+            debugMessage("Not scheduling collection, scheduling is not enabled")
+                    .collectionName(collection)
+                    .log();
         }
     }
 

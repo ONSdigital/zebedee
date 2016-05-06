@@ -8,7 +8,15 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.model.Content;
+import com.github.onsdigital.zebedee.model.KeyringCache;
+import com.github.onsdigital.zebedee.model.Permissions;
+import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
+import com.github.onsdigital.zebedee.model.Sessions;
+import com.github.onsdigital.zebedee.model.Teams;
+import com.github.onsdigital.zebedee.model.Users;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -19,6 +27,8 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;;
 
 public class Zebedee {
 
@@ -77,7 +87,7 @@ public class Zebedee {
             try {
                 Files.createFile(redirectPath);
             } catch (IOException e) {
-                System.out.println("Could not save redirect to: " + redirectPath.toString());
+                logMessage("Could not save redirect to: " + redirectPath.toString());
             }
         } else {
             this.published.redirect = new RedirectTablePartialMatch(this.published, redirectPath);
@@ -260,7 +270,7 @@ public class Zebedee {
      */
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         if (credentials == null) {
-            System.out.println("Null session due to credentials being null");
+            logMessage("Null session due to credentials being null");
             return null;
         }
 
@@ -268,7 +278,7 @@ public class Zebedee {
         User user = users.get(credentials.email);
 
         if (user == null) {
-            System.out.println("Null session due to users.get returning null");
+            logMessage("Null session due to users.get returning null");
             return null;
         }
 

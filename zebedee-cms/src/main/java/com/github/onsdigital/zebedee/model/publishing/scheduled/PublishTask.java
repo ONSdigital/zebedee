@@ -19,6 +19,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 public class PublishTask implements Runnable {
 
     private final String collectionId;
@@ -35,13 +38,13 @@ public class PublishTask implements Runnable {
      */
     @Override
     public void run() {
-        System.out.println("Running scheduled job for collection id: " + collectionId);
+        logMessage("Running scheduled job for collection id: " + collectionId);
 
         try {
             Collection collection = zebedee.collections.getCollection(this.collectionId);
 
             if (collection.description.approvedStatus == false) {
-                System.out.println("Scheduled collection has not been approved - switching to manual");
+                logMessage("Scheduled collection has not been approved - switching to manual");
 
                 // Switch to manual
                 collection.description.type = CollectionType.manual;
@@ -51,7 +54,7 @@ public class PublishTask implements Runnable {
                 // and save
                 String filename = PathUtils.toFilename(collection.description.name) + ".json";
                 Path collectionPath = zebedee.collections.path.resolve(filename);
-                System.out.println(collectionPath);
+                logMessage(collectionPath.toString());
                 try (OutputStream output = Files.newOutputStream(collectionPath)) {
                     Serialiser.serialise(output, collection.description);
                 }
@@ -78,7 +81,7 @@ public class PublishTask implements Runnable {
                 }
             }
         } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
-            System.out.println("Exception publishing collection for ID" + collectionId + " exception:" + e.getMessage());
+            logError("Exception publishing collection for ID" + collectionId + " exception:" + e.getMessage());
         }
     }
 }

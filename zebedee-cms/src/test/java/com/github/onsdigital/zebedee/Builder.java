@@ -7,7 +7,12 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.AccessMapping;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
@@ -19,10 +24,17 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
 
 /**
  * This is a utility class to build a known {@link Zebedee} structure for
@@ -40,7 +52,7 @@ public class Builder {
     static User reviewer2Template;
 
     static {
-        System.out.println("Generating test users and keys...");
+        logMessage("Generating test users and keys...");
 
         User jukesie = new User();
         jukesie.name = "Matt Jukes";
@@ -81,7 +93,7 @@ public class Builder {
             throw new RuntimeException(e);
         }
 
-        System.out.println("Done.");
+        logMessage("Done.");
     }
 
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
@@ -254,7 +266,7 @@ public class Builder {
                 @Override
                 public void run() {
                     user.resetPassword("password");
-                    System.out.println(user.email);
+                    logMessage(user.email);
                 }
             });
         }
@@ -462,7 +474,7 @@ public class Builder {
     /**
      * This method creates the expected set of folders for a Zebedee structure.
      * This code is intentionally copied from
-     *
+     * <p>
      * This ensures there's a fixed expectation, rather than relying on a method that will be tested as part
      * of the test suite.
      *

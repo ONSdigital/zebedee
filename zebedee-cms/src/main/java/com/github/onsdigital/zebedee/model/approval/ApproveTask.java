@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Callable implementation for the approval process.
  */
@@ -103,7 +105,7 @@ public class ApproveTask implements Callable<Boolean> {
                 // read the CSV and update the timeseries titles.
                 TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
-                System.out.println("Importing CSV file: " + importFile);
+                logMessage("Importing CSV file: " + importFile);
                 updateCommands.addAll(importer.importData());
             }
         }

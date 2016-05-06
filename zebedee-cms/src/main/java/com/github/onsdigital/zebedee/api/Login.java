@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -14,9 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.audit.Audit.Event.LOGIN_AUTHENTICATION_FAILURE;
-import static com.github.onsdigital.zebedee.audit.Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED;
-import static com.github.onsdigital.zebedee.audit.Audit.Event.LOGIN_SUCCESS;
+import static com.github.onsdigital.zebedee.logging.events.ZebedeeLogEvent.LOGIN_AUTH_FAILURE;
+import static com.github.onsdigital.zebedee.logging.events.ZebedeeLogEvent.LOGIN_SUCCESS;
+import static com.github.onsdigital.zebedee.logging.events.ZebedeeLogEvent.PASSWORD_CHANGE_REQUIRED;
 
 /**
  * API for processing login requests.
@@ -50,10 +51,7 @@ public class Login {
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            //Audit.LOGIN_AUTHENTICATION_FAILURE.log(request, credentials.email);
-            LOGIN_AUTHENTICATION_FAILURE.parameters().host(request).user(credentials.email).log();
-
-
+            ZebedeeLogBuilder.forEvent(LOGIN_AUTH_FAILURE).user(credentials.email).log();
             return "Authentication failed.";
         }
 
@@ -63,16 +61,11 @@ public class Login {
         com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
 
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
-
-            // Let Florence know that this user needs to change their password.
-            // This isn't what 417 is intended for, but a 4xx variation on 401 seems sensible.
-            // I guess we could use 418 just for fun and to avoid confusion.
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
-
-            LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.email).log();
+            ZebedeeLogBuilder.forEvent(PASSWORD_CHANGE_REQUIRED).user(credentials.email).log();
             return "Password change required";
         } else {
-            LOGIN_SUCCESS.parameters().host(request).user(credentials.email).log();
+            ZebedeeLogBuilder.forEvent(LOGIN_SUCCESS).user(credentials.email).log();
             response.setStatus(HttpStatus.OK_200);
         }
 

@@ -16,6 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Created by david on 12/03/2015.
  */
@@ -197,7 +199,7 @@ public class Sessions extends TimerTask {
 
         // Delete expired sessions:
         for (Session session : expired) {
-            System.out.println("Deleting expired session " + session.id);
+            logMessage("Deleting expired session " + session.id);
             Files.delete(sessionPath(session.id));
         }
     }

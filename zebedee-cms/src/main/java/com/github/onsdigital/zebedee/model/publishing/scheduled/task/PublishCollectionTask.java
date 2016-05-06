@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+
 /**
  * A wrapper around the publish process of a single collection, allowing it to be executed on its own thread.
  */
@@ -25,8 +27,9 @@ public class PublishCollectionTask implements Callable<Boolean> {
 
     /**
      * Create a new task for a collection to be published.
-     * @param collection - The collection to publish.
-     * @param collectionReader - The collection reader to read collection content.
+     *
+     * @param collection         - The collection to publish.
+     * @param collectionReader   - The collection reader to read collection content.
      * @param encryptionPassword
      */
     public PublishCollectionTask(Collection collection, ZebedeeCollectionReader collectionReader, String encryptionPassword, Map<String, String> hostToTransactionIdMap) {
@@ -54,7 +57,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
             collection.description.publishEndDate = new Date();
         } catch (IOException e) {
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
-            System.out.println(ExceptionUtils.getStackTrace(e));
+            logError(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
             if (collection.description.publishTransactionIds != null) {
                 Log.print("Attempting rollback of publishing transaction for collection: " + collection.description.name);

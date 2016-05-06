@@ -9,6 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Created by iankent on 01/04/2016.
  */
@@ -20,18 +23,18 @@ public class InfluxDB {
     static {
         try {
             if (Configuration.isInfluxReportingEnabled()) {
-                System.out.println("creating influxdb instance");
+                logMessage("creating influxdb instance");
                 influxDB = InfluxDBFactory.connect(Configuration.getInfluxDBHost(), "root", "root");
 
                 influxDB.createDatabase(pingDBName);
             }
         } catch (Exception e) {
-            System.out.println("error initialising InfluxDB class:");
+            logError("error initialising InfluxDB class:");
             e.printStackTrace();
             throw e;
         }
     }
-    
+
     public static void Ping(long ms) {
         if (!Configuration.isInfluxReportingEnabled()) return;
 

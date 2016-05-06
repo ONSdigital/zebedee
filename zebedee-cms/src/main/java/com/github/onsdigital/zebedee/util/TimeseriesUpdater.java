@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Given as CSV indexed with the timeseries CDID, update each timeseries with the given data.
  */
@@ -22,12 +25,12 @@ public class TimeseriesUpdater {
         // read the CSV and update the timeseries titles.
         TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
-        System.out.println("Importing CSV file...");
+        logMessage("Importing CSV file...");
         ArrayList<TimeseriesUpdateCommand> updateCommandsImported = importer.importData();
 
         ArrayList<TimeseriesUpdateCommand> updateCommands = filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
 
-        System.out.println("Updating timeseries with new metadata...");
+        logMessage("Updating timeseries with new metadata...");
         updateTimeseriesMetadata(contentReader, contentWriter, updateCommands);
     }
 
@@ -38,7 +41,7 @@ public class TimeseriesUpdater {
             String uri = dataIndex.getUriForCdid(command.cdid.toLowerCase());
 
             if (uri == null) {
-                System.out.println("CDID " + command.cdid + " not found in the data index.");
+                logMessage("CDID " + command.cdid + " not found in the data index.");
                 continue;
             } else {
                 command.uri = uri;
@@ -72,7 +75,7 @@ public class TimeseriesUpdater {
                 }
 
             } catch (Exception e) {
-                System.out.println("Failed to read timeseries page for uri: " + command.uri);
+                logError("Failed to read timeseries page for uri: " + command.uri);
             }
         }
     }

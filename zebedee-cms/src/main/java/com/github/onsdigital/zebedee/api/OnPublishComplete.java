@@ -12,6 +12,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Endpoint to be called when a publish takes place.
  * Can be used to clear cached items / search indexes etc.
@@ -26,14 +28,14 @@ public class OnPublishComplete {
      */
     public static void main(String[] args) {
         String key = Random.password(64);
-        System.out.println("Key (add to environment): " + key);
-        System.out.println("Key hash (for REINDEX_KEY_HASH)" + Password.hash(key));
+        logMessage("Key (add to environment): " + key);
+        logMessage("Key hash (for REINDEX_KEY_HASH)" + Password.hash(key));
     }
 
     @POST
     public Object onPublishComplete(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
 
-        System.out.println("Clearing browser tree cache");
+        logMessage("Clearing browser tree cache");
         ContentTree.dropCache();
         response.setStatus(HttpStatus.OK_200);
         return "OnPublishComplete handler finished";

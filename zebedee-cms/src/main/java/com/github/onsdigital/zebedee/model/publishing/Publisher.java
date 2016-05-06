@@ -24,7 +24,11 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
-import com.github.onsdigital.zebedee.util.*;
+import com.github.onsdigital.zebedee.util.ContentTree;
+import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.ZipUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -40,10 +44,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
+
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
 
 public class Publisher {
 
@@ -152,7 +166,7 @@ public class Publisher {
 
             Log.print("Exception publishing collection: %s: %s", collection.description.name, e.getMessage());
             SlackNotification.alarm(String.format("Exception publishing collection: %s: %s", collection.description.name, e.getMessage()));
-            System.out.println(ExceptionUtils.getStackTrace(e));
+            logError(ExceptionUtils.getStackTrace(e));
             // If an error was caught, attempt to roll back the transaction:
             Map<String, String> transactionIds = collection.description.publishTransactionIds;
             if (transactionIds != null && transactionIds.size() > 0) {
@@ -695,8 +709,8 @@ public class Publisher {
             try {
                 endPublish(host, "rollback", transactionId, encryptionPassword);
             } catch (IOException e) {
-                System.out.println("Error rolling back publish transaction:");
-                System.out.println(ExceptionUtils.getStackTrace(e));
+                logError("Error rolling back publish transaction:");
+                logError(ExceptionUtils.getStackTrace(e));
             }
         }
     }

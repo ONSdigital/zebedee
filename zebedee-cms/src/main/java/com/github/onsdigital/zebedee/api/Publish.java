@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 @Api
 public class Publish {
 
@@ -43,10 +45,10 @@ public class Publish {
 		Session session = Root.zebedee.sessions.get(request);
 
 		String breakBeforePublish = request.getParameter("breakbeforefiletransfer");
-		System.out.println("breakBeforeFileTransfer = " + breakBeforePublish);
+        logMessage("breakBeforeFileTransfer = " + breakBeforePublish);
 
 		String skipVerification = request.getParameter("skipVerification");
-		System.out.println("skipVerification = " + skipVerification);
+        logMessage("skipVerification = " + skipVerification);
 
 		boolean doBreakBeforeFileTransfer = BooleanUtils.toBoolean(breakBeforePublish);
 		boolean doSkipVerification = BooleanUtils.toBoolean(skipVerification);

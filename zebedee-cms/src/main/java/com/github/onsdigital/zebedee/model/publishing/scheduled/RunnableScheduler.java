@@ -8,6 +8,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Schedule a task to run at the given date.
  */
@@ -43,7 +45,7 @@ public class RunnableScheduler {
      * Shutdown the scheduler to ensure resources are disposed of.
      */
     public void shutdown() {
-        System.out.println("Shutdown called on Scheduler.");
+        logMessage("Shutdown called on Scheduler.");
         scheduledExecutorService.shutdown();
     }
 }

@@ -5,7 +5,12 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -41,6 +46,7 @@ import java.util.Date;
 import java.util.concurrent.Future;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
 
 public class Collections {
     public final Path path;
@@ -296,10 +302,10 @@ public class Collections {
 
         // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
         if (breakBeforePublish) {
-            System.out.println("Breaking before publish");
+            logMessage("Breaking before publish");
             return true;
         }
-        System.out.println("Going ahead with publish");
+        logMessage("Going ahead with publish");
 
         Keyring keyring = zebedee.keyringCache.get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);

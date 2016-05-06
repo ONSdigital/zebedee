@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Created by bren on 16/12/15.
  * Publish notification to be sent to the website for caching timing purposes
@@ -49,7 +52,7 @@ public class PublishNotification {
     }
 
     public void sendNotification(EventType eventType) {
-        System.out.println("Sending publish notification to website for " + eventType.name());
+        logMessage("Sending publish notification to website for " + eventType.name());
         try (Http http = new Http()) {
             for (Host host : websiteHosts) {
                 try {
@@ -57,9 +60,9 @@ public class PublishNotification {
                     Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
                     String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
                     if (response.statusLine.getStatusCode() > 302) {
-                        System.err.println("Error response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                        logError("Error response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
                     } else {
-                        System.out.println("Response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
+                        logError("Response from website for publish notification: " + responseMessage + " for collection id:" + payload.collectionId);
                     }
                 } catch (Exception e) {
                     Log.print("Failed sending publish notification to website for " + eventType);

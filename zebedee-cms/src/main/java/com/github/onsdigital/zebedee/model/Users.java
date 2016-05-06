@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Created by david on 12/03/2015.
  * <p/>
@@ -103,7 +106,7 @@ public class Users {
             }
         }
 
-        System.out.println(users.size() + " users in the system: " + withKeyring + " of them have keyrings and " + withoutKeyring + " ");
+        logMessage(users.size() + " users in the system: " + withKeyring + " of them have keyrings and " + withoutKeyring + " ");
     }
 
     /**
@@ -159,12 +162,12 @@ public class Users {
             // The keyring has not been generated yet,
             // so reset the password to the current password
             // in order to generate a keyring and associated key pair:
-            System.out.println("Generating keyring for " + user.name + " (" + user.email + ")..");
+            logMessage("Generating keyring for " + user.name + " (" + user.email + ")..");
             user.resetPassword(password);
 
             zebedee.users.update(user, "Encryption migration");
 
-            System.out.println("Done.");
+           logMessage("Done.");
         }
         return result;
     }
@@ -557,7 +560,7 @@ public class Users {
                         User user = Serialiser.deserialise(input, User.class);
                         result.add(user);
                     } catch(JsonSyntaxException e) {
-                        System.out.println("Error deserialising user at path " + path);
+                        logError("Error deserialising user at path " + path);
                     }
                 }
             }

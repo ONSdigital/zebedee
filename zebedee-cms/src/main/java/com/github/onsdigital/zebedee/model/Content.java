@@ -51,7 +51,6 @@ public class Content {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
             for (Path entry : stream) {
                 if (Files.isDirectory(entry)) {
-                    //System.out.println(entry + ": " + entry.getFileName());
                     if (entry.getFileName().toString().equals("timeseries")) {
                         result.add(entry);
                         return result;

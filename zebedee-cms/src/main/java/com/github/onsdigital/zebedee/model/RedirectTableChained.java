@@ -1,8 +1,14 @@
 package com.github.onsdigital.zebedee.model;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
+
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
 
 /**
  * RedirectTable sits at the content level.
@@ -53,7 +59,7 @@ public class RedirectTableChained {
         try {
             load(path);
         } catch (IOException e) {
-            System.out.println("Could not load redirect from: " + path.toString());
+            logError("Could not load redirect from: " + path.toString());
         }
     }
 

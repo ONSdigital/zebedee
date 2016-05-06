@@ -2,20 +2,16 @@ package com.github.onsdigital.zebedee.verification;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.DateConverter;
 import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.verification.http.ClientConfiguration;
 import com.github.onsdigital.zebedee.verification.http.PooledHttpClient;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -32,8 +28,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
 
 /**
  * Created by bren on 16/11/15.
@@ -48,7 +45,7 @@ public class VerificationAgent {
     public VerificationAgent(Zebedee zebedee) {
         this.zebedee = zebedee;
         String defaultVerificationUrl = Configuration.getDefaultVerificationUrl();
-        System.out.println("Initializing verification agent with url " + defaultVerificationUrl);
+        logMessage("Initializing verification agent with url " + defaultVerificationUrl);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setMaxTotalConnection(100);
         clientConfiguration.setDisableRedirectHandling(true);
@@ -57,7 +54,7 @@ public class VerificationAgent {
     }
 
     public void submitForVerification(PublishedCollection publishedCollection, Path jsonPath, CollectionReader reader) {
-        System.out.println("Submitting collection " + publishedCollection.name + " for external verification");
+        logMessage("Submitting collection " + publishedCollection.name + " for external verification");
         List<Result> publishResults = publishedCollection.publishResults;
         for (Result publishResult : publishResults) {
             Set<UriInfo> uriInfos = publishResult.transaction.uriInfos;
@@ -81,7 +78,7 @@ public class VerificationAgent {
             try {
                 Thread.sleep(Configuration.getVerifyRetrtyDelay());
             } catch (InterruptedException e) {
-                System.err.println("Warning! Retry delay failed, continues with verification retry ");
+                logError("Warning! Retry delay failed, continues with verification retry ");
             }
             uriInfo.verificationStatus = UriInfo.VERIFY_RETRYING;
             submit(publishedCollection, jsonPath, uriInfo);
@@ -102,7 +99,6 @@ public class VerificationAgent {
         private void verify() {
             try {
                 uriInfo.verificationRetryCount++;
-//                System.out.println("Verifying " + uriInfo.uri + ", trial number " + uriInfo.verificationRetryCount);
                 if (isPublished(uriInfo)) {
                     onVerified();
                 } else {
@@ -112,14 +108,14 @@ public class VerificationAgent {
                 onVerifyFailed("Verification agent error code:" + e.getStatusCode());
             } catch (IOException e) {
                 String errorMessage = "Failed verifying " + e.getMessage();
-                System.err.println(errorMessage + " " + uriInfo.uri + "\n" + e.getMessage());
+                logError(errorMessage + " " + uriInfo.uri + "\n" + e.getMessage());
                 onVerifyFailed(errorMessage);
             }
 
         }
 
         private void onVerified() {
-            System.out.println("Succesfully verified " + uriInfo.uri);
+            logMessage("Succesfully verified " + uriInfo.uri);
             publishedCollection.incrementVerified();
             publishedCollection.decrementVerifyInProgressCount();
             uriInfo.verificationStatus = UriInfo.VERIFIED;
@@ -128,7 +124,6 @@ public class VerificationAgent {
         }
 
         private void onVerifyFailed(String errorMessage) {
-//            System.out.println("Failed verifying " + uriInfo.uri + " " + errorMessage);
             if (Configuration.getVerifyRetrtyCount() == uriInfo.verificationRetryCount) {
                 uriInfo.verificationStatus = UriInfo.VERIFY_FAILED;
                 publishedCollection.incrementVerifyFailed();
@@ -165,11 +160,11 @@ public class VerificationAgent {
     private void setHash(UriInfo uriInfo, CollectionReader reader) {
         String uri = uriInfo.uri;
         try {
-                try (Resource resource = reader.getResource(uri)) {
-                    uriInfo.sha = ContentUtil.hash(resource.getData());
-                }
+            try (Resource resource = reader.getResource(uri)) {
+                uriInfo.sha = ContentUtil.hash(resource.getData());
+            }
         } catch (Exception e) {
-            Log.print(e, "Failed resolving hash for content " + uri);
+            logError("Failed resolving hash for content " + uri);
             e.printStackTrace();
         }
     }

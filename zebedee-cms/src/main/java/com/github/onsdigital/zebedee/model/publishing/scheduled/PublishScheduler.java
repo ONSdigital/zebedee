@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+
 /**
  * Public interface to schedule publishes in Zebedee
  */
@@ -42,9 +44,10 @@ public class PublishScheduler extends Scheduler {
 
     /**
      * Validate and schedule the given collection to be published based on the publish date set in the collection.
-     * @param collection The collection to publish.
+     *
+     * @param collection          The collection to publish.
      * @param prePublishStartDate The start date of the pre-publish date.
-     * @param publishStartDate The start date of the publish process.
+     * @param publishStartDate    The start date of the publish process.
      */
     void schedulePrePublish(Collection collection, Zebedee zebedee, Date prePublishStartDate, Date publishStartDate) {
         // cancel existing publish for the collection
@@ -77,7 +80,7 @@ public class PublishScheduler extends Scheduler {
                 PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, postPublishCollectionTasks);
                 publishTask.schedule(publishDate);
             } catch (Exception e) {
-                System.out.println("Exception caught trying to schedule: " + e.getMessage());
+                logError("Exception caught trying to schedule: " + e.getMessage());
             }
         } else {
             Log.print("Not scheduling publish, scheduling is not enabled");

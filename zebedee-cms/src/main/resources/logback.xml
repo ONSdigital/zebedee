@@ -11,6 +11,15 @@
         </layout>
     </appender>
 
+    <!-- For logging a json object to the console. Only the json message will be output. -->
+    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
     <appender name="AUDIT_SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
 <!--        <syslogHost>192.168.0.8</syslogHost>
         <port>8514</port>-->
@@ -33,7 +42,10 @@
     <!-- Send logs to both console and file audit -->
     <logger name="com.github.onsdigital.zebedee.audit" level="info" additivity="false">
         <appender-ref ref="AUDIT_SYSLOG" />
-        <!--<appender-ref ref="AUDIT-FILE" />-->
+    </logger>
+
+    <logger name="com.github.onsdigital.logging" level="info" additivity="false">
+        <appender-ref ref="STDOUT_JSON" />
     </logger>
 
     <root level="info">

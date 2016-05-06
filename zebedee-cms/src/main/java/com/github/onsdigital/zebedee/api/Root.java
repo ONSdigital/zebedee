@@ -35,6 +35,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 public class Root {
     static final String ZEBEDEE_ROOT = "zebedee_root";
     // Environment variables are stored as a static variable so if necessary we can hijack them for testing
@@ -65,7 +67,7 @@ public class Root {
 
     public static void init() {
 
-        System.out.println("zebedee init: ");
+        logMessage("zebedee init: ");
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
@@ -91,7 +93,7 @@ public class Root {
                 // Create a Zebedee folder:
                 root = Files.createTempDirectory("zebedee");
                 zebedee = Zebedee.create(root);
-                System.out.println("zebedee root: " + root.toString());
+                logMessage("zebedee root: " + root.toString());
                 ReaderConfiguration.init(root.toString());
 
                 // Initialise content folders from bundle
@@ -157,13 +159,13 @@ public class Root {
     private static void loadExistingCollectionsIntoScheduler() {
         if (Configuration.isSchedulingEnabled()) {
 
-            System.out.println("Adding existing collections to the scheduler.");
+            logMessage("Adding existing collections to the scheduler.");
 
             Collections.CollectionList collections;
             try {
                 collections = zebedee.collections.list();
             } catch (IOException e) {
-                System.out.println("*** Failed to load collections list to schedule publishes ***");
+                logMessage("*** Failed to load collections list to schedule publishes ***");
                 return;
             }
 
@@ -178,10 +180,10 @@ public class Root {
 
     public static void cancelPublish(Collection collection) {
         try {
-            System.out.println("Attempting to cancel publish for collection " + collection.description.name + " type=" + collection.description.type);
+            logMessage("Attempting to cancel publish for collection " + collection.description.name + " type=" + collection.description.type);
             scheduler.cancel(collection);
         } catch (Exception e) {
-            System.out.println("Exception caught trying to cancel scheduled publish of collection: " + e.getMessage());
+            logMessage("Exception caught trying to cancel scheduled publish of collection: " + e.getMessage());
         }
     }
 
@@ -208,8 +210,7 @@ public class Root {
                 IOUtils.copy(input, output);
             }
         }
-
-        System.out.println("Zebedee root is at: " + root.toAbsolutePath());
+        logMessage("Zebedee root is at: " + root.toAbsolutePath());
     }
 
     public static void schedulePublish(Collection collection) {

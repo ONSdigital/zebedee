@@ -4,22 +4,26 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.util.Log;
+
+import java.text.MessageFormat;
+
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
 
 public abstract class Scheduler {
 
     public void schedulePublish(Collection collection, Zebedee zebedee) {
         if (Configuration.isSchedulingEnabled()) {
             try {
-                System.out.println("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
+                logMessage("Attempting to schedule publish for collection " + collection.description.name + " type=" + collection.description.type);
                 if (collection.description.type == CollectionType.scheduled) {
                     schedule(collection, zebedee);
                 }
             } catch (Exception e) {
-                System.out.println("Exception caught trying to schedule existing collection: " + e.getMessage());
+                logError("Exception caught trying to schedule existing collection: " + e.getMessage());
             }
         } else {
-            Log.print("Not scheduling collection %s, scheduling is not enabled", collection.description.name);
+            logMessage(MessageFormat.format("Not scheduling collection {0}, scheduling is not enabled", collection.description.name));
         }
     }
 

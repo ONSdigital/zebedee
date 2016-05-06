@@ -21,6 +21,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Sends messages to slack.
  */
@@ -82,10 +85,11 @@ public class SlackNotification {
                         .setParameter("icon_emoji", emoji)
                         .setParameter("text", StringEscapeUtils.escapeHtml(text));
                 Response<JsonObject> response = http.post(slack, JsonObject.class);
-                System.out.println("response.statusLine = " + response.statusLine);
+                logMessage("response.statusLine = " + response.statusLine);
             } catch (Exception e) {
                 result = e;
                 Log.print(e);
+                logError(e);
             }
             return result;
         });
@@ -93,8 +97,7 @@ public class SlackNotification {
 
     public static void main(String[] args) {
         String timeTaken = String.format("%.3f", (77 / 1000.0));
-        System.out.println("timeTaken = " + timeTaken);
-        //send("test");
+        logMessage("timeTaken = " + timeTaken);
     }
 
 

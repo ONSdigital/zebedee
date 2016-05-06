@@ -14,6 +14,8 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 import java.security.PrivateKey;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 @Api
 public class CsdbNotify {
 
@@ -30,7 +32,7 @@ public class CsdbNotify {
      */
     @POST
     public void csdbNotify(HttpServletRequest request, HttpServletResponse response, String csdbId) throws IOException, ZebedeeException {
-        System.out.println(String.format("\n\tReceived csdb file notification: filename='%s'.\n", csdbId));
+        logMessage(String.format("Received csdb file notification: filename='%s'.", csdbId));
 
         PrivateKey privateKey = Root.zebedee.applicationKeys.getPrivateKeyFromCache(CsdbImporter.APPLICATION_KEY_ID);
 

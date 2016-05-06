@@ -12,6 +12,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
+
 /**
  * Render PDF output for a given URI using babbage.
  */
@@ -44,7 +46,7 @@ public class BabbagePdfService implements PdfService {
         String trimmedUri = URIUtils.removeTrailingSlash(uri);
         String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
 
-        System.out.println("Reading PDF from: " + src);
+        logMessage("Reading PDF from: " + src);
 
         // if the url is absolute, go get it using HTTP client.
         HttpClient client = HttpClientBuilder.create().build();

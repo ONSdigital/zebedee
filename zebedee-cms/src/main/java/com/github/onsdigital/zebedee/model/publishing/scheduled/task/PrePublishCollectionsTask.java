@@ -15,11 +15,18 @@ import com.github.onsdigital.zebedee.util.Log;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static com.github.onsdigital.zebedee.logging.SimpleLogBuilder.logMessage;
 
 /**
  * A scheduled task to run the pre-publish process for a number of collections.
@@ -102,7 +109,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                 Collection collection = zebedee.collections.getCollection(collectionId);
 
                 if (collection.description.approvedStatus == false) {
-                    System.out.println("Scheduled collection has not been approved - switching to manual");
+                    logMessage("Scheduled collection has not been approved - switching to manual");
 
                     // Switch to manual
                     collection.description.type = CollectionType.manual;

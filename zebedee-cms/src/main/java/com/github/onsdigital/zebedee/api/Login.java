@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
@@ -51,6 +52,7 @@ public class Login {
 
         if (!result) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            Audit.Event.LOGIN_AUTHENTICATION_FAILURE.parameters().host(request).user(credentials.email).log();
             ZebedeeLogBuilder.forEvent(LOGIN_AUTH_FAILURE).user(credentials.email).log();
             return "Authentication failed.";
         }
@@ -62,9 +64,11 @@ public class Login {
 
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
+            Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.email).log();
             ZebedeeLogBuilder.forEvent(PASSWORD_CHANGE_REQUIRED).user(credentials.email).log();
             return "Password change required";
         } else {
+            Audit.Event.LOGIN_SUCCESS.parameters().host(request).user(credentials.email).log();
             ZebedeeLogBuilder.forEvent(LOGIN_SUCCESS).user(credentials.email).log();
             response.setStatus(HttpStatus.OK_200);
         }

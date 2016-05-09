@@ -21,14 +21,31 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLConnection;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 import static com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration.getConfiguration;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.exists;
+import static java.nio.file.Files.isDirectory;
+import static java.nio.file.Files.newDirectoryStream;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.probeContentType;
+import static java.nio.file.Files.size;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
@@ -322,7 +339,8 @@ public class FileSystemContentReader implements ContentReader {
         try {
             return ContentUtil.deserialiseContent(resource.getData());
         } catch (JsonSyntaxException e) {
-            System.out.println("Failed to deserialise " + resource.getUri());
+            logError(e).errorContext("Failed to deserialise resource")
+                    .addParameter("resourceUri", resource.getUri()).log();
             throw e;
         }
     }
@@ -424,7 +442,7 @@ public class FileSystemContentReader implements ContentReader {
         } catch (NotFoundException e) {
             contentNode = createContentNodeForFolder(path);
         } catch (JsonSyntaxException e) {
-            System.out.println("Warning!!! Invalid json file encountered, path: " + path.toString());
+            logError(e).errorContext("Warning!!! Invalid json file encountered").addParameter("path", path.toString()).log();
         }
 
         return contentNode;

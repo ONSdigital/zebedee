@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.ss.usermodel.Row;
@@ -16,7 +15,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.xml.sax.SAXException;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,23 +30,26 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+
 public class TimeseriesDataFix {
 
 
     public static void main(String[] args) throws IOException, OpenXML4JException, SAXException, InterruptedException {
 
         if (args == null || args.length < 1) {
-            System.out.println("Please provide a root path to apply the data fix.");
+            debugMessage("Please provide a root path to apply the data fix.").log();
             return;
         }
 
         String inputPath = args[0];
-        Log.print("Running data fix in %s", inputPath);
+        debugMessage("Applying timeSeries data fix").path(Paths.get(inputPath)).log();
 
         ContentReader contentReader = new FileSystemContentReader(Paths.get(inputPath));
         DataIndex dataIndex = new DataIndex(contentReader);
 
-        System.out.println("Data indexing...");
+        debugMessage("Data indexing").log();
 
         CsdbFinder csdbFinder = new CsdbFinder();
         List<Path> csdbPaths = csdbFinder.find(Paths.get(inputPath));
@@ -59,13 +67,14 @@ public class TimeseriesDataFix {
 
                 int count = 0;
 
-                System.out.println("Processing csdb: " + csdbPath + " last modified: " + sdf.format(csdbPath.toFile().lastModified()));
+                debugMessage("Processing csdb").path(csdbPath)
+                        .addParameter("lastModified", sdf.format(csdbPath.toFile().lastModified()))
+                        .log();
 
                 DataLinkBrian brian = new DataLinkBrian();
                 TimeSerieses timeSeries = brian.getTimeSeries(brian.csdbURI(), Files.newInputStream(csdbPath), csdbPath.getFileName().toString());
 
                 for (TimeSeries series : timeSeries) {
-                    //System.out.println("series.getDescription().getTitle() = " + series.getDescription().getTitle());
 
                     try {
                         // Build new timeseries
@@ -82,15 +91,19 @@ public class TimeseriesDataFix {
                                 count++;
                             }
                         } catch (ZebedeeException e) {
-                            System.out.println(e.getMessage());
+                            logError(e).errorContext("Error while applying timeseries data fix");
                         }
 
                     } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                        logError(e).errorContext("Error while applying timeseries data fix");
                     }
                 }
 
-                System.out.println("Finished processing csdb: " + csdbPath + " number of changes: " + count);
+                debugMessage("Timeseries data fix processing completed")
+                        .addParameter("csdb", csdbPath.toString())
+                        .path(csdbPath)
+                        .addParameter("numberOfChanges", count)
+                        .log();
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -101,7 +114,7 @@ public class TimeseriesDataFix {
     public static void removeSeasonallyAdjusted(String inputPath) throws IOException, OpenXML4JException, SAXException {
         TimeseriesFinder finder = new TimeseriesFinder();
         List<Path> timeseries = finder.findTimeseries(Paths.get(inputPath));
-        Log.print("Processing %s timeseries...", timeseries.size());
+        debugMessage("Processing timeseries").addParameter("size", timeseries.size()).log();
 
         for (Path timeseriesPath : timeseries) {
             //removeSeasonalAdjustmentValue(timeseriesPath);
@@ -109,25 +122,25 @@ public class TimeseriesDataFix {
 
         CsdbFinder csdbFinder = new CsdbFinder();
         List<Path> csdbPaths = csdbFinder.find(Paths.get(inputPath));
-        Log.print("Found %s CSDB files", csdbPaths.size());
+        debugMessage("Found CSDB files").addParameter("numberOfFiles", csdbPaths.size()).log();
 
         for (Path csdbPath : csdbPaths) {
 
             try {
                 // determine xls path
                 Path csvPath = csdbPath.getParent().resolve(FilenameUtils.getBaseName(csdbPath.toString()) + ".csv");
-                Log.print("Updating: " + csvPath);
+                debugMessage("Updating csv").path(csvPath).log();
                 Path outputCsvPath = csdbPath.getParent().resolve(FilenameUtils.getBaseName(csdbPath.toString()) + "_updated.csv");
                 updateCsv(csvPath, outputCsvPath);
                 Files.move(outputCsvPath, csvPath, StandardCopyOption.REPLACE_EXISTING);
 
                 Path xlsPath = csdbPath.getParent().resolve(FilenameUtils.getBaseName(csdbPath.toString()) + ".xlsx");
-                Log.print("Updating: " + xlsPath);
+                debugMessage("Updating xls").path(xlsPath).log();
                 Path outputXlsxPath = xlsPath.getParent().resolve(FilenameUtils.getBaseName(csdbPath.toString()) + "_updated.xlsx");
                 updateXlsx(csvPath, outputXlsxPath);
                 Files.move(outputXlsxPath, xlsPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (FileNotFoundException ex) {
-                System.out.println("*** Files not found for CSDB file = " + csdbPath.toString());
+                logError(ex).errorContext("Files not found for CSDB file").path(csdbPath).log();
             }
         }
     }

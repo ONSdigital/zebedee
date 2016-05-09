@@ -9,9 +9,7 @@ public class DataIndexBuilder {
 
         while (!dataIndex.isIndexBuilt()) {
             Thread.sleep(1000);
-            System.out.print(".");
         }
-        System.out.println("");
         return dataIndex;
     }
 }

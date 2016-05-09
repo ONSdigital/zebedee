@@ -1,20 +1,24 @@
 package com.github.onsdigital.zebedee.reader.data.filter;
 
 import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.timeseries.Point;
+import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
-import com.github.onsdigital.zebedee.content.dynamic.ContentNodeDetails;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class FilterUtil {
@@ -114,22 +118,21 @@ public class FilterUtil {
             return set;
         }
 
-        Set<TimeSeriesValue> result =new TreeSet<>();
-        
+        Set<TimeSeriesValue> result = new TreeSet<>();
+
         boolean add = false;
         for (TimeSeriesValue timeSeriesValue : set) {
             Date date = timeSeriesValue.toDate();
             // Start adding if no from date has been specified:
             if ((!add && from == null) || date.equals(from) || date.after(from)) {
-                System.out.println("Starting range at " + date);
+                debugMessage("applying date range").addParameter("from", date.toString()).log();
                 add = true;
             }
             if (add) {
-                // System.out.print(".");
                 result.add(timeSeriesValue);
             }
             if (date.equals(to)) {
-                System.out.println("Ending range at " + date);
+                debugMessage("applying date range").addParameter("to", date.toString()).log();
                 break;
             }
         }

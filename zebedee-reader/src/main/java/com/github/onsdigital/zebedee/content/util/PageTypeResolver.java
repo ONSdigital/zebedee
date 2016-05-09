@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+
 /**
  * Created by bren on 09/06/15.
  */
@@ -24,7 +27,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
     }
 
     private static void registerContentTypes() {
-        System.out.println("Resolving page types");
+        debugMessage("Resolving page types").log();
         try {
 
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(PageTypeResolver.class.getProtectionDomain().getCodeSource().getLocation());
@@ -35,20 +38,20 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                 String className = contentClass.getSimpleName();
                 boolean _abstract = Modifier.isAbstract(contentClass.getModifiers());
                 if (_abstract) {
-                    System.out.println("Skipping registering abstract content type " + className);
+                    debugMessage("Skipping registering abstract content").addParameter("type", className).log();
                     continue;
                 }
 
                 try {
                     Page contentInstance = contentClass.newInstance();
-                    System.out.println("Registering content type, Page type : " + contentInstance.getType() + ":" + className);
+                    debugMessage("Registering content type").addParameter("pageType", contentInstance.getType()).log();
                     contentClasses.put(contentInstance.getType(), contentClass);
                 } catch (InstantiationException e) {
-                    System.out.println("Failed to instantiate content type, Page type : " + className);
+                    logError(e).errorContext("Failed to instantiate content type").addParameter("pageType", className).log();
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed initializing content types");
+            logError(e).errorContext("Failed initializing content types").log();
             throw new RuntimeException("Failed initializing request handlers", e);
         }
     }

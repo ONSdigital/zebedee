@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
+
 class EmbeddedElasticSearchServer {
 
     private static final String DEFAULT_CLUSTERNAME = "ONSCluster";
@@ -26,7 +28,7 @@ class EmbeddedElasticSearchServer {
         this.dataDirectory = Files.createTempDirectory("searchindex");
         Settings.Builder settingsBuilder = Settings.builder().put("cluster.name", clusterName).put("http.enabled", true).put("path.home", dataDirectory)
                 .put("node.data", true);
-        System.out.println("Creating index data in: " + this.dataDirectory);
+        elasticSearchLog("Creating index data").path(this.dataDirectory).log();
 
         if (settings != null) {
             settingsBuilder.put(settings);
@@ -38,7 +40,7 @@ class EmbeddedElasticSearchServer {
             }
         }
 
-        System.out.println("Starting embedded Elastic Search node with settings" + settingsBuilder.internalMap());
+        elasticSearchLog("Starting embedded search node").addParameter("settings", settingsBuilder.internalMap()).log();
         node = NodeBuilder.nodeBuilder().local(false).settings(settingsBuilder.build()).node();
     }
 
@@ -53,9 +55,8 @@ class EmbeddedElasticSearchServer {
 
     private void deleteDataDirectory() {
         try {
-            System.out.println("Deleting data directory: " + dataDirectory);
+            elasticSearchLog("Deleting data directory").path(dataDirectory).log();
             FileUtils.deleteDirectory(dataDirectory.toFile());
-            System.out.println("Finished deleting " + dataDirectory);
         } catch (IOException e) {
             throw new RuntimeException("Could not delete data directory of embedded elasticsearch server", e);
         }

@@ -6,15 +6,17 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.*;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchCluster;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.getElasticSearchServer;
+import static com.github.onsdigital.zebedee.search.configuration.SearchConfiguration.isStartEmbeddedSearch;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
 
 /**
  * Starts an {@link EmbeddedElasticSearchServer} when a client requested
@@ -46,15 +48,19 @@ public class ElasticSearchClient {
 
                 // Server
                 start = System.currentTimeMillis();
-                System.out.println("Elasticsearch: starting embedded server..");
+                elasticSearchLog("Starting embedded server").log();
                 EmbeddedElasticSearchServer server = new EmbeddedElasticSearchServer();
-                System.out.println("Elasticsearch: embedded server started (" + (System.currentTimeMillis() - start) + "ms)");
+                elasticSearchLog("Embedded server started")
+                        .addParameter("startTimeMS", (System.currentTimeMillis() - start))
+                        .log();
 
                 // Client
                 start = System.currentTimeMillis();
-                System.out.println("Elasticsearch: creating client..");
+                elasticSearchLog("Creating client").log();
                 client = server.getClient();
-                System.out.println("Elasticsearch: client set up (" + (System.currentTimeMillis() - start) + "ms)");
+                elasticSearchLog("Client up")
+                        .addParameter("startTimeMS", (System.currentTimeMillis() - start))
+                        .log();
 
                 Runtime.getRuntime().addShutdownHook(new ShutDownNodeThread(client, server));
             }
@@ -63,10 +69,10 @@ public class ElasticSearchClient {
 
     public static void init() throws IOException {
         if (isStartEmbeddedSearch()) {
-            System.out.println("Starting embedded elastic search server");
+            elasticSearchLog("Starting embedded search server").log();
             startEmbeddedServer();
         } else {
-            System.out.println("Not starting elastic search server due to configuration parameters");
+            elasticSearchLog("Not starting search server due to configuration parameters").log();
             connect();
         }
     }

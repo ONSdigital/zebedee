@@ -14,8 +14,14 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
 
 public class TimeseriesDataRemover {
 
@@ -32,15 +38,13 @@ public class TimeseriesDataRemover {
         Set<String> cdids = new TreeSet<>(Arrays.asList(args[3].split(",")));
         Set<String> dates = new HashSet<>();
 
-        for (String cdid : cdids) {
-            System.out.println("Adding CDID: " + cdid);
-        }
+        debugMessage("TimeSeries entries to remove").addParameter("targets", cdids).log();
 
         for (int i = 4; i < args.length; i++) {
             dates.add(args[i]);
-            System.out.println("Adding date: " + args[i]);
         }
 
+        debugMessage("Dates to remove").addParameter("dates", dates).log();
         removeTimeseriesEntries(source, destination, cdids, dates);
     }
 
@@ -59,13 +63,14 @@ public class TimeseriesDataRemover {
 
         for (int i = 4; i < args.length; i++) {
             cdids.add(args[i]);
-            System.out.println("Adding CDID: " + args[i]);
         }
 
+        debugMessage("TimesSeries CDID's to be removed").addParameter("targets", cdids).log();
         removeTimeseriesData(source, destination, dataResoltion, cdids);
     }
 
-    private static void removeTimeseriesEntries(Path source, Path destination, Set<String> cdids, Set<String> dates) throws InterruptedException, NotFoundException, IOException, BadRequestException {
+    private static void removeTimeseriesEntries(Path source, Path destination, Set<String> cdids, Set<String> dates)
+            throws InterruptedException, NotFoundException, IOException, BadRequestException {
 // build the data index so we know where to find timeseries files given the CDID
         ContentReader contentReader = new FileSystemContentReader(source);
 
@@ -84,13 +89,12 @@ public class TimeseriesDataRemover {
             String uri = dataIndex.getUriForCdid(cdid.toLowerCase());
 
             if (uri == null) {
-                System.out.println("CDID " + cdid + " not found in the data index.");
+                debugMessage("TimeSeries data not found in data index").addParameter("CDID", cdid).log();
                 return;
             }
 
             TimeSeries page = (TimeSeries) compoundContentReader.getContent(uri);
-
-            System.out.println("removing entries from uri: " + uri);
+            debugMessage("Removing TimeSeries entries").addParameter("CDID", cdid).addParameter("uri", uri).log();
 
             for (String date : dates) {
                 removeLabel(date, page.years);
@@ -107,7 +111,7 @@ public class TimeseriesDataRemover {
         List<TimeSeriesValue> toRemove = values.stream().filter(item -> item.date.equalsIgnoreCase(date)).collect(Collectors.toList());
         toRemove.forEach(item -> {
             values.remove(item);
-            System.out.println("Removed item with date: " + item.date);
+            debugMessage("Removed item").addParameter("itemDate", item.date).log();
         });
     }
 
@@ -128,7 +132,7 @@ public class TimeseriesDataRemover {
             String uri = dataIndex.getUriForCdid(cdid.toLowerCase());
 
             if (uri == null) {
-                System.out.println("CDID " + cdid + " not found in the data index.");
+                debugMessage("Timeseries file not found in data index").addParameter("CDID", cdid).log();
                 continue;
             }
 
@@ -136,15 +140,15 @@ public class TimeseriesDataRemover {
 
             switch (dataResoltion) {
                 case months:
-                    System.out.println("Removing monthly data for CDID " + cdid + " with url: " + uri);
+                    debugMessage("Removing monthly Timeseries data").addParameter("CDID", cdid).addParameter("uri", uri).log();
                     page.months = new TreeSet<>();
                     break;
                 case quarters:
-                    System.out.println("Removing quarterly data for CDID " + cdid + " with url: " + uri);
+                    debugMessage("Removing quarterly Timeseries data").addParameter("CDID", cdid).addParameter("uri", uri).log();
                     page.quarters = new TreeSet<>();
                     break;
                 case years:
-                    System.out.println("Removing yearly data for CDID " + cdid + " with url: " + uri);
+                    debugMessage("Removing yearly Timeseries data").addParameter("CDID", cdid).addParameter("uri", uri).log();
                     page.years = new TreeSet<>();
                     break;
             }

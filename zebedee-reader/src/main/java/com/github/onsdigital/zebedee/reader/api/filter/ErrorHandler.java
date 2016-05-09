@@ -8,6 +8,8 @@ import com.github.onsdigital.zebedee.reader.api.bean.ServerResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+
 /**
  * The error handler catches various exceptions and sets the response status code accordingly.
  */
@@ -19,11 +21,11 @@ public class ErrorHandler implements ServerError {
         if (t != null && ZebedeeException.class.isAssignableFrom(t.getClass())) {
             ZebedeeException exception = (ZebedeeException) t;
             res.setStatus(exception.statusCode);
-            System.out.println(exception.statusCode + ": " + exception.getMessage());
+            logError(exception).errorContext("Zebedee Reader API error").addParameter("exceptionStatusCode", exception.statusCode).log();
             return new ServerResponse(exception.getMessage());
         }
         // Otherwise leave the default 500 response
-        t.printStackTrace();
+        logError(t).errorContext("Internal Server Error").log();
         return new ServerResponse("Internal Server Error");
     }
 }

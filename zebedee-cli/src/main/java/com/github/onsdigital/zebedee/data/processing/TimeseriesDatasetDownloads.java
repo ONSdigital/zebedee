@@ -6,6 +6,8 @@ import org.apache.commons.io.FilenameUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
+
 /**
  * determines the uri's of timeseries dataset download files given the uri of the CSDB file.
  */
@@ -39,10 +41,12 @@ public class TimeseriesDatasetDownloads {
 
     public static void main(String[] args) {
         TimeseriesDatasetDownloads downloads = new TimeseriesDatasetDownloads(Paths.get("some/path/ct.csdb"));
-        System.out.println("downloads.csdbId = " + downloads.csdbId);
-        System.out.println("downloads.csdbPath = " + downloads.csdbPath);
-        System.out.println("downloads.csvPath = " + downloads.csvPath);
-        System.out.println("downloads.xlsPath = " + downloads.xlsPath);
+        debugMessage("Timeseries Dataset Downloads")
+                .addParameter("downloads.csdbId", downloads.csdbId)
+                .addParameter("downloads.csdbPath", downloads.csdbPath.toString())
+                .addParameter("downloads.csvPath", downloads.csvPath.toString())
+                .addParameter("downloads.xlsPath", downloads.xlsPath.toString())
+                .log();
     }
 
     public Path getCsdbPath() {

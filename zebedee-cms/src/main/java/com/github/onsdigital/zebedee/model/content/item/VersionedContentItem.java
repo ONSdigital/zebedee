@@ -27,8 +27,8 @@ import static com.github.onsdigital.zebedee.util.URIUtils.removeLeadingSlash;
  */
 public class VersionedContentItem extends ContentItem {
 
-    private static final String VERSION_DIRECTORY = "previous";
-    private static final String VERSION_PREFIX = "v";
+    static final String VERSION_DIRECTORY = "previous";
+    static final String VERSION_PREFIX = "v";
 
     private final ContentWriter contentWriter;
 
@@ -157,7 +157,14 @@ public class VersionedContentItem extends ContentItem {
             version = versionDirectory.toFile().listFiles().length + 1;
         }
 
-        return VERSION_PREFIX + version;
+        String versionIdentifier = VERSION_PREFIX + version;
+
+        while (Files.exists(versionDirectory.resolve(versionIdentifier))) {
+            version++;
+            versionIdentifier = VERSION_PREFIX + version;
+        }
+
+        return versionIdentifier;
     }
 
     public boolean versionExists(Content content) {

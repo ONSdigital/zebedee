@@ -33,6 +33,32 @@ public class VersionedContentItemTest {
     }
 
     @Test
+    public void createVersionShouldCreateExpectedDirectoryWhenGapsExistsInVersions() throws Exception {
+
+        // Given an instance of VersionedContentItem with a path to some content which has a v1 and V3 (explicitly missing v2).
+        Path rootPath = Files.createTempDirectory("VersionedContentItemTest");
+        String path = "economy";
+
+        Files.createDirectories(rootPath.resolve(path).resolve(VersionedContentItem.VERSION_DIRECTORY).resolve("v1"));
+        Files.createDirectories(rootPath.resolve(path).resolve(VersionedContentItem.VERSION_DIRECTORY).resolve("v3"));
+
+        VersionedContentItem versionedContentItem = new VersionedContentItem(path, new ContentWriter(rootPath));
+        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
+        FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
+
+        ContentReader contentReader = new FileSystemContentReader(rootPath);
+
+        // When we create a new version.
+        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader);
+
+        // Then a it creates a version after the highest version, ignoring the gap.
+        assertEquals("v4", version.getIdentifier());
+        assertTrue(Files.exists(contentItemPath.resolve(VersionedContentItem.getVersionDirectoryName())));
+        assertTrue(Files.exists(rootPath.resolve(version.getUri())));
+
+    }
+
+    @Test
     public void createVersionShouldCreateIncrementalVersionNumbers() throws Exception {
 
         // Given an existing version of some content.

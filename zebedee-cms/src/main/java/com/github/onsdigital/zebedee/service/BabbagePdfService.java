@@ -12,7 +12,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Render PDF output for a given URI using babbage.
@@ -46,7 +46,7 @@ public class BabbagePdfService implements PdfService {
         String trimmedUri = URIUtils.removeTrailingSlash(uri);
         String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
 
-        debugMessage("Reading PDF").addParameter("src", src).log();
+        logInfo("Reading PDF").addParameter("src", src).log();
 
         // if the url is absolute, go get it using HTTP client.
         HttpClient client = HttpClientBuilder.create().build();

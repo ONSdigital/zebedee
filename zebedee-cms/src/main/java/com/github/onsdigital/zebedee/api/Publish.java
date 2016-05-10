@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
-
 @Api
 public class Publish {
 

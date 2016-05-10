@@ -24,7 +24,6 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.util.JsonUtils;
-import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -46,7 +45,8 @@ import java.util.Date;
 import java.util.concurrent.Future;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class Collections {
     public final Path path;
@@ -154,7 +154,9 @@ public class Collections {
                     try {
                         result.add(new Collection(path, zebedee));
                     } catch (CollectionNotFoundException e) {
-                        Log.print(e, "Failed to deserialise collection with path %s", path.toString());
+                        logError(e, "Failed to deserialise collection")
+                                .addParameter("collectionPath", path.toString())
+                                .log();
                     }
                 }
             }
@@ -187,7 +189,7 @@ public class Collections {
 
     /**
      * Approve the given collection.
-     *
+     * <p>
      * Uses the environment variable use_beta_publisher to choose publisher
      *
      * @param collection
@@ -302,10 +304,10 @@ public class Collections {
 
         // Break before transfer allows us to run tests on the prepublish-hook without messing up the content
         if (breakBeforePublish) {
-            debugMessage("Breaking before publish").log();
+            logInfo("Breaking before publish").log();
             return true;
         }
-        debugMessage("Going ahead with publish").log();
+        logInfo("Going ahead with publish").log();
 
         Keyring keyring = zebedee.keyringCache.get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
@@ -323,12 +325,14 @@ public class Collections {
 
             Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
 
-            Log.print("postPublish process finished for collection %s time taken: %dms",
-                    collection.description.name,
-                    (System.currentTimeMillis() - onPublishCompleteStart));
-            Log.print("Publish complete for collection %s total time taken: %dms",
-                    collection.description.name,
-                    (System.currentTimeMillis() - publishStart));
+            logInfo("Collection postPublish process finished")
+                    .addParameter("collectioName", collection.description.name)
+                    .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
+                    .log();
+            logInfo("Collection publish complete.")
+                    .addParameter("collectioName", collection.description.name)
+                    .timeTaken((System.currentTimeMillis() - publishStart))
+                    .log();
         }
 
         return publishComplete;

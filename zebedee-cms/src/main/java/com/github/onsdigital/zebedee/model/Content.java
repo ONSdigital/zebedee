@@ -4,7 +4,6 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,6 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class Content {
     public static final String REDIRECT = "redirect.txt";
@@ -246,7 +248,7 @@ public class Content {
                 });
             }
         } catch (IllegalArgumentException e) {
-            Log.print(e, "Failed to sort content detail items for path %s", path.toString());
+            logError(e, "Failed to sort content detail items").addParameter("path", path.toString()).log();
         }
 
         return detail;
@@ -267,7 +269,9 @@ public class Content {
                 if (result != null) {
                     result.uri = PathUtils.toUri(this.path.relativize(path.getParent()));
                 } else {
-                    Log.print("Failed to deserialise content details for path %s", PathUtils.toUri(this.path.relativize(path.getParent())).toString());
+                    logInfo("Failed to deserialise content details")
+                            .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())).toString())
+                            .log();
                 }
             }
         }

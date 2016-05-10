@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.joda.time.DateTime;
 
@@ -17,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Created by bren on 16/12/15.
@@ -51,7 +51,7 @@ public class PublishNotification {
     }
 
     public void sendNotification(EventType eventType) {
-        debugMessage("Sending publish notification to website").addParameter("eventType", eventType.name()).log();
+        logInfo("Sending publish notification to website").addParameter("eventType", eventType.name()).log();
         try (Http http = new Http()) {
             for (Host host : websiteHosts) {
                 try {
@@ -59,18 +59,18 @@ public class PublishNotification {
                     Response<WebsiteResponse> response = http.postJson(endpoint, payload, WebsiteResponse.class);
                     String responseMessage = response.body == null ? response.statusLine.getReasonPhrase() : response.body.getMessage();
                     if (response.statusLine.getStatusCode() > 302) {
-                        debugMessage("Error response from website for publish notification")
+                        logInfo("Error response from website for publish notification")
                                 .addParameter("responseMessage", responseMessage)
                                 .addParameter("collectionId", payload.collectionId)
                                 .log();
                     } else {
-                        debugMessage("Response from website for publish notification")
+                        logInfo("Response from website for publish notification")
                                 .addParameter("responseMessage", responseMessage)
                                 .addParameter("collectionId", payload.collectionId)
                                 .log();
                     }
                 } catch (Exception e) {
-                    Log.print("Failed sending publish notification to website for " + eventType);
+                    logError(e, "Failed sending publish notification to website").addParameter("eventType", eventType).log();
                     SlackNotification.alarm("Failed sending publish notification to website for " + eventType + " host:" + host.toString());
                 }
             }

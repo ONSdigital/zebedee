@@ -5,8 +5,6 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollectionSearchResult;
 import com.github.onsdigital.zebedee.search.client.ElasticSearchClient;
-import com.github.onsdigital.zebedee.util.Log;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -29,6 +27,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
@@ -79,17 +79,17 @@ public class PublishedCollections {
             boolean exists = client.admin().indices().prepareExists(index).execute().actionGet().isExists();
 
             if (!exists) {
-                Log.print("Creating search index for published collections.");
+                logInfo("Creating search index for published collections.").log();
                 CreateIndexRequestBuilder indexBuilder = client.admin().indices()
                         .prepareCreate(index);
 
-                Log.print("Adding mapping for published collections index");
+                logInfo("Adding mapping for published collections index").log();
                 //indexBuilder.addMapping(mapping, getMappingProperties(mapping));
                 indexBuilder.execute().actionGet();
 
                 indexExistingResults(client);
 
-                Log.print("Finished indexing existing published collections");
+                logInfo("Finished indexing existing published collections").log();
             }
 
             initialised = true;
@@ -103,7 +103,7 @@ public class PublishedCollections {
      */
     public void index(Client client, PublishedCollection publishedCollection) throws IOException {
 
-        Log.print("Indexing collection %s", publishedCollection.name);
+        logInfo("Indexing collection").addParameter("collectionName", publishedCollection.name).log();
 
         IndexRequestBuilder indexRequest = client.prepareIndex(index, type);
         indexRequest.setSource(Serialiser.serialise(publishedCollection));
@@ -120,7 +120,7 @@ public class PublishedCollections {
     public PublishedCollectionSearchResult search(Client client) throws IOException {
         tryInit(client);
 
-        Log.print("Searching published collections");
+        logInfo("Searching published collections").log();
 
         PublishedCollectionSearchResult results = new PublishedCollectionSearchResult();
 
@@ -132,19 +132,20 @@ public class PublishedCollections {
                     .setFrom(0)
                     .setSize(20)
                     .addSort(new FieldSortBuilder("publishStartDate").order(SortOrder.DESC))
-                            //.setExplain(true)
+                    //.setExplain(true)
                     .execute()
                     .actionGet();
 
-            Log.print("Found %d published collections. Returned %d results", response.getHits().getTotalHits(), response.getHits().getHits().length);
+            logInfo("Search published collections")
+                    .addParameter("found", response.getHits().getTotalHits())
+                    .addParameter("returned", response.getHits().getHits().length).log();
 
             for (SearchHit searchHit : response.getHits()) {
                 PublishedCollection collection = Serialiser.deserialise(searchHit.sourceAsString(), PublishedCollection.class);
                 results.add(collection);
             }
         } catch (SearchPhaseExecutionException e) {
-            Log.print("Search failed");
-            ExceptionUtils.printRootCauseStackTrace(e);
+            logError(e, "Search published collections failed").log();
         }
 
         return results;
@@ -155,7 +156,7 @@ public class PublishedCollections {
      */
     private void indexExistingResults(Client client) throws IOException {
 
-        Log.print("Loading existing published collections from file");
+        logInfo("Loading existing published collections from file").log();
         List<PublishedCollection> publishedCollections = readFromFile();
 
         for (PublishedCollection publishedCollection : publishedCollections) {
@@ -175,12 +176,14 @@ public class PublishedCollections {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.json")) {
             for (Path filePath : stream) {
                 if (!Files.isDirectory(filePath)) {
-                    Log.print("Attempting to read published collection %s", filePath.toString());
+                    logInfo("Attempting to read published collection").addParameter("path", filePath.toString())
+                            .log();
                     try (InputStream input = Files.newInputStream(filePath)) {
                         publishedCollections.add(Serialiser.deserialise(input,
                                 PublishedCollection.class));
                     } catch (IOException e) {
-                        Log.print("Failed to read published collection with path %s", filePath.toString());
+                        logError(e, "Failed to read published collection")
+                                .addParameter("path", filePath.toString()).log();
                     }
                 }
             }
@@ -198,7 +201,8 @@ public class PublishedCollections {
             index(ElasticSearchClient.getClient(), publishedCollection);
             return publishedCollection;
         } catch (IOException e) {
-            Log.print("Failed to read published collection with path %s", collectionJsonPath.toString());
+            logError(e, "Failed to read published collection")
+                    .addParameter("path", collectionJsonPath.toString()).log();
             return null;
         }
     }

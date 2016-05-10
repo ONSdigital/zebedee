@@ -34,8 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
 /**
  * This is a utility class to build a known {@link Zebedee} structure for
@@ -53,7 +52,7 @@ public class Builder {
     static User reviewer2Template;
 
     static {
-        debugMessage("Generating test users and keys...").log();
+        logDebug("Generating test users and keys...").log();
 
         User jukesie = new User();
         jukesie.name = "Matt Jukes";
@@ -94,7 +93,7 @@ public class Builder {
             throw new RuntimeException(e);
         }
 
-        debugMessage("Done.").log();
+        logDebug("Done.").log();
     }
 
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
@@ -267,7 +266,7 @@ public class Builder {
                 @Override
                 public void run() {
                     user.resetPassword("password");
-                    debugMessage(user.email).log();
+                    logDebug(user.email).log();
                 }
             });
         }

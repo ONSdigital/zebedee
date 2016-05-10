@@ -6,7 +6,6 @@ import com.github.davidcarboni.cryptolite.KeyExchange;
 import com.github.davidcarboni.cryptolite.KeyWrapper;
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.util.Log;
 
 import javax.crypto.SecretKey;
 import java.security.KeyPair;
@@ -15,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Represents the encryption keys needed for a user account to access collections.
@@ -95,7 +97,7 @@ public class Keyring implements Cloneable {
             result = true;
         } catch (IllegalArgumentException e) {
             // Seems the private key could not be unwrapped, so return false
-            Log.print("Error unlocking keyring: " + e.getMessage());
+            logError(e, "Error unlocking keyring").log();
             result = false;
         }
 
@@ -123,7 +125,7 @@ public class Keyring implements Cloneable {
             result = true;
         } catch (IllegalArgumentException e) {
             // Seems the private key could not be unwrapped, so return false
-            Log.print("Error changing keyring password: " + e.getMessage());
+            logError(e, "Error changing keyring password").log();
             result = false;
         }
 
@@ -152,12 +154,14 @@ public class Keyring implements Cloneable {
                     keys.put(collectionId, result);
             } catch (IllegalArgumentException e) {
                 // Error decrypting key
-                Log.print("Error recovering encryption key for collection " + collectionId + ": " + e.getMessage());
+                logError(e, "Error recovering encryption key for collection")
+                        .addParameter("collectionId", collectionId).log();
             }
         }
 
         if (result == null) {
-            Log.print("Keyring has not been unlocked, cannot recover encryption key for collection " + collectionId);
+            logInfo("Keyring has not been unlocked, cannot recover encryption key")
+                    .addParameter("collectionId", collectionId).log();
         }
 
         return result;

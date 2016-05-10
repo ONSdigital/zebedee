@@ -6,13 +6,14 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class TimeSeriesCompressor {
 
@@ -27,12 +28,12 @@ public class TimeSeriesCompressor {
      * @throws IOException
      */
     public static void compressFiles(ContentReader contentReader, ContentWriter contentWriter, Collection collection) throws ZebedeeException, IOException {
-        Log.print("Compressing time series directories...");
+        logInfo("Compressing time series directories").collectionName(collection).log();
 
         List<Path> timeSeriesDirectories = contentReader.listTimeSeriesDirectories();
 
         for (Path timeSeriesDirectory : timeSeriesDirectories) {
-            Log.print("Compressing time series directory %s", timeSeriesDirectory.toString());
+            logInfo("Compressing time series directory").addParameter("directory", timeSeriesDirectory.toString()).log();
             String saveUri = contentReader.getRootFolder().relativize(timeSeriesDirectory).toString() + "-to-publish.zip";
 
             if (!collection.description.isEncrypted) {

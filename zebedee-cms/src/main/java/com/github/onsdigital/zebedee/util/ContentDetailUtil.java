@@ -45,7 +45,7 @@ public class ContentDetailUtil {
                         page.setUri(resolveUri(pageUri, page));
                         PageDescription description = page.getDescription();
                     } catch (JsonSyntaxException e) {
-                        logError(e).errorContext("Failed to deserialise json").addParameter("resourceUri", resource.getUri()).log();
+                        logError(e, "Failed to deserialise json").addParameter("resourceUri", resource.getUri()).log();
                         throw e;
                     }
                 }

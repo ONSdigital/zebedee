@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PostPublish
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PrePublishCollectionsTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionsTask;
-import com.github.onsdigital.zebedee.util.Log;
 import org.joda.time.DateTime;
 
 import java.util.Date;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Public interface to schedule publishes in Zebedee
@@ -27,12 +27,14 @@ public class PublishScheduler extends Scheduler {
 
     @Override
     protected void schedule(Collection collection, Zebedee zebedee) {
-        Log.print("Scheduling collection using optimised publisher: %s", collection.description.name);
+        logInfo("Scheduling collection using optimised publisher").collectionName(collection).log();
         Date publishStartDate = collection.description.publishDate;
         int getPreProcessSecondsBeforePublish = Configuration.getPreProcessSecondsBeforePublish();
         Date prePublishStartDate = new DateTime(publishStartDate).minusSeconds(getPreProcessSecondsBeforePublish).toDate();
 
-        Log.print("Scheduling collection %s prepublish: %s, publish %s", collection.description.name, prePublishStartDate, publishStartDate);
+        logInfo("Scheduling collection prepublish").collectionName(collection)
+                .addParameter("prePublishStartDate", prePublishStartDate)
+                .addParameter("publishStartDate", publishStartDate).log();
         schedulePrePublish(collection, zebedee, prePublishStartDate, publishStartDate);
     }
 
@@ -80,10 +82,10 @@ public class PublishScheduler extends Scheduler {
                 PublishCollectionsTask publishTask = new PublishCollectionsTask(collectionPublishTasks, postPublishCollectionTasks);
                 publishTask.schedule(publishDate);
             } catch (Exception e) {
-                logError(e).errorContext("Exception caught trying to schedule").log();
+                logError(e, "Exception caught trying to schedule").log();
             }
         } else {
-            Log.print("Not scheduling publish, scheduling is not enabled");
+            logInfo("Not scheduling publish, scheduling is not enabled").log();
         }
     }
 

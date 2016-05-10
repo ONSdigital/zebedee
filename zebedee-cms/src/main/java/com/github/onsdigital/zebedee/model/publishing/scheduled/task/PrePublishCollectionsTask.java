@@ -25,8 +25,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * A scheduled task to run the pre-publish process for a number of collections.
@@ -62,7 +62,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     public void run() {
 
         long startTime = System.currentTimeMillis();
-        debugMessage("PRE-PUBLISH: Starting Pre-publish process.").log();
+        logInfo("PRE-PUBLISH: Starting Pre-publish process.").log();
 
         // load collections into memory
         Set<Collection> collections = loadCollections();
@@ -75,21 +75,21 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         // create a post-publish task for each collection
         List<PostPublishCollectionTask> postPublishCollectionTasks = createCollectionPostPublishTasks(collectionPublishTasks, zebedee);
 
-        debugMessage("PRE-PUBLISH: Scheduling publish task")
+        logInfo("PRE-PUBLISH: Scheduling publish task")
                 .addParameter("publishDate", publishDate).log();
         publishScheduler.schedulePublish(collectionPublishTasks, postPublishCollectionTasks, publishDate);
 
-        debugMessage("PRE-PUBLISH: Finished Pre-publish")
+        logInfo("PRE-PUBLISH: Finished Pre-publish")
                 .addParameter("totalProcessTime", (System.currentTimeMillis() - startTime)).log();
     }
 
     private void preProcessCollectionsForPublish(Set<Collection> collections) {
-        debugMessage("PRE-PUBLISH: Preprocessing collections").log();
+        logInfo("PRE-PUBLISH: Preprocessing collections").log();
         for (Collection collection : collections) {
-            debugMessage("PRE-PUBLISH: Preprocessing collection").collectionName(collection).log();
+            logInfo("PRE-PUBLISH: Preprocessing collection").collectionName(collection).log();
             SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
             CollectionPublishPreprocessor.preProcessCollectionForPublish(collection, key);
-            debugMessage("PRE-PUBLISH: Preprocessing completed.").collectionName(collection).log();
+            logInfo("PRE-PUBLISH: Preprocessing completed.").collectionName(collection).log();
         }
     }
 
@@ -103,15 +103,15 @@ public class PrePublishCollectionsTask extends ScheduledTask {
     private Set<Collection> loadCollections() {
         Set<Collection> collections = new HashSet<>();
 
-        debugMessage("PRE-PUBLISH: Loading collections into memory").log();
+        logInfo("PRE-PUBLISH: Loading collections into memory").log();
         collectionIds.forEach(collectionId -> {
 
-            debugMessage("PRE-PUBLISH: Loading collection job").addParameter("collectionId", collectionId).log();
+            logInfo("PRE-PUBLISH: Loading collection job").addParameter("collectionId", collectionId).log();
             try {
                 Collection collection = zebedee.collections.getCollection(collectionId);
 
                 if (collection.description.approvedStatus == false) {
-                    debugMessage("Scheduled collection has not been approved - switching to manual").log();
+                    logInfo("Scheduled collection has not been approved - switching to manual").log();
 
                     // Switch to manual
                     collection.description.type = CollectionType.manual;
@@ -122,7 +122,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                     collections.add(collection);
                 }
             } catch (IOException e) {
-                logError(e).errorContext("Exception publishing collection").addParameter("collectionId", collectionId).log();
+                logError(e, "Exception publishing collection").addParameter("collectionId", collectionId).log();
             }
         });
         return collections;
@@ -148,7 +148,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
             for (Collection collection : collections) {
                 futures.add(pool.submit(() -> {
                     try {
-                        debugMessage("PRE-PUBLISH: creating collection publish task").collectionName(collection).log();
+                        logInfo("PRE-PUBLISH: creating collection publish task").collectionName(collection).log();
                         SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
 
@@ -162,7 +162,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
 
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
 
-                        debugMessage("PRE-PUBLISH: Adding publish task").collectionName(collection).log();
+                        logInfo("PRE-PUBLISH: Adding publish task").collectionName(collection).log();
                         collectionPublishTasks.add(publishCollectionTask);
                         return true;
                     } catch (BadRequestException | IOException | UnauthorizedException | NotFoundException e) {
@@ -198,7 +198,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         List<PostPublishCollectionTask> postPublishCollectionTasks = new ArrayList<>(collectionPublishTasks.size());
 
         collectionPublishTasks.forEach(publishTask -> {
-            debugMessage("PRE-PUBLISH: creating collection post-publish task").collectionName(publishTask.getCollection()).log();
+            logInfo("PRE-PUBLISH: creating collection post-publish task").collectionName(publishTask.getCollection()).log();
             PostPublishCollectionTask postPublishCollectionTask = new PostPublishCollectionTask(zebedee, publishTask);
             postPublishCollectionTasks.add(postPublishCollectionTask);
         });

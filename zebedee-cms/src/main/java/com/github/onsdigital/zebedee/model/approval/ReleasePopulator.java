@@ -8,15 +8,16 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReleasePopulator {
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
+public class ReleasePopulator {
 
 
     /**
@@ -44,22 +45,34 @@ public class ReleasePopulator {
                 || contentDetail.type.equals(PageType.article_download.toString())
                 || contentDetail.type.equals(PageType.bulletin.toString())
                 || contentDetail.type.equals(PageType.compendium_landing_page.toString())) {
-            Log.print("Adding document: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
+            logInfo("Adding document as a link to release")
+                    .addParameter("contentTitle", contentDetail.description.title)
+                    .addParameter("releaseTitle", release.getDescription().getTitle())
+                    .log();
             addRelatedDocument(release, contentDetail);
         }
 
         if (contentDetail.type.equals(PageType.dataset_landing_page.toString())) {
-            Log.print("Adding dataset: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
+            logInfo("Adding dataset as a link to release")
+                    .addParameter("contentTitle", contentDetail.description.title)
+                    .addParameter("releaseTitle", release.getDescription().getTitle())
+                    .log();
             addRelatedDataset(release, contentDetail);
         }
 
         if (contentDetail.type.equals(PageType.static_qmi.toString())) {
-            Log.print("Adding qmi: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
+            logInfo("Adding qmi as a link to release")
+                    .addParameter("contentTitle", contentDetail.description.title)
+                    .addParameter("releaseTitle", release.getDescription().getTitle())
+                    .log();
             addRelatedQMI(release, contentDetail);
         }
         if (contentDetail.type.equals(PageType.static_methodology.toString())
                 || contentDetail.type.equals(PageType.static_methodology_download.toString())) {
-            Log.print("Adding methodology article: %s as a link to release %s", contentDetail.description.title, release.getDescription().getTitle());
+            logInfo("Adding methodology article as a link to release")
+                    .addParameter("contentTitle", contentDetail.description.title)
+                    .addParameter("releaseTitle", release.getDescription().getTitle())
+                    .log();
             addRelatedMethodologyArticle(release, contentDetail);
         }
     }
@@ -108,11 +121,15 @@ public class ReleasePopulator {
                                        CollectionWriter collectionWriter,
                                        List<ContentDetail> collectionContent) throws IOException {
         if (collection.isRelease()) {
-            Log.print("Release identified for collection %s, populating the page links...", collection.description.name);
+            logInfo("Release identified for collection, populating the page links")
+                    .addParameter("collectionName", collection.description.name)
+                    .log();
             try {
                 collection.populateRelease(collectionReader, collectionWriter, collectionContent);
             } catch (ZebedeeException e) {
-                Log.print(e, "Failed to populate release page for collection %s", collection.description.name);
+                logError(e, "Failed to populate release page for collection")
+                        .addParameter("collectionName", collection.description.name)
+                        .log();
             }
         }
     }

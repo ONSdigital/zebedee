@@ -15,14 +15,17 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.Collections;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
-import com.github.onsdigital.zebedee.util.Log;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.crypto.SecretKey;
@@ -37,6 +40,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Handles a notification when a new CSDB file is available to zebedee.
@@ -73,7 +79,7 @@ public class CsdbImporter {
     }
 
     private static void processCsdb(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan, Collections collections, Map<String, SecretKey> keyCache) {
-        Log.print("Processing notification for CSDB %s", csdbIdentifier);
+        logInfo("Processing CSDB notification").addParameter("CSDBIdentifier", csdbIdentifier).log();
 
         Collection collection;
         try (InputStream csdbData = getDylanData(privateCsdbImportKey, csdbIdentifier, dylan)) {
@@ -81,18 +87,24 @@ public class CsdbImporter {
 
             if (collection != null) {
 
-                Log.print("Collection %s found for CSDB %s.", collection.description.name, csdbIdentifier);
+                logInfo("Found collection found for CSDB identifier")
+                        .addParameter("collectionName", collection.description.name)
+                        .addParameter("CSDBIdentifier", csdbIdentifier).log();
 
                 if (collection.description.approvedStatus == true) {
                     preProcessCollection(collection);
                 } else {
-                    Log.print("The collection %s is not approved.", collection.description.name);
+                    logInfo("Collection for CSDB identifier is not approved")
+                            .addParameter("collectionName", collection.description.name)
+                            .addParameter("CSDBIdentifier", csdbIdentifier).log();
                 }
             } else {
-                Log.print("No collection found for CSDB file with ID %s", csdbIdentifier);
+                logInfo("No collection found for CSDB identifier")
+                        .addParameter("CSDBIdentifier", csdbIdentifier).log();
             }
         } catch (ZebedeeException | IOException | URISyntaxException e) {
-            Log.print(e);
+            logError(e, "Error while processing CSDB file notification")
+                    .addParameter("CSDBIdentifier", csdbIdentifier).log();
         }
     }
 
@@ -192,17 +204,18 @@ public class CsdbImporter {
                         }
                     }
                 } catch (ZebedeeException e) {
-                    Log.print(e);
+                    logError(e, "Error while getting CSDB path from collection")
+                            .addParameter("CSDBIdentifier", csdbIdentifier).log();
                 }
             }
         }
         return null;
     }
 
-    private static boolean containsIgnoreCase(List<String> list, String toCompare){
+    private static boolean containsIgnoreCase(List<String> list, String toCompare) {
         for (String item : list) {
-            if (item.equalsIgnoreCase(toCompare));
-                return true;
+            if (item.equalsIgnoreCase(toCompare)) ;
+            return true;
         }
         return false;
     }

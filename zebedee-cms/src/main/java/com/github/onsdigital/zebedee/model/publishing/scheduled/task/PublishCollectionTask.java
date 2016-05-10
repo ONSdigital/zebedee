@@ -3,15 +3,14 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * A wrapper around the publish process of a single collection, allowing it to be executed on its own thread.
@@ -46,7 +45,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws Exception {
-        Log.print("PUBLISH: Running publish task for collection: " + collection.description.name);
+        logInfo("PUBLISH: Running collectiom publish task").collectionName(collection).log();
 
         try {
             collection.description.publishStartDate = new Date();
@@ -56,10 +55,10 @@ public class PublishCollectionTask implements Callable<Boolean> {
             published = Publisher.CommitPublish(collection, publisherSystemEmail, encryptionPassword);
             collection.description.publishEndDate = new Date();
         } catch (IOException e) {
-            logError(e).errorContext("Exception publishing collection").collectionName(collection).log();
+            logError(e, "Exception publishing collection").collectionName(collection).log();
             // If an error was caught, attempt to roll back the transaction:
             if (collection.description.publishTransactionIds != null) {
-                debugMessage("Attempting rollback of publishing transaction").collectionName(collection).log();
+                logInfo("Attempting rollback of publishing transaction").collectionName(collection).log();
                 Publisher.rollbackPublish(hostToTransactionIdMap, encryptionPassword);
             }
         } finally {

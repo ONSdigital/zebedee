@@ -6,10 +6,12 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * The task that runs after a collection is published.
@@ -44,7 +46,7 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
      */
     protected boolean doPostPublish(Collection collection, ZebedeeCollectionReader collectionReader) {
 
-        Log.print("POST-PUBLISH: Running post publish process for collection: " + collection.description.name);
+        logInfo("POST-PUBLISH: Running collection post publish process").collectionName(collection).log();
         long onPublishCompleteStart = System.currentTimeMillis();
         boolean skipVerification = false;
         boolean result = false;
@@ -52,12 +54,11 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
         try {
             result = Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
         } catch (IOException e) {
-            Log.print(e);
+            logError(e, "Error while Running collection post publish process").collectionName(collection).log();
         }
 
-        Log.print("POST-PUBLISH: postPublish process finished for collection %s time taken: %dms",
-                collection.description.name,
-                (System.currentTimeMillis() - onPublishCompleteStart));
+        logInfo("POST-PUBLISH: collectiom postPublish process complete.")
+                .collectionName(collection).timeTaken((System.currentTimeMillis() - onPublishCompleteStart)).log();
 
         return result;
     }

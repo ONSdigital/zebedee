@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.util.EncryptionUtils;
-import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.io.FileUtils;
 
@@ -11,6 +10,8 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Collection specific implementation of ContentWriter that is session / encryption aware.
@@ -39,7 +40,10 @@ public class CollectionContentWriter extends ContentWriter {
         } else {
             String logMessage = String.format("Writing unencrypted content in collection %s for URI %s", collection.description.name, uri);
             SlackNotification.send(logMessage);
-            Log.print(logMessage);
+            logInfo("Writing unencrypted content in collection")
+                    .addParameter("uri", uri)
+                    .addParameter("collectioName", collection.description.name)
+                    .log();
 
             return FileUtils.openOutputStream(path.toFile());
         }

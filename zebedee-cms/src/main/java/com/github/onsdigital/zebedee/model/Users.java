@@ -6,8 +6,11 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.*;
-import com.github.onsdigital.zebedee.util.Log;
+import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.UserList;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
@@ -107,7 +109,7 @@ public class Users {
             }
         }
 
-        debugMessage("User info")
+        logDebug("User info")
                 .addParameter("numberOfUsers", users.size())
                 .addParameter("withKeyRing", withKeyring)
                 .addParameter("withoutKeyRing", withoutKeyring).log();
@@ -142,7 +144,7 @@ public class Users {
             }
 
             for (String key : keysToRemove) {
-                Log.print("Removing stale key %s" + key);
+                logDebug("Removing stale key").addParameter("key", key).log();
                 user.keyring.remove(key);
             }
 
@@ -166,7 +168,7 @@ public class Users {
             // The keyring has not been generated yet,
             // so reset the password to the current password
             // in order to generate a keyring and associated key pair:
-            debugMessage("Generating keyring").addParameter("user", user.email).log();
+            logDebug("Generating keyring").addParameter("user", user.email).log();
             user.resetPassword(password);
 
             zebedee.users.update(user, "Encryption migration");
@@ -260,7 +262,7 @@ public class Users {
 
     /**
      * Update user details
-     *
+     * <p>
      * At present user email cannot be updated
      *
      * @param session
@@ -298,11 +300,11 @@ public class Users {
 
     /**
      * Save the user file
-     *
+     * <p>
      * To avoid concurrency issues this deserialises the saved user and updates
      * details atomically
      *
-     * @param user the user
+     * @param user      the user
      * @param lastAdmin the last person to administrate the user
      * @return
      * @throws IOException
@@ -419,7 +421,8 @@ public class Users {
             resetPassword(user, credentials.password, session.email);
 
             // Restore the user keyring (or not if this is system setup)
-            if (originalKeyring != null) KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session), originalKeyring.list());
+            if (originalKeyring != null)
+                KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session), originalKeyring.list());
 
             // Save the user
             write(user);
@@ -561,8 +564,8 @@ public class Users {
                     try (InputStream input = Files.newInputStream(path)) {
                         User user = Serialiser.deserialise(input, User.class);
                         result.add(user);
-                    } catch(JsonSyntaxException e) {
-                        logError(e).errorContext("Error deserialising user").addParameter("path", path.toString()).log();
+                    } catch (JsonSyntaxException e) {
+                        logError(e, "Error deserialising user").addParameter("path", path.toString()).log();
                     }
                 }
             }

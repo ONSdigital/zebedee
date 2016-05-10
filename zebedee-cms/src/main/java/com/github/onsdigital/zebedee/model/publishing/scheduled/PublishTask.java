@@ -12,15 +12,14 @@ import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class PublishTask implements Runnable {
 
@@ -38,14 +37,14 @@ public class PublishTask implements Runnable {
      */
     @Override
     public void run() {
-        debugMessage("Running scheduled job for collection")
+        logInfo("Running scheduled job for collection")
                 .addParameter("collectionId", collectionId).log();
 
         try {
             Collection collection = zebedee.collections.getCollection(this.collectionId);
 
             if (collection.description.approvedStatus == false) {
-                debugMessage("Scheduled collection has not been approved - switching to manual")
+                logInfo("Scheduled collection has not been approved - switching to manual")
                         .addParameter("collectionId", collectionId).log();
 
                 // Switch to manual
@@ -73,16 +72,15 @@ public class PublishTask implements Runnable {
                     long onPublishCompleteStart = System.currentTimeMillis();
                     new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
                     Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
-                    Log.print("postPublish process finished for collection %s time taken: %dms",
-                            collection.description.name,
-                            (System.currentTimeMillis() - onPublishCompleteStart));
-                    Log.print("Publish complete for collection %s total time taken: %dms",
-                            collection.description.name,
-                            (System.currentTimeMillis() - publishStart));
+
+                    logInfo("Collection postPublish process finished").collectionName(collection)
+                            .timeTaken((System.currentTimeMillis() - onPublishCompleteStart)).log();
+                    logInfo("Collection publish complete").collectionName(collection)
+                            .timeTaken((System.currentTimeMillis() - publishStart)).log();
                 }
             }
         } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
-            logError(e).errorContext("Exception publishing collection").addParameter("collectionId", collectionId).log();
+            logError(e, "Exception publishing collection").addParameter("collectionId", collectionId).log();
         }
     }
 }

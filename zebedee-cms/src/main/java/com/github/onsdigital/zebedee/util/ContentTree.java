@@ -8,6 +8,8 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 
 import java.io.IOException;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+
 /**
  * Holds a cached instance of the published content tree
  */
@@ -51,7 +53,7 @@ public class ContentTree {
     }
 
     public static void dropCache() {
-        Log.print("Clearing browser tree cache.");
+        logDebug("Clearing browser tree cache.").log();
         publishedContentTree = null;
     }
 }

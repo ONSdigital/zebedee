@@ -59,7 +59,7 @@ public class RedirectTableChained {
         try {
             load(path);
         } catch (IOException e) {
-            logError(e).errorContext("Could not load redirect").addParameter("path", path.toString()).log();
+            logError(e, "Could not load redirect").addParameter("path", path.toString()).log();
         }
     }
 

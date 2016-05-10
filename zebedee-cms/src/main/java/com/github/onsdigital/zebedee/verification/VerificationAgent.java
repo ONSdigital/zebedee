@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.json.publishing.UriInfo;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.DateConverter;
-import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.verification.http.ClientConfiguration;
 import com.github.onsdigital.zebedee.verification.http.PooledHttpClient;
 import org.apache.http.NameValuePair;
@@ -28,8 +27,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static java.util.Arrays.asList;
 
 /**
@@ -45,7 +44,7 @@ public class VerificationAgent {
     public VerificationAgent(Zebedee zebedee) {
         this.zebedee = zebedee;
         String defaultVerificationUrl = Configuration.getDefaultVerificationUrl();
-        debugMessage("Initializing verification agent").addParameter("url", defaultVerificationUrl).log();
+        logInfo("Initializing verification agent").addParameter("url", defaultVerificationUrl).log();
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setMaxTotalConnection(100);
         clientConfiguration.setDisableRedirectHandling(true);
@@ -54,7 +53,7 @@ public class VerificationAgent {
     }
 
     public void submitForVerification(PublishedCollection publishedCollection, Path jsonPath, CollectionReader reader) {
-        debugMessage("Submitting collection for external verification").addParameter("collectionName", publishedCollection.name).log();
+        logInfo("Submitting collection for external verification").addParameter("collectionName", publishedCollection.name).log();
         List<Result> publishResults = publishedCollection.publishResults;
         for (Result publishResult : publishResults) {
             Set<UriInfo> uriInfos = publishResult.transaction.uriInfos;
@@ -78,7 +77,7 @@ public class VerificationAgent {
             try {
                 Thread.sleep(Configuration.getVerifyRetrtyDelay());
             } catch (InterruptedException e) {
-                logError(e).errorContext("Retry delay failed, continuing with verification retry").log();
+                logError(e, "Retry delay failed, continuing with verification retry").log();
             }
             uriInfo.verificationStatus = UriInfo.VERIFY_RETRYING;
             submit(publishedCollection, jsonPath, uriInfo);
@@ -108,14 +107,14 @@ public class VerificationAgent {
                 onVerifyFailed("Verification agent error code:" + e.getStatusCode());
             } catch (IOException e) {
                 String errorMessage = "Failed verifying " + e.getMessage();
-                logError(e).errorContext("Failed verifying").addParameter("uri", uriInfo.uri).log();
+                logError(e, "Failed verifying").addParameter("uri", uriInfo.uri).log();
                 onVerifyFailed(errorMessage);
             }
 
         }
 
         private void onVerified() {
-            debugMessage("Succesfully verified").addParameter("uri", uriInfo.uri).log();
+            logInfo("Succesfully verified").addParameter("uri", uriInfo.uri).log();
             publishedCollection.incrementVerified();
             publishedCollection.decrementVerifyInProgressCount();
             uriInfo.verificationStatus = UriInfo.VERIFIED;
@@ -164,7 +163,7 @@ public class VerificationAgent {
                 uriInfo.sha = ContentUtil.hash(resource.getData());
             }
         } catch (Exception e) {
-            logError(e).errorContext("Failed resolving hash for content").addParameter("uri", uri).log();
+            logError(e, "Failed resolving hash for content").addParameter("uri", uri).log();
             e.printStackTrace();
         }
     }
@@ -173,7 +172,8 @@ public class VerificationAgent {
         try {
             zebedee.publishedCollections.save(publishedCollection, jsonPath);
         } catch (IOException e) {
-            Log.print(e, "!!!!!!Saving published collection failed, name: ", publishedCollection.name);
+            logError(e, "Saving published collection failed")
+                    .addParameter("collectionName", publishedCollection.name).log();
         }
     }
 }

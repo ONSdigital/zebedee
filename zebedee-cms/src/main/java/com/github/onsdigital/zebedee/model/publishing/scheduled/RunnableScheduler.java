@@ -1,14 +1,13 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
-import com.github.onsdigital.zebedee.util.Log;
-
 import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Schedule a task to run at the given date.
@@ -37,7 +36,7 @@ public class RunnableScheduler {
         long nowMs = System.currentTimeMillis();
         long ms = scheduledDate.getTime() - nowMs;
         ScheduledFuture<?> future = scheduledExecutorService.schedule(task, ms, TimeUnit.MILLISECONDS);
-        Log.print("Task scheduled to run in " + ms + "ms.");
+        logInfo("Pending scheduled task info").addParameter("MS_leftTillStart", +ms).log();
         return future;
     }
 
@@ -45,7 +44,7 @@ public class RunnableScheduler {
      * Shutdown the scheduler to ensure resources are disposed of.
      */
     public void shutdown() {
-        debugMessage("Shutdown called on Scheduler.").log();
+        logDebug("Shutdown called on Scheduler.").log();
         scheduledExecutorService.shutdown();
     }
 }

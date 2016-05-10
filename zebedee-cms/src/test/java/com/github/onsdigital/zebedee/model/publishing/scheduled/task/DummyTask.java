@@ -1,7 +1,8 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.util.Log;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
 /**
  * Dummy task to test if it has been run.
@@ -12,12 +13,12 @@ public class DummyTask implements Runnable {
     public boolean hasRun = false;
 
     public DummyTask() {
-        Log.print("Created dummy task with ID %s", id);
+        logDebug("Created dummy task").addParameter("taskId", id).log();
     }
 
     @Override
     public void run() {
-        Log.print("DummyTask %s has run at " + System.currentTimeMillis(), id);
+        logDebug("Dummy task completed").timeTaken(System.currentTimeMillis()).addParameter("taskId", id).log();
         hasRun = true;
     }
 }

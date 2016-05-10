@@ -29,7 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
 public class Zebedee {
 
@@ -88,8 +88,7 @@ public class Zebedee {
             try {
                 Files.createFile(redirectPath);
             } catch (IOException e) {
-                logError(e)
-                        .addParameter("message", "Could not save redirect to requested path")
+                logError(e, "Could not save redirect to requested path")
                         .addParameter("requestedPath", redirectPath.toString())
                         .log();
             }
@@ -274,7 +273,7 @@ public class Zebedee {
      */
     public Session openSession(Credentials credentials) throws IOException, NotFoundException, BadRequestException {
         if (credentials == null) {
-            debugMessage("Null session due to credentials being null").log();
+            logDebug("Null session due to credentials being null").log();
             return null;
         }
 
@@ -282,7 +281,7 @@ public class Zebedee {
         User user = users.get(credentials.email);
 
         if (user == null) {
-            debugMessage("Null session due to users.get returning null").log();
+            logDebug("Null session due to users.get returning null").log();
             return null;
         }
 

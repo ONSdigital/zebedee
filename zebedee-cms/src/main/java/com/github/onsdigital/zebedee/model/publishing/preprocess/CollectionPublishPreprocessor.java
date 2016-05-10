@@ -7,25 +7,27 @@ import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.util.Log;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class CollectionPublishPreprocessor {
 
     public static void preProcessCollectionForPublish(Collection collection, SecretKey key) {
         try {
-            Log.print("PRE-PUBLISH: creating manifest for collection: " + collection.description.name);
+            logInfo("PRE-PUBLISH: creating manifest").collectionName(collection).log();
             Manifest manifest = Manifest.create(collection);
             Manifest.save(manifest, collection);
 
-            Log.print("PRE-PUBLISH: compressing timeseries for collection: " + collection.description.name);
+            logInfo("PRE-PUBLISH: compressing timeseries").collectionName(collection).log();
             CollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
             CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, key);
             TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection);
         } catch (IOException | ZebedeeException e) {
-            Log.print(e);
+            logError(e, "Unexpected error for preProcessCollectionForPublish").log();
         }
     }
 }

@@ -18,7 +18,6 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
-import com.github.onsdigital.zebedee.util.Log;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
 import java.io.IOException;
@@ -29,7 +28,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Callable implementation for the approval process.
@@ -85,7 +85,7 @@ public class ApproveTask implements Callable<Boolean> {
             return result;
 
         } catch (IOException | ZebedeeException | URISyntaxException e) {
-            Log.print(e);
+            logError(e, "Exception approving collection").collectionName(collection).log();
             SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
             return false;
         }
@@ -105,7 +105,7 @@ public class ApproveTask implements Callable<Boolean> {
                 // read the CSV and update the timeseries titles.
                 TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
-                debugMessage("Importing CSV file").addParameter("filename", importFile).log();
+                logInfo("Importing CSV file").addParameter("filename", importFile).log();
                 updateCommands.addAll(importer.importData());
             }
         }

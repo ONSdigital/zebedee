@@ -2,9 +2,10 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.util.Log;
 
 import java.util.Date;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
 public class DummyPublishCollectionTask extends PublishCollectionTask {
 
@@ -36,12 +37,12 @@ public class DummyPublishCollectionTask extends PublishCollectionTask {
     public Boolean call() throws Exception {
 
         this.start = new Date();
-        Log.print("Running dummy publish task with ID %s", id);
+        logDebug("Running dummy publish task").addParameter("taskId", id).log();
 
         Thread.sleep(duration);
         this.published = true;
 
-        Log.print("Finished dummy publish task with ID %s", id);
+        logDebug("Finished dummy publish task").addParameter("taskId", id).log();
         this.end = new Date();
 
         return true;

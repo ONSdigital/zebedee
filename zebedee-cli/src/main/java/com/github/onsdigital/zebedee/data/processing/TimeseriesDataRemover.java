@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 
 public class TimeseriesDataRemover {
 
@@ -38,13 +38,13 @@ public class TimeseriesDataRemover {
         Set<String> cdids = new TreeSet<>(Arrays.asList(args[3].split(",")));
         Set<String> dates = new HashSet<>();
 
-        debugMessage("TimeSeries entries to remove").addParameter("targets", cdids).log();
+        logDebug("TimeSeries entries to remove").addParameter("targets", cdids).log();
 
         for (int i = 4; i < args.length; i++) {
             dates.add(args[i]);
         }
 
-        debugMessage("Dates to remove").addParameter("dates", dates).log();
+        logDebug("Dates to remove").addParameter("dates", dates).log();
         removeTimeseriesEntries(source, destination, cdids, dates);
     }
 
@@ -65,7 +65,7 @@ public class TimeseriesDataRemover {
             cdids.add(args[i]);
         }
 
-        debugMessage("TimesSeries CDID's to be removed").addParameter("targets", cdids).log();
+        logDebug("TimesSeries CDID's to be removed").addParameter("targets", cdids).log();
         removeTimeseriesData(source, destination, dataResoltion, cdids);
     }
 
@@ -89,12 +89,12 @@ public class TimeseriesDataRemover {
             String uri = dataIndex.getUriForCdid(cdid.toLowerCase());
 
             if (uri == null) {
-                debugMessage("TimeSeries data not found in data index").addParameter("CDID", cdid).log();
+                logDebug("TimeSeries data not found in data index").cdid(cdid).log();
                 return;
             }
 
             TimeSeries page = (TimeSeries) compoundContentReader.getContent(uri);
-            debugMessage("Removing TimeSeries entries").addParameter("CDID", cdid).addParameter("uri", uri).log();
+            logDebug("Removing TimeSeries entries").cdid(cdid).addParameter("uri", uri).log();
 
             for (String date : dates) {
                 removeLabel(date, page.years);
@@ -111,7 +111,7 @@ public class TimeseriesDataRemover {
         List<TimeSeriesValue> toRemove = values.stream().filter(item -> item.date.equalsIgnoreCase(date)).collect(Collectors.toList());
         toRemove.forEach(item -> {
             values.remove(item);
-            debugMessage("Removed item").addParameter("itemDate", item.date).log();
+            logDebug("Removed item").addParameter("itemDate", item.date).log();
         });
     }
 
@@ -132,7 +132,7 @@ public class TimeseriesDataRemover {
             String uri = dataIndex.getUriForCdid(cdid.toLowerCase());
 
             if (uri == null) {
-                debugMessage("Timeseries file not found in data index").addParameter("CDID", cdid).log();
+                logDebug("Timeseries file not found in data index").cdid(cdid).log();
                 continue;
             }
 
@@ -140,15 +140,15 @@ public class TimeseriesDataRemover {
 
             switch (dataResoltion) {
                 case months:
-                    debugMessage("Removing monthly Timeseries data").addParameter("CDID", cdid).addParameter("uri", uri).log();
+                    logDebug("Removing monthly Timeseries data").cdid(cdid).addParameter("uri", uri).log();
                     page.months = new TreeSet<>();
                     break;
                 case quarters:
-                    debugMessage("Removing quarterly Timeseries data").addParameter("CDID", cdid).addParameter("uri", uri).log();
+                    logDebug("Removing quarterly Timeseries data").cdid(cdid).addParameter("uri", uri).log();
                     page.quarters = new TreeSet<>();
                     break;
                 case years:
-                    debugMessage("Removing yearly Timeseries data").addParameter("CDID", cdid).addParameter("uri", uri).log();
+                    logDebug("Removing yearly Timeseries data").cdid(cdid).addParameter("uri", uri).log();
                     page.years = new TreeSet<>();
                     break;
             }

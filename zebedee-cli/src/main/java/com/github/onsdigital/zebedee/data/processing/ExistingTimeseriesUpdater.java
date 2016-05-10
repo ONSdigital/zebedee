@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 
 /**
@@ -70,7 +70,7 @@ public class ExistingTimeseriesUpdater {
         // read the CSV and update the timeseries titles.
         TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(new FileInputStream(csvInput.toFile()));
 
-        debugMessage("Importing CSV file")
+        logDebug("Importing CSV file")
                 .addParameter("source", source.toString())
                 .addParameter("destination", destination.toString())
                 .addParameter("csvInput", csvInput.toString())
@@ -79,20 +79,20 @@ public class ExistingTimeseriesUpdater {
 
         ArrayList<TimeseriesUpdateCommand> updateCommands = TimeseriesUpdater.filterTimeseriesThatDoNotExist(dataIndex, updateCommandsImported);
 
-        debugMessage("Updating timeseries with new metadata")
+        logDebug("Updating timeseries with new metadata")
                 .addParameter("source", source.toString())
                 .addParameter("destination", destination.toString())
                 .addParameter("csvInput", csvInput.toString())
                 .log();
         TimeseriesUpdater.updateTimeseriesMetadata(new CompoundContentReader(contentReader), contentWriter, updateCommands);
 
-        debugMessage("Finding all CSDB files").log();
+        logDebug("Finding all CSDB files").log();
         List<TimeseriesDatasetDownloads> datasetDownloads = findCsdbFiles(source);
 
-        debugMessage("Working out which CSDB files need their download files updated").log();
+        logDebug("Working out which CSDB files need their download files updated").log();
         Set<TimeseriesDatasetDownloads> datasetDownloadsToUpdate = determineWhatDownloadsNeedUpdating(updateCommands, datasetDownloads);
 
-        debugMessage("Generating new downloads").log();
+        logDebug("Generating new downloads").log();
         for (TimeseriesDatasetDownloads timeseriesDatasetDownloads : datasetDownloadsToUpdate) {
 
             try {
@@ -105,7 +105,7 @@ public class ExistingTimeseriesUpdater {
                 generateXlsx(source, destination, timeseriesDatasetDownloads, commandsForThisDataset);
 
             } catch (Exception e) {
-                logError(e).errorContext("Error updating timeSeries.")
+                logError(e, "Error updating timeSeries.")
                         .addParameter("source", source.toString())
                         .addParameter("destination", destination.toString())
                         .addParameter("csvInput", csvInput.toString())
@@ -117,11 +117,11 @@ public class ExistingTimeseriesUpdater {
     public static void generateXlsx(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
         int rowIndex = 0;
         File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
-        debugMessage("Generating Xlsx").addParameter("inputCsv", inputCsv).log();
+        logDebug("Generating Xlsx").addParameter("inputCsv", inputCsv).log();
         File outputTempXls = destination.resolve(timeseriesDatasetDownloads.getXlsTempPath()).toFile();
         File outputFinalXls = destination.resolve(timeseriesDatasetDownloads.getXlsPath()).toFile();
         Files.createDirectories(outputTempXls.toPath().getParent());
-        debugMessage("Generated Xlsx").addParameter("outputXls", outputTempXls).log();
+        logDebug("Generated Xlsx").addParameter("outputXls", outputTempXls).log();
 
         try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(inputCsv), Charset.forName("UTF8")), ',')) {
 
@@ -182,11 +182,11 @@ public class ExistingTimeseriesUpdater {
     public static void generateCsv(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
         int rowIndex = 0;
         File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
-        debugMessage("Generate CSV").addParameter("input", inputCsv.getName()).log();
+        logDebug("Generate CSV").addParameter("input", inputCsv.getName()).log();
         File outputTempCsv = destination.resolve(timeseriesDatasetDownloads.getCsvTempPath()).toFile();
         File outputFinalCsv = destination.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
         Files.createDirectories(outputTempCsv.toPath().getParent());
-        debugMessage("Generate CSV").addParameter("outputTempCsv", outputTempCsv.getName()).log();
+        logDebug("Generate CSV").addParameter("outputTempCsv", outputTempCsv.getName()).log();
 
         try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(inputCsv), Charset.forName("UTF8")), ',')) {
             try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(outputTempCsv), Charset.forName("UTF8")), ',')) {
@@ -200,7 +200,7 @@ public class ExistingTimeseriesUpdater {
                         for (TimeseriesUpdateCommand command : commandsForThisDataset) {
                             Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
                             if (index != null) {
-                                debugMessage("Generating CSV")
+                                logDebug("Generating CSV")
                                         .addParameter("fromTitle", strings[index])
                                         .addParameter("toTitle", command.title)
                                         .addParameter("index", index)
@@ -279,7 +279,7 @@ public class ExistingTimeseriesUpdater {
             if (updateCommand.sourceDatasets != null) {
                 for (String sourceDataset : updateCommand.sourceDatasets) {
                     if (sourceDataset.equalsIgnoreCase(timeseriesDatasetDownloads.getCsdbId())) {
-                        debugMessage("UpdateCommand added to dataset")
+                        logDebug("UpdateCommand added to dataset")
                                 .addParameter("cdid", updateCommand.cdid)
                                 .addParameter("csdbid", timeseriesDatasetDownloads.getCsdbId())
                                 .log();
@@ -287,7 +287,7 @@ public class ExistingTimeseriesUpdater {
                     }
                 }
             } else {
-                debugMessage("No source datasets defined for CDID").addParameter("cdid", updateCommand.cdid).log();
+                logDebug("No source datasets defined for CDID").addParameter("cdid", updateCommand.cdid).log();
                 commandsForThisDataset.add(updateCommand);
             }
 
@@ -303,7 +303,7 @@ public class ExistingTimeseriesUpdater {
                 for (String sourceDataset : command.sourceDatasets) {
                     for (TimeseriesDatasetDownloads datasetDownload : datasetDownloads) {
                         if (sourceDataset.equalsIgnoreCase(datasetDownload.getCsdbId())) {
-                            debugMessage("datasetDownload to update").addParameter("CSDBID", datasetDownload.getCsdbId()).log();
+                            logDebug("datasetDownload to update").addParameter("CSDBID", datasetDownload.getCsdbId()).log();
                             datasetDownloadsToUpdate.add(datasetDownload);
                         }
                     }

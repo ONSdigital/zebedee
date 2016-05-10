@@ -341,7 +341,7 @@ public class Collection {
         String uri = this.description.releaseUri + "/data.json";
         Release release = (Release) ContentUtil.deserialiseContent(reader.getResource(uri).getData());
         logInfo("Release identified for collection")
-                .addParameter("collectionName", this.description.name)
+                .collectionName(this.description.name)
                 .addParameter("title", release.getDescription().getTitle())
                 .log();
 

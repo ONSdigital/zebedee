@@ -1,10 +1,10 @@
 package com.github.onsdigital.zebedee.reader.configuration;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import com.github.onsdigital.zebedee.util.URIUtils;
 
 import static com.github.onsdigital.zebedee.util.VariableUtils.getVariableValue;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
 /**
  * Content reader configuration
  */
@@ -86,8 +86,8 @@ public class ReaderConfiguration {
      * Prints configuration into console
      */
     public static void dumpConfiguration() {
-        debugMessage("Collections folder:" + collectionsFolder).log();
-        debugMessage("Published content dir:" + contentDir).log();
+        logDebug("Collections folder:" + collectionsFolder).log();
+        logDebug("Published content dir:" + contentDir).log();
     }
 
     /**

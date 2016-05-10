@@ -2,81 +2,96 @@ package com.github.onsdigital.zebedee.logging;
 
 import ch.qos.logback.classic.Level;
 import com.github.onsdigital.logging.builder.LogMessageBuilder;
-import com.github.onsdigital.zebedee.logging.events.ZebedeeReaderLogEvent;
 
 import java.nio.file.Path;
-
-import static com.github.onsdigital.zebedee.logging.events.ZebedeeReaderLogEvent.DEBUG_MESSAGE;
-import static com.github.onsdigital.zebedee.logging.events.ZebedeeReaderLogEvent.ELASTIC_SEARCH_DEBUG;
-import static com.github.onsdigital.zebedee.logging.events.ZebedeeReaderLogEvent.EXCEPTION;
 
 /**
  * Created by dave on 5/5/16.
  */
 public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
 
-    public static final String LOG_NAME = "com.github.onsdigital.logging";
+    private static final String LOG_NAME = "com.github.onsdigital.logging";
 
-    /**
-     * Get a {@link ZebedeeReaderLogBuilder} for the specified {@link ZebedeeReaderLogBuilder}.
-     */
-    public static ZebedeeReaderLogBuilder logEvent(ZebedeeReaderLogEvent eventType) {
-        return new ZebedeeReaderLogBuilder(eventType);
-    }
+    private static final String ELASTIC_SEARCH_PREFIX = "[ElasticSearch log] ";
+    private static final String ZEBEDEE_READER_EXCEPTION = "Zebedee Reader Exception";
+    private static final String CLASS = "class";
+    private static final String EXCEPTION = "exception";
+    private static final String ERROR_CONTEXT = "exception";
+    private static final String USER = "user";
+    private static final String TABLE = "table";
+    private static final String CDID = "CDID";
+    private static final String PATH = "path";
+    private static final String URI = "uri";
+    private static final String COLLECTION_ID = "collectionId";
 
     public static ZebedeeReaderLogBuilder logError(Throwable t) {
-        return new ZebedeeReaderLogBuilder(EXCEPTION)
-                .addParameter("class", t.getClass().getName())
-                .addParameter("exception", t);
+        return new ZebedeeReaderLogBuilder(ZEBEDEE_READER_EXCEPTION)
+                .addParameter(CLASS, t.getClass().getName())
+                .addParameter(EXCEPTION, t);
     }
 
-    public static ZebedeeReaderLogBuilder debugMessage(String message) {
-        return (ZebedeeReaderLogBuilder) new ZebedeeReaderLogBuilder(DEBUG_MESSAGE, Level.DEBUG)
-                .addMessage(message);
+    public static ZebedeeReaderLogBuilder logError(Throwable t, String errorContext) {
+        return new ZebedeeReaderLogBuilder(ZEBEDEE_READER_EXCEPTION)
+                .addParameter(ERROR_CONTEXT, errorContext)
+                .addParameter(CLASS, t.getClass().getName())
+                .addParameter(EXCEPTION, t);
     }
 
-    public static ZebedeeReaderLogBuilder debugMessage(String message, Level level) {
-        return (ZebedeeReaderLogBuilder) new ZebedeeReaderLogBuilder(DEBUG_MESSAGE, level)
-                .addMessage(message);
+    public static ZebedeeReaderLogBuilder logDebug(String message) {
+        return new ZebedeeReaderLogBuilder(message, Level.DEBUG);
     }
+
+    public static ZebedeeReaderLogBuilder logInfo(String message) {
+        return new ZebedeeReaderLogBuilder(message, Level.INFO);
+    }
+
 
     public static ZebedeeReaderLogBuilder elasticSearchLog(String message) {
-        return (ZebedeeReaderLogBuilder) new ZebedeeReaderLogBuilder(ELASTIC_SEARCH_DEBUG, Level.INFO)
+        return (ZebedeeReaderLogBuilder) new ZebedeeReaderLogBuilder(ELASTIC_SEARCH_PREFIX + message, Level.INFO)
                 .addMessage(message);
     }
 
-
-    private ZebedeeReaderLogBuilder(ZebedeeReaderLogEvent eventType) {
-        super(eventType.getDescription());
+    private ZebedeeReaderLogBuilder(String description) {
+        super(description);
     }
 
-    private ZebedeeReaderLogBuilder(ZebedeeReaderLogEvent eventType, Level level) {
-        super(eventType.getDescription(), level);
+    private ZebedeeReaderLogBuilder(String description, Level level) {
+        super(description, level);
     }
 
     public ZebedeeReaderLogBuilder user(String email) {
-        addParameter("user", email);
+        addParameter(USER, email);
         return this;
     }
 
     public ZebedeeReaderLogBuilder table(String tableName) {
-        addParameter("table", tableName);
+        addParameter(TABLE, tableName);
+        return this;
+    }
+
+    public ZebedeeReaderLogBuilder cdid(String cdid) {
+        addParameter(CDID, cdid);
         return this;
     }
 
     public ZebedeeReaderLogBuilder path(Path path) {
-        addParameter("path", path.toString());
+        addParameter(PATH, path.toString());
+        return this;
+    }
+
+    public ZebedeeReaderLogBuilder uri(String uri) {
+        addParameter(URI, uri);
+        return this;
+    }
+
+    public ZebedeeReaderLogBuilder collectionId(String collectionId) {
+        addParameter(COLLECTION_ID, collectionId);
         return this;
     }
 
     @Override
     public ZebedeeReaderLogBuilder addParameter(String key, Object value) {
         return (ZebedeeReaderLogBuilder) super.addParameter(key, value);
-    }
-
-    public ZebedeeReaderLogBuilder errorContext(String context) {
-        addParameter("errorContext", context);
-        return this;
     }
 
     @Override

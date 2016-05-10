@@ -15,7 +15,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 
 /**
  * Created by bren on 09/07/15.
@@ -65,8 +65,8 @@ public class ReIndex {
      */
     public static void main(String[] args) {
         String key = Random.password(64);
-        debugMessage("Redindex: Key (add to environment)").addParameter("key", key).log();
-        debugMessage("Key hash (for REINDEX_KEY_HASH)").addParameter("hash", Password.hash(key)).log();
+        logDebug("Redindex: Key (add to environment)").addParameter("key", key).log();
+        logDebug("Key hash (for REINDEX_KEY_HASH)").addParameter("hash", Password.hash(key)).log();
     }
 
 }

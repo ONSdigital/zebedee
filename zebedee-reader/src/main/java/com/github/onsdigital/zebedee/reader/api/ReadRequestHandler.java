@@ -1,12 +1,12 @@
 package com.github.onsdigital.zebedee.reader.api;
 
-import ch.qos.logback.classic.Level;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
@@ -25,8 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.util.URIUtils.getLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 
@@ -67,6 +66,7 @@ public class ReadRequestHandler {
     public Content find(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         String collectionId = getCollectionId(request);
         String lastSegment = getLastSegment(uri);
+        logDebug("finding requested content").uri(uri).collectionId(collectionId).log();
         if (LATEST.equalsIgnoreCase(lastSegment)) {
             return getLatestContent(request, collectionId, dataFilter, removeLastSegment(uri));
         } else {
@@ -82,9 +82,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getLatestCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException | NoSuchFileException e) {
-                debugMessage("Could not find resource in collection. Will try published content", Level.TRACE)
+                logDebug("Could not find resource in collection. Will try published content")
                         .addParameter("resourceURI", uri)
-                        .addParameter("collectionId", collectionId)
+                        .collectionId(collectionId)
                         .log();
             }
         }
@@ -98,9 +98,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException e) {
-                debugMessage("Could not find resource in collection. Will try published content", Level.TRACE)
+                logDebug("Could not find resource in collection. Will try published content")
                         .addParameter("uri", uri)
-                        .addParameter("collectionId", collectionId)
+                        .collectionId(collectionId)
                         .log();
             }
         }
@@ -124,9 +124,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionResource(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-                debugMessage("Could not find resource under collection, trying published content")
+                ZebedeeReaderLogBuilder.logDebug("Could not find resource under collection, trying published content")
                         .addParameter("resourceUri", uri)
-                        .addParameter("collectionId", collectionId)
+                        .collectionId(collectionId)
                         .log();
             }
         }
@@ -149,9 +149,9 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContentLength(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-                debugMessage("Could not find resource in collection. Will try published content", Level.TRACE)
+                logDebug("Could not find resource in collection. Will try published content")
                         .addParameter("uri", uri)
-                        .addParameter("collectionId", collectionId)
+                        .collectionId(collectionId)
                         .log();
             }
         }

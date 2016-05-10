@@ -339,7 +339,7 @@ public class FileSystemContentReader implements ContentReader {
         try {
             return ContentUtil.deserialiseContent(resource.getData());
         } catch (JsonSyntaxException e) {
-            logError(e).errorContext("Failed to deserialise resource")
+            logError(e, "Failed to deserialise resource")
                     .addParameter("resourceUri", resource.getUri()).log();
             throw e;
         }
@@ -442,7 +442,7 @@ public class FileSystemContentReader implements ContentReader {
         } catch (NotFoundException e) {
             contentNode = createContentNodeForFolder(path);
         } catch (JsonSyntaxException e) {
-            logError(e).errorContext("Warning!!! Invalid json file encountered").addParameter("path", path.toString()).log();
+            logError(e, "Warning!!! Invalid json file encountered").addParameter("path", path.toString()).log();
         }
 
         return contentNode;

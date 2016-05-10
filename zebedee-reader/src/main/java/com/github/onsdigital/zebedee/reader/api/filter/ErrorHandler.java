@@ -21,11 +21,11 @@ public class ErrorHandler implements ServerError {
         if (t != null && ZebedeeException.class.isAssignableFrom(t.getClass())) {
             ZebedeeException exception = (ZebedeeException) t;
             res.setStatus(exception.statusCode);
-            logError(exception).errorContext("Zebedee Reader API error").addParameter("exceptionStatusCode", exception.statusCode).log();
+            logError(exception, "Zebedee Reader API error").addParameter("exceptionStatusCode", exception.statusCode).log();
             return new ServerResponse(exception.getMessage());
         }
         // Otherwise leave the default 500 response
-        logError(t).errorContext("Internal Server Error").log();
+        logError(t, "Internal Server Error").log();
         return new ServerResponse("Internal Server Error");
     }
 }

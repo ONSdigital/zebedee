@@ -12,20 +12,29 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     public static final String LOG_NAME = "com.github.onsdigital.logging";
     private static final String ZEBEDEE_EXCEPTION = "Zebedee Exception";
 
+    private static final String CLASS = "class";
+    private static final String EXCEPTION = "exception";
+    private static final String ERROR_CONTEXT = "exception";
+    private static final String USER = "user";
+    private static final String TABLE = "table";
+    private static final String COLLECTION_ID = "collectionId";
+    private static final String COLLECTION = "collection";
+    private static final String COLLECTION_NAME = "collectionName";
+    private static final String COLLECTION_LOG_DESC = "collectionLogDesc";
+    private static final String TIME_TAKEN = "timeTaken(ms)";
+
     public static ZebedeeLogBuilder logError(Throwable t) {
         return new ZebedeeLogBuilder(ZEBEDEE_EXCEPTION)
-                .addParameter("class", t.getClass().getName())
-                .addParameter("exception", t);
+                .addParameter(CLASS, t.getClass().getName())
+                .addParameter(EXCEPTION, t);
     }
 
     public static ZebedeeLogBuilder logError(Throwable t, String errorContext) {
         return new ZebedeeLogBuilder(ZEBEDEE_EXCEPTION)
-                .addParameter("errorContext", errorContext)
-                .addParameter("class", t.getClass().getName())
-                .addParameter("exception", t);
+                .addParameter(ERROR_CONTEXT, errorContext)
+                .addParameter(CLASS, t.getClass().getName())
+                .addParameter(EXCEPTION, t);
     }
-
-    //addParameter("errorContext", context);
 
     /**
      * Log a debug level message.
@@ -50,37 +59,42 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     public ZebedeeLogBuilder user(String email) {
-        addParameter("user", email);
+        addParameter(USER, email);
         return this;
     }
 
     public ZebedeeLogBuilder collectionPath(Collection collection) {
-        addParameter("collection", collection.path.toString());
+        addParameter(COLLECTION, collection.path.toString());
         return this;
     }
 
     public ZebedeeLogBuilder collectionId(Collection collection) {
-        addParameter("collectionId", collection.description.id);
+        addParameter(COLLECTION_ID, collection.description.id);
         return this;
     }
 
     public ZebedeeLogBuilder collectionName(Collection collection) {
-        addParameter("collectionName", collection.description.name);
+        addParameter(COLLECTION_NAME, collection.description.name);
+        return this;
+    }
+
+    public ZebedeeLogBuilder collectionName(String name) {
+        addParameter(COLLECTION_NAME, name);
         return this;
     }
 
     public ZebedeeLogBuilder table(String tableName) {
-        addParameter("table", tableName);
+        addParameter(TABLE, tableName);
         return this;
     }
 
     public ZebedeeLogBuilder timeTaken(long timeTaken) {
-        addParameter("timeTaken(MS)", timeTaken);
+        addParameter(TIME_TAKEN, timeTaken);
         return this;
     }
 
     public ZebedeeLogBuilder collectionLogDesc(CollectionLogDesc desc) {
-        addParameter("collectionLogDesc", desc);
+        addParameter(COLLECTION_LOG_DESC, desc);
         return this;
     }
 

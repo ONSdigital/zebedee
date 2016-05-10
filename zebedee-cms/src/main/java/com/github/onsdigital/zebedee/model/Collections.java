@@ -326,11 +326,11 @@ public class Collections {
             Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
 
             logInfo("Collection postPublish process finished")
-                    .addParameter("collectioName", collection.description.name)
+                    .collectionName(collection)
                     .timeTaken((System.currentTimeMillis() - onPublishCompleteStart))
                     .log();
             logInfo("Collection publish complete.")
-                    .addParameter("collectioName", collection.description.name)
+                    .collectionName(collection)
                     .timeTaken((System.currentTimeMillis() - publishStart))
                     .log();
         }

@@ -42,7 +42,7 @@ public class CollectionContentWriter extends ContentWriter {
             SlackNotification.send(logMessage);
             logInfo("Writing unencrypted content in collection")
                     .addParameter("uri", uri)
-                    .addParameter("collectioName", collection.description.name)
+                    .collectionName(collection.description.name)
                     .log();
 
             return FileUtils.openOutputStream(path.toFile());

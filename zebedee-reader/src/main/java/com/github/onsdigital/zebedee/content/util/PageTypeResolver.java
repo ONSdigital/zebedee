@@ -2,7 +2,11 @@ package com.github.onsdigital.zebedee.content.util;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import org.reflections.Reflections;
 import org.reflections.util.ConfigurationBuilder;
 
@@ -12,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.debugMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
 
 /**
@@ -27,7 +31,7 @@ class PageTypeResolver implements JsonDeserializer<Page> {
     }
 
     private static void registerContentTypes() {
-        debugMessage("Resolving page types").log();
+        logDebug("Resolving page types").log();
         try {
 
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(PageTypeResolver.class.getProtectionDomain().getCodeSource().getLocation());
@@ -38,20 +42,20 @@ class PageTypeResolver implements JsonDeserializer<Page> {
                 String className = contentClass.getSimpleName();
                 boolean _abstract = Modifier.isAbstract(contentClass.getModifiers());
                 if (_abstract) {
-                    debugMessage("Skipping registering abstract content").addParameter("type", className).log();
+                    logDebug("Skipping registering abstract content").addParameter("type", className).log();
                     continue;
                 }
 
                 try {
                     Page contentInstance = contentClass.newInstance();
-                    debugMessage("Registering content type").addParameter("pageType", contentInstance.getType()).log();
+                    logDebug("Registering content type").addParameter("pageType", contentInstance.getType()).log();
                     contentClasses.put(contentInstance.getType(), contentClass);
                 } catch (InstantiationException e) {
-                    logError(e).errorContext("Failed to instantiate content type").addParameter("pageType", className).log();
+                    logError(e, "Failed to instantiate content type").addParameter("pageType", className).log();
                 }
             }
         } catch (Exception e) {
-            logError(e).errorContext("Failed initializing content types").log();
+            logError(e, "Failed initializing content types").log();
             throw new RuntimeException("Failed initializing request handlers", e);
         }
     }

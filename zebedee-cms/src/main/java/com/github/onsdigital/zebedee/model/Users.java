@@ -149,7 +149,7 @@ public class Users {
             }
 
             if (keysToRemove.size() > 0)
-                zebedee.users.update(user, user.lastAdmin);
+                zebedee.users.update(user, user, user.lastAdmin);
         }
     }
 
@@ -171,7 +171,7 @@ public class Users {
             logDebug("Generating keyring").addParameter("user", user.email).log();
             user.resetPassword(password);
 
-            zebedee.users.update(user, "Encryption migration");
+            zebedee.users.update(user, user, "Encryption migration");
         }
         return result;
     }
@@ -265,16 +265,14 @@ public class Users {
      * <p>
      * At present user email cannot be updated
      *
-     * @param session
-     * @param user    - a user object with the new details
-     * @return
+     * @param user
+     * @param updatedUser    - a user object with the new details  @return
      * @throws IOException
      * @throws UnauthorizedException - Session does not have update permissions
      * @throws NotFoundException     - user account does not exist
      * @throws BadRequestException   - problem with the update
      */
-    public User update(Session session,
-                       User user) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
+    public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         if (zebedee.permissions.isAdministrator(session.email) == false) {
             throw new UnauthorizedException("Administrator permissions required");
@@ -284,12 +282,12 @@ public class Users {
             throw new NotFoundException("User " + user.email + " could not be found");
         }
 
-        if (!valid(user)) {
-            throw new BadRequestException("Insufficient user details given (name, email)");
-        }
+//        if (!valid(user)) {
+//            throw new BadRequestException("Insufficient user details given (name, email)");
+//        }
 
         // Update
-        User updated = update(user, session.email);
+        User updated = update(user, updatedUser, session.email);
 
         // We'll allow changing the email at some point.
         // It entails renaming the json file and checking
@@ -309,19 +307,33 @@ public class Users {
      * @return
      * @throws IOException
      */
-    synchronized User update(User user, String lastAdmin) throws IOException {
+    synchronized User update(User user, User updatedUser, String lastAdmin) throws IOException {
 
-        User updated = read(user.email);
-        if (updated != null) {
-            updated.name = user.name;
-            updated.lastAdmin = lastAdmin;
-            updated.keyring = user.keyring.clone();
+        if (user != null) {
 
-            // Only set this to true if explicitly set:
-            updated.inactive = BooleanUtils.isTrue(user.inactive);
-            write(updated);
+            if (updatedUser.name != null && updatedUser.name.length() > 0) {
+                user.name = updatedUser.name;
+            }
+            if (updatedUser.lastAdmin != null && updatedUser.lastAdmin.length() > 0) {
+                user.lastAdmin = lastAdmin;
+            }
+
+            // Create adminOptions object if user doesn't already have it
+            if (user.adminOptions == null) {
+                user.adminOptions = new AdminOptions();
+            }
+
+            // Update adminOptions object if updatedUser options are different to stored user options
+            if (updatedUser.adminOptions != null) {
+                if (updatedUser.adminOptions.rawJson != user.adminOptions.rawJson) {
+                    user.adminOptions.rawJson = updatedUser.adminOptions.rawJson;
+                    System.out.println(user.adminOptions.rawJson);
+                }
+            }
+
+            write(user);
         }
-        return updated;
+        return user;
     }
 
     /**

@@ -271,7 +271,7 @@ public class UsersTest {
         // We update the user
         existing.name = name;
         existing.inactive = inactive;
-        User updated = zebedee.users.update(existing, lastAdmin);
+        User updated = zebedee.users.update(existing, existing, lastAdmin);
         User read = zebedee.users.get(email);
 
         // Then
@@ -301,7 +301,7 @@ public class UsersTest {
         // When
         // We update the user, even though we set the password
         existing.resetPassword(password);
-        User updated = zebedee.users.update(existing, lastAdmin);
+        User updated = zebedee.users.update(existing, existing, lastAdmin);
         User read = zebedee.users.get(email);
 
         // Then
@@ -326,7 +326,7 @@ public class UsersTest {
 
         // When
         existing.email = newEmail;
-        User updated = zebedee.users.update(existing, lastAdmin);
+        User updated = zebedee.users.update(existing, existing, lastAdmin);
         User read = zebedee.users.get(email);
         User readNew = null;
         try {

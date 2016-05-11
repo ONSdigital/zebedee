@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!--<property name="AUDIT_FILE" value="" />-->
-
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
@@ -44,16 +42,6 @@
         <suffixPattern>[%thread] %logger %msg</suffixPattern>
     </appender>
 
-    <!--<appender name="AUDIT-FILE"
-                  class="ch.qos.logback.core.FileAppender">
-            <file>${AUDIT_FILE}</file>
-            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                <Pattern>
-                    %d{yyyy-MM-dd HH:mm:ss} - %msg%n
-                </Pattern>
-            </encoder>
-        </appender>-->
-
     <!-- Send logs to both console and file audit -->
     <logger name="com.github.onsdigital.zebedee.audit" level="info" additivity="false">
         <appender-ref ref="AUDIT_SYSLOG" />
@@ -67,5 +55,7 @@
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
+
+    <logger name="com.github.davidcarboni.restolino" level="WARN"/>
 
 </configuration>

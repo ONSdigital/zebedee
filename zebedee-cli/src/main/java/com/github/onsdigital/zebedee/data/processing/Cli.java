@@ -17,7 +17,6 @@ public class Cli {
                 .argName("source directory> <destination directory> <csv file")
                 .numberOfArgs(3)
                 .build());
-
         options.addOption(Option.builder("removetimeseriesdata")
                 .desc("Remove all timeseries data entries for the given resolution ( months | quarters | years )")
                 .argName("source directory> <destination directory> <resolution> <CDID...")
@@ -27,6 +26,11 @@ public class Cli {
                 .desc("Remove specific timeseries entries for the given CDID")
                 .argName("source directory> <destination directory> <CDID> <labels...")
                 .hasArgs()
+                .build());
+        options.addOption(Option.builder("findtimeseriesforsourcedataset")
+                .desc("find the timeseries files that exclusively have the given source dataset.")
+                .argName("source directory> <source dataset ID")
+                .numberOfArgs(2)
                 .build());
 
         CommandLineParser parser = new DefaultParser();
@@ -41,6 +45,8 @@ public class Cli {
                 TimeseriesDataRemover.removeTimeseriesData(args);
             } else if (line.hasOption("removetimeseriesentries")) {
                 TimeseriesDataRemover.removeTimeseriesEntries(args);
+            } else if (line.hasOption("findtimeseriesforsourcedataset")) {
+                TimeseriesFinder.findTimeseriesForSourceDataset(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

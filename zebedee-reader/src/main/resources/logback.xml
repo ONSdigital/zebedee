@@ -9,17 +9,23 @@
         </layout>
     </appender>
 
-    <!-- For logging a json object to the console. Only the json message will be output. -->
-    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %msg%n
-            </Pattern>
-        </layout>
+    <!-- Use this appender if you want the log output in plain/standard log format. -->
+    <appender name="PLAIN_TEXT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.onsdigital.logging.layouts.TextLayout" />
+        </encoder>
     </appender>
 
+    <!-- Use this appender if you want the log output in json -->
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.onsdigital.logging.layouts.JsonLayout" />
+        </encoder>
+    </appender>
+
+
     <logger name="com.github.onsdigital.logging" level="info" additivity="false">
-        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="JSON"/>
     </logger>
 
     <root level="info">

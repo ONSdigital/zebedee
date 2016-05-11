@@ -10,4 +10,6 @@ public class CollectionDetail extends CollectionBase {
     public boolean approvedStatus;
 
     public Events events;
+
+    public List<String> owners; // What team created the collection (eg PST or Data vis)
 }

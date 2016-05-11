@@ -24,6 +24,8 @@ public class CollectionDescription extends CollectionBase {
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
 
+    public List<String> owners; // What team created the collection (eg PST or Data vis)
+
     public List<String> timeseriesImportFiles = new ArrayList<>();
 
     /**

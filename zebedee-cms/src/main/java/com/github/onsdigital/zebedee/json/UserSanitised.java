@@ -21,6 +21,8 @@ public class UserSanitised {
     public Boolean temporaryPassword;
     public String lastAdmin;
 
+    public AdminOptions adminOptions;
+
     @Override
     public String toString() {
         return name + ", " + email + (BooleanUtils.isTrue(inactive) ? " (inactive)" : "");

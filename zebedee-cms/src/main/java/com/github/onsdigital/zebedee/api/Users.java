@@ -96,15 +96,18 @@ public class Users {
      *
      * @param request  Requires an admin session
      * @param response The updated user
-     * @param user     A user object with the new details
+     * @param updatedUser     A user object with the new details
      * @return A sanitised view of the updated {@link User}
      */
     @PUT
-    public UserSanitised update(HttpServletRequest request, HttpServletResponse response, User user) throws
+    public UserSanitised update(HttpServletRequest request, HttpServletResponse response, User updatedUser) throws
             IOException, NotFoundException, BadRequestException, UnauthorizedException {
         Session session = Root.zebedee.sessions.get(request);
 
-        User updated = Root.zebedee.users.update(session, user);
+        String email = request.getParameter("email");
+        User user = Root.zebedee.users.get(email);
+
+        User updated = Root.zebedee.users.update(session, user, updatedUser);
 
         Audit.Event.USER_UPDATED
                 .parameters()

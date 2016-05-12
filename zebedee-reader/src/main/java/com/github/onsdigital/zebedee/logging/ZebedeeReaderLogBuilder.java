@@ -24,6 +24,14 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
     private static final String URI = "uri";
     private static final String COLLECTION_ID = "collectionId";
 
+    private ZebedeeReaderLogBuilder(String description) {
+        super(description);
+    }
+
+    private ZebedeeReaderLogBuilder(String description, Level level) {
+        super(description, level);
+    }
+
     public static ZebedeeReaderLogBuilder logError(Throwable t) {
         return new ZebedeeReaderLogBuilder(ZEBEDEE_READER_EXCEPTION)
                 .addParameter(CLASS, t.getClass().getName())
@@ -45,18 +53,9 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
         return new ZebedeeReaderLogBuilder(message, Level.INFO);
     }
 
-
     public static ZebedeeReaderLogBuilder elasticSearchLog(String message) {
         return (ZebedeeReaderLogBuilder) new ZebedeeReaderLogBuilder(ELASTIC_SEARCH_PREFIX + message, Level.INFO)
                 .addMessage(message);
-    }
-
-    private ZebedeeReaderLogBuilder(String description) {
-        super(description);
-    }
-
-    private ZebedeeReaderLogBuilder(String description, Level level) {
-        super(description, level);
     }
 
     public ZebedeeReaderLogBuilder user(String email) {
@@ -85,7 +84,7 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
     }
 
     public ZebedeeReaderLogBuilder collectionId(String collectionId) {
-        addParameter(COLLECTION_ID, collectionId);
+        addParameter(COLLECTION_ID, collectionId != null ? collectionId : "");
         return this;
     }
 

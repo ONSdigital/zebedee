@@ -7,12 +7,7 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.json.AccessMapping;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
@@ -24,15 +19,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
@@ -44,57 +31,13 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
  */
 public class Builder {
 
-    static int teamId;
-    static User administratorTemplate;
-    static User publisher1Template;
-    static User publisher2Template;
-    static User reviewer1Template;
-    static User reviewer2Template;
-
-    static {
-        logDebug("Generating test users and keys...").log();
-
-        User jukesie = new User();
-        jukesie.name = "Matt Jukes";
-        jukesie.email = "jukesie@example.com";
-        jukesie.inactive = false;
-        administratorTemplate = jukesie;
-
-        User patricia = new User();
-        patricia.name = "Patricia Pumpkin";
-        patricia.email = "patricia@example.com";
-        patricia.inactive = false;
-        publisher1Template = patricia;
-
-        User bernard = new User();
-        bernard.name = "Bernard Black";
-        bernard.email = "bernard@example.com";
-        bernard.inactive = false;
-        publisher2Template = bernard;
-
-        User freddy = new User();
-        freddy.name = "freddy Pumpkin";
-        freddy.email = "freddy@example.com";
-        freddy.inactive = false;
-        reviewer1Template = freddy;
-
-        User ronny = new User();
-        ronny.name = "Ronny Roller";
-        ronny.email = "ronny@example.com";
-        ronny.inactive = false;
-        reviewer2Template = ronny;
-
-        ExecutorService pool = Executors.newCachedThreadPool();
-        submit(pool, jukesie, patricia, bernard, freddy, ronny);
-        pool.shutdown();
-        try {
-            pool.awaitTermination(1, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        logDebug("Done.").log();
-    }
+    private static int teamId;
+    private static User administratorTemplate;
+    private static User publisher1Template;
+    private static User publisher2Template;
+    private static User reviewer1Template;
+    private static User reviewer2Template;
+    private static boolean usersInitialised = false;
 
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
     public String[] teamNames = {"Economy Team", "Labour Market Team"};
@@ -123,6 +66,9 @@ public class Builder {
      * @throws IOException
      */
     public Builder(Class<?> name) throws IOException, CollectionNotFoundException {
+
+        setupUsers();
+
         Root.env = new HashMap<>();
 
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
@@ -241,6 +187,8 @@ public class Builder {
     public Builder(Class<?> name, Path bootStrap) throws IOException, CollectionNotFoundException {
         this(name);
 
+        setupUsers();
+
         FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
         FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
         FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.COLLECTIONS).toFile());
@@ -257,18 +205,6 @@ public class Builder {
 
         if (Files.exists(bootStrap.resolve(Zebedee.COLLECTIONS))) {
             FileUtils.copyDirectory(bootStrap.resolve(Zebedee.COLLECTIONS).toFile(), this.zebedee.resolve(Zebedee.COLLECTIONS).toFile());
-        }
-    }
-
-    private static void submit(ExecutorService pool, User... users) {
-        for (final User user : users) {
-            pool.submit(new Runnable() {
-                @Override
-                public void run() {
-                    user.resetPassword("password");
-                    logDebug(user.email).log();
-                }
-            });
         }
     }
 
@@ -292,6 +228,46 @@ public class Builder {
             field.set(clone, field.get(user));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException("Error cloning user", e);
+        }
+    }
+
+    private synchronized void setupUsers() {
+
+        if (!usersInitialised) {
+            usersInitialised = true;
+
+            logDebug("Generating test users and keys...").log();
+
+            User jukesie = new User();
+            jukesie.name = "Matt Jukes";
+            jukesie.email = "jukesie@example.com";
+            jukesie.inactive = false;
+            administratorTemplate = jukesie;
+            jukesie.resetPassword("password");
+
+            User patricia = clone(jukesie);
+            patricia.name = "Patricia Pumpkin";
+            patricia.email = "patricia@example.com";
+            patricia.inactive = false;
+            publisher1Template = patricia;
+
+            User bernard = clone(jukesie);
+            bernard.name = "Bernard Black";
+            bernard.email = "bernard@example.com";
+            bernard.inactive = false;
+            publisher2Template = bernard;
+
+            User freddy = clone(jukesie);
+            freddy.name = "freddy Pumpkin";
+            freddy.email = "freddy@example.com";
+            freddy.inactive = false;
+            reviewer1Template = freddy;
+
+            User ronny = clone(jukesie);
+            ronny.name = "Ronny Roller";
+            ronny.email = "ronny@example.com";
+            ronny.inactive = false;
+            reviewer2Template = ronny;
         }
     }
 

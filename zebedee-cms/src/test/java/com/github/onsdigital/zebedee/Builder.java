@@ -70,8 +70,7 @@ public class Builder {
 
         Root.env = new HashMap<>();
 
-        // Set ISO date formatting in Gson to match Javascript Date.toISODate()
-        Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
+
 
         // Create the structure:
         parent = Files.createTempDirectory(Random.id());
@@ -231,6 +230,9 @@ public class Builder {
 
         if (!usersInitialised) {
             usersInitialised = true;
+
+            // Set ISO date formatting in Gson to match Javascript Date.toISODate()
+            Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
             logDebug("Generating test users and keys...").log();
 

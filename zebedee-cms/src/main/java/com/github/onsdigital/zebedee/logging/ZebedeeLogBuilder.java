@@ -22,6 +22,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     private static final String COLLECTION_NAME = "collectionName";
     private static final String COLLECTION_LOG_DESC = "collectionLogDesc";
     private static final String TIME_TAKEN = "timeTaken(ms)";
+    private static final String PATH = "path";
 
     private ZebedeeLogBuilder(String description) {
         super(description);
@@ -95,6 +96,11 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public ZebedeeLogBuilder collectionLogDesc(CollectionLogDesc desc) {
         addParameter(COLLECTION_LOG_DESC, desc);
+        return this;
+    }
+
+    public ZebedeeLogBuilder path(String path) {
+        addParameter(PATH, path);
         return this;
     }
 

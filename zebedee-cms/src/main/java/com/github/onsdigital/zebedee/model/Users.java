@@ -310,9 +310,6 @@ public class Users {
             if (updatedUser.name != null && updatedUser.name.length() > 0) {
                 user.name = updatedUser.name;
             }
-            if (updatedUser.lastAdmin != null && updatedUser.lastAdmin.length() > 0) {
-                user.lastAdmin = lastAdmin;
-            }
 
             // Create adminOptions object if user doesn't already have it
             if (user.adminOptions == null) {
@@ -326,6 +323,8 @@ public class Users {
                     System.out.println(user.adminOptions.rawJson);
                 }
             }
+
+            user.lastAdmin = lastAdmin;
 
             write(user);
         }

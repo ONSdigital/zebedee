@@ -296,12 +296,13 @@ public class UsersTest {
         String email = builder.publisher1.email;
         String password = "new password";
         String lastAdmin = builder.administrator.email;
-        User existing = zebedee.users.get(email);
+        User existingUser = zebedee.users.get(email);
+        User updatedUser = zebedee.users.get(email);
 
         // When
         // We update the user, even though we set the password
-        existing.resetPassword(password);
-        User updated = zebedee.users.update(existing, existing, lastAdmin);
+        updatedUser.resetPassword(password);
+        User updated = zebedee.users.update(existingUser, updatedUser, lastAdmin);
         User read = zebedee.users.get(email);
 
         // Then
@@ -322,11 +323,12 @@ public class UsersTest {
         String email = builder.publisher1.email;
         String newEmail = "new@email.com";
         String lastAdmin = builder.administrator.email;;
-        User existing = zebedee.users.get(email);
+        User existingUser = zebedee.users.get(email);
+        User updatedUser = zebedee.users.get(email);
 
         // When
-        existing.email = newEmail;
-        User updated = zebedee.users.update(existing, existing, lastAdmin);
+        updatedUser.email = newEmail;
+        User updated = zebedee.users.update(existingUser, updatedUser, lastAdmin);
         User read = zebedee.users.get(email);
         User readNew = null;
         try {
@@ -339,7 +341,7 @@ public class UsersTest {
 
         // It will not have been possible to update
         // because no user exists with this email:
-        assertNull(updated);
+        assertNotEquals(newEmail, updated.email);
 
         // The old user should still exist
         assertNotNull(read);

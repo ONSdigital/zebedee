@@ -62,10 +62,9 @@ public class Builder {
     /**
      * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
      *
-     * @param name
      * @throws IOException
      */
-    public Builder(Class<?> name) throws IOException, CollectionNotFoundException {
+    public Builder() throws IOException, CollectionNotFoundException {
 
         setupUsers();
 
@@ -75,7 +74,7 @@ public class Builder {
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
 
         // Create the structure:
-        parent = Files.createTempDirectory(name.getSimpleName());
+        parent = Files.createTempDirectory(Random.id());
         zebedee = createZebedee(parent);
 
         // Create the collections:
@@ -180,14 +179,11 @@ public class Builder {
     /**
      * Constructor to build an instance of zebedee using a predefined set of content
      *
-     * @param name
      * @param bootStrap
      * @throws IOException
      */
-    public Builder(Class<?> name, Path bootStrap) throws IOException, CollectionNotFoundException {
-        this(name);
-
-        setupUsers();
+    public Builder(Path bootStrap) throws IOException, CollectionNotFoundException {
+        this();
 
         FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
         FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());

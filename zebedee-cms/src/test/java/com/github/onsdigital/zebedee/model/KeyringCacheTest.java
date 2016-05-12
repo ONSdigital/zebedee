@@ -26,7 +26,7 @@ public class KeyringCacheTest {
 
     @BeforeClass
     public static void beforeClass() throws IOException, CollectionNotFoundException {
-        builder = new Builder(KeyringCacheTest.class);
+        builder = new Builder();
     }
 
     @Before

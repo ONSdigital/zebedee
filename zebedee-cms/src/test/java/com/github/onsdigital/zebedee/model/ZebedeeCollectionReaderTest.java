@@ -24,7 +24,7 @@ public class ZebedeeCollectionReaderTest {
 
     @Before
     public void setUp() throws Exception {
-        builder = new Builder(this.getClass());
+        builder = new Builder();
         zebedee = new Zebedee(builder.zebedee, false);
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);

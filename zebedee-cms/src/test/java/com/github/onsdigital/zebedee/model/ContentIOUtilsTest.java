@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
-import com.github.onsdigital.zebedee.data.processing.DataPublicationDetailsTest;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
@@ -52,7 +51,7 @@ public class ContentIOUtilsTest {
     @Before
     public void setUp() throws Exception {
 
-        bob = new Builder(DataPublicationDetailsTest.class);
+        bob = new Builder();
         zebedee = new Zebedee(bob.zebedee, false);
 
         publisher = zebedee.openSession(bob.publisher1Credentials);

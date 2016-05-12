@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
-import com.github.onsdigital.zebedee.data.processing.DataPublicationDetailsTest;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -57,7 +56,7 @@ public class CompoundContentReaderTest {
     @Before
     public void setUp() throws Exception {
 
-        bob = new Builder(DataPublicationDetailsTest.class);
+        bob = new Builder();
         zebedee = new Zebedee(bob.zebedee, false);
 
         publisher = zebedee.openSession(bob.publisher1Credentials);

@@ -55,7 +55,7 @@ public class CsdbImporterTest {
     public void setUp() throws Exception {
         // Loads a zebedee with two collections, each of which contain a dataset
         //
-        bob = new Builder(this.getClass(), ResourceUtils.getPath("/bootstraps/data_publisher"));
+        bob = new Builder(ResourceUtils.getPath("/bootstraps/data_publisher"));
         zebedee = new Zebedee(bob.zebedee, false);
         publisher = bob.createSession(bob.publisher1);
 

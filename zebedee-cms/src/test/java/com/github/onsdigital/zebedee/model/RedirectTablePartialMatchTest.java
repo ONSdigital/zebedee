@@ -22,7 +22,7 @@ public class RedirectTablePartialMatchTest {
     @Before
     public void setUp() throws Exception {
         // Create a
-        Builder bob = new Builder(RedirectTablePartialMatchTest.class, ResourceUtils.getPath("/bootstraps/basic"));
+        Builder bob = new Builder(ResourceUtils.getPath("/bootstraps/basic"));
         root = bob.zebedee;
         zebedee = new Zebedee(root, false);
     }

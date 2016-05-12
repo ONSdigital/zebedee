@@ -24,7 +24,7 @@ public class PublishCollectionsTaskTest {
 
     @Before
     public void setUp() throws Exception {
-        builder = new Builder(this.getClass());
+        builder = new Builder();
         zebedee = new Zebedee(builder.zebedee, false);
         session = zebedee.openSession(builder.administratorCredentials);
     }

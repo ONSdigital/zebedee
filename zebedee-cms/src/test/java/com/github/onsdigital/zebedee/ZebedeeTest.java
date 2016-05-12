@@ -31,7 +31,7 @@ public class ZebedeeTest {
 		env = Root.env;
 		Root.env = new HashMap<>(); // Run tests with known environment variables
 
-		builder = new Builder(this.getClass());
+		builder = new Builder();
 		expectedPath = builder.parent.resolve(Zebedee.ZEBEDEE);
 	}
 

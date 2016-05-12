@@ -76,7 +76,7 @@ public class DataProcessorTest {
     @Before
     public void setUp() throws Exception {
 
-        bob = new Builder(DataPublicationDetailsTest.class);
+        bob = new Builder();
         zebedee = new Zebedee(bob.zebedee, false);
 
         publisher = zebedee.openSession(bob.publisher1Credentials);

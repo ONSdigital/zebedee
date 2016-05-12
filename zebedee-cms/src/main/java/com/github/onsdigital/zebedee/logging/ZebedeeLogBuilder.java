@@ -23,6 +23,14 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     private static final String COLLECTION_LOG_DESC = "collectionLogDesc";
     private static final String TIME_TAKEN = "timeTaken(ms)";
 
+    private ZebedeeLogBuilder(String description) {
+        super(description);
+    }
+
+    private ZebedeeLogBuilder(String description, Level level) {
+        super(description, level);
+    }
+
     public static ZebedeeLogBuilder logError(Throwable t) {
         return new ZebedeeLogBuilder(ZEBEDEE_EXCEPTION)
                 .addParameter(CLASS, t.getClass().getName())
@@ -48,14 +56,6 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
      */
     public static ZebedeeLogBuilder logInfo(String message) {
         return new ZebedeeLogBuilder(message, Level.INFO);
-    }
-
-    private ZebedeeLogBuilder(String description) {
-        super(description);
-    }
-
-    private ZebedeeLogBuilder(String description, Level level) {
-        super(description, level);
     }
 
     public ZebedeeLogBuilder user(String email) {
@@ -100,7 +100,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     @Override
     public ZebedeeLogBuilder addParameter(String key, Object value) {
-        return (ZebedeeLogBuilder)super.addParameter(key, value);
+        return (ZebedeeLogBuilder) super.addParameter(key, value != null ? value : "");
     }
 
     @Override

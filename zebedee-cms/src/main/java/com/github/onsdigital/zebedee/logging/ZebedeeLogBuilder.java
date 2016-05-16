@@ -20,9 +20,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public static final String LOG_NAME = "com.github.onsdigital.logging";
     private static final String ZEBEDEE_EXCEPTION = "Zebedee Exception";
-
-    private static final String CLASS = "class";
-    private static final String EXCEPTION = "exception";
+    private static final String STACK_TRACE_KEY = "stackTrace";
     private static final String ERROR_CONTEXT = "exception";
     private static final String USER = "user";
     private static final String TABLE = "table";
@@ -37,48 +35,54 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         super(description);
     }
 
+    private ZebedeeLogBuilder(Throwable t, String description) {
+        super(t, description);
+    }
+
     private ZebedeeLogBuilder(String description, Level level) {
         super(description, level);
     }
 
     public static ZebedeeLogBuilder logError(Throwable t) {
-        return new ZebedeeLogBuilder(ZEBEDEE_EXCEPTION)
-                .addParameter(CLASS, t.getClass().getName())
-                .addParameter(EXCEPTION, t);
+        return new ZebedeeLogBuilder(t, ZEBEDEE_EXCEPTION);
     }
 
     public static ZebedeeLogBuilder logError(Throwable t, String errorContext) {
-        return new ZebedeeLogBuilder(ZEBEDEE_EXCEPTION)
-                .addParameter(ERROR_CONTEXT, errorContext)
-                .addParameter(CLASS, t.getClass().getName())
-                .addParameter(EXCEPTION, t);
+        return new ZebedeeLogBuilder(t, ZEBEDEE_EXCEPTION + " " + errorContext);
     }
 
+    /**
+     * Log the error and throw the exception.
+     */
     public void logAndThrow(Class<? extends ZebedeeException> exceptionClass) throws ZebedeeException {
         this.log();
 
         if (BadRequestException.class.equals(exceptionClass)) {
-            throw new BadRequestException(this.parameters.getParameters().get(ERROR_CONTEXT));
+            throw new BadRequestException(getStringProperty(ERROR_CONTEXT));
         }
 
         if (CollectionNotFoundException.class.equals(exceptionClass)) {
-            throw new CollectionNotFoundException(this.parameters.getParameters().get(ERROR_CONTEXT));
+            throw new CollectionNotFoundException(getStringProperty(ERROR_CONTEXT));
         }
 
         if (ConflictException.class.equals(exceptionClass)) {
-            throw new ConflictException(this.parameters.getParameters().get(ERROR_CONTEXT));
+            throw new ConflictException(getStringProperty(ERROR_CONTEXT));
         }
 
         if (NotFoundException.class.equals(exceptionClass)) {
-            throw new NotFoundException(this.parameters.getParameters().get(ERROR_CONTEXT));
+            throw new NotFoundException(getStringProperty(ERROR_CONTEXT));
         }
 
         if (UnauthorizedException.class.equals(exceptionClass)) {
-            throw new UnauthorizedException(this.parameters.getParameters().get(ERROR_CONTEXT));
+            throw new UnauthorizedException(getStringProperty(ERROR_CONTEXT));
         }
         // Default to internal server error.
-        throw new UnexpectedErrorException(this.parameters.getParameters().get(ERROR_CONTEXT),
+        throw new UnexpectedErrorException(getStringProperty(ERROR_CONTEXT),
                 Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    }
+
+    private String getStringProperty(String key) {
+        return (String) this.parameters.getParameters().get(key);
     }
 
     /**

@@ -24,6 +24,12 @@
         </encoder>
     </appender>
 
+    <appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />
+        </encoder>
+    </appender>
+
     <!-- For logging a json object to the console. Only the json message will be output. -->
 <!--    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -48,8 +54,9 @@
     </logger>
 
     <logger name="com.github.onsdigital.logging" level="debug" additivity="false">
-        <appender-ref ref="JSON" />
-        <!--<appender-ref ref="PLAIN_TEXT" />-->
+        <!--<appender-ref ref="PRETTY_JSON" />-->
+       <!-- <appender-ref ref="JSON" />-->
+        <appender-ref ref="PLAIN_TEXT" />
     </logger>
 
     <root level="info">

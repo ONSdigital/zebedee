@@ -12,11 +12,8 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
 
     private static final String LOG_NAME = "com.github.onsdigital.logging";
 
-    private static final String ELASTIC_SEARCH_PREFIX = "[ElasticSearch log] ";
+    private static final String ELASTIC_SEARCH_PREFIX = "[ElasticSearch] ";
     private static final String ZEBEDEE_READER_EXCEPTION = "Zebedee Reader Exception";
-    private static final String CLASS = "class";
-    private static final String EXCEPTION = "exception";
-    private static final String ERROR_CONTEXT = "exception";
     private static final String USER = "user";
     private static final String TABLE = "table";
     private static final String CDID = "CDID";
@@ -32,17 +29,16 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
         super(description, level);
     }
 
+    private ZebedeeReaderLogBuilder(Throwable t, String description) {
+        super(t, description);
+    }
+
     public static ZebedeeReaderLogBuilder logError(Throwable t) {
-        return new ZebedeeReaderLogBuilder(ZEBEDEE_READER_EXCEPTION)
-                .addParameter(CLASS, t.getClass().getName())
-                .addParameter(EXCEPTION, t);
+        return new ZebedeeReaderLogBuilder(t, ZEBEDEE_READER_EXCEPTION);
     }
 
     public static ZebedeeReaderLogBuilder logError(Throwable t, String errorContext) {
-        return new ZebedeeReaderLogBuilder(ZEBEDEE_READER_EXCEPTION)
-                .addParameter(ERROR_CONTEXT, errorContext)
-                .addParameter(CLASS, t.getClass().getName())
-                .addParameter(EXCEPTION, t);
+        return new ZebedeeReaderLogBuilder(t, ZEBEDEE_READER_EXCEPTION + ": " + errorContext);
     }
 
     public static ZebedeeReaderLogBuilder logDebug(String message) {

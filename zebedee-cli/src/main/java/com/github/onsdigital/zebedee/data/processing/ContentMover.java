@@ -51,7 +51,7 @@ public class ContentMover {
         System.out.println("Searching collection content for links for fix...." + destination);
         // do the same process for files in the collection in case they need links fixing
         List<Path> collectionJsonFiles = new DataJsonFinder().findJsonFiles(destination);
-        Set<Path> collectionFilesToFixLinksIn = findJsonFilesWithLinksToFix(destinationDirectory, sourceUri, latestUri, collectionJsonFiles);
+        Set<Path> collectionFilesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, collectionJsonFiles);
         FixLinksAndWriteToDestination(source, destination, sourceUri, destinationUri, collectionFilesToFixLinksIn);
 
         System.out.println("Searching master content for links for fix....");

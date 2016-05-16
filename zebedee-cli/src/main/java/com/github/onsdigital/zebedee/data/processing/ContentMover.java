@@ -48,17 +48,17 @@ public class ContentMover {
 
         String latestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
 
-        System.out.println("Searching master content for links for fix....");
-        // identify pages in master content with links to fix - search source path for old URI
-        List<Path> masterJsonFiles = new DataJsonFinder().findJsonFiles(source);
-        Set<Path> filesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, masterJsonFiles);
-        FixLinksAndWriteToDestination(source, destination, sourceUri, destinationUri, filesToFixLinksIn);
-
         System.out.println("Searching collection content for links for fix...." + destination);
         // do the same process for files in the collection in case they need links fixing
         List<Path> collectionJsonFiles = new DataJsonFinder().findJsonFiles(destination);
         Set<Path> collectionFilesToFixLinksIn = findJsonFilesWithLinksToFix(destinationDirectory, sourceUri, latestUri, collectionJsonFiles);
         FixLinksAndWriteToDestination(source, destination, sourceUri, destinationUri, collectionFilesToFixLinksIn);
+
+        System.out.println("Searching master content for links for fix....");
+        // identify pages in master content with links to fix - search source path for old URI
+        List<Path> masterJsonFiles = new DataJsonFinder().findJsonFiles(source);
+        Set<Path> filesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, masterJsonFiles);
+        FixLinksAndWriteToDestination(source, destination, sourceUri, destinationUri, filesToFixLinksIn);
 
         // publish the collection...
         // run the delete commands on the web servers and reindex search on publishing and web

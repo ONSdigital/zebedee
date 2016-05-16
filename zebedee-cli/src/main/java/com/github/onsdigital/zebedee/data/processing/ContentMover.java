@@ -71,7 +71,11 @@ public class ContentMover {
 
             Path destinationFilePath = destination.resolve(source.relativize(path));
             System.out.println("destinationFilePath = " + destinationFilePath);
-            Files.createDirectories(destination);
+
+            Path parentDirectory = destinationFilePath.getParent();
+            if (!Files.exists(parentDirectory))
+                Files.createDirectories(parentDirectory);
+
             Files.write(destinationFilePath, content.getBytes(StandardCharsets.UTF_8));
         }
     }

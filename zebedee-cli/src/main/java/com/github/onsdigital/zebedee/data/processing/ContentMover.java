@@ -65,18 +65,28 @@ public class ContentMover {
     }
 
     private static void FixLinksAndWriteBackToCollection(String sourceUri, String destinationUri, Set<Path> collectionFilesToFixLinksIn) throws IOException {
+
+        String sourceLatestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
+        String destinationLatestUri = Paths.get(destinationUri).getParent().resolve("latest").toString();
+
         for (Path path : collectionFilesToFixLinksIn) {
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll(sourceUri, destinationUri);
+            content = content.replaceAll(sourceLatestUri, destinationLatestUri);
             System.out.println("destinationFilePath = " + path);
             Files.write(path, content.getBytes(StandardCharsets.UTF_8));
         }
     }
 
     private static void FixLinksAndWriteToDestination(Path source, Path destination, String sourceUri, String destinationUri, Set<Path> filesToFixLinksIn) throws IOException {
+
+        String sourceLatestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
+        String destinationLatestUri = Paths.get(destinationUri).getParent().resolve("latest").toString();
+
         for (Path path : filesToFixLinksIn) {
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll(sourceUri, destinationUri);
+            content = content.replaceAll(sourceLatestUri, destinationLatestUri);
 
             Path destinationFilePath = destination.resolve(source.relativize(path));
             System.out.println("destinationFilePath = " + destinationFilePath);

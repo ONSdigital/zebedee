@@ -38,15 +38,16 @@ public class Transfer {
     public boolean move(HttpServletRequest request, HttpServletResponse response, TransferRequest params) throws IOException {
         boolean result = true;
 
+        // get the source collection
+        Collection source = getSource(params,request);
+
         // user has permission
         Session session = Root.zebedee.sessions.get(request);
-        if (!Root.zebedee.permissions.canEdit(session.email)){
+        if (!Root.zebedee.permissions.canEdit(session.email, source.description)){
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return false;
         }
 
-        // get the source collection
-        Collection source = getSource(params,request);
         if(source == null) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return false;

@@ -1,12 +1,21 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.PublisherType;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.AccessMapping;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.PermissionDefinition;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.json.User;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,6 +28,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
@@ -82,6 +92,12 @@ public class Permissions {
     public boolean isAdministrator(String email) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         return isAdministrator(email, accessMapping);
+    }
+
+    public boolean isDataVisPublisher(String email) throws IOException {
+        AccessMapping accessMapping = readAccessMapping();
+        return accessMapping.dataVisualisationPublishers != null
+                && accessMapping.dataVisualisationPublishers.contains(standardise(email));
     }
 
     private boolean isAdministrator(String email, AccessMapping accessMapping) {
@@ -176,9 +192,9 @@ public class Permissions {
      */
     public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(session.email) && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
+            return canEdit(session.email, collectionDescription) && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
         } else {
-            return canEdit(session.email);
+            return canEdit(session.email, collectionDescription);
         }
     }
 
@@ -192,9 +208,9 @@ public class Permissions {
      */
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(user.email) && user.keyring.list().contains(collectionDescription.id);
+            return canEdit(user.email, collectionDescription) && user.keyring.list().contains(collectionDescription.id);
         } else {
-            return canEdit(user.email);
+            return canEdit(user.email, readAccessMapping(), collectionDescription);
         }
     }
 
@@ -288,7 +304,7 @@ public class Permissions {
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         return user != null && (
-                canEdit(user.email, accessMapping) || canView(user.email, collectionDescription, accessMapping));
+                canEdit(user.email, accessMapping, collectionDescription) || canView(user.email, collectionDescription, accessMapping));
     }
 
     /**
@@ -318,7 +334,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !canEdit(session.email)) {
+        if (session == null || !canEdit(session.email, collectionDescription)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -361,7 +377,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !canEdit(session.email)) {
+        if (session == null || !canEdit(session.email, collectionDescription)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -377,7 +393,23 @@ public class Permissions {
 
     private boolean canEdit(String email, AccessMapping accessMapping) throws IOException {
         Set<String> digitalPublishingTeam = accessMapping.digitalPublishingTeam;
-        return digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email));
+        Set<String> dataVisualisationPublishers = accessMapping.dataVisualisationPublishers;
+
+        return (digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email)))
+                || (dataVisualisationPublishers != null && dataVisualisationPublishers.contains(standardise(email)));
+    }
+
+    private boolean canEdit(String email, AccessMapping accessMapping, CollectionDescription collectionDescription) throws IOException {
+        switch (collectionDescription.publisherType) {
+            case PUBLISHING_SUPPORT:
+                Set<String> digitalPublishingTeam = accessMapping.digitalPublishingTeam;
+                return digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email));
+            case DATA_VISUALISATION:
+                Set<String> dataVisualisationPublishers = accessMapping.dataVisualisationPublishers;
+                return dataVisualisationPublishers != null && dataVisualisationPublishers.contains(standardise(email));
+            default:
+                return false;
+        }
     }
 
     private boolean canView(String email, CollectionDescription collectionDescription, AccessMapping accessMapping) throws IOException {
@@ -387,7 +419,9 @@ public class Permissions {
         Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
         if (teams != null) {
             for (Team team : zebedee.teams.listTeams()) {
-                if (teams.contains(team.id) && team.members.contains(standardise(email))) {
+                boolean isTeamMember = teams.contains(team.id) && team.members.contains(standardise(email));
+                boolean inCollectionGroup = getUserCollectionGroup(email).equals(collectionDescription.publisherType);
+                if (isTeamMember && inCollectionGroup) {
                     return true;
                 }
             }
@@ -467,6 +501,59 @@ public class Permissions {
         definition.email = email;
         definition.admin = isAdministrator(email);
         definition.editor = canEdit(email);
+        definition.dataVisPublisher = isDataVisPublisher(email);
         return definition;
+    }
+
+    /**
+     * Add a Data Visualisation Publisher.
+     *
+     * @param email
+     * @param session
+     * @throws ZebedeeException
+     */
+    public void addDataVisualisationPublisher(String email, Session session) throws ZebedeeException {
+        try {
+            // Allow the initial user to be set as an administrator:
+            if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
+                throw new UnauthorizedException(getUnauthorizedMessage(session));
+            }
+
+            AccessMapping accessMapping = readAccessMapping();
+            if (accessMapping.dataVisualisationPublishers == null) {
+                accessMapping.dataVisualisationPublishers = new HashSet<>();
+            }
+            accessMapping.dataVisualisationPublishers.add(standardise(email));
+            writeAccessMapping(accessMapping);
+        } catch (IOException e) {
+            logError(e, "Error while attempting to add Data Vis publisher permission.")
+                    .user(session.email)
+                    .addParameter("forUser", email)
+                    .log();
+            throw new UnexpectedErrorException("Error while attempting to add Data Vis publisher permission.",
+                    Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        }
+    }
+
+    public void removeDataVisualisationPublisher(String email, Session session) throws IOException, UnauthorizedException {
+        if (session == null || !isAdministrator(session.email)) {
+            throw new UnauthorizedException(getUnauthorizedMessage(session));
+        }
+
+        AccessMapping accessMapping = readAccessMapping();
+        accessMapping.dataVisualisationPublishers.remove(PathUtils.standardise(email));
+        writeAccessMapping(accessMapping);
+    }
+
+    /**
+     * Determined the {@link PublisherType} for this collection (PUBLISHING_SUPPORT or Data Visualisation).
+     */
+    public PublisherType getUserCollectionGroup(Session session) throws IOException {
+        return getUserCollectionGroup(session.email);
+    }
+
+    // TODO rename this to something that makes more sense.
+    public PublisherType getUserCollectionGroup(String email) throws IOException {
+        return isDataVisPublisher(email) ? PublisherType.DATA_VISUALISATION : PublisherType.PUBLISHING_SUPPORT;
     }
 }

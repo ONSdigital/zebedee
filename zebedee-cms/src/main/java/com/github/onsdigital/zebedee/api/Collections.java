@@ -56,7 +56,7 @@ public class Collections {
         List<Collection> collections = Root.zebedee.collections.list();
 
         for (Collection collection : collections) {
-            if (Root.zebedee.permissions.canView(session,collection.description)) {
+            if (Root.zebedee.permissions.canView(session, collection.description)) {
                 CollectionDescription description = new CollectionDescription();
                 description.id = collection.description.id;
                 description.name = collection.description.name;

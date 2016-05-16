@@ -2,7 +2,16 @@ package com.github.onsdigital.zebedee.logging;
 
 import ch.qos.logback.classic.Level;
 import com.github.onsdigital.logging.builder.LogMessageBuilder;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
+
+import javax.ws.rs.core.Response;
 
 /**
  * Created by dave on 5/5/16.
@@ -43,6 +52,33 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
                 .addParameter(ERROR_CONTEXT, errorContext)
                 .addParameter(CLASS, t.getClass().getName())
                 .addParameter(EXCEPTION, t);
+    }
+
+    public void logAndThrow(Class<? extends ZebedeeException> exceptionClass) throws ZebedeeException {
+        this.log();
+
+        if (BadRequestException.class.equals(exceptionClass)) {
+            throw new BadRequestException(this.parameters.getParameters().get(ERROR_CONTEXT));
+        }
+
+        if (CollectionNotFoundException.class.equals(exceptionClass)) {
+            throw new CollectionNotFoundException(this.parameters.getParameters().get(ERROR_CONTEXT));
+        }
+
+        if (ConflictException.class.equals(exceptionClass)) {
+            throw new ConflictException(this.parameters.getParameters().get(ERROR_CONTEXT));
+        }
+
+        if (NotFoundException.class.equals(exceptionClass)) {
+            throw new NotFoundException(this.parameters.getParameters().get(ERROR_CONTEXT));
+        }
+
+        if (UnauthorizedException.class.equals(exceptionClass)) {
+            throw new UnauthorizedException(this.parameters.getParameters().get(ERROR_CONTEXT));
+        }
+        // Default to internal server error.
+        throw new UnexpectedErrorException(this.parameters.getParameters().get(ERROR_CONTEXT),
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }
 
     /**

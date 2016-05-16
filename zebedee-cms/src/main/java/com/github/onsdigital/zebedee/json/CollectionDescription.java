@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.json;
 
+import com.github.onsdigital.zebedee.PublisherType;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 
 import java.util.ArrayList;
@@ -24,7 +25,9 @@ public class CollectionDescription extends CollectionBase {
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
 
-    public List<String> owners; // What team created the collection (eg PST or Data vis)
+    // Default to PUBLISHING_SUPPORT_TEAM
+    public PublisherType publisherType = PublisherType.PUBLISHING_SUPPORT;
+    public List<String> owners; // What team created the collection (eg PUBLISHING_SUPPORT_TEAM or Data vis)
 
     public List<String> timeseriesImportFiles = new ArrayList<>();
 
@@ -61,6 +64,14 @@ public class CollectionDescription extends CollectionBase {
     }
 
     /**
+     *
+     */
+    public CollectionDescription(String name, PublisherType publisherType) {
+        this.name = name;
+        this.publisherType = publisherType != null ? publisherType : PublisherType.PUBLISHING_SUPPORT;
+    }
+
+    /**
      * Convenience constructor for instantiating with a name
      * and publish date.
      *
@@ -70,6 +81,24 @@ public class CollectionDescription extends CollectionBase {
     public CollectionDescription(String name, Date publishDate) {
         this.publishDate = publishDate;
         this.name = name;
+    }
+
+    /**
+     * Convenience constructor for instantiating with a name
+     * and publish date.
+     *
+     * @param name
+     * @param publishDate
+     */
+    public CollectionDescription(String name, Date publishDate, PublisherType publisherType) {
+        this.publishDate = publishDate;
+        this.name = name;
+        this.publisherType = publisherType != null ? publisherType : PublisherType.PUBLISHING_SUPPORT;
+    }
+
+
+    public void setPublisherType(PublisherType audience) {
+        this.publisherType = audience != null ? audience : PublisherType.PUBLISHING_SUPPORT;
     }
 
 

@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
@@ -36,7 +37,7 @@ public class Version {
     public String create(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
         Session session = Root.zebedee.sessions.get(request);
-        if (session == null || !Root.zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !Root.zebedee.permissions.canEdit(session.email, getCollectionDescription(request))) {
             throw new UnauthorizedException("You are not authorised to edit content.");
         }
 
@@ -70,7 +71,7 @@ public class Version {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, NotFoundException, UnauthorizedException {
 
         Session session = Root.zebedee.sessions.get(request);
-        if (session == null || !Root.zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !Root.zebedee.permissions.canEdit(session.email, getCollectionDescription(request))) {
             throw new UnauthorizedException("You are not authorised to edit content.");
         }
 
@@ -87,5 +88,9 @@ public class Version {
                 .user(session.email)
                 .log();
         return true;
+    }
+
+    private CollectionDescription getCollectionDescription(HttpServletRequest request) throws IOException {
+        return Collections.getCollection(request).description;
     }
 }

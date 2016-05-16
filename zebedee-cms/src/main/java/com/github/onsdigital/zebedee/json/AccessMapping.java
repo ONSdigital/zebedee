@@ -19,6 +19,9 @@ public class AccessMapping {
      */
     public Set<String> digitalPublishingTeam;
 
+
+    public Set<String> dataVisualisationPublishers;
+
     /**
      * Content owners can be assigned access to collections via one or more teams.
      * <p>NB: This is a map of collection ID to the set of team IDs that have access to the collection.</p>

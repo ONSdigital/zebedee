@@ -8,4 +8,5 @@ public class PermissionDefinition {
     public String email;
     public Boolean admin;
     public Boolean editor;
+    public Boolean dataVisPublisher;
 }

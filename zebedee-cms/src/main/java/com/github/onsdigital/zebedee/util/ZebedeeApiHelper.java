@@ -1,10 +1,13 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.onsdigital.zebedee.PublisherType;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -14,7 +17,9 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
@@ -46,9 +51,9 @@ public class ZebedeeApiHelper {
         try {
             return Root.zebedee.sessions.get(request);
         } catch (IOException e) {
-            logError(e, SESSION_NOT_FOUND_MSG).log();
-            throw new UnauthorizedException(SESSION_NOT_FOUND_MSG);
+            logError(e, SESSION_NOT_FOUND_MSG).logAndThrow(UnauthorizedException.class);
         }
+        return null;
     }
 
     public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session)
@@ -59,9 +64,9 @@ public class ZebedeeApiHelper {
             logError(e, COLLECTION_WRI_ERROR_MSG)
                     .collectionId(collection)
                     .user(session.email)
-                    .log();
-            throw new BadRequestException(COLLECTION_WRI_ERROR_MSG);
+                    .logAndThrow(BadRequestException.class);
         }
+        return null;
     }
 
     public CollectionReader getZebedeeCollectionReader(Collection collection, Session session) throws ZebedeeException {
@@ -71,18 +76,32 @@ public class ZebedeeApiHelper {
             logError(e, COLLECTION_READ_ERROR_MSG)
                     .collectionId(collection)
                     .user(session.email)
-                    .log();
-            throw new BadRequestException(COLLECTION_READ_ERROR_MSG);
+                    .logAndThrow(BadRequestException.class);
         }
-
+        return null;
     }
 
     public Collection getCollection(HttpServletRequest request) throws ZebedeeException {
         try {
             return Collections.getCollection(request);
         } catch (IOException e) {
-            logError(e, COLLECTION_NOT_FOUND_MSG).log();
-            throw new NotFoundException(COLLECTION_NOT_FOUND_MSG);
+            logError(e, COLLECTION_NOT_FOUND_MSG).logAndThrow(NotFoundException.class);
         }
+        return null;
+    }
+
+    public PublisherType getPublisherType(String email) throws ZebedeeException {
+        try {
+            return Root.zebedee.permissions.getUserCollectionGroup(email);
+        } catch (IOException e) {
+            logError(e, "Error while trying to determined user PublisherType.")
+                    .user(email)
+                    .logAndThrow(UnexpectedErrorException.class);
+        }
+        return null;
+    }
+
+    public InputStream objectAsInputStream(Object obj) {
+        return new ByteArrayInputStream(ContentUtil.serialise(obj).getBytes());
     }
 }

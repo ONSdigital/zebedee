@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang3.BooleanUtils;
@@ -14,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Created by david on 12/03/2015.
@@ -37,7 +40,8 @@ public class Permission {
      * @throws BadRequestException   If the user specified in the {@link PermissionDefinition} is not found.
      */
     @POST
-    public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
+    public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition)
+            throws IOException, ZebedeeException {
 
         Session session = Root.zebedee.sessions.get(request);
 
@@ -58,6 +62,18 @@ public class Permission {
                     .host(request)
                     .actionedByEffecting(session.email, permissionDefinition.email)
                     .log();
+        }
+
+        if (BooleanUtils.isTrue(permissionDefinition.dataVisPublisher)) {
+            Root.zebedee.permissions.addDataVisualisationPublisher(permissionDefinition.email, session);
+            logInfo("Data Vis Publisher permission added to user.")
+                    .user(permissionDefinition.email)
+                    .addParameter("by", session.email).log();
+        } else if (BooleanUtils.isFalse(permissionDefinition.dataVisPublisher)) {
+            Root.zebedee.permissions.removeDataVisualisationPublisher(permissionDefinition.email, session);
+            logInfo("Data Vis Publisher permission removed from user.")
+                    .user(permissionDefinition.email)
+                    .addParameter("by", session.email).log();
         }
 
         // Digital publishing

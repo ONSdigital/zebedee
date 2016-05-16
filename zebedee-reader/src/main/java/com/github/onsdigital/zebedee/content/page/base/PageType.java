@@ -39,5 +39,6 @@ public enum PageType {
     reference_tables,
     chart,
     table,
-    image
+    image,
+    visualisation
 }

@@ -208,7 +208,7 @@ public class Permissions {
      */
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(user.email, collectionDescription) && user.keyring.list().contains(collectionDescription.id);
+            return canEdit(user.email, readAccessMapping(), collectionDescription) && user.keyring.list().contains(collectionDescription.id);
         } else {
             return canEdit(user.email, readAccessMapping(), collectionDescription);
         }

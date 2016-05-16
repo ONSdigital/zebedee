@@ -32,6 +32,11 @@ public class Cli {
                 .argName("source directory> <source dataset ID")
                 .numberOfArgs(2)
                 .build());
+        options.addOption(Option.builder("movecontent")
+                .desc("Move content into a new location in a collection")
+                .argName("source directory> <destination directory> <source URI> <destination URI")
+                .numberOfArgs(4)
+                .build());
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -47,6 +52,8 @@ public class Cli {
                 TimeseriesDataRemover.removeTimeseriesEntries(args);
             } else if (line.hasOption("findtimeseriesforsourcedataset")) {
                 TimeseriesFinder.findTimeseriesForSourceDataset(args);
+            } else if (line.hasOption("movecontent")) {
+                ContentMover.moveContent(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

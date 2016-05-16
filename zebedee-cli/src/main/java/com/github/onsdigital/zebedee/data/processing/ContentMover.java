@@ -52,7 +52,7 @@ public class ContentMover {
         // do the same process for files in the collection in case they need links fixing
         List<Path> collectionJsonFiles = new DataJsonFinder().findJsonFiles(destination);
         Set<Path> collectionFilesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, collectionJsonFiles);
-        FixLinksAndWriteToDestination(source, destination, sourceUri, destinationUri, collectionFilesToFixLinksIn);
+        FixLinksAndWriteBackToCollection(sourceUri, destinationUri, collectionFilesToFixLinksIn);
 
         System.out.println("Searching master content for links for fix....");
         // identify pages in master content with links to fix - search source path for old URI
@@ -62,6 +62,15 @@ public class ContentMover {
 
         // publish the collection...
         // run the delete commands on the web servers and reindex search on publishing and web
+    }
+
+    private static void FixLinksAndWriteBackToCollection(String sourceUri, String destinationUri, Set<Path> collectionFilesToFixLinksIn) throws IOException {
+        for (Path path : collectionFilesToFixLinksIn) {
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            content = content.replaceAll(sourceUri, destinationUri);
+            System.out.println("destinationFilePath = " + path);
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     private static void FixLinksAndWriteToDestination(Path source, Path destination, String sourceUri, String destinationUri, Set<Path> filesToFixLinksIn) throws IOException {

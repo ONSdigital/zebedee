@@ -18,6 +18,16 @@ public class Visualisation extends Page {
         this.uid = uid;
     }
 
+    public String fileUri;
+
+    public String getFileUri() {
+        return fileUri;
+    }
+
+    public void setFileUri(String fileUri) {
+        this.fileUri = fileUri;
+    }
+
     @Override
     public PageType getType() {
         return PageType.visualisation;

@@ -11,6 +11,8 @@ import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -79,11 +81,14 @@ public class UnzipDataVisualisation {
 
             while (zipEntry != null) {
                 filePath = zipDir.resolve(zipEntry.getName());
-                contentWriter.write(zipInputStream, filePath.toString());
 
-                logDebug("Successfully unzipped data viz file.")
-                        .addParameter("file", filePath.toString())
-                        .log();
+                if (FilenameUtils.getExtension(filePath.toString()).length() > 0) {
+                    contentWriter.write(zipInputStream, filePath.toString());
+
+                    logDebug("Successfully unzipped data viz file.")
+                            .addParameter("file", filePath.toString())
+                            .log();
+                }
 
                 zipEntry = zipInputStream.getNextEntry();
             }

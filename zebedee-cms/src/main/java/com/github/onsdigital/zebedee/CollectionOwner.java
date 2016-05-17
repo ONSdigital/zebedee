@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee;
 /**
  * Type representing which audience the collection can be viewed by.
  */
-public enum PublisherType {
+public enum CollectionOwner {
 
     /**
      * Publishing support team.

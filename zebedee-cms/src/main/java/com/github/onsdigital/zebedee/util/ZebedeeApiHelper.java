@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
-import com.github.onsdigital.zebedee.PublisherType;
+import com.github.onsdigital.zebedee.CollectionOwner;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -90,11 +90,11 @@ public class ZebedeeApiHelper {
         return null;
     }
 
-    public PublisherType getPublisherType(String email) throws ZebedeeException {
+    public CollectionOwner getPublisherType(String email) throws ZebedeeException {
         try {
             return Root.zebedee.permissions.getUserCollectionGroup(email);
         } catch (IOException e) {
-            logError(e, "Error while trying to determined user PublisherType.")
+            logError(e, "Error while trying to determined user collectionOwner.")
                     .user(email)
                     .logAndThrow(UnexpectedErrorException.class);
         }

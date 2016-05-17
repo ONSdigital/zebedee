@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.PublisherType;
+import com.github.onsdigital.zebedee.CollectionOwner;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -192,9 +192,9 @@ public class Permissions {
      */
     public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(session.email, collectionDescription) && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
+            return canEdit(session.email) && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
         } else {
-            return canEdit(session.email, collectionDescription);
+            return canEdit(session.email);
         }
     }
 
@@ -208,9 +208,9 @@ public class Permissions {
      */
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(user.email, readAccessMapping(), collectionDescription) && user.keyring.list().contains(collectionDescription.id);
+            return canEdit(user.email, readAccessMapping()) && user.keyring.list().contains(collectionDescription.id);
         } else {
-            return canEdit(user.email, readAccessMapping(), collectionDescription);
+            return canEdit(user.email, readAccessMapping());
         }
     }
 
@@ -304,7 +304,7 @@ public class Permissions {
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         return user != null && (
-                canEdit(user.email, accessMapping, collectionDescription) || canView(user.email, collectionDescription, accessMapping));
+                canEdit(user.email, accessMapping) || canView(user.email, collectionDescription, accessMapping));
     }
 
     /**
@@ -334,7 +334,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !canEdit(session.email, collectionDescription)) {
+        if (session == null || !canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -400,7 +400,7 @@ public class Permissions {
     }
 
     private boolean canEdit(String email, AccessMapping accessMapping, CollectionDescription collectionDescription) throws IOException {
-        switch (collectionDescription.publisherType) {
+        switch (collectionDescription.collectionOwner) {
             case PUBLISHING_SUPPORT:
                 Set<String> digitalPublishingTeam = accessMapping.digitalPublishingTeam;
                 return digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email));
@@ -420,7 +420,7 @@ public class Permissions {
         if (teams != null) {
             for (Team team : zebedee.teams.listTeams()) {
                 boolean isTeamMember = teams.contains(team.id) && team.members.contains(standardise(email));
-                boolean inCollectionGroup = getUserCollectionGroup(email).equals(collectionDescription.publisherType);
+                boolean inCollectionGroup = getUserCollectionGroup(email).equals(collectionDescription.collectionOwner);
                 if (isTeamMember && inCollectionGroup) {
                     return true;
                 }
@@ -546,14 +546,14 @@ public class Permissions {
     }
 
     /**
-     * Determined the {@link PublisherType} for this collection (PUBLISHING_SUPPORT or Data Visualisation).
+     * Determined the {@link CollectionOwner} for this collection (PUBLISHING_SUPPORT or Data Visualisation).
      */
-    public PublisherType getUserCollectionGroup(Session session) throws IOException {
+    public CollectionOwner getUserCollectionGroup(Session session) throws IOException {
         return getUserCollectionGroup(session.email);
     }
 
     // TODO rename this to something that makes more sense.
-    public PublisherType getUserCollectionGroup(String email) throws IOException {
-        return isDataVisPublisher(email) ? PublisherType.DATA_VISUALISATION : PublisherType.PUBLISHING_SUPPORT;
+    public CollectionOwner getUserCollectionGroup(String email) throws IOException {
+        return isDataVisPublisher(email) ? CollectionOwner.DATA_VISUALISATION : CollectionOwner.PUBLISHING_SUPPORT;
     }
 }

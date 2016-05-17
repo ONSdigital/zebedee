@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.CollectionOwner;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
@@ -19,7 +20,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  * Created by dave on 5/13/16.
  */
 @Api
-public class PublisherType {
+public class collectionOwner {
 
     private static ZebedeeApiHelper apiHelper = ZebedeeApiHelper.getInstance();
 
@@ -34,9 +35,9 @@ public class PublisherType {
         }
     }
 
-    private void writeToResponse(com.github.onsdigital.zebedee.PublisherType publisherType, HttpServletResponse response) throws IOException {
+    private void writeToResponse(CollectionOwner collectionOwner, HttpServletResponse response) throws IOException {
         JsonObject jsonResponse = new JsonObject();
-        jsonResponse.addProperty("publisherType", publisherType.name());
+        jsonResponse.addProperty("collectionOwner", collectionOwner.name());
         IOUtils.copy(apiHelper.objectAsInputStream(jsonResponse), response.getOutputStream());
     }
 }

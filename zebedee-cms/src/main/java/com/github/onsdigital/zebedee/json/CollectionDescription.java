@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.json;
 
-import com.github.onsdigital.zebedee.PublisherType;
+import com.github.onsdigital.zebedee.CollectionOwner;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 
 import java.util.ArrayList;
@@ -26,8 +26,7 @@ public class CollectionDescription extends CollectionBase {
     public boolean isEncrypted;
 
     // Default to PUBLISHING_SUPPORT_TEAM
-    public PublisherType publisherType = PublisherType.PUBLISHING_SUPPORT;
-    public List<String> owners; // What team created the collection (eg PUBLISHING_SUPPORT_TEAM or Data vis)
+    public CollectionOwner collectionOwner = CollectionOwner.PUBLISHING_SUPPORT;
 
     public List<String> timeseriesImportFiles = new ArrayList<>();
 
@@ -66,9 +65,9 @@ public class CollectionDescription extends CollectionBase {
     /**
      *
      */
-    public CollectionDescription(String name, PublisherType publisherType) {
+    public CollectionDescription(String name, CollectionOwner collectionOwner) {
         this.name = name;
-        this.publisherType = publisherType != null ? publisherType : PublisherType.PUBLISHING_SUPPORT;
+        this.collectionOwner = collectionOwner != null ? collectionOwner : CollectionOwner.PUBLISHING_SUPPORT;
     }
 
     /**
@@ -90,15 +89,15 @@ public class CollectionDescription extends CollectionBase {
      * @param name
      * @param publishDate
      */
-    public CollectionDescription(String name, Date publishDate, PublisherType publisherType) {
+    public CollectionDescription(String name, Date publishDate, CollectionOwner collectionOwner) {
         this.publishDate = publishDate;
         this.name = name;
-        this.publisherType = publisherType != null ? publisherType : PublisherType.PUBLISHING_SUPPORT;
+        this.collectionOwner = collectionOwner != null ? collectionOwner : CollectionOwner.PUBLISHING_SUPPORT;
     }
 
 
-    public void setPublisherType(PublisherType audience) {
-        this.publisherType = audience != null ? audience : PublisherType.PUBLISHING_SUPPORT;
+    public void setCollectionOwner(CollectionOwner audience) {
+        this.collectionOwner = audience != null ? audience : CollectionOwner.PUBLISHING_SUPPORT;
     }
 
 

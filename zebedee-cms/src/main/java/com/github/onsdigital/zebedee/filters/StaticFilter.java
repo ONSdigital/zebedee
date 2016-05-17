@@ -1,15 +1,11 @@
-package com.github.onsdigital.zebedee.api;
+package com.github.onsdigital.zebedee.filters;
 
 import com.github.davidcarboni.restolino.framework.Filter;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * Captures requests with a file extension as they do not get routed to the API.
@@ -20,11 +16,11 @@ public class StaticFilter implements Filter
     @Override
     public boolean filter(HttpServletRequest req, HttpServletResponse res) {
         if (isStaticContentRequest(req)) {
-            try {
-                new Browse().browse(req, res);
-            } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
-                return true;
-            }
+//            try {
+//                // reading the content and add it to the response
+//            } catch (IOException | NotFoundException | BadRequestException | UnauthorizedException e) {
+//                return true;
+//            }
 
             return false;
         }

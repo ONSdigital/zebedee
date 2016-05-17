@@ -486,7 +486,7 @@ public class Collection {
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
 
         // Does the current user have permission to edit?
-        boolean permission = zebedee.permissions.canEdit(email, this.description);
+        boolean permission = zebedee.permissions.canEdit(email);
 
         if (!isBeingEdited && !exists && permission) {
             // Copy from Published to in progress:
@@ -562,7 +562,7 @@ public class Collection {
 
     public boolean complete(String email, String uri) throws IOException {
         boolean result = false;
-        boolean permission = zebedee.permissions.canEdit(email, this.description);
+        boolean permission = zebedee.permissions.canEdit(email);
 
         if (isInProgress(uri) && permission) {
             // Move the in-progress copy to completed:
@@ -600,7 +600,7 @@ public class Collection {
         }
 
 
-        boolean permission = zebedee.permissions.canEdit(session.email, this.description);
+        boolean permission = zebedee.permissions.canEdit(session.email);
         if (!permission) {
             throw new UnauthorizedException("Insufficient permissions");
         }

@@ -135,7 +135,7 @@ public class Collection {
     ) throws IOException, ZebedeeException {
 
         Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.canEdit(session.email, collectionDescription) == false) {
+        if (Root.zebedee.permissions.canEdit(session.email) == false) {
             throw new UnauthorizedException("You are not authorised to update collections.");
         }
 

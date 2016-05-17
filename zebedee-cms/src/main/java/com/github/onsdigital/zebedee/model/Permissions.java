@@ -208,9 +208,9 @@ public class Permissions {
      */
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(user.email, readAccessMapping()) && user.keyring.list().contains(collectionDescription.id);
+            return canEdit(user.email) && user.keyring.list().contains(collectionDescription.id);
         } else {
-            return canEdit(user.email, readAccessMapping());
+            return canEdit(user.email);
         }
     }
 
@@ -377,7 +377,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !canEdit(session.email, collectionDescription)) {
+        if (session == null || !canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -399,18 +399,6 @@ public class Permissions {
                 || (dataVisualisationPublishers != null && dataVisualisationPublishers.contains(standardise(email)));
     }
 
-    private boolean canEdit(String email, AccessMapping accessMapping, CollectionDescription collectionDescription) throws IOException {
-        switch (collectionDescription.collectionOwner) {
-            case PUBLISHING_SUPPORT:
-                Set<String> digitalPublishingTeam = accessMapping.digitalPublishingTeam;
-                return digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email));
-            case DATA_VISUALISATION:
-                Set<String> dataVisualisationPublishers = accessMapping.dataVisualisationPublishers;
-                return dataVisualisationPublishers != null && dataVisualisationPublishers.contains(standardise(email));
-            default:
-                return false;
-        }
-    }
 
     private boolean canView(String email, CollectionDescription collectionDescription, AccessMapping accessMapping) throws IOException {
         boolean result = false;

@@ -209,7 +209,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.permissions.canEdit(session.email, collection.description)) {
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -253,7 +253,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.permissions.canEdit(session.email, collection.description)) {
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -293,7 +293,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.permissions.canEdit(session.email, collection.description)) {
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -547,7 +547,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session.email, collection.description)) {
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -658,7 +658,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session.email, collection.description)) {
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -685,7 +685,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session.email, collection.description)) {
+        if (session == null || !zebedee.permissions.canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

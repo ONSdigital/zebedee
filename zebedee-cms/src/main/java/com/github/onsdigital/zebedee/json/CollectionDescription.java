@@ -1,12 +1,14 @@
 package com.github.onsdigital.zebedee.json;
 
-import com.github.onsdigital.zebedee.CollectionOwner;
 import com.github.onsdigital.zebedee.json.publishing.Result;
+import com.github.onsdigital.zebedee.model.CollectionOwner;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
 
 /**
  * This cd ..
@@ -26,7 +28,7 @@ public class CollectionDescription extends CollectionBase {
     public boolean isEncrypted;
 
     // Default to PUBLISHING_SUPPORT_TEAM
-    public CollectionOwner collectionOwner = CollectionOwner.PUBLISHING_SUPPORT;
+    public CollectionOwner collectionOwner = PUBLISHING_SUPPORT;
 
     public List<String> timeseriesImportFiles = new ArrayList<>();
 
@@ -67,7 +69,7 @@ public class CollectionDescription extends CollectionBase {
      */
     public CollectionDescription(String name, CollectionOwner collectionOwner) {
         this.name = name;
-        this.collectionOwner = collectionOwner != null ? collectionOwner : CollectionOwner.PUBLISHING_SUPPORT;
+        this.collectionOwner = collectionOwner != null ? collectionOwner : PUBLISHING_SUPPORT;
     }
 
     /**
@@ -92,17 +94,18 @@ public class CollectionDescription extends CollectionBase {
     public CollectionDescription(String name, Date publishDate, CollectionOwner collectionOwner) {
         this.publishDate = publishDate;
         this.name = name;
-        this.collectionOwner = collectionOwner != null ? collectionOwner : CollectionOwner.PUBLISHING_SUPPORT;
+        this.collectionOwner = collectionOwner != null ? collectionOwner : PUBLISHING_SUPPORT;
     }
 
 
     public void setCollectionOwner(CollectionOwner audience) {
-        this.collectionOwner = audience != null ? audience : CollectionOwner.PUBLISHING_SUPPORT;
+        this.collectionOwner = audience != null ? audience : PUBLISHING_SUPPORT;
     }
 
 
     /**
      * Add an event to this collection description.
+     *
      * @param event
      */
     public void AddEvent(Event event) {
@@ -116,6 +119,7 @@ public class CollectionDescription extends CollectionBase {
     /**
      * Add a {@link Result} to this
      * {@link CollectionDescription}.
+     *
      * @param result
      */
     public void AddPublishResult(Result result) {

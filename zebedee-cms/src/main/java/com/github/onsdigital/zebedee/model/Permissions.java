@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.CollectionOwner;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -29,6 +28,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.model.CollectionOwner.DATA_VISUALISATION;
+import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
 
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
@@ -182,10 +183,10 @@ public class Permissions {
 
     /**
      * Get whether a user session can edit a collection
-     *
+     * <p>
      * Future-proofing only at present
      *
-     * @param session the session
+     * @param session               the session
      * @param collectionDescription the collection description
      * @return
      * @throws IOException
@@ -201,7 +202,7 @@ public class Permissions {
     /**
      * Get whether a user can edit a collection
      *
-     * @param user the user
+     * @param user                  the user
      * @param collectionDescription
      * @return
      * @throws IOException
@@ -218,7 +219,7 @@ public class Permissions {
     /**
      * Get whether a user can edit a collection
      *
-     * @param email the user email
+     * @param email                 the user email
      * @param collectionDescription
      * @return
      * @throws IOException
@@ -230,7 +231,6 @@ public class Permissions {
             return false;
         }
     }
-
 
 
     /**
@@ -294,8 +294,9 @@ public class Permissions {
 
     /**
      * Determines whether the specified user has viewing rights.
-     **
-     * @param user               The user. Can be null.
+     * *
+     *
+     * @param user                  The user. Can be null.
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
      * the user is a content owner with access to the given path or any parent path.
@@ -310,7 +311,7 @@ public class Permissions {
     /**
      * Determines whether the specified user has viewing rights.
      *
-     * @param email               The email of the user
+     * @param email                 The email of the user
      * @param collectionDescription The collection to check access for.
      * @return True if the user is a member of the Digital Publishing team or
      * the user is a content owner with access to the given path or any parent path.
@@ -350,6 +351,7 @@ public class Permissions {
 
     /**
      * Provide a list of team ID's currently associated with a collection
+     *
      * @param collectionDescription
      * @param session
      * @return
@@ -542,6 +544,6 @@ public class Permissions {
 
     // TODO rename this to something that makes more sense.
     public CollectionOwner getUserCollectionGroup(String email) throws IOException {
-        return isDataVisPublisher(email) ? CollectionOwner.DATA_VISUALISATION : CollectionOwner.PUBLISHING_SUPPORT;
+        return isDataVisPublisher(email) ? DATA_VISUALISATION : PUBLISHING_SUPPORT;
     }
 }

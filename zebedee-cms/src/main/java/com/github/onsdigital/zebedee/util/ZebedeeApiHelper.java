@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
-import com.github.onsdigital.zebedee.CollectionOwner;
+import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;

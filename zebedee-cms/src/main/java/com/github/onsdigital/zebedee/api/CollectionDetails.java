@@ -2,7 +2,11 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.CollectionDetail;
+import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.Events;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;

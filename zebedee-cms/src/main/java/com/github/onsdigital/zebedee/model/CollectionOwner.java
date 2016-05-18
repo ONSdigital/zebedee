@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee;
+package com.github.onsdigital.zebedee.model;
 
 /**
  * Type representing which audience the collection can be viewed by.

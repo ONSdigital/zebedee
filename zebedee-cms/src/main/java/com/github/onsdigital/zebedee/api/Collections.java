@@ -65,7 +65,7 @@ public class Collections {
 
             for (Collection collection : collections) {
                 if (Root.zebedee.permissions.canView(session, collection.description)
-                        && (collection.description.collectionOwner.equals(collectionOwner) || Root.zebedee.permissions.isAdministrator(session))) {
+                        && (collection.description.collectionOwner.equals(collectionOwner))) {
 
                     CollectionDescription description = new CollectionDescription();
                     description.id = collection.description.id;

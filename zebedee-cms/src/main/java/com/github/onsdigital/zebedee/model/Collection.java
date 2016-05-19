@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -788,6 +789,28 @@ public class Collection {
         if (hasDeleted) addEvent(uri, new Event(new Date(), EventType.DELETED, email));
         save();
 
+        return hasDeleted;
+    }
+
+    public boolean deleteDataVisContent(String email, Path contentPath) throws IOException {
+        if (contentPath == null || StringUtils.isEmpty(contentPath.toString())) {
+            return false;
+        }
+
+        String contentUri = contentPath.toString();
+        boolean hasDeleted = false;
+
+        for (Content collectionDir : new Content[] {inProgress, complete, reviewed}) {
+            if (collectionDir.exists(contentUri)) {
+                FileUtils.deleteDirectory(Paths.get(collectionDir.path.toString() + contentUri).toFile());
+                hasDeleted = true;
+            }
+        }
+
+        if (hasDeleted) {
+            addEvent(contentUri, new Event(new Date(), EventType.DELETED, email));
+        }
+        save();
         return hasDeleted;
     }
 

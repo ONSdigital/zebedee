@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -32,7 +33,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  * Endpoint for unzipping an uploaded data visualisation zip file.
  */
 @Api
-public class UnzipDataVisualisation {
+public class DataVisualisationZip {
 
     private static ZebedeeApiHelper zebedeeApiHelper = ZebedeeApiHelper.getInstance();
 
@@ -40,6 +41,31 @@ public class UnzipDataVisualisation {
     private static final String COLLECTION_RES_ERROR_MSG = "Could not find the requested collection Resource";
     private static final String UNZIPPING_ERROR_MSG = "Error while trying to unzip Data Visualisation file";
     private static final String NO_ZIP_PATH_ERROR_MSG = "Please specify the zip file path.";
+
+    /**
+     * Delete Data Vis content and zip file if it exists in the specified collection.
+     */
+    @DELETE
+    public void deleteZipAndContent(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
+        String zipPath = request.getParameter(ZIP_PATH);
+
+        if (StringUtils.isEmpty(zipPath)) {
+            throw new BadRequestException(NO_ZIP_PATH_ERROR_MSG);
+        }
+
+        logDebug("Deleting data visualisation zip").path(zipPath).log();
+
+        Session session = zebedeeApiHelper.getSession(request);
+        com.github.onsdigital.zebedee.model.Collection collection = zebedeeApiHelper.getCollection(request);
+
+        try {
+            collection.deleteDataVisContent(session.email, Paths.get(zipPath));
+        } catch (IOException e) {
+            logError(e, "Unexpected error while attempting to delete existing data vis zip content.")
+                    .path(zipPath)
+                    .logAndThrow(UnexpectedErrorException.class);
+        }
+    }
 
     @POST
     public void unpackDataVisualizationZip(HttpServletRequest request, HttpServletResponse response)
@@ -57,8 +83,6 @@ public class UnzipDataVisualisation {
         CollectionReader collectionReader = zebedeeApiHelper.getZebedeeCollectionReader(collection, session);
         CollectionWriter collectionWriter = zebedeeApiHelper.getZebedeeCollectionWriter(collection, session);
 
-        removeExisting(collection, session, Paths.get(zipPath).getParent());
-
         Resource zipRes;
         try {
             zipRes = collectionReader.getResource(zipPath);
@@ -68,17 +92,6 @@ public class UnzipDataVisualisation {
         }
 
         unzipContent(collectionWriter.getInProgress(), zipRes, zipPath);
-    }
-
-    private void removeExisting(com.github.onsdigital.zebedee.model.Collection collection, Session session, Path zipDir) throws ZebedeeException {
-        if (Files.exists(zipDir)) {
-            try {
-                collection.deleteContent(session.email, zipDir.toString());
-            } catch (IOException e) {
-                logError(e, "Unexpected error while attempting to delete existing data vis zip content.")
-                        .logAndThrow(UnexpectedErrorException.class);
-            }
-        }
     }
 
     /**
@@ -95,8 +108,7 @@ public class UnzipDataVisualisation {
             while (zipEntry != null) {
                 filePath = zipDir.resolve(zipEntry.getName());
 
-                // TODO zipEntry.isDirectory() takes care of this.
-                if (FilenameUtils.getExtension(filePath.toString()).length() > 0) {
+                if (!zipEntry.isDirectory()) {
                     contentWriter.write(zipInputStream, filePath.toString());
 
                     logDebug("Successfully unzipped data viz file.")

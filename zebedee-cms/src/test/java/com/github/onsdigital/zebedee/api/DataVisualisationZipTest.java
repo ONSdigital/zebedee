@@ -29,16 +29,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests Verifies the {@link UnzipDataVisualisation} endpoint behaves correctly in the happy path scenario.
+ * Tests Verifies the {@link DataVisualisationZip} endpoint behaves correctly in the happy path scenario.
  */
-public class UnzipDataVisualisationTest {
+public class DataVisualisationZipTest {
 
     private static final String ZIP_PATH_KEY = "zipPath";
     private static final String ZIP_PATH = "/data-visualisation/dataVis.zip";
     private static final String ZIP_WRITE_PATH = "/data-visualisation/";
     private static List<String> expectedZipContent;
 
-    private UnzipDataVisualisation endpoint;
+    private DataVisualisationZip endpoint;
 
     @Mock
     private HttpServletRequest mockRequest;
@@ -69,7 +69,7 @@ public class UnzipDataVisualisationTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        endpoint = new UnzipDataVisualisation();
+        endpoint = new DataVisualisationZip();
         zipResource = new Resource();
         ReflectionTestUtils.setField(endpoint, "zebedeeApiHelper", apiHelperMock);
     }
@@ -132,7 +132,7 @@ public class UnzipDataVisualisationTest {
 
     private static InputStream getZipInputStream() throws Exception {
         try {
-            return UnzipDataVisualisationTest.class.getResourceAsStream(ZIP_PATH);
+            return DataVisualisationZipTest.class.getResourceAsStream(ZIP_PATH);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;

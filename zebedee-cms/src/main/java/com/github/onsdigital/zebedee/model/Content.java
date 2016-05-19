@@ -20,8 +20,12 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class Content {
+
     public static final String REDIRECT = "redirect.txt";
+    public static final String DATA_VIS_DIR = "visualisations";
+
     public final Path path;
+    public final Path dataVisualisationsPath;
 
     public RedirectTablePartialMatch redirect = null;
 
@@ -30,6 +34,12 @@ public class Content {
         if (!Files.exists(path)) {
             throw new IllegalArgumentException("Path does not exist: "
                     + path.toAbsolutePath());
+        }
+
+        this.dataVisualisationsPath = this.path.resolve(DATA_VIS_DIR);
+        if (!Files.exists(path)) {
+            throw new IllegalArgumentException("Path does not exist: "
+                    + dataVisualisationsPath.toAbsolutePath());
         }
     }
 
@@ -199,12 +209,11 @@ public class Content {
      * @return
      * @throws IOException
      */
-    public ContentDetail nestedDetails() throws IOException {
-        return nestedDetails(this.path);
+    public ContentDetail nestedDetails(CollectionOwner collectionOwner) throws IOException {
+        return nestedDetails(path, collectionOwner);
     }
 
-    private ContentDetail nestedDetails(Path path) throws IOException {
-
+    private ContentDetail nestedDetails(Path path, CollectionOwner collectionOwner) throws IOException {
         ContentDetail detail = details(path.resolve("data.json"));
 
         // if the folder is empty put in an empty node with just a name.
@@ -218,9 +227,20 @@ public class Content {
 
         // todo: remove timeseries filter once we are caching the browse tree.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            boolean fileFilterCondition;
             for (Path entry : stream) {
-                if (Files.isDirectory(entry) && isNotTimeseries(entry) && isNotPreviousVersions(entry)) {
-                    ContentDetail child = nestedDetails(entry);
+                switch (collectionOwner) {
+                    case DATA_VISUALISATION:
+                        fileFilterCondition = Files.isDirectory(entry) && entry.getFileName().toString().equalsIgnoreCase("visualisations")
+                                && isNotTimeseries(entry) && isNotPreviousVersions(entry);
+                        break;
+                    default: // PUBLISHING_SUPPORT:
+                        fileFilterCondition = Files.isDirectory(entry) && isNotTimeseries(entry) && isNotPreviousVersions(entry);
+                        break;
+                }
+
+                if (fileFilterCondition) {
+                    ContentDetail child = nestedDetails(entry, collectionOwner);
                     if (child != null) {
                         detail.children.add(child);
                     }
@@ -235,15 +255,12 @@ public class Content {
                     if ((o1.description == null || o1.description.title == null) && (o2.description == null || o2.description.title == null)) {
                         return 0; // if both are null
                     }
-
                     if (o1.description == null || o1.description.title == null) {
                         return 1;//nulls last
                     }
-
                     if (o2.description == null || o2.description.title == null) {
                         return -1;
                     }
-
                     return o1.description.title.compareTo(o2.description.title);
                 });
             }

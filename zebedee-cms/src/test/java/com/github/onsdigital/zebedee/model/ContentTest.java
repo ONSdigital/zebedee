@@ -122,7 +122,7 @@ public class ContentTest {
         Content content = new Content(basePath);
 
         // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails();
+        ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);
 
         // Then the result has child nodes defined.
         assertNotNull(root);
@@ -138,7 +138,7 @@ public class ContentTest {
         Content content = new Content(basePath);
 
         // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails();
+        ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);
 
         // Then the result has child nodes ordered alphabetically
         assertNotNull(root);
@@ -157,7 +157,7 @@ public class ContentTest {
         Content content = new Content(basePath);
 
         // When the nestedDetails method is called
-        ContentDetail root = content.nestedDetails();
+        ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);
 
         // Then a directory with no data.json file will still be evaluated but only the name returned without the URI.
         ContentDetail bulletinDirectoryDetails = root.children.get(0).children.get(0);

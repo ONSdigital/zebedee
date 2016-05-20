@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Future;
@@ -567,10 +568,15 @@ public class Collections {
 
         // Go ahead
         boolean deleted;
-        if (Files.isDirectory(path)) {
-            deleted = collection.deleteContent(session.email, uri);
+
+        if (collection.description.collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
+            deleted = collection.deleteDataVisContent(session.email, Paths.get(uri));
         } else {
-            deleted = collection.deleteFile(uri);
+            if (Files.isDirectory(path)) {
+                deleted = collection.deleteContent(session.email, uri);
+            } else {
+                deleted = collection.deleteFile(uri);
+            }
         }
 
         collection.save();

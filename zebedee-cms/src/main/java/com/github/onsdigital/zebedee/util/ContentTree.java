@@ -28,24 +28,17 @@ public class ContentTree {
      * @return
      * @throws IOException
      */
-
-/*    public static ContentDetail get() throws IOException {
-        if (publishedContentTree == null) {
-            synchronized (ContentTree.class) {
-                if (publishedContentTree == null) {
-                    publishedContentTree = Root.zebedee.published.nestedDetails();
-                }
-            }
-        }
-        return publishedContentTree;
-    }*/
-
     public static ContentDetail get(CollectionOwner collectionOwner) throws IOException {
         ContentDetail contentTree = getContentTree(collectionOwner);
         if (contentTree == null) {
             synchronized (ContentTree.class) {
                 if (contentTree == null) {
                     contentTree = Root.zebedee.published.nestedDetails(collectionOwner);
+                    if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
+                        publishedDataVisualisationsTree = contentTree;
+                    } else {
+                        publishedContentTree = contentTree;
+                    }
                 }
             }
         }

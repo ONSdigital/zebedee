@@ -229,14 +229,13 @@ public class Content {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             boolean fileFilterCondition;
             for (Path entry : stream) {
-                switch (collectionOwner) {
-                    case DATA_VISUALISATION:
-                        fileFilterCondition = Files.isDirectory(entry) && entry.getFileName().toString().equalsIgnoreCase("visualisations")
-                                && isNotTimeseries(entry) && isNotPreviousVersions(entry);
-                        break;
-                    default: // PUBLISHING_SUPPORT:
-                        fileFilterCondition = Files.isDirectory(entry) && isNotTimeseries(entry) && isNotPreviousVersions(entry);
-                        break;
+
+                if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
+                    fileFilterCondition = Files.isDirectory(entry) && entry.getFileName().toString().equalsIgnoreCase("visualisations")
+                            && isNotTimeseries(entry) && isNotPreviousVersions(entry);
+                } else {
+                    // PUBLISHING SUPPORT
+                    fileFilterCondition = Files.isDirectory(entry) && isNotTimeseries(entry) && isNotPreviousVersions(entry);
                 }
 
                 if (fileFilterCondition) {

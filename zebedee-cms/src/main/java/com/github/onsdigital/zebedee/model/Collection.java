@@ -1040,5 +1040,9 @@ public class Collection {
         FileUtils.moveFile(fromFile, toFile);
         return true;
     }
+
+    public Content getInProgress() {
+        return inProgress;
+    }
 }
 

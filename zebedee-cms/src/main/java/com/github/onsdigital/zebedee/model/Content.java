@@ -43,6 +43,10 @@ public class Content {
         }
     }
 
+    public Path getPath() {
+        return this.path;
+    }
+
     private static boolean isDirEmpty(final Path directory) throws IOException {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
             return !dirStream.iterator().hasNext();

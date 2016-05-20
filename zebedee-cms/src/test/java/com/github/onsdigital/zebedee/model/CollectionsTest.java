@@ -32,6 +32,7 @@ import static org.mockito.Mockito.*;
 
 public class CollectionsTest {
 
+    private static final boolean recursive = false;
     Zebedee zebedee;
     Builder builder;
     Session session;
@@ -159,7 +160,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to complete
-        zebedee.collections.complete(collection, uri, session);
+        zebedee.collections.complete(collection, uri, session, recursive);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -201,7 +202,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream);
+                inputStream, recursive);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -323,7 +324,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to complete
-        zebedee.collections.complete(collection, uri, session);
+        zebedee.collections.complete(collection, uri, session, recursive);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -364,7 +365,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream);
+                inputStream, recursive);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -421,7 +422,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream);
+                inputStream, recursive);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -459,7 +460,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.complete(collection, uri, session);
+        zebedee.collections.complete(collection, uri, session, recursive);
 
         // Then
         // We should get the expected exception
@@ -479,7 +480,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.complete(collection, uri, session);
+        zebedee.collections.complete(collection, uri, session, recursive);
 
         // Then
         // We should get the expected exception
@@ -499,7 +500,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.complete(collection, uri, session);
+        zebedee.collections.complete(collection, uri, session, recursive);
 
         // Then
         assertTrue(collection.isComplete(uri));
@@ -534,7 +535,7 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         assertTrue(collection.create(builder.publisher1.email, uri));
-        assertTrue(collection.complete(builder.publisher1.email, uri));
+        assertTrue(collection.complete(builder.publisher1.email, uri, recursive));
 
         // When
         // We attempt to approve
@@ -789,7 +790,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
 
         // Then
         // We should get the expected exception
@@ -812,7 +813,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
 
         // Then
         // We should get the expected exception
@@ -834,14 +835,14 @@ public class CollectionsTest {
         Files.createFile(path);
 
         FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), otherCollection.description.id);
-        assertTrue(otherCollection.edit(builder.publisher1.email, uri, collectionWriter));
+        assertTrue(otherCollection.edit(builder.publisher1.email, uri, collectionWriter, recursive));
 
         HttpServletRequest request = null;
         InputStream inputStream = null;
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
 
         // Then
         // We should get the expected exception
@@ -863,7 +864,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
 
         // Then
         // We should see the file
@@ -1016,7 +1017,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
 
         // Then
         // We should see the file

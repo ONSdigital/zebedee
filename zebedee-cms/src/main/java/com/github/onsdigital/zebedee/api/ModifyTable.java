@@ -112,13 +112,14 @@ public class ModifyTable {
             String newXlsFilename = Paths.get(newUri + XLS_FILE_EXT).getFileName().toString();
             String currentXlsFilename = Paths.get(currentUri + XLS_FILE_EXT).getFileName().toString();
 
+            boolean recursive = false;
             if (!StringUtils.equals(newXlsFilename, currentXlsFilename)) {
                 Root.zebedee.collections.writeContent(collection, newUri + XLS_FILE_EXT, session, request,
-                        currentXlsResource.getData());
+                        currentXlsResource.getData(), recursive);
             }
 
-            Root.zebedee.collections.writeContent(collection, newUri + HTML_FILE_EXT, session, request, htmlInputStream);
-            Root.zebedee.collections.writeContent(collection, newUri + JSON_FILE_EXT, session, request, jsonInputStream);
+            Root.zebedee.collections.writeContent(collection, newUri + HTML_FILE_EXT, session, request, htmlInputStream, recursive);
+            Root.zebedee.collections.writeContent(collection, newUri + JSON_FILE_EXT, session, request, jsonInputStream, recursive);
         } catch (Exception ex) {
             throw new TableBuilderException(UNEXPECTED_ERROR, ex.getMessage());
         }

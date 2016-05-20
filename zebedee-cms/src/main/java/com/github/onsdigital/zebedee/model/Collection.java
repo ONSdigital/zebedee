@@ -4,24 +4,10 @@ import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.approval.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -33,21 +19,11 @@ import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -506,13 +482,14 @@ public class Collection {
 
     /**
      * @param uri The path you would like to edit.
+     * @param recursive
      * @return True if the path was added to {@link #inProgress}. If the path is
      * already present in the {@link Collection}, another
      * {@link Collection} is editing this path or this path already
      * exists in the published content, false.
      * @throws IOException If a filesystem error occurs.
      */
-    public boolean edit(String email, String uri, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+    public boolean edit(String email, String uri, CollectionWriter collectionWriter, Boolean recursive) throws IOException, BadRequestException {
         boolean result = false;
 
         if (isInProgress(uri))
@@ -531,7 +508,13 @@ public class Collection {
             // Copy to in progress:
             if (this.isInCollection(uri)) {
                 Path destination = inProgress.toPath(uri);
-                PathUtils.moveFilesInDirectory(source, destination);
+
+                if (recursive) {
+                    FileUtils.deleteDirectory(destination.getParent().toFile());
+                    FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
+                } else {
+                    PathUtils.moveFilesInDirectory(source, destination);
+                }
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
                     collectionWriter.getInProgress().write(inputStream, uri);
@@ -545,15 +528,20 @@ public class Collection {
         return result;
     }
 
+    public boolean edit(String email, String uri, CollectionWriter collectionWriter) throws IOException, BadRequestException {
+        return edit(email, uri, collectionWriter, false);
+    }
+
     /**
      * @param email The reviewing user's email.
      * @param uri   The path you would like to review.
+     * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
      * @throws IOException If a filesystem error occurs.
      */
 
-    public boolean complete(String email, String uri) throws IOException {
+    public boolean complete(String email, String uri, boolean recursive) throws IOException {
         boolean result = false;
         boolean permission = zebedee.permissions.canEdit(email);
 
@@ -562,7 +550,12 @@ public class Collection {
             Path source = inProgress.get(uri);
             Path destination = complete.toPath(uri);
 
-            moveContent(source, destination);
+            if (recursive) {
+                FileUtils.deleteDirectory(destination.getParent().toFile());
+                FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
+            } else {
+                PathUtils.moveFilesInDirectory(source, destination);
+            }
 
             addEvent(uri, new Event(new Date(), EventType.COMPLETED, email));
             result = true;
@@ -572,40 +565,17 @@ public class Collection {
     }
 
     /**
-     * Moves content from one directory to another. Typically this involves moving all files (not sub directories),
-     * but it can move the entire directory for specific page types if required.
-     * @param source
-     * @param destination
-     * @throws IOException
-     */
-    private void moveContent(Path source, Path destination) throws IOException {
-        PageType pageType = null;
-        try (InputStream inputStream = Files.newInputStream(source)){
-            Page page = ContentUtil.deserialiseContent(inputStream);
-            pageType = page.getType();
-        } catch (Exception e) {
-            // if there is  an issue deserialising the content, do not set the page type
-        }
-
-        if (pageType != null && pageType.equals(pageType.visualisation)) {
-            // for visualisations move the whole directory including sub directories.
-            FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
-        } else {
-            PathUtils.moveFilesInDirectory(source, destination);
-        }
-    }
-
-    /**
      * Set the given uri to reviewed in this collection.
      *
      * @param session The user session attempting to review
      * @param uri     The path you would like to review.
+     * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
      * @throws UnauthorizedException if user
      * @throws IOException           If a filesystem error occurs.
      */
-    public boolean review(Session session, String uri) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    public boolean review(Session session, String uri, boolean recursive) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
         if (session == null) {
             throw new UnauthorizedException("Insufficient permissions");
         }
@@ -652,7 +622,12 @@ public class Collection {
 
             Path destination = reviewed.toPath(uri);
 
-            moveContent(source, destination);
+            if (recursive) {
+                FileUtils.deleteDirectory(destination.getParent().toFile());
+                FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
+            } else {
+                PathUtils.moveFilesInDirectory(source, destination);
+            }
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
             result = true;
@@ -864,7 +839,7 @@ public class Collection {
 
         // add the release page to the collection in progress
         if (!isInCollection(uri)) {
-            this.edit(email, uri, collectionWriter);
+            this.edit(email, uri, collectionWriter, false);
         }
 
         release.getDescription().setPublished(true);

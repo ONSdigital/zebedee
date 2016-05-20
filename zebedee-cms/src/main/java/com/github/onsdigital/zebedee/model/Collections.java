@@ -5,12 +5,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -102,6 +97,7 @@ public class Collections {
      * @param collection
      * @param uri
      * @param session
+     * @param recursive
      * @throws IOException
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -109,7 +105,8 @@ public class Collections {
      */
     public void complete(
             Collection collection, String uri,
-            Session session
+            Session session,
+            boolean recursive
     ) throws IOException, NotFoundException,
             UnauthorizedException, BadRequestException {
 
@@ -135,7 +132,7 @@ public class Collections {
         }
 
         // Attempt to complete:
-        if (collection.complete(session.email, uri)) {
+        if (collection.complete(session.email, uri, recursive)) {
             collection.save();
         } else {
             throw new BadRequestException("URI was not completed.");
@@ -442,12 +439,13 @@ public class Collections {
             throw new ConflictException("This URI already exists");
         }
 
-        writeContent(collection, uri, session, request, requestBody);
+        writeContent(collection, uri, session, request, requestBody, false);
     }
 
     public void writeContent(
             Collection collection, String uri,
-            Session session, HttpServletRequest request, InputStream requestBody
+            Session session, HttpServletRequest request, InputStream requestBody,
+            Boolean recursive
     )
             throws IOException, BadRequestException, UnauthorizedException,
             ConflictException, NotFoundException, FileUploadException {
@@ -481,7 +479,7 @@ public class Collections {
             }
         } else {
             // edit the file
-            boolean result = collection.edit(session.email, uri, collectionWriter);
+            boolean result = collection.edit(session.email, uri, collectionWriter, recursive);
             if (!result) {
                 // file may be being edited in a different collection
                 throw new ConflictException(

@@ -37,6 +37,7 @@ import static org.junit.Assert.*;
 
 public class CollectionTest {
 
+    private static final boolean recursive = false;
     Zebedee zebedee;
     Collection collection;
     Builder builder;
@@ -464,7 +465,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
 
         // Then
         assertTrue(edited);
@@ -489,7 +490,7 @@ public class CollectionTest {
         builder.createCompleteFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
 
         // Then
         // It should be edited
@@ -514,7 +515,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
 
         // Then
         // It should be edited
@@ -538,7 +539,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
 
         // Then
         assertTrue(edited);
@@ -553,7 +554,7 @@ public class CollectionTest {
         builder.isBeingEditedElsewhere(uri, 0);
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
 
         // Then
         assertFalse(edited);
@@ -567,7 +568,7 @@ public class CollectionTest {
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
 
         // When
-        boolean edited = collection.edit(publisher1Email, uri, collectionWriter);
+        boolean edited = collection.edit(publisher1Email, uri, collectionWriter, recursive);
 
         // Then
         assertFalse(edited);
@@ -582,7 +583,7 @@ public class CollectionTest {
 
         // When
         // One of the digital publishing team reviews it
-        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri);
+        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri, recursive);
 
         // Then
         // The content should be reviewed and no longer located in "in progress"
@@ -603,7 +604,7 @@ public class CollectionTest {
 
         // When
         // the original content creator attempts to review the content
-        collection.review(builder.createSession(publisher1Email), uri);
+        collection.review(builder.createSession(publisher1Email), uri, recursive);
 
         // Then
         // expect an Unauthorized error
@@ -617,13 +618,13 @@ public class CollectionTest {
 
     private String CreateEditedContent() throws IOException, BadRequestException {
         String uri = CreatePublishedContent();
-        collection.edit(publisher1Email, uri, collectionWriter);
+        collection.edit(publisher1Email, uri, collectionWriter, recursive);
         return uri;
     }
 
     private String CreateCompleteContent() throws IOException, BadRequestException {
         String uri = CreateEditedContent();
-        collection.complete(publisher1Email, uri);
+        collection.complete(publisher1Email, uri, recursive);
         return uri;
     }
 
@@ -633,10 +634,10 @@ public class CollectionTest {
         // Given some content that has been edited by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
         builder.createPublishedFile(uri);
-        collection.edit(publisher1Email, uri, collectionWriter);
+        collection.edit(publisher1Email, uri, collectionWriter, recursive);
 
         // When - A reviewer edits reviews content
-        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri);
+        boolean reviewed = collection.review(builder.createSession(builder.publisher2), uri, recursive);
 
         // Then
         // Expect an error
@@ -652,7 +653,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean complete = collection.complete(publisher1Email, uri);
+        boolean complete = collection.complete(publisher1Email, uri, recursive);
 
         // Then
         assertTrue(complete);
@@ -672,7 +673,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean complete = collection.complete(publisher1Email, uri);
+        boolean complete = collection.complete(publisher1Email, uri, recursive);
 
         // Then
         assertTrue(complete);
@@ -694,7 +695,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean isComplete = collection.complete(publisher1Email, uri);
+        boolean isComplete = collection.complete(publisher1Email, uri, recursive);
 
         // Then
         assertFalse(isComplete);
@@ -709,7 +710,7 @@ public class CollectionTest {
         builder.createCompleteFile(uri);
 
         // When
-        boolean isComplete = collection.complete(publisher1Email, uri);
+        boolean isComplete = collection.complete(publisher1Email, uri, recursive);
 
         // Then
         assertFalse(isComplete);
@@ -724,7 +725,7 @@ public class CollectionTest {
         builder.createCompleteFile(uri);
 
         // When
-        boolean isComplete = collection.complete(publisher1Email, uri);
+        boolean isComplete = collection.complete(publisher1Email, uri, recursive);
 
         // Then
         assertFalse(isComplete);
@@ -740,7 +741,7 @@ public class CollectionTest {
 
         // When
         // An alternative publisher reviews the content
-        collection.review(builder.createSession(builder.publisher2), uri);
+        collection.review(builder.createSession(builder.publisher2), uri, recursive);
 
         // Then
         // Expect error
@@ -752,10 +753,10 @@ public class CollectionTest {
         // Given
         // Some content:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
-        collection.edit(publisher1Email, uri, collectionWriter);
+        collection.edit(publisher1Email, uri, collectionWriter, recursive);
 
         // When content is trying to be reviewed before being completed
-        boolean reviewed = collection.review(builder.createSession(publisher1Email), uri);
+        boolean reviewed = collection.review(builder.createSession(publisher1Email), uri, recursive);
 
         // Then the expected exception is thrown.
     }
@@ -1015,7 +1016,7 @@ public class CollectionTest {
         // There is a release already in progress
         String uri = String.format("/releases/%s", Random.id());
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
-        collection.edit(publisher1Email, uri + "/data.json", collectionWriter);
+        collection.edit(publisher1Email, uri + "/data.json", collectionWriter, recursive);
 
         // When we attempt to associate the collection with a release
         Release result = collection.associateWithRelease(publisher1Email, release, collectionWriter);
@@ -1056,8 +1057,8 @@ public class CollectionTest {
 
         String releaseJsonUri = uri + "/data.json";
 
-        collection.complete(builder.publisher1.email, releaseJsonUri);
-        collection.review(builder.createSession(builder.publisher2), releaseJsonUri);
+        collection.complete(builder.publisher1.email, releaseJsonUri, recursive);
+        collection.review(builder.createSession(builder.publisher2), releaseJsonUri, recursive);
 
         ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());
         FileUtils.write(collection.reviewed.path.resolve("some/uri/data.json").toFile(), Serialiser.serialise(articleDetail));

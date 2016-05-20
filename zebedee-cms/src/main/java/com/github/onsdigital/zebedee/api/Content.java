@@ -2,11 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -77,9 +73,10 @@ public class Content {
 
         String uri = request.getParameter("uri");
         Boolean overwriteExisting = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("overwriteExisting"), "true"));
+        Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
 
         if (overwriteExisting) {
-            Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody);
+            Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody, recursive);
             Audit.Event.CONTENT_OVERWRITTEN
                     .parameters()
                     .host(request)

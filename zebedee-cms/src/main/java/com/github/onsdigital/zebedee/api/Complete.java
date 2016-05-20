@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +40,9 @@ public class Complete {
         Session session = Root.zebedee.sessions.get(request);
         String uri = request.getParameter("uri");
 
-        Root.zebedee.collections.complete(collection, uri, session);
+        Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
+
+        Root.zebedee.collections.complete(collection, uri, session, recursive);
 
         Audit.Event.COLLECTION_MOVED_TO_REVIEWED
                 .parameters()

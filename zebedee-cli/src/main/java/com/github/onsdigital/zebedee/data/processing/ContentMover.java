@@ -48,29 +48,53 @@ public class ContentMover {
 
         String latestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
 
+        System.out.println("Searching collection content for links for fix...." + destination);
+        // do the same process for files in the collection in case they need links fixing
+        List<Path> collectionJsonFiles = new DataJsonFinder().findJsonFiles(destination);
+        Set<Path> collectionFilesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, collectionJsonFiles);
+        FixLinksAndWriteBackToCollection(sourceUri, destinationUri, collectionFilesToFixLinksIn);
+
         System.out.println("Searching master content for links for fix....");
         // identify pages in master content with links to fix - search source path for old URI
         List<Path> masterJsonFiles = new DataJsonFinder().findJsonFiles(source);
         Set<Path> filesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, masterJsonFiles);
         FixLinksAndWriteToDestination(source, destination, sourceUri, destinationUri, filesToFixLinksIn);
 
-        System.out.println("Searching collection content for links for fix...." + destination);
-        // do the same process for files in the collection in case they need links fixing
-        List<Path> collectionJsonFiles = new DataJsonFinder().findJsonFiles(destination);
-        Set<Path> collectionFilesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, collectionJsonFiles);
-        FixLinksAndWriteToDestination(source, destination, sourceUri, destinationUri, collectionFilesToFixLinksIn);
-
         // publish the collection...
         // run the delete commands on the web servers and reindex search on publishing and web
     }
 
+    private static void FixLinksAndWriteBackToCollection(String sourceUri, String destinationUri, Set<Path> collectionFilesToFixLinksIn) throws IOException {
+
+        String sourceLatestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
+        String destinationLatestUri = Paths.get(destinationUri).getParent().resolve("latest").toString();
+
+        for (Path path : collectionFilesToFixLinksIn) {
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            content = content.replaceAll(sourceUri, destinationUri);
+            content = content.replaceAll(sourceLatestUri, destinationLatestUri);
+            System.out.println("destinationFilePath = " + path);
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
     private static void FixLinksAndWriteToDestination(Path source, Path destination, String sourceUri, String destinationUri, Set<Path> filesToFixLinksIn) throws IOException {
+
+        String sourceLatestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
+        String destinationLatestUri = Paths.get(destinationUri).getParent().resolve("latest").toString();
+
         for (Path path : filesToFixLinksIn) {
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll(sourceUri, destinationUri);
+            content = content.replaceAll(sourceLatestUri, destinationLatestUri);
 
             Path destinationFilePath = destination.resolve(source.relativize(path));
             System.out.println("destinationFilePath = " + destinationFilePath);
+
+            Path parentDirectory = destinationFilePath.getParent();
+            if (!Files.exists(parentDirectory))
+                Files.createDirectories(parentDirectory);
+
             Files.write(destinationFilePath, content.getBytes(StandardCharsets.UTF_8));
         }
     }

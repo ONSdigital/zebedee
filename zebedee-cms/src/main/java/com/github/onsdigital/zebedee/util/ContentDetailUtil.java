@@ -12,7 +12,6 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -44,9 +43,8 @@ public class ContentDetailUtil {
                         String pageUri = resource.getUri().toString();
                         page.setUri(resolveUri(pageUri, page));
                         PageDescription description = page.getDescription();
-                    } catch (JsonSyntaxException e) {
+                    } catch (Exception e) {
                         logError(e, "Failed to deserialise json").addParameter("resourceUri", resource.getUri()).log();
-                        throw e;
                     }
                 }
 

@@ -4,6 +4,8 @@ import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -502,16 +504,6 @@ public class Collection {
         return result;
     }
 
-    public Path autocreateReviewedPath(String uri) throws IOException {
-        // Does this path already exist in the published area?
-        Path path = reviewed.get(uri);
-        if (path == null) {
-            path = reviewed.toPath(uri);
-            PathUtils.create(path);
-        }
-        return path;
-    }
-
     /**
      * @param uri The path you would like to edit.
      * @return True if the path was added to {@link #inProgress}. If the path is
@@ -569,13 +561,38 @@ public class Collection {
             // Move the in-progress copy to completed:
             Path source = inProgress.get(uri);
             Path destination = complete.toPath(uri);
-            PathUtils.moveFilesInDirectory(source, destination);
+
+            moveContent(source, destination);
 
             addEvent(uri, new Event(new Date(), EventType.COMPLETED, email));
             result = true;
         }
 
         return result;
+    }
+
+    /**
+     * Moves content from one directory to another. Typically this involves moving all files (not sub directories),
+     * but it can move the entire directory for specific page types if required.
+     * @param source
+     * @param destination
+     * @throws IOException
+     */
+    private void moveContent(Path source, Path destination) throws IOException {
+        PageType pageType = null;
+        try (InputStream inputStream = Files.newInputStream(source)){
+            Page page = ContentUtil.deserialiseContent(inputStream);
+            pageType = page.getType();
+        } catch (Exception e) {
+            // if there is  an issue deserialising the content, do not set the page type
+        }
+
+        if (pageType != null && pageType.equals(pageType.visualisation)) {
+            // for visualisations move the whole directory including sub directories.
+            FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
+        } else {
+            PathUtils.moveFilesInDirectory(source, destination);
+        }
     }
 
     /**
@@ -635,7 +652,7 @@ public class Collection {
 
             Path destination = reviewed.toPath(uri);
 
-            PathUtils.moveFilesInDirectory(source, destination);
+            moveContent(source, destination);
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
             result = true;

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.api.DataVisualisationZip;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.visualisation.Visualisation;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import org.apache.commons.io.FileUtils;
@@ -73,9 +74,13 @@ public class VisualisationImporter {
         String uri = "/visualisations/" + visualisationCode;
         visualisation.setUri(new URI(uri));
         System.out.println("uri = " + uri);
+        visualisation.setUid(visualisationCode);
+        visualisation.setDescription(new PageDescription());
+        visualisation.getDescription().setTitle(visualisationCode);
+
 
         // read all HTML pages in the directory and populate json
-        visualisation.setFilenames(DataVisualisationZip.extractHtmlFilenames.apply(destinationPath, destinationRoot));
+        visualisation.setFilenames(DataVisualisationZip.extractHtmlFilenames.apply(destinationPath, destinationContent));
 
         // persist the json file
         FileUtils.write(new File(outputJsonPath), ContentUtil.serialise(visualisation));

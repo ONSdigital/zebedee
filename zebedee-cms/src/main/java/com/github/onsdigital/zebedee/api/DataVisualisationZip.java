@@ -72,7 +72,7 @@ public class DataVisualisationZip {
     public static BiFunction<Path, Path, Set<String>> extractHtmlFilenames = (zipEntries, contentRoot) ->
             FileUtils.listFiles(zipEntries.toFile(), htmlFileFilter, TrueFileFilter.TRUE)
                     .stream()
-                    .map(file -> file.getPath().split(contentRoot.toString())[1])
+                    .map(file -> zipEntries.relativize(file.toPath()).toString())
                     .collect(Collectors.toSet());
 
     /**
@@ -176,9 +176,9 @@ public class DataVisualisationZip {
             Visualisation pageJson = (Visualisation) collectionReader.getContent(dataJsonPath);
 
             Path zipEntries = Paths.get(collection.getInProgress().getPath().toString() + zipPath.getParent().toString());
-            Path contentRoot = zipPath.getParent();
+            //Path contentRoot = zipPath.getParent();
 
-            pageJson.setFilenames(extractHtmlFilenames.apply(zipEntries, contentRoot));
+            pageJson.setFilenames(extractHtmlFilenames.apply(zipEntries, zipPath));
 
             collectionWriter.getInProgress().writeObject(pageJson, dataJsonPath + "/data.json");
 

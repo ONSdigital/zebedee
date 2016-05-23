@@ -44,10 +44,6 @@ public class Content {
         }
     }
 
-    public Path getPath() {
-        return this.path;
-    }
-
     private static boolean isDirEmpty(final Path directory) throws IOException {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
             return !dirStream.iterator().hasNext();
@@ -59,7 +55,7 @@ public class Content {
     }
 
     private static boolean isNotDataVisualisation(Path p) {
-        return !p.getFileName().toString().contains(DATA_VIS_DIR);
+        return !p.toString().contains(DATA_VIS_DIR);
     }
 
     private static boolean isDataVisualisation(Path p) {
@@ -87,6 +83,10 @@ public class Content {
         }
 
         return result;
+    }
+
+    public Path getPath() {
+        return this.path;
     }
 
     boolean exists(URI uri) {

@@ -23,6 +23,7 @@ public class Content {
 
     public static final String REDIRECT = "redirect.txt";
     public static final String DATA_VIS_DIR = "visualisations";
+    public static final String TIME_SERIES_KEYWORD = "timeseries";
 
     public final Path path;
     public final Path dataVisualisationsPath;
@@ -54,7 +55,15 @@ public class Content {
     }
 
     private static boolean isNotTimeseries(Path p) {
-        return !p.getFileName().toString().contains("timeseries");
+        return !p.getFileName().toString().contains(TIME_SERIES_KEYWORD);
+    }
+
+    private static boolean isNotDataVisualisation(Path p) {
+        return !p.getFileName().toString().contains(DATA_VIS_DIR);
+    }
+
+    private static boolean isDataVisualisation(Path p) {
+        return !isNotDataVisualisation(p);
     }
 
     private static boolean isNotPreviousVersions(Path p) {
@@ -67,7 +76,7 @@ public class Content {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
             for (Path entry : stream) {
                 if (Files.isDirectory(entry)) {
-                    if (entry.getFileName().toString().equals("timeseries")) {
+                    if (entry.getFileName().toString().equals(TIME_SERIES_KEYWORD)) {
                         result.add(entry);
                         return result;
                     }
@@ -231,18 +240,8 @@ public class Content {
 
         // todo: remove timeseries filter once we are caching the browse tree.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-            boolean fileFilterCondition;
             for (Path entry : stream) {
-
-                if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
-                    fileFilterCondition = Files.isDirectory(entry) && entry.getFileName().toString().equalsIgnoreCase("visualisations")
-                            && isNotTimeseries(entry) && isNotPreviousVersions(entry);
-                } else {
-                    // PUBLISHING SUPPORT
-                    fileFilterCondition = Files.isDirectory(entry) && isNotTimeseries(entry) && isNotPreviousVersions(entry);
-                }
-
-                if (fileFilterCondition) {
+                if (isVisibleForCollectionOwner(collectionOwner, entry)) {
                     ContentDetail child = nestedDetails(entry, collectionOwner);
                     if (child != null) {
                         detail.children.add(child);
@@ -398,5 +397,20 @@ public class Content {
             return true;
         }
         return false;
+    }
+
+    private boolean isVisibleForCollectionOwner(CollectionOwner collectionOwner, Path entry) {
+        if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
+            return Files.isDirectory(entry)
+                    && isDataVisualisation(entry)
+                    && isNotTimeseries(entry)
+                    && isNotPreviousVersions(entry);
+        } else {
+            // PUBLISHING SUPPORT
+            return Files.isDirectory(entry)
+                    && isNotTimeseries(entry)
+                    && isNotPreviousVersions(entry)
+                    && isNotDataVisualisation(entry);
+        }
     }
 }

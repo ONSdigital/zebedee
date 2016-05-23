@@ -80,7 +80,7 @@ public class VisualisationImporter {
 
 
         // read all HTML pages in the directory and populate json
-        visualisation.setFilenames(DataVisualisationZip.extractHtmlFilenames.apply(destinationPath, destinationContent));
+        visualisation.setFilenames(DataVisualisationZip.extractHtmlFilenames.apply(destinationContent, destinationContent));
 
         // persist the json file
         FileUtils.write(new File(outputJsonPath), ContentUtil.serialise(visualisation));

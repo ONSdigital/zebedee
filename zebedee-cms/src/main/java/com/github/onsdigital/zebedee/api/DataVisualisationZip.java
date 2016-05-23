@@ -42,14 +42,12 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 @Api
 public class DataVisualisationZip {
 
-    private static ZebedeeApiHelper zebedeeApiHelper = ZebedeeApiHelper.getInstance();
-
     private static final String ZIP_PATH = "zipPath";
     private static final String COLLECTION_RES_ERROR_MSG = "Could not find the requested collection Resource";
     private static final String UNZIPPING_ERROR_MSG = "Error while trying to unzip Data Visualisation file";
     private static final String NO_ZIP_PATH_ERROR_MSG = "Please specify the zip file path.";
     private static final String HTML_EXT = ".html";
-
+    private static ZebedeeApiHelper zebedeeApiHelper = ZebedeeApiHelper.getInstance();
     /**
      * Custom {@link IOFileFilter} implementation for .html files.
      */
@@ -68,7 +66,7 @@ public class DataVisualisationZip {
         }
     };
 
-    private static BiFunction<Path, Path, Set<String>> extractHtmlFilenames = (zipEntries, contentRoot) ->
+    public static BiFunction<Path, Path, Set<String>> extractHtmlFilenames = (zipEntries, contentRoot) ->
             FileUtils.listFiles(zipEntries.toFile(), htmlFileFilter, TrueFileFilter.TRUE)
                     .stream()
                     .map(file -> file.getPath().split(contentRoot.toString())[1])
@@ -178,6 +176,4 @@ public class DataVisualisationZip {
                     .logAndThrow(UnexpectedErrorException.class);
         }
     }
-
-
 }

@@ -9,14 +9,19 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 public class PermissionsTest {
 
@@ -29,8 +34,12 @@ public class PermissionsTest {
     Team team;
     String viewerEmail;
 
+    @Mock
+    private ZebedeeApiHelper zebedeeApiHelper;
+
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         builder = new Builder();
         zebedee = new Zebedee(builder.zebedee, false);
         inflationCollection = new Collection(builder.collections.get(0), zebedee);
@@ -47,6 +56,12 @@ public class PermissionsTest {
         team = zebedee.teams.createTeam(this.getClass().getSimpleName() + "-team-" + Random.id(), session);
         viewerEmail = builder.reviewer1.email;
         zebedee.teams.addTeamMember(viewerEmail, team, session);
+
+
+        when(zebedeeApiHelper.getCollection(anyString()))
+                .thenReturn(inflationCollection);
+
+        KeyManager.setZebedeeHelper(zebedeeApiHelper);
     }
 
     @After

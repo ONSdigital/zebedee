@@ -252,11 +252,7 @@ public class Permissions {
         writeAccessMapping(accessMapping);
 
         // Update keyring (assuming this is not the system initialisation)
-        User user = zebedee.users.get(email);
-        if (session != null && user.keyring != null) {
-            KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session));
-            zebedee.users.updateKeyring(user);
-        }
+        updateKeyring(session, email, PUBLISHING_SUPPORT);
     }
 
 
@@ -515,6 +511,9 @@ public class Permissions {
             }
             accessMapping.dataVisualisationPublishers.add(standardise(email));
             writeAccessMapping(accessMapping);
+
+            // Update keyring (assuming this is not the system initialisation)
+            updateKeyring(session, email, DATA_VISUALISATION);
         } catch (IOException e) {
             logError(e, "Error while attempting to add Data Vis publisher permission.")
                     .user(session.email)
@@ -542,8 +541,27 @@ public class Permissions {
         return getUserCollectionGroup(session.email);
     }
 
-    // TODO rename this to something that makes more sense.
     public CollectionOwner getUserCollectionGroup(String email) throws IOException {
         return isDataVisPublisher(email) ? DATA_VISUALISATION : PUBLISHING_SUPPORT;
+    }
+
+    /**
+     * Add the necessary keyrings to the user.
+     *
+     * @param session         The session of the user who is adding the new user.
+     * @param email           the email of the new user.
+     * @param collectionOwner {@link CollectionOwner#PUBLISHING_SUPPORT} for PST users
+     *                        or {@link CollectionOwner#DATA_VISUALISATION} for data vis users.
+     * @throws IOException
+     * @throws NotFoundException
+     * @throws BadRequestException
+     */
+    private void updateKeyring(Session session, String email, CollectionOwner collectionOwner)
+            throws IOException, NotFoundException, BadRequestException {
+        User user = zebedee.users.get(email);
+        if (session != null && user.keyring != null) {
+            KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session), collectionOwner);
+            zebedee.users.updateKeyring(user);
+        }
     }
 }

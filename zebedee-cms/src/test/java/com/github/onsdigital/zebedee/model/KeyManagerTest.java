@@ -9,15 +9,24 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by thomasridd on 18/11/15.
@@ -26,10 +35,15 @@ public class KeyManagerTest {
     Zebedee zebedee;
     Builder builder;
 
+    @Mock
+    private ZebedeeApiHelper zebedeeHelperMock;
+
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         builder = new Builder();
         zebedee = new Zebedee(builder.zebedee, false);
+        KeyManager.setZebedeeHelper(zebedeeHelperMock);
     }
 
     @After
@@ -190,7 +204,7 @@ public class KeyManagerTest {
 
         // Then
         // A can unlock their keyring with the new password and not the old
-        User reloaded =  zebedee.users.get(builder.publisher1.email);
+        User reloaded = zebedee.users.get(builder.publisher1.email);
         assertTrue(reloaded.keyring.unlock(credentials.password));
         assertFalse(reloaded.keyring.unlock(oldPassword));
     }
@@ -221,7 +235,9 @@ public class KeyManagerTest {
         // Given
         // An administrator and a collection
         Session sessionA = zebedee.openSession(builder.administratorCredentials);
-        publishCollection(sessionA);
+        CollectionDescription collectionDescription = new CollectionDescription();
+        collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
+        Collection collection = Collection.create(collectionDescription, zebedee, sessionA);
         assertEquals(1, zebedee.users.get(builder.administrator.email).keyring().size());
 
         // When
@@ -236,6 +252,8 @@ public class KeyManagerTest {
         credentials.email = test.email;
         credentials.password = "password";
         zebedee.users.setPassword(sessionA, credentials);
+        when(zebedeeHelperMock.getCollection(anyString()))
+                .thenReturn(collection);
 
         zebedee.permissions.addEditor(test.email, sessionA);
 

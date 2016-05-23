@@ -4,18 +4,27 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
+import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
  * Created by thomasridd on 18/11/15.
  */
 public class KeyManager {
+
+    private static ZebedeeApiHelper ZEBEDEE_HELPER = ZebedeeApiHelper.getInstance();
 
     /**
      * Distributes an encryption key to all users
@@ -163,8 +172,22 @@ public class KeyManager {
      * @throws BadRequestException
      * @throws IOException
      */
-    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring) throws NotFoundException, BadRequestException, IOException {
-        Set<String> collectionIds = sourceKeyring.list();
+    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring, CollectionOwner collectionOwner)
+            throws NotFoundException, BadRequestException, IOException {
+        Set<String> collectionIds = new HashSet<>();
+
+        sourceKeyring.list()
+                .stream()
+                .forEach(collectionId -> {
+                    if (StringUtils.equals(collectionId, CsdbImporter.APPLICATION_KEY_ID)) {
+                        // csdb-import is a special case always add this.
+                        collectionIds.add(collectionId);
+                    } else {
+                        if (getCollection(collectionId).description.collectionOwner.equals(collectionOwner)) {
+                            collectionIds.add(collectionId);
+                        }
+                    }
+                });
         transferKeyring(targetKeyring, sourceKeyring, collectionIds);
     }
 
@@ -172,5 +195,18 @@ public class KeyManager {
         if (zebedee.permissions.isAdministrator(user.email)
                 || zebedee.permissions.canView(user, collection.description)) return true;
         return false;
+    }
+
+    private static Collection getCollection(String id) {
+        try {
+            return ZEBEDEE_HELPER.getCollection(id);
+        } catch (ZebedeeException e) {
+            logError(e, "failed to get collection").addParameter("collectionId", id).log();
+            throw new RuntimeException("failed to get collection with collectionId " + id, e);
+        }
+    }
+
+    public static void setZebedeeHelper(ZebedeeApiHelper helper) {
+        ZEBEDEE_HELPER = helper;
     }
 }

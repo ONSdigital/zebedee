@@ -90,6 +90,15 @@ public class ZebedeeApiHelper {
         return null;
     }
 
+    public Collection getCollection(String collectionId) throws ZebedeeException {
+        try {
+            return Root.zebedee.collections.getCollection(collectionId);
+        } catch (IOException e) {
+            logError(e, COLLECTION_NOT_FOUND_MSG).logAndThrow(NotFoundException.class);
+        }
+        return null;
+    }
+
     public CollectionOwner getPublisherType(String email) throws ZebedeeException {
         try {
             return Root.zebedee.permissions.getUserCollectionGroup(email);

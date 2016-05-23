@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.content.page.visualisation.Visualisation;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.model.SimpleResponse;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
@@ -16,6 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,6 +30,8 @@ import java.util.function.BinaryOperator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -140,7 +144,7 @@ public class DataVisualisationZipTest {
         zipResource.setData(getZipInputStream());
 
         // Run the test.
-        endpoint.unpackDataVisualizationZip(mockRequest, mockResponse);
+        SimpleResponse response = endpoint.unpackDataVisualizationZip(mockRequest, mockResponse);
 
         // Verify
         verify(mockCollectionWriter, times(2)).getInProgress();
@@ -150,12 +154,8 @@ public class DataVisualisationZipTest {
         verify(mockCollectionReader, times(1)).getResource(ZIP_PATH);
         verify(apiHelperMock, times(1)).getZebedeeCollectionWriter(mockCollection, mockSession);
 
-        //TODO work out what the hell this should be and uncomment it.
-/*        verify(mockContentWriter, times(expectedZipContent.size())).write(any(ZipInputStream.class), anyString());
-
-        for (String zipEntryName : expectedZipContent) {
-            verify(mockContentWriter, times(1)).write(any(ZipInputStream.class), eq(zipEntryName));
-        }*/
+        assertThat(response.getMessage(), is("Visualisation zip unpacked successfully"));
+        assertThat(response.getStatusCode(), is(Response.Status.CREATED.getStatusCode()));
     }
 
     private static InputStream getZipInputStream() throws Exception {

@@ -10,11 +10,11 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.model.SimpleResponse;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.StringUtils;
@@ -28,8 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -50,7 +48,12 @@ public class DataVisualisationZip {
     private static final String UNZIPPING_ERROR_MSG = "Error while trying to unzip Data Visualisation file";
     private static final String NO_ZIP_PATH_ERROR_MSG = "Please specify the zip file path.";
     private static final String HTML_EXT = ".html";
+    private static final String UNPACK_ZIP_SUCCESS_MSG = "Visualisation zip unpacked successfully";
+    private static final String DATA_VIS_DELETED_SUCCESS_MSG = "The requested data visualisation was deleted";
+    private static final String NO_DATA_VIS_TO_DELETE_MSG = "The specified data visualisation was not deleted as it did not exist";
+
     private static ZebedeeApiHelper zebedeeApiHelper = ZebedeeApiHelper.getInstance();
+
     /**
      * Custom {@link IOFileFilter} implementation for .html files.
      */
@@ -79,7 +82,7 @@ public class DataVisualisationZip {
      * Delete Data Vis content and zip file if it exists in the specified collection.
      */
     @DELETE
-    public void deleteZipAndContent(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
+    public SimpleResponse deleteZipAndContent(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
         String zipPath = request.getParameter(ZIP_PATH);
 
         if (StringUtils.isEmpty(zipPath)) {
@@ -91,17 +94,21 @@ public class DataVisualisationZip {
         Session session = zebedeeApiHelper.getSession(request);
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeApiHelper.getCollection(request);
 
+        boolean fileDeleted = false;
         try {
-            collection.deleteDataVisContent(session.email, Paths.get(zipPath));
+            fileDeleted = collection.deleteDataVisContent(session.email, Paths.get(zipPath));
         } catch (IOException e) {
             logError(e, "Unexpected error while attempting to delete existing data vis zip content.")
                     .path(zipPath)
                     .logAndThrow(UnexpectedErrorException.class);
         }
+
+        String message = fileDeleted ? DATA_VIS_DELETED_SUCCESS_MSG : NO_DATA_VIS_TO_DELETE_MSG;
+        return new SimpleResponse(message, Response.Status.OK);
     }
 
     @POST
-    public void unpackDataVisualizationZip(HttpServletRequest request, HttpServletResponse response)
+    public SimpleResponse unpackDataVisualizationZip(HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException {
         String zipPath = request.getParameter(ZIP_PATH);
 
@@ -126,16 +133,7 @@ public class DataVisualisationZip {
 
         unzipContent(collectionWriter.getInProgress(), zipRes, zipPath);
         updatePageJson(collection, collectionReader, collectionWriter, Paths.get(zipPath), session);
-
-        //TODO Dave to replace - from Crispin
-        try {
-            Map<String, String> successResponse = new HashMap<>();
-            successResponse.put("success", "true");
-
-            IOUtils.copy(zebedeeApiHelper.objectAsInputStream(successResponse), response.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return new SimpleResponse(UNPACK_ZIP_SUCCESS_MSG, Response.Status.CREATED);
     }
 
     /**

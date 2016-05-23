@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.util;
 
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -11,6 +10,7 @@ import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;

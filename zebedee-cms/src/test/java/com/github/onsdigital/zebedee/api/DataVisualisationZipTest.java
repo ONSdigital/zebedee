@@ -21,7 +21,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -40,7 +42,7 @@ public class DataVisualisationZipTest {
     private static final String ZIP_PATH = "/data-visualisation/dataVis.zip";
     private static final String ZIP_WRITE_PATH = "/data-visualisation/";
     private static List<String> expectedZipContent;
-    private static List<String> newFiles = Arrays.asList(new String[]{"index.html"});
+    private static Set<String> filenamesSet = new HashSet<>(Arrays.asList(new String[]{"index.html"}));
 
     private DataVisualisationZip endpoint;
 
@@ -72,7 +74,7 @@ public class DataVisualisationZipTest {
     private com.github.onsdigital.zebedee.model.Content mockContent;
 
     @Mock
-    private BinaryOperator updateHtmlFilenames;
+    private BinaryOperator extractHtmlFilenames;
 
     private Resource zipResource;
     private Visualisation visualisation;
@@ -86,7 +88,7 @@ public class DataVisualisationZipTest {
         visualisation = new Visualisation();
         visualisation.setUid("1234657890");
         ReflectionTestUtils.setField(endpoint, "zebedeeApiHelper", apiHelperMock);
-        ReflectionTestUtils.setField(endpoint, "updateHtmlFilenames", updateHtmlFilenames);
+        ReflectionTestUtils.setField(endpoint, "extractHtmlFilenames", extractHtmlFilenames);
     }
 
     @BeforeClass
@@ -132,8 +134,8 @@ public class DataVisualisationZipTest {
                 .thenReturn(mockContent);
         when(mockContent.getPath())
                 .thenReturn(inProgressPath);
-        when(updateHtmlFilenames.apply(any(Path.class), any(Path.class)))
-                .thenReturn(newFiles);
+        when(extractHtmlFilenames.apply(any(Path.class), any(Path.class)))
+                .thenReturn(filenamesSet);
 
         zipResource.setData(getZipInputStream());
 

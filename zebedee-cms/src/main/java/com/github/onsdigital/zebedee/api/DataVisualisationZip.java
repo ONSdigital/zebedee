@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -68,11 +68,11 @@ public class DataVisualisationZip {
         }
     };
 
-    private static BiFunction<Path, Path, List<String>> updateHtmlFilenames = (zipEntries, contentRoot) ->
+    private static BiFunction<Path, Path, Set<String>> extractHtmlFilenames = (zipEntries, contentRoot) ->
             FileUtils.listFiles(zipEntries.toFile(), htmlFileFilter, TrueFileFilter.TRUE)
                     .stream()
                     .map(file -> file.getPath().split(contentRoot.toString())[1])
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
 
     /**
      * Delete Data Vis content and zip file if it exists in the specified collection.
@@ -167,9 +167,7 @@ public class DataVisualisationZip {
             Path zipEntries = Paths.get(collection.getInProgress().getPath().toString() + zipPath.getParent().toString());
             Path contentRoot = zipPath.getParent();
 
-            updateHtmlFilenames
-                    .apply(zipEntries, contentRoot)
-                    .forEach(zipRelativePath -> pageJson.addFilename(zipRelativePath));
+            pageJson.setFilenames(extractHtmlFilenames.apply(zipEntries, contentRoot));
 
             collectionWriter.getInProgress().writeObject(pageJson, dataJsonPath + "/data.json");
 

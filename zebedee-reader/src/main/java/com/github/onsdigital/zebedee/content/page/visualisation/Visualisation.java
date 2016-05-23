@@ -12,7 +12,7 @@ import java.util.Set;
 public class Visualisation extends Page {
 
     private String uid;
-    public String fileUri;
+    public String zipTitle;
     private Set<String> filenames;
     private String indexPage = null;
 
@@ -25,11 +25,11 @@ public class Visualisation extends Page {
     }
 
     public String getFileUri() {
-        return fileUri;
+        return zipTitle;
     }
 
     public void setFileUri(String fileUri) {
-        this.fileUri = fileUri;
+        this.zipTitle = fileUri;
     }
 
     public Set<String> getFilenames() {

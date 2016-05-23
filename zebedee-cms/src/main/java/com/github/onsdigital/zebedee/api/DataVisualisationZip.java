@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -123,6 +126,16 @@ public class DataVisualisationZip {
 
         unzipContent(collectionWriter.getInProgress(), zipRes, zipPath);
         updatePageJson(collection, collectionReader, collectionWriter, Paths.get(zipPath), session);
+
+        //TODO Dave to replace - from Crispin
+        try {
+            Map<String, String> successResponse = new HashMap<>();
+            successResponse.put("success", "true");
+
+            IOUtils.copy(zebedeeApiHelper.objectAsInputStream(successResponse), response.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -2,9 +2,8 @@ package com.github.onsdigital.zebedee.content.page.visualisation;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -15,6 +14,7 @@ public class Visualisation extends Page {
     private String uid;
     public String fileUri;
     private Set<String> filenames;
+    private String indexPage = null;
 
     public String getUid() {
         return uid;
@@ -38,15 +38,18 @@ public class Visualisation extends Page {
 
     public void setFilenames(Set<String> filenames) {
         this.filenames = filenames;
+
+        if (!this.filenames.isEmpty() && this.filenames.size() == 1) {
+            this.indexPage = new ArrayList<String>(filenames).get(0);
+        }
     }
 
-    public void addFilename(String filename) {
-        if (this.filenames == null) {
-            this.filenames = new HashSet<>();
-        }
-        if (StringUtils.isNotEmpty(filename)) {
-            filenames.add(filename);
-        }
+    public String getIndexPage() {
+        return indexPage;
+    }
+
+    public void setIndexPage(String indexPage) {
+        this.indexPage = indexPage;
     }
 
     @Override

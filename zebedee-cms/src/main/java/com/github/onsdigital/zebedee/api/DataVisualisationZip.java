@@ -150,6 +150,11 @@ public class DataVisualisationZip {
             while (zipEntry != null) {
                 filePath = zipDir.resolve(zipEntry.getName());
 
+                if (filePath.toString().contains("__MACOSX")) {
+                    zipEntry = zipInputStream.getNextEntry();
+                    continue;
+                }
+
                 if (!zipEntry.isDirectory()) {
                     contentWriter.write(zipInputStream, filePath.toString());
 

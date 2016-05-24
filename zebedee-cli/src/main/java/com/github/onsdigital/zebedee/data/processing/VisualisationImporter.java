@@ -71,9 +71,6 @@ public class VisualisationImporter {
 
         // create a json object with the directory name as the code and title
         Visualisation visualisation = new Visualisation();
-        String uri = "/visualisations/" + visualisationCode;
-        visualisation.setUri(new URI(uri));
-        System.out.println("uri = " + uri);
         visualisation.setUid(visualisationCode);
         visualisation.setDescription(new PageDescription());
         visualisation.getDescription().setTitle(visualisationCode);
@@ -81,6 +78,10 @@ public class VisualisationImporter {
 
         // read all HTML pages in the directory and populate json
         visualisation.setFilenames(DataVisualisationZip.extractHtmlFilenames.apply(destinationContent, destinationContent));
+
+        String uri = "/visualisations/" + visualisationCode + "/"; //+ visualisation.getIndexPage();
+        visualisation.setUri(new URI(uri));
+        System.out.println("uri = " + uri);
 
         // persist the json file
         FileUtils.write(new File(outputJsonPath), ContentUtil.serialise(visualisation));

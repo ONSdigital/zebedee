@@ -44,6 +44,10 @@ public class Visualisation extends Page {
         }
     }
 
+    public void setZipTitle(String zipTitle) {
+        this.zipTitle = zipTitle;
+    }
+
     public String getIndexPage() {
         return indexPage;
     }

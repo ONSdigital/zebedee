@@ -1,15 +1,17 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.onsdigital.zebedee.content.page.visualisation.Visualisation;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.model.SimpleResponse;
+import com.github.onsdigital.zebedee.model.SimpleZebedeeResponse;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -17,22 +19,22 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BinaryOperator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,9 +46,10 @@ public class DataVisualisationZipTest {
 
     private static final String ZIP_PATH_KEY = "zipPath";
     private static final String ZIP_PATH = "/data-visualisation/dataVis.zip";
-    private static final String ZIP_WRITE_PATH = "/data-visualisation/";
-    private static List<String> expectedZipContent;
-    private static Set<String> filenamesSet = new HashSet<>(Arrays.asList(new String[]{"index.html"}));
+    private static final String EXPECTED_PATH = "/data-visualisation/dataVis/unitTest.html";
+    private static final String TEST_EMAIL = "hodor@gameOfThrones.com";
+
+    private static Set<String> filenamesSet = new HashSet<>(Arrays.asList(new String[]{"unitTest.html"}));
 
     private DataVisualisationZip endpoint;
 
@@ -95,24 +98,6 @@ public class DataVisualisationZipTest {
         ReflectionTestUtils.setField(endpoint, "extractHtmlFilenames", extractHtmlFilenames);
     }
 
-    @BeforeClass
-    public static void setUpZipExpectations() {
-        expectedZipContent = new ArrayList<>();
-        try (ZipInputStream zipInputStream = new ZipInputStream(getZipInputStream())) {
-            ZipEntry zipEntry = zipInputStream.getNextEntry();
-            while (zipEntry != null) {
-                String name = ZIP_WRITE_PATH + zipEntry.getName();
-                if (zipEntry.isDirectory() && name.endsWith("/")) {
-                    name = name.substring(0, name.lastIndexOf("/"));
-                }
-                expectedZipContent.add(name);
-                zipEntry = zipInputStream.getNextEntry();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Happy path test case.
      */
@@ -144,7 +129,7 @@ public class DataVisualisationZipTest {
         zipResource.setData(getZipInputStream());
 
         // Run the test.
-        SimpleResponse response = endpoint.unpackDataVisualizationZip(mockRequest, mockResponse);
+        SimpleZebedeeResponse response = endpoint.unpackDataVisualizationZip(mockRequest, mockResponse);
 
         // Verify
         verify(mockCollectionWriter, times(2)).getInProgress();
@@ -153,9 +138,111 @@ public class DataVisualisationZipTest {
         verify(apiHelperMock, times(1)).getZebedeeCollectionReader(mockCollection, mockSession);
         verify(mockCollectionReader, times(1)).getResource(ZIP_PATH);
         verify(apiHelperMock, times(1)).getZebedeeCollectionWriter(mockCollection, mockSession);
+        verify(mockContentWriter, times(1)).writeObject(eq(visualisation), any());
+        verify(mockContentWriter, times(1)).write(any(InputStream.class), eq(EXPECTED_PATH));
+        verify(mockContentWriter, never()).write(any(InputStream.class), contains("__MACOSX"));
+        verify(mockContentWriter, never()).write(any(InputStream.class), contains(".DS_Store"));
 
-        assertThat(response.getMessage(), is("Visualisation zip unpacked successfully"));
-        assertThat(response.getStatusCode(), is(Response.Status.CREATED.getStatusCode()));
+        assertThat(response, is(equalTo(DataVisualisationZip.unzipSuccessResponse)));
+    }
+
+    /**
+     * Happy path test case for {@link DataVisualisationZip#deleteZipAndContent(HttpServletRequest, HttpServletResponse)}.
+     */
+    @Test
+    public void shouldDeleteZipAndContent() throws Exception {
+        Session session = new Session();
+        session.email = TEST_EMAIL;
+
+        when(mockRequest.getParameter(ZIP_PATH_KEY))
+                .thenReturn(ZIP_PATH);
+        when(apiHelperMock.getSession(mockRequest))
+                .thenReturn(session);
+        when(apiHelperMock.getCollection(mockRequest))
+                .thenReturn(mockCollection);
+
+        assertThat(endpoint.deleteZipAndContent(mockRequest, mockResponse),
+                is(equalTo(DataVisualisationZip.deleteContentSuccessResponse)));
+
+        verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
+        verify(apiHelperMock, times(1)).getCollection(mockRequest);
+        verify(mockCollection, times(1)).deleteDataVisContent(session.email, Paths.get(ZIP_PATH));
+    }
+
+    /**
+     * Test verifies behaviour for cases where no zipPath parameter is provided.
+     *
+     * @throws Exception expected.
+     */
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestExWhenZipParamIsMissing() throws Exception {
+        try {
+            endpoint.deleteZipAndContent(mockRequest, mockResponse);
+        } catch (BadRequestException br) {
+            assertThat(br.getMessage(), equalTo("Please specify the zip file path."));
+
+            verify(apiHelperMock, never()).getSession(mockRequest);
+            verify(apiHelperMock, never()).getCollection(mockRequest);
+            verify(mockCollection, never()).deleteDataVisContent(any(), any());
+            throw br;
+        }
+    }
+
+    /**
+     * Test verifies API behaves as expected in cases where an exception is thrown when trying to get the requested collection.
+     *
+     * @throws Exception expected.
+     */
+    @Test(expected = UnexpectedErrorException.class)
+    public void shouldThrowNotFoundExceptionForGetCollectionError() throws Exception {
+        Session session = new Session();
+        session.email = TEST_EMAIL;
+
+        try {
+            when(mockRequest.getParameter(ZIP_PATH_KEY))
+                    .thenReturn(ZIP_PATH);
+            when(apiHelperMock.getSession(mockRequest))
+                    .thenReturn(session);
+            when(apiHelperMock.getCollection(mockRequest))
+                    .thenThrow(new UnexpectedErrorException(null, 0));
+
+            // Run the test.
+            endpoint.deleteZipAndContent(mockRequest, mockResponse);
+
+        } catch (UnexpectedErrorException ex) {
+            verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
+            verify(apiHelperMock, times(1)).getCollection(mockRequest);
+            verify(mockCollection, never()).deleteDataVisContent(session.email, Paths.get(ZIP_PATH));
+            throw ex;
+        }
+    }
+
+    /**
+     * Test verifies API behaves as expected in cases where an exception is thrown when there is an error while trying to
+     * delete the data vis zip/content in the specified collection.
+     */
+    @Test(expected = UnexpectedErrorException.class)
+    public void shouldThrowUnexpectedErrorForErrorWhileDeletingContent() throws Exception {
+        Session session = new Session();
+        session.email = TEST_EMAIL;
+
+        when(mockRequest.getParameter(ZIP_PATH_KEY))
+                .thenReturn(ZIP_PATH);
+        when(apiHelperMock.getSession(mockRequest))
+                .thenReturn(session);
+        when(apiHelperMock.getCollection(mockRequest))
+                .thenReturn(mockCollection);
+        when(mockCollection.deleteDataVisContent(session.email, Paths.get(ZIP_PATH)))
+                .thenThrow(new IOException());
+
+        try {
+            endpoint.deleteZipAndContent(mockRequest, mockResponse);
+        } catch (ZebedeeException ex) {
+            verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
+            verify(apiHelperMock, times(1)).getCollection(mockRequest);
+            verify(mockCollection, times(1)).deleteDataVisContent(session.email, Paths.get(ZIP_PATH));
+            throw ex;
+        }
     }
 
     private static InputStream getZipInputStream() throws Exception {

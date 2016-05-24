@@ -24,7 +24,6 @@ public class Content {
 
     public static final String REDIRECT = "redirect.txt";
     public static final String DATA_VIS_DIR = "visualisations";
-    public static final String DATA_VIS_CONTENT_DIR = "/content";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
 
     public final Path path;
@@ -58,7 +57,7 @@ public class Content {
 
     private static boolean isDataVisualisation(Path p) {
         // should be under visualisations but stop at the content directory.
-        return p.toString().contains(DATA_VIS_DIR) && !p.toString().contains(DATA_VIS_CONTENT_DIR);
+        return p.getFileName().toString().equals(DATA_VIS_DIR) || p.getParent().getFileName().toString().equals(DATA_VIS_DIR);
     }
 
     private static boolean isNotPreviousVersions(Path p) {

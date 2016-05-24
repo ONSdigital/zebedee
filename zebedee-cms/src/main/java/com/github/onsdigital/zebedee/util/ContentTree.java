@@ -72,5 +72,6 @@ public class ContentTree {
     public static void dropCache() {
         logDebug("Clearing browser tree cache.").log();
         publishedContentTree = null;
+        publishedDataVisualisationsTree = null;
     }
 }

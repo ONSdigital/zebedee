@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,6 +24,7 @@ public class Content {
 
     public static final String REDIRECT = "redirect.txt";
     public static final String DATA_VIS_DIR = "visualisations";
+    public static final String DATA_VIS_CONTENT_DIR = "/content/";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
 
     public final Path path;
@@ -54,12 +56,9 @@ public class Content {
         return !p.getFileName().toString().contains(TIME_SERIES_KEYWORD);
     }
 
-    private static boolean isNotDataVisualisation(Path p) {
-        return !p.toString().contains(DATA_VIS_DIR);
-    }
-
     private static boolean isDataVisualisation(Path p) {
-        return !isNotDataVisualisation(p);
+        // should be under visualisations but stop at the content directory.
+        return p.toString().contains(DATA_VIS_DIR) && !p.toString().contains(DATA_VIS_CONTENT_DIR);
     }
 
     private static boolean isNotPreviousVersions(Path p) {
@@ -292,6 +291,10 @@ public class Content {
                             .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())).toString())
                             .log();
                 }
+            } catch (JsonSyntaxException exception) {
+                logInfo("Failed to deserialise content details")
+                        .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())).toString())
+                        .log();
             }
         }
         return result;
@@ -410,7 +413,7 @@ public class Content {
             return Files.isDirectory(entry)
                     && isNotTimeseries(entry)
                     && isNotPreviousVersions(entry)
-                    && isNotDataVisualisation(entry);
+                    && !isDataVisualisation(entry);
         }
     }
 }

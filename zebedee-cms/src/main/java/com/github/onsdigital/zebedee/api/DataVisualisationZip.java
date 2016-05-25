@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.SimpleZebedeeResponse;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
 import org.apache.commons.io.FileUtils;
@@ -50,30 +51,31 @@ public class DataVisualisationZip {
     private static final String HTML_EXT = ".html";
     private static final String DATA_JSON_FILE = "/data.json";
     private static final List<String> MAC_OS_ZIP_IGNORE = Arrays.asList(new String[]{"__MACOSX", ".DS_Store"});
-
+    /**
+     * {@link Predicate} determining if a {@link ZipEntry} should be written to the collection content dir when unzipping
+     * a data visualisation zip file.
+     */
+    public static final Predicate<ZipEntry> isValidDataVisContentFile = (zipEntry ->
+            (!MAC_OS_ZIP_IGNORE.stream().filter(ignoreItem -> zipEntry.getName().contains(ignoreItem))
+                    .findFirst().isPresent()) && !zipEntry.isDirectory());
     // debug messages
     private static final String DELETING_ZIP_DEBUG = "Deleting data visualisation zip";
     private static final String DELETING_ZIP_ERROR_DEBUG = "Unexpected error while attempting to delete existing data vis zip content.";
     private static final String UNZIP_DEBUG = "Unpacking data visualisation zip";
     private static final String UNZIP_SUCCESS_DEBUG = "Successfully unzipped data viz file.";
-
     // Error messages
     private static final String UNZIPPING_ERROR_MSG = "Error while trying to unzip Data Visualisation file";
     private static final String COLLECTION_RES_ERROR_MSG = "Could not find the requested collection Resource";
     private static final String NO_ZIP_PATH_ERROR_MSG = "Please specify the zip file path.";
     private static final String UNPACK_ZIP_SUCCESS_MSG = "Visualisation zip unpacked successfully";
-    private static final String DATA_VIS_DELETED_SUCCESS_MSG = "The requested data visualisation was deleted or did not exist.";
-    private static final String UPDATE_PAGE_JSON_ERROR_MSG = "Unexpected error while updating data visualisation data.json";
-
-    public static final SimpleZebedeeResponse deleteContentSuccessResponse
-            = new SimpleZebedeeResponse(DATA_VIS_DELETED_SUCCESS_MSG, Response.Status.OK);
-
     public static final SimpleZebedeeResponse unzipSuccessResponse
             = new SimpleZebedeeResponse(UNPACK_ZIP_SUCCESS_MSG, Response.Status.OK);
-
+    private static final String DATA_VIS_DELETED_SUCCESS_MSG = "The requested data visualisation was deleted or did not exist.";
+    public static final SimpleZebedeeResponse deleteContentSuccessResponse
+            = new SimpleZebedeeResponse(DATA_VIS_DELETED_SUCCESS_MSG, Response.Status.OK);
+    private static final String UPDATE_PAGE_JSON_ERROR_MSG = "Unexpected error while updating data visualisation data.json";
     // Use this wrapper class to access static method (cleaner to test).
     private static ZebedeeApiHelper zebedeeApiHelper = ZebedeeApiHelper.getInstance();
-
     /**
      * Custom {@link IOFileFilter} implementation to filter out only .html files.
      */
@@ -91,7 +93,6 @@ public class DataVisualisationZip {
             return StringUtils.isNotEmpty(name) && name.toLowerCase().endsWith(HTML_EXT);
         }
     };
-
     /**
      * Function filters returns a {@link Set}  of Html files paths relative to the root directory of the data
      * visualisation zip.
@@ -101,13 +102,6 @@ public class DataVisualisationZip {
                     .stream()
                     .map(file -> zipEntries.relativize(file.toPath()).toString())
                     .collect(Collectors.toSet());
-    /**
-     * {@link Predicate} determining if a {@link ZipEntry} should be written to the collection content dir when unzipping
-     * a data visualisation zip file.
-     */
-    public static final Predicate<ZipEntry> isValidDataVisContentFile = (zipEntry ->
-            (!MAC_OS_ZIP_IGNORE.stream().filter(ignoreItem -> zipEntry.getName().contains(ignoreItem))
-                    .findFirst().isPresent()) && !zipEntry.isDirectory());
 
     /**
      * Data Visualisation Zip API method for deleting DV content folder and the original zip file if they exists in the
@@ -154,6 +148,7 @@ public class DataVisualisationZip {
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeApiHelper.getCollection(request);
         CollectionReader collectionReader = zebedeeApiHelper.getZebedeeCollectionReader(collection, session);
         CollectionWriter collectionWriter = zebedeeApiHelper.getZebedeeCollectionWriter(collection, session);
+        ContentReader publishedContentReader = zebedeeApiHelper.getPublishedContentReader();
 
         Resource zipRes;
         try {
@@ -164,7 +159,7 @@ public class DataVisualisationZip {
         }
 
         unzipContent(collectionWriter.getInProgress(), zipRes, zipPath);
-        updatePageJson(collection, collectionReader, collectionWriter, Paths.get(zipPath), session);
+        updatePageJson(collection, collectionReader, publishedContentReader, collectionWriter, Paths.get(zipPath), session);
         return unzipSuccessResponse;
     }
 
@@ -195,11 +190,18 @@ public class DataVisualisationZip {
         }
     }
 
-    private void updatePageJson(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter,
-                                Path zipPath, Session session) throws ZebedeeException {
+    private void updatePageJson(
+            Collection collection, CollectionReader collectionReader, ContentReader publishedContentReader, CollectionWriter collectionWriter,
+            Path zipPath, Session session
+    ) throws ZebedeeException {
         try {
             String dataJsonPath = zipPath.getParent().getParent().toString();
-            Visualisation pageJson = (Visualisation) collectionReader.getContent(dataJsonPath);
+            Visualisation pageJson;
+            try {
+                pageJson = (Visualisation) collectionReader.getContent(dataJsonPath);
+            } catch (ZebedeeException e) {
+                pageJson = (Visualisation) publishedContentReader.getContent(dataJsonPath);
+            }
 
             Path zipEntries = Paths.get(collection.getInProgress().getPath().toString() + zipPath.getParent().toString());
 

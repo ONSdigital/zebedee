@@ -3,18 +3,12 @@ package com.github.onsdigital.zebedee.util;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
@@ -39,12 +33,12 @@ public class ZebedeeApiHelper {
 
     private static final ZebedeeApiHelper instance = new ZebedeeApiHelper();
 
-    public static ZebedeeApiHelper getInstance() {
-        return instance;
-    }
-
     private ZebedeeApiHelper() {
         // use getInstance() method.
+    }
+
+    public static ZebedeeApiHelper getInstance() {
+        return instance;
     }
 
     public Session getSession(HttpServletRequest request) throws ZebedeeException {
@@ -54,6 +48,10 @@ public class ZebedeeApiHelper {
             logError(e, SESSION_NOT_FOUND_MSG).logAndThrow(UnauthorizedException.class);
         }
         return null;
+    }
+
+    public ContentReader getPublishedContentReader() {
+        return new FileSystemContentReader(Root.zebedee.published.path);
     }
 
     public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session)

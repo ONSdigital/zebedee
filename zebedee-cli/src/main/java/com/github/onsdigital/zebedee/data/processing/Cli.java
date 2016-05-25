@@ -37,6 +37,11 @@ public class Cli {
                 .argName("source directory> <destination directory> <source URI> <destination URI")
                 .numberOfArgs(4)
                 .build());
+        options.addOption(Option.builder("listtimeseries")
+                .desc("List time series")
+                .argName("source directory> <destination file")
+                .numberOfArgs(2)
+                .build());
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -54,6 +59,8 @@ public class Cli {
                 TimeseriesFinder.findTimeseriesForSourceDataset(args);
             } else if (line.hasOption("movecontent")) {
                 ContentMover.moveContent(args);
+            } else if (line.hasOption("listtimeseries")) {
+                TimeseriesLister.listTimeseries(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

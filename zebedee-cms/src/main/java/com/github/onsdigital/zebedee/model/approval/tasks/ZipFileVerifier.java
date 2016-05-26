@@ -38,7 +38,6 @@ public class ZipFileVerifier {
                 if (!verified)
                     failedVerifications.add(zipFile);
 
-                failedVerifications.add(zipFile);
             } catch (IOException | ZebedeeException e) {
                 e.printStackTrace();
                 failedVerifications.add(zipFile);

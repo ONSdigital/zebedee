@@ -18,7 +18,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 public class TimeSeriesCompressor {
 
     /**
-     * Compress timeseries
+     * Find each time series directory in a collection and create a zip file for it.
      * <p>
      * Uses content
      *
@@ -49,35 +49,4 @@ public class TimeSeriesCompressor {
             //FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
         }
     }
-
-    //    /**
-//     * Zip up timeseries to be transferred by the train
-//     *
-//     * @param collection the collection being published
-//     * @throws IOException
-//     */
-//    public static void compressTimeseries(Zebedee zebedee, Collection collection) throws IOException {
-//        Log.print("Compressing time series directories...");
-//        List<Path> timeSeriesDirectories = collection.reviewed.listTimeSeriesDirectories();
-//        for (Path timeSeriesDirectory : timeSeriesDirectories) {
-//
-//            Log.print("Compressing time series directory %s", timeSeriesDirectory.toString());
-//            if (collection.description.isEncrypted) {
-//                ZipUtils.zipFolderWithEncryption(
-//                        timeSeriesDirectory.toFile(),
-//                        new File(timeSeriesDirectory.toString() + "-to-publish.zip"),
-//                        zebedee.keyringCache.schedulerCache.get(collection.description.id),
-//                        url -> VersionedContentItem.isVersionedUri(url));
-//            } else {
-//                ZipUtils.zipFolder(
-//                        timeSeriesDirectory.toFile(),
-//                        new File(timeSeriesDirectory.toString() + "-to-publish.zip"),
-//                        url -> VersionedContentItem.isVersionedUri(url));
-//            }
-//
-//            Log.print("Deleting directory after compression %s", timeSeriesDirectory);
-//            FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
-//        }
-//    }
-
 }

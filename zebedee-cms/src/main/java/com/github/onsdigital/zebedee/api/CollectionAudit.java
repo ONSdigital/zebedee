@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.zebedee.audit.collection.CollectionAuditor;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.collection.audit.CollectionAuditHistory;
@@ -11,7 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 
-import static com.github.onsdigital.zebedee.model.collection.audit.AuditAction.COLLECTION_CREATED;
+import static com.github.onsdigital.zebedee.model.collection.audit.builder.CollectionAuditBuilder.getCollectionAuditBuilder;
+import static com.github.onsdigital.zebedee.model.collection.audit.actions.AuditAction.COLLECTION_CREATED;
 
 /**
  * API returning the collection audit history for the specified collection.
@@ -24,18 +26,30 @@ public class CollectionAudit {
 
     static {
         SAMPLE_HISTORY = new CollectionAuditHistory();
-        SAMPLE_HISTORY.add(new com.github.onsdigital.zebedee.model.collection.audit.CollectionAudit.Builder()
+        SAMPLE_HISTORY.add(getCollectionAuditBuilder()
                 .collectionId("1234567890")
                 .user("Batman@JusticeLeague.com")
-                .eventAction(COLLECTION_CREATED).build());
-        SAMPLE_HISTORY.add(new com.github.onsdigital.zebedee.model.collection.audit.CollectionAudit.Builder()
+                .eventAction(COLLECTION_CREATED)
+                .addMetaItem("item1", "item1")
+                .addMetaItem("item2", "item2")
+                .addMetaItem("item3", "item3")
+                .build());
+        SAMPLE_HISTORY.add(getCollectionAuditBuilder()
                 .collectionId("9876543210")
                 .user("Superman@JusticeLeague.com")
-                .eventAction(COLLECTION_CREATED).build());
-        SAMPLE_HISTORY.add(new com.github.onsdigital.zebedee.model.collection.audit.CollectionAudit.Builder()
+                .eventAction(COLLECTION_CREATED)
+                .addMetaItem("item1", "item1")
+                .addMetaItem("item2", "item2")
+                .addMetaItem("item3", "item3")
+                .build());
+        SAMPLE_HISTORY.add(getCollectionAuditBuilder()
                 .collectionId("66666666")
                 .user("WonderWoman@JusticeLeague.com")
-                .eventAction(COLLECTION_CREATED).build());
+                .eventAction(COLLECTION_CREATED)
+                .addMetaItem("item1", "item1")
+                .addMetaItem("item2", "item2")
+                .addMetaItem("item3", "item3")
+                .build());
     }
 
     /**
@@ -53,7 +67,6 @@ public class CollectionAudit {
         if (StringUtils.isEmpty(collectionId)) {
             throw new BadRequestException("CollectionID was not specified.");
         }
-
-        return SAMPLE_HISTORY;
+        return CollectionAuditor.getAuditor().listAll();
     }
 }

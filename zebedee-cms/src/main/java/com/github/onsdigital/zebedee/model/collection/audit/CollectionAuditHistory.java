@@ -5,5 +5,5 @@ import java.util.ArrayList;
 /**
  * Created by dave on 5/26/16.
  */
-public class CollectionAuditHistory extends ArrayList<CollectionAudit> {
+public class CollectionAuditHistory extends ArrayList<CollectionAuditEvent> {
 }

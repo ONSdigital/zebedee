@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.collection.audit;
+package com.github.onsdigital.zebedee.model.collection.audit.actions;
 
 /**
  * Constants representing the different types of collection audit events.

@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.collection.audit.actions.AuditAction;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -21,6 +22,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.io.IOException;
+
+import static com.github.onsdigital.zebedee.model.collection.audit.builder.CollectionAuditBuilder.getCollectionAuditBuilder;
 
 @Api
 public class Collection {
@@ -124,6 +127,12 @@ public class Collection {
                 .collection(collection)
                 .actionedBy(session.email)
                 .log();
+
+        getCollectionAuditBuilder()
+                .collection(collection)
+                .user(session)
+                .eventAction(AuditAction.COLLECTION_CREATED)
+                .save();
 
         return collection.description;
     }

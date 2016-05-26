@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.github.onsdigital.zebedee.model.collection.audit">
+
+    <class name="CollectionAuditEvent" table="COLLECTION_AUDIT">
+        <id name="id" column="id">
+            <generator class="native"/>
+        </id>
+        <property name="collectionId" column="collection_id" not-null="true"/>
+        <property name="eventDate" column="event_date" type="timestamp" not-null="true"/>
+        <property name="user" column="florence_user" not-null="true"/>
+        <property name="eventType" column="event_type" not-null="true"/>
+        <property name="collectionName" column="collection_name"/>
+        <property name="pageURI" column="page_uri"/>
+        <property name="fileURI" column="file_uri"/>
+        <property name="exceptionText" column="exception_text"/>
+        <!--<property name="metaData" column="meta_data"/>-->
+    </class>
+
+</hibernate-mapping>

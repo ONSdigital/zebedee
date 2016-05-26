@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.approval;
+package com.github.onsdigital.zebedee.model.approval.task;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.DummyCollectionReader;
 import com.github.onsdigital.zebedee.model.DummyCollectionWriter;
+import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.DummyPdfService;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.approval;
+package com.github.onsdigital.zebedee.model.approval.tasks;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;

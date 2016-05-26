@@ -70,6 +70,7 @@ public class ApproveTask implements Callable<Boolean> {
             ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
 
             List<String> uriList = generateTimeseries();
+            TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection);
 
             CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
             pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
@@ -93,7 +94,7 @@ public class ApproveTask implements Callable<Boolean> {
 
     public List<String> generateTimeseries() throws IOException, ZebedeeException, URISyntaxException {
 
-        // Import any timeseries update CSV file
+        // Import any time series update CSV file
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
         if (collection.description.timeseriesImportFiles != null) {
             for (String importFile : collection.description.timeseriesImportFiles) {
@@ -110,7 +111,7 @@ public class ApproveTask implements Callable<Boolean> {
             }
         }
 
-        // Generate timeseries if required.
+        // Generate time series if required.
         return new DataPublisher().preprocessCollection(
                 publishedReader,
                 collectionReader,

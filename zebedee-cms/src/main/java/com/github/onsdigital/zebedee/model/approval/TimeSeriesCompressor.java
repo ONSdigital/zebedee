@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.publishing.preprocess;
+package com.github.onsdigital.zebedee.model.approval;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;

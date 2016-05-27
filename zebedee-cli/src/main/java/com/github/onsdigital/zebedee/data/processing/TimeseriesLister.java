@@ -71,6 +71,7 @@ public class TimeseriesLister {
                 TimeseriesCsvEntry entry = new TimeseriesCsvEntry();
                 entry.cdid = page.getCdid();
                 entry.title = page.getDescription().getTitle();
+                entry.path = uri;
                 entries.add(entry);
                 System.out.println("CDID:" + page.getCdid() + " Title: " + page.getDescription().getTitle());
             }
@@ -94,5 +95,6 @@ public class TimeseriesLister {
     static class TimeseriesCsvEntry {
         public String cdid;
         public String title;
+        public String path;
     }
 }

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -75,7 +76,7 @@ public class TimeseriesFinder extends SimpleFileVisitor<Path> {
         String uri = "/" + root.relativize(path).toString();
 
         // Check json files in timeseries directories (excluding versions)
-        if (uri.endsWith("data.json") && uri.toString().contains("/timeseries/")) {
+        if (uri.endsWith("data.json") && uri.toString().contains("/timeseries/") && !VersionedContentItem.isVersionedUri(uri)) {
             uri = uri.substring(0, uri.length() - "/data.json".length());
 
             //Log.print("Adding file with uri: %s and path %s", uri, path.toString());

@@ -46,6 +46,8 @@ public class TimeseriesLister {
                 writer.append(entry.cdid);
                 writer.append(',');
                 writer.append("\"" + entry.title + "\"");
+                writer.append(',');
+                writer.append("\"" + entry.path + "\"");
                 writer.append('\n');
             }
 

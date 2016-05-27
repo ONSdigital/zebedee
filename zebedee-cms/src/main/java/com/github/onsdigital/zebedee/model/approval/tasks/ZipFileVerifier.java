@@ -6,12 +6,15 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.util.ZipUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  *
@@ -24,7 +27,7 @@ public class ZipFileVerifier {
             ContentReader contentReader,
             ContentReader verificationContentReader,
             ContentWriter verificationContentWriter
-    ) {
+    ) throws IOException {
 
         List<TimeseriesCompressionResult> failedVerifications = new ArrayList<>();
 
@@ -44,7 +47,7 @@ public class ZipFileVerifier {
             }
         }
 
-        //FileUtils.deleteDirectory(verificationContentReader.getRootFolder().resolve("verification").toFile());
+        FileUtils.deleteDirectory(verificationContentReader.getRootFolder().resolve("verification").toFile());
         return failedVerifications;
     }
 
@@ -59,7 +62,7 @@ public class ZipFileVerifier {
         List<String> unzipped = ZipUtils.unzip(inputStream, verificationPath, verificationContentWriter);
 
         // count number of files?
-        if (unzipped.size() == 0)
+        if (zipData.numberOfFiles == 0)
             return false;
 
         if (unzipped.size() != zipData.numberOfFiles) {
@@ -72,6 +75,8 @@ public class ZipFileVerifier {
 
         if (page == null)
             return false;
+
+        logInfo("Verified " + unzipped.size() + " files in zip file: " + zipData.path).log();
 
         return true;
     }

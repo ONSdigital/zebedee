@@ -38,6 +38,8 @@ public class ZipFileVerifierTest {
         FileUtils.write(timeseriesDirectory.resolve("data.json").toFile(), "");
     }
 
+    // If the number of json files in the zip matches the original number of json files in the timeseries directory
+    // and we can deserialise the json then its a success
     @Test
     public void shouldReturnEmptyListForSuccessfulVerification() throws IOException, ZebedeeException {
 
@@ -56,10 +58,10 @@ public class ZipFileVerifierTest {
         assertTrue(failedVerifications.size() == 0);
     }
 
+    // If there is an empty json file in the zip file then fail verification.
     @Test
     public void shouldReturnFailedVerificationsForEmptyJsonFile() throws IOException, ZebedeeException {
 
-        // Given a directory with timeseries and a zip file of the timeseries
         Path tempDirectory = Files.createTempDirectory(Random.id());
         Path timeseriesRoot = Files.createDirectories(tempDirectory.resolve("timeseries"));
 
@@ -69,13 +71,13 @@ public class ZipFileVerifierTest {
         createEmptyFile(timeseriesRoot);
         List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(reader, writer, false);
 
-        // when the zip file is verified.
         List<TimeseriesCompressionResult> failedVerifications = ZipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
         assertTrue(failedVerifications.size() > 0);
     }
 
+    // if there is an empty timeseries directory then the zip will be empty. Recognise there are no timeseries and do not fail verification.
     @Test
-    public void shouldReturnFailedVerificationsForEmptyZip() throws IOException, ZebedeeException {
+    public void shouldReturnSuccessfullyWhenTimeseriesDirectoryIsEmpty() throws IOException, ZebedeeException {
 
         // Given a directory with timeseries and a zip file of the timeseries
         Path tempDirectory = Files.createTempDirectory(Random.id());
@@ -85,6 +87,24 @@ public class ZipFileVerifierTest {
         ContentWriter writer = new ContentWriter(tempDirectory);
 
         List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(reader, writer, false);
+
+        List<TimeseriesCompressionResult> failedVerifications = ZipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
+        assertTrue(failedVerifications.size() > 0);
+    }
+
+    // If a zip file has no files but there should be timeseries in there then fail verification
+    @Test
+    public void shouldReturnFailedVerificationsForEmptyZip() throws IOException, ZebedeeException {
+
+
+        Path tempDirectory = Files.createTempDirectory(Random.id());
+        Files.createDirectories(tempDirectory.resolve("timeseries"));
+
+        ContentReader reader = new FileSystemContentReader(tempDirectory);
+        ContentWriter writer = new ContentWriter(tempDirectory);
+
+        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(reader, writer, false);
+        zipFiles.get(0).numberOfFiles = 1;
 
         // when the zip file is verified.
         List<TimeseriesCompressionResult> failedVerifications = ZipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);

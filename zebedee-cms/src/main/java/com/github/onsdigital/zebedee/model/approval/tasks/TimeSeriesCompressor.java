@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.model.approval.tasks;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -11,6 +10,7 @@ import com.github.onsdigital.zebedee.util.ZipUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -27,26 +27,34 @@ public class TimeSeriesCompressor {
      * @throws BadRequestException
      * @throws IOException
      */
-    public static void compressFiles(ContentReader contentReader, ContentWriter contentWriter, Collection collection) throws ZebedeeException, IOException {
-        logInfo("Compressing time series directories").collectionName(collection).log();
+    public static List<TimeseriesCompressionResult> compressFiles(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted) throws ZebedeeException, IOException {
 
         List<Path> timeSeriesDirectories = contentReader.listTimeSeriesDirectories();
+        List<TimeseriesCompressionResult> results = new ArrayList<>();
 
         for (Path timeSeriesDirectory : timeSeriesDirectories) {
-            logInfo("Compressing time series directory").addParameter("directory", timeSeriesDirectory.toString()).log();
-            String saveUri = contentReader.getRootFolder().relativize(timeSeriesDirectory).toString() + "-to-publish.zip";
 
-            if (!collection.description.isEncrypted) {
-                try (OutputStream outputStream = contentWriter.getOutputStream(saveUri)) {
-                    ZipUtils.zipFolder(timeSeriesDirectory.toFile(), outputStream,
-                            url -> VersionedContentItem.isVersionedUri(url));
-                }
-            } else {
-                ZipUtils.zipFolderWithEncryption(contentReader, contentWriter, timeSeriesDirectory.toFile().toString(), saveUri,
-                        url -> VersionedContentItem.isVersionedUri(url));
-            }
+            String saveUri = contentReader.getRootFolder().relativize(timeSeriesDirectory).toString() + "-to-publish.zip";
+            int filesAdded = compressFile(contentReader, contentWriter, isEncrypted, timeSeriesDirectory, saveUri);
+            results.add(new TimeseriesCompressionResult(saveUri, filesAdded));
+
             //Log.print("Deleting directory after compression %s", timeSeriesDirectory);
             //FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
+        }
+
+        return results;
+    }
+
+    public static int compressFile(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted, Path timeSeriesDirectory, String saveUri) throws IOException, ZebedeeException {
+        logInfo("Compressing time series directory").addParameter("directory", timeSeriesDirectory.toString()).log();
+        if (!isEncrypted) {
+            try (OutputStream outputStream = contentWriter.getOutputStream(saveUri)) {
+                return ZipUtils.zipFolder(timeSeriesDirectory.toFile(), outputStream,
+                        url -> VersionedContentItem.isVersionedUri(url));
+            }
+        } else {
+            return ZipUtils.zipFolderWithEncryption(contentReader, contentWriter, timeSeriesDirectory.toFile().toString(), saveUri,
+                    url -> VersionedContentItem.isVersionedUri(url));
         }
     }
 }

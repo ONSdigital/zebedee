@@ -105,7 +105,7 @@ public class ZipUtils {
                 zipOutputStream.closeEntry();
                 filesAdded++;
             } else if (file.isDirectory()) {
-                return zipFolder(file, zipOutputStream, prefixLength, filters);
+                filesAdded += zipFolder(file, zipOutputStream, prefixLength, filters);
             }
         }
         return filesAdded;
@@ -169,7 +169,7 @@ public class ZipUtils {
                 zipOutputStream.closeEntry();
                 filesAdded++;
             } else if (file.isDirectory()) {
-                return zipFolderWithEncryption(contentReader, contentReader.getRootFolder().resolve(fileUri).toString(), zipOutputStream, prefixLength);
+                filesAdded += zipFolderWithEncryption(contentReader, contentReader.getRootFolder().resolve(fileUri).toString(), zipOutputStream, prefixLength);
             }
         }
         return filesAdded;

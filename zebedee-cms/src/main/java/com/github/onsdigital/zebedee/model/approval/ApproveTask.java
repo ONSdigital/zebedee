@@ -12,9 +12,7 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
-import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
-import com.github.onsdigital.zebedee.model.approval.tasks.TimeSeriesCompressor;
+import com.github.onsdigital.zebedee.model.approval.tasks.*;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -69,29 +67,56 @@ public class ApproveTask implements Callable<Boolean> {
 
             List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
-            // If the collection is associated with a release then populate the release page.
-            ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
-
+            populateReleasePage(collectionContent);
             List<String> uriList = generateTimeseries();
-            TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection);
-
-            CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
-            pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
-
-            // set the approved state on the collection
-            collection.description.approvedStatus = true;
-            collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
-            boolean result = collection.save();
+            compressZipFiles();
+            generatePdfFiles(collectionContent);
+            approveCollection();
 
             // Send a notification to the website with the publish date for caching.
             new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
 
-            return result;
+            return true;
 
         } catch (IOException | ZebedeeException | URISyntaxException e) {
             logError(e, "Exception approving collection").collectionName(collection).log();
             SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
             return false;
+        }
+    }
+
+    public void approveCollection() throws IOException {
+        // set the approved state on the collection
+        collection.description.approvedStatus = true;
+        collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
+        collection.save();
+    }
+
+    public void populateReleasePage(List<ContentDetail> collectionContent) throws IOException {
+        // If the collection is associated with a release then populate the release page.
+        ReleasePopulator.populateQuietly(collection, collectionReader, collectionWriter, collectionContent);
+    }
+
+    public void generatePdfFiles(List<ContentDetail> collectionContent) {
+        CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
+        pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
+    }
+
+    public void compressZipFiles() throws ZebedeeException, IOException {
+        logInfo("Compressing time series directories").collectionName(collection).log();
+        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.description.isEncrypted);
+
+        logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionName(collection).log();
+        List<TimeseriesCompressionResult> failedZipFiles = ZipFileVerifier.verifyZipFiles(
+                zipFiles,
+                collectionReader.getReviewed(),
+                collectionReader.getRoot(),
+                collectionWriter.getRoot());
+
+        for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
+            String message = "Failed verification of time series zip file: " + failedZipFile.path;
+            logInfo(message).collectionName(collection).log();
+            SlackNotification.alarm(message + " in collection " + collection + ". Unlock and approve the collection again.");
         }
     }
 

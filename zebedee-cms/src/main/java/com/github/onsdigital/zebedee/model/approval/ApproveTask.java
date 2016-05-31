@@ -68,8 +68,8 @@ public class ApproveTask implements Callable<Boolean> {
             List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
             populateReleasePage(collectionContent);
-            List<String> uriList = generateTimeseries();
-            compressZipFiles();
+            List<String> uriList = ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+            ApproveTask.compressZipFiles(collection, collectionReader, collectionWriter);
             generatePdfFiles(collectionContent);
             approveCollection();
 
@@ -102,7 +102,7 @@ public class ApproveTask implements Callable<Boolean> {
         pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
     }
 
-    public void compressZipFiles() throws ZebedeeException, IOException {
+    public static void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
         logInfo("Compressing time series directories").collectionName(collection).log();
         List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.description.isEncrypted);
 
@@ -120,7 +120,11 @@ public class ApproveTask implements Callable<Boolean> {
         }
     }
 
-    public List<String> generateTimeseries() throws IOException, ZebedeeException, URISyntaxException {
+    public static List<String> generateTimeseries(Collection collection,
+                                                  ContentReader publishedReader,
+                                                  CollectionReader collectionReader,
+                                                  CollectionWriter collectionWriter,
+                                                  DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
 
         // Import any time series update CSV file
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();

@@ -7,19 +7,14 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.data.DataPublisher;
-import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -35,7 +30,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -128,11 +122,10 @@ public class CsdbImporter {
         ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.published.path);
         DataIndex dataIndex = Root.zebedee.dataIndex;
 
-        List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-        return new DataPublisher().preprocessCollection(
-                publishedReader,
-                collectionReader,
-                collectionWriter.getReviewed(), true, dataIndex, updateCommands);
+        List<String> uriList = ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+        ApproveTask.compressZipFiles(collection, collectionReader, collectionWriter);
+
+        return uriList;
     }
 
     /**

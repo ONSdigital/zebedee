@@ -1,15 +1,19 @@
 package com.github.onsdigital.zebedee.model.approval.tasks.timeseries;
 
+import java.nio.file.Path;
+
 /**
  * track the verification of compressed timeseries.
  */
 public class TimeseriesCompressionResult {
 
-    public String path;
+    public Path sourcePath;
+    public Path zipPath;
     public int numberOfFiles;
 
-    public TimeseriesCompressionResult(String path, int numberOfFiles) {
-        this.path = path;
+    public TimeseriesCompressionResult(Path sourcePath, Path zipPath, int numberOfFiles) {
+        this.sourcePath = sourcePath;
+        this.zipPath = zipPath;
         this.numberOfFiles = numberOfFiles;
     }
 }

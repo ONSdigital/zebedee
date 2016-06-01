@@ -2,13 +2,7 @@ package com.github.onsdigital.zebedee.logging;
 
 import ch.qos.logback.classic.Level;
 import com.github.onsdigital.logging.builder.LogMessageBuilder;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.model.Collection;
 
 import javax.ws.rs.core.Response;
@@ -52,6 +46,20 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     /**
+     * Log a debug level message.
+     */
+    public static ZebedeeLogBuilder logDebug(String message) {
+        return new ZebedeeLogBuilder(message, Level.DEBUG);
+    }
+
+    /**
+     * Log an info level message.
+     */
+    public static ZebedeeLogBuilder logInfo(String message) {
+        return new ZebedeeLogBuilder(message, Level.INFO);
+    }
+
+    /**
      * Log the error and throw the exception.
      */
     public void logAndThrow(Class<? extends ZebedeeException> exceptionClass) throws ZebedeeException {
@@ -85,20 +93,6 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         return (String) this.parameters.getParameters().get(key);
     }
 
-    /**
-     * Log a debug level message.
-     */
-    public static ZebedeeLogBuilder logDebug(String message) {
-        return new ZebedeeLogBuilder(message, Level.DEBUG);
-    }
-
-    /**
-     * Log an info level message.
-     */
-    public static ZebedeeLogBuilder logInfo(String message) {
-        return new ZebedeeLogBuilder(message, Level.INFO);
-    }
-
     public ZebedeeLogBuilder user(String email) {
         addParameter(USER, email);
         return this;
@@ -110,12 +104,12 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     public ZebedeeLogBuilder collectionId(Collection collection) {
-        addParameter(COLLECTION_ID, collection.description.id);
+        addParameter(COLLECTION_ID, collection.getDescription().id);
         return this;
     }
 
     public ZebedeeLogBuilder collectionName(Collection collection) {
-        addParameter(COLLECTION_NAME, collection.description.name);
+        addParameter(COLLECTION_NAME, collection.getDescription().name);
         return this;
     }
 

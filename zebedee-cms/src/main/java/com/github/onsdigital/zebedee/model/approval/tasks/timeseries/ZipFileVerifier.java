@@ -28,6 +28,7 @@ public class ZipFileVerifier {
             ContentWriter verificationContentWriter
     ) throws IOException {
 
+        // maintain a list of failed verifications.
         List<TimeseriesCompressionResult> failedVerifications = new ArrayList<>();
 
         for (TimeseriesCompressionResult zipFile : zipFiles) {
@@ -57,7 +58,7 @@ public class ZipFileVerifier {
             TimeseriesCompressionResult zipData
     ) throws ZebedeeException, IOException {
         String verificationPath = "verification/" + Random.id();
-        InputStream inputStream = contentReader.getResource(zipData.path).getData();
+        InputStream inputStream = contentReader.getResource(zipData.zipPath.toString()).getData();
         List<String> unzipped = ZipUtils.unzip(inputStream, verificationPath, verificationContentWriter);
 
         // count number of files?
@@ -75,7 +76,7 @@ public class ZipFileVerifier {
         if (page == null)
             return false;
 
-        logInfo("Verified " + unzipped.size() + " files in zip file: " + zipData.path).log();
+        logInfo("Verified " + unzipped.size() + " files in zip file: " + zipData.zipPath).log();
 
         return true;
     }

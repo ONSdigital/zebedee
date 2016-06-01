@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.util.ZipUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,16 +34,47 @@ public class TimeSeriesCompressor {
         List<TimeseriesCompressionResult> results = new ArrayList<>();
 
         for (Path timeSeriesDirectory : timeSeriesDirectories) {
-
-            String saveUri = contentReader.getRootFolder().relativize(timeSeriesDirectory).toString() + "-to-publish.zip";
+            String saveUri = getZipUri(contentReader, timeSeriesDirectory);
             int filesAdded = compressFile(contentReader, contentWriter, isEncrypted, timeSeriesDirectory, saveUri);
-            results.add(new TimeseriesCompressionResult(saveUri, filesAdded));
+            results.add(new TimeseriesCompressionResult(timeSeriesDirectory, Paths.get(saveUri), filesAdded));
 
             //Log.print("Deleting directory after compression %s", timeSeriesDirectory);
             //FileUtils.deleteDirectory(timeSeriesDirectory.toFile());
         }
 
         return results;
+    }
+
+    /**
+     * Compress each file defined in the compression results.
+     *
+     * @param contentReader
+     * @param contentWriter
+     * @param isEncrypted
+     * @param zipFilesToCompress
+     * @return
+     * @throws IOException
+     * @throws ZebedeeException
+     */
+    public List<TimeseriesCompressionResult> compressFiles(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted, List<TimeseriesCompressionResult> zipFilesToCompress) throws IOException, ZebedeeException {
+        for (TimeseriesCompressionResult result : zipFilesToCompress) {
+            String zipUri = getZipUri(contentReader, result.sourcePath);
+            int filesAdded = compressFile(contentReader, contentWriter, isEncrypted, result.sourcePath, zipUri);
+            result.numberOfFiles = filesAdded;
+        }
+
+        return zipFilesToCompress;
+    }
+
+    /**
+     * Resolve the zip uri.
+     *
+     * @param contentReader
+     * @param sourcePath
+     * @return
+     */
+    private String getZipUri(ContentReader contentReader, Path sourcePath) {
+        return contentReader.getRootFolder().relativize(sourcePath).toString() + "-to-publish.zip";
     }
 
     public int compressFile(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted, Path timeSeriesDirectory, String saveUri) throws IOException, ZebedeeException {

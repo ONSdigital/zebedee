@@ -16,6 +16,8 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
  */
 public class TimeSeriesCompressionTask {
 
+    private static final int maxAttempts = 5; // number of attempts made at generating and verifying zip files.
+
     protected TimeSeriesCompressor timeSeriesCompressor;
     protected ZipFileVerifier zipFileVerifier;
 
@@ -36,7 +38,7 @@ public class TimeSeriesCompressionTask {
     }
 
     /**
-     * Compresses timeseries directories and verifies that the zip files are not corrupt.
+     * Compresses time series directories and verifies that the zip files are not corrupt.
      *
      * @param collection
      * @param collectionReader
@@ -44,21 +46,52 @@ public class TimeSeriesCompressionTask {
      * @throws ZebedeeException
      * @throws IOException
      */
-    public void compressTimeseries(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
+    public boolean compressTimeseries(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
         logInfo("Compressing time series directories").collectionName(collection).log();
-        List<TimeseriesCompressionResult> zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.getDescription().isEncrypted);
+        int attempt = 1;
+        List<TimeseriesCompressionResult> failedZipFiles = null; // populated on a failed attempt
 
-        logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionName(collection).log();
-        List<TimeseriesCompressionResult> failedZipFiles = zipFileVerifier.verifyZipFiles(
+        while (attempt <= maxAttempts) {
+            List<TimeseriesCompressionResult> zipFiles = createZipFiles(collection, collectionReader, collectionWriter, attempt, failedZipFiles);
+
+            failedZipFiles = verifyZipFiles(collection, collectionReader, collectionWriter, attempt, zipFiles);
+            if (failedZipFiles.size() == 0) {
+                logInfo("Verified time series zip files").collectionName(collection).addParameter("attempt", attempt).log();
+                return true;
+            }
+
+            attempt++;
+        }
+
+        return false; // if we got this far we have hit the limit of attempts, so its failed.
+    }
+
+    private List<TimeseriesCompressionResult> createZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter, int attempt, List<TimeseriesCompressionResult> failedZipFiles) throws ZebedeeException, IOException {
+        List<TimeseriesCompressionResult> zipFiles;
+        if (attempt == 1) { // on the first attempt we check all the files.
+            zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.getDescription().isEncrypted);
+        } else { // on additional attempts we check only the failed files.
+            zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.getDescription().isEncrypted, failedZipFiles);
+        }
+        return zipFiles;
+    }
+
+    private List<TimeseriesCompressionResult> verifyZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter, int attempt, List<TimeseriesCompressionResult> zipFiles) throws IOException {
+        List<TimeseriesCompressionResult> failedZipFiles;
+        logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionName(collection).addParameter("attempt", attempt).log();
+        failedZipFiles = zipFileVerifier.verifyZipFiles(
                 zipFiles,
                 collectionReader.getReviewed(),
                 collectionReader.getRoot(),
                 collectionWriter.getRoot());
 
         for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
-            String message = "Failed verification of time series zip file: " + failedZipFile.path;
-            logInfo(message).collectionName(collection).log();
-            SlackNotification.alarm(message + " in collection " + collection + ". Unlock and approve the collection again.");
+            String message = "Failed verification of time series zip file: " + failedZipFile.zipPath;
+            logInfo(message).collectionName(collection).addParameter("attempt", attempt).log();
+            SlackNotification.send(message + " in collection " + collection.description.name + " on attempt number " + attempt);
         }
+        return failedZipFiles;
     }
+
+
 }

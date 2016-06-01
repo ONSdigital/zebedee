@@ -46,7 +46,7 @@ public class TimeSeriesCompressionTask {
      */
     public void compressTimeseries(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
         logInfo("Compressing time series directories").collectionName(collection).log();
-        List<TimeseriesCompressionResult> zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.description.isEncrypted);
+        List<TimeseriesCompressionResult> zipFiles = timeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.getDescription().isEncrypted);
 
         logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionName(collection).log();
         List<TimeseriesCompressionResult> failedZipFiles = zipFileVerifier.verifyZipFiles(

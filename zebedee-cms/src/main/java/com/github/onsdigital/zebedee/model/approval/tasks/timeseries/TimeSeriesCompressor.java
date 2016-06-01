@@ -27,7 +27,7 @@ public class TimeSeriesCompressor {
      * @throws BadRequestException
      * @throws IOException
      */
-    public static List<TimeseriesCompressionResult> compressFiles(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted) throws ZebedeeException, IOException {
+    public List<TimeseriesCompressionResult> compressFiles(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted) throws ZebedeeException, IOException {
 
         List<Path> timeSeriesDirectories = contentReader.listTimeSeriesDirectories();
         List<TimeseriesCompressionResult> results = new ArrayList<>();
@@ -45,7 +45,7 @@ public class TimeSeriesCompressor {
         return results;
     }
 
-    public static int compressFile(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted, Path timeSeriesDirectory, String saveUri) throws IOException, ZebedeeException {
+    public int compressFile(ContentReader contentReader, ContentWriter contentWriter, boolean isEncrypted, Path timeSeriesDirectory, String saveUri) throws IOException, ZebedeeException {
         logInfo("Compressing time series directory").addParameter("directory", timeSeriesDirectory.toString()).log();
         if (!isEncrypted) {
             try (OutputStream outputStream = contentWriter.getOutputStream(saveUri)) {

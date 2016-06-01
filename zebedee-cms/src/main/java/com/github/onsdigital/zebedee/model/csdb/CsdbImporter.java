@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressionTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -49,84 +50,6 @@ public class CsdbImporter {
 
     // Single threaded pool to process a single CSDB at a time.
     private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    /**
-     * When processing the notification, add a task to a single threaded executor to process the CSDB.
-     * This ensures only one CSDB file is processed at a time.
-     *
-     * @param privateCsdbImportKey
-     * @param csdbIdentifier
-     * @param dylan
-     * @param collections
-     * @param keyCache
-     * @throws IOException
-     * @throws ZebedeeException
-     */
-    public static void processNotification(
-            PrivateKey privateCsdbImportKey,
-            String csdbIdentifier,
-            DylanClient dylan,
-            Collections collections,
-            Map<String, SecretKey> keyCache
-    ) throws IOException, ZebedeeException {
-        executorService.submit(() -> processCsdb(privateCsdbImportKey, csdbIdentifier, dylan, collections, keyCache));
-    }
-
-    private static void processCsdb(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan, Collections collections, Map<String, SecretKey> keyCache) {
-        logInfo("Processing CSDB notification").addParameter("CSDBIdentifier", csdbIdentifier).log();
-
-        Collection collection;
-        try (InputStream csdbData = getDylanData(privateCsdbImportKey, csdbIdentifier, dylan)) {
-            collection = addCsdbToCollectionWithCorrectDataset(csdbIdentifier, collections, keyCache, csdbData);
-
-            if (collection != null) {
-
-                logInfo("Found collection found for CSDB identifier")
-                        .addParameter("collectionName", collection.description.name)
-                        .addParameter("CSDBIdentifier", csdbIdentifier).log();
-
-                if (collection.description.approvedStatus == true) {
-                    preProcessCollection(collection);
-                } else {
-                    logInfo("Collection for CSDB identifier is not approved")
-                            .addParameter("collectionName", collection.description.name)
-                            .addParameter("CSDBIdentifier", csdbIdentifier).log();
-                }
-            } else {
-                logInfo("No collection found for CSDB identifier")
-                        .addParameter("CSDBIdentifier", csdbIdentifier).log();
-            }
-        } catch (ZebedeeException | IOException | URISyntaxException e) {
-            logError(e, "Error while processing CSDB file notification")
-                    .addParameter("CSDBIdentifier", csdbIdentifier).log();
-        }
-    }
-
-    /**
-     * Once a CSDB file has been inserted into a collection, the timeseries files must be regenerated.
-     * Generate the files and then publish the updated uri list to babbage for cache notification.
-     *
-     * @param collection
-     * @throws IOException
-     * @throws ZebedeeException
-     */
-    public static void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
-        List<String> uriList = generateTimeseries(collection);
-        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
-    }
-
-    private static List<String> generateTimeseries(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
-        SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
-        CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
-        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
-        ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.published.path);
-        DataIndex dataIndex = Root.zebedee.dataIndex;
-
-        List<String> uriList = ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-        ApproveTask.compressZipFiles(collection, collectionReader, collectionWriter);
-
-        return uriList;
-    }
 
     /**
      * Save the CSDB file into the collection that it should be inserted into.
@@ -236,5 +159,88 @@ public class CsdbImporter {
         InputStream inputStream = EncryptionUtils.encryptionInputStream(csdbData, secretKey);
 
         return inputStream;
+    }
+
+    /**
+     * When processing the notification, add a task to a single threaded executor to process the CSDB.
+     * This ensures only one CSDB file is processed at a time.
+     *
+     * @param privateCsdbImportKey
+     * @param csdbIdentifier
+     * @param dylan
+     * @param collections
+     * @param keyCache
+     * @throws IOException
+     * @throws ZebedeeException
+     */
+    public void processNotification(
+            PrivateKey privateCsdbImportKey,
+            String csdbIdentifier,
+            DylanClient dylan,
+            Collections collections,
+            Map<String, SecretKey> keyCache
+    ) throws IOException, ZebedeeException {
+        executorService.submit(() -> processCsdb(privateCsdbImportKey, csdbIdentifier, dylan, collections, keyCache));
+    }
+
+    private void processCsdb(PrivateKey privateCsdbImportKey, String csdbIdentifier, DylanClient dylan, Collections collections, Map<String, SecretKey> keyCache) {
+        logInfo("Processing CSDB notification").addParameter("CSDBIdentifier", csdbIdentifier).log();
+
+        Collection collection;
+        try (InputStream csdbData = getDylanData(privateCsdbImportKey, csdbIdentifier, dylan)) {
+            collection = addCsdbToCollectionWithCorrectDataset(csdbIdentifier, collections, keyCache, csdbData);
+
+            if (collection != null) {
+
+                logInfo("Found collection found for CSDB identifier")
+                        .addParameter("collectionName", collection.description.name)
+                        .addParameter("CSDBIdentifier", csdbIdentifier).log();
+
+                if (collection.description.approvedStatus == true) {
+                    preProcessCollection(collection);
+                } else {
+                    logInfo("Collection for CSDB identifier is not approved")
+                            .addParameter("collectionName", collection.description.name)
+                            .addParameter("CSDBIdentifier", csdbIdentifier).log();
+                }
+            } else {
+                logInfo("No collection found for CSDB identifier")
+                        .addParameter("CSDBIdentifier", csdbIdentifier).log();
+            }
+        } catch (ZebedeeException | IOException | URISyntaxException e) {
+            logError(e, "Error while processing CSDB file notification")
+                    .addParameter("CSDBIdentifier", csdbIdentifier).log();
+        }
+    }
+
+    /**
+     * Once a CSDB file has been inserted into a collection, the timeseries files must be regenerated.
+     * Generate the files and then publish the updated uri list to babbage for cache notification.
+     *
+     * @param collection
+     * @throws IOException
+     * @throws ZebedeeException
+     */
+    public void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
+        List<String> uriList = generateTimeseries(collection);
+        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
+    }
+
+    private List<String> generateTimeseries(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
+        SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
+        CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
+        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
+        ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.published.path);
+        DataIndex dataIndex = Root.zebedee.dataIndex;
+
+        List<String> uriList = ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+        compressZipFiles(collection, collectionReader, collectionWriter);
+
+        return uriList;
+    }
+
+    private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
+        TimeSeriesCompressionTask timeSeriesCompressionTask = new TimeSeriesCompressionTask();
+        timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
     }
 }

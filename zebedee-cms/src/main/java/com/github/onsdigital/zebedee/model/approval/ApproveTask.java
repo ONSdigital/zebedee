@@ -14,9 +14,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
-import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressor;
-import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeseriesCompressionResult;
-import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.ZipFileVerifier;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressionTask;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -64,24 +62,6 @@ public class ApproveTask implements Callable<Boolean> {
         this.dataIndex = dataIndex;
     }
 
-    public static void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
-        logInfo("Compressing time series directories").collectionName(collection).log();
-        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.description.isEncrypted);
-
-        logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionName(collection).log();
-        List<TimeseriesCompressionResult> failedZipFiles = ZipFileVerifier.verifyZipFiles(
-                zipFiles,
-                collectionReader.getReviewed(),
-                collectionReader.getRoot(),
-                collectionWriter.getRoot());
-
-        for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
-            String message = "Failed verification of time series zip file: " + failedZipFile.path;
-            logInfo(message).collectionName(collection).log();
-            SlackNotification.alarm(message + " in collection " + collection + ". Unlock and approve the collection again.");
-        }
-    }
-
     public static List<String> generateTimeseries(
             Collection collection,
             ContentReader publishedReader,
@@ -114,6 +94,11 @@ public class ApproveTask implements Callable<Boolean> {
                 collectionWriter.getReviewed(), true, dataIndex, updateCommands);
     }
 
+    private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
+        TimeSeriesCompressionTask timeSeriesCompressionTask = new TimeSeriesCompressionTask();
+        timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
+    }
+
     @Override
     public Boolean call() {
 
@@ -122,8 +107,8 @@ public class ApproveTask implements Callable<Boolean> {
             List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
             populateReleasePage(collectionContent);
-            List<String> uriList = ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-            ApproveTask.compressZipFiles(collection, collectionReader, collectionWriter);
+            List<String> uriList = generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+            compressZipFiles(collection, collectionReader, collectionWriter);
             generatePdfFiles(collectionContent);
             approveCollection();
 

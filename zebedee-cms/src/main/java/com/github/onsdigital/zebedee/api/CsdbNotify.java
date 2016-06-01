@@ -21,6 +21,7 @@ public class CsdbNotify {
 
     // Hold a single instance of DylanClient.
     private static final DylanClient dylanClient = new HttpDylanClient(Configuration.getDylanUrl());
+    private static final CsdbImporter csdbImporter = new CsdbImporter();
 
     /**
      * Notify zebedee that a new CSDB file is available
@@ -38,7 +39,7 @@ public class CsdbNotify {
 
         if (privateKey == null) throw new IOException("An administrator needs to login to unlock the CSDB import key.");
 
-        CsdbImporter.processNotification(
+        csdbImporter.processNotification(
                 privateKey,
                 csdbId,
                 dylanClient,

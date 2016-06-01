@@ -22,6 +22,9 @@ import static junit.framework.TestCase.assertTrue;
 
 public class ZipFileVerifierTest {
 
+    private TimeSeriesCompressor timeSeriesCompressor = new TimeSeriesCompressor();
+    private ZipFileVerifier zipFileVerifier = new ZipFileVerifier();
+
     public static void createTimeseriesFile(Path timeseriesRoot) throws IOException {
         String timeseriesId = Random.id();
         Path timeseriesDirectory = timeseriesRoot.resolve(timeseriesId);
@@ -51,10 +54,10 @@ public class ZipFileVerifierTest {
         ContentWriter writer = new ContentWriter(tempDirectory);
 
         createTimeseriesFile(timeseriesRoot);
-        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(reader, writer, false);
+        List<TimeseriesCompressionResult> zipFiles = timeSeriesCompressor.compressFiles(reader, writer, false);
 
         // when the zip file is verified.
-        List<TimeseriesCompressionResult> failedVerifications = ZipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
+        List<TimeseriesCompressionResult> failedVerifications = zipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
         assertTrue(failedVerifications.size() == 0);
     }
 
@@ -69,9 +72,9 @@ public class ZipFileVerifierTest {
         ContentWriter writer = new ContentWriter(tempDirectory);
 
         createEmptyFile(timeseriesRoot);
-        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(reader, writer, false);
+        List<TimeseriesCompressionResult> zipFiles = timeSeriesCompressor.compressFiles(reader, writer, false);
 
-        List<TimeseriesCompressionResult> failedVerifications = ZipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
+        List<TimeseriesCompressionResult> failedVerifications = zipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
         assertTrue(failedVerifications.size() > 0);
     }
 
@@ -86,9 +89,9 @@ public class ZipFileVerifierTest {
         ContentReader reader = new FileSystemContentReader(tempDirectory);
         ContentWriter writer = new ContentWriter(tempDirectory);
 
-        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(reader, writer, false);
+        List<TimeseriesCompressionResult> zipFiles = timeSeriesCompressor.compressFiles(reader, writer, false);
 
-        List<TimeseriesCompressionResult> failedVerifications = ZipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
+        List<TimeseriesCompressionResult> failedVerifications = zipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
         assertTrue(failedVerifications.size() > 0);
     }
 
@@ -103,11 +106,11 @@ public class ZipFileVerifierTest {
         ContentReader reader = new FileSystemContentReader(tempDirectory);
         ContentWriter writer = new ContentWriter(tempDirectory);
 
-        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(reader, writer, false);
+        List<TimeseriesCompressionResult> zipFiles = timeSeriesCompressor.compressFiles(reader, writer, false);
         zipFiles.get(0).numberOfFiles = 1;
 
         // when the zip file is verified.
-        List<TimeseriesCompressionResult> failedVerifications = ZipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
+        List<TimeseriesCompressionResult> failedVerifications = zipFileVerifier.verifyZipFiles(zipFiles, reader, reader, writer);
         assertTrue(failedVerifications.size() > 0);
     }
 }

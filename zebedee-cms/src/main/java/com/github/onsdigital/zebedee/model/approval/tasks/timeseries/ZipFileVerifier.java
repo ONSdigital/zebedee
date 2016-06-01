@@ -17,12 +17,11 @@ import java.util.List;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
- *
+ * Verifies that generated zip files are not corrupt by unzipping them and checking their contents is as expected.
  */
 public class ZipFileVerifier {
 
-
-    public static List<TimeseriesCompressionResult> verifyZipFiles(
+    public List<TimeseriesCompressionResult> verifyZipFiles(
             List<TimeseriesCompressionResult> zipFiles,
             ContentReader contentReader,
             ContentReader verificationContentReader,
@@ -51,7 +50,7 @@ public class ZipFileVerifier {
         return failedVerifications;
     }
 
-    public static boolean verifyZipFile(
+    public boolean verifyZipFile(
             ContentReader contentReader,
             ContentReader verificationContentReader,
             ContentWriter verificationContentWriter,

@@ -97,6 +97,10 @@ public class ApproveTask implements Callable<Boolean> {
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
         TimeSeriesCompressionTask timeSeriesCompressionTask = new TimeSeriesCompressionTask();
         timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
+
+        String message = "Failed verification of time series zip files";
+        logInfo(message).collectionName(collection).log();
+        SlackNotification.alarm(message + " in collection " + collection.description.name + ". Unlock the collection and re-approve to try again.");
     }
 
     @Override

@@ -1044,5 +1044,9 @@ public class Collection {
     public Content getInProgress() {
         return inProgress;
     }
+
+    public CollectionDescription getDescription() {
+        return description;
+    }
 }
 

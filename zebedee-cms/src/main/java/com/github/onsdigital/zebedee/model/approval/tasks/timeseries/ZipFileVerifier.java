@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.approval.tasks;
+package com.github.onsdigital.zebedee.model.approval.tasks.timeseries;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;

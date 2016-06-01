@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.approval.tasks;
+package com.github.onsdigital.zebedee.model.approval.tasks.timeseries;
 
 /**
  * track the verification of compressed timeseries.

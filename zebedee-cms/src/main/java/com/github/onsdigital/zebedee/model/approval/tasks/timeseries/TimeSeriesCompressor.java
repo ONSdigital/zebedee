@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.model.approval.tasks;
+package com.github.onsdigital.zebedee.model.approval.tasks.timeseries;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;

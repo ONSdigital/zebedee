@@ -12,7 +12,11 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.approval.tasks.*;
+import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
+import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressor;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeseriesCompressionResult;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.ZipFileVerifier;
 import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -60,6 +64,56 @@ public class ApproveTask implements Callable<Boolean> {
         this.dataIndex = dataIndex;
     }
 
+    public static void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
+        logInfo("Compressing time series directories").collectionName(collection).log();
+        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.description.isEncrypted);
+
+        logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionName(collection).log();
+        List<TimeseriesCompressionResult> failedZipFiles = ZipFileVerifier.verifyZipFiles(
+                zipFiles,
+                collectionReader.getReviewed(),
+                collectionReader.getRoot(),
+                collectionWriter.getRoot());
+
+        for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
+            String message = "Failed verification of time series zip file: " + failedZipFile.path;
+            logInfo(message).collectionName(collection).log();
+            SlackNotification.alarm(message + " in collection " + collection + ". Unlock and approve the collection again.");
+        }
+    }
+
+    public static List<String> generateTimeseries(
+            Collection collection,
+            ContentReader publishedReader,
+            CollectionReader collectionReader,
+            CollectionWriter collectionWriter,
+            DataIndex dataIndex
+    ) throws IOException, ZebedeeException, URISyntaxException {
+
+        // Import any time series update CSV file
+        List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
+        if (collection.description.timeseriesImportFiles != null) {
+            for (String importFile : collection.description.timeseriesImportFiles) {
+                CompoundContentReader compoundContentReader = new CompoundContentReader(publishedReader);
+                compoundContentReader.add(collectionReader.getReviewed());
+
+                InputStream csvInput = collectionReader.getRoot().getResource(importFile).getData();
+
+                // read the CSV and update the timeseries titles.
+                TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
+
+                logInfo("Importing CSV file").addParameter("filename", importFile).log();
+                updateCommands.addAll(importer.importData());
+            }
+        }
+
+        // Generate time series if required.
+        return new DataPublisher().preprocessCollection(
+                publishedReader,
+                collectionReader,
+                collectionWriter.getReviewed(), true, dataIndex, updateCommands);
+    }
+
     @Override
     public Boolean call() {
 
@@ -100,53 +154,5 @@ public class ApproveTask implements Callable<Boolean> {
     public void generatePdfFiles(List<ContentDetail> collectionContent) {
         CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
         pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
-    }
-
-    public static void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
-        logInfo("Compressing time series directories").collectionName(collection).log();
-        List<TimeseriesCompressionResult> zipFiles = TimeSeriesCompressor.compressFiles(collectionReader.getReviewed(), collectionWriter.getReviewed(), collection.description.isEncrypted);
-
-        logInfo("Verifying " + zipFiles.size() + " time series zip files").collectionName(collection).log();
-        List<TimeseriesCompressionResult> failedZipFiles = ZipFileVerifier.verifyZipFiles(
-                zipFiles,
-                collectionReader.getReviewed(),
-                collectionReader.getRoot(),
-                collectionWriter.getRoot());
-
-        for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
-            String message = "Failed verification of time series zip file: " + failedZipFile.path;
-            logInfo(message).collectionName(collection).log();
-            SlackNotification.alarm(message + " in collection " + collection + ". Unlock and approve the collection again.");
-        }
-    }
-
-    public static List<String> generateTimeseries(Collection collection,
-                                                  ContentReader publishedReader,
-                                                  CollectionReader collectionReader,
-                                                  CollectionWriter collectionWriter,
-                                                  DataIndex dataIndex) throws IOException, ZebedeeException, URISyntaxException {
-
-        // Import any time series update CSV file
-        List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-        if (collection.description.timeseriesImportFiles != null) {
-            for (String importFile : collection.description.timeseriesImportFiles) {
-                CompoundContentReader compoundContentReader = new CompoundContentReader(publishedReader);
-                compoundContentReader.add(collectionReader.getReviewed());
-
-                InputStream csvInput = collectionReader.getRoot().getResource(importFile).getData();
-
-                // read the CSV and update the timeseries titles.
-                TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
-
-                logInfo("Importing CSV file").addParameter("filename", importFile).log();
-                updateCommands.addAll(importer.importData());
-            }
-        }
-
-        // Generate time series if required.
-        return new DataPublisher().preprocessCollection(
-                publishedReader,
-                collectionReader,
-                collectionWriter.getReviewed(), true, dataIndex, updateCommands);
     }
 }

@@ -1,13 +1,13 @@
-package com.github.onsdigital.zebedee.model.approval.task;
+package com.github.onsdigital.zebedee.model.approval.task.timeseries;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.model.approval.tasks.TimeSeriesCompressor;
-import com.github.onsdigital.zebedee.model.approval.tasks.TimeseriesCompressionResult;
-import com.github.onsdigital.zebedee.model.approval.tasks.ZipFileVerifier;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeSeriesCompressor;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.TimeseriesCompressionResult;
+import com.github.onsdigital.zebedee.model.approval.tasks.timeseries.ZipFileVerifier;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.apache.commons.io.FileUtils;

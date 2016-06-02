@@ -67,6 +67,7 @@ public class KeyManager {
 
     /**
      * Determine if the user should have the key assigned or removed for the given collection.
+     *
      * @param zebedee
      * @param collection
      * @param session
@@ -118,6 +119,7 @@ public class KeyManager {
      * Remove the collection key for the given user.
      * This method is intentionally private as the distribute* methods should be used
      * to re-evaluate whether a key should be removed instead of just removing it.
+     *
      * @param zebedee
      * @param user
      * @throws IOException
@@ -183,8 +185,15 @@ public class KeyManager {
                         // csdb-import is a special case always add this.
                         collectionIds.add(collectionId);
                     } else {
-                        if (getCollection(collectionId).description.collectionOwner.equals(collectionOwner)) {
+                        Collection collection = getCollection(collectionId);
+                        if (collection != null
+                                && collection.description.collectionOwner != null
+                                && collection.description.collectionOwner.equals(collectionOwner)) {
                             collectionIds.add(collectionId);
+                        } else {
+                            if (CollectionOwner.PUBLISHING_SUPPORT.equals(collectionOwner)) {
+                                collectionIds.add(collectionId);
+                            }
                         }
                     }
                 });

@@ -6,12 +6,26 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Events;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.model.approval.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -19,11 +33,21 @@ import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -31,6 +55,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.model.collection.audit.actions.CollectionEventType.COLLECTION_EDIT_CHANGED_NAME;
 
 public class Collection {
     public static final String REVIEWED = "reviewed";
@@ -242,7 +267,7 @@ public class Collection {
                                     CollectionDescription collectionDescription,
                                     Zebedee zebedee,
                                     Scheduler scheduler,
-                                    Session session) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
+                                    Session session) throws IOException, ZebedeeException {
 
         if (collection == null) {
             throw new BadRequestException("Please specify a collection");
@@ -251,7 +276,12 @@ public class Collection {
 
         // only update the collection name if its given and its changed.
         if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
+            String nameBeforeUpdate = collection.description.name;
             updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
+            CollectionHistoryDao.getInstance().saveCollectionHistoryEvent(
+                    new CollectionHistoryEvent(collection, session, COLLECTION_EDIT_CHANGED_NAME)
+                            .addEventMetaData("previousName", nameBeforeUpdate)
+            );
         }
 
         // if the type has changed
@@ -481,7 +511,7 @@ public class Collection {
     }
 
     /**
-     * @param uri The path you would like to edit.
+     * @param uri       The path you would like to edit.
      * @param recursive
      * @return True if the path was added to {@link #inProgress}. If the path is
      * already present in the {@link Collection}, another
@@ -533,8 +563,8 @@ public class Collection {
     }
 
     /**
-     * @param email The reviewing user's email.
-     * @param uri   The path you would like to review.
+     * @param email     The reviewing user's email.
+     * @param uri       The path you would like to review.
      * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
@@ -567,8 +597,8 @@ public class Collection {
     /**
      * Set the given uri to reviewed in this collection.
      *
-     * @param session The user session attempting to review
-     * @param uri     The path you would like to review.
+     * @param session   The user session attempting to review
+     * @param uri       The path you would like to review.
      * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
@@ -792,7 +822,7 @@ public class Collection {
         String contentUri = contentPath.toString();
         boolean hasDeleted = false;
 
-        for (Content collectionDir : new Content[] {inProgress, complete, reviewed}) {
+        for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
             if (collectionDir.exists(contentUri)) {
                 FileUtils.deleteDirectory(Paths.get(collectionDir.path.toString() + contentUri).toFile());
                 hasDeleted = true;

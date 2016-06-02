@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.util.hibernate;
+package com.github.onsdigital.zebedee.persistence;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

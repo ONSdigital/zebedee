@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.model.collection.audit.actions;
 /**
  * Constants representing the different types of collection audit events.
  */
-public enum AuditAction {
+public enum CollectionEventType {
 
     COLLECTION_CREATED,
 

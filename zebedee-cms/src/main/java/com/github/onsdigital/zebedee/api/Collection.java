@@ -11,7 +11,8 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.collection.audit.actions.AuditAction;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -23,10 +24,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.model.collection.audit.builder.CollectionAuditBuilder.getCollectionAuditBuilder;
+import static com.github.onsdigital.zebedee.model.collection.audit.actions.CollectionEventType.COLLECTION_CREATED;
 
 @Api
 public class Collection {
+
+    private static CollectionHistoryDao collectionHistoryDaoImpl = CollectionHistoryDao.getInstance();
 
     /**
      * Retrieves a CollectionDescription object at the endpoint /Collection/[CollectionName]
@@ -128,11 +131,7 @@ public class Collection {
                 .actionedBy(session.email)
                 .log();
 
-        getCollectionAuditBuilder()
-                .collection(collection)
-                .user(session)
-                .eventAction(AuditAction.COLLECTION_CREATED)
-                .save();
+        collectionHistoryDaoImpl.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session, COLLECTION_CREATED));
 
         return collection.description;
     }

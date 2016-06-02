@@ -9,8 +9,9 @@
 
         <!-- Database connection settings -->
         <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.url">jdbc:postgresql://192.168.99.100:32768/collection_audit</property>
+        <property name="connection.url">jdbc:postgresql://192.168.99.100:32768/collection_audit_history</property>
         <property name="connection.username">postgres</property>
+        <!-- TODO: USE A PROPER VALUE WHEN A DB IS AVAILABLE TO CONNECT TO. -->
         <property name="connection.password">mysecretpassword</property>
 
         <!-- JDBC connection pool (use the built-in) -->
@@ -31,7 +32,8 @@
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">update</property>
 
-        <mapping resource="com/github/onsdigital/zebedee/model/collection/audit/CollectionAuditEvent.hbm.xml"/>
+        <mapping class="com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent"/>
+        <mapping class="com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEventMetaData"/>
 
     </session-factory>
 

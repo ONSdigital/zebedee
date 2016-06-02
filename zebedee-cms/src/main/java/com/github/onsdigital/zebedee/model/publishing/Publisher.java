@@ -43,16 +43,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
@@ -378,26 +370,20 @@ public class Publisher {
     public static boolean postPublish(Zebedee zebedee, Collection collection, boolean skipVerification, CollectionReader collectionReader) throws IOException {
 
         try {
+            // send a slack success message
+            Path path = Paths.get(collection.path.toString() + ".json");
+            SlackNotification.publishNotification(path);
 
             ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
             ContentWriter contentWriter = new ContentWriter(zebedee.published.path);
 
             processManifestForMaster(collection, contentReader, contentWriter);
-
-            //unzipTimeseries(collection, collectionReader, zebedee);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
             logInfo("Post publish reindexing search").collectionName(collection).log();
             reindexSearch(collection);
 
-
-            // send a slack success message
-            Path path = Paths.get(collection.path.toString() + ".json");
-            SlackNotification.publishNotification(path);
-
-            // move collection files to archive
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
-            //zebedee.publishedCollections.add(collectionJsonPath);
 
             if (!skipVerification) {
                 // add to published collections list
@@ -406,6 +392,7 @@ public class Publisher {
 
             collection.delete();
             ContentTree.dropCache();
+
             return true;
         } catch (Exception exception) {
             logError(exception, "An error occurred during the publish cleanup")

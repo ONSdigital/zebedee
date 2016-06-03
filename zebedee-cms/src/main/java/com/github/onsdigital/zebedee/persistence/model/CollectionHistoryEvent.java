@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.persistence.model;
 
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.collection.audit.actions.CollectionEventType;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Entity object for a Collection audit history event.
+ * Entity object for a Collection event history.
  */
 @Entity
 @Table(name = "collection_history")

@@ -2,8 +2,8 @@ package com.github.onsdigital.zebedee.persistence.dao;
 
 import com.github.onsdigital.zebedee.exceptions.CollectionAuditException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.persistence.HibernateUtil;
+import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import org.hibernate.Session;
 
 import java.util.List;
@@ -11,20 +11,19 @@ import java.util.List;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
- * Created by dave on 5/26/16.
+ * Implementation of the {@link CollectionHistoryDao} interface. Provides methods for saving {@link CollectionHistoryEvent}'s
+ * and getting events by collection ID.
  */
 public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
 
     private static final String COLLECTION_ID = "collection_id";
 
-    private static final String BASE_SELECT = "SELECT collection_history_event_id, collection_id, collection_name, " +
-            "event_date, event_type, exception_text, file_uri, page_uri, florence_user FROM collection_history";
-
-    private static final String WHERE_NAME_LIKE = " WHERE collection_id = :" + COLLECTION_ID;
-
-    private static final String ORDER_BY_DATE = " ORDER BY event_date ASC";
-
-    private static final String QUERY_BY_COLLECTION_NAME = BASE_SELECT + WHERE_NAME_LIKE + ORDER_BY_DATE;
+    private static final String SELECT_BY_COLLECTION_ID =
+            "SELECT collection_history_event_id, collection_id, collection_name, " +
+                    "event_date, event_type, exception_text, file_uri, page_uri, florence_user" +
+                    " FROM collection_history " +
+                    "WHERE collection_id = :collection_id " +
+                    "ORDER BY event_date ASC";
 
     CollectionHistoryDaoImpl() {
         // Hide constructor and force use of singleton instance.
@@ -55,7 +54,7 @@ public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
             session.beginTransaction();
 
             List<CollectionHistoryEvent> events = (List<CollectionHistoryEvent>) session
-                    .createSQLQuery(QUERY_BY_COLLECTION_NAME)
+                    .createSQLQuery(SELECT_BY_COLLECTION_ID)
                     .addEntity(CollectionHistoryEvent.class)
                     .setString(COLLECTION_ID, collectionId)
                     .list();

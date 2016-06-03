@@ -7,18 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.onsdigital.zebedee.model.collection.audit.actions.CollectionEventType.COLLECTION_CREATED;
-import static com.github.onsdigital.zebedee.model.collection.audit.actions.CollectionEventType.COLLECTION_EDIT_CHANGED_NAME;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_NAME_CHANGED;
 
 /**
- * Mock implementation of {@link CollectionHistoryDao}.
+ * Mock implementation of {@link CollectionHistoryDao} for use while actual DB is still being set up and for testing.
  */
 public class CollectionHistoryDaoStub extends CollectionHistoryDao {
 
     private static final List<CollectionHistoryEvent> mockHistory = new ArrayList<>();
 
     CollectionHistoryDaoStub() {
-        // Hide constructor use static getInstance().
+        // Calls outside the package should use the inherited static getInstance() method.
     }
 
     static {
@@ -32,8 +32,8 @@ public class CollectionHistoryDaoStub extends CollectionHistoryDao {
                 .collectionId("1234567890")
                 .user("Superman@JusticeLeague.com")
                 .collectionName("mockCollectionTwo")
-                .eventType(COLLECTION_EDIT_CHANGED_NAME)
-                .addEventMetaData("presviousName", "mockCollectionOne"));
+                .eventType(COLLECTION_EDITED_NAME_CHANGED)
+                .addEventMetaData("previousName", "mockCollectionOne"));
     }
 
     @Override

@@ -9,7 +9,7 @@
 
         <!-- Database connection settings -->
         <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.url">jdbc:postgresql://192.168.99.100:32768/collection_audit_history</property>
+        <property name="connection.url">jdbc:postgresql://192.168.99.100:32768/collection_event_history</property>
         <property name="connection.username">postgres</property>
         <!-- TODO: USE A PROPER VALUE WHEN A DB IS AVAILABLE TO CONNECT TO. -->
         <property name="connection.password">mysecretpassword</property>
@@ -31,6 +31,9 @@
 
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">update</property>
+        <!--<property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor</property>-->
+        <!--<property name="hbm2ddl.import_files">x-import.sql</property>-->
+<!--        <property name="hbm2ddl.auto">create-drop</property>-->
 
         <mapping class="com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent"/>
         <mapping class="com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEventMetaData"/>

@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 
 /**
- * API returning the collection audit history for the specified collection.
+ * API returning the collection event history for the specified collection. API collectionID as the last section of the
+ * URI.
  */
 @Api
 public class CollectionHistory {
@@ -21,7 +22,7 @@ public class CollectionHistory {
     private static CollectionHistoryDao collectionHistoryDaoImpl = CollectionHistoryDao.getInstance();
 
     /**
-     * Get the collection audit history for the specified collection.
+     * Get the collection event history for the specified collection.
      *
      * @param request
      * @param response
@@ -37,14 +38,7 @@ public class CollectionHistory {
         if (StringUtils.isEmpty(collectionName)) {
             throw new BadRequestException("collectionId was not specified.");
         }
-
-        com.github.onsdigital.zebedee.model.collection.audit.CollectionHistory collectionHistory
-                = new com.github.onsdigital.zebedee.model.collection.audit.CollectionHistory();
-
-        collectionHistoryDaoImpl.getCollectionEventHistory(collectionName)
-                .stream()
-                .forEach(collectionEvent -> collectionHistory.add(new CollectionHistoryEvent(collectionEvent)));
-
-        return collectionHistory;
+        return new com.github.onsdigital.zebedee.model.collection.audit.CollectionHistory(
+                collectionHistoryDaoImpl.getCollectionEventHistory(collectionName));
     }
 }

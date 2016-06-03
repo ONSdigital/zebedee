@@ -55,7 +55,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.model.collection.audit.actions.CollectionEventType.COLLECTION_EDIT_CHANGED_NAME;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_NAME_CHANGED;
 
 public class Collection {
     public static final String REVIEWED = "reviewed";
@@ -279,7 +279,7 @@ public class Collection {
             String nameBeforeUpdate = collection.description.name;
             updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
             CollectionHistoryDao.getInstance().saveCollectionHistoryEvent(
-                    new CollectionHistoryEvent(collection, session, COLLECTION_EDIT_CHANGED_NAME)
+                    new CollectionHistoryEvent(collection, session, COLLECTION_EDITED_NAME_CHANGED)
                             .addEventMetaData("previousName", nameBeforeUpdate)
             );
         }

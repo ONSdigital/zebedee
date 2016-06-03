@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -24,7 +23,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.io.IOException;
 
-import static com.github.onsdigital.zebedee.model.collection.audit.actions.CollectionEventType.COLLECTION_CREATED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 
 @Api
 public class Collection {
@@ -180,7 +179,8 @@ public class Collection {
      * @throws IOException
      */
     @DELETE
-    public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
+    public boolean deleteCollection(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         Session session = Root.zebedee.sessions.get(request);

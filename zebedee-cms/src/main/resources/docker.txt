@@ -24,7 +24,7 @@ For my local dev environment I use docker to run the postgres database
 
     Create/Run a Postgres DB container:
 
-        $ docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -d -P postgres
+        $ docker run --name some-postgres -e POSTGRES_DB=audit -e POSTGRES_PASSWORD=mysecretpassword -d -P postgres
 
     This will start a container running a postgres instance as a daemon. By default postgres listens on port 5432 On a
     Mac you need to connect to the container via the docker VM.

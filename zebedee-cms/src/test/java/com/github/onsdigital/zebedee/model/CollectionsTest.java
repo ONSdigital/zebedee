@@ -168,8 +168,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnDelete()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null collection
@@ -332,8 +331,7 @@ public class CollectionsTest {
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnDelete()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null session
@@ -737,8 +735,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldNotDeleteCollectionIfNotEmpty()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A collection with some content in it
@@ -757,8 +754,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldDeleteCollection()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // An empty collection

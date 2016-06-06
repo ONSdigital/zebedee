@@ -18,6 +18,10 @@ For my local dev environment I use docker to run the postgres database
     (Make a note of the IP address under URL).
 
 (3)
+    To run docker commands on the host machine run the command:
+
+        $ eval "$(docker-machine env default)"
+
     Create/Run a Postgres DB container:
 
         $ docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -d -P postgres
@@ -39,14 +43,23 @@ For my local dev environment I use docker to run the postgres database
     update the hibernate mapping config (hibernate.cfg.xml) connection.url property with the values of your set up:
 
     For me this is:
-        <property name="connection.url">jdbc:postgresql://192.168.99.100:32768/collection_audit</property>
+        <property name="connection.url">jdbc:postgresql://192.168.99.100:32768/audit</property>
 
-(3)
+(4)
     To connect to the container to view/query the DB run:
 
         $ docker run -it --rm --link some-postgres:postgres postgres psql -h postgres -U postgres
 
     You will need to create a database:
-        $ CREATE DATABASE collection_audit;
+        $ CREATE DATABASE audit;
 
     The table creation is handled by hibernate when an event is saved.
+
+(5)
+    Add environment variables to provide database detail to Zebedee / liquibase
+        export db_audit_username=postgres
+        export db_audit_password=mysecretpassword
+        export db_audit_url='jdbc:postgresql://192.168.99.100:32768/audit'
+
+(6)
+    run update-database.sh in the root of the project to create required database tables

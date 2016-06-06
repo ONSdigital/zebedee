@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
 
@@ -9,10 +9,14 @@
 
         <!-- Database connection settings -->
         <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.url">jdbc:postgresql://192.168.99.100:32768/collection_event_history</property>
-        <property name="connection.username">postgres</property>
-        <!-- TODO: USE A PROPER VALUE WHEN A DB IS AVAILABLE TO CONNECT TO. -->
-        <property name="connection.password">mysecretpassword</property>
+        <property name="connection.username">${db_audit_username}</property>
+        <property name="connection.password">${db_audit_password}</property>
+        <property name="connection.url">${db_audit_url}</property>
+
+        <!--<property name="connection.url">jdbc:postgresql://192.168.99.100:32770/audit</property>-->
+        <!--<property name="connection.username">postgres</property>-->
+        <!--&lt;!&ndash; TODO: USE A PROPER VALUE WHEN A DB IS AVAILABLE TO CONNECT TO. &ndash;&gt;-->
+        <!--<property name="connection.password">mysecretpassword</property>-->
 
         <!-- JDBC connection pool (use the built-in) -->
         <property name="connection.pool_size">1</property>

@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
@@ -22,6 +23,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -57,6 +59,8 @@ public class DataPublicationFinderTest {
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.name = "DataPublicationFinder";
+        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.publishDate = new Date();
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.published.path);

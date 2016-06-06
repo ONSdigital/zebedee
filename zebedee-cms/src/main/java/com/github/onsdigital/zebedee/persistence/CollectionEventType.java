@@ -17,11 +17,13 @@ public enum CollectionEventType {
 
     COLLECTION_EDITED_NAME_CHANGED("collection.name.changed.description"),
 
-    COLLECTION_EDITED_PUBLISH_RESCHEDULED("collection.publish.changed.description"),
+    COLLECTION_EDITED_PUBLISH_RESCHEDULED("collection.publish.rescheduled.description"),
 
-    COLLECTION_EDITED_TEAM_ADDED("collection.team.added.description"),
+    COLLECTION_EDITED_VIEWER_TEAM_ADDED("collection.viewer.team.added.description"),
 
-    COLLECTION_EDITED_TEAM_REMOVED("collection.team.removed.description"),
+    COLLECTION_EDITED_VIEWER_TEAM_REMOVED("collection.viewer.team.removed.description"),
+
+    COLLECTION_EDITED_TYPE_CHANGED("collection.type.changed.description"),
 
     PAGE(""),
 

@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -50,6 +52,9 @@ public class PermissionsTest {
         // A new collection
         collectionDescription = new CollectionDescription();
         collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
+        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.publishDate = new Date();
+
         Collection.create(collectionDescription, zebedee, session);
 
         // A new team for the new collection

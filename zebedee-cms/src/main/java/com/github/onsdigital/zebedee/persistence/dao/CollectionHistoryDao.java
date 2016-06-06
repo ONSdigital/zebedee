@@ -1,6 +1,10 @@
 package com.github.onsdigital.zebedee.persistence.dao;
 
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 
 import java.util.List;
@@ -10,7 +14,7 @@ import java.util.List;
  */
 public abstract class CollectionHistoryDao {
 
-    private static CollectionHistoryDao instance = new CollectionHistoryDaoStub();
+    private static CollectionHistoryDao instance = new CollectionHistoryDaoImpl();
 
     public static CollectionHistoryDao getInstance() {
         return instance;
@@ -27,6 +31,16 @@ public abstract class CollectionHistoryDao {
      * @throws ZebedeeException unexpected problem saving the event.
      */
     public abstract void saveCollectionHistoryEvent(CollectionHistoryEvent event) throws ZebedeeException;
+
+
+    public abstract void saveCollectionHistoryEvent(Collection collection, Session session,
+                                                    CollectionEventType collectionEventType,
+                                                    CollectionEventMetaData... metaValues) throws ZebedeeException;
+
+
+    public abstract void saveCollectionHistoryEvent(String collectionName, String collectionId, Session session,
+                                                    CollectionEventType collectionEventType,
+                                                    CollectionEventMetaData... metaValues) throws ZebedeeException;
 
     /**
      * Get the CollectionEventHistory of the specific collection.

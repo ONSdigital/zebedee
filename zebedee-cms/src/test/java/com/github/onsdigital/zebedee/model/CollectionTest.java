@@ -68,6 +68,8 @@ public class CollectionTest {
         // The content doesn't exist at any level:
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.publishDate = new Date();
         String filename = PathUtils.toFilename(name);
 
         // When
@@ -227,6 +229,8 @@ public class CollectionTest {
         // A folder that isn't a valid release:
         String name = "Population Release";
         CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.publishDate = new Date();
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 
@@ -1090,6 +1094,7 @@ public class CollectionTest {
         // When a new collection is created with the release uri given
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
+        collectionDescription.type = CollectionType.scheduled;
 
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
@@ -1124,6 +1129,7 @@ public class CollectionTest {
         Release release = createRelease(uri, new DateTime().plusWeeks(4).toDate());
         CollectionDescription collectionDescription = new CollectionDescription(Random.id());
         collectionDescription.releaseUri = release.getUri().toString();
+        collectionDescription.type = CollectionType.scheduled;
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.util;
 
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,7 @@ public class PropertiesUtil {
                 throw new UnexpectedErrorException(io.getMessage(), 500);
             }
         }
-        return (String)languageProperties.get(key);
+        String result = (String)languageProperties.get(key);
+        return StringUtils.isNotEmpty(result) ? result : key;
     }
 }

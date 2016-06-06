@@ -59,12 +59,22 @@ public class CollectionHistoryEvent {
         this.eventDate = new Date();
     }
 
-    public CollectionHistoryEvent(Collection collection, Session session, CollectionEventType collectionEventType) {
+    public CollectionHistoryEvent(Collection collection, Session session, CollectionEventType collectionEventType,
+                                  CollectionEventMetaData... metaValues) {
+        this(collection.description.id, collection.description.name, session, collectionEventType, metaValues);
+    }
+
+    public CollectionHistoryEvent(String collectionId, String collectionName, Session session,
+                                  CollectionEventType collectionEventType, CollectionEventMetaData... metaValues) {
         this.eventDate = new Date();
-        collectionId(collection.description.id);
-        collectionName(collection.description.name);
+        collectionId(collectionId);
+        collectionName(collectionName);
         user(session.email);
         eventType(collectionEventType);
+
+        for (CollectionEventMetaData collectionEventMetaData : metaValues) {
+            addEventMetaData(collectionEventMetaData.getKey(), collectionEventMetaData.getValue());
+        }
     }
 
     public long getId() {

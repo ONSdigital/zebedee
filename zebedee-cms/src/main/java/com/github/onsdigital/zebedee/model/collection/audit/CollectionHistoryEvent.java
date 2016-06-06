@@ -2,6 +2,8 @@ package com.github.onsdigital.zebedee.model.collection.audit;
 
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEventMetaData;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,7 +15,7 @@ public class CollectionHistoryEvent {
 
     private String collectionId;
     private String collectionName;
-    private CollectionEvent eventDetails;
+    private CollectionEventDetails eventDetails;
     private String pageURI;
     private String fileURI;
     private String exceptionText;
@@ -33,14 +35,14 @@ public class CollectionHistoryEvent {
                             CollectionHistoryEventMetaData::getKey, CollectionHistoryEventMetaData::getValue)
                     );
         }
-        this.eventDetails = new CollectionEvent(event.getEventType(), event.getEventDate(), event.getUser(), metaData);
+        this.eventDetails = new CollectionEventDetails(event.getEventType(), event.getEventDate(), event.getUser(), metaData);
     }
 
     public String getCollectionId() {
         return collectionId;
     }
 
-    public CollectionEvent getEventDetails() {
+    public CollectionEventDetails getEventDetails() {
         return eventDetails;
     }
 
@@ -58,5 +60,16 @@ public class CollectionHistoryEvent {
 
     public String getExceptionText() {
         return exceptionText;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 }

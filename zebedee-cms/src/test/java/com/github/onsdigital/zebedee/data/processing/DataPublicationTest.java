@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -23,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -70,6 +72,8 @@ public class DataPublicationTest {
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.name = "DataPublicationDetails";
         collectionDescription.isEncrypted = true;
+        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.publishDate = new Date();
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.published.path);

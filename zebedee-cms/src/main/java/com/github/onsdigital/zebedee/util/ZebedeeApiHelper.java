@@ -108,6 +108,10 @@ public class ZebedeeApiHelper {
         return null;
     }
 
+    public Permissions getPermissions() {
+        return Root.zebedee.permissions;
+    }
+
     public InputStream objectAsInputStream(Object obj) {
         return new ByteArrayInputStream(ContentUtil.serialise(obj).getBytes());
     }

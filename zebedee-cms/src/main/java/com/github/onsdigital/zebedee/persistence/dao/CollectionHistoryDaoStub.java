@@ -1,6 +1,10 @@
 package com.github.onsdigital.zebedee.persistence.dao;
 
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 
 import java.util.ArrayList;
@@ -16,10 +20,6 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 public class CollectionHistoryDaoStub extends CollectionHistoryDao {
 
     private static final List<CollectionHistoryEvent> mockHistory = new ArrayList<>();
-
-    CollectionHistoryDaoStub() {
-        // Calls outside the package should use the inherited static getInstance() method.
-    }
 
     static {
         mockHistory.add(new CollectionHistoryEvent()
@@ -39,6 +39,20 @@ public class CollectionHistoryDaoStub extends CollectionHistoryDao {
     @Override
     public void saveCollectionHistoryEvent(CollectionHistoryEvent event) throws ZebedeeException {
         mockHistory.add(event);
+    }
+
+    @Override
+    public void saveCollectionHistoryEvent(Collection collection, Session session,
+                                           CollectionEventType collectionEventType, CollectionEventMetaData... metaValues)
+            throws ZebedeeException {
+
+    }
+
+    @Override
+    public void saveCollectionHistoryEvent(String collectionName, String collectionId, Session session,
+                                           CollectionEventType collectionEventType, CollectionEventMetaData... metaValues)
+            throws ZebedeeException {
+
     }
 
     @Override

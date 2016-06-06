@@ -2,7 +2,10 @@ package com.github.onsdigital.zebedee.persistence.dao;
 
 import com.github.onsdigital.zebedee.exceptions.CollectionAuditException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.HibernateUtil;
+import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import org.hibernate.Session;
 
@@ -46,6 +49,23 @@ public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
                     .addParameter("event", event.toString())
                     .logAndThrow(CollectionAuditException.class);
         }
+    }
+
+    @Override
+    public void saveCollectionHistoryEvent(Collection collection, com.github.onsdigital.zebedee.json.Session session,
+                                           CollectionEventType collectionEventType, CollectionEventMetaData... metaValues)
+            throws ZebedeeException {
+        this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection.description.id, collection.description.name,
+                session, collectionEventType, metaValues));
+    }
+
+    @Override
+    public void saveCollectionHistoryEvent(String collectionId, String collectionName,
+                                           com.github.onsdigital.zebedee.json.Session session,
+                                           CollectionEventType collectionEventType, CollectionEventMetaData... metaValues)
+            throws ZebedeeException {
+        this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collectionId, collectionName, session,
+                collectionEventType, metaValues));
     }
 
     public List<CollectionHistoryEvent> getCollectionEventHistory(String collectionId) throws ZebedeeException {

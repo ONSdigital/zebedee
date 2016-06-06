@@ -25,7 +25,6 @@ import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
-import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -55,7 +54,14 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_NAME_CHANGED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_PUBLISH_RESCHEDULED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_TYPE_CHANGED;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.collectionCreated;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.renamed;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.reschedule;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.typeChanged;
 
 public class Collection {
     public static final String REVIEWED = "reviewed";
@@ -63,6 +69,7 @@ public class Collection {
     public static final String IN_PROGRESS = "inprogress";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
+    private static CollectionHistoryDao collectionHistoryDao = CollectionHistoryDao.getInstance();
     public final CollectionDescription description;
     public final Path path;
     public final Content reviewed;
@@ -165,6 +172,7 @@ public class Collection {
         }
 
         Collection collection = new Collection(collectionDescription, zebedee);
+        collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED, collectionCreated(collectionDescription));
 
         if (collectionDescription.teams != null) {
             for (String teamName : collectionDescription.teams) {
@@ -278,20 +286,22 @@ public class Collection {
         if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
             String nameBeforeUpdate = collection.description.name;
             updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
-            CollectionHistoryDao.getInstance().saveCollectionHistoryEvent(
-                    new CollectionHistoryEvent(collection, session, COLLECTION_EDITED_NAME_CHANGED)
-                            .addEventMetaData("previousName", nameBeforeUpdate)
-            );
+            collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_NAME_CHANGED, renamed(nameBeforeUpdate));
         }
 
         // if the type has changed
         if (collectionDescription.type != null
                 && updatedCollection.description.type != collectionDescription.type) {
             updatedCollection.description.type = collectionDescription.type;
+            collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_TYPE_CHANGED, typeChanged(updatedCollection.description));
         }
 
         if (updatedCollection.description.type == CollectionType.scheduled) {
             if (collectionDescription.publishDate != null) {
+                if (!collection.description.publishDate.equals(collectionDescription.publishDate)) {
+                    collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_PUBLISH_RESCHEDULED,
+                            reschedule(collection.description.publishDate, collectionDescription.publishDate));
+                }
                 updatedCollection.description.publishDate = collectionDescription.publishDate;
                 scheduler.schedulePublish(updatedCollection, zebedee);
             }
@@ -308,7 +318,7 @@ public class Collection {
         return updatedCollection;
     }
 
-    private static void updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, UnauthorizedException {
+    private static void updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, ZebedeeException {
         if (collectionDescription.teams != null) {
             // work out which teams need to be removed from the existing teams.
             Set<Integer> currentTeamIds = zebedee.permissions.listViewerTeams(collectionDescription, session);
@@ -1073,6 +1083,10 @@ public class Collection {
 
     public Content getInProgress() {
         return inProgress;
+    }
+
+    public static void setCollectionHistoryDao(CollectionHistoryDao collectionHistoryDao) {
+        Collection.collectionHistoryDao = collectionHistoryDao;
     }
 }
 

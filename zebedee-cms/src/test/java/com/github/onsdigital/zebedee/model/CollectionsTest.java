@@ -44,7 +44,6 @@ public class CollectionsTest {
         builder = new Builder();
         zebedee = new Zebedee(builder.zebedee, false);
         session = zebedee.openSession(builder.administratorCredentials);
-        Collection.setCollectionHistoryDao(CollectionHistoryDaoStub.getInstance());
     }
 
     @After

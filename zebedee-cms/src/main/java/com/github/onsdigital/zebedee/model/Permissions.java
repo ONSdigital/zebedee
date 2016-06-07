@@ -14,7 +14,6 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -32,6 +31,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.DATA_VISUALISATION;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamAdded;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamRemoved;
 
@@ -43,8 +43,6 @@ public class Permissions {
     private Zebedee zebedee;
     private Path accessMappingPath;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
-
-    private CollectionHistoryDao collectionHistoryDao = CollectionHistoryDao.getInstance();
 
     public Permissions(Path permissions, Zebedee zebedee) {
         this.zebedee = zebedee;
@@ -353,7 +351,7 @@ public class Permissions {
         writeAccessMapping(accessMapping);
 
         if (teamAdded != null) {
-            collectionHistoryDao.saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name, session,
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name, session,
                     CollectionEventType.COLLECTION_EDITED_VIEWER_TEAM_ADDED, teamAdded(collectionDescription, session, team));
         }
     }
@@ -405,7 +403,7 @@ public class Permissions {
         writeAccessMapping(accessMapping);
 
         if (teamRemoved != null) {
-            collectionHistoryDao.saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name,
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name,
                     session, CollectionEventType.COLLECTION_EDITED_VIEWER_TEAM_REMOVED,
                     teamRemoved(collectionDescription, session, team));
         }

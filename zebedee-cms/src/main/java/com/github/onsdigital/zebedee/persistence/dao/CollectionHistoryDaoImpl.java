@@ -1,10 +1,10 @@
 package com.github.onsdigital.zebedee.persistence.dao;
 
-import com.github.onsdigital.zebedee.exceptions.CollectionAuditException;
+import com.github.onsdigital.zebedee.exceptions.CollectionEventHistoryException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
-import com.github.onsdigital.zebedee.persistence.HibernateUtil;
+import com.github.onsdigital.zebedee.persistence.HibernateService;
 import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import org.hibernate.Session;
@@ -19,17 +19,19 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  */
 public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
 
-    private static final String COLLECTION_ID = "collection_id";
+    private HibernateService hibernateService = null;
 
-    private static final String SELECT_BY_COLLECTION_ID =
+    static final String COLLECTION_ID = "collection_id";
+
+    static final String SELECT_BY_COLLECTION_ID =
             "SELECT collection_history_event_id, collection_id, collection_name, " +
                     "event_date, event_type, exception_text, file_uri, page_uri, florence_user" +
                     " FROM collection_history " +
                     "WHERE collection_id = :collection_id " +
                     "ORDER BY event_date ASC";
 
-    CollectionHistoryDaoImpl() {
-        // Hide constructor and force use of singleton instance.
+    public CollectionHistoryDaoImpl(HibernateService hibernateService) {
+        this.hibernateService = hibernateService;
     }
 
     /**
@@ -40,14 +42,14 @@ public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
      */
     public void saveCollectionHistoryEvent(CollectionHistoryEvent event) throws ZebedeeException {
         try {
-            Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+            Session session = hibernateService.getSessionFactory().getCurrentSession();
             session.beginTransaction();
             session.save(event);
             session.getTransaction().commit();
         } catch (Exception e) {
             logError(e, "Unexpected error while attempting to save collection audit event")
                     .addParameter("event", event.toString())
-                    .logAndThrow(CollectionAuditException.class);
+                    .logAndThrow(CollectionEventHistoryException.class);
         }
     }
 
@@ -55,8 +57,8 @@ public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
     public void saveCollectionHistoryEvent(Collection collection, com.github.onsdigital.zebedee.json.Session session,
                                            CollectionEventType collectionEventType, CollectionEventMetaData... metaValues)
             throws ZebedeeException {
-        this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection.description.id, collection.description.name,
-                session, collectionEventType, metaValues));
+        this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection.getDescription().id,
+                collection.getDescription().name, session, collectionEventType, metaValues));
     }
 
     @Override
@@ -70,7 +72,7 @@ public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
 
     public List<CollectionHistoryEvent> getCollectionEventHistory(String collectionId) throws ZebedeeException {
         try {
-            Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+            Session session = hibernateService.getSessionFactory().getCurrentSession();
             session.beginTransaction();
 
             List<CollectionHistoryEvent> events = (List<CollectionHistoryEvent>) session
@@ -83,8 +85,9 @@ public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
             return events;
 
         } catch (Exception e) {
-            logError(e, "Unexpected error while attempting to save collection audit event")
-                    .logAndThrow(CollectionAuditException.class);
+            logError(e, "Unexpected error while attempting to get collection event history")
+                    .collectionId(collectionId)
+                    .logAndThrow(CollectionEventHistoryException.class);
         }
         return null;
     }

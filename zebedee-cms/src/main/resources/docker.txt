@@ -1,0 +1,68 @@
+For my local dev environment I use docker to run the postgres database
+
+(1)
+    If you haven't already install Docker.
+
+(2)
+    On a MAC you need to will need the address / port of the docker machine to be able to connect to the container from
+    outside of the vm. Run:
+
+        $ docker-machine ls
+
+        ....
+
+        NAME      ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER    ERRORS
+        default   *        virtualbox   Running   tcp://192.168.99.100:2376           v1.10.2
+
+
+    (Make a note of the IP address under URL).
+
+(3)
+    To run docker commands on the host machine run the command:
+
+        $ eval "$(docker-machine env default)"
+
+    Create/Run a Postgres DB container:
+
+        $ docker run --name some-postgres -e POSTGRES_DB=audit -e POSTGRES_PASSWORD=mysecretpassword -d -P postgres
+
+    This will start a container running a postgres instance as a daemon. By default postgres listens on port 5432 On a
+    Mac you need to connect to the container via the docker VM.
+
+    The -P flag basically creates a mapping from a port on the VM to port on the container. After running the above you
+    can see which port has been mapped with (see PORTS):
+
+        $ docker ps -a
+
+        ...
+
+        CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                     NAMES
+        0a2b4549a667        postgres            "/docker-entrypoint.s"   2 hours ago         Up 2 hours          0.0.0.0:32768->5432/tcp   some-postgres
+
+    In this case port 32768 of the vm is mappped to port 5432 of the container. Once your know the URL of VM and the PORT
+    update the hibernate mapping config (hibernate.cfg.xml) connection.url property with the values of your set up:
+
+    For me this is:
+        <property name="connection.url">jdbc:postgresql://192.168.99.100:32768/audit</property>
+
+(4)
+    To connect to the container to view/query the DB run:
+
+        $ docker run -it --rm --link some-postgres:postgres postgres psql -h postgres -U postgres
+
+    You will need to create a database:
+        $ CREATE DATABASE audit;
+
+    The table creation is handled by hibernate when an event is saved.
+
+(5)
+    Add environment variables to provide database detail to Zebedee / liquibase
+        export db_audit_username=postgres
+        export db_audit_password=mysecretpassword
+        export db_audit_url='jdbc:postgresql://192.168.99.100:32768/audit'
+
+(6)
+    run update-database.sh in the root of the project to create required database tables
+
+    To drop all database tables to re-run liquibase use the command (from zebedee root):
+        mvn -f zebedee-cms/pom.xml liquibase:dropAll

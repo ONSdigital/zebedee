@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
 
@@ -67,6 +69,8 @@ public class ContentIOUtilsTest {
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.name = "ContentIOUtils";
         collectionDescription.isEncrypted = true;
+        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.publishDate = new Date();
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
         publishedReader = new FileSystemContentReader(zebedee.published.path);

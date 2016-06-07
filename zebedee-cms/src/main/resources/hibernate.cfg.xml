@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+
+        <!-- Database connection settings -->
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="connection.username">${db_audit_username}</property>
+        <property name="connection.password">${db_audit_password}</property>
+        <property name="connection.url">${db_audit_url}</property>
+
+        <!--<property name="connection.url">jdbc:postgresql://192.168.99.100:32770/audit</property>-->
+        <!--<property name="connection.username">postgres</property>-->
+        <!--&lt;!&ndash; TODO: USE A PROPER VALUE WHEN A DB IS AVAILABLE TO CONNECT TO. &ndash;&gt;-->
+        <!--<property name="connection.password">mysecretpassword</property>-->
+
+        <!-- JDBC connection pool (use the built-in) -->
+        <property name="connection.pool_size">1</property>
+
+        <!-- SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
+
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class">thread</property>
+
+        <!-- Disable the second-level cache  -->
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">true</property>
+
+        <!-- Drop and re-create the database schema on startup -->
+        <property name="hbm2ddl.auto">update</property>
+        <!--<property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor</property>-->
+        <!--<property name="hbm2ddl.import_files">x-import.sql</property>-->
+<!--        <property name="hbm2ddl.auto">create-drop</property>-->
+
+        <mapping class="com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent"/>
+        <mapping class="com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEventMetaData"/>
+
+    </session-factory>
+
+</hibernate-configuration>

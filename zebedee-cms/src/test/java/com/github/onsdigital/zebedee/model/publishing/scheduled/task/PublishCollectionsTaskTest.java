@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.junit.After;
@@ -12,6 +13,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
@@ -37,8 +39,10 @@ public class PublishCollectionsTaskTest {
     @Test
     public void shouldCancelTask() throws IOException, ZebedeeException {
 
-        Collection collection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, session);
+        CollectionDescription collectionDescription = new CollectionDescription("FirstCollection");
+        collectionDescription.publishDate = new Date();
+        collectionDescription.type = CollectionType.scheduled;
+        Collection collection = Collection.create(collectionDescription, zebedee, session);
 
         ArrayList<PublishCollectionTask> publishCollectionTasks = new ArrayList<>();
         DummyPublishCollectionTask publish1 = new DummyPublishCollectionTask(collection);

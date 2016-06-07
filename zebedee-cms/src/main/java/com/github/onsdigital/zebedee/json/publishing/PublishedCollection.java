@@ -1,15 +1,25 @@
 package com.github.onsdigital.zebedee.json.publishing;
 
 import com.github.onsdigital.zebedee.json.CollectionBase;
+import com.github.onsdigital.zebedee.json.CollectionType;
 
 import java.util.Date;
 import java.util.List;
 
 public class PublishedCollection extends CollectionBase {
 
-    public int verifiedCount;
-    public int verifyFailedCount;
-    public int verifyInprogressCount;
+    public PublishedCollection(String id, String name, CollectionType type, Date publishDate) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.publishDate = publishDate;
+    }
+
+    public PublishedCollection() {}
+
+    public Integer verifiedCount;
+    public Integer verifyFailedCount;
+    public Integer verifyInprogressCount;
 
     public Date publishStartDate; // The date the publish process was actually started
     public Date publishEndDate; // The date the publish process ended.

@@ -5,9 +5,11 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoStub;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -42,6 +44,7 @@ public class CollectionsTest {
         builder = new Builder();
         zebedee = new Zebedee(builder.zebedee, false);
         session = zebedee.openSession(builder.administratorCredentials);
+        Collection.setCollectionHistoryDao(CollectionHistoryDaoStub.getInstance());
     }
 
     @After
@@ -54,10 +57,8 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.administratorCredentials);
         Collections.CollectionList collections = new Collections.CollectionList();
 
-        Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, session);
-        Collection secondCollection = Collection.create(
-                new CollectionDescription("SecondCollection"), zebedee, session);
+        Collection firstCollection = Collection.create(collectionDescription("FirstCollection", CollectionType.manual), zebedee, session);
+        Collection secondCollection = Collection.create(collectionDescription("SecondCollection", CollectionType.manual), zebedee, session);
 
         collections.add(firstCollection);
         collections.add(secondCollection);
@@ -85,7 +86,7 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, session);
+                collectionDescription("FirstCollection", CollectionType.manual), zebedee, session);
 
         collections.add(firstCollection);
 
@@ -98,9 +99,9 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.administratorCredentials);
 
         Collection firstCollection = Collection.create(
-                new CollectionDescription("FirstCollection"), zebedee, session);
+                collectionDescription("FirstCollection", CollectionType.manual), zebedee, session);
         Collection secondCollection = Collection.create(
-                new CollectionDescription("SecondCollection"), zebedee, session);
+                collectionDescription("SecondCollection", CollectionType.manual), zebedee, session);
 
         collectionList.add(firstCollection);
         collectionList.add(secondCollection);
@@ -168,8 +169,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnDelete()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null collection
@@ -332,8 +332,7 @@ public class CollectionsTest {
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnDelete()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null session
@@ -737,8 +736,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldNotDeleteCollectionIfNotEmpty()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A collection with some content in it
@@ -757,8 +755,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldDeleteCollection()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // An empty collection
@@ -967,8 +964,10 @@ public class CollectionsTest {
         // Given
         // A collection
         Session session = zebedee.openSession(builder.administratorCredentials);
-        Collection collection = Collection.create(
-                new CollectionDescription("collection"), zebedee, session);
+        CollectionDescription collectionDescription = new CollectionDescription("collection");
+        collectionDescription.type = CollectionType.manual;
+        collectionDescription.publishDate = new Date();
+        Collection collection = Collection.create(collectionDescription, zebedee, session);
 
         // When the collection is updated concurrently.
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -1057,6 +1056,12 @@ public class CollectionsTest {
                 System.out.println();
             }
         }
+    }
+
+    private CollectionDescription collectionDescription(String name, CollectionType type) {
+        CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.type = type;
+        return collectionDescription;
     }
 
 }

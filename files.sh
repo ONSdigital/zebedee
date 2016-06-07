@@ -11,6 +11,10 @@ export PACKAGE_PREFIX=com.github.onsdigital.zebedee
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
 java $JAVA_OPTS \
+ -Ddb_audit_url=$db_audit_url \
+ -Ddb_audit_username=$db_audit_username \
+ -Ddb_audit_password=$db_audit_password \
+ -Drestolino.files=$RESTOLINO_STATIC \
  -Drestolino.files=$RESTOLINO_STATIC \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \

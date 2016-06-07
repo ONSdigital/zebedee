@@ -34,7 +34,11 @@ public class Collections {
      */
     public static Collection getCollection(HttpServletRequest request)
             throws IOException {
+        String collectionId = getCollectionId(request);
+        return Root.zebedee.collections.getCollection(collectionId);
+    }
 
+    public static String getCollectionId(HttpServletRequest request) {
         Path path = Path.newInstance(request);
         List<String> segments = path.segments();
 
@@ -42,8 +46,7 @@ public class Collections {
         if (segments.size() > 1) {
             collectionId = segments.get(1);
         }
-
-        return Root.zebedee.collections.getCollection(collectionId);
+        return collectionId;
     }
 
     /**

@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -31,6 +32,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.*;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.*;
 
 public class Collection {
     public static final String REVIEWED = "reviewed";
@@ -38,6 +41,7 @@ public class Collection {
     public static final String IN_PROGRESS = "inprogress";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
+    private static CollectionHistoryDao collectionHistoryDao = CollectionHistoryDao.getInstance();
     public final CollectionDescription description;
     public final Path path;
     public final Content reviewed;
@@ -140,6 +144,7 @@ public class Collection {
         }
 
         Collection collection = new Collection(collectionDescription, zebedee);
+        collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED, collectionCreated(collectionDescription));
 
         if (collectionDescription.teams != null) {
             for (String teamName : collectionDescription.teams) {
@@ -238,11 +243,13 @@ public class Collection {
      * @param scheduler
      * @return
      */
-    public static Collection update(Collection collection,
-                                    CollectionDescription collectionDescription,
-                                    Zebedee zebedee,
-                                    Scheduler scheduler,
-                                    Session session) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
+    public static Collection update(
+            Collection collection,
+            CollectionDescription collectionDescription,
+            Zebedee zebedee,
+            Scheduler scheduler,
+            Session session
+    ) throws IOException, ZebedeeException {
 
         if (collection == null) {
             throw new BadRequestException("Please specify a collection");
@@ -251,17 +258,24 @@ public class Collection {
 
         // only update the collection name if its given and its changed.
         if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
+            String nameBeforeUpdate = collection.description.name;
             updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
+            collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_NAME_CHANGED, renamed(nameBeforeUpdate));
         }
 
         // if the type has changed
         if (collectionDescription.type != null
                 && updatedCollection.description.type != collectionDescription.type) {
             updatedCollection.description.type = collectionDescription.type;
+            collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_TYPE_CHANGED, typeChanged(updatedCollection.description));
         }
 
         if (updatedCollection.description.type == CollectionType.scheduled) {
             if (collectionDescription.publishDate != null) {
+                if (!collection.description.publishDate.equals(collectionDescription.publishDate)) {
+                    collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_PUBLISH_RESCHEDULED,
+                            reschedule(collection.description.publishDate, collectionDescription.publishDate));
+                }
                 updatedCollection.description.publishDate = collectionDescription.publishDate;
                 scheduler.schedulePublish(updatedCollection, zebedee);
             }
@@ -278,7 +292,7 @@ public class Collection {
         return updatedCollection;
     }
 
-    private static void updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, UnauthorizedException {
+    private static void updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, ZebedeeException {
         if (collectionDescription.teams != null) {
             // work out which teams need to be removed from the existing teams.
             Set<Integer> currentTeamIds = zebedee.permissions.listViewerTeams(collectionDescription, session);
@@ -481,7 +495,7 @@ public class Collection {
     }
 
     /**
-     * @param uri The path you would like to edit.
+     * @param uri       The path you would like to edit.
      * @param recursive
      * @return True if the path was added to {@link #inProgress}. If the path is
      * already present in the {@link Collection}, another
@@ -533,8 +547,8 @@ public class Collection {
     }
 
     /**
-     * @param email The reviewing user's email.
-     * @param uri   The path you would like to review.
+     * @param email     The reviewing user's email.
+     * @param uri       The path you would like to review.
      * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
@@ -567,8 +581,8 @@ public class Collection {
     /**
      * Set the given uri to reviewed in this collection.
      *
-     * @param session The user session attempting to review
-     * @param uri     The path you would like to review.
+     * @param session   The user session attempting to review
+     * @param uri       The path you would like to review.
      * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
@@ -792,7 +806,7 @@ public class Collection {
         String contentUri = contentPath.toString();
         boolean hasDeleted = false;
 
-        for (Content collectionDir : new Content[] {inProgress, complete, reviewed}) {
+        for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
             if (collectionDir.exists(contentUri)) {
                 FileUtils.deleteDirectory(Paths.get(collectionDir.path.toString() + contentUri).toFile());
                 hasDeleted = true;
@@ -1047,6 +1061,10 @@ public class Collection {
 
     public CollectionDescription getDescription() {
         return description;
+    }
+
+    public static void setCollectionHistoryDao(CollectionHistoryDao collectionHistoryDao) {
+        Collection.collectionHistoryDao = collectionHistoryDao;
     }
 }
 

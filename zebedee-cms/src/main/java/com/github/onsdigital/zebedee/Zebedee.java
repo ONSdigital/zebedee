@@ -97,7 +97,7 @@ public class Zebedee {
         }
 
         this.collections = new Collections(collections, this);
-        this.publishedCollections = new PublishedCollections(publishedCollections, this);
+        this.publishedCollections = new PublishedCollections(publishedCollections);
         this.users = new Users(users, this);
         this.keyringCache = new KeyringCache(this);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);

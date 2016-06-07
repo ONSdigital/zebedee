@@ -5,7 +5,12 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -15,6 +20,8 @@ import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -43,6 +50,7 @@ import java.util.concurrent.Future;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 
 public class Collections {
     public final Path path;
@@ -397,8 +405,7 @@ public class Collections {
     }
 
     public void delete(Collection collection, Session session)
-            throws IOException, NotFoundException, UnauthorizedException,
-            BadRequestException {
+            throws IOException, ZebedeeException {
 
         // Collection exists
         if (collection == null) {
@@ -416,7 +423,10 @@ public class Collections {
         }
 
         // Go ahead
+
+        CollectionHistoryEvent event = new CollectionHistoryEvent(collection, session, COLLECTION_DELETED);
         collection.delete();
+        CollectionHistoryDao.getInstance().saveCollectionHistoryEvent(event);
     }
 
     /**
@@ -433,7 +443,9 @@ public class Collections {
      * @throws UnauthorizedException
      * @throws IOException
      */
-    public void createContent(Collection collection, String uri, Session session, HttpServletRequest request, InputStream requestBody) throws ConflictException, NotFoundException, BadRequestException, UnauthorizedException, IOException, FileUploadException {
+    public void createContent(Collection collection, String uri, Session session, HttpServletRequest request,
+                              InputStream requestBody) throws ConflictException, NotFoundException, BadRequestException,
+            UnauthorizedException, IOException, FileUploadException {
 
         if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0) {
             throw new ConflictException("This URI already exists");

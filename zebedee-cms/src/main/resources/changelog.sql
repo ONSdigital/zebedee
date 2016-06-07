@@ -3,7 +3,7 @@
 --changeset carl:1
 CREATE TABLE collection_history
 (
-    collection_history_event_id BIGINT PRIMARY KEY NOT NULL,
+    collection_history_event_id serial PRIMARY KEY NOT NULL,
     collection_id VARCHAR(255) NOT NULL,
     collection_name VARCHAR(255) NOT NULL,
     event_date TIMESTAMP NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE collection_history
 --changeset carl:2
 CREATE TABLE history_event_meta_data
 (
-    history_event_meta_data_id INT PRIMARY KEY NOT NULL,
+    history_event_meta_data_id serial PRIMARY KEY NOT NULL,
     meta_data_key VARCHAR(255) NOT NULL,
     meta_data_value VARCHAR(255) NOT NULL,
     event_collection_history_event_id BIGINT,

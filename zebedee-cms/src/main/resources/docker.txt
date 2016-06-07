@@ -63,3 +63,6 @@ For my local dev environment I use docker to run the postgres database
 
 (6)
     run update-database.sh in the root of the project to create required database tables
+
+    To drop all database tables to re-run liquibase use the command (from zebedee root):
+        mvn -f zebedee-cms/pom.xml liquibase:dropAll

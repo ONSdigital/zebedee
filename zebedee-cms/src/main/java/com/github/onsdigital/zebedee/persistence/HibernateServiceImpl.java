@@ -8,18 +8,11 @@ import org.hibernate.cfg.Configuration;
  */
 public class HibernateServiceImpl implements HibernateService {
 
-    private SessionFactory sessionFactory = null;
     private static HibernateServiceImpl instance = null;
+    private SessionFactory sessionFactory = null;
 
     private HibernateServiceImpl() {
         this.sessionFactory = buildSessionFactory();
-    }
-
-    public SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            sessionFactory = buildSessionFactory();
-        }
-        return sessionFactory;
     }
 
     public static HibernateServiceImpl getInstance() {
@@ -39,5 +32,12 @@ public class HibernateServiceImpl implements HibernateService {
             System.err.println("Initial SessionFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);
         }
+    }
+
+    public SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            sessionFactory = buildSessionFactory();
+        }
+        return sessionFactory;
     }
 }

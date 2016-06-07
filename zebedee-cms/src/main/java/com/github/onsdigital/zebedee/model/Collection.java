@@ -12,7 +12,6 @@ import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -49,13 +48,6 @@ public class Collection {
     public final Content inProgress;
     final Zebedee zebedee;
     final Collections collections;
-
-    public CollectionDescription getDescription() {
-        return this.description;
-    }
-
-    //public RedirectTableChained redirect = null;
-    //private RedirectTableChained collectionRedirect = null;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -109,6 +101,9 @@ public class Collection {
         // this compound redirect will retrieve
 //        redirect = this.inProgress.redirect;
     }
+
+    //public RedirectTableChained redirect = null;
+    //private RedirectTableChained collectionRedirect = null;
 
     Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, CollectionNotFoundException {
         this(zebedee.collections.path.resolve(PathUtils.toFilename(collectionDescription.name)), zebedee);
@@ -324,6 +319,10 @@ public class Collection {
                 }
             }
         }
+    }
+
+    public CollectionDescription getDescription() {
+        return this.description;
     }
 
     private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {

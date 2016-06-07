@@ -4,12 +4,7 @@ import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoStub;
+import com.github.onsdigital.zebedee.json.*;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -1024,6 +1019,11 @@ public class CollectionsTest {
         assertTrue(Files.exists(path));
     }
 
+    private CollectionDescription collectionDescription(String name, CollectionType type) {
+        CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.type = type;
+        return collectionDescription;
+    }
 
     public class UpdateCollection implements Runnable {
         public boolean failed = false;
@@ -1055,12 +1055,6 @@ public class CollectionsTest {
                 System.out.println();
             }
         }
-    }
-
-    private CollectionDescription collectionDescription(String name, CollectionType type) {
-        CollectionDescription collectionDescription = new CollectionDescription(name);
-        collectionDescription.type = type;
-        return collectionDescription;
     }
 
 }

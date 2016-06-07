@@ -177,7 +177,7 @@ public class CollectionHistoryEvent {
 
     @Override
     public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj, new String[] {"eventDate"});
+        return EqualsBuilder.reflectionEquals(this, obj, new String[]{"eventDate"});
     }
 
     @Override

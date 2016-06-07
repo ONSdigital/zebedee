@@ -19,16 +19,14 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  */
 public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
 
-    private HibernateService hibernateService = null;
-
     static final String COLLECTION_ID = "collection_id";
-
     static final String SELECT_BY_COLLECTION_ID =
             "SELECT collection_history_event_id, collection_id, collection_name, " +
                     "event_date, event_type, exception_text, file_uri, page_uri, florence_user" +
                     " FROM collection_history " +
                     "WHERE collection_id = :collection_id " +
                     "ORDER BY event_date ASC";
+    private HibernateService hibernateService = null;
 
     public CollectionHistoryDaoImpl(HibernateService hibernateService) {
         this.hibernateService = hibernateService;

@@ -16,6 +16,10 @@ public abstract class CollectionHistoryDao {
 
     private static CollectionHistoryDao instance = null;
 
+    CollectionHistoryDao() {
+        // Hide Constructor from the outside.
+    }
+
     public static void setInstance(CollectionHistoryDao dao) {
         instance = dao;
     }
@@ -26,10 +30,6 @@ public abstract class CollectionHistoryDao {
             instance = new CollectionHistoryDaoStub();
         }
         return instance;
-    }
-
-    CollectionHistoryDao() {
-        // Hide Constructor from the outside.
     }
 
     /**

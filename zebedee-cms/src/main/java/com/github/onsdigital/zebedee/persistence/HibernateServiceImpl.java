@@ -6,9 +6,28 @@ import org.hibernate.cfg.Configuration;
 /**
  * Created by dave on 5/26/16.
  */
-public class HibernateUtil {
+public class HibernateServiceImpl implements HibernateService {
 
-    private static final SessionFactory sessionFactory = buildSessionFactory();
+    private SessionFactory sessionFactory = null;
+    private static HibernateServiceImpl instance = null;
+
+    private HibernateServiceImpl() {
+        this.sessionFactory = buildSessionFactory();
+    }
+
+    public SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            sessionFactory = buildSessionFactory();
+        }
+        return sessionFactory;
+    }
+
+    public static HibernateServiceImpl getInstance() {
+        if (instance == null) {
+            instance = new HibernateServiceImpl();
+        }
+        return instance;
+    }
 
     private static SessionFactory buildSessionFactory() {
         try {
@@ -20,9 +39,5 @@ public class HibernateUtil {
             System.err.println("Initial SessionFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);
         }
-    }
-
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
     }
 }

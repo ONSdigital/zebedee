@@ -3,6 +3,10 @@ package com.github.onsdigital.zebedee.persistence.model;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -169,6 +173,21 @@ public class CollectionHistoryEvent {
     public CollectionHistoryEvent collectionEventMetaData(List<CollectionHistoryEventMetaData> collectionHistoryEventMetaData) {
         this.collectionHistoryEventMetaData = collectionHistoryEventMetaData;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj, new String[] {"eventDate"});
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
     }
 }
 

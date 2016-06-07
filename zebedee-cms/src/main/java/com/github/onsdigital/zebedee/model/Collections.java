@@ -426,7 +426,7 @@ public class Collections {
 
         CollectionHistoryEvent event = new CollectionHistoryEvent(collection, session, COLLECTION_DELETED);
         collection.delete();
-        CollectionHistoryDao.getInstance().saveCollectionHistoryEvent(event);
+        CollectionHistoryDao.getCollectionHistoryDao().saveCollectionHistoryEvent(event);
     }
 
     /**

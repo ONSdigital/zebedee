@@ -24,7 +24,6 @@ import com.github.onsdigital.zebedee.model.approval.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -58,6 +57,7 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_NAME_CHANGED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_PUBLISH_RESCHEDULED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_TYPE_CHANGED;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.collectionCreated;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.renamed;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.reschedule;
@@ -69,7 +69,6 @@ public class Collection {
     public static final String IN_PROGRESS = "inprogress";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
-    private static CollectionHistoryDao collectionHistoryDao = CollectionHistoryDao.getInstance();
     public final CollectionDescription description;
     public final Path path;
     public final Content reviewed;
@@ -77,6 +76,10 @@ public class Collection {
     public final Content inProgress;
     final Zebedee zebedee;
     final Collections collections;
+
+    public CollectionDescription getDescription() {
+        return this.description;
+    }
 
     //public RedirectTableChained redirect = null;
     //private RedirectTableChained collectionRedirect = null;
@@ -172,7 +175,8 @@ public class Collection {
         }
 
         Collection collection = new Collection(collectionDescription, zebedee);
-        collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED, collectionCreated(collectionDescription));
+        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED, collectionCreated
+                (collectionDescription));
 
         if (collectionDescription.teams != null) {
             for (String teamName : collectionDescription.teams) {
@@ -286,20 +290,22 @@ public class Collection {
         if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
             String nameBeforeUpdate = collection.description.name;
             updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
-            collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_NAME_CHANGED, renamed(nameBeforeUpdate));
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_NAME_CHANGED, renamed
+                    (nameBeforeUpdate));
         }
 
         // if the type has changed
         if (collectionDescription.type != null
                 && updatedCollection.description.type != collectionDescription.type) {
             updatedCollection.description.type = collectionDescription.type;
-            collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_TYPE_CHANGED, typeChanged(updatedCollection.description));
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_TYPE_CHANGED, typeChanged
+                    (updatedCollection.description));
         }
 
         if (updatedCollection.description.type == CollectionType.scheduled) {
             if (collectionDescription.publishDate != null) {
                 if (!collection.description.publishDate.equals(collectionDescription.publishDate)) {
-                    collectionHistoryDao.saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_PUBLISH_RESCHEDULED,
+                    getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_PUBLISH_RESCHEDULED,
                             reschedule(collection.description.publishDate, collectionDescription.publishDate));
                 }
                 updatedCollection.description.publishDate = collectionDescription.publishDate;
@@ -1083,10 +1089,6 @@ public class Collection {
 
     public Content getInProgress() {
         return inProgress;
-    }
-
-    public static void setCollectionHistoryDao(CollectionHistoryDao collectionHistoryDao) {
-        Collection.collectionHistoryDao = collectionHistoryDao;
     }
 }
 

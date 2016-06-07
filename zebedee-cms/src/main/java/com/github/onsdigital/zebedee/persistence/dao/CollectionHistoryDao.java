@@ -14,9 +14,17 @@ import java.util.List;
  */
 public abstract class CollectionHistoryDao {
 
-    private static CollectionHistoryDao instance = new CollectionHistoryDaoImpl();
+    private static CollectionHistoryDao instance = null;
 
-    public static CollectionHistoryDao getInstance() {
+    public static void setInstance(CollectionHistoryDao dao) {
+        instance = dao;
+    }
+
+    public static CollectionHistoryDao getCollectionHistoryDao() {
+        if (instance == null) {
+            // Default to the test stub.
+            instance = new CollectionHistoryDaoStub();
+        }
         return instance;
     }
 

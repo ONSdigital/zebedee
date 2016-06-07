@@ -4,14 +4,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +17,10 @@ import java.util.List;
 public class CollectionHistoryEvent {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "collection_history_seq")
+    @SequenceGenerator(name = "collection_history_seq",
+            sequenceName = "collection_history_collection_history_event_id_seq",
+            allocationSize = 1)
     @Column(name = "collection_history_event_id")
     private long id;
 
@@ -81,6 +77,11 @@ public class CollectionHistoryEvent {
         return id;
     }
 
+    public CollectionHistoryEvent setId(long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getCollectionId() {
         return collectionId;
     }
@@ -115,11 +116,6 @@ public class CollectionHistoryEvent {
 
     public List<CollectionHistoryEventMetaData> getCollectionHistoryEventMetaData() {
         return collectionHistoryEventMetaData;
-    }
-
-    public CollectionHistoryEvent setId(long id) {
-        this.id = id;
-        return this;
     }
 
     public CollectionHistoryEvent collectionId(String collectionId) {

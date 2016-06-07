@@ -1,11 +1,6 @@
 package com.github.onsdigital.zebedee.persistence.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by dave on 6/1/16.
@@ -13,6 +8,23 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "history_event_meta_data")
 public class CollectionHistoryEventMetaData {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "history_event_meta_data_seq")
+    @SequenceGenerator(name = "history_event_meta_data_seq",
+            sequenceName = "history_event_meta_data_history_event_meta_data_id_seq",
+            allocationSize = 1)
+    @Column(name = "history_event_meta_data_id")
+    private int id;
+    @ManyToOne
+    @JoinColumn(name = "event_collection_history_event_id",
+            foreignKey = @ForeignKey(name = "event_collection_history_event_id")
+    )
+    private CollectionHistoryEvent event;
+    @Column(name = "meta_data_key")
+    private String key;
+    @Column(name = "meta_data_value")
+    private String value;
 
     public CollectionHistoryEventMetaData() {
     }
@@ -22,20 +34,6 @@ public class CollectionHistoryEventMetaData {
         this.value = value;
         this.event = event;
     }
-
-    @Id
-    @GeneratedValue
-    @Column(name = "history_event_meta_data_id")
-    private int id;
-
-    @ManyToOne
-    private CollectionHistoryEvent event;
-
-    @Column(name = "meta_data_key")
-    private String key;
-
-    @Column(name = "meta_data_value")
-    private String value;
 
     public String getKey() {
         return key;

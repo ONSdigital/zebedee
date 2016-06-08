@@ -286,15 +286,21 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
+        Set<String> updatesTeams = updateViewerTeams(collectionDescription, zebedee, session);
+        updatedCollection.description.teams.clear();
+        updatedCollection.description.teams.addAll(updatesTeams);
+
         updatedCollection.save();
 
-        updateViewerTeams(collectionDescription, zebedee, session);
         KeyManager.distributeCollectionKey(zebedee, session, collection);
 
         return updatedCollection;
     }
 
-    private static void updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, ZebedeeException {
+    private static Set<String> updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, ZebedeeException {
+
+        Set<String> updatedTeams = new HashSet<>();
+
         if (collectionDescription.teams != null) {
             // work out which teams need to be removed from the existing teams.
             Set<Integer> currentTeamIds = zebedee.permissions.listViewerTeams(collectionDescription, session);
@@ -315,10 +321,13 @@ public class Collection {
                 for (Team team : teams) { // iterate the teams list to find the team object
                     if (teamName.equals(team.name)) {
                         zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+                        updatedTeams.add(teamName);
                     }
                 }
             }
         }
+
+        return updatedTeams;
     }
 
     public CollectionDescription getDescription() {

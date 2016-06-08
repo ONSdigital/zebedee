@@ -61,7 +61,8 @@ public class Content {
      * @throws NotFoundException     If the file cannot be edited for some other reason
      */
     @POST
-    public boolean saveContent(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException, UnauthorizedException, ConflictException, FileUploadException {
+    public boolean saveContent(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ZebedeeException, FileUploadException {
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
@@ -109,7 +110,8 @@ public class Content {
      * @throws ConflictException     If the URI is being edited in another collection
      */
     @DELETE
-    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, NotFoundException, UnauthorizedException {
+    public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            BadRequestException, NotFoundException, UnauthorizedException {
 
         Session session = Root.zebedee.sessions.get(request);
 

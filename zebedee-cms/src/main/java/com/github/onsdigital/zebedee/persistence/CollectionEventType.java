@@ -25,9 +25,9 @@ public enum CollectionEventType {
 
     COLLECTION_EDITED_TYPE_CHANGED("collection.type.changed.description"),
 
-    PAGE(""),
+    COLLECTION_PAGE_ADDED("collection.page.added.description"),
 
-    FILE("");
+    COLLECTION_FILE_ADDED("collection.file.added.description");
 
     private final String descriptionKey;
 

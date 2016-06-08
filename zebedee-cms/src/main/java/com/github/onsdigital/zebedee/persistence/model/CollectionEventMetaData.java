@@ -31,6 +31,12 @@ public class CollectionEventMetaData {
     private final String key;
     private final String value;
 
+    /**
+     * Construct a new collection event meta data object.
+     *
+     * @param key
+     * @param value
+     */
     private CollectionEventMetaData(String key, String value) {
         this.key = key;
         this.value = value;
@@ -44,6 +50,9 @@ public class CollectionEventMetaData {
         return value;
     }
 
+    /**
+     * Create a {@link CollectionEventMetaData} for viewer team removed event.
+     */
     public static CollectionEventMetaData[] teamRemoved(CollectionDescription collectionDescription,
                                                         Session session, Team team) throws IOException, ZebedeeException {
         return toArray(
@@ -52,6 +61,9 @@ public class CollectionEventMetaData {
         );
     }
 
+    /**
+     * Create a {@link CollectionEventMetaData} for viewer team added event.
+     */
     public static CollectionEventMetaData[] teamAdded(CollectionDescription collectionDescription, Session session,
                                                       Team team) throws IOException, ZebedeeException {
         return toArray(
@@ -73,10 +85,16 @@ public class CollectionEventMetaData {
         return teamsListStr.toString();
     }
 
+    /**
+     * Create a {@link CollectionEventMetaData} for collection renamed.
+     */
     public static CollectionEventMetaData renamed(String previousName) {
         return new CollectionEventMetaData(PREVIOUS_NAME, previousName);
     }
 
+    /**
+     * Create a {@link CollectionEventMetaData} for {@link CollectionType} changed.
+     */
     public static CollectionEventMetaData[] typeChanged(CollectionDescription updatedCollectionDescription) {
         CollectionType previousType = updatedCollectionDescription.type.equals(CollectionType.manual)
                 ? CollectionType.scheduled : CollectionType.manual;
@@ -89,6 +107,9 @@ public class CollectionEventMetaData {
         );
     }
 
+    /**
+     * Create a {@link CollectionEventMetaData} for {@link com.github.onsdigital.zebedee.model.Collection} rescheduled.
+     */
     public static CollectionEventMetaData[] reschedule(Date originalDate, Date newDate) {
         return toArray(
                 new CollectionEventMetaData(PREVIOUS_PUBLISH_DATE, originalDate.toString()),
@@ -96,18 +117,26 @@ public class CollectionEventMetaData {
         );
     }
 
+    /**
+     * Create a {@link CollectionEventMetaData} for {@link com.github.onsdigital.zebedee.model.Collection} created.
+     */
     public static CollectionEventMetaData[] collectionCreated(CollectionDescription description) {
         if (description.type.equals(CollectionType.manual)) {
             return toArray(
-                    new CollectionEventMetaData(PUBLISH_TYPE, description.type.toString()),
-                    new CollectionEventMetaData(COLLECTION_OWNER, description.collectionOwner.name())
+                    new CollectionEventMetaData(PUBLISH_TYPE,
+                            description.type != null ? description.type.toString() : null),
+                    new CollectionEventMetaData(COLLECTION_OWNER,
+                            description.collectionOwner != null ? description.collectionOwner.name() : null)
             );
         }
 
         return toArray(
-                new CollectionEventMetaData(PUBLISH_DATE, description.publishDate.toString()),
-                new CollectionEventMetaData(PUBLISH_TYPE, description.type.toString()),
-                new CollectionEventMetaData(COLLECTION_OWNER, description.collectionOwner.name())
+                new CollectionEventMetaData(PUBLISH_DATE,
+                        description.publishDate != null ? description.publishDate.toString() : null),
+                new CollectionEventMetaData(PUBLISH_TYPE,
+                        description.type != null ? description.type.toString() : null),
+                new CollectionEventMetaData(COLLECTION_OWNER,
+                        description.collectionOwner != null ? description.collectionOwner.name() : null)
         );
     }
 

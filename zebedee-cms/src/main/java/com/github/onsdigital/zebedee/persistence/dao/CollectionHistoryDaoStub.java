@@ -34,6 +34,12 @@ public class CollectionHistoryDaoStub extends CollectionHistoryDao {
                 .collectionName("mockCollectionTwo")
                 .eventType(COLLECTION_EDITED_NAME_CHANGED)
                 .addEventMetaData("previousName", "mockCollectionOne"));
+
+        mockHistory.add(new CollectionHistoryEvent()
+                .collectionId("1234567890")
+                .user("Flash@JusticeLeague.com")
+                .collectionName("mockCollectionThree")
+                .eventType(COLLECTION_EDITED_NAME_CHANGED));
     }
 
     @Override

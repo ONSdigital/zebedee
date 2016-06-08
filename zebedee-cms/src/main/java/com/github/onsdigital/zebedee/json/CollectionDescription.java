@@ -129,4 +129,8 @@ public class CollectionDescription extends CollectionBase {
 
         publishResults.add(result);
     }
+
+    public CollectionOwner getCollectionOwner() {
+        return collectionOwner == null ? PUBLISHING_SUPPORT : collectionOwner;
+    }
 }

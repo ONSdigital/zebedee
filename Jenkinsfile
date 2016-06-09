@@ -6,7 +6,7 @@ node {
 
     stage 'Build'
     def mvn = "${tool 'm3'}/bin/mvn"
-    sh "${mvn} -Dmaven.test.skip=true clean package dependency:copy-dependencies"
+    sh "${mvn} clean package dependency:copy-dependencies"
 
     stage 'Image'
     sh 'git rev-parse --short HEAD | tee git_commit_id zebedee-reader/git_commit_id > /dev/null'

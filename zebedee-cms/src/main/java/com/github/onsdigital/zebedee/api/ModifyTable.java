@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
@@ -40,6 +41,9 @@ import java.nio.file.Paths;
 
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.deserialiseContent;
 import static com.github.onsdigital.zebedee.exceptions.TableBuilderException.ErrorType.UNEXPECTED_ERROR;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_TABLE_MODIFIED;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.tableModified;
 
 /**
  * Created by dave on 4/15/16.
@@ -115,11 +119,17 @@ public class ModifyTable {
             boolean recursive = false;
             if (!StringUtils.equals(newXlsFilename, currentXlsFilename)) {
                 Root.zebedee.collections.writeContent(collection, newUri + XLS_FILE_EXT, session, request,
-                        currentXlsResource.getData(), recursive);
+                        currentXlsResource.getData(), recursive, null);
             }
 
-            Root.zebedee.collections.writeContent(collection, newUri + HTML_FILE_EXT, session, request, htmlInputStream, recursive);
-            Root.zebedee.collections.writeContent(collection, newUri + JSON_FILE_EXT, session, request, jsonInputStream, recursive);
+            Root.zebedee.collections.writeContent(collection, newUri + HTML_FILE_EXT, session, request,
+                    htmlInputStream, recursive, null);
+            Root.zebedee.collections.writeContent(collection, newUri + JSON_FILE_EXT, session, request,
+                    jsonInputStream, recursive, null);
+
+            getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
+                    COLLECTION_TABLE_MODIFIED, tableModified(newUri)));
+
         } catch (Exception ex) {
             throw new TableBuilderException(UNEXPECTED_ERROR, ex.getMessage());
         }

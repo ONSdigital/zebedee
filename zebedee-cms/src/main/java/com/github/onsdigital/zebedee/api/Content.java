@@ -2,9 +2,14 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
@@ -19,9 +24,18 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_FILE_ADDED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_FILE_MODIFIED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_PAGE_ADDED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_PAGE_MODIFIED;
 
 @Api
 public class Content {
+
+    private static final String DATA_JSON = "data.json";
 
     /**
      * Retrieves file content for the endpoint <code>/Content/[CollectionName]/?uri=[uri]</code>
@@ -75,9 +89,10 @@ public class Content {
         String uri = request.getParameter("uri");
         Boolean overwriteExisting = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("overwriteExisting"), "true"));
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
+        CollectionEventType eventType = getEventType(overwriteExisting, Paths.get(uri));
 
         if (overwriteExisting) {
-            Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody, recursive);
+            Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody, recursive, eventType);
             Audit.Event.CONTENT_OVERWRITTEN
                     .parameters()
                     .host(request)
@@ -85,7 +100,7 @@ public class Content {
                     .content(uri)
                     .user(session.email).log();
         } else {
-            Root.zebedee.collections.createContent(collection, uri, session, request, requestBody);
+            Root.zebedee.collections.createContent(collection, uri, session, request, requestBody, eventType);
             Audit.Event.CONTENT_SAVED
                     .parameters()
                     .host(request)
@@ -111,7 +126,7 @@ public class Content {
      */
     @DELETE
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException,
-            BadRequestException, NotFoundException, UnauthorizedException {
+            ZebedeeException {
 
         Session session = Root.zebedee.sessions.get(request);
 
@@ -119,7 +134,7 @@ public class Content {
         String uri = request.getParameter("uri");
 
         boolean result = Root.zebedee.collections.deleteContent(collection, uri, session);
-        if(result) {
+        if (result) {
             Audit.Event.CONTENT_DELETED
                     .parameters()
                     .host(request)
@@ -129,5 +144,12 @@ public class Content {
         }
 
         return result;
+    }
+
+    private CollectionEventType getEventType(boolean overwriteExisting, Path uri) {
+        if (DATA_JSON.equals(uri.getFileName().toString())) {
+            return overwriteExisting ? COLLECTION_PAGE_MODIFIED : COLLECTION_PAGE_ADDED;
+        }
+        return overwriteExisting ? COLLECTION_FILE_MODIFIED : COLLECTION_FILE_ADDED;
     }
 }

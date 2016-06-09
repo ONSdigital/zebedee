@@ -16,15 +16,13 @@ public class CollectionHistoryEvent {
     private String collectionId;
     private String collectionName;
     private CollectionEventDetails eventDetails;
-    private String pageURI;
-    private String fileURI;
+    private String uri;
     private String exceptionText;
 
     public CollectionHistoryEvent(com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent event) throws ZebedeeException {
         this.collectionId = event.getCollectionId();
         this.collectionName = event.getCollectionName();
-        this.pageURI = event.getPageURI();
-        this.fileURI = event.getFileURI();
+        this.uri = event.getUri();
         this.exceptionText = event.getExceptionText();
         Map<String, String> metaData = null;
 
@@ -50,12 +48,8 @@ public class CollectionHistoryEvent {
         return collectionName;
     }
 
-    public String getPageURI() {
-        return pageURI;
-    }
-
-    public String getFileURI() {
-        return fileURI;
+    public String getUri() {
+        return uri;
     }
 
     public String getExceptionText() {

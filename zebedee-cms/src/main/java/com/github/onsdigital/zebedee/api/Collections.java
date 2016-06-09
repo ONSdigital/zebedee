@@ -9,7 +9,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +23,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 @Api
 public class Collections {
 
-    private static ZebedeeApiHelper zebedeeHelper = ZebedeeApiHelper.getInstance();
+    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
 
     /**
      * Get the collection defined by the given HttpServletRequest
@@ -64,7 +64,7 @@ public class Collections {
             Session session = Root.zebedee.sessions.get(request);
             CollectionDescriptions result = new CollectionDescriptions();
             List<Collection> collections = Root.zebedee.collections.list();
-            CollectionOwner collectionOwner = zebedeeHelper.getPublisherType(session.email);
+            CollectionOwner collectionOwner = zebedeeCmsService.getPublisherType(session.email);
 
             for (Collection collection : collections) {
                 if (Root.zebedee.permissions.canView(session, collection.description)

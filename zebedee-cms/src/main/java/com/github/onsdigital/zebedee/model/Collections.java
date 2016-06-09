@@ -5,7 +5,12 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -15,7 +20,7 @@ import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -45,7 +50,12 @@ import java.util.concurrent.Future;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
 
 public class Collections {
     public final Path path;
@@ -110,8 +120,7 @@ public class Collections {
             Collection collection, String uri,
             Session session,
             boolean recursive
-    ) throws IOException, NotFoundException,
-            UnauthorizedException, BadRequestException {
+    ) throws IOException, ZebedeeException {
 
         // Check the collection
         if (collection == null) {
@@ -134,10 +143,13 @@ public class Collections {
             throw new BadRequestException("URI does not represent a file.");
         }
 
+        CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, null).uri(uri);
         // Attempt to complete:
         if (collection.complete(session.email, uri, recursive)) {
             collection.save();
+            getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_ITEM_COMPLETED));
         } else {
+            getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_COMPLETED_ERROR));
             throw new BadRequestException("URI was not completed.");
         }
     }
@@ -421,7 +433,7 @@ public class Collections {
 
         CollectionHistoryEvent event = new CollectionHistoryEvent(collection, session, COLLECTION_DELETED);
         collection.delete();
-        CollectionHistoryDao.getCollectionHistoryDao().saveCollectionHistoryEvent(event);
+        getCollectionHistoryDao().saveCollectionHistoryEvent(event);
     }
 
     /**
@@ -439,23 +451,21 @@ public class Collections {
      * @throws IOException
      */
     public void createContent(Collection collection, String uri, Session session, HttpServletRequest request,
-                              InputStream requestBody) throws ConflictException, NotFoundException, BadRequestException,
-            UnauthorizedException, IOException, FileUploadException {
+                              InputStream requestBody, CollectionEventType eventType) throws ZebedeeException, IOException,
+            FileUploadException {
 
         if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0) {
             throw new ConflictException("This URI already exists");
         }
 
-        writeContent(collection, uri, session, request, requestBody, false);
+        writeContent(collection, uri, session, request, requestBody, false, eventType);
     }
+
 
     public void writeContent(
             Collection collection, String uri,
-            Session session, HttpServletRequest request, InputStream requestBody,
-            Boolean recursive
-    )
-            throws IOException, BadRequestException, UnauthorizedException,
-            ConflictException, NotFoundException, FileUploadException {
+            Session session, HttpServletRequest request, InputStream requestBody, Boolean recursive,
+            CollectionEventType eventType) throws IOException, ZebedeeException, FileUploadException {
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
@@ -503,9 +513,12 @@ public class Collections {
                     "Somehow we weren't able to edit the requested URI");
         }
 
+        CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, eventType);
+
         // Detect whether this is a multipart request
         if (ServletFileUpload.isMultipartContent(request)) {
-            postDataFile(request, uri, collectionWriter);
+            postDataFile(request, uri, collectionWriter, historyEvent);
+
         } else {
 
             Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
@@ -515,6 +528,9 @@ public class Collections {
                 }
             } else {
                 collectionWriter.getInProgress().write(requestBody, uri);
+            }
+            if (eventType != null) {
+                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.uri(uri));
             }
         }
     }
@@ -544,8 +560,7 @@ public class Collections {
     public boolean deleteContent(
             Collection collection, String uri,
             Session session
-    ) throws IOException, BadRequestException,
-            UnauthorizedException, NotFoundException {
+    ) throws IOException, ZebedeeException {
 
         // Collection (null check before authorisation check)
         if (collection == null) {
@@ -573,19 +588,25 @@ public class Collections {
 
         // Go ahead
         boolean deleted;
+        CollectionEventType eventType;
 
         if (collection.description.collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
             deleted = collection.deleteDataVisContent(session.email, Paths.get(uri));
+            eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
         } else {
             if (Files.isDirectory(path)) {
+
                 deleted = collection.deleteContent(session.email, uri);
             } else {
                 deleted = collection.deleteFile(uri);
             }
+            eventType = COLLECTION_CONTENT_DELETED;
         }
-
         collection.save();
-
+        if (deleted) {
+            getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
+                    eventType).uri(uri));
+        }
         return deleted;
     }
 
@@ -598,7 +619,8 @@ public class Collections {
      * @throws FileUploadException
      * @throws IOException
      */
-    private void postDataFile(HttpServletRequest request, String uri, CollectionWriter collectionWriter)
+    private void postDataFile(HttpServletRequest request, String uri, CollectionWriter collectionWriter,
+                              CollectionHistoryEvent historyEvent)
             throws FileUploadException, IOException {
 
         ServletFileUpload upload = getServletFileUpload();
@@ -608,6 +630,7 @@ public class Collections {
                 try (InputStream inputStream = item.getInputStream()) {
                     collectionWriter.getInProgress().write(inputStream, uri);
                 }
+                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.uri(uri));
             }
         } catch (Exception e) {
             throw new IOException("Error processing uploaded file", e);

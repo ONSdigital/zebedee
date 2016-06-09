@@ -32,6 +32,13 @@ public class CollectionEventMetaData {
     static final String PREVIOUS_PUBLISH_DATE = "previousPublishDate";
     static final String PUBLISH_TYPE = "publishType";
     static final String COLLECTION_OWNER = "collectionOwner";
+    static final String TABLE_XLS_MODIFIED = "updatedXLSFile";
+    static final String TABLE_JSON_MODIFIED = "updateJSONFile";
+    static final String TABLE_HTML_MODIFIED = "updatedHTMLFile";
+
+    private static final String HTML = ".html";
+    private static final String XLS = ".xls";
+    private static final String JSON = ".json";
 
     private final String key;
     private final String value;
@@ -167,7 +174,18 @@ public class CollectionEventMetaData {
         }
 
         if (description.collectionOwner != null) {
-            metaDataList.add(new CollectionEventMetaData(COLLECTION_OWNER, description.getCollectionOwner().name()));
+            metaDataList.add(new CollectionEventMetaData(COLLECTION_OWNER, description.getCollectionOwner().getDisplayText()));
+        }
+        return toArray(metaDataList);
+    }
+
+    public static CollectionEventMetaData[] tableModified(String uri) {
+        List<CollectionEventMetaData> metaDataList = new ArrayList<>();
+
+        if (StringUtils.isNotEmpty(uri)) {
+            metaDataList.add((new CollectionEventMetaData(TABLE_XLS_MODIFIED, uri + XLS)));
+            metaDataList.add((new CollectionEventMetaData(TABLE_JSON_MODIFIED, uri + JSON)));
+            metaDataList.add((new CollectionEventMetaData(TABLE_HTML_MODIFIED, uri + HTML)));
         }
         return toArray(metaDataList);
     }

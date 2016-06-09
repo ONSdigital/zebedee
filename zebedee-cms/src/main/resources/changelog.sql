@@ -9,9 +9,8 @@ CREATE TABLE collection_history
     event_date TIMESTAMP NOT NULL,
     event_type INT NOT NULL,
     exception_text VARCHAR(255),
-    file_uri VARCHAR(255),
-    page_uri VARCHAR(255),
-    florence_user VARCHAR(255)
+    uri VARCHAR(255),
+    florence_user VARCHAR(255) NOT NULL
 );
 --rollback drop table collection_history;
 

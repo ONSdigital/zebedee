@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
-import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao
 public class CollectionHistory {
 
     private static CollectionHistoryDao collectionHistoryDao = CollectionHistoryDao.getCollectionHistoryDao();
-    private static ZebedeeApiHelper apiHelper = ZebedeeApiHelper.getInstance();
+    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
 
     /**
      * Get the collection event history for the specified collection.
@@ -42,7 +42,7 @@ public class CollectionHistory {
             HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException, IOException {
 
-        Session session = apiHelper.getSession(request);
+        Session session = zebedeeCmsService.getSession(request);
         checkPermission(session);
 
         String collectionId = RequestUtils.getCollectionId(request);
@@ -56,7 +56,7 @@ public class CollectionHistory {
 
     private void checkPermission(Session session) throws ZebedeeException {
         try {
-            if (session == null || apiHelper.getPermissions().canEdit(session.email) == false) {
+            if (session == null || zebedeeCmsService.getPermissions().canEdit(session.email) == false) {
                 throw new UnauthorizedException("You are not authorised to create collections.");
             }
         } catch (IOException io) {

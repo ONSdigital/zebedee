@@ -28,26 +28,23 @@ public class CollectionHistoryEvent {
     @Column(name = "collection_history_event_id")
     private long id;
 
-    @Column(name = "collection_id")
+    @Column(name = "collection_id", nullable = false)
     private String collectionId;
 
-    @Column(name = "event_date")
+    @Column(name = "collection_name", nullable = false)
+    private String collectionName;
+
+    @Column(name = "event_date", nullable = false)
     private Date eventDate;
 
-    @Column(name = "florence_user")
+    @Column(name = "florence_user", nullable = false)
     private String user;
 
     @Column(name = "event_type")
     private CollectionEventType eventType;
 
-    @Column(name = "collection_name")
-    private String collectionName;
-
-    @Column(name = "page_uri")
-    private String pageURI;
-
-    @Column(name = "file_uri")
-    private String fileURI;
+    @Column(name = "uri")
+    private String uri;
 
     @Column(name = "exception_text")
     private String exceptionText;
@@ -108,12 +105,8 @@ public class CollectionHistoryEvent {
         return eventType;
     }
 
-    public String getPageURI() {
-        return pageURI;
-    }
-
-    public String getFileURI() {
-        return fileURI;
+    public String getUri() {
+        return uri;
     }
 
     public String getExceptionText() {
@@ -149,13 +142,8 @@ public class CollectionHistoryEvent {
         return this;
     }
 
-    public CollectionHistoryEvent pageURI(String pageURI) {
-        this.pageURI = pageURI;
-        return this;
-    }
-
-    public CollectionHistoryEvent fileURI(String fileURI) {
-        this.fileURI = fileURI;
+    public CollectionHistoryEvent uri(String uri) {
+        this.uri = uri;
         return this;
     }
 

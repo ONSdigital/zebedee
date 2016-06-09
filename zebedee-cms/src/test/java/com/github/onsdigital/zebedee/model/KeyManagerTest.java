@@ -10,7 +10,7 @@ import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,14 +38,14 @@ public class KeyManagerTest {
     Builder builder;
 
     @Mock
-    private ZebedeeApiHelper zebedeeHelperMock;
+    private ZebedeeCmsService zebedeeHelperMock;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         builder = new Builder();
         zebedee = new Zebedee(builder.zebedee, false);
-        KeyManager.setZebedeeHelper(zebedeeHelperMock);
+        KeyManager.setZebedeeCmsService(zebedeeHelperMock);
     }
 
     @After

@@ -2,9 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang.BooleanUtils;
@@ -33,7 +31,8 @@ public class Complete {
      * @throws IOException
      */
     @POST
-    public ResultMessage complete(HttpServletRequest request, HttpServletResponse response) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
+    public ResultMessage complete(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ZebedeeException{
 
         // Locate the collection:
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);

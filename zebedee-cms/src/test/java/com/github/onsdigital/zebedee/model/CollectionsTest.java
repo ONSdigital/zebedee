@@ -3,8 +3,17 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -24,8 +33,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CollectionsTest {
 
@@ -144,8 +159,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnComplete()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException,ZebedeeException {
 
         // Given
         // A null collection
@@ -182,8 +196,7 @@ public class CollectionsTest {
 
     @Test(expected = NotFoundException.class)
     public void shouldThrowNotFoundForNullCollectionOnWriteContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException, FileUploadException {
+            throws IOException, ZebedeeException, FileUploadException {
 
         // Given
         // A null collection
@@ -196,7 +209,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_MODIFIED);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -204,8 +217,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnDeleteContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null collection
@@ -307,8 +319,7 @@ public class CollectionsTest {
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnComplete()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null session
@@ -344,8 +355,7 @@ public class CollectionsTest {
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnWriteContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException, FileUploadException {
+            throws IOException, ZebedeeException, FileUploadException {
 
         // Given
         // A null session
@@ -358,7 +368,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_MODIFIED);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -366,8 +376,7 @@ public class CollectionsTest {
 
     @Test(expected = UnauthorizedException.class)
     public void shouldThrowUnauthorizedIfNotLoggedInOnDeleteContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null session
@@ -401,8 +410,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestIfNoUriOnWriteContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException, FileUploadException {
+            throws IOException, ZebedeeException, FileUploadException {
 
         // Given
         // A null session
@@ -415,7 +423,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_MODIFIED);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -423,8 +431,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestIfNoUriOnDeleteContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null session
@@ -442,8 +449,7 @@ public class CollectionsTest {
 
     @Test(expected = NotFoundException.class)
     public void shouldThrowNotFoundIfUriNotInProgressOnComplete()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A URI that is not in progress
@@ -461,8 +467,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestIfUriIsADirectoryOnComplete()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A URI that indicates a directory
@@ -481,8 +486,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldCompleteContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A URI that indicates a file
@@ -767,8 +771,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForWritingADirectoryAsAFile()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException, FileUploadException {
+            throws IOException, ZebedeeException, FileUploadException {
 
         // Given
         // A directory instead of a file
@@ -781,7 +784,8 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+                CollectionEventType.COLLECTION_PAGE_MODIFIED);
 
         // Then
         // We should get the expected exception
@@ -789,8 +793,7 @@ public class CollectionsTest {
 
     @Test(expected = ConflictException.class)
     public void shouldThrowConflictForCreatingFileBeingEditedElsewhere()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException, FileUploadException {
+            throws IOException, ZebedeeException, FileUploadException {
 
         // Given
         // A file in a different collection
@@ -804,7 +807,8 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+                CollectionEventType.COLLECTION_PAGE_MODIFIED);
 
         // Then
         // We should get the expected exception
@@ -812,8 +816,7 @@ public class CollectionsTest {
 
     @Test(expected = ConflictException.class)
     public void shouldThrowConflictForEditingFileBeingEditedElsewhere()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException, FileUploadException {
+            throws IOException, ZebedeeException, FileUploadException {
 
         // Given
         // A file being edited in a different collection
@@ -833,7 +836,8 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+                CollectionEventType.COLLECTION_PAGE_MODIFIED);
 
         // Then
         // We should get the expected exception
@@ -841,8 +845,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldWriteContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException, FileUploadException {
+            throws IOException, ZebedeeException, FileUploadException {
 
         // Given
         // A new file
@@ -855,7 +858,8 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+                CollectionEventType.COLLECTION_PAGE_MODIFIED);
 
         // Then
         // We should see the file
@@ -866,8 +870,7 @@ public class CollectionsTest {
 
     @Test(expected = NotFoundException.class)
     public void shouldThrowNotFoundForDeletingNonexistentFile()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A file that doesn't exist in the collection
@@ -885,8 +888,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldDeleteFile()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A file that doesn't exist in the collection
@@ -907,8 +909,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldDeleteFolderRecursively()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A file that doesn't exist in the collection
@@ -939,7 +940,7 @@ public class CollectionsTest {
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         builder.createPublishedFile(uri);
-        zebedee.collections.createContent(collection, uri, null, null, null);
+        zebedee.collections.createContent(collection, uri, null, null, null, null);
     }
 
     @Test(expected = ConflictException.class)
@@ -949,7 +950,7 @@ public class CollectionsTest {
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         builder.createInProgressFile(uri);
-        zebedee.collections.createContent(collection, uri, null, null, null);
+        zebedee.collections.createContent(collection, uri, null, null, null, null);
     }
 
     @Test
@@ -995,8 +996,7 @@ public class CollectionsTest {
 
     @Test
     public void shouldWriteEncryptedContent()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException, FileUploadException {
+            throws IOException, ZebedeeException, FileUploadException {
 
         // Given
         // A new file
@@ -1010,7 +1010,8 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive);
+        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+                CollectionEventType.COLLECTION_PAGE_MODIFIED);
 
         // Then
         // We should see the file

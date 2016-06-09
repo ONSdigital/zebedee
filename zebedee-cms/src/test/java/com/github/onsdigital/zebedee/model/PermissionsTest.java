@@ -10,7 +10,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class PermissionsTest {
     String viewerEmail;
 
     @Mock
-    private ZebedeeApiHelper zebedeeApiHelper;
+    private ZebedeeCmsService zebedeeCmsService;
 
     @Before
     public void setUp() throws Exception {
@@ -63,10 +63,10 @@ public class PermissionsTest {
         zebedee.teams.addTeamMember(viewerEmail, team, session);
 
 
-        when(zebedeeApiHelper.getCollection(anyString()))
+        when(zebedeeCmsService.getCollection(anyString()))
                 .thenReturn(inflationCollection);
 
-        KeyManager.setZebedeeHelper(zebedeeApiHelper);
+        KeyManager.setZebedeeCmsService(zebedeeCmsService);
     }
 
     @After

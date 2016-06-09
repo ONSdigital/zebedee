@@ -16,14 +16,17 @@ public class CollectionHistoryEventMetaData {
             allocationSize = 1)
     @Column(name = "history_event_meta_data_id")
     private int id;
+
     @ManyToOne
     @JoinColumn(name = "event_collection_history_event_id",
             foreignKey = @ForeignKey(name = "event_collection_history_event_id")
     )
     private CollectionHistoryEvent event;
-    @Column(name = "meta_data_key")
+
+    @Column(name = "meta_data_key", nullable = false)
     private String key;
-    @Column(name = "meta_data_value")
+
+    @Column(name = "meta_data_value", nullable = false)
     private String value;
 
     public CollectionHistoryEventMetaData() {

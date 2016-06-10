@@ -9,6 +9,8 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.XlsToHtmlConverter;
@@ -25,6 +27,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_TABLE_CREATED;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.tableCreated;
 
 @Api
 public class Table {
@@ -63,12 +69,16 @@ public class Table {
         }
 
         Resource resource = collectionReader.getResource(uri);
-        Node table = XlsToHtmlConverter.convertToHtmlPageWithModifications(resource.getData(), getTableModifications(request));
+        TableModifications modifications = getTableModifications(request);
+        Node table = XlsToHtmlConverter.convertToHtmlPageWithModifications(resource.getData(), modifications);
         String output = XlsToHtmlConverter.docToString(table);
 
         // Write the file to the response
         org.apache.commons.io.IOUtils.copy(new StringReader(output),
                 response.getOutputStream());
+
+        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_TABLE_CREATED,
+                tableCreated(uri, modifications));
 
         Audit.Event.COLLECTION_TABLE_CREATED
                 .parameters()

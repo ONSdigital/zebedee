@@ -209,7 +209,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_MODIFIED);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -368,7 +368,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_MODIFIED);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -423,7 +423,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_MODIFIED);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -622,8 +622,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnUnlock()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null collection
@@ -785,7 +784,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_MODIFIED);
+                CollectionEventType.COLLECTION_PAGE_SAVED);
 
         // Then
         // We should get the expected exception
@@ -808,7 +807,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_MODIFIED);
+                CollectionEventType.COLLECTION_PAGE_SAVED);
 
         // Then
         // We should get the expected exception
@@ -837,7 +836,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_MODIFIED);
+                CollectionEventType.COLLECTION_PAGE_SAVED);
 
         // Then
         // We should get the expected exception
@@ -859,7 +858,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_MODIFIED);
+                CollectionEventType.COLLECTION_PAGE_SAVED);
 
         // Then
         // We should see the file
@@ -1011,7 +1010,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_MODIFIED);
+                CollectionEventType.COLLECTION_PAGE_SAVED);
 
         // Then
         // We should see the file

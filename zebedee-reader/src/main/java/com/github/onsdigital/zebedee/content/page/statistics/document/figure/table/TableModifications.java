@@ -1,5 +1,8 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.figure.table;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -59,5 +62,9 @@ public class TableModifications {
 
     public boolean modificationsExist() {
         return this.rowsExcluded.size() > 0 || this.headerRows.size() > 0 || this.headerColumns.size() > 0;
+    }
+
+    public String summary() {
+        return "rowsExcluded: " + rowsExcluded + ", headerRows: " + headerRows + ", headerColumns: " + headerColumns;
     }
 }

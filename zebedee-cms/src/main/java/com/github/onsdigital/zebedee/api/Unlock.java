@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +28,8 @@ public class Unlock {
      * @throws UnauthorizedException
      */
     @POST
-    public boolean unlockCollection(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, BadRequestException, UnauthorizedException {
+    public boolean unlockCollection(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         Session session = Root.zebedee.sessions.get(request);

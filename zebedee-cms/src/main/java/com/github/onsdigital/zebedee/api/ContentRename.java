@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +25,8 @@ public class ContentRename {
      * @throws UnauthorizedException
      */
     @POST
-    public boolean RenameContent(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, UnauthorizedException {
+    public boolean RenameContent(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ZebedeeException {
 
         Session session = Root.zebedee.sessions.get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);

@@ -11,9 +11,40 @@ public enum CollectionEventType {
     COLLECTION_CREATED("collection.created.description"),
 
     /**
-     * Collection approved.
+     * Collection name changed.
      */
-    COLLECTION_APPROVED("collection.approved.description"),
+    COLLECTION_NAME_CHANGED("collection.name.changed.description"),
+
+    /**
+     * Collection publish rescheduled.
+     */
+    COLLECTION_PUBLISH_RESCHEDULED("collection.publish.rescheduled.description"),
+
+    /**
+     * Viewer team added to collection.
+     */
+    COLLECTION_VIEWER_TEAM_ADDED("collection.viewer.team.added.description"),
+
+    /**
+     * Viewer team removed from collection.
+     */
+    COLLECTION_VIEWER_TEAM_REMOVED("collection.viewer.team.removed.description"),
+
+    /**
+     * Collection type({@link com.github.onsdigital.zebedee.json.CollectionType#manual} /
+     * {@link com.github.onsdigital.zebedee.json.CollectionType#scheduled}) changed.
+     */
+    COLLECTION_TYPE_CHANGED("collection.type.changed.description"),
+
+    /**
+     * Page added to collection.
+     */
+    COLLECTION_PAGE_SAVED("collection.page.saved.description"),
+
+    /**
+     * File added.
+     */
+    COLLECTION_FILE_SAVED("collection.file.saved.description"),
 
     /**
      * Collection deleted.
@@ -21,60 +52,39 @@ public enum CollectionEventType {
     COLLECTION_DELETED("collection.delete.description"),
 
     /**
+     * Collection approved.
+     */
+    COLLECTION_APPROVED("collection.approved.description"),
+
+    /**
      * Collection unlocked.
      */
     COLLECTION_UNLOCKED("collection.unlocked.description"),
 
     /**
+     * Collection page moved to completed state.
+     */
+    COLLECTION_ITEM_COMPLETED("collection.completed.description"),
+
+    /**
      * Collection published.
      */
-    COLLECTION_PUBLISHED("collection.published.description"),
+    COLLECTION_POST_PUBLISHED_CONFIRMATION("collection.post.publish.confirmation.description"),
 
     /**
-     * Collection name changed.
+     * Collection manual publish invoked.
      */
-    COLLECTION_EDITED_NAME_CHANGED("collection.name.changed.description"),
+    COLLECTION_MANUAL_PUBLISHED_TRIGGERED("collection.manual.publish.triggered.description"),
 
     /**
-     * Collection publish rescheduled.
+     * Collection manual publish complete successfully.
      */
-    COLLECTION_EDITED_PUBLISH_RESCHEDULED("collection.publish.rescheduled.description"),
+    COLLECTION_MANUAL_PUBLISHED_SUCCESS("collection.manual.publish.success.description"),
 
     /**
-     * Viewer team added to collection.
+     * Collection manual publish complete successfully.
      */
-    COLLECTION_EDITED_VIEWER_TEAM_ADDED("collection.viewer.team.added.description"),
-
-    /**
-     * Viewer team removed from collection.
-     */
-    COLLECTION_EDITED_VIEWER_TEAM_REMOVED("collection.viewer.team.removed.description"),
-
-    /**
-     * Collection type({@link com.github.onsdigital.zebedee.json.CollectionType#manual} /
-     * {@link com.github.onsdigital.zebedee.json.CollectionType#scheduled}) changed.
-     */
-    COLLECTION_EDITED_TYPE_CHANGED("collection.type.changed.description"),
-
-    /**
-     * Page added to collection.
-     */
-    COLLECTION_PAGE_ADDED("collection.page.added.description"),
-
-    /**
-     * Page updated or saved.
-     */
-    COLLECTION_PAGE_MODIFIED("collection.page.modified.description"),
-
-    /**
-     * File added.
-     */
-    COLLECTION_FILE_ADDED("collection.file.added.description"),
-
-    /**
-     * File updated.
-     */
-    COLLECTION_FILE_MODIFIED("collection.file.modified.description"),
+    COLLECTION_MANUAL_PUBLISHED_FAILURE("collection.manual.publish.failure.description"),
 
     /**
      * Collection table modified - rows/columns excluded or header rows/cols added.
@@ -82,9 +92,9 @@ public enum CollectionEventType {
     COLLECTION_TABLE_MODIFIED("collection.table.file.modified.description"),
 
     /**
-     * Collection page moved to completed state.
+     * Collection table created.
      */
-    COLLECTION_ITEM_COMPLETED("collection.completed.description"),
+    COLLECTION_TABLE_CREATED("collection.table.created.description"),
 
     /**
      * Error while attemption to move collection page completed state.
@@ -97,9 +107,29 @@ public enum CollectionEventType {
     COLLECTION_CONTENT_DELETED("collection.content.deleted.description"),
 
     /**
+     * Data visualisation zip unpacked.
+     */
+    DATA_VISUALISATION_ZIP_UNPACKED("data.visualisation.zip.unpacked.description"),
+
+    /**
      * Collect page/item deleted.
      */
-    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED("data.visualisation.collection.content.deleted.description");
+    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED("data.visualisation.collection.content.deleted.description"),
+
+    /**
+     * Collect page/item reviewed.
+     */
+    COLLECTION_CONTENT_REVIEWED("collection.content.reviewed.description"),
+
+    /**
+     * Collect page/item renamed.
+     */
+    COLLECTION_CONTENT_RENAMED("collection.content.renamed.description"),
+
+    /**
+     * Collection content moved.
+     */
+    COLLECTION_CONTENT_MOVED("collection.content.moved.description");
 
     private final String descriptionKey;
 

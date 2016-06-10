@@ -57,6 +57,12 @@ public class CollectionHistoryEvent {
     }
 
     public CollectionHistoryEvent(Collection collection, Session session, CollectionEventType collectionEventType,
+                                  String uri, CollectionEventMetaData... metaValues) {
+        this(collection.description.id, collection.description.name, session, collectionEventType, metaValues);
+        this.uri = uri;
+    }
+
+    public CollectionHistoryEvent(Collection collection, Session session, CollectionEventType collectionEventType,
                                   CollectionEventMetaData... metaValues) {
         this(collection.description.id, collection.description.name, session, collectionEventType, metaValues);
     }
@@ -66,8 +72,8 @@ public class CollectionHistoryEvent {
         this.eventDate = new Date();
         collectionId(collectionId);
         collectionName(collectionName);
-        user(session.email);
         eventType(collectionEventType);
+        user(session.email);
 
         if (metaValues != null) {
             for (CollectionEventMetaData collectionEventMetaData : metaValues) {

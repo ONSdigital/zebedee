@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ResultMessage;
 import com.github.onsdigital.zebedee.json.Session;
 import org.apache.commons.lang.BooleanUtils;
@@ -33,7 +34,8 @@ public class Review {
      * @throws IOException
      */
     @POST
-    public ResultMessage review(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    public ResultMessage review(HttpServletRequest request, HttpServletResponse response) throws IOException,
+            ZebedeeException {
 
         // Collate parameters
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);

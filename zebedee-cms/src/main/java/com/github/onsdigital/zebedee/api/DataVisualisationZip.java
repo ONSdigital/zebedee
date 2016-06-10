@@ -40,6 +40,9 @@ import java.util.zip.ZipInputStream;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_ZIP_UNPACKED;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.dataVisZipUnpacked;
 
 /**
  * Endpoint for unzipping an uploaded data visualisation zip file.
@@ -51,6 +54,17 @@ public class DataVisualisationZip {
     private static final String HTML_EXT = ".html";
     private static final String DATA_JSON_FILE = "/data.json";
     private static final List<String> MAC_OS_ZIP_IGNORE = Arrays.asList(new String[]{"__MACOSX", ".DS_Store"});
+    private static final String DELETING_ZIP_DEBUG = "Deleting data visualisation zip";
+    private static final String DELETING_ZIP_ERROR_DEBUG = "Unexpected error while attempting to delete existing data vis zip content.";
+    private static final String UNZIP_DEBUG = "Unpacking data visualisation zip";
+    private static final String UNZIP_SUCCESS_DEBUG = "Successfully unzipped data viz file.";
+    private static final String UNZIPPING_ERROR_MSG = "Error while trying to unzip Data Visualisation file";
+    private static final String COLLECTION_RES_ERROR_MSG = "Could not find the requested collection Resource";
+    private static final String NO_ZIP_PATH_ERROR_MSG = "Please specify the zip file path.";
+    private static final String UNPACK_ZIP_SUCCESS_MSG = "Visualisation zip unpacked successfully";
+    private static final String DATA_VIS_DELETED_SUCCESS_MSG = "The requested data visualisation was deleted or did not exist.";
+    private static final String UPDATE_PAGE_JSON_ERROR_MSG = "Unexpected error while updating data visualisation data.json";
+
     /**
      * {@link Predicate} determining if a {@link ZipEntry} should be written to the collection content dir when unzipping
      * a data visualisation zip file.
@@ -58,22 +72,14 @@ public class DataVisualisationZip {
     public static final Predicate<ZipEntry> isValidDataVisContentFile = (zipEntry ->
             (!MAC_OS_ZIP_IGNORE.stream().filter(ignoreItem -> zipEntry.getName().contains(ignoreItem))
                     .findFirst().isPresent()) && !zipEntry.isDirectory());
-    // debug messages
-    private static final String DELETING_ZIP_DEBUG = "Deleting data visualisation zip";
-    private static final String DELETING_ZIP_ERROR_DEBUG = "Unexpected error while attempting to delete existing data vis zip content.";
-    private static final String UNZIP_DEBUG = "Unpacking data visualisation zip";
-    private static final String UNZIP_SUCCESS_DEBUG = "Successfully unzipped data viz file.";
-    // Error messages
-    private static final String UNZIPPING_ERROR_MSG = "Error while trying to unzip Data Visualisation file";
-    private static final String COLLECTION_RES_ERROR_MSG = "Could not find the requested collection Resource";
-    private static final String NO_ZIP_PATH_ERROR_MSG = "Please specify the zip file path.";
-    private static final String UNPACK_ZIP_SUCCESS_MSG = "Visualisation zip unpacked successfully";
-    public static final SimpleZebedeeResponse unzipSuccessResponse
-            = new SimpleZebedeeResponse(UNPACK_ZIP_SUCCESS_MSG, Response.Status.OK);
-    private static final String DATA_VIS_DELETED_SUCCESS_MSG = "The requested data visualisation was deleted or did not exist.";
-    public static final SimpleZebedeeResponse deleteContentSuccessResponse
-            = new SimpleZebedeeResponse(DATA_VIS_DELETED_SUCCESS_MSG, Response.Status.OK);
-    private static final String UPDATE_PAGE_JSON_ERROR_MSG = "Unexpected error while updating data visualisation data.json";
+
+    public static final SimpleZebedeeResponse unzipSuccessResponse = new SimpleZebedeeResponse(
+            UNPACK_ZIP_SUCCESS_MSG, Response.Status.OK);
+
+    public static final SimpleZebedeeResponse deleteContentSuccessResponse = new SimpleZebedeeResponse(
+            DATA_VIS_DELETED_SUCCESS_MSG, Response.Status.OK);
+
+
     // Use this wrapper class to access static method (cleaner to test).
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
     /**
@@ -122,7 +128,7 @@ public class DataVisualisationZip {
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
 
         try {
-            collection.deleteDataVisContent(session.email, Paths.get(zipPath));
+            collection.deleteDataVisContent(session, Paths.get(zipPath));
         } catch (IOException e) {
             logError(e, DELETING_ZIP_ERROR_DEBUG).path(zipPath).logAndThrow(UnexpectedErrorException.class);
         }
@@ -205,10 +211,14 @@ public class DataVisualisationZip {
 
             Path zipEntries = Paths.get(collection.getInProgress().getPath().toString() + zipPath.getParent().toString());
 
-            pageJson.setFilenames(extractHtmlFilenames.apply(zipEntries, zipPath));
+            Set<String> files = extractHtmlFilenames.apply(zipEntries, zipPath);
+            pageJson.setFilenames(files);
             pageJson.setZipTitle(zipPath.getFileName().toString());
 
             collectionWriter.getInProgress().writeObject(pageJson, dataJsonPath + DATA_JSON_FILE);
+
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session,
+                    DATA_VISUALISATION_ZIP_UNPACKED, dataVisZipUnpacked(pageJson));
 
         } catch (IOException e) {
             logError(e, UPDATE_PAGE_JSON_ERROR_MSG)

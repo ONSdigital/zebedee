@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_EDITED_NAME_CHANGED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
 
 /**
  * Mock implementation of {@link CollectionHistoryDao} for use while actual DB is still being set up and for testing.
@@ -32,14 +32,14 @@ public class CollectionHistoryDaoStub extends CollectionHistoryDao {
                 .collectionId("1234567890")
                 .user("Superman@JusticeLeague.com")
                 .collectionName("mockCollectionTwo")
-                .eventType(COLLECTION_EDITED_NAME_CHANGED)
+                .eventType(COLLECTION_NAME_CHANGED)
                 .addEventMetaData("previousName", "mockCollectionOne"));
 
         mockHistory.add(new CollectionHistoryEvent()
                 .collectionId("1234567890")
                 .user("Flash@JusticeLeague.com")
                 .collectionName("mockCollectionThree")
-                .eventType(COLLECTION_EDITED_NAME_CHANGED));
+                .eventType(COLLECTION_NAME_CHANGED));
     }
 
     @Override

@@ -58,6 +58,8 @@ public class Audit {
 
         COLLECTION_PUBLISHED("Collection published"),
 
+        COLLECTION_PUBLISH_UNSUCCESSFUL("Collection publish unsucessful"),
+
         COLLECTION_CREATED("Collection created"),
 
         COLLECTION_UPDATED("Collection updated"),

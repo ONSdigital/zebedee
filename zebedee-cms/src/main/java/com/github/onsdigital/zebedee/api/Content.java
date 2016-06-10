@@ -27,10 +27,8 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_FILE_ADDED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_FILE_MODIFIED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_PAGE_ADDED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_PAGE_MODIFIED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_FILE_SAVED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_PAGE_SAVED;
 
 @Api
 public class Content {
@@ -89,7 +87,7 @@ public class Content {
         String uri = request.getParameter("uri");
         Boolean overwriteExisting = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("overwriteExisting"), "true"));
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
-        CollectionEventType eventType = getEventType(overwriteExisting, Paths.get(uri));
+        CollectionEventType eventType = getEventType(Paths.get(uri));
 
         if (overwriteExisting) {
             Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody, recursive, eventType);
@@ -146,10 +144,7 @@ public class Content {
         return result;
     }
 
-    private CollectionEventType getEventType(boolean overwriteExisting, Path uri) {
-        if (DATA_JSON.equals(uri.getFileName().toString())) {
-            return overwriteExisting ? COLLECTION_PAGE_MODIFIED : COLLECTION_PAGE_ADDED;
-        }
-        return overwriteExisting ? COLLECTION_FILE_MODIFIED : COLLECTION_FILE_ADDED;
+    private CollectionEventType getEventType(Path uri) {
+        return DATA_JSON.equals(uri.getFileName().toString()) ? COLLECTION_PAGE_SAVED : COLLECTION_FILE_SAVED;
     }
 }

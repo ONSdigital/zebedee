@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
@@ -19,6 +20,7 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -50,11 +52,14 @@ import java.util.function.Function;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
 
 public class Publisher {
 
     private static final List<Host> theTrainHosts;
     private static final ExecutorService pool = Executors.newFixedThreadPool(50);
+    private static Session zebdeePublisherSession = null;
 
     // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
     private static FastDateFormat format = FastDateFormat.getInstance("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("Europe/London"));
@@ -373,6 +378,8 @@ public class Publisher {
             // send a slack success message
             Path path = Paths.get(collection.path.toString() + ".json");
             SlackNotification.publishNotification(path);
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
+                    COLLECTION_POST_PUBLISHED_CONFIRMATION);
 
             ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
             ContentWriter contentWriter = new ContentWriter(zebedee.published.path);
@@ -748,5 +755,17 @@ public class Publisher {
         public void run() {
             this.executorService.shutdown();
         }
+    }
+
+    /**
+     * Returns a session object with the email as the class name of {@link Publisher} - required by the history event
+     * logging.
+     */
+    private static Session getPublisherClassSession() {
+        if (zebdeePublisherSession == null) {
+            zebdeePublisherSession = new Session();
+            zebdeePublisherSession.email = Publisher.class.getName();
+        }
+        return zebdeePublisherSession;
     }
 }

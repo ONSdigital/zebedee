@@ -50,12 +50,18 @@ import java.util.concurrent.Future;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_RENAMED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_MOVED;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
 
 public class Collections {
     public final Path path;
@@ -143,7 +149,7 @@ public class Collections {
             throw new BadRequestException("URI does not represent a file.");
         }
 
-        CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, null).uri(uri);
+        CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, null, uri);
         // Attempt to complete:
         if (collection.complete(session.email, uri, recursive)) {
             collection.save();
@@ -242,6 +248,7 @@ public class Collections {
         Future<Boolean> future = ApprovalQueue.add(
                 new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex));
 
+        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
         return future;
     }
 
@@ -257,8 +264,7 @@ public class Collections {
      * @throws ConflictException
      */
     public boolean unlock(Collection collection, Session session)
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException {
+            throws IOException, ZebedeeException {
 
         // Collection exists
         if (collection == null) {
@@ -278,6 +284,7 @@ public class Collections {
         // Go ahead
         collection.description.approvedStatus = false;
         collection.description.AddEvent(new Event(new Date(), EventType.UNLOCKED, session.email));
+        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_UNLOCKED);
 
         boolean result = collection.save();
         new PublishNotification(collection).sendNotification(EventType.UNLOCKED);
@@ -430,10 +437,8 @@ public class Collections {
         }
 
         // Go ahead
-
-        CollectionHistoryEvent event = new CollectionHistoryEvent(collection, session, COLLECTION_DELETED);
         collection.delete();
-        getCollectionHistoryDao().saveCollectionHistoryEvent(event);
+        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
     }
 
     /**
@@ -513,7 +518,7 @@ public class Collections {
                     "Somehow we weren't able to edit the requested URI");
         }
 
-        CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, eventType);
+        CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, eventType, uri);
 
         // Detect whether this is a multipart request
         if (ServletFileUpload.isMultipartContent(request)) {
@@ -530,7 +535,7 @@ public class Collections {
                 collectionWriter.getInProgress().write(requestBody, uri);
             }
             if (eventType != null) {
-                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.uri(uri));
+                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent);
             }
         }
     }
@@ -591,7 +596,7 @@ public class Collections {
         CollectionEventType eventType;
 
         if (collection.description.collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
-            deleted = collection.deleteDataVisContent(session.email, Paths.get(uri));
+            deleted = collection.deleteDataVisContent(session, Paths.get(uri));
             eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
         } else {
             if (Files.isDirectory(path)) {
@@ -605,7 +610,7 @@ public class Collections {
         collection.save();
         if (deleted) {
             getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
-                    eventType).uri(uri));
+                    eventType, uri));
         }
         return deleted;
     }
@@ -630,7 +635,7 @@ public class Collections {
                 try (InputStream inputStream = item.getInputStream()) {
                     collectionWriter.getInProgress().write(inputStream, uri);
                 }
-                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.uri(uri));
+                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent);
             }
         } catch (Exception e) {
             throw new IOException("Error processing uploaded file", e);
@@ -709,10 +714,13 @@ public class Collections {
         }
 
         collection.moveContent(session, uri, newUri);
+        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_MOVED,
+                contentMoved(uri, newUri));
         collection.save();
     }
 
-    public void renameContent(Session session, Collection collection, String uri, String toUri) throws BadRequestException, IOException, UnauthorizedException {
+    public void renameContent(Session session, Collection collection, String uri, String toUri) throws IOException,
+            ZebedeeException {
 
         if (collection == null) {
             throw new BadRequestException("Please specify a collection");
@@ -736,6 +744,8 @@ public class Collections {
         }
 
         collection.renameContent(session.email, uri, toUri);
+        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_RENAMED,
+                contentRenamed(uri, toUri));
         collection.save();
     }
 

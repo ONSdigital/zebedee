@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -151,6 +152,7 @@ public class CollectionTest {
         CollectionDescription collectionDescription = new CollectionDescription(name);
         collectionDescription.type = CollectionType.manual;
         collectionDescription.publishDate = new Date();
+        collectionDescription.teams = new ArrayList<>();
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         // When the collection is updated
@@ -193,6 +195,7 @@ public class CollectionTest {
         CollectionDescription collectionDescription = new CollectionDescription(name);
         collectionDescription.publishDate = DateTime.now().plusSeconds(2).toDate();
         collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.teams = new ArrayList<>();
         Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
 
         DummyScheduler scheduler = new DummyScheduler();
@@ -579,7 +582,7 @@ public class CollectionTest {
     }
 
     @Test
-    public void shouldReviewWithReviewer() throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    public void shouldReviewWithReviewer() throws IOException, ZebedeeException {
 
         // Given
         // The content exists, has been edited and complete:
@@ -600,7 +603,7 @@ public class CollectionTest {
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldNotReviewAsPublisher() throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    public void shouldNotReviewAsPublisher() throws IOException, ZebedeeException{
 
         // Given
         // The content exists, has been edited and complete by publisher1:
@@ -633,7 +636,7 @@ public class CollectionTest {
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotReviewIfContentHasNotBeenCompleted() throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    public void shouldNotReviewIfContentHasNotBeenCompleted() throws IOException, ZebedeeException {
 
         // Given some content that has been edited by a publisher:
         String uri = "/economy/inflationandpriceindices/timeseries/a9er.html";
@@ -736,7 +739,7 @@ public class CollectionTest {
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotReviewIfAlreadyReviewed() throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    public void shouldNotReviewIfAlreadyReviewed() throws IOException, ZebedeeException{
 
         // Given
         // The content already exists:
@@ -752,7 +755,7 @@ public class CollectionTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void shouldNotReviewIfNotPreviouslyCompleted() throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    public void shouldNotReviewIfNotPreviouslyCompleted() throws IOException, ZebedeeException {
 
         // Given
         // Some content:

@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
+import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -260,7 +261,7 @@ public class Collection {
         if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
             String nameBeforeUpdate = collection.description.name;
             updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
-            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_NAME_CHANGED, renamed
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_NAME_CHANGED, renamed
                     (nameBeforeUpdate));
         }
 
@@ -268,14 +269,14 @@ public class Collection {
         if (collectionDescription.type != null
                 && updatedCollection.description.type != collectionDescription.type) {
             updatedCollection.description.type = collectionDescription.type;
-            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_TYPE_CHANGED, typeChanged
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_TYPE_CHANGED, typeChanged
                     (updatedCollection.description));
         }
 
         if (updatedCollection.description.type == CollectionType.scheduled) {
             if (collectionDescription.publishDate != null) {
                 if (!collection.description.publishDate.equals(collectionDescription.publishDate)) {
-                    getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_PUBLISH_RESCHEDULED,
+                    getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_PUBLISH_RESCHEDULED,
                             reschedule(collection.description.publishDate, collectionDescription.publishDate));
                 }
                 updatedCollection.description.publishDate = collectionDescription.publishDate;
@@ -604,7 +605,7 @@ public class Collection {
      * @throws UnauthorizedException if user
      * @throws IOException           If a filesystem error occurs.
      */
-    public boolean review(Session session, String uri, boolean recursive) throws IOException, BadRequestException, UnauthorizedException, NotFoundException {
+    public boolean review(Session session, String uri, boolean recursive) throws IOException, ZebedeeException {
         if (session == null) {
             throw new UnauthorizedException("Insufficient permissions");
         }
@@ -659,6 +660,9 @@ public class Collection {
             }
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
+            getCollectionHistoryDao().saveCollectionHistoryEvent(
+                    new CollectionHistoryEvent(this.description.id, this.description.name, session,
+                            COLLECTION_CONTENT_REVIEWED, contentReviewed(source, destination)));
             result = true;
         }
 
@@ -813,7 +817,7 @@ public class Collection {
         return hasDeleted;
     }
 
-    public boolean deleteDataVisContent(String email, Path contentPath) throws IOException {
+    public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException, ZebedeeException {
         if (contentPath == null || StringUtils.isEmpty(contentPath.toString())) {
             return false;
         }
@@ -829,7 +833,9 @@ public class Collection {
         }
 
         if (hasDeleted) {
-            addEvent(contentUri, new Event(new Date(), EventType.DELETED, email));
+            addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.email));
+            getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
+                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri.toString()));
         }
         save();
         return hasDeleted;

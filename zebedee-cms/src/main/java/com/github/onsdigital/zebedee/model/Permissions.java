@@ -343,7 +343,7 @@ public class Permissions {
 
         if (teamAdded != null) {
             getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name, session,
-                    CollectionEventType.COLLECTION_EDITED_VIEWER_TEAM_ADDED, teamAdded(collectionDescription, session, team));
+                    CollectionEventType.COLLECTION_VIEWER_TEAM_ADDED, teamAdded(collectionDescription, session, team));
         }
     }
 
@@ -402,7 +402,7 @@ public class Permissions {
 
         if (teamRemoved != null) {
             getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name,
-                    session, CollectionEventType.COLLECTION_EDITED_VIEWER_TEAM_REMOVED,
+                    session, CollectionEventType.COLLECTION_VIEWER_TEAM_REMOVED,
                     teamRemoved(collectionDescription, session, team));
         }
     }

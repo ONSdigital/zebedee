@@ -166,7 +166,7 @@ public class DataVisualisationZipTest {
 
         verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
         verify(zebedeeCmsServiceMock, times(1)).getCollection(mockRequest);
-        verify(mockCollection, times(1)).deleteDataVisContent(session.email, Paths.get(ZIP_PATH));
+        verify(mockCollection, times(1)).deleteDataVisContent(session, Paths.get(ZIP_PATH));
     }
 
     /**
@@ -212,7 +212,7 @@ public class DataVisualisationZipTest {
         } catch (UnexpectedErrorException ex) {
             verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
             verify(zebedeeCmsServiceMock, times(1)).getCollection(mockRequest);
-            verify(mockCollection, never()).deleteDataVisContent(session.email, Paths.get(ZIP_PATH));
+            verify(mockCollection, never()).deleteDataVisContent(session, Paths.get(ZIP_PATH));
             throw ex;
         }
     }
@@ -232,7 +232,7 @@ public class DataVisualisationZipTest {
                 .thenReturn(session);
         when(zebedeeCmsServiceMock.getCollection(mockRequest))
                 .thenReturn(mockCollection);
-        when(mockCollection.deleteDataVisContent(session.email, Paths.get(ZIP_PATH)))
+        when(mockCollection.deleteDataVisContent(session, Paths.get(ZIP_PATH)))
                 .thenThrow(new IOException());
 
         try {
@@ -240,7 +240,7 @@ public class DataVisualisationZipTest {
         } catch (ZebedeeException ex) {
             verify(mockRequest, times(1)).getParameter(ZIP_PATH_KEY);
             verify(zebedeeCmsServiceMock, times(1)).getCollection(mockRequest);
-            verify(mockCollection, times(1)).deleteDataVisContent(session.email, Paths.get(ZIP_PATH));
+            verify(mockCollection, times(1)).deleteDataVisContent(session, Paths.get(ZIP_PATH));
             throw ex;
         }
     }

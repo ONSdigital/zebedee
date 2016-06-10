@@ -2,17 +2,9 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.AccessMapping;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -30,6 +22,9 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.DATA_VISUALISATION;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamAdded;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamRemoved;
 
 /**
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
@@ -330,7 +325,7 @@ public class Permissions {
      * @param session               Only editors can grant a team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
-    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
+    public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
         if (session == null || !canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -341,8 +336,15 @@ public class Permissions {
             collectionTeams = new HashSet<>();
             accessMapping.collections.put(collectionDescription.id, collectionTeams);
         }
+
+        Team teamAdded = !collectionTeams.contains(team.id) ? team : null;
         collectionTeams.add(team.id);
         writeAccessMapping(accessMapping);
+
+        if (teamAdded != null) {
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name, session,
+                    CollectionEventType.COLLECTION_EDITED_VIEWER_TEAM_ADDED, teamAdded(collectionDescription, session, team));
+        }
     }
 
     /**
@@ -363,6 +365,13 @@ public class Permissions {
         Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.id);
         if (teamIds == null) teamIds = new HashSet<>();
 
+        System.out.println("Teams for collection " + collectionDescription.name);
+
+        for (Integer teamId : teamIds) {
+            System.out.println("teamId = " + teamId);
+        }
+
+
         return java.util.Collections.unmodifiableSet(teamIds);
     }
 
@@ -374,7 +383,7 @@ public class Permissions {
      * @param session               Only editors can revoke team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
-    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, UnauthorizedException {
+    public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
         if (session == null || !canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -385,8 +394,17 @@ public class Permissions {
             collectionTeams = new HashSet<>();
             accessMapping.collections.put(collectionDescription.id, collectionTeams);
         }
+
+
+        Team teamRemoved = collectionTeams.contains(team.id) ? team : null;
         collectionTeams.remove(team.id);
         writeAccessMapping(accessMapping);
+
+        if (teamRemoved != null) {
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name,
+                    session, CollectionEventType.COLLECTION_EDITED_VIEWER_TEAM_REMOVED,
+                    teamRemoved(collectionDescription, session, team));
+        }
     }
 
     private boolean canEdit(String email, AccessMapping accessMapping) throws IOException {

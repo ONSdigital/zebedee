@@ -13,6 +13,9 @@ EXPOSE 9200
 # Update the entry point script
 ENTRYPOINT java -Xmx2048m \
           -javaagent:/usr/src/target/dependency/newrelic/newrelic.jar \
+          -Ddb_audit_url=$db_audit_url \
+          -Ddb_audit_username=$db_audit_username \
+          -Ddb_audit_password=$db_audit_password \
           -Drestolino.classes=target/classes \
           -Drestolino.packageprefix=com.github.onsdigital.zebedee.api \
           -cp "target/dependency/*:target/classes/" \

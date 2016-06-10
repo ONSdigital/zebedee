@@ -9,7 +9,7 @@ import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
-import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -24,7 +24,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  */
 public class KeyManager {
 
-    private static ZebedeeApiHelper ZEBEDEE_HELPER = ZebedeeApiHelper.getInstance();
+    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
 
     /**
      * Distributes an encryption key to all users
@@ -208,14 +208,14 @@ public class KeyManager {
 
     private static Collection getCollection(String id) {
         try {
-            return ZEBEDEE_HELPER.getCollection(id);
+            return zebedeeCmsService.getCollection(id);
         } catch (ZebedeeException e) {
             logError(e, "failed to get collection").addParameter("collectionId", id).log();
             throw new RuntimeException("failed to get collection with collectionId " + id, e);
         }
     }
 
-    public static void setZebedeeHelper(ZebedeeApiHelper helper) {
-        ZEBEDEE_HELPER = helper;
+    public static void setZebedeeCmsService(ZebedeeCmsService zebedeeCmsService) {
+        KeyManager.zebedeeCmsService = zebedeeCmsService;
     }
 }

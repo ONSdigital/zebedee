@@ -31,6 +31,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.*;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.*;
 
 public class Collection {
     public static final String REVIEWED = "reviewed";
@@ -45,9 +48,6 @@ public class Collection {
     public final Content inProgress;
     final Zebedee zebedee;
     final Collections collections;
-
-    //public RedirectTableChained redirect = null;
-    //private RedirectTableChained collectionRedirect = null;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -102,6 +102,9 @@ public class Collection {
 //        redirect = this.inProgress.redirect;
     }
 
+    //public RedirectTableChained redirect = null;
+    //private RedirectTableChained collectionRedirect = null;
+
     Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, CollectionNotFoundException {
         this(zebedee.collections.path.resolve(PathUtils.toFilename(collectionDescription.name)), zebedee);
     }
@@ -140,6 +143,8 @@ public class Collection {
         }
 
         Collection collection = new Collection(collectionDescription, zebedee);
+        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED, collectionCreated
+                (collectionDescription));
 
         if (collectionDescription.teams != null) {
             for (String teamName : collectionDescription.teams) {
@@ -238,11 +243,13 @@ public class Collection {
      * @param scheduler
      * @return
      */
-    public static Collection update(Collection collection,
-                                    CollectionDescription collectionDescription,
-                                    Zebedee zebedee,
-                                    Scheduler scheduler,
-                                    Session session) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
+    public static Collection update(
+            Collection collection,
+            CollectionDescription collectionDescription,
+            Zebedee zebedee,
+            Scheduler scheduler,
+            Session session
+    ) throws IOException, ZebedeeException {
 
         if (collection == null) {
             throw new BadRequestException("Please specify a collection");
@@ -251,17 +258,26 @@ public class Collection {
 
         // only update the collection name if its given and its changed.
         if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
+            String nameBeforeUpdate = collection.description.name;
             updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_NAME_CHANGED, renamed
+                    (nameBeforeUpdate));
         }
 
         // if the type has changed
         if (collectionDescription.type != null
                 && updatedCollection.description.type != collectionDescription.type) {
             updatedCollection.description.type = collectionDescription.type;
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_TYPE_CHANGED, typeChanged
+                    (updatedCollection.description));
         }
 
         if (updatedCollection.description.type == CollectionType.scheduled) {
             if (collectionDescription.publishDate != null) {
+                if (!collection.description.publishDate.equals(collectionDescription.publishDate)) {
+                    getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_EDITED_PUBLISH_RESCHEDULED,
+                            reschedule(collection.description.publishDate, collectionDescription.publishDate));
+                }
                 updatedCollection.description.publishDate = collectionDescription.publishDate;
                 scheduler.schedulePublish(updatedCollection, zebedee);
             }
@@ -270,15 +286,21 @@ public class Collection {
             scheduler.cancel(collection);
         }
 
+        Set<String> updatesTeams = updateViewerTeams(collectionDescription, zebedee, session);
+        updatedCollection.description.teams.clear();
+        updatedCollection.description.teams.addAll(updatesTeams);
+
         updatedCollection.save();
 
-        updateViewerTeams(collectionDescription, zebedee, session);
         KeyManager.distributeCollectionKey(zebedee, session, collection);
 
         return updatedCollection;
     }
 
-    private static void updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, UnauthorizedException {
+    private static Set<String> updateViewerTeams(CollectionDescription collectionDescription, Zebedee zebedee, Session session) throws IOException, ZebedeeException {
+
+        Set<String> updatedTeams = new HashSet<>();
+
         if (collectionDescription.teams != null) {
             // work out which teams need to be removed from the existing teams.
             Set<Integer> currentTeamIds = zebedee.permissions.listViewerTeams(collectionDescription, session);
@@ -299,10 +321,17 @@ public class Collection {
                 for (Team team : teams) { // iterate the teams list to find the team object
                     if (teamName.equals(team.name)) {
                         zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+                        updatedTeams.add(teamName);
                     }
                 }
             }
         }
+
+        return updatedTeams;
+    }
+
+    public CollectionDescription getDescription() {
+        return this.description;
     }
 
     private Release getReleaseFromCollection(String uri) throws IOException, ZebedeeException {
@@ -481,7 +510,7 @@ public class Collection {
     }
 
     /**
-     * @param uri The path you would like to edit.
+     * @param uri       The path you would like to edit.
      * @param recursive
      * @return True if the path was added to {@link #inProgress}. If the path is
      * already present in the {@link Collection}, another
@@ -533,8 +562,8 @@ public class Collection {
     }
 
     /**
-     * @param email The reviewing user's email.
-     * @param uri   The path you would like to review.
+     * @param email     The reviewing user's email.
+     * @param uri       The path you would like to review.
      * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
@@ -567,8 +596,8 @@ public class Collection {
     /**
      * Set the given uri to reviewed in this collection.
      *
-     * @param session The user session attempting to review
-     * @param uri     The path you would like to review.
+     * @param session   The user session attempting to review
+     * @param uri       The path you would like to review.
      * @param recursive
      * @return True if the path is found in {@link #inProgress} and was copied
      * to {@link #reviewed}.
@@ -792,7 +821,7 @@ public class Collection {
         String contentUri = contentPath.toString();
         boolean hasDeleted = false;
 
-        for (Content collectionDir : new Content[] {inProgress, complete, reviewed}) {
+        for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
             if (collectionDir.exists(contentUri)) {
                 FileUtils.deleteDirectory(Paths.get(collectionDir.path.toString() + contentUri).toFile());
                 hasDeleted = true;
@@ -1043,10 +1072,6 @@ public class Collection {
 
     public Content getInProgress() {
         return inProgress;
-    }
-
-    public CollectionDescription getDescription() {
-        return description;
     }
 }
 

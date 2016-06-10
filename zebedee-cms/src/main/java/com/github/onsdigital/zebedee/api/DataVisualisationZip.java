@@ -14,7 +14,7 @@ import com.github.onsdigital.zebedee.model.SimpleZebedeeResponse;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -75,7 +75,7 @@ public class DataVisualisationZip {
             = new SimpleZebedeeResponse(DATA_VIS_DELETED_SUCCESS_MSG, Response.Status.OK);
     private static final String UPDATE_PAGE_JSON_ERROR_MSG = "Unexpected error while updating data visualisation data.json";
     // Use this wrapper class to access static method (cleaner to test).
-    private static ZebedeeApiHelper zebedeeApiHelper = ZebedeeApiHelper.getInstance();
+    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
     /**
      * Custom {@link IOFileFilter} implementation to filter out only .html files.
      */
@@ -118,8 +118,8 @@ public class DataVisualisationZip {
 
         logDebug(DELETING_ZIP_DEBUG).path(zipPath).log();
 
-        Session session = zebedeeApiHelper.getSession(request);
-        com.github.onsdigital.zebedee.model.Collection collection = zebedeeApiHelper.getCollection(request);
+        Session session = zebedeeCmsService.getSession(request);
+        com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
 
         try {
             collection.deleteDataVisContent(session.email, Paths.get(zipPath));
@@ -144,11 +144,11 @@ public class DataVisualisationZip {
 
         logDebug(UNZIP_DEBUG).path(zipPath).log();
 
-        Session session = zebedeeApiHelper.getSession(request);
-        com.github.onsdigital.zebedee.model.Collection collection = zebedeeApiHelper.getCollection(request);
-        CollectionReader collectionReader = zebedeeApiHelper.getZebedeeCollectionReader(collection, session);
-        CollectionWriter collectionWriter = zebedeeApiHelper.getZebedeeCollectionWriter(collection, session);
-        ContentReader publishedContentReader = zebedeeApiHelper.getPublishedContentReader();
+        Session session = zebedeeCmsService.getSession(request);
+        com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
+        CollectionReader collectionReader = zebedeeCmsService.getZebedeeCollectionReader(collection, session);
+        CollectionWriter collectionWriter = zebedeeCmsService.getZebedeeCollectionWriter(collection, session);
+        ContentReader publishedContentReader = zebedeeCmsService.getPublishedContentReader();
 
         Resource zipRes;
         try {

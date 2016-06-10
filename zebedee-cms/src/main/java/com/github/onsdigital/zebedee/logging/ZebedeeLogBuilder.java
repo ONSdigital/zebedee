@@ -67,23 +67,18 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
         if (BadRequestException.class.equals(exceptionClass)) {
             throw new BadRequestException(getStringProperty(ERROR_CONTEXT));
-        }
-
-        if (CollectionNotFoundException.class.equals(exceptionClass)) {
+        } else if (CollectionNotFoundException.class.equals(exceptionClass)) {
             throw new CollectionNotFoundException(getStringProperty(ERROR_CONTEXT));
-        }
-
-        if (ConflictException.class.equals(exceptionClass)) {
+        } else if (ConflictException.class.equals(exceptionClass)) {
             throw new ConflictException(getStringProperty(ERROR_CONTEXT));
-        }
-
-        if (NotFoundException.class.equals(exceptionClass)) {
+        } else if (NotFoundException.class.equals(exceptionClass)) {
             throw new NotFoundException(getStringProperty(ERROR_CONTEXT));
+        } else if (UnauthorizedException.class.equals(exceptionClass)) {
+            throw new UnauthorizedException(getStringProperty(ERROR_CONTEXT));
+        } else if (CollectionEventHistoryException.class.equals(exceptionClass)) {
+            throw new CollectionEventHistoryException(getStringProperty(ERROR_CONTEXT));
         }
 
-        if (UnauthorizedException.class.equals(exceptionClass)) {
-            throw new UnauthorizedException(getStringProperty(ERROR_CONTEXT));
-        }
         // Default to internal server error.
         throw new UnexpectedErrorException(getStringProperty(ERROR_CONTEXT),
                 Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
@@ -105,6 +100,11 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public ZebedeeLogBuilder collectionId(Collection collection) {
         addParameter(COLLECTION_ID, collection.getDescription().id);
+        return this;
+    }
+
+    public ZebedeeLogBuilder collectionId(String collectionId) {
+        addParameter(COLLECTION_ID, collectionId);
         return this;
     }
 

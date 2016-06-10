@@ -24,20 +24,20 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  * Also adds additional error logging and rethrows all exceptions as a {@link ZebedeeException} removing unnecessary
  * try/catch/throws code from calling classes.
  */
-public class ZebedeeApiHelper {
+public class ZebedeeCmsService {
 
     private static final String COLLECTION_WRI_ERROR_MSG = "Could not obtain collection writer for requested collection";
     private static final String COLLECTION_READ_ERROR_MSG = "Could not obtain collection reader for requested collection";
     private static final String COLLECTION_NOT_FOUND_MSG = "Could not find requested collection.";
     private static final String SESSION_NOT_FOUND_MSG = "Could not get session from request";
 
-    private static final ZebedeeApiHelper instance = new ZebedeeApiHelper();
+    private static final ZebedeeCmsService instance = new ZebedeeCmsService();
 
-    private ZebedeeApiHelper() {
+    private ZebedeeCmsService() {
         // use getInstance() method.
     }
 
-    public static ZebedeeApiHelper getInstance() {
+    public static ZebedeeCmsService getInstance() {
         return instance;
     }
 
@@ -106,6 +106,10 @@ public class ZebedeeApiHelper {
                     .logAndThrow(UnexpectedErrorException.class);
         }
         return null;
+    }
+
+    public Permissions getPermissions() {
+        return Root.zebedee.permissions;
     }
 
     public InputStream objectAsInputStream(Object obj) {

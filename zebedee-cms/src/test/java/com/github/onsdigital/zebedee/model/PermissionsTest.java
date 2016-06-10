@@ -7,9 +7,10 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.util.ZebedeeApiHelper;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +37,7 @@ public class PermissionsTest {
     String viewerEmail;
 
     @Mock
-    private ZebedeeApiHelper zebedeeApiHelper;
+    private ZebedeeCmsService zebedeeCmsService;
 
     @Before
     public void setUp() throws Exception {
@@ -50,6 +52,9 @@ public class PermissionsTest {
         // A new collection
         collectionDescription = new CollectionDescription();
         collectionDescription.name = this.getClass().getSimpleName() + "-" + Random.id();
+        collectionDescription.type = CollectionType.scheduled;
+        collectionDescription.publishDate = new Date();
+
         Collection.create(collectionDescription, zebedee, session);
 
         // A new team for the new collection
@@ -58,10 +63,10 @@ public class PermissionsTest {
         zebedee.teams.addTeamMember(viewerEmail, team, session);
 
 
-        when(zebedeeApiHelper.getCollection(anyString()))
+        when(zebedeeCmsService.getCollection(anyString()))
                 .thenReturn(inflationCollection);
 
-        KeyManager.setZebedeeHelper(zebedeeApiHelper);
+        KeyManager.setZebedeeCmsService(zebedeeCmsService);
     }
 
     @After

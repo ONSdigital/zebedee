@@ -8,10 +8,20 @@ public enum CollectionOwner {
     /**
      * Publishing support team.
      */
-    PUBLISHING_SUPPORT,
+    PUBLISHING_SUPPORT("PST"),
 
     /**
      * Data Visualisation Team.
      */
-    DATA_VISUALISATION
+    DATA_VISUALISATION("Data Visualisation");
+
+    private final String displayText;
+
+    CollectionOwner(String displayText) {
+        this.displayText = displayText;
+    }
+
+    public String getDisplayText() {
+        return displayText;
+    }
 }

@@ -260,7 +260,14 @@ public class Collection {
         // only update the collection name if its given and its changed.
         if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
             String nameBeforeUpdate = collection.description.name;
-            updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
+
+            // check if only the casing of the name has changed. If so only the json is updated, not the filename.
+            if (!collectionDescription.name.equalsIgnoreCase(collection.description.name)) {
+                updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
+            } else {
+                updatedCollection.description.name = collectionDescription.name;
+            }
+
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_NAME_CHANGED, renamed
                     (nameBeforeUpdate));
         }

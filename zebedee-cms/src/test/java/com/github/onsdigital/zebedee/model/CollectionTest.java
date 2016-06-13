@@ -144,6 +144,7 @@ public class CollectionTest {
         assertEquals(collectionDescription.type, renamedCollectionDescription.type);
     }
 
+
     @Test
     public void shouldUpdateCollection() throws Exception {
 
@@ -184,6 +185,44 @@ public class CollectionTest {
         assertEquals(newName, updatedCollectionDescription.name);
         assertEquals(updatedDescription.type, updatedCollectionDescription.type);
         assertEquals(updatedDescription.publishDate, updatedCollectionDescription.publishDate);
+        assertTrue(updatedCollectionDescription.events.hasEventForType(EventType.CREATED));
+    }
+
+    @Test
+    public void shouldUpdateCollectionNameIfCaseIsChanged() throws Exception {
+
+        // Given an existing collection
+        String name = "population release";
+        CollectionDescription collectionDescription = new CollectionDescription(name);
+        collectionDescription.type = CollectionType.manual;
+        collectionDescription.publishDate = new Date();
+        Collection collection = Collection.create(collectionDescription, zebedee, publisherSession);
+
+        // When the collection is updated
+        String newName = "Population Release";
+        String filename = PathUtils.toFilename(newName);
+        CollectionDescription updatedDescription = new CollectionDescription(newName);
+        updatedDescription.type = CollectionType.manual;
+        updatedDescription.publishDate = new Date();
+        Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
+
+        // Then the properties of the description passed to update have been updated.
+        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path collectionFolderPath = rootPath.resolve(filename);
+        Path collectionJsonPath = rootPath.resolve(filename + ".json");
+
+        assertTrue(Files.exists(collectionFolderPath));
+        assertTrue(Files.exists(collectionJsonPath));
+
+        CollectionDescription updatedCollectionDescription;
+        try (InputStream inputStream = Files.newInputStream(collectionJsonPath)) {
+            updatedCollectionDescription = Serialiser.deserialise(inputStream, CollectionDescription.class);
+        }
+
+        assertNotNull(updatedCollectionDescription);
+        assertEquals(collectionDescription.id, updatedCollectionDescription.id);
+        assertEquals(newName, updatedCollectionDescription.name);
+        assertEquals(updatedDescription.type, updatedCollectionDescription.type);
         assertTrue(updatedCollectionDescription.events.hasEventForType(EventType.CREATED));
     }
 

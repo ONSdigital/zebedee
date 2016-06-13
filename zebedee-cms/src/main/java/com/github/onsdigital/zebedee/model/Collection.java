@@ -295,7 +295,12 @@ public class Collection {
         }
 
         Set<String> updatesTeams = updateViewerTeams(collectionDescription, zebedee, session);
-        updatedCollection.description.teams.clear();
+
+        if (updatedCollection.description.teams != null) {
+            updatedCollection.description.teams.clear();
+        } else {
+            updatedCollection.description.teams = new ArrayList<>();
+        }
         updatedCollection.description.teams.addAll(updatesTeams);
 
         updatedCollection.save();

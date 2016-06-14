@@ -17,23 +17,13 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
@@ -87,22 +77,22 @@ public class ExistingTimeseriesUpdater {
         TimeseriesUpdater.updateTimeseriesMetadata(new CompoundContentReader(contentReader), contentWriter, updateCommands);
 
         logDebug("Finding all CSDB files").log();
-        List<TimeseriesDatasetDownloads> datasetDownloads = findCsdbFiles(source);
+        List<TimeseriesDatasetFiles> datasetDownloads = findCsdbFiles(source);
 
         logDebug("Working out which CSDB files need their download files updated").log();
-        Set<TimeseriesDatasetDownloads> datasetDownloadsToUpdate = determineWhatDownloadsNeedUpdating(updateCommands, datasetDownloads);
+        Set<TimeseriesDatasetFiles> datasetDownloadsToUpdate = determineWhatDownloadsNeedUpdating(updateCommands, datasetDownloads);
 
         logDebug("Generating new downloads").log();
-        for (TimeseriesDatasetDownloads timeseriesDatasetDownloads : datasetDownloadsToUpdate) {
+        for (TimeseriesDatasetFiles timeseriesDatasetFiles : datasetDownloadsToUpdate) {
 
             try {
                 // get all the update commands for this particular CSDB
-                Set<TimeseriesUpdateCommand> commandsForThisDataset = getCommandsForDataset(updateCommands, timeseriesDatasetDownloads);
+                Set<TimeseriesUpdateCommand> commandsForThisDataset = getCommandsForDataset(updateCommands, timeseriesDatasetFiles);
 
                 // populate the column indexes for each command so we know what column to update the title for.
-                populateCsvColumnIndexesToUpdate(timeseriesDatasetDownloads, commandsForThisDataset, source);
-                generateCsv(source, destination, timeseriesDatasetDownloads, commandsForThisDataset);
-                generateXlsx(source, destination, timeseriesDatasetDownloads, commandsForThisDataset);
+                populateCsvColumnIndexesToUpdate(timeseriesDatasetFiles, commandsForThisDataset, source);
+                generateCsv(source, destination, timeseriesDatasetFiles, commandsForThisDataset);
+                generateXlsx(source, destination, timeseriesDatasetFiles, commandsForThisDataset);
 
             } catch (Exception e) {
                 logError(e, "Error updating timeSeries.")
@@ -114,12 +104,12 @@ public class ExistingTimeseriesUpdater {
         }
     }
 
-    public static void generateXlsx(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
+    public static void generateXlsx(Path source, Path destination, TimeseriesDatasetFiles timeseriesDatasetFiles, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
         int rowIndex = 0;
-        File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
+        File inputCsv = source.resolve(timeseriesDatasetFiles.getCsvPath()).toFile();
         logDebug("Generating Xlsx").addParameter("inputCsv", inputCsv).log();
-        File outputTempXls = destination.resolve(timeseriesDatasetDownloads.getXlsTempPath()).toFile();
-        File outputFinalXls = destination.resolve(timeseriesDatasetDownloads.getXlsPath()).toFile();
+        File outputTempXls = destination.resolve(timeseriesDatasetFiles.getXlsTempPath()).toFile();
+        File outputFinalXls = destination.resolve(timeseriesDatasetFiles.getXlsPath()).toFile();
         Files.createDirectories(outputTempXls.toPath().getParent());
         logDebug("Generated Xlsx").addParameter("outputXls", outputTempXls).log();
 
@@ -137,7 +127,7 @@ public class ExistingTimeseriesUpdater {
                 if (rowIndex == 0) { // the row with all the titles in
                     // set the updated titles
                     for (TimeseriesUpdateCommand command : commandsForThisDataset) {
-                        Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
+                        Integer index = command.datasetCsvColumn.get(timeseriesDatasetFiles.getCsdbId());
                         if (index != null) {
                             strings[index] = command.title;
                         }
@@ -179,12 +169,12 @@ public class ExistingTimeseriesUpdater {
         Files.move(outputTempXls.toPath(), outputFinalXls.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static void generateCsv(Path source, Path destination, TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
+    public static void generateCsv(Path source, Path destination, TimeseriesDatasetFiles timeseriesDatasetFiles, Set<TimeseriesUpdateCommand> commandsForThisDataset) throws IOException {
         int rowIndex = 0;
-        File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
+        File inputCsv = source.resolve(timeseriesDatasetFiles.getCsvPath()).toFile();
         logDebug("Generate CSV").addParameter("input", inputCsv.getName()).log();
-        File outputTempCsv = destination.resolve(timeseriesDatasetDownloads.getCsvTempPath()).toFile();
-        File outputFinalCsv = destination.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
+        File outputTempCsv = destination.resolve(timeseriesDatasetFiles.getCsvTempPath()).toFile();
+        File outputFinalCsv = destination.resolve(timeseriesDatasetFiles.getCsvPath()).toFile();
         Files.createDirectories(outputTempCsv.toPath().getParent());
         logDebug("Generate CSV").addParameter("outputTempCsv", outputTempCsv.getName()).log();
 
@@ -198,14 +188,14 @@ public class ExistingTimeseriesUpdater {
                     if (rowIndex == 0) { // the row with all the titles in
                         // set the updated titles
                         for (TimeseriesUpdateCommand command : commandsForThisDataset) {
-                            Integer index = command.datasetCsvColumn.get(timeseriesDatasetDownloads.getCsdbId());
+                            Integer index = command.datasetCsvColumn.get(timeseriesDatasetFiles.getCsdbId());
                             if (index != null) {
                                 logDebug("Generating CSV")
                                         .addParameter("fromTitle", strings[index])
                                         .addParameter("toTitle", command.title)
                                         .addParameter("index", index)
                                         .addParameter("csdb", command.cdid)
-                                        .addParameter("CSDB", timeseriesDatasetDownloads.getCsdbId())
+                                        .addParameter("CSDB", timeseriesDatasetFiles.getCsdbId())
                                         .log();
                                 strings[index] = command.title;
                             }
@@ -237,8 +227,8 @@ public class ExistingTimeseriesUpdater {
         Files.move(outputTempCsv.toPath(), outputFinalCsv.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static void populateCsvColumnIndexesToUpdate(TimeseriesDatasetDownloads timeseriesDatasetDownloads, Set<TimeseriesUpdateCommand> commandsForThisDataset, Path source) throws IOException {
-        File inputCsv = source.resolve(timeseriesDatasetDownloads.getCsvPath()).toFile();
+    public static void populateCsvColumnIndexesToUpdate(TimeseriesDatasetFiles timeseriesDatasetFiles, Set<TimeseriesUpdateCommand> commandsForThisDataset, Path source) throws IOException {
+        File inputCsv = source.resolve(timeseriesDatasetFiles.getCsvPath()).toFile();
         try (CSVReader reader = new CSVReader(new InputStreamReader(
                 new FileInputStream(inputCsv), Charset.forName("UTF8")), ',')) {
 
@@ -263,7 +253,7 @@ public class ExistingTimeseriesUpdater {
 //                        System.out.println("CSV index for command :" + command.cdid);
 //                        System.out.println("csdb id: " + timeseriesDatasetDownloads.getCsdbId());
 //                        System.out.println("column index: " + columnIndex);
-                        command.datasetCsvColumn.put(timeseriesDatasetDownloads.getCsdbId(), columnIndex);
+                        command.datasetCsvColumn.put(timeseriesDatasetFiles.getCsdbId(), columnIndex);
                     }
                 }
 
@@ -272,16 +262,16 @@ public class ExistingTimeseriesUpdater {
         }
     }
 
-    public static Set<TimeseriesUpdateCommand> getCommandsForDataset(ArrayList<TimeseriesUpdateCommand> updateCommands, TimeseriesDatasetDownloads timeseriesDatasetDownloads) {
+    public static Set<TimeseriesUpdateCommand> getCommandsForDataset(ArrayList<TimeseriesUpdateCommand> updateCommands, TimeseriesDatasetFiles timeseriesDatasetFiles) {
         Set<TimeseriesUpdateCommand> commandsForThisDataset = new HashSet<>();
         for (TimeseriesUpdateCommand updateCommand : updateCommands) {
 
             if (updateCommand.sourceDatasets != null) {
                 for (String sourceDataset : updateCommand.sourceDatasets) {
-                    if (sourceDataset.equalsIgnoreCase(timeseriesDatasetDownloads.getCsdbId())) {
+                    if (sourceDataset.equalsIgnoreCase(timeseriesDatasetFiles.getCsdbId())) {
                         logDebug("UpdateCommand added to dataset")
                                 .addParameter("cdid", updateCommand.cdid)
-                                .addParameter("csdbid", timeseriesDatasetDownloads.getCsdbId())
+                                .addParameter("csdbid", timeseriesDatasetFiles.getCsdbId())
                                 .log();
                         commandsForThisDataset.add(updateCommand);
                     }
@@ -295,13 +285,13 @@ public class ExistingTimeseriesUpdater {
         return commandsForThisDataset;
     }
 
-    public static Set<TimeseriesDatasetDownloads> determineWhatDownloadsNeedUpdating(ArrayList<TimeseriesUpdateCommand> updateCommands, List<TimeseriesDatasetDownloads> datasetDownloads) {
-        Set<TimeseriesDatasetDownloads> datasetDownloadsToUpdate = new HashSet<>();
+    public static Set<TimeseriesDatasetFiles> determineWhatDownloadsNeedUpdating(ArrayList<TimeseriesUpdateCommand> updateCommands, List<TimeseriesDatasetFiles> datasetDownloads) {
+        Set<TimeseriesDatasetFiles> datasetDownloadsToUpdate = new HashSet<>();
         for (TimeseriesUpdateCommand command : updateCommands) {
 
             if (command.sourceDatasets != null) {
                 for (String sourceDataset : command.sourceDatasets) {
-                    for (TimeseriesDatasetDownloads datasetDownload : datasetDownloads) {
+                    for (TimeseriesDatasetFiles datasetDownload : datasetDownloads) {
                         if (sourceDataset.equalsIgnoreCase(datasetDownload.getCsdbId())) {
                             logDebug("datasetDownload to update").addParameter("CSDBID", datasetDownload.getCsdbId()).log();
                             datasetDownloadsToUpdate.add(datasetDownload);
@@ -314,12 +304,12 @@ public class ExistingTimeseriesUpdater {
         return datasetDownloadsToUpdate;
     }
 
-    public static List<TimeseriesDatasetDownloads> findCsdbFiles(Path source) {
+    public static List<TimeseriesDatasetFiles> findCsdbFiles(Path source) {
         CsdbFinder csdbFinder = new CsdbFinder();
         csdbFinder.find(source);
-        List<TimeseriesDatasetDownloads> datasetDownloads = new ArrayList<>();
+        List<TimeseriesDatasetFiles> datasetDownloads = new ArrayList<>();
         for (String uri : csdbFinder.uris) {
-            datasetDownloads.add(new TimeseriesDatasetDownloads(Paths.get(uri)));
+            datasetDownloads.add(new TimeseriesDatasetFiles(Paths.get(uri)));
         }
         return datasetDownloads;
     }

@@ -111,23 +111,23 @@ public class DataProcessor {
     }
 
     public TimeSeries processTimeseries(
-            ContentReader publishedContentReader,
+            ContentReader contentReader,
             DataPublicationDetails details,
             TimeSeries newTimeSeries,
             DataIndex dataIndex
     ) throws ZebedeeException, IOException, URISyntaxException {
-        return processTimeseries(publishedContentReader, details, newTimeSeries, dataIndex, Optional.<TimeseriesUpdateCommand>empty());
+        return processTimeseries(contentReader, details, newTimeSeries, dataIndex, Optional.<TimeseriesUpdateCommand>empty());
     }
 
     /**
      * Take a timeseries as produced by Brian from an upload and combine it with current content
      *
-     * @param publishedContentReader
+     * @param contentReader
      * @param details
      * @param newTimeSeries          @return
      */
     public TimeSeries processTimeseries(
-            ContentReader publishedContentReader,
+            ContentReader contentReader,
             DataPublicationDetails details,
             TimeSeries newTimeSeries,
             DataIndex dataIndex,
@@ -135,7 +135,7 @@ public class DataProcessor {
     ) throws ZebedeeException, IOException, URISyntaxException {
 
         // Get current version of the time series (persists any manually entered data)
-        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details, dataIndex);
+        this.timeSeries = initialTimeseries(newTimeSeries, contentReader, details, dataIndex);
 
         // Add meta from the landing page and timeseries dataset page
         syncLandingPageMetadata(this.timeSeries, details);
@@ -243,6 +243,7 @@ public class DataProcessor {
 
     /**
      * Get the url for the timeseries when the url has the dataset ID included (new timeseries location)
+     *
      * @param series
      * @param details
      * @return
@@ -269,34 +270,47 @@ public class DataProcessor {
      * Get the starting point for our timeseries by loading a
      *
      * @param series
-     * @param publishedContentReader
+     * @param contentReader
      * @param details
      * @return
      * @throws ZebedeeException
      * @throws IOException
      */
-    TimeSeries initialTimeseries(TimeSeries series, ContentReader publishedContentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
+    TimeSeries initialTimeseries(TimeSeries series, ContentReader contentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
 
-        String publishUri = publishUriForTimeseries(series, details, dataIndex);
+        String timeseriesUri = getDatasetBasedUriForTimeseries(series, details, dataIndex);
 
-        // Try to get an existing timeseries
         try {
-            TimeSeries existing = (TimeSeries) publishedContentReader.getContent(publishUri);
+            // try and get the timeseries in the new format ( /timeseries/cdid/datasetId ) if its exists.
+            TimeSeries existing = (TimeSeries) contentReader.getContent(timeseriesUri);
             return existing;
-        } catch (NotFoundException e) {
-            // If it doesn't exist create a new empty one using the description
-            TimeSeries initial = new TimeSeries();
-            initial.setDescription(series.getDescription());
-            initial.setUri(new URI(publishUri));
 
-            return initial;
-        } catch (IllegalStateException e) {
-            logError(e, "Error with timeseries")
-                    .addParameter("CDID", series.getCdid())
-                    .addParameter("publishUri", publishUri)
-                    .log();
-            throw e;
+        } catch (NotFoundException notFoundInNewFormat) {
+
+            // if its not found, then look for it in the old format ( /timeseries/cdid )
+            String publishUri = publishUriForTimeseries(series, details, dataIndex);
+
+            try {
+                TimeSeries existing = (TimeSeries) contentReader.getContent(publishUri);
+                return existing;
+
+            } catch (NotFoundException notFoundAnywhere) {
+                // If it doesn't exist create a new empty one using the description
+                TimeSeries initial = new TimeSeries();
+                initial.setDescription(series.getDescription());
+                initial.setUri(new URI(publishUri));
+
+                return initial;
+            } catch (IllegalStateException e) {
+                logError(e, "Error with timeseries")
+                        .addParameter("CDID", series.getCdid())
+                        .addParameter("publishUri", publishUri)
+                        .log();
+                throw e;
+            }
         }
+
+
     }
 
 

@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSec
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.net.URI;
@@ -195,8 +194,6 @@ public class DataPagesGenerator {
 
         String dateAsString = releaseYear + "-01-01 00:00:00.0";
         Date releaseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateAsString);
-
-
 
         DatasetLandingPage landingPage = exampleDataLandingPage("Landing Page " + datasetId, datasetId, releaseDate);
 

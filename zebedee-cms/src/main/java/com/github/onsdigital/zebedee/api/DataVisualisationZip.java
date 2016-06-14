@@ -41,7 +41,7 @@ import java.util.zip.ZipInputStream;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_ZIP_UNPACKED;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.dataVisZipUnpacked;
 
 /**

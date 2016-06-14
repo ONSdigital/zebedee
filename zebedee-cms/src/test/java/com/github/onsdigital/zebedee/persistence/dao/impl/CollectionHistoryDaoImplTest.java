@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.persistence.dao;
+package com.github.onsdigital.zebedee.persistence.dao.impl;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.exceptions.CollectionEventHistoryException;
@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.HibernateServiceImpl;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import org.hibernate.HibernateException;
@@ -23,8 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoImpl.COLLECTION_ID;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoImpl.SELECT_BY_COLLECTION_ID;
+import static com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHistoryDaoImpl.COLLECTION_ID;
+import static com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHistoryDaoImpl.SELECT_BY_COLLECTION_ID;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;

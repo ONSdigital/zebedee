@@ -60,6 +60,13 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     /**
+     * Log an info level message.
+     */
+    public static ZebedeeLogBuilder logWarn(String message) {
+        return new ZebedeeLogBuilder(message, Level.WARN);
+    }
+
+    /**
      * Log the error and throw the exception.
      */
     public void logAndThrow(Class<? extends ZebedeeException> exceptionClass) throws ZebedeeException {
@@ -82,6 +89,11 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         // Default to internal server error.
         throw new UnexpectedErrorException(getStringProperty(ERROR_CONTEXT),
                 Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    }
+
+    public void throwUnchecked(Throwable error) {
+        this.log();
+        throw new RuntimeException(error);
     }
 
     private String getStringProperty(String key) {

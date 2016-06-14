@@ -22,7 +22,7 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.DATA_VISUALISATION;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamAdded;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamRemoved;
 

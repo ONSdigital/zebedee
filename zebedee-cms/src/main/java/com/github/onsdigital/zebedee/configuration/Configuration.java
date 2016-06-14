@@ -16,6 +16,7 @@ public class Configuration {
     private static final String DEFAULT_DYLAN_URL = "http://localhost:8085";
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
     private static final String INFLUXDB_URL = "http://influxdb:8086";
+    private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -98,6 +99,14 @@ public class Configuration {
 
     public static String getReindexKey() {
         return StringUtils.defaultIfBlank(getValue("website_reindex_key"), "");
+    }
+
+    public static boolean isAuditDatabaseEnabled() {
+        return Boolean.valueOf(StringUtils.defaultIfBlank(getValue(AUDIT_DB_ENABLED_ENV_VAR), "true"));
+    }
+
+    public static String getAuditDBURL() {
+        return StringUtils.defaultIfBlank(getValue("db_audit_url"), "");
     }
 
     /**

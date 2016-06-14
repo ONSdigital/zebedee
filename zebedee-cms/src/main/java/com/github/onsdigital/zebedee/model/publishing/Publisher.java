@@ -52,7 +52,7 @@ import java.util.function.Function;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
 
 public class Publisher {

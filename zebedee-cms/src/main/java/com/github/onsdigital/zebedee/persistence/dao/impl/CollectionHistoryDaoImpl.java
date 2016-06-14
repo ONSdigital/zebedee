@@ -1,10 +1,11 @@
-package com.github.onsdigital.zebedee.persistence.dao;
+package com.github.onsdigital.zebedee.persistence.dao.impl;
 
 import com.github.onsdigital.zebedee.exceptions.CollectionEventHistoryException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.HibernateService;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import org.hibernate.Session;
@@ -17,7 +18,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  * Implementation of the {@link CollectionHistoryDao} interface. Provides methods for saving {@link CollectionHistoryEvent}'s
  * and getting events by collection ID.
  */
-public class CollectionHistoryDaoImpl extends CollectionHistoryDao {
+public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
 
     static final String COLLECTION_ID = "collection_id";
     static final String SELECT_BY_COLLECTION_ID =

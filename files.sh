@@ -7,11 +7,13 @@ export PORT="8082"
 export RESTOLINO_STATIC="src/main/resources/files"
 export RESTOLINO_CLASSES="zebedee-cms/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee
+export audit_db_enabled=true
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
 java $JAVA_OPTS \
  -Ddb_audit_url=$db_audit_url \
+ -Daudit_db_enabled=$audit_db_enabled \
  -Ddb_audit_username=$db_audit_username \
  -Ddb_audit_password=$db_audit_password \
  -Drestolino.files=$RESTOLINO_STATIC \

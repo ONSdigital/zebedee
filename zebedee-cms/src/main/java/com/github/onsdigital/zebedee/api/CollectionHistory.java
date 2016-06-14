@@ -17,7 +17,7 @@ import javax.ws.rs.GET;
 import java.io.IOException;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
 /**
  * API returning the collection event history for the specified collection. API collectionID as the last section of the
@@ -26,7 +26,7 @@ import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao
 @Api
 public class CollectionHistory {
 
-    private static CollectionHistoryDao collectionHistoryDao = CollectionHistoryDao.getCollectionHistoryDao();
+    private static CollectionHistoryDao collectionHistoryDao = getCollectionHistoryDao();
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
 
     /**

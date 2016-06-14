@@ -213,17 +213,59 @@ public class DataProcessorTest {
         // Then
         // we expect it to be the published timeseries complete with existing data
         assertEquals(PageType.timeseries, initial.getType());
+        assertEquals(republish.timeSeriesList.get(0).getUri(), initial.getUri());
         assertNotEquals(0, initial.years.size());
         assertNotEquals(0, initial.months.size());
         assertNotEquals(0, initial.quarters.size());
     }
 
+    @Test
+    public void initialTimeseries_givenExistingTimeseriesData_returnsCurrentTimeseriesData() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+        // Given
+        // We upload a data collection to a zebedee instance with current published content
+        DataPagesSet dataPagesSet = generator.generateDataPagesSet("dataprocessor", "published", 2016, 1, 1, "");
+        dataBuilder.addReviewedDataPagesSet(dataPagesSet, collection, collectionWriter);
+        dataBuilder.publishDataPagesSet(dataPagesSet);
 
+        DataPublicationDetails details = dataPagesSet.getDetails(publishedReader, collectionReader.getReviewed());
+        TimeSeries timeSeries = dataPagesSet.timeSeriesDataList.get(0);
 
+        // When
+        // we get the initialTimeseries
+        TimeSeries initial = new DataProcessor().initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
 
+        // Then
+        // we expect it to be the published timeseries complete with existing data
+        assertEquals(PageType.timeseries, initial.getType());
+        assertEquals(dataPagesSet.timeSeriesDataList.get(0).getUri(), initial.getUri());
+        assertNotEquals(0, initial.years.size());
+        assertNotEquals(0, initial.months.size());
+        assertNotEquals(0, initial.quarters.size());
+    }
 
+    @Test
+    public void initialTimeseries_givenOnlyTimeseriesData_returnsCurrentTimeseriesData() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+        // Given
+        // We upload a data collection to a zebedee instance with current published content
+        DataPagesSet dataPagesSet = generator.generateDataPagesSet("dataprocessor", "published", 2016, 0, 1, "");
+        dataBuilder.addReviewedDataPagesSet(dataPagesSet, collection, collectionWriter);
+        dataBuilder.publishDataPagesSet(dataPagesSet);
 
+        DataPublicationDetails details = dataPagesSet.getDetails(publishedReader, collectionReader.getReviewed());
+        TimeSeries timeSeries = dataPagesSet.timeSeriesDataList.get(0);
 
+        // When
+        // we get the initialTimeseries
+        TimeSeries initial = new DataProcessor().initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
+
+        // Then
+        // we expect it to be the published timeseries complete with existing data
+        assertEquals(PageType.timeseries, initial.getType());
+        assertEquals(dataPagesSet.timeSeriesDataList.get(0).getUri(), initial.getUri());
+        assertNotEquals(0, initial.years.size());
+        assertNotEquals(0, initial.months.size());
+        assertNotEquals(0, initial.quarters.size());
+    }
 
     @Test
     public void syncMetadata_givenVariedDetailSet_takesContactsFromLandingPage() throws IOException, ZebedeeException, ParseException, URISyntaxException {

@@ -47,7 +47,14 @@ public class DataBuilder {
 
         publishPage(dataPagesSet.datasetLandingPage, dataPagesSet.datasetLandingPage.getUri().toString());
         publishPage(dataPagesSet.timeSeriesDataset, dataPagesSet.timeSeriesDataset.getUri().toString());
+
+        // timeseries in the old format
         for (TimeSeries timeSeries : dataPagesSet.timeSeriesList) {
+            publishPage(timeSeries, timeSeries.getUri().toString());
+        }
+
+        // timeseries in the new format.
+        for (TimeSeries timeSeries : dataPagesSet.timeSeriesDataList) {
             publishPage(timeSeries, timeSeries.getUri().toString());
         }
 

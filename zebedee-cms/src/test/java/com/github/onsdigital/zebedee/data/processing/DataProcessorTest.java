@@ -64,7 +64,6 @@ public class DataProcessorTest {
 
     DataPagesSet published;
     DataPagesSet inReview;
-    DataPagesSet republish;
 
     Date date;
     /**
@@ -99,7 +98,7 @@ public class DataProcessorTest {
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
 
         // add a set of data in a collection
-        inReview = generator.generateDataPagesSet("dataprocessor", "inreview", 2015, 2, "");
+        inReview = generator.generateDataPagesSet("dataprocessor", "thedatasetid", 2015, 2, "");
         dataBuilder.addReviewedDataPagesSet(inReview, collection, collectionWriter);
 
         // add a set of data to published
@@ -135,9 +134,47 @@ public class DataProcessorTest {
         assertEquals(details.parentFolderUri + "/timeseries/" + cdid, publishUri);
     }
 
+    @Test
+    public void getDatasetBasedUriForTimeseries_givenUnindexed_returnsExpectedUrl() throws ParseException, URISyntaxException, IOException, ZebedeeException {
+        // Given
+        // A timeseries from our reviewed dataset
+        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
+        TimeSeries series = inReview.timeSeriesList.get(0);
 
+        // When
+        // we get the publish uri for a timeseries
+        String publishUri = new DataProcessor().getDatasetBasedUriForTimeseries(series, details, zebedee.dataIndex);
 
+        // Then
+        // we expect it to be the cdid at the same root
+        String cdid = series.getCdid();
 
+        String expectedUri = String.format("%s/timeseries/%s/%s", details.parentFolderUri, cdid, details.landingPage.getDescription().getDatasetId().toLowerCase());
+
+        assertEquals(expectedUri, publishUri);
+    }
+
+    @Test
+    public void getDatasetBasedUriForTimeseries_givenIndexed_returnsExpectedUrl() throws ParseException, URISyntaxException, IOException, ZebedeeException {
+        // Given
+        // A timeseries from our reviewed dataset
+        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
+        TimeSeries series = inReview.timeSeriesList.get(0);
+        DataIndex dataIndex = new DataIndex(); // empty data index.
+        dataIndex.setUriForCdid(series.getCdid(), series.getUri().toString());
+
+        // When
+        // we get the publish uri for a timeseries
+        String publishUri = new DataProcessor().getDatasetBasedUriForTimeseries(series, details, dataIndex);
+
+        // Then
+        // we expect it to be the cdid at the same root
+        String cdid = series.getCdid();
+
+        String expectedUri = String.format("%s/timeseries/%s/%s", details.parentFolderUri, cdid, details.landingPage.getDescription().getDatasetId().toLowerCase());
+
+        assertEquals(expectedUri, publishUri);
+    }
 
 
     @Test

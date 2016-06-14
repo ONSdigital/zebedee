@@ -242,6 +242,30 @@ public class DataProcessor {
     }
 
     /**
+     * Get the url for the timeseries when the url has the dataset ID included (new timeseries location)
+     * @param series
+     * @param details
+     * @return
+     */
+    String getDatasetBasedUriForTimeseries(TimeSeries series, DataPublicationDetails details, DataIndex dataIndex) {
+        String cdid = series.getCdid().toLowerCase();
+        String datasetId = details.landingPage.getDescription().getDatasetId().toLowerCase();
+        String indexed = dataIndex.getUriForCdid(cdid);
+
+        if (indexed != null) {
+            // if its in the index, just add the dataset id to the end of the existing timeseries URL.
+            return String.format("%s/%s", indexed, datasetId);
+        } else {
+            // if its not in the data index, build the URI based on the dataset location.
+            String timeseriesUri = details.getTimeseriesFolder() + "/" + series.getCdid().toLowerCase();
+            dataIndex.setUriForCdid(cdid, timeseriesUri);
+
+            String timeseriesDataUri = String.format("%s/%s", timeseriesUri, datasetId);
+            return timeseriesDataUri;
+        }
+    }
+
+    /**
      * Get the starting point for our timeseries by loading a
      *
      * @param series

@@ -76,6 +76,21 @@ public class TimeseriesMigration {
 
         // create the new timeseries-data json under the directory of the dataset id
 
+
+        List<DataPublication> dataPublications = new ArrayList<>();
+        for (TimeSeriesDataset timeSeriesDataset : datasets) {
+            DataPublication newPublication = new DataPublication(contentReader, contentReader, timeSeriesDataset.getUri().toString());
+            dataPublications.add(newPublication);
+        }
+
+        for (DataPublication dataPublication : dataPublications) {
+            // If a file upload exists
+            if (dataPublication.hasUpload()) {
+                boolean saveTimeSeries = false;
+                //dataPublication.process(contentReader, contentReader, contentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
+            }
+        }
+
     }
 
     /**

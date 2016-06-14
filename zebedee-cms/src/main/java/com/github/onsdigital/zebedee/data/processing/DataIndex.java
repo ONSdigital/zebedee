@@ -21,7 +21,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
- * A hashmap storing a mapping from cdid
+ * A hashmap storing an entry for each timeseries - mapping the CDID to the url of the timeseries.
  */
 public class DataIndex {
     private static final ExecutorService pool = Executors.newSingleThreadExecutor();
@@ -37,6 +37,9 @@ public class DataIndex {
     public DataIndex(ContentReader contentReader) {
         this.contentReader = contentReader;
         reindex();
+    }
+
+    public DataIndex() {
     }
 
     public String getUriForCdid(String cdid) {

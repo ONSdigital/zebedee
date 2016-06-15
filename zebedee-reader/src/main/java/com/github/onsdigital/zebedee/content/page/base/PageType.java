@@ -20,6 +20,7 @@ public enum PageType {
     article,
     article_download,
     timeseries,
+    timeseries_data,
     data_slice,
     compendium_landing_page,
     compendium_chapter,//Resolve parent

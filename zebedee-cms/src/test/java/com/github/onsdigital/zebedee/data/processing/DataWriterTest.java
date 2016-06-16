@@ -127,7 +127,8 @@ public class DataWriterTest {
     }
 
     @Test
-    public void versionAndSave_forAlreadyPublishedData_doesntCreateFileInReviewed() throws ZebedeeException, IOException, URISyntaxException {
+    public void versionAndSave_forAlreadyPublishedData_shouldCreateFileInReviewed() throws ZebedeeException,
+            IOException, URISyntaxException {
         // Given
         // we republish a published timeseries with identical values
         TimeSeries timeSeries = published.timeSeriesList.get(0);
@@ -142,8 +143,9 @@ public class DataWriterTest {
         dataWriter.versionAndSave(processor, details);
 
         // Then
-        // we expect no addition to the collection
-        assertFalse(fileExists(collectionReader.getReviewed(), timeSeries.getUri().toString()));
+        // we expect an addition to the collection -  as the date will have been modified.
+        assertTrue(timeSeries.getUri().toString(), fileExists(collectionReader.getReviewed(), timeSeries.getUri()
+                .toString()));
     }
 
     @Test

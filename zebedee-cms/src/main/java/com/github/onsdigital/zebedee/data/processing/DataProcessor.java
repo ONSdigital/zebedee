@@ -124,7 +124,7 @@ public class DataProcessor {
      *
      * @param contentReader
      * @param details
-     * @param newTimeSeries          @return
+     * @param newTimeSeries @return
      */
     public TimeSeries processTimeseries(
             ContentReader contentReader,
@@ -281,33 +281,23 @@ public class DataProcessor {
         String timeseriesUri = getDatasetBasedUriForTimeseries(series, details, dataIndex);
 
         try {
-            // try and get the timeseries in the new format ( /timeseries/cdid/datasetId ) if its exists.
             TimeSeries existing = (TimeSeries) contentReader.getContent(timeseriesUri);
             return existing;
 
-        } catch (NotFoundException notFoundInNewFormat) {
+        } catch (NotFoundException notFoundAnywhere) {
+            // If it doesn't exist create a new empty one using the description
+            TimeSeries initial = new TimeSeries();
+            initial.setDescription(series.getDescription());
+            initial.setUri(new URI(timeseriesUri));
 
-            // if its not found, then look for it in the old format ( /timeseries/cdid )
-            String publishUri = publishUriForTimeseries(series, details, dataIndex);
-
-            try {
-                TimeSeries existing = (TimeSeries) contentReader.getContent(publishUri);
-                return existing;
-
-            } catch (NotFoundException notFoundAnywhere) {
-                // If it doesn't exist create a new empty one using the description
-                TimeSeries initial = new TimeSeries();
-                initial.setDescription(series.getDescription());
-                initial.setUri(new URI(publishUri));
-
-                return initial;
-            } catch (IllegalStateException e) {
-                logError(e, "Error with timeseries")
-                        .addParameter("CDID", series.getCdid())
-                        .addParameter("publishUri", publishUri)
-                        .log();
-                throw e;
-            }
+            return initial;
+        } catch (IllegalStateException e) {
+            logError(e, "Error with timeseries")
+                    .addParameter("CDID", series.getCdid())
+                    .addParameter("publishUri", timeseriesUri)
+                    .log();
+            throw e;
         }
+
     }
 }

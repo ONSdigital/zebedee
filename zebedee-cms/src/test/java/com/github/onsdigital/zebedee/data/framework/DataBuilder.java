@@ -53,11 +53,6 @@ public class DataBuilder {
             publishPage(timeSeries, timeSeries.getUri().toString());
         }
 
-        // timeseries in the new format.
-        for (TimeSeries timeSeries : dataPagesSet.timeSeriesDataList) {
-            publishPage(timeSeries, timeSeries.getUri().toString());
-        }
-
         // We have added pages directly to the master so need to reindex
         zebedee.dataIndex.reindex();
         zebedee.dataIndex.pauseUntilComplete(60);

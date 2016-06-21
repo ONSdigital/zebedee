@@ -19,8 +19,8 @@ public enum PageType {
     bulletin,
     article,
     article_download,
+    timeseries_landing_page,
     timeseries,
-    timeseries_data,
     data_slice,
     compendium_landing_page,
     compendium_chapter,//Resolve parent

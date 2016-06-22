@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesD
 import com.github.onsdigital.zebedee.data.processing.setup.DataIndexBuilder;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
+import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 
@@ -52,23 +53,17 @@ public class TimeseriesMigration {
         DataIndex dataIndex = DataIndexBuilder.buildDataIndex(contentReader); // build the dataindex of existing timeseries to determine location of output
 
         // find all dataset files on the site including versions.
-        List<TimeSeriesDataset> datasets = getAllDatasets(source, contentReader);
+        List<DataPublication> datasets = getAllDatasets(source, contentReader);
 
         // sort the datasets found by release date
-        sortDatasetsByReleaseDate(datasets);
 
-        for (TimeSeriesDataset dataset : datasets) {
-            System.out.println("Uri = " + dataset.getUri());
-            System.out.println("release date = " + dataset.getDescription().getReleaseDate());
-        }
+//        for (TimeSeriesDataset dataset : datasets) {
+//            System.out.println("Uri = " + dataset.getUri());
+//            System.out.println("release date = " + dataset.getDescription().getReleaseDate());
+//        }
 
-        List<DataPublication> dataPublications = new ArrayList<>();
-        for (TimeSeriesDataset timeSeriesDataset : datasets) {
-            DataPublication newPublication = new DataPublication(contentReader, contentReader, timeSeriesDataset.getUri().toString());
-            dataPublications.add(newPublication);
-        }
 
-        for (DataPublication dataPublication : dataPublications) {
+        for (DataPublication dataPublication : datasets) {
             // If a file upload exists
             if (dataPublication.hasUpload()) {
                 boolean saveTimeSeries = false;
@@ -77,16 +72,16 @@ public class TimeseriesMigration {
         }
     }
 
-    private static void sortDatasetsByReleaseDate(List<TimeSeriesDataset> datasets) {
-        Comparator<TimeSeriesDataset> byReleaseDate = (ds1, ds2) -> ds1.getDescription().getReleaseDate()
-                .compareTo(ds2.getDescription().getReleaseDate());
+    private static void sortDatasetsByReleaseDate(List<DataPublication> datasets) {
+        Comparator<DataPublication> byReleaseDate = (ds1, ds2) -> ds1.getDetails().datasetPage.getDescription().getReleaseDate()
+                .compareTo(ds2.getDetails().datasetPage.getDescription().getReleaseDate());
         datasets.sort(byReleaseDate);
     }
 
-    private static List<TimeSeriesDataset> getAllDatasets(Path source, ContentReader contentReader) throws ZebedeeException, IOException {
+    private static List<DataPublication> getAllDatasets(Path source, ContentReader contentReader) throws ZebedeeException, IOException {
         List<TimeseriesDatasetFiles> datasetDownloads = getTimeseriesDatasets(source);
 
-        List<TimeSeriesDataset> datasets = new ArrayList<>();
+        List<DataPublication> dataPublications = new ArrayList<>();
 
         for (TimeseriesDatasetFiles datasetDownload : datasetDownloads) {
             System.out.println("------------------------------------------------------");
@@ -102,15 +97,32 @@ public class TimeseriesMigration {
 
             TimeSeriesDataset timeseriesDatasetPage = (TimeSeriesDataset) page;
 
-            DatasetLandingPage landingPage = (DatasetLandingPage) contentReader.getContent(datasetDownload.getRootPath().getParent().toString());
-            System.out.println("landingPage.getDescription().getDatasetId() = " + landingPage.getDescription().getDatasetId());
-
             //System.out.println("Uri = " + timeseriesDatasetPage.getUri());
             //System.out.println("release date = " + timeseriesDatasetPage.getDescription().getReleaseDate());
 
-            datasets.add(timeseriesDatasetPage);
+            // create custom instance of data publication. We want to reference versioned datasets but specify the landing page
+            // relative to the current version.
+
+            String datasetUri = datasetDownload.getRootPath().toString();
+
+            if (VersionedContentItem.isVersionedUri(datasetUri)) {
+
+            }
+
+            String landingPageUri = "";
+            String fileUri = "";
+            String parentFolderUri = "";
+            DatasetLandingPage landingPage = new DatasetLandingPage();
+            TimeSeriesDataset datasetPage = new TimeSeriesDataset();
+
+            DataPublicationDetails dataPublicationDetails = new DataPublicationDetails(datasetUri, landingPageUri, fileUri, parentFolderUri, landingPage, datasetPage);
+            DataPublication newPublication = new DataPublication(dataPublicationDetails);
+            dataPublications.add(newPublication);
         }
-        return datasets;
+
+        sortDatasetsByReleaseDate(dataPublications);
+
+        return dataPublications;
     }
 
     /**

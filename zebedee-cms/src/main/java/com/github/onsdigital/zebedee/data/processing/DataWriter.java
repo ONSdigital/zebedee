@@ -55,11 +55,11 @@ public class DataWriter {
 
 
         // create directory in reviewed if it does not exist.
-        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, this.contentWriter);
+        VersionedContentItem versionedContentItem = new VersionedContentItem(uri);
 
         // build a version if it doesn't exist
         if (versionedContentItem.versionExists(this.contentReader) == false) {
-            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(pubishedReader);
+            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(pubishedReader, this.contentWriter);
 
             Version version = new Version();
             version.setUri(URI.create(contentItemVersion.getUri()));

@@ -64,5 +64,6 @@
     </root>
 
     <logger name="com.github.davidcarboni.restolino" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
 
 </configuration>

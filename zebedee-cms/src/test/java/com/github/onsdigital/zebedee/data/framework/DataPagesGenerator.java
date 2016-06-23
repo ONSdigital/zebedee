@@ -178,16 +178,6 @@ public class DataPagesGenerator {
         return timeSeriesDataset;
     }
 
-    public DataPagesSet generateDataPagesSet(
-            String parentUri,
-            String datasetId,
-            int releaseYear,
-            int timeSeriesCount,
-            String fileName
-    ) throws ParseException, URISyntaxException {
-        return this.generateDataPagesSet(parentUri, datasetId, releaseYear, timeSeriesCount, 0, fileName);
-    }
-
     /**
      * Generate a full set of pages for data publication
      *
@@ -205,7 +195,6 @@ public class DataPagesGenerator {
             String datasetId,
             int releaseYear,
             int timeSeriesCount,
-            int timeSeriesDataCount,
             String fileName
     ) throws ParseException, URISyntaxException {
         DataPagesSet dataPagesSet = new DataPagesSet();
@@ -225,19 +214,19 @@ public class DataPagesGenerator {
         downloadSection.setCdids(new ArrayList<>());
 
 
-        for (int i = 0; i < timeSeriesCount; i++) {
-            TimeSeries timeSeries = exampleTimeseries(datasetId + i, datasetId, releaseDate, true, true, true, 4, releaseYear - 1);
-            downloadSection.getCdids().add(timeSeries.getCdid());
-            timeSeries.setUri(new URI("/" + parentUri + "/timeseries/" + timeSeries.getCdid().toLowerCase()));
-            dataPagesSet.timeSeriesList.add(timeSeries);
-        }
+//        for (int i = 0; i < timeSeriesCount; i++) {
+//            TimeSeries timeSeries = exampleTimeseries(datasetId + i, datasetId, releaseDate, true, true, true, 4, releaseYear - 1);
+//            downloadSection.getCdids().add(timeSeries.getCdid());
+//            timeSeries.setUri(new URI("/" + parentUri + "/timeseries/" + timeSeries.getCdid().toLowerCase()));
+//            dataPagesSet.timeSeriesList.add(timeSeries);
+//        }
 
-        for (int i = 0; i < timeSeriesDataCount; i++) {
+        for (int i = 0; i < timeSeriesCount; i++) {
             TimeSeries timeSeries = exampleTimeseries(datasetId + i, datasetId, releaseDate, true, true, true, 4, releaseYear - 1);
             downloadSection.getCdids().add(timeSeries.getCdid());
             String timeseriesDataUri = String.format("/%s/timeseries/%s/%s", parentUri, timeSeries.getCdid().toLowerCase(), datasetId.toLowerCase());
             timeSeries.setUri(new URI(timeseriesDataUri));
-            dataPagesSet.timeSeriesDataList.add(timeSeries);
+            dataPagesSet.timeSeriesList.add(timeSeries);
         }
 
         timeSeriesDataset.getDownloads().add(downloadSection);

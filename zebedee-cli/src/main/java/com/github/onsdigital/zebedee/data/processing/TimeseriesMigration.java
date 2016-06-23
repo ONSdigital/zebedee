@@ -1,9 +1,10 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.data.processing.setup.DataIndexBuilder;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -11,6 +12,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,13 +49,64 @@ public class TimeseriesMigration {
 
         // - take one web server at a time, copy from publishing to the web server + deploy latest code
 
-        ContentReader contentReader = new FileSystemContentReader(source); // read dataset / timeseries content from master
-        ContentWriter contentWriter = new ContentWriter(destination); // write output content to collection
+        ContentReader publishedContentReader = new FileSystemContentReader(source); // read dataset / timeseries content from master
 
-        DataIndex dataIndex = DataIndexBuilder.buildDataIndex(contentReader); // build the dataindex of existing timeseries to determine location of output
+        ContentReader destinationContentReader = new FileSystemContentReader(destination);
+        ContentWriter destinationContentWriter = new ContentWriter(destination); // write output content to collection
+
+        DataIndex dataIndex = DataIndexBuilder.buildDataIndex(publishedContentReader); // build the dataindex of existing timeseries to determine location of output
 
         // find all dataset files on the site including versions.
-        List<DataPublication> datasets = getAllDatasets(source, contentReader);
+        List<TimeseriesDatasetFiles> datasetDownloads = getTimeseriesDatasets(source);
+
+        // load the pages
+        List<TimeseriesDatasetContainer> datasetContainers = loadPageObjectsForDatasets(publishedContentReader, datasetDownloads);
+
+        // sort by release date.
+        sortDatasetsByReleaseDate(datasetContainers);
+
+        //TimeseriesDatasetContainer datasetContainer = datasetContainers.get(0);
+        for (TimeseriesDatasetContainer datasetContainer : datasetContainers) {
+
+            TimeSeriesDataset dataset = datasetContainer.timeSeriesDataset;
+            TimeseriesDatasetFiles datasetFiles = datasetContainer.timeseriesDatasetFiles;
+
+            System.out.println("------------------------------------------------------");
+            System.out.println("dataset.getUri() = " + dataset.getUri());
+            System.out.println("dataset.getDescription().getReleaseDate() = " + dataset.getDescription().getReleaseDate());
+
+            String datasetUri = dataset.getUri().toString();
+            System.out.println("datasetUri = " + datasetUri);
+            if (VersionedContentItem.isVersionedUri(datasetUri)) {
+                datasetUri = VersionedContentItem.resolveBaseUri(datasetUri);
+                System.out.println("VERSIONED datasetUri = " + datasetUri);
+            }
+
+            try {
+                destinationContentReader.getContent(datasetUri);
+
+                System.out.println("--- dataset already exists - creating version");
+
+                VersionedContentItem versionedContentItem = new VersionedContentItem(datasetUri);
+                versionedContentItem.createVersion(destinationContentReader, destinationContentWriter);
+
+                copyDatasetJsonToDestination(destinationContentWriter, dataset, datasetUri);
+                copyCsdbFileToLocation(publishedContentReader, destinationContentWriter, datasetFiles, datasetUri);
+
+            } catch (NotFoundException e) {
+
+                System.out.println("--- dataset does not exist - creating copy...");
+                copyDatasetJsonToDestination(destinationContentWriter, dataset, datasetUri);
+                copyCsdbFileToLocation(publishedContentReader, destinationContentWriter, datasetFiles, datasetUri);
+            }
+
+            DataPublication dataPublication = new DataPublication(publishedContentReader, destinationContentReader, datasetUri);
+
+            if (dataPublication.hasUpload()) {
+                boolean saveTimeSeries = true;
+                dataPublication.process(publishedContentReader, destinationContentReader, destinationContentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
+            }
+        }
 
         // sort the datasets found by release date
 
@@ -63,32 +116,48 @@ public class TimeseriesMigration {
 //        }
 
 
-        for (DataPublication dataPublication : datasets) {
-            // If a file upload exists
-            if (dataPublication.hasUpload()) {
-                boolean saveTimeSeries = false;
-                dataPublication.process(contentReader, contentReader, contentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
-            }
+//        for (DataPublication dataPublication : datasets) {
+//            // If a file upload exists
+//            if (dataPublication.hasUpload()) {
+//                boolean saveTimeSeries = false;
+//                dataPublication.process(publishedContentReader, publishedContentReader, contentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
+//            }
+//        }
+    }
+
+    private static void copyCsdbFileToLocation(ContentReader publishedContentReader, ContentWriter destinationContentWriter, TimeseriesDatasetFiles datasetFiles, String datasetUri) throws IOException, ZebedeeException {
+        // copy csdb file to new location
+        String csdbSource = datasetFiles.getCsdbPath().toString();
+        String csdbDestination = datasetUri + "/" + datasetFiles.getCsdbPath().getFileName().toString();
+
+        System.out.println("Copying CSDB file from " + csdbSource + " to " + csdbDestination);
+
+        try (InputStream inputStream = publishedContentReader.getResource(csdbSource).getData()) {
+            destinationContentWriter.write(inputStream, csdbSource);
         }
     }
 
-    private static void sortDatasetsByReleaseDate(List<DataPublication> datasets) {
-        Comparator<DataPublication> byReleaseDate = (ds1, ds2) -> ds1.getDetails().datasetPage.getDescription().getReleaseDate()
-                .compareTo(ds2.getDetails().datasetPage.getDescription().getReleaseDate());
-        datasets.sort(byReleaseDate);
+    private static void copyDatasetJsonToDestination(ContentWriter destinationContentWriter, TimeSeriesDataset dataset, String datasetUri) throws IOException, BadRequestException {
+        // clear downloads
+        dataset.setDownloads(new ArrayList<>());
+        // clear versions
+        dataset.setVersions(new ArrayList<>());
+
+        // write json to destination
+        String datasetPath = datasetUri + "/data.json";
+        System.out.println("Writing dataset file to " + datasetPath);
+        destinationContentWriter.writeObject(dataset, datasetPath);
     }
 
-    private static List<DataPublication> getAllDatasets(Path source, ContentReader contentReader) throws ZebedeeException, IOException {
-        List<TimeseriesDatasetFiles> datasetDownloads = getTimeseriesDatasets(source);
+    private static List<TimeseriesDatasetContainer> loadPageObjectsForDatasets(ContentReader publishedContentReader, List<TimeseriesDatasetFiles> datasetDownloads) throws ZebedeeException, IOException {
+        List<TimeseriesDatasetContainer> datasetContainers = new ArrayList<>();
 
-        List<DataPublication> dataPublications = new ArrayList<>();
+        for (TimeseriesDatasetFiles TimeseriesDatasetFile : datasetDownloads) {
+            System.out.println("------------------------loadPageObjectsForDatasets------------------------------");
+            System.out.println("CsdbPath() = " + TimeseriesDatasetFile.getCsdbPath());
+            System.out.println("DatasetPath() = " + TimeseriesDatasetFile.getDatasetPath());
 
-        for (TimeseriesDatasetFiles datasetDownload : datasetDownloads) {
-            System.out.println("------------------------------------------------------");
-            System.out.println("CsdbPath() = " + datasetDownload.getCsdbPath());
-            System.out.println("DatasetPath() = " + datasetDownload.getDatasetPath());
-
-            Page page = contentReader.getContent(datasetDownload.getRootPath().toString());
+            Page page = publishedContentReader.getContent(TimeseriesDatasetFile.getRootPath().toString());
 
             if (page instanceof TimeSeriesDataset == false) {
                 System.out.println("This is not a timeseries dataset.");
@@ -97,32 +166,21 @@ public class TimeseriesMigration {
 
             TimeSeriesDataset timeseriesDatasetPage = (TimeSeriesDataset) page;
 
-            //System.out.println("Uri = " + timeseriesDatasetPage.getUri());
-            //System.out.println("release date = " + timeseriesDatasetPage.getDescription().getReleaseDate());
+            TimeseriesDatasetContainer timeseriesDatasetContainer = new TimeseriesDatasetContainer();
+            timeseriesDatasetContainer.timeSeriesDataset = timeseriesDatasetPage;
+            timeseriesDatasetContainer.timeseriesDatasetFiles = TimeseriesDatasetFile;
+            datasetContainers.add(timeseriesDatasetContainer);
+            System.out.println("Uri = " + timeseriesDatasetPage.getUri());
+            System.out.println("release date = " + timeseriesDatasetPage.getDescription().getReleaseDate());
 
-            // create custom instance of data publication. We want to reference versioned datasets but specify the landing page
-            // relative to the current version.
-
-            String datasetUri = datasetDownload.getRootPath().toString();
-
-            if (VersionedContentItem.isVersionedUri(datasetUri)) {
-
-            }
-
-            String landingPageUri = "";
-            String fileUri = "";
-            String parentFolderUri = "";
-            DatasetLandingPage landingPage = new DatasetLandingPage();
-            TimeSeriesDataset datasetPage = new TimeSeriesDataset();
-
-            DataPublicationDetails dataPublicationDetails = new DataPublicationDetails(datasetUri, landingPageUri, fileUri, parentFolderUri, landingPage, datasetPage);
-            DataPublication newPublication = new DataPublication(dataPublicationDetails);
-            dataPublications.add(newPublication);
         }
+        return datasetContainers;
+    }
 
-        sortDatasetsByReleaseDate(dataPublications);
-
-        return dataPublications;
+    private static void sortDatasetsByReleaseDate(List<TimeseriesDatasetContainer> datasets) {
+        Comparator<TimeseriesDatasetContainer> byReleaseDate = (ds1, ds2) -> ds1.timeSeriesDataset.getDescription().getReleaseDate()
+                .compareTo(ds2.timeSeriesDataset.getDescription().getReleaseDate());
+        datasets.sort(byReleaseDate);
     }
 
     /**

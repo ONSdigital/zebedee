@@ -73,7 +73,6 @@ public class CollectionDetails {
         List<Team> teams = Root.zebedee.teams.resolveTeams(teamIds);
         teams.forEach(team -> {
             collection.description.teams.add(team.name);
-            System.out.println("team = " + team.name);
         });
 
         return result;

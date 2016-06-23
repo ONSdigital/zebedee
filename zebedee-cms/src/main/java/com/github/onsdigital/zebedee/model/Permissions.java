@@ -365,13 +365,6 @@ public class Permissions {
         Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.id);
         if (teamIds == null) teamIds = new HashSet<>();
 
-        System.out.println("Teams for collection " + collectionDescription.name);
-
-        for (Integer teamId : teamIds) {
-            System.out.println("teamId = " + teamId);
-        }
-
-
         return java.util.Collections.unmodifiableSet(teamIds);
     }
 

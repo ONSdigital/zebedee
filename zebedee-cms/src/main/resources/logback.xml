@@ -55,8 +55,8 @@
 
     <logger name="com.github.onsdigital.logging" level="debug" additivity="false">
         <!--<appender-ref ref="PRETTY_JSON" />-->
-        <appender-ref ref="JSON"/>
-        <!--<appender-ref ref="PLAIN_TEXT" />-->
+        <!--<appender-ref ref="JSON"/>-->
+        <appender-ref ref="PLAIN_TEXT"/>
     </logger>
 
     <root level="info">
@@ -64,6 +64,7 @@
     </root>
 
     <logger name="com.github.davidcarboni.restolino" level="WARN"/>
+    <logger name="c.g.d.restolino" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/>
 
 </configuration>

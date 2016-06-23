@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model.publishing;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
-import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
@@ -20,16 +19,12 @@ import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
-import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
-import com.github.onsdigital.zebedee.util.ContentTree;
-import com.github.onsdigital.zebedee.util.SlackNotification;
-import com.github.onsdigital.zebedee.util.URIUtils;
-import com.github.onsdigital.zebedee.util.ZipUtils;
+import com.github.onsdigital.zebedee.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -52,13 +47,13 @@ import java.util.function.Function;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
 public class Publisher {
 
     private static final List<Host> theTrainHosts;
-    private static final ExecutorService pool = Executors.newFixedThreadPool(50);
+    private static final ExecutorService pool = Executors.newFixedThreadPool(20);
     private static Session zebdeePublisherSession = null;
 
     // The date format including the BST timezone. Dates are stored at UTC and must be formated to take BST into account.
@@ -743,6 +738,18 @@ public class Publisher {
         }
     }
 
+    /**
+     * Returns a session object with the email as the class name of {@link Publisher} - required by the history event
+     * logging.
+     */
+    private static Session getPublisherClassSession() {
+        if (zebdeePublisherSession == null) {
+            zebdeePublisherSession = new Session();
+            zebdeePublisherSession.email = Publisher.class.getName();
+        }
+        return zebdeePublisherSession;
+    }
+
     static class ShutDownPublisherThread extends Thread {
 
         private final ExecutorService executorService;
@@ -755,17 +762,5 @@ public class Publisher {
         public void run() {
             this.executorService.shutdown();
         }
-    }
-
-    /**
-     * Returns a session object with the email as the class name of {@link Publisher} - required by the history event
-     * logging.
-     */
-    private static Session getPublisherClassSession() {
-        if (zebdeePublisherSession == null) {
-            zebdeePublisherSession = new Session();
-            zebdeePublisherSession.email = Publisher.class.getName();
-        }
-        return zebdeePublisherSession;
     }
 }

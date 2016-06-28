@@ -829,7 +829,7 @@ public class Collection {
         return hasDeleted;
     }
 
-    public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException, ZebedeeException {
+    public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException {
         if (contentPath == null || StringUtils.isEmpty(contentPath.toString())) {
             return false;
         }

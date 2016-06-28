@@ -68,7 +68,7 @@ public class Publish {
     }
 
     private void logPublishResult(HttpServletRequest request, com.github.onsdigital.zebedee.model.Collection collection,
-                                  Session session, boolean result, Exception ex) throws ZebedeeException {
+                                  Session session, boolean result, Exception ex) {
         Audit.Event auditEvent;
         CollectionHistoryEvent historyEvent;
 

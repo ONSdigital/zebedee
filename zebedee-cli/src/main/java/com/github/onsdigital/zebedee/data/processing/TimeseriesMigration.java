@@ -65,7 +65,7 @@ public class TimeseriesMigration {
         // sort by release date.
         sortDatasetsByReleaseDate(datasetContainers);
 
-        //TimeseriesDatasetContainer datasetContainer = datasetContainers.get(0);
+        // iterate each dataset found
         for (TimeseriesDatasetContainer datasetContainer : datasetContainers) {
 
             TimeSeriesDataset dataset = datasetContainer.timeSeriesDataset;
@@ -77,52 +77,45 @@ public class TimeseriesMigration {
 
             String datasetUri = dataset.getUri().toString();
             System.out.println("datasetUri = " + datasetUri);
+
+            // if processing a versioned dataset, determine the root URL of the dataset.
             if (VersionedContentItem.isVersionedUri(datasetUri)) {
                 datasetUri = VersionedContentItem.resolveBaseUri(datasetUri);
                 System.out.println("VERSIONED datasetUri = " + datasetUri);
             }
 
             try {
+
+                // attempt to read the existing dataset if it exists
                 destinationContentReader.getContent(datasetUri);
 
                 System.out.println("--- dataset already exists - creating version");
 
+                // create a version of the existing dataset.
                 VersionedContentItem versionedContentItem = new VersionedContentItem(datasetUri);
                 versionedContentItem.createVersion(destinationContentReader, destinationContentWriter);
 
+                // copy the dataset and CSDB from the version directory to the destination.
                 copyDatasetJsonToDestination(destinationContentWriter, dataset, datasetUri);
                 copyCsdbFileToLocation(publishedContentReader, destinationContentWriter, datasetFiles, datasetUri);
 
             } catch (NotFoundException e) {
 
+                // if the dataset does not alreadt exist in the destination, just move it from source into place.
                 System.out.println("--- dataset does not exist - creating copy...");
                 copyDatasetJsonToDestination(destinationContentWriter, dataset, datasetUri);
                 copyCsdbFileToLocation(publishedContentReader, destinationContentWriter, datasetFiles, datasetUri);
             }
 
+            // create the data publication object to pass into the data processor.
             DataPublication dataPublication = new DataPublication(publishedContentReader, destinationContentReader, datasetUri);
 
+            // process the dataset as it would normally be.
             if (dataPublication.hasUpload()) {
                 boolean saveTimeSeries = true;
                 dataPublication.process(publishedContentReader, destinationContentReader, destinationContentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
             }
         }
-
-        // sort the datasets found by release date
-
-//        for (TimeSeriesDataset dataset : datasets) {
-//            System.out.println("Uri = " + dataset.getUri());
-//            System.out.println("release date = " + dataset.getDescription().getReleaseDate());
-//        }
-
-
-//        for (DataPublication dataPublication : datasets) {
-//            // If a file upload exists
-//            if (dataPublication.hasUpload()) {
-//                boolean saveTimeSeries = false;
-//                dataPublication.process(publishedContentReader, publishedContentReader, contentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
-//            }
-//        }
     }
 
     private static void copyCsdbFileToLocation(ContentReader publishedContentReader, ContentWriter destinationContentWriter, TimeseriesDatasetFiles datasetFiles, String datasetUri) throws IOException, ZebedeeException {

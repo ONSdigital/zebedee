@@ -36,29 +36,6 @@ public class DataProcessor {
     }
 
     /**
-     * Check if datasetId is listed as a sourceDataset for the timeseries and if not add it
-     *
-     * @param timeSeries
-     * @param landingPage
-     */
-    private static void checkDatasetId(TimeSeries timeSeries, DatasetLandingPage landingPage) {
-        boolean datasetIsNew = true;
-
-        // Check
-        for (String datasetId : timeSeries.sourceDatasets) {
-            if (landingPage.getDescription().getDatasetId().equalsIgnoreCase(datasetId)) {
-                datasetIsNew = false;
-                break;
-            }
-        }
-
-        // Link
-        if (datasetIsNew) {
-            timeSeries.sourceDatasets.add(landingPage.getDescription().getDatasetId().toUpperCase());
-        }
-    }
-
-    /**
      * Check if a landingPage is listed as a related dataset and if not add it
      *
      * @param page
@@ -179,12 +156,10 @@ public class DataProcessor {
         }
         description.setNextRelease(details.landingPage.getDescription().getNextRelease());
         description.setReleaseDate(details.landingPage.getDescription().getReleaseDate());
+        description.setDatasetId(details.landingPage.getDescription().getDatasetId());
 
         // Set some contact details
         addContactDetails(page, details.landingPage);
-
-        // Add the dataset id to sources if necessary
-        checkDatasetId(page, details.landingPage);
 
         // Add the dataset id to sources if necessary
         checkRelatedDatasets(page, details.landingPageUri);

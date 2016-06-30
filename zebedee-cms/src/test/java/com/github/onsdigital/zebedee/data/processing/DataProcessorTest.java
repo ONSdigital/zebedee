@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
@@ -373,101 +372,6 @@ public class DataProcessorTest {
         assertEquals(manualSeries.getDescription().getUnit(), processed.getDescription().getUnit());
         assertEquals(manualSeries.getDescription().getPreUnit(), processed.getDescription().getPreUnit());
         assertEquals(manualSeries.getDescription().isNationalStatistic(), processed.getDescription().isNationalStatistic());
-    }
-
-    @Test
-    public void processTimeseries_givenNewTimeseries_copiesToTimeSeriesSourceDatasets() throws IOException, ZebedeeException, URISyntaxException {
-        // Given
-        // We upload a data collection to a zebedee instance where we don't have current published content
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        details.datasetPage.getDescription().setDatasetId("Dataset");
-        details.landingPage.getDescription().setDatasetId("Landing");
-
-        TimeSeries timeSeries = inReview.timeSeriesList.get(0);
-
-        // When
-        // we run a process
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
-
-        // Then
-        // we expect the landing page datasetId to be copied once and only once
-        long count = processor.timeSeries.sourceDatasets.stream().filter(source -> source.equalsIgnoreCase("Landing")).count();
-        assertEquals(1, count);
-    }
-
-    @Test
-    public void processTimeseries_addingPointsFromNewDataSource_addsNewDatasourceToTimeseriesAndThosePointsOnly() throws IOException, ZebedeeException, URISyntaxException, ParseException {
-        // Given
-        // We publish a specific timeseries
-        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", "v2015", 2015, 0, "file.csdb");
-        TimeSeries timeSeries = generator.exampleTimeseries("abcd", "v2015");
-        timeSeries.setUri(new URI( "pages/timeseries/" + timeSeries.getCdid().toLowerCase()));
-        timeSeries.years.stream().forEach(value -> value.value = "2015");
-        long originalTimeSeriesValues = timeSeries.years.size();
-        pagesSet.timeSeriesList.add(timeSeries);
-        dataBuilder.publishDataPagesSet(pagesSet);
-
-        // change the dataset id and add a new value
-        pagesSet.datasetLandingPage.getDescription().setDatasetId("v2016");
-        TimeSeriesValue value2016 = new TimeSeriesValue();
-        value2016.value = "2016";
-        value2016.date = "2016";
-        pagesSet.timeSeriesList.get(0).add(value2016);
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
-
-        // When
-        // we run a process
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, pagesSet.getDetails(publishedReader, collectionReader.getReviewed()), timeSeries, zebedee.dataIndex);
-
-        // Then
-        // we expect the timeseries to
-        assertEquals(1, processor.timeSeries.sourceDatasets.stream().filter(t -> t.equalsIgnoreCase("v2015")).count());
-        assertEquals(1, processor.timeSeries.sourceDatasets.stream().filter(t -> t.equalsIgnoreCase("v2016")).count());
-
-        //
-        long valuesWith2015Source = processor.timeSeries.years.stream().filter(t -> t.sourceDataset.equalsIgnoreCase("v2015")).count();
-        long valuesWith2016Source = processor.timeSeries.years.stream().filter(t -> t.sourceDataset.equalsIgnoreCase("v2016")).count();
-
-        assertEquals(originalTimeSeriesValues, valuesWith2015Source);
-        assertEquals(1, valuesWith2016Source);
-    }
-
-    @Test
-    public void processTimeseries_updatingPointsFromNewDataSource_addsNewDatasourceToTimeseriesAndChangesPoint() throws IOException, ZebedeeException, URISyntaxException, ParseException {
-        // Given
-        // We publish a specific timeseries
-        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", "original", 2015, 0, "file.csdb");
-        TimeSeries timeSeries = generator.exampleTimeseries("abcd", "original");
-        timeSeries.setUri(new URI( "pages/timeseries/" + timeSeries.getCdid().toLowerCase()));
-        timeSeries.years.stream().forEach(value -> value.value = "original");
-
-        long originalTimeSeriesValues = timeSeries.years.size();
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
-        timeSeries = new DataProcessor().processTimeseries(publishedReader, pagesSet.getDetails(publishedReader, collectionReader.getReviewed()), timeSeries, zebedee.dataIndex);
-        pagesSet.timeSeriesList.add(timeSeries);
-        dataBuilder.publishDataPagesSet(pagesSet);
-
-        // remove the 2015 value and replace with a new value
-        timeSeries.years.stream().filter(t -> t.date.equalsIgnoreCase("2015")).forEach(timeSeriesValue -> timeSeriesValue.value = "updated");
-        pagesSet.timeSeriesList.clear();
-        pagesSet.timeSeriesList.add(timeSeries);
-        pagesSet.datasetLandingPage.getDescription().setDatasetId("updated");
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
-
-        // When
-        // we run a process
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, pagesSet.getDetails(publishedReader, collectionReader.getReviewed()), timeSeries, zebedee.dataIndex);
-
-        // Then
-        // we expect updated source to have replaced original on the timeseries value
-        long valuesFromOriginal = processor.timeSeries.years.stream().filter(t -> t.sourceDataset.equalsIgnoreCase("original")).count();
-        long valuesFromUpdate = processor.timeSeries.years.stream().filter(t -> t.sourceDataset.equalsIgnoreCase("updated")).count();
-
-        assertEquals(originalTimeSeriesValues - 1, valuesFromOriginal);
-        assertEquals(1, valuesFromUpdate);
     }
 
     @Test

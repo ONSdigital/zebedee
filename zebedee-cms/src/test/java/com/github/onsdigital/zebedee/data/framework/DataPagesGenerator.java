@@ -16,7 +16,6 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -50,8 +49,6 @@ public class DataPagesGenerator {
         timeSeries.getDescription().setTitle(Random.id());
         timeSeries.getDescription().setReleaseDate(releaseDate);
         timeSeries.getDescription().setContact(dummy());
-
-        timeSeries.sourceDatasets = Arrays.asList(datasetId);
 
         String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
         String[] quarters = "Q1,Q2,Q3,Q4".split(",");

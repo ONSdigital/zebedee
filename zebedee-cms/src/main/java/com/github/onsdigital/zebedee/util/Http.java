@@ -14,7 +14,7 @@ public class Http extends com.github.davidcarboni.httpino.Http {
         HttpPost post = new HttpPost("casded");
 
         RequestConfig requestConfig = RequestConfig.custom()
-                .setSocketTimeout(5000)
+                .setSocketTimeout(300000)
                 .setConnectTimeout(5000)
                 .setConnectionRequestTimeout(5000)
                 .build();

@@ -161,7 +161,7 @@ public class DataProcessorTest {
         DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
         TimeSeries series = inReview.timeSeriesList.get(0);
         DataIndex dataIndex = new DataIndex(); // empty data index.
-        dataIndex.setUriForCdid(series.getCdid(), series.getUri().toString());
+        dataIndex.setUriForCdid(series.getCdid(), series.getUri().resolve(".").toString());
 
         // When
         // we get the publish uri for a timeseries

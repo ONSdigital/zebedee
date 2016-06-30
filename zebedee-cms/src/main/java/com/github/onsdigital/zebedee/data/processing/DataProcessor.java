@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.util.URIUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -227,6 +228,8 @@ public class DataProcessor {
         String cdid = series.getCdid().toLowerCase();
         String datasetId = details.landingPage.getDescription().getDatasetId().toLowerCase();
         String indexed = dataIndex.getUriForCdid(cdid);
+
+        indexed = URIUtils.removeTrailingSlash(indexed);
 
         if (indexed != null) {
             // if its in the index, just add the dataset id to the end of the existing timeseries URL.

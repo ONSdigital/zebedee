@@ -127,15 +127,14 @@ public class DataIndex {
             if (uri.endsWith("data.json") && uri.contains("/timeseries/") && !uri.toString().contains("/" + VersionedContentItem.getVersionDirectoryName() + "/")) {
                 uri = uri.substring(0, uri.length() - "/data.json".length());
 
-                // get the parent path so that we are referencing the timeseries landing page instead of dataset specific timeseries.
-                uri = Paths.get(uri).getParent().toString();
-
                 TimeSeries timeSeries;
                 try {
                     timeSeries = (TimeSeries) this.contentReader.getContent(uri);
                     if (timeSeries.getCdid() != null) {
 
-                        this.index.put(timeSeries.getCdid().toLowerCase(), uri);
+                        // get the parent path so that we are referencing the timeseries landing page instead of dataset specific timeseries.
+                        String timeseriesLandingPageUri = Paths.get(uri).getParent().toString();
+                        this.index.put(timeSeries.getCdid().toLowerCase(), timeseriesLandingPageUri);
                     }
                 } catch (Exception e) {
                     logError(e, "Error indexing uri").addParameter("uri", uri).log();

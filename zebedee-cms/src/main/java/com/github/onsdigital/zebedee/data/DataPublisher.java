@@ -57,27 +57,31 @@ public class DataPublisher {
                 dataPublication.process(publishedContentReader, collectionReader.getReviewed(), collectionContentWriter, saveTimeSeries, dataIndex, updateCommands);
         }
 
-        for (TimeseriesUpdateCommand updateCommand : updateCommands) {
-
-            // see if the timeseries is already in the reviewed section
-            String uriForCdid = dataIndex.getUriForCdid(updateCommand.cdid);
-
-            if (uriForCdid != null) {
-                try {
-                    // if it is then check if it needs updating.
-                    Page content = collectionReader.getReviewed().getContent(uriForCdid);
-                    updateTitle(collectionContentWriter, updateCommand, uriForCdid, content);
-                } catch (NotFoundException ex) {
-                    // if its not then update the title and write it
-                    Page content = publishedContentReader.getContent(uriForCdid);
-                    updateTitle(collectionContentWriter, updateCommand, uriForCdid, content);
-                }
-            }
-        }
+        applyUpdateCommands(publishedContentReader, collectionReader, collectionContentWriter, dataIndex, updateCommands);
 
         // Get the list of uris in reviewed
         List<String> uris = collectionReader.getReviewed().listUris();
         return uris;
+    }
+
+    public void applyUpdateCommands(ContentReader publishedContentReader, CollectionReader collectionReader, ContentWriter collectionContentWriter, DataIndex dataIndex, List<TimeseriesUpdateCommand> updateCommands) throws ZebedeeException, IOException {
+        for (TimeseriesUpdateCommand updateCommand : updateCommands) {
+
+            // see if the timeseries is already in the reviewed section
+            String timeseriesUri = updateCommand.getDatasetBasedTimeseriesUri(dataIndex);
+
+            if (timeseriesUri != null) {
+                try {
+                    // if it is then check if it needs updating.
+                    Page content = collectionReader.getReviewed().getContent(timeseriesUri);
+                    updateTitle(collectionContentWriter, updateCommand, timeseriesUri, content);
+                } catch (NotFoundException ex) {
+                    // if its not then update the title and write it
+                    Page content = publishedContentReader.getContent(timeseriesUri);
+                    updateTitle(collectionContentWriter, updateCommand, timeseriesUri, content);
+                }
+            }
+        }
     }
 
     public void updateTitle(ContentWriter collectionContentWriter, TimeseriesUpdateCommand updateCommand, String uriForCdid, Page content) throws IOException, BadRequestException {

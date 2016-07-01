@@ -266,15 +266,13 @@ public class ExistingTimeseriesUpdater {
         Set<TimeseriesUpdateCommand> commandsForThisDataset = new HashSet<>();
         for (TimeseriesUpdateCommand updateCommand : updateCommands) {
 
-            if (updateCommand.sourceDatasets != null) {
-                for (String sourceDataset : updateCommand.sourceDatasets) {
-                    if (sourceDataset.equalsIgnoreCase(timeseriesDatasetFiles.getCsdbId())) {
-                        logDebug("UpdateCommand added to dataset")
-                                .addParameter("cdid", updateCommand.cdid)
-                                .addParameter("csdbid", timeseriesDatasetFiles.getCsdbId())
-                                .log();
-                        commandsForThisDataset.add(updateCommand);
-                    }
+            if (updateCommand.dataset != null) {
+                if (updateCommand.dataset.equalsIgnoreCase(timeseriesDatasetFiles.getCsdbId())) {
+                    logDebug("UpdateCommand added to dataset")
+                            .addParameter("cdid", updateCommand.cdid)
+                            .addParameter("csdbid", timeseriesDatasetFiles.getCsdbId())
+                            .log();
+                    commandsForThisDataset.add(updateCommand);
                 }
             } else {
                 logDebug("No source datasets defined for CDID").addParameter("cdid", updateCommand.cdid).log();
@@ -289,14 +287,10 @@ public class ExistingTimeseriesUpdater {
         Set<TimeseriesDatasetFiles> datasetDownloadsToUpdate = new HashSet<>();
         for (TimeseriesUpdateCommand command : updateCommands) {
 
-            if (command.sourceDatasets != null) {
-                for (String sourceDataset : command.sourceDatasets) {
-                    for (TimeseriesDatasetFiles datasetDownload : datasetDownloads) {
-                        if (sourceDataset.equalsIgnoreCase(datasetDownload.getCsdbId())) {
-                            logDebug("datasetDownload to update").addParameter("CSDBID", datasetDownload.getCsdbId()).log();
-                            datasetDownloadsToUpdate.add(datasetDownload);
-                        }
-                    }
+            for (TimeseriesDatasetFiles datasetDownload : datasetDownloads) {
+                if (command.dataset.equalsIgnoreCase(datasetDownload.getCsdbId())) {
+                    logDebug("datasetDownload to update").addParameter("CSDBID", datasetDownload.getCsdbId()).log();
+                    datasetDownloadsToUpdate.add(datasetDownload);
                 }
             }
 

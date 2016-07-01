@@ -50,7 +50,7 @@ public class DataPublisherTest {
         publishedContentWriter.writeObject(timeSeries, uri + "/data.json");
 
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-        updateCommands.add(new TimeseriesUpdateCommand(cdid, expectedTitle));
+        updateCommands.add(new TimeseriesUpdateCommand(cdid, datasetId, expectedTitle));
 
         DataIndex dataIndex = new DataIndex(publishedContentReader);
         dataIndex.pauseUntilComplete(10);

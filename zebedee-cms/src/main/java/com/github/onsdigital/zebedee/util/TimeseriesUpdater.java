@@ -58,8 +58,6 @@ public class TimeseriesUpdater {
                 boolean updated = false;
                 TimeSeries page = (TimeSeries) contentReader.getContent(command.uri);
 
-                command.sourceDatasets = page.sourceDatasets;
-
                 if (command.title != null && command.title.length() > 0) {
                     page.getDescription().setTitle(command.title);
                     updated = true;

@@ -15,13 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.xml.sax.SAXException;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,7 +73,7 @@ public class TimeseriesDataFix {
                     try {
                         // Build new timeseries
                         DataProcessor processor = new DataProcessor();
-                        String publishUri = processor.publishUriForTimeseries(series, null, dataIndex);
+                        String publishUri = processor.getDatasetBasedUriForTimeseries(series, null, dataIndex);
 
                         // Try to get an existing timeseries
                         try {

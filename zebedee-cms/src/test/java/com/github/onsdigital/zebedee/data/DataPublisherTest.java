@@ -40,8 +40,9 @@ public class DataPublisherTest {
 
 
         String expectedTitle = "the updated title";
-        String uri = "/timeseries/whatever";
         String cdid = "abcd";
+        String datasetId = "qwef";
+        String uri = String.format("/timeseries/%s/%s", cdid, datasetId);
 
         // create the published time series and write it.
         TimeSeries timeSeries = new TimeSeries();

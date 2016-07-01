@@ -113,26 +113,6 @@ public class DataProcessorTest {
     }
 
 
-
-
-
-    @Test
-    public void publishUriForTimeseries_givenDetails_returnsParentTimeseriesFolder() throws ParseException, URISyntaxException, IOException, ZebedeeException {
-        // Given
-        // A timeseries from our reviewed dataset
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries series = inReview.timeSeriesList.get(0);
-
-        // When
-        // we get the publish uri for a timeseries
-        String publishUri = new DataProcessor().publishUriForTimeseries(series, details, zebedee.dataIndex);
-
-        // Then
-        // we expect it to be the cdid at the same root
-        String cdid = series.getCdid();
-        assertEquals(details.parentFolderUri + "/timeseries/" + cdid, publishUri);
-    }
-
     @Test
     public void getDatasetBasedUriForTimeseries_givenUnindexed_returnsExpectedUrl() throws ParseException, URISyntaxException, IOException, ZebedeeException {
         // Given
@@ -380,15 +360,16 @@ public class DataProcessorTest {
         // We publish a timeseries with update commands to update the title.
         String cdid = "abcd";
         String title = "The new title from update command.";
-        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", "original", 2015, 0, "file.csdb");
+        String datasetId = "original";
+        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", datasetId, 2015, 0, "file.csdb");
 
-        TimeSeries timeSeries = generator.exampleTimeseries(cdid, "original");
+        TimeSeries timeSeries = generator.exampleTimeseries(cdid, datasetId);
         timeSeries.setUri(new URI("pages/timeseries/" + timeSeries.getCdid().toLowerCase()));
-        timeSeries.years.stream().forEach(value -> value.value = "original");
+        timeSeries.years.stream().forEach(value -> value.value = datasetId);
 
         dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
 
-        Optional<TimeseriesUpdateCommand> command = Optional.of(new TimeseriesUpdateCommand(cdid, title));
+        Optional<TimeseriesUpdateCommand> command = Optional.of(new TimeseriesUpdateCommand(cdid, datasetId, title));
 
         // When
         // we run a process

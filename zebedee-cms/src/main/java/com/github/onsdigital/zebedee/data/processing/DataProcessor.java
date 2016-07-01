@@ -197,26 +197,6 @@ public class DataProcessor {
         return inProgress;
     }
 
-
-    /**
-     * Get the publish path for a timeseries
-     *
-     * @param series
-     * @param details
-     * @return
-     */
-    String publishUriForTimeseries(TimeSeries series, DataPublicationDetails details, DataIndex dataIndex) {
-        String cdid = series.getCdid().toLowerCase();
-        String indexed = dataIndex.getUriForCdid(cdid);
-        if (indexed != null) {
-            return indexed;
-        } else {
-            String unindexed = details.getTimeseriesFolder() + "/" + series.getCdid().toLowerCase();
-            dataIndex.setUriForCdid(cdid, unindexed);
-            return unindexed;
-        }
-    }
-
     /**
      * Get the url for the timeseries when the url has the dataset ID included (new timeseries location)
      *

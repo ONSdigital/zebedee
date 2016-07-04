@@ -329,6 +329,28 @@ public class DataProcessorTest {
     }
 
     @Test
+    public void syncMetadata_overExistingTimeSeries_shouldTransferDatasetUri() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+        // Given
+        // We create a publish over an existing dataset
+        DataPagesSet republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
+        dataBuilder.addReviewedDataPagesSet(republish, collection, collectionWriter);
+
+        DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
+        TimeSeries timeSeries = republish.timeSeriesList.get(0);
+
+        DataProcessor processor = new DataProcessor();
+        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
+
+        // When
+        // we sync details
+        TimeSeries synced = processor.syncLandingPageMetadata(initial, details);
+
+        // Then
+        // we expect the name to come from the old timeseries
+        assertEquals(details.landingPage.getUri(), synced.getDescription().getDatasetUri());
+    }
+
+    @Test
     public void processTimeseries_overExistingTimeSeries_persistsManualSetFields() throws ParseException, URISyntaxException, ZebedeeException, IOException {
         // Given
         // We create a published dataset with distinct manual metadata

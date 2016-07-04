@@ -158,6 +158,7 @@ public class DataProcessor {
         description.setNextRelease(details.landingPage.getDescription().getNextRelease());
         description.setReleaseDate(details.landingPage.getDescription().getReleaseDate());
         description.setDatasetId(details.landingPage.getDescription().getDatasetId());
+        description.setDatasetUri(details.landingPage.getUri());
 
         // Set some contact details
         addContactDetails(page, details.landingPage);

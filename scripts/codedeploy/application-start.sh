@@ -15,6 +15,8 @@ aws s3 cp s3://$CONFIG_BUCKET/zebedee/$CONFIG_FILE . || exit $?
 source $CONFIG_FILE && docker run -d                                 \
   --env=audit_db_enabled=$AUDIT_ENABLED                              \
   --env=brian_url=http://brian:8080                                  \
+  --env=ELASTIC_SEARCH_CLUSTER=cluster                               \
+  --env=ELASTIC_SEARCH_SERVER=elasticsearch                          \
   --env=db_audit_password=$AUDIT_DB_PASSWORD                         \
   --env=db_audit_url=$AUDIT_DB_URI                                   \
   --env=db_audit_username=$AUDIT_DB_USERNAME                         \
@@ -29,4 +31,5 @@ source $CONFIG_FILE && docker run -d                                 \
   --name=zebedee                                                     \
   --net=publishing                                                   \
   --restart=always                                                   \
+  --volume=/var/florence:/content                                    \
   $ECR_REPOSITORY_URI/zebedee:$GIT_COMMIT

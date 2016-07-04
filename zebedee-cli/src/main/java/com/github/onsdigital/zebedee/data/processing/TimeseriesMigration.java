@@ -23,7 +23,7 @@ import java.util.List;
 public class TimeseriesMigration {
 
     public static void main(String[] args) throws ZebedeeException, IOException, InterruptedException, URISyntaxException {
-        migrateTimeseries(Paths.get("/Users/carlhembrough/dev/zebedee/zebedee/master"), Paths.get("/Users/carlhembrough/dev/zebedee/migration"));
+        migrateTimeseries(Paths.get("/Users/carlhembrough/dev/zebedee/zebedee/masterlive"), Paths.get("/Users/carlhembrough/dev/zebedee/migration"));
     }
 
     public static void migrateTimeseries(String[] args) throws InterruptedException, ZebedeeException, IOException, URISyntaxException {
@@ -54,6 +54,7 @@ public class TimeseriesMigration {
         ContentReader destinationContentReader = new FileSystemContentReader(destination);
         ContentWriter destinationContentWriter = new ContentWriter(destination); // write output content to collection
 
+        System.out.println("Building data index...");
         DataIndex dataIndex = DataIndexBuilder.buildDataIndex(publishedContentReader); // build the dataindex of existing timeseries to determine location of output
 
         // find all dataset files on the site including versions.
@@ -65,8 +66,15 @@ public class TimeseriesMigration {
         // sort by release date.
         sortDatasetsByReleaseDate(datasetContainers);
 
+        System.out.println("Number of datasets: " + datasetContainers.size());
+
+        int count = 1;
+
         // iterate each dataset found
         for (TimeseriesDatasetContainer datasetContainer : datasetContainers) {
+
+            System.out.println("Processing dataset : " + count + " of " + datasetContainers.size());
+            count++;
 
             TimeSeriesDataset dataset = datasetContainer.timeSeriesDataset;
             TimeseriesDatasetFiles datasetFiles = datasetContainer.timeseriesDatasetFiles;
@@ -113,6 +121,7 @@ public class TimeseriesMigration {
             // process the dataset as it would normally be.
             if (dataPublication.hasUpload()) {
                 boolean saveTimeSeries = true;
+                System.out.println("--- Processing dataset... ");
                 dataPublication.process(publishedContentReader, destinationContentReader, destinationContentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
             }
         }
@@ -126,7 +135,7 @@ public class TimeseriesMigration {
         System.out.println("Copying CSDB file from " + csdbSource + " to " + csdbDestination);
 
         try (InputStream inputStream = publishedContentReader.getResource(csdbSource).getData()) {
-            destinationContentWriter.write(inputStream, csdbSource);
+            destinationContentWriter.write(inputStream, csdbDestination);
         }
     }
 

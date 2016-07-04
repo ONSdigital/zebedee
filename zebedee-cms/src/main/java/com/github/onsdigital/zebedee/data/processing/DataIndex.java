@@ -133,7 +133,13 @@ public class DataIndex {
                     if (timeSeries.getCdid() != null) {
 
                         // get the parent path so that we are referencing the timeseries landing page instead of dataset specific timeseries.
-                        String timeseriesLandingPageUri = Paths.get(uri).getParent().toString();
+                        String timeseriesLandingPageUri = uri; //if the parent directory is the timeseries folder just use the uri.
+                        Path path = Paths.get(uri);
+
+                        if (!path.getParent().getFileName().toString().equals("timeseries")) {
+                            timeseriesLandingPageUri = path.getParent().toString(); // else use the parent CDID based directory.
+                        }
+
                         this.index.put(timeSeries.getCdid().toLowerCase(), timeseriesLandingPageUri);
                     }
                 } catch (Exception e) {

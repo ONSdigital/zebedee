@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
@@ -542,15 +541,12 @@ public class Collections {
             byte[] bytes = IOUtils.toByteArray(inputStream);
 
             try (ByteArrayInputStream validationInputStream = new ByteArrayInputStream(bytes)) {
-
-                Page page = ContentUtil.deserialiseContent(validationInputStream);
-                if (page == null)
-                    throw new BadRequestException("Operation failed: Json is not valid. Please try again");
+                ContentUtil.deserialiseContent(validationInputStream);
             }
 
             return new ByteArrayInputStream(bytes);
         } catch (Exception e) {
-            throw new BadRequestException("Operation failed: Failed to validate Json. Please try again");
+            throw new BadRequestException("Validation of page content failed. Please try again");
         }
     }
 

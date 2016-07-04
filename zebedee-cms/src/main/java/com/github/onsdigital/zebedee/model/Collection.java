@@ -282,7 +282,7 @@ public class Collection {
 
         if (updatedCollection.description.type == CollectionType.scheduled) {
             if (collectionDescription.publishDate != null) {
-                if (!collection.description.publishDate.equals(collectionDescription.publishDate)) {
+                if (!collectionDescription.publishDate.equals(collection.description.publishDate)) {
                     getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_PUBLISH_RESCHEDULED,
                             reschedule(collection.description.publishDate, collectionDescription.publishDate));
                 }

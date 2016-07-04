@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.model.collection.audit;
 
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,5 +31,10 @@ public class CollectionHistory extends ArrayList<CollectionHistoryEvent> {
      */
     public CollectionHistory() {
         super();
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
     }
 }

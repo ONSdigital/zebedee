@@ -64,7 +64,7 @@ public class PublishCollectionsTask extends ScheduledTask {
 
             // run all the publish tasks and wait for them to complete
             try {
-                executorService.invokeAll(publishCollectionTasks, 120, TimeUnit.SECONDS); // Timeout after 2 minutes
+                executorService.invokeAll(publishCollectionTasks, 15, TimeUnit.MINUTES);
             } catch (InterruptedException e) {
                 logError(e, "Error while publishing collections").log();
             }
@@ -93,7 +93,7 @@ public class PublishCollectionsTask extends ScheduledTask {
 
             // run all the publish tasks and wait for them to complete
             try {
-                executorService.invokeAll(postPublishCollectionTasks, 120, TimeUnit.SECONDS); // Timeout after 2 minutes
+                executorService.invokeAll(postPublishCollectionTasks, 15, TimeUnit.MINUTES);
             } catch (InterruptedException e) {
                 logError(e, "Error while post publishing collections").log();
             }

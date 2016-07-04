@@ -4,11 +4,10 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %highlight(%-5level) %logger{36} - %msg%n
             </Pattern>
         </layout>
     </appender>
-
 
     <!-- Use this appender if you want the log output in plain/standard log format. -->
     <appender name="PLAIN_TEXT" class="ch.qos.logback.core.ConsoleAppender">
@@ -55,8 +54,8 @@
 
     <logger name="com.github.onsdigital.logging" level="debug" additivity="false">
         <!--<appender-ref ref="PRETTY_JSON" />-->
-        <appender-ref ref="JSON"/>
-        <!--<appender-ref ref="PLAIN_TEXT" />-->
+        <!--<appender-ref ref="JSON"/>-->
+        <appender-ref ref="PLAIN_TEXT"/>
     </logger>
 
     <root level="info">
@@ -64,6 +63,7 @@
     </root>
 
     <logger name="com.github.davidcarboni.restolino" level="WARN"/>
+    <logger name="c.g.d.restolino" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/>
 
 </configuration>

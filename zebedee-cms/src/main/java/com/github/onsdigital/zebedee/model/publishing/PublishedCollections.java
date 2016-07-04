@@ -43,15 +43,17 @@ public class PublishedCollections {
 
     private static final String index = "publishedcollections";
     private static final String type = "collection";
-
-    public final Path path;
-
-    private boolean initialised = false;
-
     private static final IsoDateSerializer dateSerialiser = new IsoDateSerializer(ContentConstants.JSON_DATE_PATTERN);
+    public final Path path;
+    private boolean initialised = false;
 
     public PublishedCollections(Path path) {
         this.path = path;
+    }
+
+    public static void main(String[] args) throws ParseException {
+        Date date = dateSerialiser.deserialize("2016-05-25T11:54:10.521Z");
+        System.out.println("date = " + date);
     }
 
     // todo: Currently 'lazy loading' the index, need a hook on the end of initialising elastic search
@@ -99,7 +101,6 @@ public class PublishedCollections {
         execution.actionGet();
     }
 
-
     public PublishedCollectionSearchResult search(Client client) throws IOException {
         tryInit(client);
 
@@ -132,8 +133,6 @@ public class PublishedCollections {
                     publishStartDate = searchHit.field("publishStartDate").getValue().toString();
                 } catch (NullPointerException e) { } // leave as default value
 
-                System.out.println("publishStartDate = " + publishStartDate);
-
                 if (StringUtils.isNotEmpty(publishStartDate)) {
                     PublishedCollection collection = new PublishedCollection(
                             searchHit.field("id").getValue().toString(),
@@ -148,11 +147,6 @@ public class PublishedCollections {
         }
 
         return results;
-    }
-
-    public static void main(String[] args) throws ParseException {
-        Date date = dateSerialiser.deserialize("2016-05-25T11:54:10.521Z");
-        System.out.println("date = " + date);
     }
 
     /**

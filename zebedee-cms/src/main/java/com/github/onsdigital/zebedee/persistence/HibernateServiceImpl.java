@@ -3,8 +3,10 @@ package com.github.onsdigital.zebedee.persistence;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+
 /**
- * Created by dave on 5/26/16.
+ * Provides access to {@link SessionFactory}.
  */
 public class HibernateServiceImpl implements HibernateService {
 
@@ -29,8 +31,9 @@ public class HibernateServiceImpl implements HibernateService {
         }
         catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
-            System.err.println("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
+            logError(ex, "Hibernate Error: Initial SessionFactory creation failed.")
+                    .throwUnchecked(ex);
+            return null;
         }
     }
 

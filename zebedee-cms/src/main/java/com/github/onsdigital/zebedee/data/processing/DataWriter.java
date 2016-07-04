@@ -29,7 +29,6 @@ public class DataWriter {
     public void versionAndSave(DataProcessor processor, DataPublicationDetails details) throws ZebedeeException, IOException {
         // If no change then don't update anything
         int dataChanges = processor.insertions + processor.corrections;
-        if (dataChanges == 0 && !processor.titleUpdated) return;
 
         if (dataChanges > 0) {
             // Version the timeseries

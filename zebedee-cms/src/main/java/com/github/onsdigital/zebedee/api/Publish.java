@@ -20,7 +20,7 @@ import java.io.IOException;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_MANUAL_PUBLISHED_FAILURE;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_MANUAL_PUBLISHED_SUCCESS;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_MANUAL_PUBLISHED_TRIGGERED;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
 @Api
 public class Publish {
@@ -68,7 +68,7 @@ public class Publish {
     }
 
     private void logPublishResult(HttpServletRequest request, com.github.onsdigital.zebedee.model.Collection collection,
-                                  Session session, boolean result, Exception ex) throws ZebedeeException {
+                                  Session session, boolean result, Exception ex) {
         Audit.Event auditEvent;
         CollectionHistoryEvent historyEvent;
 

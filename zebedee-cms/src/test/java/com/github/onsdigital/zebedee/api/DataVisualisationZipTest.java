@@ -8,11 +8,15 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.SimpleZebedeeResponse;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
+import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -28,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_ZIP_UNPACKED;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -81,6 +86,9 @@ public class DataVisualisationZipTest {
     private com.github.onsdigital.zebedee.model.Content mockContent;
 
     @Mock
+    private CollectionHistoryDao collectionHistoryDaoMock;
+
+    @Mock
     private BinaryOperator extractHtmlFilenames;
 
     private Resource zipResource;
@@ -94,6 +102,7 @@ public class DataVisualisationZipTest {
         zipResource = new Resource();
         visualisation = new Visualisation();
         visualisation.setUid("1234657890");
+        CollectionHistoryDaoFactory.setCollectionHistoryDao(collectionHistoryDaoMock);
         ReflectionTestUtils.setField(endpoint, "zebedeeCmsService", zebedeeCmsServiceMock);
         ReflectionTestUtils.setField(endpoint, "extractHtmlFilenames", extractHtmlFilenames);
     }
@@ -142,6 +151,8 @@ public class DataVisualisationZipTest {
         verify(mockContentWriter, times(1)).write(any(InputStream.class), eq(EXPECTED_PATH));
         verify(mockContentWriter, never()).write(any(InputStream.class), contains("__MACOSX"));
         verify(mockContentWriter, never()).write(any(InputStream.class), contains(".DS_Store"));
+        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(eq(mockCollection), eq(mockSession),
+                eq(DATA_VISUALISATION_ZIP_UNPACKED), Matchers.<CollectionEventMetaData>anyVararg());
 
         assertThat(response, is(equalTo(DataVisualisationZip.unzipSuccessResponse)));
     }

@@ -42,7 +42,7 @@ import java.nio.file.Paths;
 import static com.github.onsdigital.zebedee.content.util.ContentUtil.deserialiseContent;
 import static com.github.onsdigital.zebedee.exceptions.TableBuilderException.ErrorType.UNEXPECTED_ERROR;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_TABLE_MODIFIED;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.tableModified;
 
 /**

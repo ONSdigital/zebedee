@@ -28,7 +28,7 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_TABLE_CREATED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.tableCreated;
 

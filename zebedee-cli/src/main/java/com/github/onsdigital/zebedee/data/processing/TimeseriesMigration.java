@@ -33,7 +33,12 @@ public class TimeseriesMigration {
         Path source = Paths.get(args[1]);
         Path destination = Paths.get(args[2]);
 
+        long start = System.currentTimeMillis();
+
         migrateTimeseries(source, destination);
+
+        long taken = System.currentTimeMillis() - start;
+        System.out.println("seconds taken: " + taken / 1000);
     }
 
     private static void migrateTimeseries(Path source, Path destination) throws ZebedeeException, IOException, InterruptedException, URISyntaxException {
@@ -122,7 +127,7 @@ public class TimeseriesMigration {
             if (dataPublication.hasUpload()) {
                 boolean saveTimeSeries = true;
                 System.out.println("--- Processing dataset... ");
-                dataPublication.process(publishedContentReader, destinationContentReader, destinationContentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
+                dataPublication.process(destinationContentReader, destinationContentReader, destinationContentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
             }
         }
     }

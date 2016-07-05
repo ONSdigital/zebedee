@@ -52,6 +52,8 @@ node {
         }
     })
 
+    if (branch != 'develop') return
+
     stage 'Bundle'
     sh sprintf('sed -i -e %s -e %s -e %s -e %s -e %s appspec.yml zebedee-reader/appspec.yml scripts/codedeploy/* zebedee-reader/scripts/codedeploy/*', [
         "s/\\\${CODEDEPLOY_USER}/${env.CODEDEPLOY_USER}/g",

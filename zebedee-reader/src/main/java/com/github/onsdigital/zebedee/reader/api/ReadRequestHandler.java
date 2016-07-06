@@ -67,7 +67,7 @@ public class ReadRequestHandler {
     public Content find(HttpServletRequest request, DataFilter dataFilter, String uri) throws IOException, ZebedeeException {
         String collectionId = getCollectionId(request);
         String lastSegment = getLastSegment(uri);
-        logDebug("finding requested content").uri(uri).collectionId(collectionId).log();
+        logTrace("finding requested content").uri(uri).collectionId(collectionId).log();
         if (LATEST.equalsIgnoreCase(lastSegment)) {
             return getLatestContent(request, collectionId, dataFilter, removeLastSegment(uri));
         } else {

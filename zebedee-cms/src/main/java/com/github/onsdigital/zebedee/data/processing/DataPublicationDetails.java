@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -53,12 +54,12 @@ public class DataPublicationDetails {
         return parentFolderUri + "/timeseries";
     }
 
-    public String getDatasetCorrectionsNotice() {
-            if (datasetPage.getVersions() == null || datasetPage.getVersions().size() == 0) {
-                return "";
-            } else {
-                return datasetPage.getVersions().get(datasetPage.getVersions().size() - 1).getCorrectionNotice();
-            }
+    public Version getLastDatasetVersion() {
+        if (datasetPage.getVersions() == null || datasetPage.getVersions().size() == 0) {
+            return null;
+        } else {
+            return datasetPage.getVersions().get(datasetPage.getVersions().size() - 1);
+        }
     }
 
     /**

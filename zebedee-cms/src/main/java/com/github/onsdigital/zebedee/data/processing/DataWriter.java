@@ -32,7 +32,7 @@ public class DataWriter {
 
         if (dataChanges > 0) {
             // Version the timeseries
-            versionTimeseries(processor.timeSeries, details.getDatasetCorrectionsNotice());
+            versionTimeseries(processor.timeSeries, details.getLastDatasetVersion());
         }
 
         // Save the new page to reviewed
@@ -41,7 +41,7 @@ public class DataWriter {
 
     void versionTimeseries(
             TimeSeries timeSeries,
-            String correctionNotice
+            Version datasetVersion
     ) throws ZebedeeException, IOException {
         String uri = timeSeries.getUri().toString();
 
@@ -52,7 +52,6 @@ public class DataWriter {
             return;
         }
 
-
         // create directory in reviewed if it does not exist.
         VersionedContentItem versionedContentItem = new VersionedContentItem(uri);
 
@@ -62,9 +61,9 @@ public class DataWriter {
 
             Version version = new Version();
             version.setUri(URI.create(contentItemVersion.getUri()));
-            version.setUpdateDate(timeSeries.getDescription().getReleaseDate());
+            version.setUpdateDate(datasetVersion.getUpdateDate());
             version.setLabel(contentItemVersion.getIdentifier());
-            version.setCorrectionNotice(correctionNotice);
+            version.setCorrectionNotice(datasetVersion.getCorrectionNotice());
 
             if (timeSeries.getVersions() == null)
                 timeSeries.setVersions(new ArrayList<>());

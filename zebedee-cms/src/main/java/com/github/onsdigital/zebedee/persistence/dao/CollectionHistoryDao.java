@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * Defines API of a CollectionHistoryDao.
@@ -20,17 +21,17 @@ public interface CollectionHistoryDao {
      * @param event a {@link CollectionHistoryEvent} containing the specific details of the event to save.
      * @throws ZebedeeException unexpected problem saving the event.
      */
-    void saveCollectionHistoryEvent(CollectionHistoryEvent event) throws ZebedeeException;
+    Future saveCollectionHistoryEvent(CollectionHistoryEvent event);
 
 
-    void saveCollectionHistoryEvent(Collection collection, Session session,
-                                                    CollectionEventType collectionEventType,
-                                                    CollectionEventMetaData... metaValues) throws ZebedeeException;
+    Future saveCollectionHistoryEvent(Collection collection, Session session,
+                                      CollectionEventType collectionEventType,
+                                      CollectionEventMetaData... metaValues);
 
 
-    void saveCollectionHistoryEvent(String collectionName, String collectionId, Session session,
-                                                    CollectionEventType collectionEventType,
-                                                    CollectionEventMetaData... metaValues) throws ZebedeeException;
+    Future saveCollectionHistoryEvent(String collectionName, String collectionId, Session session,
+                                      CollectionEventType collectionEventType,
+                                      CollectionEventMetaData... metaValues);
 
     /**
      * Get the CollectionEventHistory of the specific collection.

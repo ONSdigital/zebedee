@@ -12,6 +12,7 @@ export audit_db_enabled=true
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
 java $JAVA_OPTS \
+ -Dcolour_logging_enabled=$colour_logging_enabled \
  -Ddb_audit_url=$db_audit_url \
  -Daudit_db_enabled=$audit_db_enabled \
  -Ddb_audit_username=$db_audit_username \

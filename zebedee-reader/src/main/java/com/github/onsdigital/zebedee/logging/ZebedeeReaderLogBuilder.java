@@ -45,6 +45,10 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
         return new ZebedeeReaderLogBuilder(message, Level.DEBUG);
     }
 
+    public static ZebedeeReaderLogBuilder logTrace(String message) {
+        return new ZebedeeReaderLogBuilder(message, Level.TRACE);
+    }
+
     public static ZebedeeReaderLogBuilder logInfo(String message) {
         return new ZebedeeReaderLogBuilder(message, Level.INFO);
     }

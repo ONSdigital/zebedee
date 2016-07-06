@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logTrace;
 import static com.github.onsdigital.zebedee.util.URIUtils.getLastSegment;
 import static com.github.onsdigital.zebedee.util.URIUtils.removeLastSegment;
 
@@ -82,7 +83,7 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getLatestCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException | NoSuchFileException e) {
-                logDebug("Could not find resource in collection. Will try published content")
+                logTrace("Could not find resource in collection. Will try published content")
                         .addParameter("resourceURI", uri)
                         .collectionId(collectionId)
                         .log();
@@ -98,7 +99,7 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContent(collectionId, sessionId, uri, dataFilter);
             } catch (NotFoundException e) {
-                logDebug("Could not find resource in collection. Will try published content")
+                logTrace("Could not find resource in collection. Will try published content")
                         .addParameter("uri", uri)
                         .collectionId(collectionId)
                         .log();
@@ -124,7 +125,7 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionResource(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-                ZebedeeReaderLogBuilder.logDebug("Could not find resource under collection, trying published content")
+                logTrace("Could not find resource under collection, trying published content")
                         .addParameter("resourceUri", uri)
                         .collectionId(collectionId)
                         .log();
@@ -149,7 +150,7 @@ public class ReadRequestHandler {
                 String sessionId = RequestUtils.getSessionId(request);
                 return reader.getCollectionContentLength(collectionId, sessionId, uri);
             } catch (NotFoundException e) {
-                logDebug("Could not find resource in collection. Will try published content")
+                logTrace("Could not find resource in collection. Will try published content")
                         .addParameter("uri", uri)
                         .collectionId(collectionId)
                         .log();

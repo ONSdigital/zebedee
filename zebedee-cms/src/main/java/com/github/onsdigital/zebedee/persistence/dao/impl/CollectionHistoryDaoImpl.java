@@ -11,6 +11,10 @@ import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import org.hibernate.Session;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Function;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
@@ -20,6 +24,10 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  */
 public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
 
+    private static ExecutorService threadPool;
+    private static Function<ExecutorService, Thread> shutdownTask = (executorService ->
+            new Thread(() -> executorService.shutdown()));
+
     static final String COLLECTION_ID = "collection_id";
     static final String SELECT_BY_COLLECTION_ID =
             "SELECT collection_history_event_id, collection_id, collection_name, " +
@@ -28,6 +36,11 @@ public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
                     "WHERE collection_id = :collection_id " +
                     "ORDER BY event_date ASC";
     private HibernateService hibernateService = null;
+
+    static {
+        threadPool = Executors.newFixedThreadPool(20);
+        Runtime.getRuntime().addShutdownHook(shutdownTask.apply(threadPool));
+    }
 
     public CollectionHistoryDaoImpl(HibernateService hibernateService) {
         this.hibernateService = hibernateService;
@@ -39,33 +52,32 @@ public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
      * @param event
      * @throws ZebedeeException
      */
-    public void saveCollectionHistoryEvent(CollectionHistoryEvent event) throws ZebedeeException {
-        try {
-            Session session = hibernateService.getSessionFactory().getCurrentSession();
-            session.beginTransaction();
-            session.save(event);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            logError(e, "Unexpected error while attempting to save collection audit event")
-                    .addParameter("event", event.toString())
-                    .logAndThrow(CollectionEventHistoryException.class);
-        }
+    public Future saveCollectionHistoryEvent(CollectionHistoryEvent event) {
+        return threadPool.submit(() -> {
+            try {
+                Session session = hibernateService.getSessionFactory().getCurrentSession();
+                session.beginTransaction();
+                session.save(event);
+                session.getTransaction().commit();
+            } catch (Exception ex) {
+                logError(ex, "Unexpected error while attempting to save collection audit event")
+                        .addParameter("event", event.toString()).throwUnchecked(ex);
+            }
+        });
     }
 
     @Override
-    public void saveCollectionHistoryEvent(Collection collection, com.github.onsdigital.zebedee.json.Session session,
-                                           CollectionEventType collectionEventType, CollectionEventMetaData... metaValues)
-            throws ZebedeeException {
-        this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection.getDescription().id,
+    public Future saveCollectionHistoryEvent(Collection collection, com.github.onsdigital.zebedee.json.Session session,
+                                             CollectionEventType collectionEventType, CollectionEventMetaData... metaValues) {
+        return this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection.getDescription().id,
                 collection.getDescription().name, session, collectionEventType, metaValues));
     }
 
     @Override
-    public void saveCollectionHistoryEvent(String collectionId, String collectionName,
-                                           com.github.onsdigital.zebedee.json.Session session,
-                                           CollectionEventType collectionEventType, CollectionEventMetaData... metaValues)
-            throws ZebedeeException {
-        this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collectionId, collectionName, session,
+    public Future saveCollectionHistoryEvent(String collectionId, String collectionName,
+                                             com.github.onsdigital.zebedee.json.Session session,
+                                             CollectionEventType collectionEventType, CollectionEventMetaData... metaValues) {
+        return this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collectionId, collectionName, session,
                 collectionEventType, metaValues));
     }
 

@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 import static com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHistoryDaoImpl.COLLECTION_ID;
 import static com.github.onsdigital.zebedee.persistence.dao.impl.CollectionHistoryDaoImpl.SELECT_BY_COLLECTION_ID;
@@ -30,7 +32,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests verifying {@link CollectionHistoryDaoImpl} behaves as expected in success and error scenarios.
@@ -58,6 +63,9 @@ public class CollectionHistoryDaoImplTest {
     @Mock
     private Collection collectionMock;
 
+    @Mock
+    private ExecutorService threadPoolMock;
+
     private CollectionHistoryDaoImpl dao;
     private CollectionHistoryEvent event;
     private CollectionEventType eventType;
@@ -77,8 +85,6 @@ public class CollectionHistoryDaoImplTest {
         collectionDescription = new CollectionDescription(COLLECTION_NAME);
         collectionDescription.id = TEST_COLLECTION_ID;
 
-/*        ReflectionTestUtils.setField(dao, "hibernateService", hibernateServiceMock);*/
-
         when(hibernateServiceMock.getSessionFactory())
                 .thenReturn(sessionFactoryMock);
         when(sessionFactoryMock.getCurrentSession())
@@ -94,21 +100,23 @@ public class CollectionHistoryDaoImplTest {
      */
     @Test
     public void shouldSaveEventSuccessfully() throws Exception {
-        dao.saveCollectionHistoryEvent(event);
+        dao.saveCollectionHistoryEvent(event).get();
         saveEventSuccessVerifications();
     }
+
+
 
     /**
      * Exception test case for {@link CollectionHistoryDao#saveCollectionHistoryEvent(CollectionHistoryEvent)}
      */
-    @Test(expected = CollectionEventHistoryException.class)
+    @Test(expected = ExecutionException.class)
     public void shouldLogAndThrowZebedeeExceptionOnSaveWithError() throws Exception {
         when(sessionFactoryMock.getCurrentSession())
                 .thenThrow(new HibernateException("Whoops!"));
 
         try {
-            dao.saveCollectionHistoryEvent(event);
-        } catch (CollectionEventHistoryException ex) {
+            dao.saveCollectionHistoryEvent(event).get();
+        } catch (Exception ex) {
             saveEventHistoryFailureVerifications();
             throw ex;
         }
@@ -120,7 +128,7 @@ public class CollectionHistoryDaoImplTest {
      */
     @Test
     public void shouldSaveEventSuccessfullyFromIdAndName() throws Exception {
-        dao.saveCollectionHistoryEvent(TEST_COLLECTION_ID, COLLECTION_NAME, session, eventType);
+        dao.saveCollectionHistoryEvent(TEST_COLLECTION_ID, COLLECTION_NAME, session, eventType).get();
         saveEventSuccessVerifications();
     }
 
@@ -128,14 +136,14 @@ public class CollectionHistoryDaoImplTest {
      * Exception test case for {@link CollectionHistoryDao#saveCollectionHistoryEvent(String, String, Session,
      * CollectionEventType, CollectionEventMetaData...)}
      */
-    @Test(expected = CollectionEventHistoryException.class)
+    @Test(expected = ExecutionException.class)
     public void shouldLogAndThrowExceptionForSaveEventFromIdAndNameWithError() throws Exception {
         when(sessionFactoryMock.getCurrentSession())
                 .thenThrow(new HibernateException("Whoops!"));
 
         try {
-            dao.saveCollectionHistoryEvent(TEST_COLLECTION_ID, COLLECTION_NAME, session, eventType);
-        } catch (CollectionEventHistoryException ex) {
+            dao.saveCollectionHistoryEvent(TEST_COLLECTION_ID, COLLECTION_NAME, session, eventType).get();
+        } catch (Exception ex) {
             saveEventHistoryFailureVerifications();
             throw ex;
         }
@@ -147,7 +155,7 @@ public class CollectionHistoryDaoImplTest {
      */
     @Test
     public void shouldSaveEventSuccessfullyFromCollectionAndSession() throws Exception {
-        dao.saveCollectionHistoryEvent(collectionMock, session, event.getEventType());
+        dao.saveCollectionHistoryEvent(collectionMock, session, event.getEventType()).get();
         saveEventSuccessVerifications();
     }
 
@@ -155,14 +163,14 @@ public class CollectionHistoryDaoImplTest {
      * Exception test case for {@link CollectionHistoryDao#saveCollectionHistoryEvent(Collection, Session,
      * CollectionEventType, CollectionEventMetaData...)}
      */
-    @Test(expected = CollectionEventHistoryException.class)
+    @Test(expected = ExecutionException.class)
     public void shouldLogAndThrowExceptionForSaveEventFromCollectionDescriptionWithError() throws Exception {
         when(sessionFactoryMock.getCurrentSession())
                 .thenThrow(new HibernateException("Whoops!"));
 
         try {
-            dao.saveCollectionHistoryEvent(collectionMock, session, event.getEventType());
-        } catch (CollectionEventHistoryException ex) {
+            dao.saveCollectionHistoryEvent(collectionMock, session, event.getEventType()).get();
+        } catch (ExecutionException ex) {
             saveEventHistoryFailureVerifications();
             throw ex;
         }

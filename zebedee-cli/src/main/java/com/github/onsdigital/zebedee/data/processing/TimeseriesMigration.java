@@ -73,6 +73,14 @@ public class TimeseriesMigration {
         // sort by release date.
         sortDatasetsByReleaseDate(datasetContainers);
 
+        for (TimeseriesDatasetContainer container : datasetContainers) {
+            System.out.println("------------------------loadPageObjectsForDatasets------------------------------");
+            System.out.println("CsdbPath() = " + container.timeseriesDatasetFiles.getCsdbPath());
+            System.out.println("DatasetPath() = " + container.timeseriesDatasetFiles.getDatasetPath());
+            System.out.println("Uri = " + container.timeSeriesDataset.getUri());
+            System.out.println("release date = " + container.timeSeriesDataset.getDescription().getReleaseDate());
+        }
+
         System.out.println("Number of datasets: " + datasetContainers.size());
 
         int count = 1;
@@ -121,7 +129,9 @@ public class TimeseriesMigration {
     private static void prepareDatasetContentInDestination(ContentReader publishedContentReader, ContentReader destinationContentReader, ContentWriter destinationContentWriter, TimeSeriesDataset dataset, TimeseriesDatasetFiles datasetFiles, String datasetUri, String landingPageUri) throws ZebedeeException, IOException {
         try {
             // attempt to read the existing dataset if it exists
-            destinationContentReader.getContent(datasetUri);
+            Page content = destinationContentReader.getContent(datasetUri);
+            //content.getDescription().setNextRelease(null);
+            //destinationContentWriter.writeObject(content, datasetUri + "/.json");
 
             System.out.println("--- dataset already exists - creating version");
 
@@ -148,7 +158,7 @@ public class TimeseriesMigration {
 
     private static void updateLandingPageReleaseDate(ContentReader destinationContentReader, ContentWriter destinationContentWriter, TimeSeriesDataset dataset, String landingPageUri) throws ZebedeeException, IOException {
         // if the dataset has a version, we want to use the date it was updated as the release date
-        if (dataset.getVersions().size() > 0) {
+        if (dataset.getVersions() != null && dataset.getVersions().size() > 0) {
 
             dataset.getVersions()
                     .stream()
@@ -163,7 +173,7 @@ public class TimeseriesMigration {
 
             System.out.println("SelectedVersion : " + lastVersion.getLabel() + " " + lastVersion.getUpdateDate() + " " + lastVersion.getCorrectionNotice());
 
-            if (StringUtils.isNotBlank(lastVersion.getCorrectionNotice())) {
+            if (StringUtils.isBlank(lastVersion.getCorrectionNotice())) {
                 System.out.println("There is no correction notice here, using the last version date");
 
                 // set the landing page release date to the most recent version date in the dataset.
@@ -204,9 +214,9 @@ public class TimeseriesMigration {
 
     private static void copyDatasetJsonToDestination(ContentWriter destinationContentWriter, TimeSeriesDataset dataset, String datasetUri) throws IOException, BadRequestException {
         // clear downloads
-        dataset.setDownloads(new ArrayList<>());
+        //dataset.setDownloads(new ArrayList<>());
         // clear versions
-        dataset.setVersions(new ArrayList<>());
+        //dataset.setVersions(new ArrayList<>());
 
         dataset.getDescription().setReleaseDate(null);
         dataset.getDescription().setUnit(null);
@@ -223,9 +233,7 @@ public class TimeseriesMigration {
         List<TimeseriesDatasetContainer> datasetContainers = new ArrayList<>();
 
         for (TimeseriesDatasetFiles TimeseriesDatasetFile : datasetDownloads) {
-            System.out.println("------------------------loadPageObjectsForDatasets------------------------------");
-            System.out.println("CsdbPath() = " + TimeseriesDatasetFile.getCsdbPath());
-            System.out.println("DatasetPath() = " + TimeseriesDatasetFile.getDatasetPath());
+
 
             Page page = publishedContentReader.getContent(TimeseriesDatasetFile.getRootPath().toString());
 
@@ -236,13 +244,22 @@ public class TimeseriesMigration {
 
             TimeSeriesDataset timeseriesDatasetPage = (TimeSeriesDataset) page;
 
+            if (timeseriesDatasetPage.getVersions() != null) {
+                Version lastVersion = timeseriesDatasetPage.getVersions()
+                        .stream()
+                        .sorted((o1, o2) -> o1.getUpdateDate().compareTo(o2.getUpdateDate()))
+                        .reduce((v1, v2) -> v2)
+                        .orElse(null);
+
+                if (lastVersion != null) {
+                    timeseriesDatasetPage.getDescription().setReleaseDate(lastVersion.getUpdateDate());
+                }
+            }
+
             TimeseriesDatasetContainer timeseriesDatasetContainer = new TimeseriesDatasetContainer();
             timeseriesDatasetContainer.timeSeriesDataset = timeseriesDatasetPage;
             timeseriesDatasetContainer.timeseriesDatasetFiles = TimeseriesDatasetFile;
             datasetContainers.add(timeseriesDatasetContainer);
-            System.out.println("Uri = " + timeseriesDatasetPage.getUri());
-            System.out.println("release date = " + timeseriesDatasetPage.getDescription().getReleaseDate());
-
         }
         return datasetContainers;
     }

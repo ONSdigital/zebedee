@@ -67,7 +67,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     /**
-     * Log an info level message.
+     * Log an warn level message.
      */
     public static ZebedeeLogBuilder logWarn(String message) {
         return new ZebedeeLogBuilder(message, Level.WARN);

@@ -120,6 +120,9 @@ public class CollectionHistoryEvent {
     }
 
     public List<CollectionHistoryEventMetaData> getCollectionHistoryEventMetaData() {
+        if (this.collectionHistoryEventMetaData == null) {
+            this.collectionHistoryEventMetaData = new ArrayList<>();
+        }
         return collectionHistoryEventMetaData;
     }
 

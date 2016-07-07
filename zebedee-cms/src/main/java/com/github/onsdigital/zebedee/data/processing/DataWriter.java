@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by thomasridd on 1/21/16.
@@ -59,11 +60,14 @@ public class DataWriter {
         if (versionedContentItem.versionExists(this.contentReader) == false) {
             ContentItemVersion contentItemVersion = versionedContentItem.createVersion(pubishedReader, this.contentWriter);
 
+            String correctionNotice = datasetVersion != null ? datasetVersion.getCorrectionNotice() : "";
+            Date updateDate = datasetVersion != null ? datasetVersion.getUpdateDate() : timeSeries.getDescription().getReleaseDate();
+
             Version version = new Version();
             version.setUri(URI.create(contentItemVersion.getUri()));
-            version.setUpdateDate(datasetVersion.getUpdateDate());
+            version.setUpdateDate(updateDate);
             version.setLabel(contentItemVersion.getIdentifier());
-            version.setCorrectionNotice(datasetVersion.getCorrectionNotice());
+            version.setCorrectionNotice(correctionNotice);
 
             if (timeSeries.getVersions() == null)
                 timeSeries.setVersions(new ArrayList<>());

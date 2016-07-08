@@ -3,14 +3,10 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.encryptedfileupload.EncryptedFileItemFactory;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -25,7 +21,6 @@ import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.util.JsonUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -50,15 +45,7 @@ import java.util.concurrent.Future;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_RENAMED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_MOVED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.*;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
@@ -455,8 +442,10 @@ public class Collections {
      * @throws UnauthorizedException
      * @throws IOException
      */
-    public void createContent(Collection collection, String uri, Session session, HttpServletRequest request,
-                              InputStream requestBody, CollectionEventType eventType) throws ZebedeeException, IOException,
+    public void createContent(
+            Collection collection, String uri, Session session, HttpServletRequest request,
+            InputStream requestBody, CollectionEventType eventType
+    ) throws ZebedeeException, IOException,
             FileUploadException {
 
         if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0) {
@@ -470,7 +459,8 @@ public class Collections {
     public void writeContent(
             Collection collection, String uri,
             Session session, HttpServletRequest request, InputStream requestBody, Boolean recursive,
-            CollectionEventType eventType) throws IOException, ZebedeeException, FileUploadException {
+            CollectionEventType eventType
+    ) throws IOException, ZebedeeException, FileUploadException {
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
@@ -551,14 +541,12 @@ public class Collections {
             byte[] bytes = IOUtils.toByteArray(inputStream);
 
             try (ByteArrayInputStream validationInputStream = new ByteArrayInputStream(bytes)) {
-                if (!JsonUtils.isValidJson(validationInputStream)) {
-                    throw new BadRequestException("Operation failed: Json is not valid. Please try again");
-                }
+                ContentUtil.deserialiseContent(validationInputStream);
             }
 
             return new ByteArrayInputStream(bytes);
-        } catch (IOException e) {
-            throw new BadRequestException("Operation failed: Failed to validate Json. Please try again");
+        } catch (Exception e) {
+            throw new BadRequestException("Validation of page content failed. Please try again");
         }
     }
 
@@ -624,8 +612,10 @@ public class Collections {
      * @throws FileUploadException
      * @throws IOException
      */
-    private void postDataFile(HttpServletRequest request, String uri, CollectionWriter collectionWriter,
-                              CollectionHistoryEvent historyEvent)
+    private void postDataFile(
+            HttpServletRequest request, String uri, CollectionWriter collectionWriter,
+            CollectionHistoryEvent historyEvent
+    )
             throws FileUploadException, IOException {
 
         ServletFileUpload upload = getServletFileUpload();

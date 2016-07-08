@@ -50,6 +50,7 @@ public class CsvTimeseriesUpdateImporter implements TimeseriesUpdateImporter {
                     if (strings.length > 2)
                         command.title = strings[2];//command.releaseDate = dateSerializer.deserialize(strings[1]);
 
+
                     commands.add(command);
                 }
 

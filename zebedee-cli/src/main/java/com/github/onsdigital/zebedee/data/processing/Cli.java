@@ -61,6 +61,8 @@ public class Cli {
                 ContentMover.moveContent(args);
             } else if (line.hasOption("listtimeseries")) {
                 TimeseriesLister.listTimeseries(args);
+            } else if (line.hasOption("migratetimeseries")) {
+                TimeseriesMigration.migrateTimeseries(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

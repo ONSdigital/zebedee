@@ -151,7 +151,7 @@ public class TimeseriesMigration {
                 if (timeseriesMigrationData.monthLabelStyle != null) {
                     TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
 
-                    if (!newTimeseries.getDescription().getMonthLabelStyle().equals(timeseriesMigrationData.monthLabelStyle)) {
+                    if (!timeseriesMigrationData.monthLabelStyle.equals(newTimeseries.getDescription().getMonthLabelStyle())) {
                         newTimeseries.getDescription().setMonthLabelStyle(timeseriesMigrationData.monthLabelStyle);
                         destinationContentWriter.writeObject(newTimeseries, datauri);
                     }

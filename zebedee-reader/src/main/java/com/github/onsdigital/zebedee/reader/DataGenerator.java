@@ -120,13 +120,13 @@ public class DataGenerator {
         List<List<String>> rows = new ArrayList<>();
 
         // Initialise the grid columns
-        List<String> orderedCDIDs = timeSeriesIdList(serieses);
+        List<String> timeseriesUrls = timeSeriesIdList(serieses);
 
         // Initialise the grid rows
         Map<String, Map<String, String>> mapOfData = mapOfAllDataInTimeSeriesList(serieses);
 
         // Add the basic details header rows
-        addTimeSeriesDetails(rows, orderedCDIDs, mapOfData);
+        addTimeSeriesDetails(rows, timeseriesUrls, mapOfData);
 
         // Add years
         List<String> yearRange = yearRange(serieses);
@@ -134,8 +134,8 @@ public class DataGenerator {
             for (String year : yearRange) {
                 List<String> newRow = new ArrayList<>();
                 newRow.add(year);
-                for (String cdid : orderedCDIDs) {
-                    newRow.add(mapOfData.get(year).get(cdid));
+                for (String url : timeseriesUrls) {
+                    newRow.add(mapOfData.get(year).get(url));
                 }
                 rows.add(newRow);
             }
@@ -147,8 +147,8 @@ public class DataGenerator {
             for (String quarter : quarterRange) {
                 List<String> newRow = new ArrayList<>();
                 newRow.add(quarter);
-                for (String cdid : orderedCDIDs) {
-                    newRow.add(mapOfData.get(quarter).get(cdid));
+                for (String url : timeseriesUrls) {
+                    newRow.add(mapOfData.get(quarter).get(url));
                 }
                 rows.add(newRow);
             }
@@ -160,8 +160,8 @@ public class DataGenerator {
             for (String month : monthRange) {
                 List<String> newRow = new ArrayList<>();
                 newRow.add(month);
-                for (String cdid : orderedCDIDs) {
-                    newRow.add(mapOfData.get(month).get(cdid));
+                for (String url : timeseriesUrls) {
+                    newRow.add(mapOfData.get(month).get(url));
                 }
                 rows.add(newRow);
             }
@@ -170,10 +170,11 @@ public class DataGenerator {
         return rows;
     }
 
-    static void addTimeSeriesDetails(List<List<String>> rows, List<String> orderedCDIDs, Map<String, Map<String, String>> mapOfData) {
+    static void addTimeSeriesDetails(List<List<String>> rows, List<String> timeseriesId, Map<String, Map<String, String>> mapOfData) {
         // Add detail rows
         List<String> titleRow = newRow("Title");
         List<String> cdidRow = newRow("CDID");
+        List<String> datasetIdRow = newRow("Source dataset ID");
         List<String> nationalStatistic = newRow("National Statistic");
         List<String> preunit = newRow("PreUnit");
         List<String> unit = newRow("Unit");
@@ -182,19 +183,21 @@ public class DataGenerator {
         List<String> importantNotes = newRow("Important notes");
 
         // Write details for each cdid
-        for (String cdid : orderedCDIDs) {
-            titleRow.add(mapOfData.get("Title").get(cdid));
-            cdidRow.add(cdid);
-            nationalStatistic.add(mapOfData.get("National Statistic").get(cdid));
-            preunit.add(mapOfData.get("PreUnit").get(cdid));
-            unit.add(mapOfData.get("Unit").get(cdid));
-            releaseDate.add(mapOfData.get("Release date").get(cdid));
-            nextRelease.add(mapOfData.get("Next release").get(cdid));
-            importantNotes.add(mapOfData.get("Important notes").get(cdid));
+        for (String id : timeseriesId) {
+            titleRow.add(mapOfData.get("Title").get(id));
+            cdidRow.add(mapOfData.get("CDID").get(id));
+            datasetIdRow.add(mapOfData.get("Source dataset ID").get(id));
+            nationalStatistic.add(mapOfData.get("National Statistic").get(id));
+            preunit.add(mapOfData.get("PreUnit").get(id));
+            unit.add(mapOfData.get("Unit").get(id));
+            releaseDate.add(mapOfData.get("Release date").get(id));
+            nextRelease.add(mapOfData.get("Next release").get(id));
+            importantNotes.add(mapOfData.get("Important notes").get(id));
         }
 
         rows.add(titleRow);
         rows.add(cdidRow);
+        rows.add(datasetIdRow);
         rows.add(nationalStatistic);
         rows.add(preunit);
         rows.add(unit);
@@ -225,35 +228,38 @@ public class DataGenerator {
         HashMap<String, Map<String, String>> map = new HashMap<>();
 
         for (TimeSeries series : serieses) {
-            putCombination(series.getCdid(), "Title", series.getDescription().getTitle(), map);
-            putCombination(series.getCdid(), "CDID", series.getDescription().getCdid(), map);
-            putCombination(series.getCdid(), "National Statistic", (series.getDescription().isNationalStatistic() ? "Y" : "N"), map);
-            putCombination(series.getCdid(), "PreUnit", series.getDescription().getPreUnit(), map);
-            putCombination(series.getCdid(), "Unit", series.getDescription().getUnit(), map);
+            String seriesIdentifier = series.getUri().toString();
+
+            putCombination(seriesIdentifier, "Title", series.getDescription().getTitle(), map);
+            putCombination(seriesIdentifier, "CDID", series.getDescription().getCdid(), map);
+            putCombination(seriesIdentifier, "Source dataset ID", series.getDescription().getDatasetId(), map);
+            putCombination(seriesIdentifier, "National Statistic", (series.getDescription().isNationalStatistic() ? "Y" : "N"), map);
+            putCombination(seriesIdentifier, "PreUnit", series.getDescription().getPreUnit(), map);
+            putCombination(seriesIdentifier, "Unit", series.getDescription().getUnit(), map);
 
             if (series.getDescription().getReleaseDate() == null) {
-                putCombination(series.getCdid(), "Release date", "", map);
+                putCombination(seriesIdentifier, "Release date", "", map);
             } else {
-                putCombination(series.getCdid(), "Release date", format.format(series.getDescription().getReleaseDate()), map);
+                putCombination(seriesIdentifier, "Release date", format.format(series.getDescription().getReleaseDate()), map);
             }
 
-            putCombination(series.getCdid(), "Next release", series.getDescription().getNextRelease(), map);
+            putCombination(seriesIdentifier, "Next release", series.getDescription().getNextRelease(), map);
 
-            putCombination(series.getCdid(), "Important notes", StringUtils.join(series.getNotes(), ", "), map);
+            putCombination(seriesIdentifier, "Important notes", StringUtils.join(series.getNotes(), ", "), map);
 
             if (series.years != null) {
                 for (TimeSeriesValue value : series.years) {
-                    putCombination(series.getCdid(), value.date, value.value, map);
+                    putCombination(seriesIdentifier, value.date, value.value, map);
                 }
             }
             if (series.months != null) {
                 for (TimeSeriesValue value : series.months) {
-                    putCombination(series.getCdid(), value.date, value.value, map);
+                    putCombination(seriesIdentifier, value.date, value.value, map);
                 }
             }
             if (series.quarters != null) {
                 for (TimeSeriesValue value : series.quarters) {
-                    putCombination(series.getCdid(), value.date, value.value, map);
+                    putCombination(seriesIdentifier, value.date, value.value, map);
                 }
             }
         }
@@ -418,7 +424,7 @@ public class DataGenerator {
     }
 
     /**
-     * get a list of series CDIDs
+     * get a list of series Urls
      *
      * This is used to define headings for our spreadsheet
      *
@@ -428,7 +434,7 @@ public class DataGenerator {
     static List<String> timeSeriesIdList(List<TimeSeries> serieses) {
         List<String> ids = new ArrayList<>();
         for (TimeSeries series : serieses) {
-            ids.add(series.getCdid());
+            ids.add(series.getUri().toString());
         }
         return ids;
     }

@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
@@ -64,7 +63,6 @@ public class DataProcessorTest {
 
     DataPagesSet published;
     DataPagesSet inReview;
-    DataPagesSet republish;
 
     Date date;
     /**
@@ -99,7 +97,7 @@ public class DataProcessorTest {
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
 
         // add a set of data in a collection
-        inReview = generator.generateDataPagesSet("dataprocessor", "inreview", 2015, 2, "");
+        inReview = generator.generateDataPagesSet("dataprocessor", "thedatasetid", 2015, 2, "");
         dataBuilder.addReviewedDataPagesSet(inReview, collection, collectionWriter);
 
         // add a set of data to published
@@ -115,11 +113,8 @@ public class DataProcessorTest {
     }
 
 
-
-
-
     @Test
-    public void publishUriForTimeseries_givenDetails_returnsParentTimeseriesFolder() throws ParseException, URISyntaxException, IOException, ZebedeeException {
+    public void getDatasetBasedUriForTimeseries_givenUnindexed_returnsExpectedUrl() throws ParseException, URISyntaxException, IOException, ZebedeeException {
         // Given
         // A timeseries from our reviewed dataset
         DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
@@ -127,17 +122,38 @@ public class DataProcessorTest {
 
         // When
         // we get the publish uri for a timeseries
-        String publishUri = new DataProcessor().publishUriForTimeseries(series, details, zebedee.dataIndex);
+        String publishUri = new DataProcessor().getDatasetBasedUriForTimeseries(series, details, zebedee.dataIndex);
 
         // Then
         // we expect it to be the cdid at the same root
         String cdid = series.getCdid();
-        assertEquals(details.parentFolderUri + "/timeseries/" + cdid, publishUri);
+
+        String expectedUri = String.format("%s/timeseries/%s/%s", details.parentFolderUri, cdid, details.landingPage.getDescription().getDatasetId().toLowerCase());
+
+        assertEquals(expectedUri, publishUri);
     }
 
+    @Test
+    public void getDatasetBasedUriForTimeseries_givenIndexed_returnsExpectedUrl() throws ParseException, URISyntaxException, IOException, ZebedeeException {
+        // Given
+        // A timeseries from our reviewed dataset
+        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
+        TimeSeries series = inReview.timeSeriesList.get(0);
+        DataIndex dataIndex = new DataIndex(); // empty data index.
+        dataIndex.setUriForCdid(series.getCdid(), series.getUri().resolve(".").toString());
 
+        // When
+        // we get the publish uri for a timeseries
+        String publishUri = new DataProcessor().getDatasetBasedUriForTimeseries(series, details, dataIndex);
 
+        // Then
+        // we expect it to be the cdid at the same root
+        String cdid = series.getCdid();
 
+        String expectedUri = String.format("%s/timeseries/%s/%s", details.parentFolderUri, cdid, details.landingPage.getDescription().getDatasetId().toLowerCase());
+
+        assertEquals(expectedUri, publishUri);
+    }
 
 
     @Test
@@ -176,17 +192,11 @@ public class DataProcessorTest {
         // Then
         // we expect it to be the published timeseries complete with existing data
         assertEquals(PageType.timeseries, initial.getType());
+        assertEquals(republish.timeSeriesList.get(0).getUri(), initial.getUri());
         assertNotEquals(0, initial.years.size());
         assertNotEquals(0, initial.months.size());
         assertNotEquals(0, initial.quarters.size());
     }
-
-
-
-
-
-
-
 
     @Test
     public void syncMetadata_givenVariedDetailSet_takesContactsFromLandingPage() throws IOException, ZebedeeException, ParseException, URISyntaxException {
@@ -319,6 +329,28 @@ public class DataProcessorTest {
     }
 
     @Test
+    public void syncMetadata_overExistingTimeSeries_shouldTransferDatasetUri() throws IOException, ParseException, URISyntaxException, ZebedeeException {
+        // Given
+        // We create a publish over an existing dataset
+        DataPagesSet republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
+        dataBuilder.addReviewedDataPagesSet(republish, collection, collectionWriter);
+
+        DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
+        TimeSeries timeSeries = republish.timeSeriesList.get(0);
+
+        DataProcessor processor = new DataProcessor();
+        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.dataIndex);
+
+        // When
+        // we sync details
+        TimeSeries synced = processor.syncLandingPageMetadata(initial, details);
+
+        // Then
+        // we expect the name to come from the old timeseries
+        assertEquals(details.landingPage.getUri(), synced.getDescription().getDatasetUri());
+    }
+
+    @Test
     public void processTimeseries_overExistingTimeSeries_persistsManualSetFields() throws ParseException, URISyntaxException, ZebedeeException, IOException {
         // Given
         // We create a published dataset with distinct manual metadata
@@ -345,115 +377,21 @@ public class DataProcessorTest {
     }
 
     @Test
-    public void processTimeseries_givenNewTimeseries_copiesToTimeSeriesSourceDatasets() throws IOException, ZebedeeException, URISyntaxException {
-        // Given
-        // We upload a data collection to a zebedee instance where we don't have current published content
-        DataPublicationDetails details = inReview.getDetails(publishedReader, collectionReader.getReviewed());
-        details.datasetPage.getDescription().setDatasetId("Dataset");
-        details.landingPage.getDescription().setDatasetId("Landing");
-
-        TimeSeries timeSeries = inReview.timeSeriesList.get(0);
-
-        // When
-        // we run a process
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, details, timeSeries, zebedee.dataIndex);
-
-        // Then
-        // we expect the landing page datasetId to be copied once and only once
-        long count = processor.timeSeries.sourceDatasets.stream().filter(source -> source.equalsIgnoreCase("Landing")).count();
-        assertEquals(1, count);
-    }
-
-    @Test
-    public void processTimeseries_addingPointsFromNewDataSource_addsNewDatasourceToTimeseriesAndThosePointsOnly() throws IOException, ZebedeeException, URISyntaxException, ParseException {
-        // Given
-        // We publish a specific timeseries
-        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", "v2015", 2015, 0, "file.csdb");
-        TimeSeries timeSeries = generator.exampleTimeseries("abcd", "v2015");
-        timeSeries.setUri(new URI( "pages/timeseries/" + timeSeries.getCdid().toLowerCase()));
-        timeSeries.years.stream().forEach(value -> value.value = "2015");
-        long originalTimeSeriesValues = timeSeries.years.size();
-        pagesSet.timeSeriesList.add(timeSeries);
-        dataBuilder.publishDataPagesSet(pagesSet);
-
-        // change the dataset id and add a new value
-        pagesSet.datasetLandingPage.getDescription().setDatasetId("v2016");
-        TimeSeriesValue value2016 = new TimeSeriesValue();
-        value2016.value = "2016";
-        value2016.date = "2016";
-        pagesSet.timeSeriesList.get(0).add(value2016);
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
-
-        // When
-        // we run a process
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, pagesSet.getDetails(publishedReader, collectionReader.getReviewed()), timeSeries, zebedee.dataIndex);
-
-        // Then
-        // we expect the timeseries to
-        assertEquals(1, processor.timeSeries.sourceDatasets.stream().filter(t -> t.equalsIgnoreCase("v2015")).count());
-        assertEquals(1, processor.timeSeries.sourceDatasets.stream().filter(t -> t.equalsIgnoreCase("v2016")).count());
-
-        //
-        long valuesWith2015Source = processor.timeSeries.years.stream().filter(t -> t.sourceDataset.equalsIgnoreCase("v2015")).count();
-        long valuesWith2016Source = processor.timeSeries.years.stream().filter(t -> t.sourceDataset.equalsIgnoreCase("v2016")).count();
-
-        assertEquals(originalTimeSeriesValues, valuesWith2015Source);
-        assertEquals(1, valuesWith2016Source);
-    }
-
-    @Test
-    public void processTimeseries_updatingPointsFromNewDataSource_addsNewDatasourceToTimeseriesAndChangesPoint() throws IOException, ZebedeeException, URISyntaxException, ParseException {
-        // Given
-        // We publish a specific timeseries
-        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", "original", 2015, 0, "file.csdb");
-        TimeSeries timeSeries = generator.exampleTimeseries("abcd", "original");
-        timeSeries.setUri(new URI( "pages/timeseries/" + timeSeries.getCdid().toLowerCase()));
-        timeSeries.years.stream().forEach(value -> value.value = "original");
-
-        long originalTimeSeriesValues = timeSeries.years.size();
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
-        timeSeries = new DataProcessor().processTimeseries(publishedReader, pagesSet.getDetails(publishedReader, collectionReader.getReviewed()), timeSeries, zebedee.dataIndex);
-        pagesSet.timeSeriesList.add(timeSeries);
-        dataBuilder.publishDataPagesSet(pagesSet);
-
-        // remove the 2015 value and replace with a new value
-        timeSeries.years.stream().filter(t -> t.date.equalsIgnoreCase("2015")).forEach(timeSeriesValue -> timeSeriesValue.value = "updated");
-        pagesSet.timeSeriesList.clear();
-        pagesSet.timeSeriesList.add(timeSeries);
-        pagesSet.datasetLandingPage.getDescription().setDatasetId("updated");
-        dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
-
-        // When
-        // we run a process
-        DataProcessor processor = new DataProcessor();
-        processor.processTimeseries(publishedReader, pagesSet.getDetails(publishedReader, collectionReader.getReviewed()), timeSeries, zebedee.dataIndex);
-
-        // Then
-        // we expect updated source to have replaced original on the timeseries value
-        long valuesFromOriginal = processor.timeSeries.years.stream().filter(t -> t.sourceDataset.equalsIgnoreCase("original")).count();
-        long valuesFromUpdate = processor.timeSeries.years.stream().filter(t -> t.sourceDataset.equalsIgnoreCase("updated")).count();
-
-        assertEquals(originalTimeSeriesValues - 1, valuesFromOriginal);
-        assertEquals(1, valuesFromUpdate);
-    }
-
-    @Test
     public void processTimeseries_withUpdateCommands_updatesTitles() throws IOException, ZebedeeException, URISyntaxException, ParseException {
         // Given
         // We publish a timeseries with update commands to update the title.
         String cdid = "abcd";
         String title = "The new title from update command.";
-        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", "original", 2015, 0, "file.csdb");
+        String datasetId = "original";
+        DataPagesSet pagesSet = generator.generateDataPagesSet("pages", datasetId, 2015, 0, "file.csdb");
 
-        TimeSeries timeSeries = generator.exampleTimeseries(cdid, "original");
+        TimeSeries timeSeries = generator.exampleTimeseries(cdid, datasetId);
         timeSeries.setUri(new URI("pages/timeseries/" + timeSeries.getCdid().toLowerCase()));
-        timeSeries.years.stream().forEach(value -> value.value = "original");
+        timeSeries.years.stream().forEach(value -> value.value = datasetId);
 
         dataBuilder.addReviewedDataPagesSet(pagesSet, collection, collectionWriter);
 
-        Optional<TimeseriesUpdateCommand> command = Optional.of(new TimeseriesUpdateCommand(cdid, title));
+        Optional<TimeseriesUpdateCommand> command = Optional.of(new TimeseriesUpdateCommand(cdid, datasetId, title));
 
         // When
         // we run a process

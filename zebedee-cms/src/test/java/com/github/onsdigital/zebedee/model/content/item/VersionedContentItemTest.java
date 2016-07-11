@@ -18,13 +18,13 @@ public class VersionedContentItemTest {
 
         // Given an instance of VersionedContentItem with a path to some content.
         Path rootPath = Files.createTempDirectory("VersionedContentItemTest");
-        VersionedContentItem versionedContentItem = new VersionedContentItem("economy", new ContentWriter(rootPath));
+        VersionedContentItem versionedContentItem = new VersionedContentItem("economy");
         Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
         FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
         ContentReader contentReader = new FileSystemContentReader(rootPath);
         // When we create a new version with the root of the content as the source for the version.
-        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader);
+        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader, new ContentWriter(rootPath));
 
         // Then a directory exists for the version and the version identifier is set as expected.
         assertTrue(Files.exists(contentItemPath.resolve(VersionedContentItem.getVersionDirectoryName())));
@@ -42,14 +42,14 @@ public class VersionedContentItemTest {
         Files.createDirectories(rootPath.resolve(path).resolve(VersionedContentItem.VERSION_DIRECTORY).resolve("v1"));
         Files.createDirectories(rootPath.resolve(path).resolve(VersionedContentItem.VERSION_DIRECTORY).resolve("v3"));
 
-        VersionedContentItem versionedContentItem = new VersionedContentItem(path, new ContentWriter(rootPath));
+        VersionedContentItem versionedContentItem = new VersionedContentItem(path);
         Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
         FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
         ContentReader contentReader = new FileSystemContentReader(rootPath);
 
         // When we create a new version.
-        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader);
+        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader, new ContentWriter(rootPath));
 
         // Then a it creates a version after the highest version, ignoring the gap.
         assertEquals("v4", version.getIdentifier());
@@ -63,16 +63,17 @@ public class VersionedContentItemTest {
 
         // Given an existing version of some content.
         Path rootPath = Files.createTempDirectory("VersionedContentItemTest");
-        VersionedContentItem versionedContentItem = new VersionedContentItem("economy", new ContentWriter(rootPath));
+        VersionedContentItem versionedContentItem = new VersionedContentItem("economy");
         Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
         FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
         ContentReader contentReader = new FileSystemContentReader(rootPath);
-        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader);
+        ContentWriter contentWriter = new ContentWriter(rootPath);
+        ContentItemVersion version = versionedContentItem.createVersion(rootPath, contentReader, contentWriter);
 
         // When we create a new version with the root of the content as the source for the version.
-        ContentItemVersion version2 = versionedContentItem.createVersion(rootPath, contentReader);
-        ContentItemVersion version3 = versionedContentItem.createVersion(rootPath, contentReader);
+        ContentItemVersion version2 = versionedContentItem.createVersion(rootPath, contentReader, contentWriter);
+        ContentItemVersion version3 = versionedContentItem.createVersion(rootPath, contentReader, contentWriter);
 
         // Then a directory exists for the version and the version identifier is set as expected.
         assertTrue(Files.exists(contentItemPath.resolve(VersionedContentItem.getVersionDirectoryName())));

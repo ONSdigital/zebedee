@@ -19,6 +19,7 @@ public enum PageType {
     bulletin,
     article,
     article_download,
+    timeseries_landing_page,
     timeseries,
     data_slice,
     compendium_landing_page,

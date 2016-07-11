@@ -26,6 +26,7 @@ public class AuthenticationFilter implements Filter {
 			.add(CsdbNotify.class)
 			.add(ReIndex.class)
 			.add(Ping.class)
+			.add(ClickEventLog.class)
 			.build();
 
 	/**

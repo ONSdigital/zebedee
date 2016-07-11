@@ -71,6 +71,16 @@ public class ApproveTask implements Callable<Boolean> {
     ) throws IOException, ZebedeeException, URISyntaxException {
 
         // Import any time series update CSV file
+        List<TimeseriesUpdateCommand> updateCommands = ImportUpdateCommandCsvs(collection, publishedReader, collectionReader);
+
+        // Generate time series if required.
+        return new DataPublisher().preprocessCollection(
+                publishedReader,
+                collectionReader,
+                collectionWriter.getReviewed(), true, dataIndex, updateCommands);
+    }
+
+    public static List<TimeseriesUpdateCommand> ImportUpdateCommandCsvs(Collection collection, ContentReader publishedReader, CollectionReader collectionReader) throws ZebedeeException, IOException {
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
         if (collection.description.timeseriesImportFiles != null) {
             for (String importFile : collection.description.timeseriesImportFiles) {
@@ -86,12 +96,7 @@ public class ApproveTask implements Callable<Boolean> {
                 updateCommands.addAll(importer.importData());
             }
         }
-
-        // Generate time series if required.
-        return new DataPublisher().preprocessCollection(
-                publishedReader,
-                collectionReader,
-                collectionWriter.getReviewed(), true, dataIndex, updateCommands);
+        return updateCommands;
     }
 
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {

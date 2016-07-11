@@ -30,11 +30,8 @@ public class VersionedContentItem extends ContentItem {
     static final String VERSION_DIRECTORY = "previous";
     static final String VERSION_PREFIX = "v";
 
-    private final ContentWriter contentWriter;
-
-    public VersionedContentItem(String uri, ContentWriter contentWriter) throws NotFoundException {
+    public VersionedContentItem(String uri) throws NotFoundException {
         super(uri);
-        this.contentWriter = contentWriter;
     }
 
     public static String getVersionDirectoryName() {
@@ -89,14 +86,14 @@ public class VersionedContentItem extends ContentItem {
      * @param contentRoot
      * @return
      */
-    public ContentItemVersion createVersion(Path contentRoot, ContentReader contentReader) throws IOException, ZebedeeException {
+    public ContentItemVersion createVersion(Path contentRoot, ContentReader contentReader, ContentWriter contentWriter) throws IOException, ZebedeeException {
 
         // create a new directory for the version. e.g. edition/previous/v1
         Path absolutePath = contentRoot.resolve(URIUtils.removeLeadingSlash(getUri().toString()));
         String versionIdentifier = createVersionIdentifier(absolutePath);
         String versionUri = String.format("%s/%s/%s", getUri(), getVersionDirectoryName(), versionIdentifier);
 
-        copyFilesIntoVersionDirectory(contentRoot, versionUri, contentReader);
+        copyFilesIntoVersionDirectory(contentRoot, versionUri, contentReader, contentWriter);
 
         return new ContentItemVersion(versionIdentifier, this, versionUri);
     }
@@ -108,9 +105,9 @@ public class VersionedContentItem extends ContentItem {
      * @param contentReader
      * @return
      */
-    public ContentItemVersion createVersion(ContentReader contentReader) throws IOException, ZebedeeException {
+    public ContentItemVersion createVersion(ContentReader contentReader, ContentWriter contentWriter) throws IOException, ZebedeeException {
 
-       return createVersion(contentReader.getRootFolder(), contentReader);
+        return createVersion(contentReader.getRootFolder(), contentReader, contentWriter);
     }
 
     /**
@@ -122,7 +119,7 @@ public class VersionedContentItem extends ContentItem {
      * @throws IOException
      * @throws ZebedeeException
      */
-    private void copyFilesIntoVersionDirectory(Path contentRoot, String versionUri, ContentReader contentReader) throws IOException, ZebedeeException {
+    private void copyFilesIntoVersionDirectory(Path contentRoot, String versionUri, ContentReader contentReader, ContentWriter contentWriter) throws IOException, ZebedeeException {
 
         // Iterate the files in the source directory.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri().toString())))) {

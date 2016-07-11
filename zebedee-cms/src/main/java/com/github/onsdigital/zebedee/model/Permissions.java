@@ -19,7 +19,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.DATA_VISUALISATION;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
@@ -365,9 +364,7 @@ public class Permissions {
         AccessMapping accessMapping = readAccessMapping();
         Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.id);
         if (teamIds == null) teamIds = new HashSet<>();
-        logDebug("Teams for collection " + collectionDescription.name)
-                .addParameter("teamIds", teamIds.toString())
-                .log();
+
         return java.util.Collections.unmodifiableSet(teamIds);
     }
 

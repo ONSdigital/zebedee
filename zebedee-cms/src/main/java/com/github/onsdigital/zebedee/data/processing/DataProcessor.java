@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.util.URIUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,29 +34,6 @@ public class DataProcessor {
 
     public DataProcessor() {
 
-    }
-
-    /**
-     * Check if datasetId is listed as a sourceDataset for the timeseries and if not add it
-     *
-     * @param timeSeries
-     * @param landingPage
-     */
-    private static void checkDatasetId(TimeSeries timeSeries, DatasetLandingPage landingPage) {
-        boolean datasetIsNew = true;
-
-        // Check
-        for (String datasetId : timeSeries.sourceDatasets) {
-            if (landingPage.getDescription().getDatasetId().equalsIgnoreCase(datasetId)) {
-                datasetIsNew = false;
-                break;
-            }
-        }
-
-        // Link
-        if (datasetIsNew) {
-            timeSeries.sourceDatasets.add(landingPage.getDescription().getDatasetId().toUpperCase());
-        }
     }
 
     /**
@@ -111,23 +89,23 @@ public class DataProcessor {
     }
 
     public TimeSeries processTimeseries(
-            ContentReader publishedContentReader,
+            ContentReader contentReader,
             DataPublicationDetails details,
             TimeSeries newTimeSeries,
             DataIndex dataIndex
     ) throws ZebedeeException, IOException, URISyntaxException {
-        return processTimeseries(publishedContentReader, details, newTimeSeries, dataIndex, Optional.<TimeseriesUpdateCommand>empty());
+        return processTimeseries(contentReader, details, newTimeSeries, dataIndex, Optional.<TimeseriesUpdateCommand>empty());
     }
 
     /**
      * Take a timeseries as produced by Brian from an upload and combine it with current content
      *
-     * @param publishedContentReader
+     * @param contentReader
      * @param details
-     * @param newTimeSeries          @return
+     * @param newTimeSeries @return
      */
     public TimeSeries processTimeseries(
-            ContentReader publishedContentReader,
+            ContentReader contentReader,
             DataPublicationDetails details,
             TimeSeries newTimeSeries,
             DataIndex dataIndex,
@@ -135,7 +113,7 @@ public class DataProcessor {
     ) throws ZebedeeException, IOException, URISyntaxException {
 
         // Get current version of the time series (persists any manually entered data)
-        this.timeSeries = initialTimeseries(newTimeSeries, publishedContentReader, details, dataIndex);
+        this.timeSeries = initialTimeseries(newTimeSeries, contentReader, details, dataIndex);
 
         // Add meta from the landing page and timeseries dataset page
         syncLandingPageMetadata(this.timeSeries, details);
@@ -179,12 +157,11 @@ public class DataProcessor {
         }
         description.setNextRelease(details.landingPage.getDescription().getNextRelease());
         description.setReleaseDate(details.landingPage.getDescription().getReleaseDate());
+        description.setDatasetId(details.landingPage.getDescription().getDatasetId());
+        description.setDatasetUri(details.landingPage.getUri());
 
         // Set some contact details
         addContactDetails(page, details.landingPage);
-
-        // Add the dataset id to sources if necessary
-        checkDatasetId(page, details.landingPage);
 
         // Add the dataset id to sources if necessary
         checkRelatedDatasets(page, details.landingPageUri);
@@ -221,23 +198,30 @@ public class DataProcessor {
         return inProgress;
     }
 
-
     /**
-     * Get the publish path for a timeseries
+     * Get the url for the timeseries when the url has the dataset ID included (new timeseries location)
      *
      * @param series
      * @param details
      * @return
      */
-    String publishUriForTimeseries(TimeSeries series, DataPublicationDetails details, DataIndex dataIndex) {
+    String getDatasetBasedUriForTimeseries(TimeSeries series, DataPublicationDetails details, DataIndex dataIndex) {
         String cdid = series.getCdid().toLowerCase();
+        String datasetId = details.landingPage.getDescription().getDatasetId().toLowerCase();
         String indexed = dataIndex.getUriForCdid(cdid);
+
+        indexed = URIUtils.removeTrailingSlash(indexed);
+
         if (indexed != null) {
-            return indexed;
+            // if its in the index, just add the dataset id to the end of the existing timeseries URL.
+            return String.format("%s/%s", indexed, datasetId);
         } else {
-            String unindexed = details.getTimeseriesFolder() + "/" + series.getCdid().toLowerCase();
-            dataIndex.setUriForCdid(cdid, unindexed);
-            return unindexed;
+            // if its not in the data index, build the URI based on the dataset location.
+            String timeseriesUri = details.getTimeseriesFolder() + "/" + series.getCdid().toLowerCase();
+            dataIndex.setUriForCdid(cdid, timeseriesUri);
+
+            String timeseriesDataUri = String.format("%s/%s", timeseriesUri, datasetId);
+            return timeseriesDataUri;
         }
     }
 
@@ -245,35 +229,34 @@ public class DataProcessor {
      * Get the starting point for our timeseries by loading a
      *
      * @param series
-     * @param publishedContentReader
+     * @param contentReader
      * @param details
      * @return
      * @throws ZebedeeException
      * @throws IOException
      */
-    TimeSeries initialTimeseries(TimeSeries series, ContentReader publishedContentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
+    TimeSeries initialTimeseries(TimeSeries series, ContentReader contentReader, DataPublicationDetails details, DataIndex dataIndex) throws ZebedeeException, IOException, URISyntaxException {
 
-        String publishUri = publishUriForTimeseries(series, details, dataIndex);
+        String timeseriesUri = getDatasetBasedUriForTimeseries(series, details, dataIndex);
 
-        // Try to get an existing timeseries
         try {
-            TimeSeries existing = (TimeSeries) publishedContentReader.getContent(publishUri);
+            TimeSeries existing = (TimeSeries) contentReader.getContent(timeseriesUri);
             return existing;
-        } catch (NotFoundException e) {
+
+        } catch (NotFoundException notFoundAnywhere) {
             // If it doesn't exist create a new empty one using the description
             TimeSeries initial = new TimeSeries();
             initial.setDescription(series.getDescription());
-            initial.setUri(new URI(publishUri));
+            initial.setUri(new URI(timeseriesUri));
 
             return initial;
         } catch (IllegalStateException e) {
             logError(e, "Error with timeseries")
                     .addParameter("CDID", series.getCdid())
-                    .addParameter("publishUri", publishUri)
+                    .addParameter("publishUri", timeseriesUri)
                     .log();
             throw e;
         }
+
     }
-
-
 }

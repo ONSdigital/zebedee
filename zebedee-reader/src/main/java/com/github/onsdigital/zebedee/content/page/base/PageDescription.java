@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class PageDescription extends Content implements Comparable<PageDescripti
     private String headline2;
     private String headline3;
     private String datasetId;
+    private URI datasetUri;
     /*Statistical Data description*/
     private String cdid;
     // We provide a minimal default for the unit, otherwise highcharts shows
@@ -240,6 +242,14 @@ public class PageDescription extends Content implements Comparable<PageDescripti
 
     public void setDatasetId(String datasetId) {
         this.datasetId = datasetId;
+    }
+
+    public URI getDatasetUri() {
+        return datasetUri;
+    }
+
+    public void setDatasetUri(URI datasetUri) {
+        this.datasetUri = datasetUri;
     }
 
     public String getCdid() {

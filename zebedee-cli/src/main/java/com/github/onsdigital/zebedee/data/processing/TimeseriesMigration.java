@@ -139,19 +139,13 @@ public class TimeseriesMigration {
             TimeseriesFinder finder = new TimeseriesFinder();
             for (Path path : finder.findTimeseries(destination)) {
 
-                System.out.println("migrating values from old timeseries to new timeseries:");
-
                 String datauri = "/" + destination.relativize(path).toString();
                 String uri = datauri.substring(0, datauri.length() - "/data.json".length());
                 String oldUri = Paths.get(uri).getParent().toString();
 
-                System.out.println("oldUri = " + oldUri);
-                System.out.println("uri = " + uri);
-
                 TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
                 TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
 
-                System.out.println("timeseriesMigrationData.monthLabelStyle = " + timeseriesMigrationData.monthLabelStyle);
                 newTimeseries.getDescription().setMonthLabelStyle(timeseriesMigrationData.monthLabelStyle);
                 newTimeseries.setRelatedData(timeseriesMigrationData.relatedData);
 
@@ -164,8 +158,6 @@ public class TimeseriesMigration {
         TimeseriesFinder finder = new TimeseriesFinder();
         for (Path path : finder.findTimeseries(destination)) {
 
-            System.out.println("migrating FINAL values from old timeseries to new timeseries:");
-
             String datauri = "/" + destination.relativize(path).toString();
             String uri = datauri.substring(0, datauri.length() - "/data.json".length());
             String oldUri = Paths.get(uri).getParent().toString();
@@ -173,7 +165,6 @@ public class TimeseriesMigration {
             TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
             TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
 
-            System.out.println("timeseriesMigrationData.title = " + timeseriesMigrationData.title);
             newTimeseries.getDescription().setTitle(timeseriesMigrationData.title);
             newTimeseries.getDescription().setUnit(timeseriesMigrationData.unit);
             newTimeseries.getDescription().setPreUnit(timeseriesMigrationData.preunit);

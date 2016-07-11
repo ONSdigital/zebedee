@@ -150,8 +150,11 @@ public class TimeseriesMigration {
 
                 if (timeseriesMigrationData.monthLabelStyle != null) {
                     TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
-                    newTimeseries.getDescription().setMonthLabelStyle(timeseriesMigrationData.monthLabelStyle);
-                    destinationContentWriter.writeObject(newTimeseries, datauri);
+
+                    if (!newTimeseries.getDescription().getMonthLabelStyle().equals(timeseriesMigrationData.monthLabelStyle)) {
+                        newTimeseries.getDescription().setMonthLabelStyle(timeseriesMigrationData.monthLabelStyle);
+                        destinationContentWriter.writeObject(newTimeseries, datauri);
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.data.processing.setup.DataIndexBuilder;
@@ -18,9 +19,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class TimeseriesMigration {
 
@@ -63,6 +62,29 @@ public class TimeseriesMigration {
 
         System.out.println("Building data index...");
         DataIndex dataIndex = DataIndexBuilder.buildDataIndex(publishedContentReader); // build the dataindex of existing timeseries to determine location of output
+
+        System.out.println("Building migration index...");
+        // data index used specifically for the migration to carry over certain field values from timeseries.
+        Map<String, TimeseriesMigrationData> migrationIndex = new HashMap<>();
+        for (String url : dataIndex.index.values()) {
+
+            //System.out.println("data index url = " + url);
+
+            // read values from
+            TimeSeries content = (TimeSeries) publishedContentReader.getContent(url);
+
+            TimeseriesMigrationData data = new TimeseriesMigrationData();
+            data.monthLabelStyle = content.getDescription().getMonthLabelStyle();
+            data.relatedData = content.getRelatedData();
+
+            data.title = content.getDescription().getTitle();
+            data.unit = content.getDescription().getUnit();
+            data.preunit = content.getDescription().getPreUnit();
+            data.keynote = content.getDescription().getKeyNote();
+
+            migrationIndex.put(url, data);
+        }
+
 
         // find all dataset files on the site including versions.
         List<TimeseriesDatasetFiles> datasetDownloads = getTimeseriesDatasets(source);
@@ -111,6 +133,53 @@ public class TimeseriesMigration {
                 System.out.println("--- Processing dataset... ");
                 dataPublication.process(destinationContentReader, destinationContentReader, destinationContentWriter, saveTimeSeries, dataIndex, new ArrayList<>());
             }
+
+
+            // inject timeseries vales into the newly generated timeseries.
+            TimeseriesFinder finder = new TimeseriesFinder();
+            for (Path path : finder.findTimeseries(destination)) {
+
+                System.out.println("migrating values from old timeseries to new timeseries:");
+
+                String datauri = "/" + destination.relativize(path).toString();
+                String uri = datauri.substring(0, datauri.length() - "/data.json".length());
+                String oldUri = Paths.get(uri).getParent().toString();
+
+                System.out.println("oldUri = " + oldUri);
+                System.out.println("uri = " + uri);
+
+                TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
+                TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
+
+                System.out.println("timeseriesMigrationData.monthLabelStyle = " + timeseriesMigrationData.monthLabelStyle);
+                newTimeseries.getDescription().setMonthLabelStyle(timeseriesMigrationData.monthLabelStyle);
+                newTimeseries.setRelatedData(timeseriesMigrationData.relatedData);
+
+                destinationContentWriter.writeObject(newTimeseries, datauri);
+            }
+
+        }
+
+        // inject timeseries vales into the newly generated timeseries.
+        TimeseriesFinder finder = new TimeseriesFinder();
+        for (Path path : finder.findTimeseries(destination)) {
+
+            System.out.println("migrating FINAL values from old timeseries to new timeseries:");
+
+            String datauri = "/" + destination.relativize(path).toString();
+            String uri = datauri.substring(0, datauri.length() - "/data.json".length());
+            String oldUri = Paths.get(uri).getParent().toString();
+
+            TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
+            TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
+
+            System.out.println("timeseriesMigrationData.title = " + timeseriesMigrationData.title);
+            newTimeseries.getDescription().setTitle(timeseriesMigrationData.title);
+            newTimeseries.getDescription().setUnit(timeseriesMigrationData.unit);
+            newTimeseries.getDescription().setPreUnit(timeseriesMigrationData.preunit);
+            newTimeseries.getDescription().setKeyNote(timeseriesMigrationData.keynote);
+
+            destinationContentWriter.writeObject(newTimeseries, datauri);
         }
     }
 

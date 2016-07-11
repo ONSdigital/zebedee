@@ -136,10 +136,13 @@ public class TimeseriesMigration {
 
 
             // inject timeseries vales into the newly generated timeseries.
-            TimeseriesFinder finder = new TimeseriesFinder();
-            for (Path path : finder.findTimeseries(destination)) {
 
-                String datauri = "/" + destination.relativize(path).toString();
+            Path monthLabelStylePath = destination.resolve("employmentandlabourmarket");
+
+            TimeseriesFinder finder = new TimeseriesFinder();
+            for (Path path : finder.findTimeseries(monthLabelStylePath)) {
+
+                String datauri = "/" + monthLabelStylePath.relativize(path).toString();
                 String uri = datauri.substring(0, datauri.length() - "/data.json".length());
                 String oldUri = Paths.get(uri).getParent().toString();
 
@@ -147,7 +150,6 @@ public class TimeseriesMigration {
                 TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
 
                 newTimeseries.getDescription().setMonthLabelStyle(timeseriesMigrationData.monthLabelStyle);
-                newTimeseries.setRelatedData(timeseriesMigrationData.relatedData);
 
                 destinationContentWriter.writeObject(newTimeseries, datauri);
             }
@@ -169,6 +171,7 @@ public class TimeseriesMigration {
             newTimeseries.getDescription().setUnit(timeseriesMigrationData.unit);
             newTimeseries.getDescription().setPreUnit(timeseriesMigrationData.preunit);
             newTimeseries.getDescription().setKeyNote(timeseriesMigrationData.keynote);
+            newTimeseries.setRelatedData(timeseriesMigrationData.relatedData);
 
             destinationContentWriter.writeObject(newTimeseries, datauri);
         }

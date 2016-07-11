@@ -142,7 +142,7 @@ public class TimeseriesMigration {
             TimeseriesFinder finder = new TimeseriesFinder();
             for (Path path : finder.findTimeseries(monthLabelStylePath)) {
 
-                String datauri = "/" + monthLabelStylePath.relativize(path).toString();
+                String datauri = "/" + destination.relativize(path).toString();
                 String uri = datauri.substring(0, datauri.length() - "/data.json".length());
                 String oldUri = Paths.get(uri).getParent().toString();
 

@@ -920,13 +920,13 @@ public class Collection {
 
         ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
 
-        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, collectionWriter.getReviewed());
+        VersionedContentItem versionedContentItem = new VersionedContentItem(uri);
 
         if (versionedContentItem.versionExists(this.reviewed)) {
             throw new ConflictException("A previous version of this file already exists");
         }
 
-        ContentItemVersion version = versionedContentItem.createVersion(zebedee.published.path, contentReader);
+        ContentItemVersion version = versionedContentItem.createVersion(zebedee.published.path, contentReader, collectionWriter.getReviewed());
         addEvent(uri, new Event(new Date(), EventType.VERSIONED, email, version.getIdentifier()));
         return version;
     }

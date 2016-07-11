@@ -6,10 +6,7 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +18,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
- * A hashmap storing a mapping from cdid
+ * A hashmap storing an entry for each timeseries - mapping the CDID to the url of the timeseries.
  */
 public class DataIndex {
     private static final ExecutorService pool = Executors.newSingleThreadExecutor();
@@ -37,6 +34,9 @@ public class DataIndex {
     public DataIndex(ContentReader contentReader) {
         this.contentReader = contentReader;
         reindex();
+    }
+
+    public DataIndex() {
     }
 
     public String getUriForCdid(String cdid) {
@@ -56,17 +56,14 @@ public class DataIndex {
      */
     public void reindex() {
         indexBuilt = false;
-        Runnable build = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Files.walkFileTree(contentReader.getRootFolder(), new IndexBuilder(index, contentReader));
-                } catch (IOException e) {
-                    logError(e);
-                }
-                logInfo("Data index built.").addParameter("entries", index.size()).log();
-                indexBuilt = true;
+        Runnable build = () -> {
+            try {
+                Files.walkFileTree(contentReader.getRootFolder(), new IndexBuilder(index, contentReader));
+            } catch (IOException e) {
+                logError(e);
             }
+            logInfo("Data index built.").addParameter("entries", index.size()).log();
+            indexBuilt = true;
         };
         pool.submit(build);
     }
@@ -127,15 +124,23 @@ public class DataIndex {
             String uri = "/" + this.contentReader.getRootFolder().relativize(file).toString();
 
             // Check json files in timeseries directories (excluding versions)
-            if (uri.endsWith("data.json") && uri.toString().contains("/timeseries/") && !uri.toString().contains("/" + VersionedContentItem.getVersionDirectoryName() + "/")) {
+            if (uri.endsWith("data.json") && uri.contains("/timeseries/") && !uri.toString().contains("/" + VersionedContentItem.getVersionDirectoryName() + "/")) {
                 uri = uri.substring(0, uri.length() - "/data.json".length());
 
-                TimeSeries timeSeries = null;
+                TimeSeries timeSeries;
                 try {
                     timeSeries = (TimeSeries) this.contentReader.getContent(uri);
                     if (timeSeries.getCdid() != null) {
 
-                        this.index.put(timeSeries.getCdid().toLowerCase(), uri);
+                        // get the parent path so that we are referencing the timeseries landing page instead of dataset specific timeseries.
+                        String timeseriesLandingPageUri = uri; //if the parent directory is the timeseries folder just use the uri.
+                        Path path = Paths.get(uri);
+
+                        if (!path.getParent().getFileName().toString().equals("timeseries")) {
+                            timeseriesLandingPageUri = path.getParent().toString(); // else use the parent CDID based directory.
+                        }
+
+                        this.index.put(timeSeries.getCdid().toLowerCase(), timeseriesLandingPageUri);
                     }
                 } catch (Exception e) {
                     logError(e, "Error indexing uri").addParameter("uri", uri).log();

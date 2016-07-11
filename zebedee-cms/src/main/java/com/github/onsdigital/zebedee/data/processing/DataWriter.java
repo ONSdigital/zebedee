@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by thomasridd on 1/21/16.
@@ -32,7 +33,7 @@ public class DataWriter {
 
         if (dataChanges > 0) {
             // Version the timeseries
-            versionTimeseries(processor.timeSeries, details.getDatasetCorrectionsNotice());
+            versionTimeseries(processor.timeSeries, details.getLastDatasetVersion());
         }
 
         // Save the new page to reviewed
@@ -41,7 +42,7 @@ public class DataWriter {
 
     void versionTimeseries(
             TimeSeries timeSeries,
-            String correctionNotice
+            Version datasetVersion
     ) throws ZebedeeException, IOException {
         String uri = timeSeries.getUri().toString();
 
@@ -52,17 +53,19 @@ public class DataWriter {
             return;
         }
 
-
         // create directory in reviewed if it does not exist.
-        VersionedContentItem versionedContentItem = new VersionedContentItem(uri, this.contentWriter);
+        VersionedContentItem versionedContentItem = new VersionedContentItem(uri);
 
         // build a version if it doesn't exist
         if (versionedContentItem.versionExists(this.contentReader) == false) {
-            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(pubishedReader);
+            ContentItemVersion contentItemVersion = versionedContentItem.createVersion(pubishedReader, this.contentWriter);
+
+            String correctionNotice = datasetVersion != null ? datasetVersion.getCorrectionNotice() : "";
+            Date updateDate = datasetVersion != null ? datasetVersion.getUpdateDate() : timeSeries.getDescription().getReleaseDate();
 
             Version version = new Version();
             version.setUri(URI.create(contentItemVersion.getUri()));
-            version.setUpdateDate(timeSeries.getDescription().getReleaseDate());
+            version.setUpdateDate(updateDate);
             version.setLabel(contentItemVersion.getIdentifier());
             version.setCorrectionNotice(correctionNotice);
 

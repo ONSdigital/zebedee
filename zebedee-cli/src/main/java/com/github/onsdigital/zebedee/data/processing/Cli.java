@@ -42,6 +42,11 @@ public class Cli {
                 .argName("source directory> <destination file")
                 .numberOfArgs(2)
                 .build());
+        options.addOption(Option.builder("migratetimeseries")
+                .desc("Migrate time series from CDID based to CDID + dataset ID based format.")
+                .argName("source directory> <destination file")
+                .numberOfArgs(2)
+                .build());
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -61,6 +66,8 @@ public class Cli {
                 ContentMover.moveContent(args);
             } else if (line.hasOption("listtimeseries")) {
                 TimeseriesLister.listTimeseries(args);
+            } else if (line.hasOption("migratetimeseries")) {
+                TimeseriesMigration.migrateTimeseries(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

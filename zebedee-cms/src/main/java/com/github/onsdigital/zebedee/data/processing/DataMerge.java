@@ -2,10 +2,8 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.DatasetLandingPage;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -31,6 +29,7 @@ public class DataMerge {
 
     /**
      * Merge a
+     *
      * @param page
      * @param currentValues
      * @param updateValues
@@ -50,8 +49,7 @@ public class DataMerge {
                     // Update the point
                     current.value = value.value;
                     current.sourceDataset = datasetId;
-
-                    current.updateDate = new Date();
+                    current.updateDate = page.getDescription().getReleaseDate();
 
                     // Log a correction has been made to existing data
                     this.corrections += 1;
@@ -60,7 +58,7 @@ public class DataMerge {
                 // Take a copy of the point and add it to our merged page
                 TimeSeriesValue copy = ContentUtil.deserialise(ContentUtil.serialise(value), TimeSeriesValue.class);
                 copy.sourceDataset = datasetId;
-                copy.updateDate = new Date();
+                copy.updateDate = page.getDescription().getReleaseDate();
 
                 page.add(copy);
 

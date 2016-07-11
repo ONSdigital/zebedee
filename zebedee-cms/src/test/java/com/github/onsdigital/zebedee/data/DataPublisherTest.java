@@ -40,8 +40,9 @@ public class DataPublisherTest {
 
 
         String expectedTitle = "the updated title";
-        String uri = "/timeseries/whatever";
         String cdid = "abcd";
+        String datasetId = "qwef";
+        String uri = String.format("/timeseries/%s/%s", cdid, datasetId);
 
         // create the published time series and write it.
         TimeSeries timeSeries = new TimeSeries();
@@ -49,7 +50,7 @@ public class DataPublisherTest {
         publishedContentWriter.writeObject(timeSeries, uri + "/data.json");
 
         List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-        updateCommands.add(new TimeseriesUpdateCommand(cdid, expectedTitle));
+        updateCommands.add(new TimeseriesUpdateCommand(cdid, datasetId, expectedTitle));
 
         DataIndex dataIndex = new DataIndex(publishedContentReader);
         dataIndex.pauseUntilComplete(10);

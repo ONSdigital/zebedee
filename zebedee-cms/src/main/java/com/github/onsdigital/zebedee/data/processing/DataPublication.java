@@ -72,12 +72,15 @@ public class DataPublication {
 
     /**
      * Process a specified collection
-     *
      * @param publishedContentReader
      * @param reviewedContentReader
      * @param reviewedContentWriter
+     * @param saveTimeSeries
+     * @param dataIndex
+     * @param updateCommands - a set of commands to update the timeseries metadata.
      * @throws IOException
      * @throws ZebedeeException
+     * @throws URISyntaxException
      */
     public void process(
             ContentReader publishedContentReader,
@@ -93,12 +96,12 @@ public class DataPublication {
         // check this landingpage has a datasetId and generate if necessary
         checkLandingPageDatasetId(reviewedContentWriter);
 
-        // send the file for processing
+        // send the file to brian to create timeseries.
         this.serieses = callDataLink(reviewedContentReader, details.fileUri);
 
         CompositeContentReader compositeContentReader = new CompositeContentReader(reviewedContentReader, publishedContentReader);
 
-        // Process each returned timeseries
+        // Process each timeseries returned from Brian
         for(TimeSeries series: serieses) {
 
             // see if there is an update command for this timeseries.

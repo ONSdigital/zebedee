@@ -6,6 +6,8 @@ GIT_COMMIT=
 
 if [[ $DEPLOYMENT_GROUP_NAME =~ ^production-.+ ]]; then
   CONFIG_FILE=production.sh
+elif [[ $DEPLOYMENT_GROUP_NAME =~ ^sandpit-.+ ]]; then
+  CONFIG_FILE=sandpit.sh
 else
   CONFIG_FILE=development.sh
 fi

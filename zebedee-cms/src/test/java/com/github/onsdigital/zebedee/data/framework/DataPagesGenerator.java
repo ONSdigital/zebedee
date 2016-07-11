@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSec
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.content.partial.Contact;
 import com.github.onsdigital.zebedee.content.partial.Link;
-import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.net.URI;
@@ -17,7 +16,6 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -33,14 +31,14 @@ public class DataPagesGenerator {
     /**
      * Build an example timeseries page
      *
-     * @param cdid a cdid for the dataset
-     * @param datasetId the dataset id the timeseries has been generated from
-     * @param releaseDate the release date to set
-     * @param withYears include years
-     * @param withQuarters include quarters
-     * @param withMonths include months
+     * @param cdid            a cdid for the dataset
+     * @param datasetId       the dataset id the timeseries has been generated from
+     * @param releaseDate     the release date to set
+     * @param withYears       include years
+     * @param withQuarters    include quarters
+     * @param withMonths      include months
      * @param yearsToGenerate the number of years to generate
-     * @param finalYear the final year to generate
+     * @param finalYear       the final year to generate
      * @return a random walk timeseries
      */
     public TimeSeries exampleTimeseries(String cdid, String datasetId, Date releaseDate, boolean withYears, boolean withQuarters, boolean withMonths, int yearsToGenerate, int finalYear) {
@@ -51,8 +49,6 @@ public class DataPagesGenerator {
         timeSeries.getDescription().setTitle(Random.id());
         timeSeries.getDescription().setReleaseDate(releaseDate);
         timeSeries.getDescription().setContact(dummy());
-
-        timeSeries.sourceDatasets = Arrays.asList(datasetId);
 
         String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
         String[] quarters = "Q1,Q2,Q3,Q4".split(",");
@@ -114,12 +110,12 @@ public class DataPagesGenerator {
     /**
      * Build an example timeseries page
      *
-     * @param description standard page metadata (CDID, DatasetId, and ReleaseDate required)
-     * @param withYears include years
-     * @param withQuarters include quarters
-     * @param withMonths include months
+     * @param description     standard page metadata (CDID, DatasetId, and ReleaseDate required)
+     * @param withYears       include years
+     * @param withQuarters    include quarters
+     * @param withMonths      include months
      * @param yearsToGenerate the number of years to generate
-     * @param finalYear the final year to generate
+     * @param finalYear       the final year to generate
      * @return a random walk timeseries
      */
     public TimeSeries exampleTimeseries(PageDescription description, boolean withYears, boolean withQuarters, boolean withMonths, int yearsToGenerate, int finalYear) {
@@ -141,8 +137,8 @@ public class DataPagesGenerator {
     /**
      * Build a boilerplate dataset landing page
      *
-     * @param title the dataset title
-     * @param datasetId the dataset id
+     * @param title       the dataset title
+     * @param datasetId   the dataset id
      * @param releaseDate a release date
      * @return a data landing page
      */
@@ -162,8 +158,8 @@ public class DataPagesGenerator {
     /**
      * Build a boilerplate time series dataset
      *
-     * @param title the dataset title
-     * @param edition the edition of the dataset (relative to the landing page)
+     * @param title       the dataset title
+     * @param edition     the edition of the dataset (relative to the landing page)
      * @param releaseDate a release date
      * @return a time series dataset
      */
@@ -182,47 +178,59 @@ public class DataPagesGenerator {
     /**
      * Generate a full set of pages for data publication
      *
-     * @param parentUri the taxonomy node to save at
-     * @param datasetId an id for the dataset
-     * @param releaseYear a release year
-     * @param timeSeriesCount the number of timeseries to generate
+     * @param parentUri           the taxonomy node to save at
+     * @param datasetId           an id for the dataset
+     * @param releaseYear         a release year
+     * @param timeSeriesCount     the number of timeseries to generate
+     * @param timeSeriesDataCount the number of timeseries data pages to generate
      * @return
      * @throws ParseException
      * @throws URISyntaxException
      */
-    public DataPagesSet generateDataPagesSet(String parentUri, String datasetId, int releaseYear, int timeSeriesCount, String fileName) throws ParseException, URISyntaxException {
+    public DataPagesSet generateDataPagesSet(
+            String parentUri,
+            String datasetId,
+            int releaseYear,
+            int timeSeriesCount,
+            String fileName
+    ) throws ParseException, URISyntaxException {
         DataPagesSet dataPagesSet = new DataPagesSet();
 
         String dateAsString = releaseYear + "-01-01 00:00:00.0";
         Date releaseDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(dateAsString);
-
-
 
         DatasetLandingPage landingPage = exampleDataLandingPage("Landing Page " + datasetId, datasetId, releaseDate);
 
         TimeSeriesDataset timeSeriesDataset = exampleTimeSeriesDataset("Dataset " + datasetId, "current", releaseDate);
 
         landingPage.setDatasets(new ArrayList<>());
-        landingPage.getDatasets().add(new Link(new URI( "/" + parentUri + "/datasets/" + datasetId + "/current")));
+        landingPage.getDatasets().add(new Link(new URI("/" + parentUri + "/datasets/" + datasetId + "/current")));
 
         DownloadSection downloadSection = new DownloadSection();
         downloadSection.setTitle(datasetId + " time series dataset");
         downloadSection.setCdids(new ArrayList<>());
 
 
-        for (int i = 0; i < timeSeriesCount; i++) {
+//        for (int i = 0; i < timeSeriesCount; i++) {
+//            TimeSeries timeSeries = exampleTimeseries(datasetId + i, datasetId, releaseDate, true, true, true, 4, releaseYear - 1);
+//            downloadSection.getCdids().add(timeSeries.getCdid());
+//            timeSeries.setUri(new URI("/" + parentUri + "/timeseries/" + timeSeries.getCdid().toLowerCase()));
+//            dataPagesSet.timeSeriesList.add(timeSeries);
+//        }
 
+        for (int i = 0; i < timeSeriesCount; i++) {
             TimeSeries timeSeries = exampleTimeseries(datasetId + i, datasetId, releaseDate, true, true, true, 4, releaseYear - 1);
             downloadSection.getCdids().add(timeSeries.getCdid());
-            timeSeries.setUri(new URI( "/" + parentUri + "/timeseries/" + timeSeries.getCdid().toLowerCase()));
+            String timeseriesDataUri = String.format("/%s/timeseries/%s/%s", parentUri, timeSeries.getCdid().toLowerCase(), datasetId.toLowerCase());
+            timeSeries.setUri(new URI(timeseriesDataUri));
             dataPagesSet.timeSeriesList.add(timeSeries);
         }
 
         timeSeriesDataset.getDownloads().add(downloadSection);
-        timeSeriesDataset.setUri(new URI( "/" + parentUri + "/datasets/" + datasetId + "/current"));
+        timeSeriesDataset.setUri(new URI("/" + parentUri + "/datasets/" + datasetId + "/current"));
         dataPagesSet.timeSeriesDataset = timeSeriesDataset;
 
-        landingPage.setUri(new URI( "/" + parentUri + "/datasets/" + datasetId));
+        landingPage.setUri(new URI("/" + parentUri + "/datasets/" + datasetId));
         dataPagesSet.datasetLandingPage = landingPage;
 
         if (fileName.trim().length() == 0) {

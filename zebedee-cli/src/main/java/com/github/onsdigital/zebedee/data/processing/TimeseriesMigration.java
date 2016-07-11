@@ -147,13 +147,13 @@ public class TimeseriesMigration {
                 String oldUri = Paths.get(uri).getParent().toString();
 
                 TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
-                TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
 
-                newTimeseries.getDescription().setMonthLabelStyle(timeseriesMigrationData.monthLabelStyle);
-
-                destinationContentWriter.writeObject(newTimeseries, datauri);
+                if (timeseriesMigrationData.monthLabelStyle != null) {
+                    TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
+                    newTimeseries.getDescription().setMonthLabelStyle(timeseriesMigrationData.monthLabelStyle);
+                    destinationContentWriter.writeObject(newTimeseries, datauri);
+                }
             }
-
         }
 
         // inject timeseries vales into the newly generated timeseries.

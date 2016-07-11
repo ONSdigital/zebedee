@@ -65,9 +65,7 @@ public class TimeseriesMigration {
 
         Map<String, TimeseriesMigrationData> migrationIndex = buildMigrationIndex(publishedContentReader, dataIndex);
 
-
-        //doMigration(source, destination, publishedContentReader, destinationContentReader, destinationContentWriter, dataIndex, migrationIndex);
-
+        doMigration(source, destination, publishedContentReader, destinationContentReader, destinationContentWriter, dataIndex, migrationIndex);
 
         // inject timeseries vales into the newly generated timeseries.
         TimeseriesFinder finder = new TimeseriesFinder();

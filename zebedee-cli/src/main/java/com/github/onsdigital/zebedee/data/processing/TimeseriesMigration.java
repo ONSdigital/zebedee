@@ -63,29 +63,40 @@ public class TimeseriesMigration {
         System.out.println("Building data index...");
         DataIndex dataIndex = DataIndexBuilder.buildDataIndex(publishedContentReader); // build the dataindex of existing timeseries to determine location of output
 
-        System.out.println("Building migration index...");
-        // data index used specifically for the migration to carry over certain field values from timeseries.
-        Map<String, TimeseriesMigrationData> migrationIndex = new HashMap<>();
-        for (String url : dataIndex.index.values()) {
+        Map<String, TimeseriesMigrationData> migrationIndex = buildMigrationIndex(publishedContentReader, dataIndex);
 
-            //System.out.println("data index url = " + url);
 
-            // read values from
-            TimeSeries content = (TimeSeries) publishedContentReader.getContent(url);
+        //doMigration(source, destination, publishedContentReader, destinationContentReader, destinationContentWriter, dataIndex, migrationIndex);
 
-            TimeseriesMigrationData data = new TimeseriesMigrationData();
-            data.monthLabelStyle = content.getDescription().getMonthLabelStyle();
-            data.relatedData = content.getRelatedData();
 
-            data.title = content.getDescription().getTitle();
-            data.unit = content.getDescription().getUnit();
-            data.preunit = content.getDescription().getPreUnit();
-            data.keynote = content.getDescription().getKeyNote();
+        // inject timeseries vales into the newly generated timeseries.
+        TimeseriesFinder finder = new TimeseriesFinder();
+        for (Path path : finder.findTimeseries(destination)) {
 
-            migrationIndex.put(url, data);
+            String datauri = "/" + destination.relativize(path).toString();
+            String uri = datauri.substring(0, datauri.length() - "/data.json".length());
+            String oldUri = Paths.get(uri).getParent().toString();
+
+            TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
+
+
+            if (timeseriesMigrationData != null) {
+                TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
+
+                newTimeseries.getDescription().setTitle(timeseriesMigrationData.title);
+                newTimeseries.getDescription().setUnit(timeseriesMigrationData.unit);
+                newTimeseries.getDescription().setPreUnit(timeseriesMigrationData.preunit);
+                newTimeseries.getDescription().setKeyNote(timeseriesMigrationData.keynote);
+                newTimeseries.setRelatedData(timeseriesMigrationData.relatedData);
+
+                destinationContentWriter.writeObject(newTimeseries, datauri);
+            } else {
+                System.out.println("migration data is null for uri: " + uri);
+            }
         }
+    }
 
-
+    private static void doMigration(Path source, Path destination, ContentReader publishedContentReader, ContentReader destinationContentReader, ContentWriter destinationContentWriter, DataIndex dataIndex, Map<String, TimeseriesMigrationData> migrationIndex) throws ZebedeeException, IOException, URISyntaxException {
         // find all dataset files on the site including versions.
         List<TimeseriesDatasetFiles> datasetDownloads = getTimeseriesDatasets(source);
 
@@ -158,26 +169,31 @@ public class TimeseriesMigration {
                 }
             }
         }
+    }
 
-        // inject timeseries vales into the newly generated timeseries.
-        TimeseriesFinder finder = new TimeseriesFinder();
-        for (Path path : finder.findTimeseries(destination)) {
+    private static Map<String, TimeseriesMigrationData> buildMigrationIndex(ContentReader publishedContentReader, DataIndex dataIndex) throws ZebedeeException, IOException {
+        System.out.println("Building migration index...");
+        // data index used specifically for the migration to carry over certain field values from timeseries.
+        Map<String, TimeseriesMigrationData> migrationIndex = new HashMap<>();
+        for (String url : dataIndex.index.values()) {
 
-            String datauri = "/" + destination.relativize(path).toString();
-            String uri = datauri.substring(0, datauri.length() - "/data.json".length());
-            String oldUri = Paths.get(uri).getParent().toString();
+            //System.out.println("data index url = " + url);
 
-            TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
-            TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
+            // read values from
+            TimeSeries content = (TimeSeries) publishedContentReader.getContent(url);
 
-            newTimeseries.getDescription().setTitle(timeseriesMigrationData.title);
-            newTimeseries.getDescription().setUnit(timeseriesMigrationData.unit);
-            newTimeseries.getDescription().setPreUnit(timeseriesMigrationData.preunit);
-            newTimeseries.getDescription().setKeyNote(timeseriesMigrationData.keynote);
-            newTimeseries.setRelatedData(timeseriesMigrationData.relatedData);
+            TimeseriesMigrationData data = new TimeseriesMigrationData();
+            data.monthLabelStyle = content.getDescription().getMonthLabelStyle();
+            data.relatedData = content.getRelatedData();
 
-            destinationContentWriter.writeObject(newTimeseries, datauri);
+            data.title = content.getDescription().getTitle();
+            data.unit = content.getDescription().getUnit();
+            data.preunit = content.getDescription().getPreUnit();
+            data.keynote = content.getDescription().getKeyNote();
+
+            migrationIndex.put(url, data);
         }
+        return migrationIndex;
     }
 
     private static String getDatasetUri(TimeSeriesDataset dataset) {

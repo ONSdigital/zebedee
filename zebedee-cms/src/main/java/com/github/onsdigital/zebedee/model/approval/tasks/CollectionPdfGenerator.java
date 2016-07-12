@@ -25,6 +25,7 @@ public class CollectionPdfGenerator {
         pagesWithPdf.add(PageType.article);
         pagesWithPdf.add(PageType.bulletin);
         pagesWithPdf.add(PageType.compendium_chapter);
+        pagesWithPdf.add(PageType.static_methodology);
     }
 
     private final PdfService pdfService;

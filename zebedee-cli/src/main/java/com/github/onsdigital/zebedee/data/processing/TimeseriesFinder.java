@@ -63,6 +63,8 @@ public class TimeseriesFinder extends SimpleFileVisitor<Path> {
 
         try {
             Files.walkFileTree(root, this);
+        } catch (NoSuchFileException e) {
+            return new ArrayList<>();
         } catch (IOException e) {
             e.printStackTrace();
         }

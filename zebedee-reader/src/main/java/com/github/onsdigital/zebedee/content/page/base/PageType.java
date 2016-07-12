@@ -41,5 +41,6 @@ public enum PageType {
     chart,
     table,
     image,
-    visualisation
+    visualisation,
+    equation
 }

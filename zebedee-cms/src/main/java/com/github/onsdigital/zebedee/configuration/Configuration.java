@@ -17,6 +17,7 @@ public class Configuration {
     private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
     private static final String INFLUXDB_URL = "http://influxdb:8086";
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
+    private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -67,6 +68,11 @@ public class Configuration {
 
     public static String getBabbageUrl() {
         return StringUtils.defaultIfBlank(getValue("BABBAGE_URL"), DEFAULT_WEBSITE_URL);
+    }
+
+
+    public static String getMathjaxServiceUrl() {
+        return StringUtils.defaultIfBlank(getValue("MATHJAX_SERVICE_URL"), MATHJAX_SERVICE_URL);
     }
 
     public static String[] getTheTrainUrls() {

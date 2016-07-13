@@ -3,15 +3,8 @@ package com.github.onsdigital.zebedee.content.page.statistics.document.figure.ta
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.FigureBase;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 public class Table extends FigureBase {
 
-    private String title;
     private String html;
     private String filename;
     private Boolean firstLineTitle;
@@ -21,14 +14,6 @@ public class Table extends FigureBase {
     @Override
     public PageType getType() {
         return PageType.table;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getHtml() {

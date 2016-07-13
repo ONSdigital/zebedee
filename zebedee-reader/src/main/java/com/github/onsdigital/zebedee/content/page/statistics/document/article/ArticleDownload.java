@@ -19,6 +19,7 @@ public class ArticleDownload extends Statistics {
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
+    private List<FigureSection> equations = new ArrayList<>();
     private List<Link> links;
 
     public List<DownloadSection> getDownloads() {
@@ -83,6 +84,14 @@ public class ArticleDownload extends Statistics {
 
     public void setLinks(List<Link> links) {
         this.links = links;
+    }
+
+    public List<FigureSection> getEquations() {
+        return equations;
+    }
+
+    public void setEquations(List<FigureSection> equations) {
+        this.equations = equations;
     }
 
     @Override

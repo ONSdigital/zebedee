@@ -44,8 +44,8 @@ public class Cli {
                 .build());
         options.addOption(Option.builder("migratetimeseries")
                 .desc("Migrate time series from CDID based to CDID + dataset ID based format.")
-                .argName("source directory> <destination file")
-                .numberOfArgs(2)
+                .argName("source directory> <destination file> <optional datasetID")
+                .hasArgs()
                 .build());
 
         CommandLineParser parser = new DefaultParser();

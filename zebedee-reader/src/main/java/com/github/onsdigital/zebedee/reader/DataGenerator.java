@@ -175,7 +175,6 @@ public class DataGenerator {
         List<String> titleRow = newRow("Title");
         List<String> cdidRow = newRow("CDID");
         List<String> datasetIdRow = newRow("Source dataset ID");
-        List<String> nationalStatistic = newRow("National Statistic");
         List<String> preunit = newRow("PreUnit");
         List<String> unit = newRow("Unit");
         List<String> releaseDate = newRow("Release date");
@@ -187,7 +186,6 @@ public class DataGenerator {
             titleRow.add(mapOfData.get("Title").get(id));
             cdidRow.add(mapOfData.get("CDID").get(id));
             datasetIdRow.add(mapOfData.get("Source dataset ID").get(id));
-            nationalStatistic.add(mapOfData.get("National Statistic").get(id));
             preunit.add(mapOfData.get("PreUnit").get(id));
             unit.add(mapOfData.get("Unit").get(id));
             releaseDate.add(mapOfData.get("Release date").get(id));
@@ -198,7 +196,6 @@ public class DataGenerator {
         rows.add(titleRow);
         rows.add(cdidRow);
         rows.add(datasetIdRow);
-        rows.add(nationalStatistic);
         rows.add(preunit);
         rows.add(unit);
         rows.add(releaseDate);
@@ -233,7 +230,6 @@ public class DataGenerator {
             putCombination(seriesIdentifier, "Title", series.getDescription().getTitle(), map);
             putCombination(seriesIdentifier, "CDID", series.getDescription().getCdid(), map);
             putCombination(seriesIdentifier, "Source dataset ID", series.getDescription().getDatasetId(), map);
-            putCombination(seriesIdentifier, "National Statistic", (series.getDescription().isNationalStatistic() ? "Y" : "N"), map);
             putCombination(seriesIdentifier, "PreUnit", series.getDescription().getPreUnit(), map);
             putCombination(seriesIdentifier, "Unit", series.getDescription().getUnit(), map);
 
@@ -656,7 +652,6 @@ public class DataGenerator {
 
         grid.add(rowFromPair("Title", description.getTitle()));
         grid.add(rowFromPair("CDID", description.getCdid()));
-        grid.add(rowFromPair("National Statistic", (description.isNationalStatistic() ? "Y" : "N")));
         grid.add(rowFromPair("PreUnit", description.getPreUnit()));
         grid.add(rowFromPair("Unit", description.getUnit()));
 

@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.TimeSeriesDataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
-import com.github.onsdigital.zebedee.data.processing.setup.DataIndexBuilder;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -69,37 +68,63 @@ public class TimeseriesMigration {
         ContentReader destinationContentReader = new FileSystemContentReader(destination);
         ContentWriter destinationContentWriter = new ContentWriter(destination); // write output content to collection
 
-        System.out.println("Building data index...");
-        DataIndex dataIndex = DataIndexBuilder.buildDataIndex(publishedContentReader); // build the dataindex of existing timeseries to determine location of output
+//        System.out.println("Building data index...");
+//        DataIndex dataIndex = DataIndexBuilder.buildDataIndex(publishedContentReader); // build the dataindex of existing timeseries to determine location of output
+//        Map<String, TimeseriesMigrationData> migrationIndex = buildMigrationIndex(publishedContentReader, dataIndex);
 
-        Map<String, TimeseriesMigrationData> migrationIndex = buildMigrationIndex(publishedContentReader, dataIndex);
+//        doMigration(source, destination, publishedContentReader, destinationContentReader, destinationContentWriter, dataIndex, migrationIndex, datasetId);
 
-        doMigration(source, destination, publishedContentReader, destinationContentReader, destinationContentWriter, dataIndex, migrationIndex, datasetId);
+        PrintLastVersionOfEachDataset(source, publishedContentReader);
 
         // inject timeseries vales into the newly generated timeseries.
-        TimeseriesFinder finder = new TimeseriesFinder();
-        for (Path path : finder.findTimeseries(destination)) {
+//        TimeseriesFinder finder = new TimeseriesFinder();
+//        for (Path path : finder.findTimeseries(destination)) {
+//
+//            String datauri = "/" + destination.relativize(path).toString();
+//            String uri = datauri.substring(0, datauri.length() - "/data.json".length());
+//            String oldUri = Paths.get(uri).getParent().toString();
+//
+//            TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
+//
+//
+//            if (timeseriesMigrationData != null) {
+//                TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
+//
+//                newTimeseries.getDescription().setTitle(timeseriesMigrationData.title);
+//                newTimeseries.getDescription().setUnit(timeseriesMigrationData.unit);
+//                newTimeseries.getDescription().setPreUnit(timeseriesMigrationData.preunit);
+//                newTimeseries.getDescription().setKeyNote(timeseriesMigrationData.keynote);
+//                newTimeseries.setRelatedData(timeseriesMigrationData.relatedData);
+//
+//                destinationContentWriter.writeObject(newTimeseries, datauri);
+//            } else {
+//                System.out.println("migration data is null for uri: " + uri);
+//            }
+//        }
+    }
 
-            String datauri = "/" + destination.relativize(path).toString();
-            String uri = datauri.substring(0, datauri.length() - "/data.json".length());
-            String oldUri = Paths.get(uri).getParent().toString();
+    private static void PrintLastVersionOfEachDataset(Path source, ContentReader publishedContentReader) throws ZebedeeException, IOException {
+        List<TimeseriesDatasetFiles> datasetDownloads = getTimeseriesDatasets(source);
+        List<TimeseriesDatasetContainer> datasetContainers = loadPageObjectsForDatasets(publishedContentReader, datasetDownloads);
+        Map<String, Date> datasetIdToReleaseDate = new HashMap<>();
+        sortDatasetsByReleaseDate(datasetContainers);
 
-            TimeseriesMigrationData timeseriesMigrationData = migrationIndex.get(oldUri);
+        System.out.println("=====================================================");
+        System.out.println("=====================================================");
+        System.out.println("=====================================================");
 
+        for (TimeseriesDatasetContainer datasetContainer : datasetContainers) {
+            System.out.println("id: " + datasetContainer.timeseriesDatasetFiles.getCsdbId());
+            System.out.println("date: " + datasetContainer.timeSeriesDataset.getDescription().getReleaseDate());
+            datasetIdToReleaseDate.put(datasetContainer.timeseriesDatasetFiles.getCsdbId(), datasetContainer.timeSeriesDataset.getDescription().getReleaseDate());
+        }
 
-            if (timeseriesMigrationData != null) {
-                TimeSeries newTimeseries = (TimeSeries) destinationContentReader.getContent(uri);
+        System.out.println("=====================================================");
+        System.out.println("=====================================================");
+        System.out.println("=====================================================");
 
-                newTimeseries.getDescription().setTitle(timeseriesMigrationData.title);
-                newTimeseries.getDescription().setUnit(timeseriesMigrationData.unit);
-                newTimeseries.getDescription().setPreUnit(timeseriesMigrationData.preunit);
-                newTimeseries.getDescription().setKeyNote(timeseriesMigrationData.keynote);
-                newTimeseries.setRelatedData(timeseriesMigrationData.relatedData);
-
-                destinationContentWriter.writeObject(newTimeseries, datauri);
-            } else {
-                System.out.println("migration data is null for uri: " + uri);
-            }
+        for (Map.Entry<String, Date> dateEntry : datasetIdToReleaseDate.entrySet()) {
+            System.out.println(dateEntry);
         }
     }
 

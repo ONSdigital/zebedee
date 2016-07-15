@@ -8,8 +8,10 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.MathjaxEquationService;
 import com.github.onsdigital.zebedee.service.SvgService;
 import org.apache.batik.transcoder.TranscoderException;
@@ -17,6 +19,7 @@ import org.apache.commons.fileupload.FileUploadException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -54,6 +57,47 @@ public class Equation {
         return true;
     }
 
+    @DELETE
+    public boolean deleteEquation(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException, ZebedeeException, FileUploadException, TranscoderException {
+
+        Session session = Root.zebedee.sessions.get(request);
+        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+        String uri = request.getParameter("uri");
+
+        Path path = Paths.get(uri);
+
+        CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
+        com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation = (com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation) collectionReader.getContent(uri);
+
+        // delete each associated file.
+        for (AssociatedFile file : equation.getFiles()) {
+            Path pathToDelete = path.getParent().resolve(file.getFilename());
+
+            String uriToDelete = pathToDelete.toString();
+            deleteFile(request, session, collection, uriToDelete);
+        }
+
+        // delete the Json
+        deleteFile(request, session, collection, uri + ".json");
+
+        return true;
+    }
+
+    public void deleteFile(HttpServletRequest request, Session session, com.github.onsdigital.zebedee.model.Collection collection, String uriToDelete) throws IOException, ZebedeeException {
+        boolean result = Root.zebedee.collections.deleteContent(collection, uriToDelete, session);
+        if (result) {
+            Audit.Event.CONTENT_DELETED
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .content(uriToDelete)
+                    .user(session.email).log();
+        }
+    }
+
     public void generatePngOutput(
             com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation,
             Path path, CollectionWriter collectionWriter,
@@ -67,9 +111,8 @@ public class Equation {
 
             SvgService.convertSvgToPng(inputStream, outputStream);
 
-            String fileType = "generated-png";
             String fileName = pngPath.getFileName().toString();
-            addAssociatedFileToEquation(equation, fileType, fileName);
+            addAssociatedFileToEquation(equation, "generated-png", fileName, "png");
         }
     }
 
@@ -86,9 +129,8 @@ public class Equation {
             boolean validateJson = false;
             Root.zebedee.collections.writeContent(collection, svgPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
 
-            String fileType = "generated-svg";
             String fileName = svgPath.getFileName().toString();
-            addAssociatedFileToEquation(equation, fileType, fileName);
+            addAssociatedFileToEquation(equation, "generated-svg", fileName, "svg");
         }
         return svgOuput;
     }
@@ -96,7 +138,8 @@ public class Equation {
     private void addAssociatedFileToEquation(
             com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation,
             String fileType,
-            String fileName
+            String fileName,
+            String fileExtension
     ) {
         if (equation.getFiles() == null)
             equation.setFiles(new ArrayList<>());
@@ -112,7 +155,7 @@ public class Equation {
         if (!fileAlreadyListed) {
             AssociatedFile file = new AssociatedFile();
             file.setFilename(fileName);
-            file.setFileType("svg");
+            file.setFileType(fileExtension);
             file.setType(fileType);
             equation.getFiles().add(file);
         }

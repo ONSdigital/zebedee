@@ -1,14 +1,11 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.DownloadSection;
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
+import com.github.onsdigital.zebedee.data.processing.xls.TimeSeriesCellWriter;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.model.CollectionContentWriter;
-import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -21,6 +18,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+
 /**
  * Builds CSV, XLSX and potentially other files from a set of timeseries
  */
@@ -29,6 +28,8 @@ public class DataFileGenerator {
 
     ContentWriter contentWriter;
 
+    static TimeSeriesCellWriter xlsCellWriter = TimeSeriesCellWriter.getInstance();
+
     public DataFileGenerator(ContentWriter collectionWriter) {
         this.contentWriter = collectionWriter;
     }
@@ -36,7 +37,7 @@ public class DataFileGenerator {
     /**
      * Generate the files for this data publication
      *
-     * @param details details about the publication to derive the save path
+     * @param details  details about the publication to derive the save path
      * @param serieses the timeseries
      */
     public List<DownloadSection> generateDataDownloads(DataPublicationDetails details, TimeSerieses serieses) throws IOException, BadRequestException {
@@ -50,8 +51,8 @@ public class DataFileGenerator {
 
         // write the files
         List<DownloadSection> sections = new ArrayList<>();
-        sections.add( writeCSV(grid, this.contentWriter, root + ".csv") );
-        sections.add( writeXLS(grid, this.contentWriter, root + ".xlsx") );
+        sections.add(writeCSV(grid, this.contentWriter, root + ".csv"));
+        sections.add(writeXLS(grid, this.contentWriter, root + ".xlsx"));
 
         return sections;
     }
@@ -67,48 +68,41 @@ public class DataFileGenerator {
     /**
      * Write a DataGrid as an xlsx file
      *
-     * @param grid
+     * @param dataGrid
      * @param contentWriter
      * @param xlsPath
      * @throws IOException
      * @throws BadRequestException
      */
-    private DownloadSection writeXLS(DataGrid grid, ContentWriter contentWriter, String xlsPath) throws IOException, BadRequestException {
+    DownloadSection writeXLS(DataGrid dataGrid, ContentWriter contentWriter, String xlsPath) throws IOException, BadRequestException {
+        logDebug("Writing XLS file from DataGrid.").path(xlsPath).log();
         Workbook wb = new SXSSFWorkbook(30);
         Sheet sheet = wb.createSheet("data");
 
         // Add the metadata
-        int rownum = 0;
-        for (DataGridRow dataGridRow : grid.metadata) {
-            Row row = sheet.createRow(rownum++);
-
-            int colnum = 0;
-            row.createCell(colnum++).setCellValue(dataGridRow.label);
-            for (String gridCell : dataGridRow.cells) {
-                row.createCell(colnum++).setCellValue(gridCell);
-            }
+        for (DataGridRow dataGridRow : dataGrid.metadata) {
+            xlsCellWriter.writeCells(dataGridRow, sheet.createRow(getNextRowIndex(sheet)));
         }
 
         // Write the data
-        for (DataGridRow dataGridRow : grid.rows) {
-            Row row = sheet.createRow(rownum++);
-
-            int colnum = 0;
-            row.createCell(colnum++).setCellValue(dataGridRow.label);
-            for (String gridCell : dataGridRow.cells) {
-                row.createCell(colnum++).setCellValue(gridCell);
-            }
+        for (DataGridRow dataGridRow : dataGrid.rows) {
+            xlsCellWriter.writeCells(dataGridRow, sheet.createRow(getNextRowIndex(sheet)));
         }
 
         try (OutputStream stream = contentWriter.getOutputStream(xlsPath)) {
             wb.write(stream);
         }
 
+        logDebug("Complete.").path(xlsPath).log();
         return newDownloadSection("xlsx download", xlsPath);
     }
 
+    private int getNextRowIndex(Sheet sheet) {
+        // Rows are indexed from 0. Getting the current number of rows is equal to last index + 1.
+        return sheet.getPhysicalNumberOfRows();
+    }
+
     /**
-     *
      * @param grid
      * @param contentWriter
      * @param csvPath
@@ -120,7 +114,7 @@ public class DataFileGenerator {
             for (DataGridRow dataGridRow : grid.metadata) {
                 String[] row = new String[dataGridRow.cells.size() + 1];
                 row[0] = dataGridRow.label;
-                for(int i = 1; i <= dataGridRow.cells.size(); i++)
+                for (int i = 1; i <= dataGridRow.cells.size(); i++)
                     row[i] = dataGridRow.cells.get(i - 1);
                 writer.writeNext(row);
             }
@@ -128,7 +122,7 @@ public class DataFileGenerator {
             for (DataGridRow dataGridRow : grid.rows) {
                 String[] row = new String[dataGridRow.cells.size() + 1];
                 row[0] = dataGridRow.label;
-                for(int i = 1; i <= dataGridRow.cells.size(); i++)
+                for (int i = 1; i <= dataGridRow.cells.size(); i++)
                     row[i] = dataGridRow.cells.get(i - 1);
                 writer.writeNext(row);
             }

@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -122,6 +123,15 @@ public class PooledHttpClient {
         if (postParameters != null) {
             request.setEntity(new UrlEncodedFormEntity(postParameters));
         }
+        return validate(httpClient.execute(request));
+    }
+
+    public CloseableHttpResponse sendPost(String path, Map<String, String> headers, String content) throws IOException {
+        URI uri = buildPath(path);
+        HttpPost request = new HttpPost(uri);
+        addHeaders(headers, request);
+
+        request.setEntity(new StringEntity(content));
         return validate(httpClient.execute(request));
     }
 

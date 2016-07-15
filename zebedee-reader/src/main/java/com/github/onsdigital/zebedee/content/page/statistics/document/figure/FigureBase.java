@@ -9,6 +9,15 @@ import java.util.List;
  */
 public abstract class FigureBase extends Page {
     private List<AssociatedFile> files;
+    private String title;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public List<AssociatedFile> getFiles() {
         return files;

@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class Chart extends FigureBase {
 
-    private String title;
     private String subtitle;
     private String filename;
     private String source;
@@ -33,14 +32,6 @@ public class Chart extends FigureBase {
     @Override
     public PageType getType() {
         return PageType.chart;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getSubtitle() {

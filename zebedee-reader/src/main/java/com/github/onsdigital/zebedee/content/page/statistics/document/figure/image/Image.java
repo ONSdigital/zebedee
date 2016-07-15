@@ -5,20 +5,11 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.Fig
 
 public class Image extends FigureBase {
 
-    private String title;
     private String subtitle;
     private String filename;
     private String source;
     private String notes;
     private String altText;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public String getSubtitle() {
         return subtitle;

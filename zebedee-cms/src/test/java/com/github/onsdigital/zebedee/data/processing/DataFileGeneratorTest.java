@@ -185,8 +185,4 @@ public class DataFileGeneratorTest {
         }
     }
 
-    public void copyToDesktop(File rootDir, String name) throws Exception {
-        FileUtils.copyFileToDirectory(rootDir.listFiles()[0], new File(format("/Users/dave/Desktop/{0}", name)));
-    }
-
 }

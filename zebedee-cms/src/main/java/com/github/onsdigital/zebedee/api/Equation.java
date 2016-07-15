@@ -7,12 +7,14 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.service.MathjaxEquationService;
+import com.github.onsdigital.zebedee.service.EquationService;
+import com.github.onsdigital.zebedee.service.EquationServiceResponse;
 import com.github.onsdigital.zebedee.service.SvgService;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.fileupload.FileUploadException;
@@ -49,12 +51,42 @@ public class Equation {
         Path path = Paths.get(uri);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
 
-        String svgOuput = generateEquationSvg(request, equation, session, collection, path);
-        generatePngOutput(equation, path, collectionWriter, svgOuput);
+        // call mathjax server to get SVG + MML output
+        EquationServiceResponse equationServiceResponse = EquationService.render(equation.getContent());
 
+        // save output from mathjax
+        saveSvg(request, equation, session, collection, path, equationServiceResponse);
+        saveMml(request, equation, session, collection, path, equationServiceResponse);
+
+        // use the SVG from mathjax to generate a PNG
+        generatePngOutput(equation, path, collectionWriter, equationServiceResponse.svg);
+
+        // save the equation json
         writeEquationJsonToCollection(request, equation, session, collection, uri);
 
         return true;
+    }
+
+    public void saveMml(HttpServletRequest request, com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation, Session session, Collection collection, Path path, EquationServiceResponse equationServiceResponse) throws IOException, ZebedeeException, FileUploadException {
+        Path mmlPath = path.getParent().resolve(equation.getFilename() + ".mml");
+        try (InputStream inputStream = new ByteArrayInputStream(equationServiceResponse.mml.getBytes())) {
+            boolean validateJson = false;
+            Root.zebedee.collections.writeContent(collection, mmlPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
+
+            String fileName = mmlPath.getFileName().toString();
+            addAssociatedFileToEquation(equation, "generated-mml", fileName, "mml");
+        }
+    }
+
+    public void saveSvg(HttpServletRequest request, com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation, Session session, com.github.onsdigital.zebedee.model.Collection collection, Path path, EquationServiceResponse equationServiceResponse) throws IOException, ZebedeeException, FileUploadException {
+        Path svgPath = path.getParent().resolve(equation.getFilename() + ".svg");
+        try (InputStream inputStream = new ByteArrayInputStream(equationServiceResponse.svg.getBytes())) {
+            boolean validateJson = false;
+            Root.zebedee.collections.writeContent(collection, svgPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
+
+            String fileName = svgPath.getFileName().toString();
+            addAssociatedFileToEquation(equation, "generated-svg", fileName, "svg");
+        }
     }
 
     @DELETE
@@ -116,24 +148,6 @@ public class Equation {
         }
     }
 
-    public String generateEquationSvg(
-            HttpServletRequest request,
-            com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation,
-            Session session, com.github.onsdigital.zebedee.model.Collection collection,
-            Path path
-    ) throws IOException, ZebedeeException, FileUploadException {
-        Path svgPath = path.getParent().resolve(equation.getFilename() + ".svg");
-        String svgOuput = MathjaxEquationService.render(equation.getContent());
-
-        try (InputStream inputStream = new ByteArrayInputStream(svgOuput.getBytes())) {
-            boolean validateJson = false;
-            Root.zebedee.collections.writeContent(collection, svgPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
-
-            String fileName = svgPath.getFileName().toString();
-            addAssociatedFileToEquation(equation, "generated-svg", fileName, "svg");
-        }
-        return svgOuput;
-    }
 
     private void addAssociatedFileToEquation(
             com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation,

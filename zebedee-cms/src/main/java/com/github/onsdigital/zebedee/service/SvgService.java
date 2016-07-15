@@ -4,6 +4,7 @@ import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 
 import java.io.InputStream;
@@ -23,6 +24,9 @@ public class SvgService {
      */
     public static void convertSvgToPng(InputStream inputStream, OutputStream outputStream) throws TranscoderException {
         Transcoder transcoder = new PNGTranscoder();
+
+        transcoder.addTranscodingHint(ImageTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, new Float(0.2f));
+
         TranscoderInput transcoderInput = new TranscoderInput(inputStream);
         TranscoderOutput transcoderOutput = new TranscoderOutput(outputStream);
         transcoder.transcode(transcoderInput, transcoderOutput);

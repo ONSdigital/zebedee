@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.json;
 
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
+import com.github.onsdigital.zebedee.model.DeleteMarker;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
 
@@ -28,7 +30,7 @@ public class CollectionDescription extends CollectionBase {
     public Date publishStartDate; // The date the publish process was actually started
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
-    private Set<ContentDeleteMarker> deleteMarkers;
+    private Set<DeleteMarker> deleteMarkers;
 
     // Default to PUBLISHING_SUPPORT_TEAM
     public CollectionOwner collectionOwner = PUBLISHING_SUPPORT;
@@ -137,14 +139,21 @@ public class CollectionDescription extends CollectionBase {
         return collectionOwner == null ? PUBLISHING_SUPPORT : collectionOwner;
     }
 
-    public Set<ContentDeleteMarker> getDeleteMarkers() {
+    public Set<DeleteMarker> getDeleteMarkers() {
         if (this.deleteMarkers == null) {
             this.deleteMarkers = new HashSet<>();
         }
         return deleteMarkers;
     }
 
-    public CollectionDescription addDeleteMarker(ContentDeleteMarker marker) {
+    public Set<String> getDeleteMarkedContentUris() {
+        return getDeleteMarkers()
+                .stream()
+                .map(deleteMarker -> deleteMarker.getUri())
+                .collect(Collectors.toSet());
+    }
+
+    public CollectionDescription addDeleteMarker(DeleteMarker marker) {
         if (marker != null) {
             getDeleteMarkers().add(marker);
         }

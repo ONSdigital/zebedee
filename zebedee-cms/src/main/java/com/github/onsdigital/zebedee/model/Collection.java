@@ -186,6 +186,12 @@ public class Collection {
                         "Cannot use this release. It is being edited as part of another collection.");
             }
 
+            // TODO does this check need to be here.
+            if (zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString()).isPresent()) {
+                throw new ConflictException(
+                        "Cannot use this release. It is being deleted as part of another collection.");
+            }
+
             if (release.getDescription().getReleaseDate() == null) {
                 throw new BadRequestException("Could not use this release, the release has no release date.");
             }
@@ -506,10 +512,12 @@ public class Collection {
         // Is someone creating the same file in another collection?
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
 
+       boolean hasDeleteMarker = zebedee.checkAllCollectionsForDeleteMarker(uri).isPresent();
+
         // Does the current user have permission to edit?
         boolean permission = zebedee.permissions.canEdit(email);
 
-        if (!isBeingEdited && !exists && permission) {
+        if (!isBeingEdited && !hasDeleteMarker && !exists && permission) {
             // Copy from Published to in progress:
             Path path = inProgress.toPath(uri);
             PathUtils.create(path);
@@ -533,9 +541,14 @@ public class Collection {
      */
     public boolean edit(String email, String uri, CollectionWriter collectionWriter, Boolean recursive) throws IOException, BadRequestException {
         boolean result = false;
+        boolean hasDeleteMarker = zebedee.checkAllCollectionsForDeleteMarker(uri).isPresent();
 
-        if (isInProgress(uri))
+        if (hasDeleteMarker) {
+            return false;
+        }
+        if (isInProgress(uri)) {
             return true;
+        }
 
         Path source = find(uri);
 
@@ -546,7 +559,7 @@ public class Collection {
         // Does the user have permission to edit?
         boolean permission = zebedee.permissions.canEdit(email, description);
 
-        if (source != null && !isBeingEditedElsewhere && permission) {
+        if (source != null && !isBeingEditedElsewhere && !hasDeleteMarker && permission) {
             // Copy to in progress:
             if (this.isInCollection(uri)) {
                 Path destination = inProgress.toPath(uri);

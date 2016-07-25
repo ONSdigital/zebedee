@@ -27,9 +27,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 public class Zebedee {
 
@@ -193,6 +194,20 @@ public class Zebedee {
         }
 
         return result;
+    }
+
+    public Optional<Collection> checkAllCollectionsForDeleteMarker(String uri) throws IOException {
+        return collections.list()
+                .stream()
+                .filter(collection -> collection.description.getDeleteMarkedContentUris().contains(uri))
+                .findFirst();
+    }
+
+    public Optional<Collection> isBeingEditedInAnotherCollection(String uri) throws IOException {
+        return collections.list()
+                .stream()
+                .filter(collection -> collection.isInCollection(uri))
+                .findFirst();
     }
 
     public Path find(String uri) throws IOException {

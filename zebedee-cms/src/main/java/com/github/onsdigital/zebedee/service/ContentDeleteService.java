@@ -3,13 +3,16 @@ package com.github.onsdigital.zebedee.service;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.ContentDeleteMarker;
+import com.github.onsdigital.zebedee.json.DeleteMarkerJson;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.DeleteMarker;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,11 +20,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.BlockReason.ALREADY_MARKED_BY_THIS_COLLECTION;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.BlockReason.BEING_EDITED_BY_ANOTHER_COLLECTION;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.BlockReason.MARKED_BY_ANOTHER_COLLECTION;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
@@ -30,6 +35,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 public class ContentDeleteService {
 
     private static final String JSON_FILE_EXT = ".json";
+    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
     public static ContentDeleteService instance = null;
 
     public static ContentDeleteService getInstance() {
@@ -48,13 +54,14 @@ public class ContentDeleteService {
         List<Page> pagesToDelete = new ArrayList<>();
         ZebedeeReader reader = new ZebedeeReader();
 
-        for (ContentDeleteMarker marker : collection.description.getDeleteMarkers()) {
+        for (DeleteMarker marker : collection.description.getDeleteMarkers()) {
+            DeleteMarkerJson json = DeleteMarker.markerToJson(marker);
             Page page;
             try {
-                pagesToDelete.add(reader.getPublishedContent(marker.getUri()));
+                pagesToDelete.add(reader.getPublishedContent(json.getUri()));
             } catch (ZebedeeException | IOException ex) {
-                pagesToDelete.add((Page) reader.getCollectionContent(collection.description.id, session.id, marker
-                        .getUri()));
+                pagesToDelete.add((Page) reader.getCollectionContent(collection.description.id, session.id,
+                        json.getUri()));
             }
         }
 
@@ -69,28 +76,42 @@ public class ContentDeleteService {
         return result;
     }
 
-    public void addDeleteMarkerToCollection(Collection collection, ContentDeleteMarker... markers) throws ZebedeeException {
-        List<ContentDeleteMarker> markersToAdd = Arrays.asList(markers).stream()
-                .filter(marker -> !collection.description.getDeleteMarkers().contains(marker))
-                .collect(Collectors.toList());
-
-        if (!markersToAdd.isEmpty()) {
-            collection.description.getDeleteMarkers().addAll(markersToAdd);
-            saveManifest(collection);
+    public void addDeleteMarkerToCollection(Collection collection, DeleteMarker marker)
+            throws ZebedeeException, IOException {
+        if (collection.description.getDeleteMarkers().contains(marker)) {
+            throw new DeleteContentRequestDeniedException(collection, ALREADY_MARKED_BY_THIS_COLLECTION);
         }
+
+        Optional<Collection> blockingCollection = zebedeeCmsService.getZebedee()
+                .checkAllCollectionsForDeleteMarker(marker.getUri());
+
+        if (blockingCollection.isPresent()) {
+            throw new DeleteContentRequestDeniedException(blockingCollection.get(), MARKED_BY_ANOTHER_COLLECTION);
+        }
+
+        blockingCollection = zebedeeCmsService.getZebedee().isBeingEditedInAnotherCollection(marker.getUri());
+
+        if (blockingCollection.isPresent()) {
+            throw new DeleteContentRequestDeniedException(blockingCollection.get(), BEING_EDITED_BY_ANOTHER_COLLECTION);
+        }
+
+        collection.description.getDeleteMarkers().add(marker);
+        saveManifest(collection);
+        logDebug("Content marked for delete").addParameter("target", marker).log();
     }
 
     public boolean removeMarker(Collection collection, String contentUri) throws ZebedeeException {
-        Optional<ContentDeleteMarker> marker = collection.description.getDeleteMarkers()
+        DeleteMarker deleteMarker = new DeleteMarker().setUri(contentUri);
+        Optional<DeleteMarker> deleteMarkerOptional = collection.description.getDeleteMarkers()
                 .stream()
-                .filter(deleteMarker -> contentUri.equalsIgnoreCase(deleteMarker.getUri()))
+                .filter(existingMarker -> deleteMarker.getUri().equalsIgnoreCase(existingMarker.getUri()))
                 .findFirst();
 
-        if (marker.isPresent()) {
-            collection.description.getDeleteMarkers().remove(marker.get());
+        if (deleteMarkerOptional.isPresent()) {
+            collection.description.getDeleteMarkers().remove(deleteMarkerOptional.get());
             saveManifest(collection);
         }
-        return marker.isPresent();
+        return deleteMarkerOptional.isPresent();
     }
 
     private void saveManifest(Collection collection) throws ZebedeeException {

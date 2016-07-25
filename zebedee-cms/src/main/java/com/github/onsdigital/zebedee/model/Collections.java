@@ -447,7 +447,8 @@ public class Collections {
     ) throws ZebedeeException, IOException,
             FileUploadException {
 
-        if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0) {
+        if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0 || zebedee
+                .checkAllCollectionsForDeleteMarker(uri).isPresent()) {
             throw new ConflictException("This URI already exists");
         }
 
@@ -499,7 +500,6 @@ public class Collections {
             }
         }
 
-        // Save collection metadata
         collection.save();
 
         path = collection.getInProgressPath(uri);

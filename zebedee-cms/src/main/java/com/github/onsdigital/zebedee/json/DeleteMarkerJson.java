@@ -5,10 +5,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import java.nio.file.Paths;
+
 /**
  * POJO encapsulating details required when marking a content item to be deleted.
  */
-public class ContentDeleteMarker {
+public class DeleteMarkerJson {
+
+    static final String DATE_JSON_EXT = "/data.json";
 
     private String uri;
     private String title;
@@ -19,16 +23,21 @@ public class ContentDeleteMarker {
         return uri;
     }
 
-    public void setUri(String uri) {
+    public DeleteMarkerJson setUri(String uri) {
+        if (uri.toLowerCase().endsWith(DATE_JSON_EXT)) {
+            uri = Paths.get(uri).getParent().toString();
+        }
         this.uri = uri;
+        return this;
     }
 
     public String getCollectionId() {
         return collectionId;
     }
 
-    public void setCollectionId(String collectionId) {
+    public DeleteMarkerJson setCollectionId(String collectionId) {
         this.collectionId = collectionId;
+        return this;
     }
 
     public String getUser() {
@@ -39,12 +48,14 @@ public class ContentDeleteMarker {
         return title;
     }
 
-    public void setTitle(String title) {
+    public DeleteMarkerJson setTitle(String title) {
         this.title = title;
+        return this;
     }
 
-    public void setUser(String user) {
+    public DeleteMarkerJson setUser(String user) {
         this.user = user;
+        return this;
     }
 
     @Override

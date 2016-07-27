@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.json;
 
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -18,26 +19,10 @@ public class DeleteMarkerJson {
     private String title;
     private String user;
     private String collectionId;
+    private PageType type;
 
     public String getUri() {
         return uri;
-    }
-
-    public DeleteMarkerJson setUri(String uri) {
-        if (uri.toLowerCase().endsWith(DATE_JSON_EXT)) {
-            uri = Paths.get(uri).getParent().toString();
-        }
-        this.uri = uri;
-        return this;
-    }
-
-    public String getCollectionId() {
-        return collectionId;
-    }
-
-    public DeleteMarkerJson setCollectionId(String collectionId) {
-        this.collectionId = collectionId;
-        return this;
     }
 
     public String getUser() {
@@ -48,6 +33,27 @@ public class DeleteMarkerJson {
         return title;
     }
 
+    public PageType getType() {
+        return type;
+    }
+
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public DeleteMarkerJson setUri(String uri) {
+        if (uri.toLowerCase().endsWith(DATE_JSON_EXT)) {
+            uri = Paths.get(uri).getParent().toString();
+        }
+        this.uri = uri;
+        return this;
+    }
+
+    public DeleteMarkerJson setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
+        return this;
+    }
+
     public DeleteMarkerJson setTitle(String title) {
         this.title = title;
         return this;
@@ -55,6 +61,11 @@ public class DeleteMarkerJson {
 
     public DeleteMarkerJson setUser(String user) {
         this.user = user;
+        return this;
+    }
+
+    public DeleteMarkerJson setType(PageType type) {
+        this.type = type;
         return this;
     }
 

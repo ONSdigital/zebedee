@@ -15,6 +15,8 @@ public class ContentDetail {
 
     public List<ContentDetail> children;
     public List<Event> events;
+    private boolean deleteMarker = false;
+    public String contentPath;
 
     public ContentDetail() {
     }
@@ -45,6 +47,13 @@ public class ContentDetail {
         this.description = description;
     }
 
+    public ContentDetail(ContentDetailDescription description, String uri, String type, String contentPath) {
+        this.uri = uri;
+        this.type = type;
+        this.description = description;
+        this.contentPath = contentPath;
+    }
+
     /**
      * Creates a deep copy of this content detail instance, including child items.
      *
@@ -52,6 +61,7 @@ public class ContentDetail {
      */
     public ContentDetail clone() {
         ContentDetail cloned = new ContentDetail(this.description, this.uri, this.type);
+        cloned.contentPath = this.contentPath;
 
         if (this.children != null) {
             cloned.children = new ArrayList<>(this.children.size());
@@ -202,5 +212,9 @@ public class ContentDetail {
             if (child != null)
                 child.overlayContentDetail(contentDetail, depth + 1);
         }
+    }
+
+    public void setDeleteMarker(boolean hasDeleteMarker) {
+        this.deleteMarker = hasDeleteMarker;
     }
 }

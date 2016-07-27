@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.json.DeleteMarkerJson;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -17,9 +18,26 @@ public class DeleteMarker {
     private String title;
     private String user;
     private String collectionId;
+    private PageType type;
 
     public String getUri() {
         return uri;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public PageType getType() {
+        return type;
     }
 
     public DeleteMarker setUri(String uri) {
@@ -30,17 +48,9 @@ public class DeleteMarker {
         return this;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
     public DeleteMarker setTitle(String title) {
         this.title = title;
         return this;
-    }
-
-    public String getUser() {
-        return user;
     }
 
     public DeleteMarker setUser(String user) {
@@ -48,29 +58,14 @@ public class DeleteMarker {
         return this;
     }
 
-    public String getCollectionId() {
-        return collectionId;
-    }
-
     public DeleteMarker setCollectionId(String collectionId) {
         this.collectionId = collectionId;
         return this;
     }
 
-    public static DeleteMarker jsonToMarker(DeleteMarkerJson json) {
-        return new DeleteMarker()
-                .setUri(json.getUri())
-                .setTitle(json.getTitle())
-                .setCollectionId(json.getCollectionId())
-                .setUser(json.getUser());
-    }
-
-    public static DeleteMarkerJson markerToJson(DeleteMarker marker) {
-        return new DeleteMarkerJson()
-                .setUri(marker.getUri())
-                .setTitle(marker.getTitle())
-                .setCollectionId(marker.getCollectionId())
-                .setUser(marker.getUser());
+    public DeleteMarker setType(PageType type) {
+        this.type = type;
+        return this;
     }
 
     @Override
@@ -86,5 +81,23 @@ public class DeleteMarker {
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    public static DeleteMarker jsonToMarker(DeleteMarkerJson json) {
+        return new DeleteMarker()
+                .setUri(json.getUri())
+                .setTitle(json.getTitle())
+                .setCollectionId(json.getCollectionId())
+                .setUser(json.getUser())
+                .setType(json.getType());
+    }
+
+    public static DeleteMarkerJson markerToJson(DeleteMarker marker) {
+        return new DeleteMarkerJson()
+                .setUri(marker.getUri())
+                .setTitle(marker.getTitle())
+                .setCollectionId(marker.getCollectionId())
+                .setUser(marker.getUser())
+                .setType(marker.getType());
     }
 }

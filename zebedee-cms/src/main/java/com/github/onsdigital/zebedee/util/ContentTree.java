@@ -6,6 +6,9 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.service.ContentDeleteService;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentDetailModifier;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 
 import java.io.IOException;
 
@@ -19,8 +22,16 @@ public class ContentTree {
     private static ContentDetail publishedContentTree;
     private static ContentDetail publishedDataVisualisationsTree;
 
+    private static ContentDeleteService contentDeleteService = ContentDeleteService.getInstance();
+    private static ContentTreeNavigator contentTreeNavigator = ContentTreeNavigator.getInstance();
+
     private ContentTree() {
     }
+
+    private static ContentDetailModifier nodeDeleterMarker = (node) -> {
+        node.setDeleteMarker(true);
+        logDebug("Marking node as deleted").path(node.contentPath).log();
+    };
 
     /**
      * Gets the content tree structure for published content.
@@ -66,6 +77,7 @@ public class ContentTree {
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.inProgress, reader.getInProgress()));
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.complete, reader.getComplete()));
         publishedDetails.overlayDetails(ContentDetailUtil.resolveDetails(collection.reviewed, reader.getReviewed()));
+        contentDeleteService.overlayDeletedNodesInBrowseTree(publishedDetails);
         return publishedDetails;
     }
 

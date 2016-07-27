@@ -46,6 +46,7 @@ public class Zebedee {
     static final String APPLICATION_KEYS = "application-keys";
 
     public final Path path;
+    public final Path publishedContentPath;
     public final Content published;
     public final Collections collections;
     public final PublishedCollections publishedCollections;
@@ -63,7 +64,8 @@ public class Zebedee {
 
         // Validate the directory:
         this.path = path;
-        Path published = path.resolve(PUBLISHED);
+        this.publishedContentPath = path.resolve(PUBLISHED);
+
         Path collections = path.resolve(COLLECTIONS);
         Path publishedCollections = path.resolve(PUBLISHED_COLLECTIONS);
         Path users = path.resolve(USERS);
@@ -72,7 +74,7 @@ public class Zebedee {
         Path teams = path.resolve(TEAMS);
         Path applicationKeysPath = path.resolve(APPLICATION_KEYS);
 
-        if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
+        if (!Files.exists(publishedContentPath) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
                             + path.toAbsolutePath());
@@ -80,7 +82,7 @@ public class Zebedee {
 
 
         // Create published and ensure redirect
-        this.published = new Content(published);
+        this.published = new Content(publishedContentPath);
         this.dataIndex = new DataIndex(new FileSystemContentReader(this.published.path));
 
         Path redirectPath = this.published.path.resolve(Content.REDIRECT);

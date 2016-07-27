@@ -50,6 +50,7 @@ public class ContentDetailUtil {
 
                 if (page != null) { //Contents without type is null when deserialised. There should not be no such data
                     ContentDetail contentDetail = new ContentDetail(page.getDescription().getTitle(), page.getUri().toString(), page.getType().toString());
+                    contentDetail.contentPath = page.getUri().toString();
                     contentDetail.description.edition = page.getDescription().getEdition();
                     contentDetail.description.language = page.getDescription().getLanguage();
                     details.add(contentDetail);

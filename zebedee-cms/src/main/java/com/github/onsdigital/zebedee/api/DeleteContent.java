@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
+// TODO 1 THIS NEEDS AUDIT LOGGING AND COLLECTION HISTORY LOGGING.
+// TODO 2 check type of content being deleted - dont let them delete the homepage for example.
+
 /**
  * Mark content to be deleted.
  */
@@ -32,7 +35,9 @@ public class DeleteContent {
 
     @POST
     public DeleteContentResponse createDeleteMarker(HttpServletRequest request, HttpServletResponse response,
-                                                    DeleteMarkerJson deleteMarkerJson) throws IOException, ZebedeeException {
+                                                    DeleteMarkerJson deleteMarkerJson) throws IOException,
+            ZebedeeException {
+
         if (deleteMarkerJson == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return new DeleteContentResponse(HttpStatus.SC_BAD_REQUEST);
@@ -52,7 +57,8 @@ public class DeleteContent {
     @GET
     public DeleteContentResponse getDeleteMarkers(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
-        // TODO take param for scope i.e. collection or all.
+
+        // TODO if collection ID scope = collection. Otherwise all delete items.
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
         Session session = zebedeeCmsService.getSession(request);
 

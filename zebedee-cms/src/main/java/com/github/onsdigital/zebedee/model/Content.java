@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,8 @@ public class Content {
     public static final String REDIRECT = "redirect.txt";
     public static final String DATA_VIS_DIR = "visualisations";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
+
+    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
 
     public final Path path;
     public final Path dataVisualisationsPath;
@@ -224,20 +227,21 @@ public class Content {
         return nestedDetails(path, collectionOwner);
     }
 
-    private ContentDetail nestedDetails(Path path, CollectionOwner collectionOwner) throws IOException {
-        ContentDetail detail = details(path.resolve("data.json"));
+    private ContentDetail nestedDetails(Path contentPath, CollectionOwner collectionOwner) throws IOException {
+        ContentDetail detail = details(contentPath.resolve("data.json"));
 
         // if the folder is empty put in an empty node with just a name.
         if (detail == null) {
             detail = new ContentDetail();
-            detail.description = new ContentDetailDescription(path.getFileName().toString());
+            detail.description = new ContentDetailDescription(contentPath.getFileName().toString());
             detail.uri = "";
         }
 
+        detail.contentPath = "/" + zebedeeCmsService.getZebedee().publishedContentPath.relativize(contentPath);
         detail.children = new ArrayList<>();
 
         // todo: remove timeseries filter once we are caching the browse tree.
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentPath)) {
             for (Path entry : stream) {
                 if (isVisibleForCollectionOwner(collectionOwner, entry)) {
                     ContentDetail child = nestedDetails(entry, collectionOwner);
@@ -265,7 +269,7 @@ public class Content {
                 });
             }
         } catch (IllegalArgumentException e) {
-            logError(e, "Failed to sort content detail items").addParameter("path", path.toString()).log();
+            logError(e, "Failed to sort content detail items").addParameter("path", contentPath.toString()).log();
         }
 
         return detail;

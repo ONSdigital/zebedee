@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.service.content.navigation;
 
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.model.Content;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,6 +66,28 @@ public class ContentTreeNavigator {
     public Optional<ContentDetail> findContentDetail(ContentDetail browseTree, Path targetNodeUri) {
         Iterator<Path> pathIterator = createPathIterator(targetNodeUri);
         return find(pathIterator, browseTree);
+    }
+
+    public List<ContentDetail> getDeleteChildren(Path parentUri, ContentDetail browseTree) {
+        List<ContentDetail> children = new ArrayList<>();
+        Optional<ContentDetail> targetNode = find(createPathIterator(parentUri), browseTree);
+
+        if (targetNode.isPresent()) {
+            return addChildren(children, targetNode.get());
+        }
+        return null;
+    }
+
+    private List<ContentDetail> addChildren(List<ContentDetail> masterList, ContentDetail node) {
+        if (node != null && node.children != null && !node.children.isEmpty()) {
+
+            node.children.stream().forEach(child -> {
+                masterList.add(child);
+                addChildren(masterList, child);
+            });
+            return masterList;
+        }
+        return null;
     }
 
     /**

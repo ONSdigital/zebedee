@@ -447,8 +447,13 @@ public class Collections {
     ) throws ZebedeeException, IOException,
             FileUploadException {
 
-        if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0 || zebedee
-                .checkAllCollectionsForDeleteMarker(uri).isPresent()) {
+        if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0) {
+            throw new ConflictException("This URI already exists");
+        }
+
+        try {
+            zebedee.checkAllCollectionsForDeleteMarker(uri);
+        } catch (DeleteContentRequestDeniedException ex) {
             throw new ConflictException("This URI already exists");
         }
 

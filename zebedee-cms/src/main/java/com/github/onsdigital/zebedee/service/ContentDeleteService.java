@@ -10,10 +10,12 @@ import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.json.DeleteMarkerJson;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentDetailModifier;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
+import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 
 import java.io.IOException;
@@ -32,9 +34,7 @@ import static com.github.onsdigital.zebedee.content.page.base.PageType.home_page
 import static com.github.onsdigital.zebedee.content.page.base.PageType.product_page;
 import static com.github.onsdigital.zebedee.content.page.base.PageType.taxonomy_landing_page;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.alreadyMarkedDeleteInCurrentCollectionError;
-import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.deleteForbiddenForPageTypeError;
-import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
@@ -105,34 +105,30 @@ public class ContentDeleteService {
         return result;
     }
 
-    public void addDeleteMarkerToCollection(Collection collection, DeleteMarker marker)
+    public void addDeleteMarkerToCollection(Session session, Collection collection, DeleteMarker marker)
             throws ZebedeeException, IOException {
-
+        // Page type not deletable.
         if (PAGE_TYPE_DELETE_BLACKLIST.contains(marker.getType())) {
             throw deleteForbiddenForPageTypeError(marker.getType());
         }
 
+        // Delete marker exists already.
         if (collection.description.getDeleteMarkers().contains(marker)) {
-            throw alreadyMarkedDeleteInCurrentCollectionError(collection);
+            throw alreadyMarkedDeleteInCurrentCollectionError(collection, marker.getUri());
         }
 
-        Optional<Collection> blockingCollection = zebedeeCmsService.getZebedee()
-                .checkAllCollectionsForDeleteMarker(marker.getUri());
-
-        if (blockingCollection.isPresent()) {
-            throw markedDeleteInAnotherCollectionError(blockingCollection.get());
-        }
-
-        blockingCollection = zebedeeCmsService.getZebedee().isBeingEditedInAnotherCollection(marker.getUri());
-
-        if (blockingCollection.isPresent()) {
-            throw beingEditedByAnotherCollectionError(blockingCollection.get());
+        // Check every child of this delete.
+        for (DeleteMarker pendingDelete : getAllDeletesForNode(marker)) {
+            logDebug(pendingDelete.getUri()).log();
+            zebedeeCmsService.getZebedee().checkAllCollectionsForDeleteMarker(pendingDelete.getUri());
+            zebedeeCmsService.getZebedee().isBeingEditedInAnotherCollection(pendingDelete.getUri(), session);
         }
 
         collection.description.getDeleteMarkers().add(marker);
         saveManifest(collection);
         logDebug("Content marked for delete").addParameter("target", marker).log();
     }
+
 
     public boolean removeMarker(Collection collection, String contentUri) throws ZebedeeException {
         DeleteMarker deleteMarker = new DeleteMarker().setUri(contentUri);
@@ -163,15 +159,6 @@ public class ContentDeleteService {
         return allDeleteMarkers;
     }
 
-    public boolean hasDeleteMarker(Path uri) throws IOException {
-        final Path targetPath = !uri.getFileName().equals(DATA_JSON) ? uri.resolve(DATA_JSON) : uri;
-
-        Path publishedContentPath = zebedeeCmsService.getZebedee().publishedContentPath;
-        return getAllDeleteMarkerUris().stream().filter(deletedUri ->
-                publishedContentPath.resolve(deletedUri).equals(targetPath)
-        ).findFirst().isPresent();
-    }
-
     private void saveManifest(Collection collection) throws ZebedeeException {
         try (OutputStream output = Files.newOutputStream(manifestPath(collection))) {
             Serialiser.serialise(output, collection.description);
@@ -179,6 +166,25 @@ public class ContentDeleteService {
             // TODO probably want exception type for this.
             logError(e, "Error while serialising delete markers...").logAndThrow(BadRequestException.class);
         }
+    }
+
+    public List<DeleteMarker> getAllDeletesForNode(DeleteMarker parentDeleteMarker)
+            throws IOException {
+        List<ContentDetail> deletes = contentTreeNavigator.getDeleteChildren(Paths.get(parentDeleteMarker.getUri()),
+                ContentTree.get(CollectionOwner.PUBLISHING_SUPPORT));
+
+        List<DeleteMarker> results = new ArrayList<>();
+        results.add(parentDeleteMarker);
+
+        results.addAll(deletes.stream().map(node -> {
+            return new DeleteMarker()
+                    .setType(PageType.valueOf(node.type))
+                    .setUser(parentDeleteMarker.getUser())
+                    .setUri(node.contentPath)
+                    .setCollectionId(parentDeleteMarker.getCollectionId())
+                    .setTitle(node.contentPath);
+        }).collect(Collectors.toList()));
+        return results;
     }
 
     private Path manifestPath(com.github.onsdigital.zebedee.model.Collection collection) {

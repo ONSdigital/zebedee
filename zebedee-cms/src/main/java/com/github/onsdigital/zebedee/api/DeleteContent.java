@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.DeleteMarkerJson;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.response.DeleteContentResponse;
-import com.github.onsdigital.zebedee.model.DeleteMarker;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -20,6 +19,8 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+
+import static com.github.onsdigital.zebedee.model.DeleteMarker.jsonToMarker;
 
 // TODO 1 THIS NEEDS AUDIT LOGGING AND COLLECTION HISTORY LOGGING.
 // TODO 2 check type of content being deleted - dont let them delete the homepage for example.
@@ -50,7 +51,7 @@ public class DeleteContent {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
-        deleteService.addDeleteMarkerToCollection(collection, DeleteMarker.jsonToMarker(deleteMarkerJson));
+        deleteService.addDeleteMarkerToCollection(session, collection, jsonToMarker(deleteMarkerJson));
         return new DeleteContentResponse(HttpStatus.SC_CREATED);
     }
 

@@ -187,7 +187,9 @@ public class Collection {
             }
 
             // TODO does this check need to be here.
-            if (zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString()).isPresent()) {
+            try {
+                zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString());
+            }  catch (DeleteContentRequestDeniedException ex) {
                 throw new ConflictException(
                         "Cannot use this release. It is being deleted as part of another collection.");
             }
@@ -512,7 +514,12 @@ public class Collection {
         // Is someone creating the same file in another collection?
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
 
-       boolean hasDeleteMarker = zebedee.checkAllCollectionsForDeleteMarker(uri).isPresent();
+       boolean hasDeleteMarker = false;
+        try {
+            zebedee.checkAllCollectionsForDeleteMarker(uri);
+        } catch (DeleteContentRequestDeniedException ex) {
+            hasDeleteMarker = true;
+        }
 
         // Does the current user have permission to edit?
         boolean permission = zebedee.permissions.canEdit(email);
@@ -541,11 +548,13 @@ public class Collection {
      */
     public boolean edit(String email, String uri, CollectionWriter collectionWriter, Boolean recursive) throws IOException, BadRequestException {
         boolean result = false;
-        boolean hasDeleteMarker = zebedee.checkAllCollectionsForDeleteMarker(uri).isPresent();
 
-        if (hasDeleteMarker) {
+        try {
+            zebedee.checkAllCollectionsForDeleteMarker(uri);
+        } catch (DeleteContentRequestDeniedException ex) {
             return false;
         }
+
         if (isInProgress(uri)) {
             return true;
         }
@@ -559,7 +568,7 @@ public class Collection {
         // Does the user have permission to edit?
         boolean permission = zebedee.permissions.canEdit(email, description);
 
-        if (source != null && !isBeingEditedElsewhere && !hasDeleteMarker && permission) {
+        if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
             if (this.isInCollection(uri)) {
                 Path destination = inProgress.toPath(uri);

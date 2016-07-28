@@ -1,10 +1,13 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
@@ -17,6 +20,7 @@ import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.Sessions;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.Users;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -29,6 +33,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
@@ -198,18 +204,28 @@ public class Zebedee {
         return result;
     }
 
-    public Optional<Collection> checkAllCollectionsForDeleteMarker(String uri) throws IOException {
-        return collections.list()
+    public void checkAllCollectionsForDeleteMarker(String uri) throws IOException,
+            DeleteContentRequestDeniedException {
+        Optional<Collection> result = collections.list()
                 .stream()
                 .filter(collection -> collection.description.getDeleteMarkedContentUris().contains(uri))
                 .findFirst();
+        if (result.isPresent()) {
+            throw markedDeleteInAnotherCollectionError(result.get(), uri);
+        }
     }
 
-    public Optional<Collection> isBeingEditedInAnotherCollection(String uri) throws IOException {
-        return collections.list()
+    public void isBeingEditedInAnotherCollection(String uri, Session session) throws IOException,
+            ZebedeeException {
+        Optional<Collection> result = collections.list()
                 .stream()
                 .filter(collection -> collection.isInCollection(uri))
                 .findFirst();
+        if (result.isPresent()) {
+            Page conflict = new ZebedeeCollectionReader(this, result.get(), session).getContent(Paths.get(uri)
+                    .getParent().toString());
+            throw beingEditedByAnotherCollectionError(result.get(), conflict.getDescription().getTitle());
+        }
     }
 
     public Path find(String uri) throws IOException {

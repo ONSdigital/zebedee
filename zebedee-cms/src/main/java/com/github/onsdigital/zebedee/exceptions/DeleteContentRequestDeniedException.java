@@ -4,7 +4,8 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.json.DeleteMarkerJson;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.http.HttpStatus;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+
+import java.util.Arrays;
 
 import static java.text.MessageFormat.format;
 
@@ -15,12 +16,12 @@ import static java.text.MessageFormat.format;
 public class DeleteContentRequestDeniedException extends ZebedeeException {
 
     private static final String MARKED_BY_ANOTHER_COLLECTION
-            = "Resource is currently marked deleted in Collection: {0}";
+        = "Collection: <strong>{1}</strong> has a delete lock on resource: <strong>{0}</strong>";
 
     private static final String BEING_EDITED_BY_ANOTHER_COLLECTION
-            = "Resource is currently being edited in Collection: {0}.";
+            = "Collection: <strong>{1}</strong> has an edit lock on resource: <strong>{0}</strong>";
 
-    private static final String  ALREADY_MARKED_BY_THIS_COLLECTION
+    private static final String ALREADY_MARKED_BY_THIS_COLLECTION
             = "Resource is already marked for delete in this collection.";
 
     private static final String PAGE_TYPE_CANNOT_BE_DELETED
@@ -37,32 +38,38 @@ public class DeleteContentRequestDeniedException extends ZebedeeException {
     /**
      * Delete not allowed as content is currently being edited in this collection.
      */
-    public static DeleteContentRequestDeniedException beingEditedByAnotherCollectionError(Collection collection) {
+    public static DeleteContentRequestDeniedException beingEditedByAnotherCollectionError(
+            Collection collection, String pageTitle) {
         return new DeleteContentRequestDeniedException(BEING_EDITED_BY_ANOTHER_COLLECTION,
-                HttpStatus.SC_BAD_REQUEST, collection.description.name);
+                HttpStatus.SC_BAD_REQUEST, pageTitle, collection.description.name);
     }
 
     /**
      * Delete not allowed as content is already marked for delete in this collection.
      */
-        public static DeleteContentRequestDeniedException alreadyMarkedDeleteInCurrentCollectionError(Collection collection) {
-            return new DeleteContentRequestDeniedException(ALREADY_MARKED_BY_THIS_COLLECTION,
+    public static DeleteContentRequestDeniedException alreadyMarkedDeleteInCurrentCollectionError(
+            Collection collection, String uri) {
+        return new DeleteContentRequestDeniedException(ALREADY_MARKED_BY_THIS_COLLECTION,
                 HttpStatus.SC_BAD_REQUEST, collection.description.name);
     }
 
     /**
      * Delete not allowed as content is currently being edited in another collection.
      */
-    public static DeleteContentRequestDeniedException markedDeleteInAnotherCollectionError(Collection collection) {
+    public static DeleteContentRequestDeniedException markedDeleteInAnotherCollectionError(
+            Collection collection, String uri) {
         return new DeleteContentRequestDeniedException(MARKED_BY_ANOTHER_COLLECTION,
-                HttpStatus.SC_BAD_REQUEST, collection.description.name);
+                HttpStatus.SC_BAD_REQUEST, uri, collection.description.name);
     }
 
     private static String buildDetailedMessage(String reason, Object... args) {
+        if (Arrays.asList(args).isEmpty()) {
+            return reason;
+        }
         return format(reason, args);
     }
 
-    private DeleteContentRequestDeniedException(String message, int status, Object...args) {
+    private DeleteContentRequestDeniedException(String message, int status, Object... args) {
         super(buildDetailedMessage(message, args), status);
     }
 }

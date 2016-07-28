@@ -18,6 +18,8 @@ source $CONFIG && docker run -d                                      \
   --env=db_audit_password=$AUDIT_DB_PASSWORD                         \
   --env=db_audit_url=$AUDIT_DB_URI                                   \
   --env=db_audit_username=$AUDIT_DB_USERNAME                         \
+  --env=enable_influx_reporting=$ENABLE_INFLUX_REPORTING             \
+  --env=influxdb_url=$INFLUXDB_URL                                   \
   --env=MATHJAX_SERVICE_URL=http://mathjax:8080                      \
   --env=publish_url=$PUBLISH_URL                                     \
   --env=publish_verification_enabled=$VERIFY_PUBLICATIONS            \

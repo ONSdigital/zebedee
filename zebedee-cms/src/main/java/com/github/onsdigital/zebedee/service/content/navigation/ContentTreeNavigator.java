@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.service.content.navigation;
 
 import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.model.Content;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +32,7 @@ public class ContentTreeNavigator {
     private ContentTreeNavigator() {
     }
 
-    public boolean updateNodeAndDescendants(ContentDetail browseTree, Path targetNodeUri, ContentDetailModifier function) {
+    public boolean updateNodeAndDescendants(ContentDetail browseTree, Path targetNodeUri, ContentDetailFunction function) {
         // find the parent node to update.
         Optional<ContentDetail> targetNode = findContentDetail(browseTree, targetNodeUri);
 
@@ -44,7 +43,7 @@ public class ContentTreeNavigator {
         return false;
     }
 
-    private void applyAndPropagate(ContentDetail node, ContentDetailModifier function) {
+    public void applyAndPropagate(ContentDetail node, ContentDetailFunction function) {
         if (node != null) {
             function.apply(node);
             if (node.children != null || !node.children.isEmpty()) {
@@ -53,15 +52,16 @@ public class ContentTreeNavigator {
         }
     }
 
-    public boolean updateNode(ContentDetail browseTree, Path targetNodeUri, ContentDetailModifier function) {
-        Optional<ContentDetail> targetNode = findContentDetail(browseTree, targetNodeUri);
-
-        if (targetNode.isPresent()) {
-            function.apply(targetNode.get());
-            return true;
+    public void search(ContentDetail node, ContentDetailSearch searcher) {
+        if (node != null) {
+            searcher.search(node);
+            if (node.children != null || !node.children.isEmpty()) {
+                node.children.stream().forEach(child -> search(child, searcher));
+            }
         }
-        return false;
     }
+
+    // TODO is it necessary to pass in the whole tree? can this be obtained within the method?
 
     public Optional<ContentDetail> findContentDetail(ContentDetail browseTree, Path targetNodeUri) {
         Iterator<Path> pathIterator = createPathIterator(targetNodeUri);

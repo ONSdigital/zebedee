@@ -7,6 +7,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Created by dave on 7/25/16.
  */
@@ -66,6 +69,10 @@ public class DeleteMarker {
     public DeleteMarker setType(PageType type) {
         this.type = type;
         return this;
+    }
+
+    public Path getPath() {
+        return Paths.get(this.getUri());
     }
 
     @Override

@@ -578,6 +578,7 @@ public class Collection {
                     FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
                 } else {
                     PathUtils.moveFilesInDirectory(source, destination);
+                    collections.removeEmptyCollectionDirectories(source);
                 }
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
@@ -691,6 +692,7 @@ public class Collection {
                 FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
             } else {
                 PathUtils.moveFilesInDirectory(source, destination);
+                collections.removeEmptyCollectionDirectories(source);
             }
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));

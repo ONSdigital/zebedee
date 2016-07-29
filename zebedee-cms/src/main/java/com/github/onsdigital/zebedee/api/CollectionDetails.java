@@ -23,6 +23,8 @@ import java.util.Set;
 @Api
 public class CollectionDetails {
 
+    private static ContentDeleteService contentDeleteService = ContentDeleteService.getInstance();
+
     /**
      * Retrieves a CollectionDetail object at the endpoint /CollectionDetails/[CollectionName]
      *
@@ -61,7 +63,7 @@ public class CollectionDetails {
         result.teams = collection.description.teams;
         result.releaseUri = collection.description.releaseUri;
         result.collectionOwner = collection.description.collectionOwner;
-        result.deleteMarkers = ContentDeleteService.getInstance().getDeleteItemsByCollection(collection, session);
+        result.pendingDeletes = contentDeleteService.getDeleteItemsByCollection(collection);
 
         result.inProgress = ContentDetailUtil.resolveDetails(collection.inProgress, collectionReader.getInProgress());
         result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());

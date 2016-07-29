@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.json;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentDetailFunction;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,7 +32,7 @@ public class CollectionDescription extends CollectionBase {
     public Date publishStartDate; // The date the publish process was actually started
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
-    private Set<DeleteMarker> deleteMarkers;
+    private List<ContentDetail> pendingDeletes;
 
     // Default to PUBLISHING_SUPPORT_TEAM
     public CollectionOwner collectionOwner = PUBLISHING_SUPPORT;
@@ -139,24 +141,22 @@ public class CollectionDescription extends CollectionBase {
         return collectionOwner == null ? PUBLISHING_SUPPORT : collectionOwner;
     }
 
-    public Set<DeleteMarker> getDeleteMarkers() {
-        if (this.deleteMarkers == null) {
-            this.deleteMarkers = new HashSet<>();
+    public List<ContentDetail> getPendingDeletes() {
+        if (this.pendingDeletes == null) {
+            this.pendingDeletes = new ArrayList<>();
         }
-        return deleteMarkers;
+        return pendingDeletes;
     }
 
-    public Set<String> getDeleteMarkedContentUris() {
-        return getDeleteMarkers()
+    public void cancelPendingDelete(String uri) {
+        setPendingDeletes(getPendingDeletes()
                 .stream()
-                .map(deleteMarker -> deleteMarker.getUri())
-                .collect(Collectors.toSet());
+                .filter(pd -> !pd.contentPath.equals(uri))
+                .collect(Collectors.toList())
+        );
     }
 
-    public CollectionDescription addDeleteMarker(DeleteMarker marker) {
-        if (marker != null) {
-            getDeleteMarkers().add(marker);
-        }
-        return this;
+    public void setPendingDeletes(List<ContentDetail> pendingDeletes) {
+        this.pendingDeletes = pendingDeletes;
     }
 }

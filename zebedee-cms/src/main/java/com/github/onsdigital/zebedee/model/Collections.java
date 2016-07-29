@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.Future;
 
@@ -138,6 +139,7 @@ public class Collections {
         CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, null, uri);
         // Attempt to complete:
         if (collection.complete(session.email, uri, recursive)) {
+            removeEmptyCollectionDirectories(path);
             collection.save();
             getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_ITEM_COMPLETED));
         } else {
@@ -600,10 +602,36 @@ public class Collections {
         }
         collection.save();
         if (deleted) {
+            removeEmptyCollectionDirectories(path);
             getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
                     eventType, uri));
         }
         return deleted;
+    }
+
+    public static void removeEmptyCollectionDirectories(Path path) throws IOException {
+        if (!Files.isDirectory(path)) {
+            path = path.getParent();
+        }
+        if (isEmpty(path)) {
+            Path temp = path;
+            while (!isCollectionRoot(temp.getFileName())) {
+                if (isEmpty(temp)) {
+                    Files.delete(temp);
+                }
+                temp = temp.getParent();
+            }
+        }
+    }
+
+    private static boolean isCollectionRoot(Path path) {
+        return Collection.IN_PROGRESS.equals(path.toString())
+                || Collection.REVIEWED.equals(path.toString())
+                || Collection.COMPLETE.equals(path.toString());
+    }
+
+    private static boolean isEmpty(Path path) {
+        return Arrays.asList(path.toFile().listFiles()).isEmpty();
     }
 
     /**

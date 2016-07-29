@@ -16,10 +16,14 @@ import static java.text.MessageFormat.format;
 public class DeleteContentRequestDeniedException extends ZebedeeException {
 
     private static final String MARKED_BY_ANOTHER_COLLECTION
-        = "Collection: <strong>{1}</strong> has a delete lock on resource: <strong>{0}</strong>";
+        = "Collection: {1} has a delete lock on resource: {0}";
 
     private static final String BEING_EDITED_BY_ANOTHER_COLLECTION
-            = "Collection: <strong>{1}</strong> has an edit lock on resource: <strong>{0}</strong>";
+            = "Collection: {1} has an edit lock on resource: {0}";
+
+
+    private static final String BEING_EDITED_IN_THIS_COLLECTION = "\"{0}\" contains changes made in this collection. " +
+            "If you wish to delete this resource you must delete the changes first.";
 
     private static final String ALREADY_MARKED_BY_THIS_COLLECTION
             = "Resource is already marked for delete in this collection.";
@@ -34,6 +38,15 @@ public class DeleteContentRequestDeniedException extends ZebedeeException {
         return new DeleteContentRequestDeniedException(PAGE_TYPE_CANNOT_BE_DELETED,
                 HttpStatus.SC_FORBIDDEN, pageType.getDisplayName());
     }
+
+    /**
+     * Delete not allowed as content is currently being edited in this collection.
+     */
+    public static DeleteContentRequestDeniedException beingEditedByThisCollectionError(String pageTitle) {
+        return new DeleteContentRequestDeniedException(BEING_EDITED_IN_THIS_COLLECTION,
+                HttpStatus.SC_BAD_REQUEST, pageTitle);
+    }
+
 
     /**
      * Delete not allowed as content is currently being edited in this collection.

@@ -68,7 +68,7 @@ public class DeleteContent {
         }
 
         InputStream inputStream = zebedeeCmsService.objectAsInputStream(
-                deleteService.getDeleteItemsByCollection(collection, session));
+                deleteService.getDeleteItemsByCollection(collection));
         IOUtils.copy(inputStream, response.getOutputStream());
 
         return new DeleteContentResponse(HttpStatus.SC_OK);
@@ -97,11 +97,7 @@ public class DeleteContent {
             return new DeleteContentResponse(HttpStatus.SC_BAD_REQUEST);
         }
 
-        if (deleteService.removeMarker(collection, contentUri.get())) {
-            return new DeleteContentResponse(HttpStatus.SC_OK);
-
-        } else {
-            return new DeleteContentResponse(HttpStatus.SC_NOT_FOUND);
-        }
+        deleteService.cancelPendingDelete(collection, contentUri.get());
+        return new DeleteContentResponse(HttpStatus.SC_OK);
     }
 }

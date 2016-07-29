@@ -1,13 +1,13 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
@@ -31,9 +31,12 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
@@ -204,27 +207,40 @@ public class Zebedee {
         return result;
     }
 
-    public void checkAllCollectionsForDeleteMarker(String uri) throws IOException,
-            DeleteContentRequestDeniedException {
-        Optional<Collection> result = collections.list()
-                .stream()
-                .filter(collection -> collection.description.getDeleteMarkedContentUris().contains(uri))
-                .findFirst();
-        if (result.isPresent()) {
-            throw markedDeleteInAnotherCollectionError(result.get(), uri);
+    public void checkAllCollectionsForDeleteMarker(String uri) throws IOException, DeleteContentRequestDeniedException {
+        Path searchValue = Paths.get(uri);
+
+        for (Collection collection : collections.list()) {
+            if (collection.description.getPendingDeletes()
+                    .stream()
+                    .filter(existingDeleteRoot -> searchValue.startsWith(Paths.get(existingDeleteRoot.contentPath)))
+                    .findFirst().isPresent()) {
+                throw markedDeleteInAnotherCollectionError(collection, uri);
+            }
         }
     }
 
-    public void isBeingEditedInAnotherCollection(String uri, Session session) throws IOException,
+    private List<ContentDetail> getAllPendingDeletes() throws IOException {
+        List<ContentDetail> allPendingDeletes = new ArrayList<>();
+        collections.list().forEach(collection -> allPendingDeletes.addAll(collection.description.getPendingDeletes()));
+        return allPendingDeletes;
+    }
+
+    public void isBeingEditedInAnotherCollection(Collection workingCollection, String uri, Session session) throws
+            IOException,
             ZebedeeException {
-        Optional<Collection> result = collections.list()
+        Optional<Collection> blockingCollection = collections.list()
                 .stream()
                 .filter(collection -> collection.isInCollection(uri))
                 .findFirst();
-        if (result.isPresent()) {
-            Page conflict = new ZebedeeCollectionReader(this, result.get(), session).getContent(Paths.get(uri)
-                    .getParent().toString());
-            throw beingEditedByAnotherCollectionError(result.get(), conflict.getDescription().getTitle());
+        if (blockingCollection.isPresent()) {
+            String title = new ZebedeeCollectionReader(this, blockingCollection.get(), session)
+                    .getContent(uri).getDescription().getTitle();
+
+            if (workingCollection.description.id.equals(blockingCollection.get().description.id)) {
+                throw beingEditedByThisCollectionError(title);
+            }
+            throw beingEditedByAnotherCollectionError(blockingCollection.get(), title);
         }
     }
 

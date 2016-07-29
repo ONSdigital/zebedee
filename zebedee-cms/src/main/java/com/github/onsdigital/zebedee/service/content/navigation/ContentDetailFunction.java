@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
  * Created by dave on 7/27/16.
  */
 @FunctionalInterface
-public interface ContentDetailModifier {
+public interface ContentDetailFunction {
 
     void apply(ContentDetail node);
 }

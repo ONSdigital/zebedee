@@ -15,7 +15,6 @@ import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -28,7 +27,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -95,6 +93,31 @@ public class Collections {
         } catch (StringIndexOutOfBoundsException e) {
             return id;
         }
+    }
+
+    public static void removeEmptyCollectionDirectories(Path path) throws IOException {
+        if (!Files.isDirectory(path)) {
+            path = path.getParent();
+        }
+        if (isEmpty(path)) {
+            Path temp = path;
+            while (!isCollectionRoot(temp.getFileName())) {
+                if (isEmpty(temp)) {
+                    Files.delete(temp);
+                }
+                temp = temp.getParent();
+            }
+        }
+    }
+
+    private static boolean isCollectionRoot(Path path) {
+        return Collection.IN_PROGRESS.equals(path.toString())
+                || Collection.REVIEWED.equals(path.toString())
+                || Collection.COMPLETE.equals(path.toString());
+    }
+
+    private static boolean isEmpty(Path path) {
+        return Arrays.asList(path.toFile().listFiles()).isEmpty();
     }
 
     /**
@@ -319,8 +342,6 @@ public class Collections {
 
         Keyring keyring = zebedee.keyringCache.get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
-        SecretKey key = keyring.get(collection.description.id);
-        CollectionPublishPreprocessor.preProcessCollectionForPublish(collection, key);
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
         long publishStart = System.currentTimeMillis();
@@ -461,7 +482,6 @@ public class Collections {
 
         writeContent(collection, uri, session, request, requestBody, false, eventType, validateJson);
     }
-
 
     public void writeContent(
             Collection collection, String uri,
@@ -607,31 +627,6 @@ public class Collections {
                     eventType, uri));
         }
         return deleted;
-    }
-
-    public static void removeEmptyCollectionDirectories(Path path) throws IOException {
-        if (!Files.isDirectory(path)) {
-            path = path.getParent();
-        }
-        if (isEmpty(path)) {
-            Path temp = path;
-            while (!isCollectionRoot(temp.getFileName())) {
-                if (isEmpty(temp)) {
-                    Files.delete(temp);
-                }
-                temp = temp.getParent();
-            }
-        }
-    }
-
-    private static boolean isCollectionRoot(Path path) {
-        return Collection.IN_PROGRESS.equals(path.toString())
-                || Collection.REVIEWED.equals(path.toString())
-                || Collection.COMPLETE.equals(path.toString());
-    }
-
-    private static boolean isEmpty(Path path) {
-        return Arrays.asList(path.toFile().listFiles()).isEmpty();
     }
 
     /**

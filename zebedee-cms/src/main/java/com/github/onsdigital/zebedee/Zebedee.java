@@ -7,7 +7,6 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
@@ -31,8 +30,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
@@ -213,18 +210,19 @@ public class Zebedee {
         for (Collection collection : collections.list()) {
             if (collection.description.getPendingDeletes()
                     .stream()
-                    .filter(existingDeleteRoot -> searchValue.startsWith(Paths.get(existingDeleteRoot.contentPath)))
+                    .filter(existingDeleteRoot -> searchValue.startsWith(Paths.get(existingDeleteRoot.getRoot()
+                            .contentPath)))
                     .findFirst().isPresent()) {
                 throw markedDeleteInAnotherCollectionError(collection, uri);
             }
         }
     }
 
-    private List<ContentDetail> getAllPendingDeletes() throws IOException {
+/*    private List<ContentDetail> getAllPendingDeletes() throws IOException {
         List<ContentDetail> allPendingDeletes = new ArrayList<>();
         collections.list().forEach(collection -> allPendingDeletes.addAll(collection.description.getPendingDeletes()));
         return allPendingDeletes;
-    }
+    }*/
 
     public void isBeingEditedInAnotherCollection(Collection workingCollection, String uri, Session session) throws
             IOException,

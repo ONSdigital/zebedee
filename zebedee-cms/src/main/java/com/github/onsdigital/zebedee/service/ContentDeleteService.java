@@ -5,11 +5,11 @@ import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
-import com.github.onsdigital.zebedee.service.content.navigation.ContentDetailFunction;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -59,7 +59,7 @@ public class ContentDeleteService {
     private ContentDeleteService() {
     }
 
-    public List<ContentDetail> getDeleteItemsByCollection(Collection collection) {
+    public List<PendingDelete> getDeleteItemsByCollection(Collection collection) {
         return collection.getDescription().getPendingDeletes();
     }
 
@@ -72,7 +72,7 @@ public class ContentDeleteService {
 
         List<ContentDetail> matches = new ArrayList<>();
         collection.description.getPendingDeletes().stream()
-                .forEach(deleteRoot -> contentTreeNavigator.search(deleteRoot, (node) -> {
+                .forEach(pendingDelete -> contentTreeNavigator.search(pendingDelete.getRoot(), (node) -> {
                     if (node.contentPath.equals(marker.getUri())) {
                         matches.add(node);
                     }
@@ -95,7 +95,8 @@ public class ContentDeleteService {
                     logDebug("Marking node as deleted").path(node.contentPath).log();
                 }
         );
-        collection.description.getPendingDeletes().add(deleteImpact);
+        collection.description.getPendingDeletes().add(new PendingDelete(marker.getUser(), deleteImpact));
+        // TODO collection.addEvent(deleteImpact.contentPath, new Event());
         saveManifest(collection);
     }
 
@@ -165,9 +166,9 @@ public class ContentDeleteService {
         return Paths.get(collection.path.toString() + JSON_FILE_EXT);
     }
 
-    private Consumer<ContentDetail> contentDetailsToPathList(List<Path> resultsList) {
+    private Consumer<PendingDelete> contentDetailsToPathList(List<Path> resultsList) {
         return (pendingDelete) ->
-                contentTreeNavigator.search(pendingDelete,
+                contentTreeNavigator.search(pendingDelete.getRoot(),
                         (node) -> resultsList.add(Paths.get(node.contentPath)));
     }
 }

@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.json.publishing.request;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 
@@ -68,8 +68,8 @@ public class Manifest {
             }
         }
 
-        for (ContentDetail contentDetail : collection.description.getPendingDeletes()) {
-            manifest.addDelete(contentDetail.uri);
+        for (PendingDelete delete : collection.description.getPendingDeletes()) {
+            manifest.addDelete(delete.getRoot().uri);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.json.publishing.request;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 
@@ -9,8 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A manifest is a list of files to process for a collection when publishing.
@@ -19,7 +20,8 @@ public class Manifest {
 
     public static final String filename = "manifest.json";
 
-    public List<FileCopy> filesToCopy = new ArrayList<>();
+    public Set<FileCopy> filesToCopy = new HashSet<>();
+    public Set<String> urisToDelete = new HashSet<>();
 
     /**
      * Loads the manifest if it exists already for a collection. If no manifest exists it creates a new manifest.
@@ -55,14 +57,20 @@ public class Manifest {
      */
     private static Manifest create(Collection collection) throws IOException {
         Manifest manifest = new Manifest();
+        updateManifest(collection, manifest);
+        return manifest;
+    }
 
+    private static void updateManifest(Collection collection, Manifest manifest) throws IOException {
         for (String uri : collection.reviewed.uris()) {
             if (VersionedContentItem.isVersionedUri(uri)) {
                 manifest.addFileCopy(VersionedContentItem.resolveBaseUri(uri), uri);
             }
         }
 
-        return manifest;
+        for (ContentDetail contentDetail : collection.description.getPendingDeletes()) {
+            manifest.addDelete(contentDetail.uri);
+        }
     }
 
     /**
@@ -102,6 +110,10 @@ public class Manifest {
 
     public static Path getManifestPath(Collection collection) {
         return collection.path.resolve(filename);
+    }
+
+    void addDelete(String uri) {
+        this.urisToDelete.add(uri);
     }
 
     void addFileCopy(String from, String to) {

@@ -188,15 +188,7 @@ public class Publisher {
 
     public static void SendManifest(Collection collection, String encryptionPassword) throws IOException {
 
-        Path manifestPath = Manifest.getManifestPath(collection);
-        Manifest manifest;
-
-        if (!Files.exists(manifestPath)) {
-            manifest = Manifest.create(collection);
-            Manifest.save(manifest, collection);
-        } else {
-            manifest = Manifest.load(collection);
-        }
+        Manifest manifest = Manifest.get(collection);
 
         long start = System.currentTimeMillis();
         List<Future<IOException>> futures = new ArrayList<>();
@@ -248,14 +240,14 @@ public class Publisher {
 
         long start = System.currentTimeMillis();
 
-        logInfo("Beginning collection publish").collectionName(collection).log();
+        logInfo("PRE-PUBLISH: Begin transaction").collectionName(collection).log();
+
         Map<String, String> hostToTransactionId = beginPublish(theTrainHosts, encryptionPassword);
         collection.description.publishTransactionIds = hostToTransactionId;
-        logInfo("Beginning collection publish end").collectionName(collection).log();
 
         collection.save();
 
-        logInfo("BeginPublish complete").timeTaken(System.currentTimeMillis() - start).log();
+        logInfo("PRE-PUBLISH: BeginPublish complete").timeTaken(System.currentTimeMillis() - start).log();
 
         return hostToTransactionId;
     }
@@ -405,7 +397,7 @@ public class Publisher {
     }
 
     private static void processManifestForMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
-        Manifest manifest = Manifest.load(collection);
+        Manifest manifest = Manifest.get(collection);
 
         for (FileCopy fileCopy : manifest.filesToCopy) {
             try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {

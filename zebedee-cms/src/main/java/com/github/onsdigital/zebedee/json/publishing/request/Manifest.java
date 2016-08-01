@@ -22,13 +22,38 @@ public class Manifest {
     public List<FileCopy> filesToCopy = new ArrayList<>();
 
     /**
+     * Loads the manifest if it exists already for a collection. If no manifest exists it creates a new manifest.
+     *
+     * @param collection
+     * @return
+     */
+    public static Manifest get(Collection collection) {
+
+        Path manifestPath = Manifest.getManifestPath(collection);
+        Manifest manifest;
+
+        try {
+            if (!Files.exists(manifestPath)) {
+                manifest = Manifest.create(collection);
+                Manifest.save(manifest, collection);
+            } else {
+                manifest = Manifest.load(collection);
+            }
+        } catch (IOException e) {
+            return new Manifest();
+        }
+
+        return manifest;
+    }
+
+    /**
      * Create a new manifest for the given collection.
      *
      * @param collection
      * @return
      * @throws IOException
      */
-    public static Manifest create(Collection collection) throws IOException {
+    private static Manifest create(Collection collection) throws IOException {
         Manifest manifest = new Manifest();
 
         for (String uri : collection.reviewed.uris()) {
@@ -46,7 +71,7 @@ public class Manifest {
      * @param collection
      * @return
      */
-    public static Manifest load(Collection collection) {
+    static Manifest load(Collection collection) {
 
         Path manifestPath = getManifestPath(collection);
 
@@ -66,7 +91,7 @@ public class Manifest {
      * @return
      * @throws IOException
      */
-    public static boolean save(Manifest manifest, Collection collection) throws IOException {
+    static boolean save(Manifest manifest, Collection collection) throws IOException {
         Path manifestPath = getManifestPath(collection);
 
         try (OutputStream output = Files.newOutputStream(manifestPath)) {
@@ -79,7 +104,7 @@ public class Manifest {
         return collection.path.resolve(filename);
     }
 
-    public void addFileCopy(String from, String to) {
+    void addFileCopy(String from, String to) {
         this.filesToCopy.add(new FileCopy(from, to));
     }
 }

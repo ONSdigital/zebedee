@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavig
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -60,7 +61,18 @@ public class ContentDeleteService {
     }
 
     public List<PendingDelete> getDeleteItemsByCollection(Collection collection) {
-        return collection.getDescription().getPendingDeletes();
+        List<PendingDelete> deletes = collection.getDescription().getPendingDeletes();
+
+        deletes.stream().forEach(delete -> {
+            LeafCounter leafCounter = new LeafCounter();
+            contentTreeNavigator.applyAndPropagate(delete.getRoot(), (node -> {
+                if (StringUtils.isNotEmpty(node.uri) && node.type != null) {
+                    leafCounter.increment();
+                }
+            }));
+            delete.setTotalDeletes(leafCounter.count);
+        });
+        return deletes;
     }
 
     public void addDeleteMarkerToCollection(Session session, Collection collection, DeleteMarker marker)
@@ -143,6 +155,18 @@ public class ContentDeleteService {
         return allDeleteMarkers;
     }
 
+    public List<String> getCollectionDeleteUrisAsList(Collection collection) {
+        List<String> uris = new ArrayList<>();
+        collection.description.getPendingDeletes().forEach(pendingDelete -> {
+            contentTreeNavigator.applyAndPropagate(pendingDelete.getRoot(), (node) -> {
+                if (node.type != null && StringUtils.isNotEmpty(node.uri)) {
+                    uris.add(node.uri);
+                }
+            });
+        });
+        return uris;
+    }
+
     private void saveManifest(Collection collection) throws ZebedeeException {
         try (OutputStream output = Files.newOutputStream(manifestPath(collection))) {
             Serialiser.serialise(output, collection.description);
@@ -170,5 +194,22 @@ public class ContentDeleteService {
         return (pendingDelete) ->
                 contentTreeNavigator.search(pendingDelete.getRoot(),
                         (node) -> resultsList.add(Paths.get(node.contentPath)));
+    }
+
+    private class LeafCounter {
+
+        private int count;
+
+        public LeafCounter() {
+            this.count = 0;
+        }
+
+        public void increment() {
+            this.count++;
+        }
+
+        public int getCount() {
+            return count;
+        }
     }
 }

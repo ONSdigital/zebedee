@@ -13,10 +13,12 @@ public class PendingDelete {
 
     private String user;
     private ContentDetail root;
+    private int totalDeletes;
 
     public PendingDelete(String user, ContentDetail root) {
         this.user = user;
         this.root = root;
+        this.totalDeletes = 0;
     }
 
     public String getUser() {
@@ -33,6 +35,14 @@ public class PendingDelete {
 
     public void setRoot(ContentDetail root) {
         this.root = root;
+    }
+
+    public int getTotalDeletes() {
+        return totalDeletes;
+    }
+
+    public void setTotalDeletes(int totalDeletes) {
+        this.totalDeletes = totalDeletes;
     }
 
     @Override

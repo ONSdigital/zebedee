@@ -52,8 +52,6 @@ node {
         }
     })
 
-    if (branch != 'develop') return
-
     stage 'Bundle'
     sh sprintf('sed -i -e %s -e %s -e %s -e %s -e %s appspec.yml zebedee-reader/appspec.yml scripts/codedeploy/* zebedee-reader/scripts/codedeploy/*', [
         "s/\\\${CODEDEPLOY_USER}/${env.CODEDEPLOY_USER}/g",
@@ -66,6 +64,8 @@ node {
     sh "tar -cvzf zebedee-reader-${revision}.tar.gz -C zebedee-reader appspec.yml scripts/codedeploy"
     sh "aws s3 cp zebedee-${revision}.tar.gz s3://${env.S3_REVISIONS_BUCKET}/zebedee-${revision}.tar.gz"
     sh "aws s3 cp zebedee-reader-${revision}.tar.gz s3://${env.S3_REVISIONS_BUCKET}/zebedee-reader-${revision}.tar.gz"
+
+    if (branch != 'develop') return
 
     stage 'Deploy'
     sh sprintf('aws deploy create-deployment %s %s %s,bundleType=tgz,key=%s.tar.gz', [

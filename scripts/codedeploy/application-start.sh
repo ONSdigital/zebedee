@@ -8,7 +8,7 @@ GIT_COMMIT=
 INSTANCE=$(curl -s http://instance-data/latest/meta-data/instance-id)
 CONFIG=$(aws --region $AWS_REGION ec2 describe-tags --filters "Name=resource-id,Values=$INSTANCE" "Name=key,Values=Configuration" --output text | awk '{print $5}')
 
-aws s3 cp s3://$CONFIG_BUCKET/zebedee/$CONFIG . || exit $?
+(aws s3 cp s3://$CONFIG_BUCKET/zebedee/$CONFIG.asc . && gpg --decrypt $CONFIG.asc > $CONFIG) || exit $?
 
 source $CONFIG && docker run -d                                      \
   --env=audit_db_enabled=$AUDIT_ENABLED                              \

@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+
+<!--    <appender name="splunk.http" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
+        <url>http://localhost:8099</url>
+        <token>C1231B2D-92FF-455F-BD1E-45A6E9AD12A0</token>
+        <index>metrics_index</index>
+        <source>zebedee-request-stats</source>
+        <sourcetype>_json</sourcetype>
+        <batch_size_count>1</batch_size_count>
+        <disableCertificateValidation>true</disableCertificateValidation>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%msg</pattern>
+        </layout>
+    </appender>-->
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
@@ -29,12 +43,15 @@
         </encoder>
     </appender>
 
-
     <logger name="com.github.onsdigital.logging" level="info" additivity="false">
-        <appender-ref ref="JSON"/>
+        <!--<appender-ref ref="JSON"/>-->
         <!--<appender-ref ref="PRETTY_JSON"/>-->
-        <!--<appender-ref ref="PLAIN_TEXT"/>-->
+        <appender-ref ref="PLAIN_TEXT"/>
     </logger>
+
+<!--    <logger name ="splunk.logger" level="INFO" additivity="false">
+        <appender-ref ref="splunk.http" />
+    </logger>-->
 
     <root level="info">
         <appender-ref ref="STDOUT"/>

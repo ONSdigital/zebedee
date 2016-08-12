@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.api.RequestHandler;
 import com.github.davidcarboni.restolino.framework.ServerError;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.api.bean.ServerResponse;
+import com.github.onsdigital.zebedee.util.mertics.MetricsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,8 +15,12 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logE
  * The error handler catches various exceptions and sets the response status code accordingly.
  */
 public class ErrorHandler implements ServerError {
+
+    private MetricsService metricsService = null;
+
     @Override
     public ServerResponse handle(HttpServletRequest req, HttpServletResponse res, RequestHandler requestHandler, Throwable t) {
+        getMetricsService().captureError();
 
         // If it's an ApiException subclass, set the status code and message
         if (t != null && ZebedeeException.class.isAssignableFrom(t.getClass())) {
@@ -27,5 +32,12 @@ public class ErrorHandler implements ServerError {
         // Otherwise leave the default 500 response
         logError(t, "Internal Server Error").log();
         return new ServerResponse("Internal Server Error");
+    }
+
+    private MetricsService getMetricsService() {
+        if (metricsService == null) {
+            this.metricsService = MetricsService.getInstance();
+        }
+        return this.metricsService;
     }
 }

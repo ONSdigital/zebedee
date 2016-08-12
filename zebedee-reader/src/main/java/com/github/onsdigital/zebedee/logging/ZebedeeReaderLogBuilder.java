@@ -41,6 +41,10 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
         return new ZebedeeReaderLogBuilder(t, ZEBEDEE_READER_EXCEPTION + ": " + errorContext);
     }
 
+    public static ZebedeeReaderLogBuilder logWarn(String message) {
+        return new ZebedeeReaderLogBuilder(message, Level.WARN);
+    }
+
     public static ZebedeeReaderLogBuilder logDebug(String message) {
         return new ZebedeeReaderLogBuilder(message, Level.DEBUG);
     }
@@ -80,6 +84,16 @@ public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
 
     public ZebedeeReaderLogBuilder uri(String uri) {
         addParameter(URI, uri);
+        return this;
+    }
+
+    public ZebedeeReaderLogBuilder expected(Object expected) {
+        addParameter("expected", expected.toString());
+        return this;
+    }
+
+    public ZebedeeReaderLogBuilder actual(Object actual) {
+        addParameter("actual", actual.toString());
         return this;
     }
 

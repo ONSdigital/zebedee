@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.PingRequest;
-import com.github.onsdigital.zebedee.util.mertics.MetricsService;
+import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +15,8 @@ import java.io.IOException;
 @Api
 public class Ping {
 
+    private static MetricsService metricsService = MetricsService.getInstance();
+
     /**
      * Sends a message to a user session requiring it to stay alive
      * <p>
@@ -23,7 +25,7 @@ public class Ping {
     @POST
     public boolean ping(HttpServletRequest request, HttpServletResponse response, PingRequest pingRequest) throws IOException {
         if (pingRequest.lastPingTime != null && pingRequest.lastPingTime > 0) {
-            MetricsService.getInstance().capturePing(pingRequest.lastPingTime);
+            metricsService.capturePing(pingRequest.lastPingTime);
         }
         return true;
     }

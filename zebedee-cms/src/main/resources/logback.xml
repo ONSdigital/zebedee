@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <Appender name="splunk.http" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
-        <url>http://localhost:8099</url>
-        <token>54C03DDA-D6F5-4564-BF2F-3B59463ED50D</token>
-        <index>request-stats</index>
-        <source>http:zebedee-request-stats</source>
-        <disableCertificateValidation>true</disableCertificateValidation>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%msg</pattern>
-        </layout>
-    </Appender>
-
-
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
@@ -72,10 +60,6 @@
 
     <logger name="com.github.onsdigital.logging.click.events" level="trace" additivity="false">
         <appender-ref ref="PLAIN_TEXT"/>
-    </logger>
-
-    <logger name="splunk.logger" level="INFO" additivity="false">
-        <appender-ref ref="splunk.http"/>
     </logger>
 
     <root level="info">

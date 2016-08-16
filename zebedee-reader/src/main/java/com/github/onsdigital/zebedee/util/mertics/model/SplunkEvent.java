@@ -10,16 +10,6 @@ public abstract class SplunkEvent {
 
     protected StatsType statsType;
 
-    protected static final ThreadLocal<RequestMetrics> requestTimeEventsThreadLocal = new ThreadLocal<>();
-
-    public static void storeRequestMetrics(RequestMetrics event) {
-        requestTimeEventsThreadLocal.set(event);
-    }
-
-    public static RequestMetrics getRequestMetrics() {
-        return requestTimeEventsThreadLocal.get();
-    }
-
     public StatsType getStatsType() {
         return statsType;
     }

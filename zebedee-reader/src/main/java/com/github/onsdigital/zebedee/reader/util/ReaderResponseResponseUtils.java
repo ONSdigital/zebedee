@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.reader.util;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.util.mertics.MetricsService;
+import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +16,8 @@ import java.io.StringReader;
  */
 public class ReaderResponseResponseUtils {
 
+    private static MetricsService metricsService = MetricsService.getInstance();
+
     public static void sendResponse(Object content, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON);
@@ -23,7 +25,7 @@ public class ReaderResponseResponseUtils {
             response.setHeader("Etag", ContentUtil.hash((Content) content));
         }
         IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());
-        MetricsService.getInstance().captureRequestTime();
+        metricsService.captureRequestResponseTimeMetrics();
     }
 
     public static void sendResponse(Resource resource, HttpServletResponse response, String encoding) throws IOException {

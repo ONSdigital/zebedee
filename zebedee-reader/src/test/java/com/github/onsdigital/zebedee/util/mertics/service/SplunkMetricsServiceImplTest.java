@@ -24,7 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by dave on 8/15/16.
+ * Tests verify the behaviour of {@link SplunkMetricsServiceImpl} for cases where {@link RequestMetrics} are available
+ * and unavailable to record.
  */
 public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
 

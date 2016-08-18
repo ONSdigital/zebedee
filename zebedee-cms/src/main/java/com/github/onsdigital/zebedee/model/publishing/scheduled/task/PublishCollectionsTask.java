@@ -1,12 +1,14 @@
 package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -17,12 +19,15 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
  */
 public class PublishCollectionsTask extends ScheduledTask {
 
+    private static MetricsService metricsService = MetricsService.getInstance();
+
     private final ExecutorService executorService; // Thread pool to publish each collection concurrently.
     private List<PublishCollectionTask> publishCollectionTasks; // A task object for each collection to publish.
     private List<PostPublishCollectionTask> postPublishCollectionTasks;
 
     /**
      * Create a new instance of the PublishCollectionsTask.
+     *
      * @param publishCollectionTasks A collection of tasks, one for each collection to publish.
      */
     public PublishCollectionsTask(List<PublishCollectionTask> publishCollectionTasks,
@@ -35,7 +40,7 @@ public class PublishCollectionsTask extends ScheduledTask {
 
     /**
      * The run method is called at the time this task has been scheduled for.
-     *
+     * <p>
      * Publish each collection, and run the post publish for each collection only when all collections are published.
      */
     @Override
@@ -59,6 +64,10 @@ public class PublishCollectionsTask extends ScheduledTask {
         logInfo("PUBLISH: publishing collections").addParameter("collectionsSize", publishCollectionTasks.size()).log();
         long start = System.currentTimeMillis();
 
+        List<String> collectionIds = publishCollectionTasks.stream()
+                .map(task -> task.getCollection().getDescription().id)
+                .collect(Collectors.toList());
+
         // run concurrently if there is more than one collection to publish
         if (publishCollectionTasks.size() > 1) {
 
@@ -78,6 +87,9 @@ public class PublishCollectionsTask extends ScheduledTask {
                 }
             });
         }
+
+        metricsService.captureCollectionsPublishTime(collectionIds, System.currentTimeMillis() - start);
+
         logInfo("PUBLISH: Finished publishing collections").timeTaken((System.currentTimeMillis() - start))
                 .addParameter("collectionsPublished", publishCollectionTasks.size()).log();
     }

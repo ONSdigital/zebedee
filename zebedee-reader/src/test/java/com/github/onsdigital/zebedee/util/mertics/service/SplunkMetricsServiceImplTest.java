@@ -2,18 +2,21 @@ package com.github.onsdigital.zebedee.util.mertics.service;
 
 import com.github.davidcarboni.restolino.framework.HttpMethod;
 import com.github.onsdigital.zebedee.util.mertics.AbstractMetricsTest;
-import com.github.onsdigital.zebedee.util.mertics.model.PingEvent;
-import com.github.onsdigital.zebedee.util.mertics.model.RequestMetrics;
-import com.github.onsdigital.zebedee.util.mertics.model.SplunkEvent;
-import com.github.onsdigital.zebedee.util.mertics.model.SplunkRequestMessage;
-import com.github.onsdigital.zebedee.util.mertics.service.client.SplunkClient;
+import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
+import com.github.onsdigital.zebedee.util.mertics.client.SplunkRequest;
+import com.github.onsdigital.zebedee.util.mertics.events.MetricsType;
+import com.github.onsdigital.zebedee.util.mertics.events.SplunkEvent;
+import com.google.common.collect.ImmutableMap;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -24,16 +27,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests verify the behaviour of {@link SplunkMetricsServiceImpl} for cases where {@link RequestMetrics} are available
+ * Tests verify the behaviour of {@link SplunkMetricsServiceImpl} for cases where {@link } are available
  * and unavailable to record.
  */
 public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
 
     @Mock
     private HttpServletRequest requestMock;
-
-    @Mock
-    private RequestMetrics metricsMock;
 
     @Mock
     private SplunkClient splunkClientMock;
@@ -52,48 +52,46 @@ public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
     }
 
     @Test
-    public void shouldRecordPingData() {
+    public void shouldRecordPingData() throws Exception {
         setSystemProperties();
-        PingEvent pingEvent = new PingEvent(101);
-        pingEvent.setStatsType(SplunkEvent.StatsType.PING_TIME);
-        SplunkRequestMessage expectedSplunkRequest = new SplunkRequestMessage(HttpMethod.POST, pingEvent);
+        String eventJSON = new SplunkEvent.Builder().addField("pingTime", 101).build(MetricsType.PING_TIME).toJson();
+        SplunkRequest splunkRequest = new SplunkRequest("POST", eventJSON);
 
-        metricsService.capturePing(pingEvent.getMs());
+        metricsService.capturePing(101);
 
-        verify(splunkClientMock, times(1)).send(SPLUNK_HEC_URI, expectedSplunkRequest);
+        verify(splunkClientMock, times(1)).send(SPLUNK_HEC_URI, splunkRequest);
     }
 
     @Test
-    public void shouldRecordRequestTime() {
+    public void shouldRecordRequestTime() throws Exception {
         when(requestMock.getMethod()).thenReturn(HttpMethod.POST.toString());
         when(requestMock.getRequestURI()).thenReturn("/data");
         when(requestMock.getParameter("uri")).thenReturn("/");
 
-        RequestMetrics metrics = new RequestMetrics(requestMock);
-
         metricsService.captureRequest(requestMock);
         metricsService.captureRequestResponseTimeMetrics();
-        metrics.setStatsType(SplunkEvent.StatsType.REQUEST_TIME);
 
-        verify(splunkClientMock, times(1)).send(eq(SPLUNK_HEC_URI), any(SplunkRequestMessage.class));
+        verify(splunkClientMock, times(1)).send(eq(SPLUNK_HEC_URI), any(SplunkRequest.class));
     }
 
     @Test
     public void shouldNotSendSplunkRequest() {
         metricsService.captureRequestResponseTimeMetrics();
-        verify(splunkClientMock, never()).send(anyString(), any(SplunkRequestMessage.class));
+        verify(splunkClientMock, never()).send(anyString(), any(SplunkRequest.class));
     }
 
     @Test
-    public void testBuildRequest() {
-        when(requestMock.getMethod()).thenReturn(HttpMethod.POST.toString());
-        when(requestMock.getRequestURI()).thenReturn("/data");
-        when(requestMock.getParameter("uri")).thenReturn("/");
+    public void shouldSendRequest() throws Exception {
+        Map<String, Object> fields = new ImmutableMap.Builder<String, Object>().put("one", "one").build();
+        Map<String, Object> event = new ImmutableMap.Builder<String, Object>().put("event", fields).build();
 
-        RequestMetrics metrics = new RequestMetrics(requestMock);
+        SplunkEvent splunkEvent = new SplunkEvent(fields);
+        String splunkEventJSON = new ObjectMapper().writeValueAsString(event);
+        SplunkRequest expectedRequest = new SplunkRequest("POST", splunkEventJSON);
 
-        assertThat("Splunk message request not as expected", new SplunkRequestMessage(HttpMethod.POST, metrics),
-                equalTo(metricsService.buildRequest(metrics)));
+        metricsService.sendRequest(splunkEvent);
+
+        verify(splunkClientMock, times(1)).send(SPLUNK_HEC_URI, expectedRequest);
     }
 
     @Test
@@ -105,7 +103,7 @@ public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
         metricsService.captureRequest(requestMock);
         metricsService.captureErrorMetrics();
 
-        verify(splunkClientMock, times(1)).send(eq(SPLUNK_HEC_URI), any(SplunkRequestMessage.class));
+        verify(splunkClientMock, times(1)).send(eq(SPLUNK_HEC_URI), any(SplunkRequest.class));
     }
 
     @Test

@@ -45,7 +45,7 @@ public class PublishCollectionTask implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws Exception {
-        logInfo("PUBLISH: Running collectiom publish task").collectionName(collection).log();
+        logInfo("PUBLISH: Running collection publish task").collectionName(collection).log();
 
         try {
             collection.description.publishStartDate = new Date();

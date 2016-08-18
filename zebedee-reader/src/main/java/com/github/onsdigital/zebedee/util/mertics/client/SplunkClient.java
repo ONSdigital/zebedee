@@ -1,6 +1,5 @@
-package com.github.onsdigital.zebedee.util.mertics.service.client;
+package com.github.onsdigital.zebedee.util.mertics.client;
 
-import com.github.onsdigital.zebedee.util.mertics.model.SplunkRequestMessage;
 import com.splunk.Args;
 import com.splunk.ResponseMessage;
 import com.splunk.Service;
@@ -48,12 +47,12 @@ public class SplunkClient {
     /**
      * Send a HTTP Collectiom Event to the Splunk instance.
      *
-     * @param uri                  the URI to send the request to.
-     * @param splunkRequestMessage the {@link SplunkRequestMessage} to send.
+     * @param uri            the URI to send the request to.
+     * @param requestMessage the {@link requestMessage} to send.
      */
-    public Future send(final String uri, final SplunkRequestMessage splunkRequestMessage) {
+    public Future send(final String uri, final SplunkRequest splunkRequest) {
         return pool.submit(() -> {
-            ResponseMessage responseMessage = splunkService.send(uri, splunkRequestMessage);
+            ResponseMessage responseMessage = splunkService.send(uri, splunkRequest);
             if (responseMessage == null || HttpStatus.SC_OK != responseMessage.getStatus()) {
                 errorResponseHandler.accept(responseMessage);
             }
@@ -70,11 +69,11 @@ public class SplunkClient {
         return message.toString();
     }
 
-    Args getServiceArgs() {
+    public Args getServiceArgs() {
         return serviceArgs;
     }
 
-    void setSplunkService(Service splunkService) {
+    public void setSplunkService(Service splunkService) {
         this.splunkService = splunkService;
     }
 
@@ -82,7 +81,7 @@ public class SplunkClient {
      * Sets {@link Consumer} accepting {@link ResponseMessage} to handle any Splunk response that does not have a
      * 200 status code.
      */
-    void setErrorResponseHandler(Consumer<ResponseMessage> errorResponseHandler) {
+    public void setErrorResponseHandler(Consumer<ResponseMessage> errorResponseHandler) {
         this.errorResponseHandler = errorResponseHandler;
     }
 }

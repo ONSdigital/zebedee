@@ -1,15 +1,23 @@
 package com.github.onsdigital.zebedee.util.mertics.service;
 
 import com.github.davidcarboni.restolino.framework.HttpMethod;
-import com.github.onsdigital.zebedee.util.mertics.service.client.SplunkClient;
-import com.github.onsdigital.zebedee.util.mertics.model.PingEvent;
-import com.github.onsdigital.zebedee.util.mertics.model.RequestMetrics;
-import com.github.onsdigital.zebedee.util.mertics.model.SplunkEvent;
-import com.github.onsdigital.zebedee.util.mertics.model.SplunkRequestMessage;
+import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
+import com.github.onsdigital.zebedee.util.mertics.client.SplunkRequest;
+import com.github.onsdigital.zebedee.util.mertics.events.MetricsType;
+import com.github.onsdigital.zebedee.util.mertics.events.SplunkEvent;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+import static com.github.onsdigital.zebedee.util.mertics.events.SplunkEvent.INTERCEPT_TIME_KEY;
 
 /**
  * Splunk implementation of {@link MetricsService} providing API for recording request time, error rates, ping times
@@ -18,7 +26,8 @@ import java.util.concurrent.Executors;
 public class SplunkMetricsServiceImpl extends MetricsService {
 
     protected static ExecutorService pool = Executors.newSingleThreadExecutor();
-    protected static ThreadLocal<SplunkEvent> splunkEventThreadLocal = new ThreadLocal<>();
+    protected static ThreadLocal<SplunkEvent.Builder> splunkEventThreadLocal = new ThreadLocal<>();
+    private static final Path HOME_URI = Paths.get("/");
 
     private String httpEventCollectorURI;
     private SplunkClient splunkClient = null;
@@ -30,36 +39,67 @@ public class SplunkMetricsServiceImpl extends MetricsService {
 
     @Override
     public void captureRequest(HttpServletRequest request) {
-        splunkEventThreadLocal.set(new RequestMetrics(request));
+        Path apiUri = Paths.get(request.getRequestURI());
+
+        if (!HOME_URI.equals(apiUri)) {
+            List<Path> uriPaths = new ArrayList<>();
+
+            while (apiUri.getParent() != null) {
+                uriPaths.add(apiUri);
+                apiUri = apiUri.getParent();
+            }
+            Collections.reverse(uriPaths);
+            apiUri = uriPaths.get(0);
+        }
+
+        splunkEventThreadLocal.set(new SplunkEvent.Builder()
+                .interceptTime(System.currentTimeMillis())
+                .httpMethod(request.getMethod())
+                .requestedURI(request.getParameter("uri"))
+                .api(apiUri.toString()));
     }
 
     @Override
     public void captureRequestResponseTimeMetrics() {
-        RequestMetrics metrics = (RequestMetrics) splunkEventThreadLocal.get();
-        if (metrics != null) {
-            metrics.stopTimer();
-            metrics.setStatsType(SplunkEvent.StatsType.REQUEST_TIME);
-            splunkClient.send(httpEventCollectorURI, buildRequest(metrics));
+        SplunkEvent.Builder eventBuilder = splunkEventThreadLocal.get();
+        if (eventBuilder != null) {
+            long startTime = (Long) eventBuilder.get(INTERCEPT_TIME_KEY);
+            eventBuilder.timeTaken(System.currentTimeMillis() - startTime);
+            sendRequest(eventBuilder.build(MetricsType.REQUEST_TIME, INTERCEPT_TIME_KEY));
         }
     }
 
     @Override
     public void captureErrorMetrics() {
-        RequestMetrics metrics = (RequestMetrics) splunkEventThreadLocal.get();
-        if (metrics != null) {
-            metrics.stopTimer();
-            metrics.setStatsType(SplunkEvent.StatsType.REQUEST_ERROR);
-            splunkClient.send(httpEventCollectorURI, buildRequest(metrics));
+        SplunkEvent.Builder eventBuilder = splunkEventThreadLocal.get();
+        if (eventBuilder != null) {
+            long startTime = (Long) eventBuilder.get(INTERCEPT_TIME_KEY);
+            eventBuilder.timeTaken(System.currentTimeMillis() - startTime);
+            sendRequest(eventBuilder.build(MetricsType.REQUEST_ERROR, INTERCEPT_TIME_KEY));
         }
     }
 
     @Override
     public void capturePing(long ms) {
-        splunkClient.send(httpEventCollectorURI, buildRequest(new PingEvent(ms)));
+        sendRequest(new SplunkEvent.Builder()
+                .pingTime(ms)
+                .build(MetricsType.PING_TIME));
     }
 
-    public SplunkRequestMessage buildRequest(SplunkEvent splunkEvent) {
-        return new SplunkRequestMessage(HttpMethod.POST, splunkEvent);
+    @Override
+    public void captureCollectionsPublishTime(List<String> collectionIds, long publishTime) {
+        sendRequest(new SplunkEvent.Builder()
+                .collectionIds(collectionIds)
+                .collectionPublishTime(publishTime)
+                .build(MetricsType.COLLECTIONS_PUBLISH_TIME));
+    }
+
+    public void sendRequest(SplunkEvent splunkEvent) {
+        try {
+            splunkClient.send(httpEventCollectorURI, new SplunkRequest(HttpMethod.POST.name(), splunkEvent.toJson()));
+        } catch (IOException ex) {
+            logError(ex).log();
+        }
     }
 
     public String getHttpEventCollectorURI() {

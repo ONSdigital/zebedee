@@ -1,7 +1,6 @@
-package com.github.onsdigital.zebedee.util.mertics.service.client;
+package com.github.onsdigital.zebedee.util.mertics.client;
 
 import com.github.onsdigital.zebedee.util.mertics.AbstractMetricsTest;
-import com.github.onsdigital.zebedee.util.mertics.model.SplunkRequestMessage;
 import com.splunk.ResponseMessage;
 import com.splunk.Service;
 import org.apache.http.HttpStatus;
@@ -27,7 +26,7 @@ public class SplunkClientTest extends AbstractMetricsTest {
     private Service splunkServiceMock;
 
     @Mock
-    private SplunkRequestMessage splunkRequestMessageMock;
+    private SplunkRequest splunkRequestMock;
 
     @Mock
     private ResponseMessage responseMessageMock;
@@ -55,16 +54,16 @@ public class SplunkClientTest extends AbstractMetricsTest {
      */
     @Test
     public void shouldSendMessageSuccessfully() throws ExecutionException, InterruptedException {
-        when(splunkServiceMock.send(SPLUNK_HEC_URI, splunkRequestMessageMock))
+        when(splunkServiceMock.send(SPLUNK_HEC_URI, splunkRequestMock))
                 .thenReturn(responseMessageMock);
 
         when(responseMessageMock.getStatus())
                 .thenReturn(HttpStatus.SC_OK);
 
-        Future future = client.send(SPLUNK_HEC_URI, splunkRequestMessageMock);
+        Future future = client.send(SPLUNK_HEC_URI, splunkRequestMock);
         future.get();
 
-        verify(splunkServiceMock, times(1)).send(SPLUNK_HEC_URI, splunkRequestMessageMock);
+        verify(splunkServiceMock, times(1)).send(SPLUNK_HEC_URI, splunkRequestMock);
         verify(splunkErrorHandler, never()).accept(responseMessageMock);
     }
 
@@ -73,16 +72,16 @@ public class SplunkClientTest extends AbstractMetricsTest {
      */
     @Test
     public void shouldHandleErrorResponse() throws ExecutionException, InterruptedException {
-        when(splunkServiceMock.send(SPLUNK_HEC_URI, splunkRequestMessageMock))
+        when(splunkServiceMock.send(SPLUNK_HEC_URI, splunkRequestMock))
                 .thenReturn(responseMessageMock);
 
         when(responseMessageMock.getStatus())
                 .thenReturn(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 
-        Future future = client.send(SPLUNK_HEC_URI, splunkRequestMessageMock);
+        Future future = client.send(SPLUNK_HEC_URI, splunkRequestMock);
         future.get();
 
-        verify(splunkServiceMock, times(1)).send(SPLUNK_HEC_URI, splunkRequestMessageMock);
+        verify(splunkServiceMock, times(1)).send(SPLUNK_HEC_URI, splunkRequestMock);
         verify(splunkErrorHandler, times(1)).accept(responseMessageMock);
     }
 
@@ -91,13 +90,13 @@ public class SplunkClientTest extends AbstractMetricsTest {
      */
     @Test
     public void shouldHandleNullResponse() throws ExecutionException, InterruptedException {
-        when(splunkServiceMock.send(SPLUNK_HEC_URI, splunkRequestMessageMock))
+        when(splunkServiceMock.send(SPLUNK_HEC_URI, splunkRequestMock))
                 .thenReturn(null);
 
-        Future future = client.send(SPLUNK_HEC_URI, splunkRequestMessageMock);
+        Future future = client.send(SPLUNK_HEC_URI, splunkRequestMock);
         future.get();
 
-        verify(splunkServiceMock, times(1)).send(SPLUNK_HEC_URI, splunkRequestMessageMock);
+        verify(splunkServiceMock, times(1)).send(SPLUNK_HEC_URI, splunkRequestMock);
         verify(splunkErrorHandler, times(1)).accept(null);
     }
 }

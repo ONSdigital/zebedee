@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.util.mertics.service;
 
-import com.github.onsdigital.zebedee.util.mertics.service.client.SplunkClient;
+import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
 
 import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.getEventsCollectionURI;
 import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.getServiceArgs;
@@ -57,8 +59,9 @@ public abstract class MetricsService {
 
     /**
      * Capture metrics for Ping times.
-     *
-     * @param ms the ping time.
      */
     public abstract void capturePing(long ms);
+
+
+    public abstract void captureCollectionsPublishTime(List<String> collectionIds, long publishTime);
 }

@@ -49,12 +49,23 @@ public class PublishCollectionsTask extends ScheduledTask {
         long publishStart = System.currentTimeMillis();
 
         publishCollections();
+        long publishTime = System.currentTimeMillis() - publishStart;
         postPublishCollections();
+
+        savePublishTimeMetrics(publishTime);
 
         // all tasks should be completed now so cleanup the executorService.
         executorService.shutdown();
 
         logInfo("POST-PUBLISH: Publish complete").timeTaken((System.currentTimeMillis() - publishStart)).log();
+    }
+
+    public void savePublishTimeMetrics(long publishTime) {
+        List<String> collectionIds = publishCollectionTasks.stream()
+                .map(task -> task.getCollection().getDescription().id)
+                .collect(Collectors.toList());
+
+        metricsService.captureCollectionsPublishTime(collectionIds, publishTime);
     }
 
     /**
@@ -63,10 +74,6 @@ public class PublishCollectionsTask extends ScheduledTask {
     protected void publishCollections() {
         logInfo("PUBLISH: publishing collections").addParameter("collectionsSize", publishCollectionTasks.size()).log();
         long start = System.currentTimeMillis();
-
-        List<String> collectionIds = publishCollectionTasks.stream()
-                .map(task -> task.getCollection().getDescription().id)
-                .collect(Collectors.toList());
 
         // run concurrently if there is more than one collection to publish
         if (publishCollectionTasks.size() > 1) {
@@ -87,8 +94,6 @@ public class PublishCollectionsTask extends ScheduledTask {
                 }
             });
         }
-
-        metricsService.captureCollectionsPublishTime(collectionIds, System.currentTimeMillis() - start);
 
         logInfo("PUBLISH: Finished publishing collections").timeTaken((System.currentTimeMillis() - start))
                 .addParameter("collectionsPublished", publishCollectionTasks.size()).log();

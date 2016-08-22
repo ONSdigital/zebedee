@@ -8,7 +8,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -23,7 +22,8 @@ public class SplunkEvent {
     public static final String PING_TIME_KEY = "pingTime";
     public static final String METRICS_TYPE_KEY = "metricsType";
     public static final String COLLECTION_PUBLISH_TIME = "collectionsPublishTime";
-    public static final String COLLECTION_IDS = "collectionIds";
+    public static final String COLLECTION_PUBLISH_FILE_COUNT = "collectionsPublishFileCount";
+    public static final String COLLECTION_ID = "collectionId";
     public static final String EVENT_KEY = "event";
 
     private Map<String, Object> event;
@@ -94,14 +94,18 @@ public class SplunkEvent {
             return this;
         }
 
-        public Builder collectionIds(List<String> collectionIds) {
-            fields.put(COLLECTION_IDS, collectionIds);
+        public Builder collectionId(String collectionId) {
+            fields.put(COLLECTION_ID, collectionId);
             return this;
         }
 
-
         public Builder collectionPublishTime(long collectionPublishTime) {
             fields.put(COLLECTION_PUBLISH_TIME, collectionPublishTime);
+            return this;
+        }
+
+        public Builder collectionPublishFileCount(int collectionPublishFileCount) {
+            fields.put(COLLECTION_PUBLISH_FILE_COUNT, collectionPublishFileCount);
             return this;
         }
 

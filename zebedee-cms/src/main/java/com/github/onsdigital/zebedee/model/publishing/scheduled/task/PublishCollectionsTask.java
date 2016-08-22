@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -49,23 +48,12 @@ public class PublishCollectionsTask extends ScheduledTask {
         long publishStart = System.currentTimeMillis();
 
         publishCollections();
-        long publishTime = System.currentTimeMillis() - publishStart;
         postPublishCollections();
-
-        savePublishTimeMetrics(publishTime);
 
         // all tasks should be completed now so cleanup the executorService.
         executorService.shutdown();
 
         logInfo("POST-PUBLISH: Publish complete").timeTaken((System.currentTimeMillis() - publishStart)).log();
-    }
-
-    public void savePublishTimeMetrics(long publishTime) {
-        List<String> collectionIds = publishCollectionTasks.stream()
-                .map(task -> task.getCollection().getDescription().id)
-                .collect(Collectors.toList());
-
-        metricsService.captureCollectionsPublishTime(collectionIds, publishTime);
     }
 
     /**

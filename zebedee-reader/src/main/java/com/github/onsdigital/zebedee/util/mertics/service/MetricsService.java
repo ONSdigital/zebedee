@@ -4,11 +4,7 @@ import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.List;
-
-import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.getEventsCollectionURI;
-import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.getServiceArgs;
-import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.isSplunkEnabled;
+import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.*;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logWarn;
 
@@ -63,5 +59,5 @@ public abstract class MetricsService {
     public abstract void capturePing(long ms);
 
 
-    public abstract void captureCollectionsPublishTime(List<String> collectionIds, long publishTime);
+    public abstract void captureCollectionPublishMetrics(String collectionId, long publishTime, int numberOfFiles);
 }

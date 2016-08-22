@@ -21,7 +21,6 @@ import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -40,7 +39,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Future;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
@@ -341,19 +339,9 @@ public class Collections {
                     .collectionName(collection)
                     .timeTaken((System.currentTimeMillis() - publishStart))
                     .log();
-
-            SavePublishTimeMetrics(collection, publishStart, onPublishCompleteStart);
         }
 
         return publishComplete;
-    }
-
-    public void SavePublishTimeMetrics(Collection collection, long publishStart, long onPublishCompleteStart) {
-        MetricsService metricsService = MetricsService.getInstance();
-        long publishTime = onPublishCompleteStart - publishStart;
-        List<String> collectionIds = new ArrayList<>();
-        collectionIds.add(collection.description.id);
-        metricsService.captureCollectionsPublishTime(collectionIds, publishTime);
     }
 
     public DirectoryListing listDirectory(

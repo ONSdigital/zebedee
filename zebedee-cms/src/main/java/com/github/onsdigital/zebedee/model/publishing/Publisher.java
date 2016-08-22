@@ -6,6 +6,7 @@ import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
@@ -25,6 +26,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.util.*;
+import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -370,11 +372,13 @@ public class Publisher {
     public static boolean postPublish(Zebedee zebedee, Collection collection, boolean skipVerification, CollectionReader collectionReader) throws IOException {
 
         try {
-            // send a slack success message
-            Path path = Paths.get(collection.path.toString() + ".json");
-            SlackNotification.publishNotification(path);
+            PublishedCollection publishedCollection = getPublishedCollection(collection);
+
+            SlackNotification.publishNotification(publishedCollection);
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
                     COLLECTION_POST_PUBLISHED_CONFIRMATION);
+
+            savePublishMetrics(publishedCollection);
 
             ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
             ContentWriter contentWriter = new ContentWriter(zebedee.published.path);
@@ -402,6 +406,25 @@ public class Publisher {
         }
 
         return false;
+    }
+
+    public static void savePublishMetrics(PublishedCollection publishedCollection) {
+        long publishTimeMs = Math.round(publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime());
+
+        MetricsService.getInstance().captureCollectionPublishMetrics(
+                publishedCollection.id,
+                publishTimeMs,
+                publishedCollection.publishResults.get(0).transaction.uriInfos.size());
+    }
+
+    public static PublishedCollection getPublishedCollection(Collection collection) throws IOException {
+        Path path = Paths.get(collection.path.toString() + ".json");
+        PublishedCollection publishedCollection;
+        try (InputStream input = Files.newInputStream(path)) {
+            publishedCollection = ContentUtil.deserialise(input,
+                    PublishedCollection.class);
+        }
+        return publishedCollection;
     }
 
     private static void processManifestForMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {

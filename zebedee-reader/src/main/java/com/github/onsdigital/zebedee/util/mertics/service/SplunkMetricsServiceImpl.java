@@ -25,10 +25,9 @@ import static com.github.onsdigital.zebedee.util.mertics.events.SplunkEvent.INTE
  */
 public class SplunkMetricsServiceImpl extends MetricsService {
 
+    private static final Path HOME_URI = Paths.get("/");
     protected static ExecutorService pool = Executors.newSingleThreadExecutor();
     protected static ThreadLocal<SplunkEvent.Builder> splunkEventThreadLocal = new ThreadLocal<>();
-    private static final Path HOME_URI = Paths.get("/");
-
     private String httpEventCollectorURI;
     private SplunkClient splunkClient = null;
 
@@ -87,10 +86,11 @@ public class SplunkMetricsServiceImpl extends MetricsService {
     }
 
     @Override
-    public void captureCollectionsPublishTime(List<String> collectionIds, long publishTime) {
+    public void captureCollectionPublishMetrics(String collectionId, long publishTime, int numberOfFiles) {
         sendRequest(new SplunkEvent.Builder()
-                .collectionIds(collectionIds)
+                .collectionId(collectionId)
                 .collectionPublishTime(publishTime)
+                .collectionPublishFileCount(numberOfFiles)
                 .build(MetricsType.COLLECTIONS_PUBLISH_TIME));
     }
 

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
@@ -45,7 +46,7 @@ public class PublishCollectionsTaskTest {
         Collection collection = Collection.create(collectionDescription, zebedee, session);
 
         ArrayList<PublishCollectionTask> publishCollectionTasks = new ArrayList<>();
-        DummyPublishCollectionTask publish1 = new DummyPublishCollectionTask(collection);
+        DummyPublishCollectionTask publish1 = new DummyPublishCollectionTask(collection, 0);
         publishCollectionTasks.add(publish1);
 
         ArrayList<PostPublishCollectionTask> postPublishCollectionTasks = new ArrayList<>();
@@ -64,13 +65,15 @@ public class PublishCollectionsTaskTest {
     }
 
     @Test
-    public void shouldRunInTheCorrectOrder() {
+    public void shouldRunInTheCorrectOrder() throws IOException, CollectionNotFoundException {
+
+        Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         // Given 2 publish tasks and 2 post publish tasks in a PublishCollectionsTask.
         ArrayList<PublishCollectionTask> publishCollectionTasks = new ArrayList<>();
-        DummyPublishCollectionTask publish1 = new DummyPublishCollectionTask(5);
+        DummyPublishCollectionTask publish1 = new DummyPublishCollectionTask(collection, 10);
         publishCollectionTasks.add(publish1);
-        DummyPublishCollectionTask publish2 = new DummyPublishCollectionTask(3);
+        DummyPublishCollectionTask publish2 = new DummyPublishCollectionTask(collection, 5);
         publishCollectionTasks.add(publish2);
         ArrayList<PostPublishCollectionTask> postPublishCollectionTasks = new ArrayList<>();
         DummyPostPublishCollectionTask postPublish1 = new DummyPostPublishCollectionTask(2);

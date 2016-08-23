@@ -12,35 +12,35 @@
     <!-- Use this appender if you want the log output in plain/standard log format. -->
     <appender name="PLAIN_TEXT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.TextLayout" />
+            <layout class="com.github.onsdigital.logging.layouts.TextLayout"/>
         </encoder>
     </appender>
 
     <!-- Use this appender if you want the log output in json -->
     <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.JsonLayout" />
+            <layout class="com.github.onsdigital.logging.layouts.JsonLayout"/>
         </encoder>
     </appender>
 
     <appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />
+            <layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout"/>
         </encoder>
     </appender>
 
     <!-- For logging a json object to the console. Only the json message will be output. -->
-<!--    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %msg%n
-            </Pattern>
-        </layout>
-    </appender>-->
+    <!--    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>
+                    %msg%n
+                </Pattern>
+            </layout>
+        </appender>-->
 
     <appender name="AUDIT_SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
-<!--        <syslogHost>192.168.0.8</syslogHost>
-        <port>8514</port>-->
+        <!--        <syslogHost>192.168.0.8</syslogHost>
+                <port>8514</port>-->
         <syslogHost>10.30.10.57</syslogHost>
         <port>514</port>
         <facility>LOCAL1</facility>
@@ -49,13 +49,13 @@
 
     <!-- Send logs to both console and file audit -->
     <logger name="com.github.onsdigital.zebedee.audit" level="info" additivity="false">
-        <appender-ref ref="AUDIT_SYSLOG" />
+        <appender-ref ref="AUDIT_SYSLOG"/>
     </logger>
 
     <logger name="com.github.onsdigital.logging" level="debug" additivity="false">
-        <!--<appender-ref ref="PRETTY_JSON" />-->
+        <appender-ref ref="PRETTY_JSON"/>
         <!--<appender-ref ref="JSON"/>-->
-        <appender-ref ref="PLAIN_TEXT"/>
+        <!--<appender-ref ref="PLAIN_TEXT"/>-->
     </logger>
 
     <logger name="com.github.onsdigital.logging.click.events" level="trace" additivity="false">
@@ -63,7 +63,7 @@
     </logger>
 
     <root level="info">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 
     <logger name="com.github.davidcarboni.restolino" level="WARN"/>

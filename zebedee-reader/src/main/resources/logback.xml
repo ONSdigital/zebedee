@@ -29,11 +29,10 @@
         </encoder>
     </appender>
 
-
     <logger name="com.github.onsdigital.logging" level="info" additivity="false">
-        <appender-ref ref="JSON"/>
+        <!--<appender-ref ref="JSON"/>-->
         <!--<appender-ref ref="PRETTY_JSON"/>-->
-        <!--<appender-ref ref="PLAIN_TEXT"/>-->
+        <appender-ref ref="PLAIN_TEXT"/>
     </logger>
 
     <root level="info">

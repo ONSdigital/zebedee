@@ -1,20 +1,16 @@
 #!/bin/bash
 
+AWS_REGION=
 CONFIG_BUCKET=
 ECR_REPOSITORY_URI=
 GIT_COMMIT=
 
-if [[ $DEPLOYMENT_GROUP_NAME =~ ^production-.+ ]]; then
-  CONFIG_FILE=production.sh
-elif [[ $DEPLOYMENT_GROUP_NAME =~ ^sandpit-.+ ]]; then
-  CONFIG_FILE=sandpit.sh
-else
-  CONFIG_FILE=development.sh
-fi
+INSTANCE=$(curl -s http://instance-data/latest/meta-data/instance-id)
+CONFIG=$(aws --region $AWS_REGION ec2 describe-tags --filters "Name=resource-id,Values=$INSTANCE" "Name=key,Values=Configuration" --output text | awk '{print $5}')
 
-aws s3 cp s3://$CONFIG_BUCKET/zebedee/$CONFIG_FILE . || exit $?
+(aws s3 cp s3://$CONFIG_BUCKET/zebedee/$CONFIG.asc . && gpg --decrypt $CONFIG.asc > $CONFIG) || exit $?
 
-source $CONFIG_FILE && docker run -d                                 \
+source $CONFIG && docker run -d                                      \
   --env=audit_db_enabled=$AUDIT_ENABLED                              \
   --env=brian_url=http://brian:8080                                  \
   --env=ELASTIC_SEARCH_CLUSTER=cluster                               \
@@ -22,6 +18,8 @@ source $CONFIG_FILE && docker run -d                                 \
   --env=db_audit_password=$AUDIT_DB_PASSWORD                         \
   --env=db_audit_url=$AUDIT_DB_URI                                   \
   --env=db_audit_username=$AUDIT_DB_USERNAME                         \
+  --env=enable_influx_reporting=$ENABLE_INFLUX_REPORTING             \
+  --env=influxdb_url=$INFLUXDB_URL                                   \
   --env=MATHJAX_SERVICE_URL=http://mathjax:8080                      \
   --env=publish_url=$PUBLISH_URL                                     \
   --env=publish_verification_enabled=$VERIFY_PUBLICATIONS            \

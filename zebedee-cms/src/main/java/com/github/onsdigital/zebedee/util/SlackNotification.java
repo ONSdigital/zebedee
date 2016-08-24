@@ -4,7 +4,6 @@ import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
-import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
@@ -12,9 +11,6 @@ import com.google.gson.JsonObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
@@ -102,19 +98,13 @@ public class SlackNotification {
 
     /**
      * Send a slack message containing collection publication information
-     *
-     * @param collectionJsonPath
+     * @param publishedCollection
      */
-    public static void publishNotification(Path collectionJsonPath) {
-
-        try (InputStream input = Files.newInputStream(collectionJsonPath)) {
-            PublishedCollection publishedCollection = ContentUtil.deserialise(input,
-                    PublishedCollection.class);
-
-            // get the message for the publication
+    public static void publishNotification(PublishedCollection publishedCollection) {
+        try {
             String slackMessage = publicationMessage(publishedCollection);
             sendPublishNotification(slackMessage);
-        } catch (Exception e) {
+        } catch (ParseException e) {
             logError(e, "Slack publish notification error").log();
         }
     }

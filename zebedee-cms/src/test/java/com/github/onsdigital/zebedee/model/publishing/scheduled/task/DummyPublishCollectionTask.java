@@ -15,22 +15,9 @@ public class DummyPublishCollectionTask extends PublishCollectionTask {
     private Date start;
     private Date end;
 
-    /**
-     * Dummy publish task which does nothing other than set that the publish is complete.
-     */
-    public DummyPublishCollectionTask() {
-        super(null, null, "", null);
-        duration = 0;
-    }
-
-    public DummyPublishCollectionTask(int durationMillis) {
-        super(null, null, "", null);
-        this.duration = durationMillis;
-    }
-
-    public DummyPublishCollectionTask(Collection collection) {
+    public DummyPublishCollectionTask(Collection collection, int durationMillis) {
         super(collection, null, "", null);
-        duration = 0;
+        this.duration = durationMillis;
     }
 
     @Override

@@ -17,6 +17,8 @@
 #/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections/* => poopulation, projection, age
 /census=>census
 /economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/*=>Flow of funds
+/economy/inflationandpriceindices/timeseries/chaw/mm23=>RPI
+/economy/inflationandpriceindices/timeseries/czbh/mm23=>RPI
 /economy/inflationandpriceindices/bulletins/consumerpriceinflation/*=>RPI
 /economy/inflationandpriceindices/bulletins/producerpriceinflation/*=>Producer Price Indices
 /economy/inflationandpriceindices/timeseries/chmk=>rpix

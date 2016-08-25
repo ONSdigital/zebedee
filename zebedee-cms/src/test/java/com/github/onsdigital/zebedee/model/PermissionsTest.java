@@ -6,16 +6,14 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.util.Date;
@@ -340,6 +338,23 @@ public class PermissionsTest {
         assertFalse(adminPermission);
         assertTrue(editPermission);
         assertTrue(viewPermission);
+    }
+
+    @Test
+    public void shouldGetPermissionsForCaseInsensitiveDataVisEmail() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
+
+        // Given a data vis user who logs in with an email containing captial letters
+        String email = builder.dataVis.email.toUpperCase();
+
+        Credentials credentials = builder.dataVisCredentials;
+        credentials.email = credentials.email.toUpperCase();
+        Session session = zebedee.openSession(credentials);
+
+        // When we attempt to get user permissions for that data vis publisher.
+        PermissionDefinition permissionDefinition = zebedee.permissions.userPermissions(email, session);
+
+        // Then no exception is thrown.
+        Assert.notNull(permissionDefinition);
     }
 
     @Test

@@ -121,7 +121,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                 } else {
                     collections.add(collection);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logError(e, "Exception publishing collection").addParameter("collectionId", collectionId).log();
             }
         });

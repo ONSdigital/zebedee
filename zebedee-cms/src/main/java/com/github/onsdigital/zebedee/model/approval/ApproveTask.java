@@ -6,10 +6,7 @@ import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -62,7 +59,7 @@ public class ApproveTask implements Callable<Boolean> {
         this.dataIndex = dataIndex;
     }
 
-    public static List<String> generateTimeseries(
+    public static void  generateTimeseries(
             Collection collection,
             ContentReader publishedReader,
             CollectionReader collectionReader,
@@ -74,7 +71,7 @@ public class ApproveTask implements Callable<Boolean> {
         List<TimeseriesUpdateCommand> updateCommands = ImportUpdateCommandCsvs(collection, publishedReader, collectionReader);
 
         // Generate time series if required.
-        return new DataPublisher().preprocessCollection(
+        new DataPublisher().preprocessCollection(
                 publishedReader,
                 collectionReader,
                 collectionWriter.getReviewed(), true, dataIndex, updateCommands);
@@ -118,13 +115,23 @@ public class ApproveTask implements Callable<Boolean> {
             List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
             populateReleasePage(collectionContent);
-            List<String> uriList = generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-            compressZipFiles(collection, collectionReader, collectionWriter);
+            generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
             generatePdfFiles(collectionContent);
+
+            // only provide relevent uri's
+            //  - remove versioned uris
+            //  - add associated uris? /previous /data etc?
+            List<String> uriList = collectionReader.getReviewed().listUris();
+            //List<String> urisToDelete = new ArrayList<>();
+            //List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
+            PublishNotification publishNotification = new PublishNotification(collection, uriList);
+
+            compressZipFiles(collection, collectionReader, collectionWriter);
             approveCollection();
 
+
             // Send a notification to the website with the publish date for caching.
-            new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
+            publishNotification.sendNotification(EventType.APPROVED);
 
             return true;
 

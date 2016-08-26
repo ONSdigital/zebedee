@@ -105,13 +105,19 @@ public class PublishNotification {
     class NotificationPayload {
         public String collectionId;
         public String publishDate;
-        public List<String> uriList;
+        public List<String> urisToUpdate;
+        public List<String> urisToDelete;
         public String key = Configuration.getReindexKey();
 
-        NotificationPayload(String collectionId, List<String> uriList, Date publishDate) {
+        public NotificationPayload(String collectionId, List<String> urisToUpdate, List<String> urisToDelete, Date publishDate) {
             this.collectionId = collectionId;
-            this.uriList = uriList;
             this.publishDate = format(publishDate);
+            this.urisToUpdate = urisToUpdate;
+            this.urisToDelete = urisToDelete;
+        }
+
+        public NotificationPayload(String collectionId, List<String> urisToUpdate, Date publishDate) {
+            this(collectionId, urisToUpdate, null, publishDate);
         }
     }
 }

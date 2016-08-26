@@ -14,12 +14,7 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,7 +60,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         logInfo("PRE-PUBLISH: Starting Pre-publish process.").log();
 
         // load collections into memory
-        Set<Collection> collections = loadCollections();
+        Set<Collection> collections = loadCollections(this, zebedee);
 
         preProcessCollectionsForPublish(collections);
 
@@ -100,11 +95,12 @@ public class PrePublishCollectionsTask extends ScheduledTask {
      *
      * @return
      */
-    private Set<Collection> loadCollections() {
+    public static Set<Collection> loadCollections(PrePublishCollectionsTask task, Zebedee zebedee) {
         Set<Collection> collections = new HashSet<>();
 
         logInfo("PRE-PUBLISH: Loading collections into memory").log();
-        collectionIds.forEach(collectionId -> {
+
+        task.getCollectionIds().forEach(collectionId -> {
 
             logInfo("PRE-PUBLISH: Loading collection job").addParameter("collectionId", collectionId).log();
             try {
@@ -224,4 +220,16 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         collectionIds.remove(collection.description.id);
     }
 
+    /**
+     * Get a list of current collection ids that cannot be changed
+     *
+     * @return
+     */
+    public Set<String> getCollectionIds() {
+        return Collections.unmodifiableSet(collectionIds);
+    }
+
+    public Date getPublishDate() {
+        return publishDate;
+    }
 }

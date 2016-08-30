@@ -232,7 +232,7 @@ public class Collection {
 
         Files.delete(zebedee.collections.path.resolve(filename + ".json"));
 
-        return new Collection(zebedee.collections.path.resolve(filename), zebedee);
+        return new Collection(zebedee.collections.path.resolve(newFilename), zebedee);
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {

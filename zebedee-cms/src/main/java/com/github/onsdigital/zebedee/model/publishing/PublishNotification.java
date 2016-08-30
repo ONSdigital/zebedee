@@ -6,6 +6,7 @@ import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
@@ -36,7 +37,7 @@ public class PublishNotification {
         }
     }
 
-    public PublishNotification(Collection collection, List<String> urisToUpdate, List<String> urisToDelete) {
+    public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
 
         // Delay the clearing of the cache after publish to minimise load on the server while publishing.
         Date clearCacheDate = new DateTime(collection.description.publishDate)
@@ -102,17 +103,20 @@ public class PublishNotification {
     }
 
     public boolean hasUriToDelete(String uriToDelete) {
-        return this.payload.urisToDelete.contains(uriToDelete);
+        return this.payload.urisToDelete.stream()
+                .filter(contentDetail -> contentDetail.uri.equals(uriToDelete))
+                .findFirst()
+                .isPresent();
     }
 
     class NotificationPayload {
         public String collectionId;
         public String publishDate;
         public List<String> urisToUpdate;
-        public List<String> urisToDelete;
+        public List<ContentDetail> urisToDelete;
         public String key = Configuration.getReindexKey();
 
-        public NotificationPayload(String collectionId, List<String> urisToUpdate, List<String> urisToDelete, Date publishDate) {
+        public NotificationPayload(String collectionId, List<String> urisToUpdate, List<ContentDetail> urisToDelete, Date publishDate) {
             this.collectionId = collectionId;
             this.publishDate = format(publishDate);
             this.urisToUpdate = urisToUpdate;

@@ -142,15 +142,19 @@ public class ApproveTask implements Callable<Boolean> {
         //  - remove versioned uris
         //  - add associated uris? /previous /data etc?
 
-        List<String> urisToDelete = new ArrayList<>();
+        List<ContentDetail> contentToDelete = new ArrayList<>();
         List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
 
         for (PendingDelete pendingDelete : pendingDeletes) {
-            if (!urisToDelete.contains(pendingDelete.getRoot().uri))
-                urisToDelete.add(pendingDelete.getRoot().uri);
+            if (!contentToDelete.contains(pendingDelete.getRoot().uri)) {
+                ContentDetail contentDetailToDelete = new ContentDetail();
+                contentDetailToDelete.uri = pendingDelete.getRoot().uri;
+                contentDetailToDelete.type = pendingDelete.getRoot().type;
+                contentToDelete.add(contentDetailToDelete);
+            }
         }
 
-        return new PublishNotification(collection, uriList, urisToDelete);
+        return new PublishNotification(collection, uriList, contentToDelete);
     }
 
     public void approveCollection() throws IOException {

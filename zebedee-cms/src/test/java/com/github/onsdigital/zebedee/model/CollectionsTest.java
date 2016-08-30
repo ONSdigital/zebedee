@@ -146,7 +146,7 @@ public class CollectionsTest {
 
     @Test(expected = BadRequestException.class)
     public void shouldThrowBadRequestForNullCollectionOnComplete()
-            throws IOException,ZebedeeException {
+            throws IOException, ZebedeeException {
 
         // Given
         // A null collection
@@ -1043,5 +1043,4 @@ public class CollectionsTest {
             }
         }
     }
-
 }

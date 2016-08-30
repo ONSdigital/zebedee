@@ -59,7 +59,7 @@ public class ApproveTask implements Callable<Boolean> {
         this.dataIndex = dataIndex;
     }
 
-    public static void  generateTimeseries(
+    public static void generateTimeseries(
             Collection collection,
             ContentReader publishedReader,
             CollectionReader collectionReader,
@@ -118,17 +118,10 @@ public class ApproveTask implements Callable<Boolean> {
             generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
             generatePdfFiles(collectionContent);
 
-            // only provide relevent uri's
-            //  - remove versioned uris
-            //  - add associated uris? /previous /data etc?
-            List<String> uriList = collectionReader.getReviewed().listUris();
-            //List<String> urisToDelete = new ArrayList<>();
-            //List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
-            PublishNotification publishNotification = new PublishNotification(collection, uriList);
+            PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
 
             compressZipFiles(collection, collectionReader, collectionWriter);
             approveCollection();
-
 
             // Send a notification to the website with the publish date for caching.
             publishNotification.sendNotification(EventType.APPROVED);
@@ -140,6 +133,24 @@ public class ApproveTask implements Callable<Boolean> {
             SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
             return false;
         }
+    }
+
+    public static PublishNotification createPublishNotification(CollectionReader collectionReader, Collection collection) {
+        List<String> uriList = collectionReader.getReviewed().listUris();
+
+        // only provide relevent uri's
+        //  - remove versioned uris
+        //  - add associated uris? /previous /data etc?
+
+        List<String> urisToDelete = new ArrayList<>();
+        List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
+
+        for (PendingDelete pendingDelete : pendingDeletes) {
+            if (!urisToDelete.contains(pendingDelete.getRoot().uri))
+                urisToDelete.add(pendingDelete.getRoot().uri);
+        }
+
+        return new PublishNotification(collection, uriList, urisToDelete);
     }
 
     public void approveCollection() throws IOException {

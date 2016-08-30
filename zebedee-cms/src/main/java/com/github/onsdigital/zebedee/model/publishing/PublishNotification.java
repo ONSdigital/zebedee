@@ -26,6 +26,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 public class PublishNotification {
 
     private static final List<Host> websiteHosts;
+    private NotificationPayload payload;
 
     static {
         String[] websiteUrls = Configuration.getWebsiteUrls();
@@ -35,19 +36,17 @@ public class PublishNotification {
         }
     }
 
-    private NotificationPayload payload;
-
-    public PublishNotification(Collection collection, List<String> uriList) {
+    public PublishNotification(Collection collection, List<String> urisToUpdate, List<String> urisToDelete) {
 
         // Delay the clearing of the cache after publish to minimise load on the server while publishing.
         Date clearCacheDate = new DateTime(collection.description.publishDate)
                 .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
 
-        this.payload = new NotificationPayload(collection.description.id, uriList, clearCacheDate);
+        this.payload = new NotificationPayload(collection.description.id, urisToUpdate, urisToDelete, clearCacheDate);
     }
 
     public PublishNotification(Collection collection) {
-        this(collection, null);
+        this(collection, null, null);
     }
 
     public void sendNotification(EventType eventType) {
@@ -102,6 +101,10 @@ public class PublishNotification {
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(date);
     }
 
+    public boolean hasUriToDelete(String uriToDelete) {
+        return this.payload.urisToDelete.contains(uriToDelete);
+    }
+
     class NotificationPayload {
         public String collectionId;
         public String publishDate;
@@ -114,10 +117,6 @@ public class PublishNotification {
             this.publishDate = format(publishDate);
             this.urisToUpdate = urisToUpdate;
             this.urisToDelete = urisToDelete;
-        }
-
-        public NotificationPayload(String collectionId, List<String> urisToUpdate, Date publishDate) {
-            this(collectionId, urisToUpdate, null, publishDate);
         }
     }
 }

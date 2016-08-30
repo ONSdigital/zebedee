@@ -613,8 +613,7 @@ public class Collections {
             eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
         } else {
             if (Files.isDirectory(path)) {
-
-                deleted = collection.deleteContent(session.email, uri);
+                deleted = collection.deleteContentDirectory(session.email, uri);
             } else {
                 deleted = collection.deleteFile(uri);
             }

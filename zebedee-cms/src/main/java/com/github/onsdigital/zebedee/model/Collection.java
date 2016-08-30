@@ -47,8 +47,9 @@ public class Collection {
     public final Content reviewed;
     public final Content complete;
     public final Content inProgress;
-    final Zebedee zebedee;
-    final Collections collections;
+    public final Zebedee zebedee;
+
+    private final Path collectionJsonPath;
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -62,16 +63,18 @@ public class Collection {
      */
     public Collection(Path path, Zebedee zebedee) throws IOException, CollectionNotFoundException {
 
+        this.zebedee = zebedee;
+
         // Validate the directory:
         this.path = path;
         Path reviewed = path.resolve(REVIEWED);
         Path complete = path.resolve(COMPLETE);
         Path inProgress = path.resolve(IN_PROGRESS);
 
-        Path description = path.getParent().resolve(
+        this.collectionJsonPath = path.getParent().resolve(
                 path.getFileName() + ".json");
         if (!Files.exists(reviewed) || !Files.exists(inProgress) || !Files.exists(complete)
-                || !Files.exists(description)) {
+                || !Files.exists(this.collectionJsonPath)) {
             throw new CollectionNotFoundException(
                     "This doesn't look like a collection folder: "
                             + path.toAbsolutePath());
@@ -80,7 +83,7 @@ public class Collection {
         // Deserialise the description:
         collectionLocks.putIfAbsent(this.path, new ReentrantReadWriteLock());
         collectionLocks.get(this.path).readLock().lock();
-        try (InputStream input = Files.newInputStream(description)) {
+        try (InputStream input = Files.newInputStream(this.collectionJsonPath)) {
             this.description = Serialiser.deserialise(input,
                     CollectionDescription.class);
         } finally {
@@ -88,8 +91,6 @@ public class Collection {
         }
 
         // Set fields:
-        this.zebedee = zebedee;
-        this.collections = zebedee.collections;
         this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
@@ -105,10 +106,6 @@ public class Collection {
 
     //public RedirectTableChained redirect = null;
     //private RedirectTableChained collectionRedirect = null;
-
-    Collection(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, CollectionNotFoundException {
-        this(zebedee.collections.path.resolve(PathUtils.toFilename(collectionDescription.name)), zebedee);
-    }
 
     /**
      * Deconstructs a {@link Collection} in the given {@link Zebedee},
@@ -143,7 +140,7 @@ public class Collection {
             Serialiser.serialise(output, collectionDescription);
         }
 
-        Collection collection = new Collection(collectionDescription, zebedee);
+        Collection collection = new Collection(rootCollectionsPath.resolve(filename), zebedee);
         getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED, collectionCreated
                 (collectionDescription));
 
@@ -235,7 +232,7 @@ public class Collection {
 
         Files.delete(zebedee.collections.path.resolve(filename + ".json"));
 
-        return new Collection(collectionDescription, zebedee);
+        return new Collection(zebedee.collections.path.resolve(filename), zebedee);
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
@@ -398,8 +395,7 @@ public class Collection {
         FileUtils.deleteDirectory(path.toFile()); // delete the directory including any files.
 
         // Delete the description file
-        String filename = PathUtils.toFilename(this.description.name);
-        Path collectionDescriptionPath = collections.path.resolve(filename + ".json");
+        Path collectionDescriptionPath = this.collectionJsonPath;
 
         // delete
         if (Files.exists(collectionDescriptionPath)) {
@@ -431,8 +427,7 @@ public class Collection {
     }
 
     private Path descriptionPath() {
-        String filename = PathUtils.toFilename(this.description.name);
-        return collections.path.resolve(filename + ".json");
+        return this.collectionJsonPath;
     }
 
     /**
@@ -578,7 +573,7 @@ public class Collection {
                     FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
                 } else {
                     PathUtils.moveFilesInDirectory(source, destination);
-                    collections.removeEmptyCollectionDirectories(source);
+                    zebedee.collections.removeEmptyCollectionDirectories(source);
                 }
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
@@ -692,7 +687,7 @@ public class Collection {
                 FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
             } else {
                 PathUtils.moveFilesInDirectory(source, destination);
-                collections.removeEmptyCollectionDirectories(source);
+                zebedee.collections.removeEmptyCollectionDirectories(source);
             }
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
@@ -830,7 +825,7 @@ public class Collection {
      * @return
      * @throws IOException
      */
-    public boolean deleteContent(String email, String uri) throws IOException {
+    public boolean deleteContentDirectory(String email, String uri) throws IOException {
 
         boolean hasDeleted = false;
 

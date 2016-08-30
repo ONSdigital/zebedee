@@ -909,14 +909,9 @@ public class CollectionsTest {
         // We attempt to delete the nonexistent file
         boolean result = zebedee.collections.deleteContent(collection, folderUri, session);
 
-        // Then
-        // The file should be gone
-        // NB current behaviour is that files in the folder are deleted,
-        // but not the folder itself. This may need to be reviewed,
-        // however this test has been written to reflect current behaviour.
+        // Then the file should be gone
         assertTrue(result);
         assertNull(collection.find(fileUri));
-        assertNotNull(collection.find(folderUri));
     }
 
     @Test(expected = ConflictException.class)

@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
@@ -103,7 +104,7 @@ public class Collections {
             Path temp = path;
             while (!isCollectionRoot(temp.getFileName())) {
                 if (isEmpty(temp)) {
-                    Files.delete(temp);
+                    Files.deleteIfExists(temp);
                 }
                 temp = temp.getParent();
             }
@@ -117,7 +118,12 @@ public class Collections {
     }
 
     private static boolean isEmpty(Path path) {
-        return Arrays.asList(path.toFile().listFiles()).isEmpty();
+        File[] files = path.toFile().listFiles();
+
+        if (files == null)
+            return true;
+
+        return Arrays.asList(files).isEmpty();
     }
 
     /**

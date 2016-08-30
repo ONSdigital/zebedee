@@ -27,12 +27,11 @@ public class Content {
     public static final String DATA_VIS_DIR = "visualisations";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
 
-    private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
-
     public final Path path;
     public final Path dataVisualisationsPath;
 
     public RedirectTablePartialMatch redirect = null;
+    private Path publishedContentPath;
 
     public Content(Path path) {
         this.path = path;
@@ -48,10 +47,14 @@ public class Content {
         }
     }
 
-    private static boolean isDirEmpty(final Path directory) throws IOException {
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
-            return !dirStream.iterator().hasNext();
-        }
+    /**
+     * Create a new instance using an injected publishedContentPath.
+     * @param path
+     * @param publishedContentPath
+     */
+    public Content(Path path, Path publishedContentPath) {
+        this(path);
+        this.publishedContentPath = publishedContentPath;
     }
 
     private static boolean isNotTimeseries(Path p) {
@@ -237,7 +240,7 @@ public class Content {
             detail.uri = "";
         }
 
-        detail.contentPath = "/" + zebedeeCmsService.getZebedee().publishedContentPath.relativize(contentPath);
+        detail.contentPath = "/" + getPublishedContentPath().relativize(contentPath);
         detail.children = new ArrayList<>();
 
         // todo: remove timeseries filter once we are caching the browse tree.
@@ -418,5 +421,13 @@ public class Content {
                     && isNotPreviousVersions(entry)
                     && !isDataVisualisation(entry);
         }
+    }
+
+    public Path getPublishedContentPath() {
+
+        if (publishedContentPath == null)
+            publishedContentPath = ZebedeeCmsService.getInstance().getZebedee().publishedContentPath;
+
+        return publishedContentPath;
     }
 }

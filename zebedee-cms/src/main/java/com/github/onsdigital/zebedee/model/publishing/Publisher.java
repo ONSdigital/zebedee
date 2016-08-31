@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
@@ -25,6 +26,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.*;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.FileUtils;
@@ -47,8 +49,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
@@ -379,7 +380,7 @@ public class Publisher {
             copyFilesToMaster(zebedee, collection, collectionReader);
 
             logInfo("Post publish reindexing search").collectionName(collection).log();
-            reindexSearch(collection);
+            reindexPublishingSearch(collection);
 
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 
@@ -468,7 +469,7 @@ public class Publisher {
     }
 
 
-    private static void reindexSearch(Collection collection) throws IOException {
+    private static void reindexPublishingSearch(Collection collection) throws IOException {
 
         logInfo("Reindexing search").collectionName(collection).log();
         try {
@@ -481,6 +482,20 @@ public class Publisher {
                     String contentUri = URIUtils.removeLastSegment(uri);
                     reIndexPublishingSearch(contentUri);
                 }
+            }
+
+            for (PendingDelete pendingDelete : collection.description.getPendingDeletes()) {
+
+                ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
+                    logDebug("Deleting index for uri " + node.uri);
+                    pool.submit(() -> {
+                        try {
+                            Indexer.getInstance().deleteContentIndex(node.type, node.uri);
+                        } catch (Exception e) {
+                            logError(e, "Exception reloading search index:").log();
+                        }
+                    });
+                });
             }
 
             logInfo("Redindex search completed").collectionName(collection)

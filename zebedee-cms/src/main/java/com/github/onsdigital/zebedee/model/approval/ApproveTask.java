@@ -17,6 +17,7 @@ import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
@@ -28,8 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
 
 /**
  * Callable implementation for the approval process.
@@ -96,6 +96,33 @@ public class ApproveTask implements Callable<Boolean> {
         return updateCommands;
     }
 
+    public static PublishNotification createPublishNotification(CollectionReader collectionReader, Collection collection) {
+        List<String> uriList = collectionReader.getReviewed().listUris();
+
+        // only provide relevent uri's
+        //  - remove versioned uris
+        //  - add associated uris? /previous /data etc?
+
+        List<ContentDetail> contentToDelete = new ArrayList<>();
+        List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
+
+
+        for (PendingDelete pendingDelete : pendingDeletes) {
+
+            ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
+                logDebug("Adding uri to delete to the publish notification " + node.uri);
+                if (!contentToDelete.contains(node.uri)) {
+                    ContentDetail contentDetailToDelete = new ContentDetail();
+                    contentDetailToDelete.uri = node.uri;
+                    contentDetailToDelete.type = node.type;
+                    contentToDelete.add(contentDetailToDelete);
+                }
+            });
+        }
+
+        return new PublishNotification(collection, uriList, contentToDelete);
+    }
+
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
         TimeSeriesCompressionTask timeSeriesCompressionTask = new TimeSeriesCompressionTask();
         boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
@@ -133,28 +160,6 @@ public class ApproveTask implements Callable<Boolean> {
             SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
             return false;
         }
-    }
-
-    public static PublishNotification createPublishNotification(CollectionReader collectionReader, Collection collection) {
-        List<String> uriList = collectionReader.getReviewed().listUris();
-
-        // only provide relevent uri's
-        //  - remove versioned uris
-        //  - add associated uris? /previous /data etc?
-
-        List<ContentDetail> contentToDelete = new ArrayList<>();
-        List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
-
-        for (PendingDelete pendingDelete : pendingDeletes) {
-            if (!contentToDelete.contains(pendingDelete.getRoot().uri)) {
-                ContentDetail contentDetailToDelete = new ContentDetail();
-                contentDetailToDelete.uri = pendingDelete.getRoot().uri;
-                contentDetailToDelete.type = pendingDelete.getRoot().type;
-                contentToDelete.add(contentDetailToDelete);
-            }
-        }
-
-        return new PublishNotification(collection, uriList, contentToDelete);
     }
 
     public void approveCollection() throws IOException {

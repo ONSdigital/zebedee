@@ -31,9 +31,9 @@ dwp => The Department for Work & Pensions => https://www.gov.uk/government/stati
 
 dh => The Department of Health => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-of-health =>DH,abortion
 
-mod => The Ministry of Defence => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=home-office =>MOD,defence,armed forces,military,veterans,war pensions
+mod => The Ministry of Defence => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-defence =>MOD,defence,armed forces,military,veterans,war pensions
 
-moj => The Ministry of Justice => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-defence =>MOJ,criminal justice,prison,offender,civil justice,knife possession,youth custody,probation,reoffence,asbo
+moj => The Ministry of Justice => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-justice&from_date=&to_date= =>MOJ,criminal justice,prison,offender,civil justice,knife possession,youth custody,probation,reoffence,asbo
 
 nhs => The NHS => https://www.gov.uk/government/statistics?departments%5B%5D=national-health-service =>NHS,dementia,waiting times,hospital,critical care,inpatient,outpatient,ambulance
 

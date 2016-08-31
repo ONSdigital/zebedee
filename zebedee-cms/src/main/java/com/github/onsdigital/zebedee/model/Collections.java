@@ -214,7 +214,7 @@ public class Collections {
             String collectionName = getCollectionNameFromId(collectionId);
             Collection collection = getCollectionByName(collectionName);
             return collection;
-        } catch (CollectionNotFoundException e) {
+        } catch (IOException | CollectionNotFoundException e) {
             return Root.zebedee.collections.list().getCollection(collectionId);
         }
     }

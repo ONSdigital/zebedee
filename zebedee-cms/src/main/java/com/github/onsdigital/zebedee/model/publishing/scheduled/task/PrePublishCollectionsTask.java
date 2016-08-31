@@ -59,7 +59,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         logInfo("PRE-PUBLISH: Starting Pre-publish process.").log();
 
         // load collections into memory
-        Set<Collection> collections = loadCollections();
+        Set<Collection> collections = loadCollections(this, zebedee);
 
         // create a publish task for each collection ready to publish.
         List<PublishCollectionTask> collectionPublishTasks = createCollectionPublishTasks(collections);
@@ -82,11 +82,12 @@ public class PrePublishCollectionsTask extends ScheduledTask {
      *
      * @return
      */
-    private Set<Collection> loadCollections() {
+    public static Set<Collection> loadCollections(PrePublishCollectionsTask task, Zebedee zebedee) {
         Set<Collection> collections = new HashSet<>();
 
         logInfo("PRE-PUBLISH: Loading collections into memory").log();
-        collectionIds.forEach(collectionId -> {
+
+        task.getCollectionIds().forEach(collectionId -> {
 
             logInfo("PRE-PUBLISH: Loading collection job").addParameter("collectionId", collectionId).log();
             try {
@@ -103,7 +104,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                 } else {
                     collections.add(collection);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logError(e, "Exception publishing collection").addParameter("collectionId", collectionId).log();
             }
         });
@@ -206,4 +207,16 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         collectionIds.remove(collection.description.id);
     }
 
+    /**
+     * Get a list of current collection ids that cannot be changed
+     *
+     * @return
+     */
+    public Set<String> getCollectionIds() {
+        return Collections.unmodifiableSet(collectionIds);
+    }
+
+    public Date getPublishDate() {
+        return publishDate;
+    }
 }

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.json.CollectionBase;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PostPublishCollectionTask;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PrePublishCollectionsTask;
@@ -9,10 +10,8 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishColl
 import com.github.onsdigital.zebedee.model.publishing.scheduled.task.PublishCollectionsTask;
 import org.joda.time.DateTime;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -69,7 +68,6 @@ public class PublishScheduler extends Scheduler {
         task.addCollection(collection);
     }
 
-
     public void schedulePublish(
             List<PublishCollectionTask> collectionPublishTasks,
             List<PostPublishCollectionTask> postPublishCollectionTasks,
@@ -121,5 +119,31 @@ public class PublishScheduler extends Scheduler {
 
         prePublishTasks.remove(date);
         return true;
+    }
+
+    public List<ScheduledPublishTaskData> getPrePublishTaskData(Zebedee zebedee) {
+
+        List<ScheduledPublishTaskData> dataList = new ArrayList<>();
+
+        for (PrePublishCollectionsTask task : prePublishTasks.values()) {
+            ScheduledPublishTaskData data = new ScheduledPublishTaskData();
+            data.delay = task.getDelay(TimeUnit.MILLISECONDS);
+            data.scheduledPublishDate = new Date(System.currentTimeMillis() + data.delay);
+            data.collectionIds = task.getCollectionIds();
+            data.expectedPublishDate = task.getPublishDate();
+
+            Set<Collection> collections = PrePublishCollectionsTask.loadCollections(task, zebedee);
+
+            Set<CollectionBase> collectionData = new HashSet<>();
+            for (Collection collection : collections) {
+                collectionData.add(collection.description);
+            }
+            data.collections = collectionData;
+
+
+            dataList.add(data);
+        }
+
+        return dataList;
     }
 }

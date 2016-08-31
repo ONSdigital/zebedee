@@ -4,11 +4,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 
@@ -22,14 +18,14 @@ public class ContentTreeNavigator {
 
     private static ContentTreeNavigator instance = null;
 
+    private ContentTreeNavigator() {
+    }
+
     public static ContentTreeNavigator getInstance() {
         if (instance == null) {
             instance = new ContentTreeNavigator();
         }
         return instance;
-    }
-
-    private ContentTreeNavigator() {
     }
 
     public boolean updateNodeAndDescendants(ContentDetail browseTree, Path targetNodeUri, ContentDetailFunction function) {
@@ -55,7 +51,7 @@ public class ContentTreeNavigator {
     public void search(ContentDetail node, ContentDetailSearch searcher) {
         if (node != null) {
             searcher.search(node);
-            if (node.children != null || !node.children.isEmpty()) {
+            if (node.children != null && !node.children.isEmpty()) {
                 node.children.stream().forEach(child -> search(child, searcher));
             }
         }

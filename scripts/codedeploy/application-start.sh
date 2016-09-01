@@ -12,6 +12,7 @@ CONFIG=$(aws --region $AWS_REGION ec2 describe-tags --filters "Name=resource-id,
 
 source $CONFIG && docker run -d                                      \
   --env=audit_db_enabled=$AUDIT_ENABLED                              \
+  --env=BABBAGE_URL=$BABBAGE_URL                                     \
   --env=brian_url=http://brian:8080                                  \
   --env=ELASTIC_SEARCH_CLUSTER=cluster                               \
   --env=ELASTIC_SEARCH_SERVER=elasticsearch                          \

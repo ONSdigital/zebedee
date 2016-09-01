@@ -146,6 +146,7 @@ public class Indexer {
         String[] split = line.split(" *=> *");
         if (split.length != 4) {
             elasticSearchLog("Skipping invalid external department").addParameter("line", line).log();
+            return;
         }
         String[] terms = split[3].split(" *, *");
         if (terms == null || terms.length == 0) {

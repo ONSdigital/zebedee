@@ -40,22 +40,27 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
 public class Indexer {
+    private final static String DEPARTMENTS_INDEX = "departments";
+    private final static String DEPARTMENT_TYPE = "departments";
     private static Indexer instance = new Indexer();
-
     private final Lock LOCK = new ReentrantLock();
-
     private final Client client = ElasticSearchClient.getClient();
     private ElasticSearchUtils searchUtils = new ElasticSearchUtils(client);
     private ZebedeeReader zebedeeReader = new ZebedeeReader();
-
-    private final static String DEPARTMENTS_INDEX = "departments";
-    private final static String DEPARTMENT_TYPE = "departments";
 
     private Indexer() {
     }
 
     public static Indexer getInstance() {
         return instance;
+    }
+
+    public static void main(String[] args) {
+        try {
+            Indexer.getInstance().reload();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -114,9 +119,11 @@ public class Indexer {
 
     private void loadDepartments() throws IOException {
 
-        if (!searchUtils.isIndexAvailable(DEPARTMENTS_INDEX)) {
-            searchUtils.createIndex(DEPARTMENTS_INDEX, getDepartmentsSetting(), DEPARTMENT_TYPE, getDepartmentsMapping());
+        if (searchUtils.isIndexAvailable(DEPARTMENTS_INDEX)) {
+            searchUtils.deleteIndex(DEPARTMENTS_INDEX);
         }
+
+        searchUtils.createIndex(DEPARTMENTS_INDEX, getDepartmentsSetting(), DEPARTMENT_TYPE, getDepartmentsMapping());
 
         elasticSearchLog("Indexing departments").log();
         long start = System.currentTimeMillis();
@@ -186,7 +193,6 @@ public class Indexer {
         return getSearchAlias() + System.currentTimeMillis();
     }
 
-
     /**
      * Resolves search terms for a single document
      */
@@ -242,7 +248,6 @@ public class Indexer {
         }
     }
 
-
     private Page getPage(String uri) throws ZebedeeException, IOException {
         return zebedeeReader.getPublishedContent(uri);
     }
@@ -261,7 +266,6 @@ public class Indexer {
         List<String> terms = resolveSearchTerms(page.getUri().toString());
         searchUtils.createDocument(indexName, page.getType().toString(), page.getUri().toString(), serialise(toSearchDocument(page, terms)));
     }
-
 
     private SearchDocument toSearchDocument(Page page, List<String> searchTerms) {
         SearchDocument indexDocument = new SearchDocument();
@@ -298,7 +302,6 @@ public class Indexer {
         return settingsBuilder.build();
     }
 
-
     private String getDefaultMapping() throws IOException {
         InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json");
         String mappingSource = IOUtils.toString(mappingSourceStream);
@@ -321,11 +324,9 @@ public class Indexer {
         }
     }
 
-
     private void unlockGlobal() {
         searchUtils.deleteDocument("fs", "lock", "global");
     }
-
 
     private boolean isPeriodic(PageType type) {
         switch (type) {
@@ -343,15 +344,19 @@ public class Indexer {
                 client,
                 new BulkProcessor.Listener() {
                     @Override
-                    public void beforeBulk(long executionId,
-                                           BulkRequest request) {
+                    public void beforeBulk(
+                            long executionId,
+                            BulkRequest request
+                    ) {
                         elasticSearchLog("Bulk Indexing documents").addParameter("quantity", request.numberOfActions()).log();
                     }
 
                     @Override
-                    public void afterBulk(long executionId,
-                                          BulkRequest request,
-                                          BulkResponse response) {
+                    public void afterBulk(
+                            long executionId,
+                            BulkRequest request,
+                            BulkResponse response
+                    ) {
                         if (response.hasFailures()) {
                             BulkItemResponse[] items = response.getItems();
                             for (BulkItemResponse item : items) {
@@ -366,9 +371,11 @@ public class Indexer {
                     }
 
                     @Override
-                    public void afterBulk(long executionId,
-                                          BulkRequest request,
-                                          Throwable failure) {
+                    public void afterBulk(
+                            long executionId,
+                            BulkRequest request,
+                            Throwable failure
+                    ) {
                         elasticSearchLog("Bulk index failure")
                                 .addParameter("detailedMessagee", failure.getMessage())
                                 .log();
@@ -381,13 +388,5 @@ public class Indexer {
                 .build();
 
         return bulkProcessor;
-    }
-
-    public static void main(String[] args) {
-        try {
-            Indexer.getInstance().reload();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

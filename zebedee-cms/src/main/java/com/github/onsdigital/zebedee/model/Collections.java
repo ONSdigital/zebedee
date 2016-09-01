@@ -26,7 +26,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -444,7 +443,7 @@ public class Collections {
      */
     public void createContent(
             Collection collection, String uri, Session session, HttpServletRequest request,
-            InputStream requestBody, CollectionEventType eventType
+            InputStream requestBody, CollectionEventType eventType, boolean validateJson
     ) throws ZebedeeException, IOException,
             FileUploadException {
 
@@ -452,14 +451,15 @@ public class Collections {
             throw new ConflictException("This URI already exists");
         }
 
-        writeContent(collection, uri, session, request, requestBody, false, eventType);
+        writeContent(collection, uri, session, request, requestBody, false, eventType, validateJson);
     }
 
 
     public void writeContent(
             Collection collection, String uri,
             Session session, HttpServletRequest request, InputStream requestBody, Boolean recursive,
-            CollectionEventType eventType
+            CollectionEventType eventType,
+            boolean validateJson
     ) throws IOException, ZebedeeException, FileUploadException {
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
@@ -515,8 +515,6 @@ public class Collections {
             postDataFile(request, uri, collectionWriter, historyEvent);
 
         } else {
-
-            Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
             if (validateJson) {
                 try (InputStream inputStream = validateJsonStream(requestBody)) {
                     collectionWriter.getInProgress().write(inputStream, uri);

@@ -14,11 +14,7 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
@@ -36,6 +32,7 @@ public class TimeseriesDataRemover {
         Path destination = Paths.get(args[2]);
 
         Set<String> cdids = new TreeSet<>(Arrays.asList(args[3].split(",")));
+        Set<String> datasets = new TreeSet<>(Arrays.asList(args[4].split(",")));
         Set<String> dates = new HashSet<>();
 
         logDebug("TimeSeries entries to remove").addParameter("targets", cdids).log();
@@ -45,7 +42,7 @@ public class TimeseriesDataRemover {
         }
 
         logDebug("Dates to remove").addParameter("dates", dates).log();
-        removeTimeseriesEntries(source, destination, cdids, dates);
+        removeTimeseriesEntries(source, destination, cdids, datasets, dates);
     }
 
     public static void removeTimeseriesData(String[] args) throws Exception {
@@ -69,7 +66,7 @@ public class TimeseriesDataRemover {
         removeTimeseriesData(source, destination, dataResoltion, cdids);
     }
 
-    private static void removeTimeseriesEntries(Path source, Path destination, Set<String> cdids, Set<String> dates)
+    private static void removeTimeseriesEntries(Path source, Path destination, Set<String> cdids, Set<String> datasets, Set<String> dates)
             throws InterruptedException, NotFoundException, IOException, BadRequestException {
 // build the data index so we know where to find timeseries files given the CDID
         ContentReader contentReader = new FileSystemContentReader(source);
@@ -93,16 +90,21 @@ public class TimeseriesDataRemover {
                 return;
             }
 
-            TimeSeries page = (TimeSeries) compoundContentReader.getContent(uri);
-            logDebug("Removing TimeSeries entries").cdid(cdid).addParameter("uri", uri).log();
+            for (String dataset : datasets) {
 
-            for (String date : dates) {
-                removeLabel(date, page.years);
-                removeLabel(date, page.quarters);
-                removeLabel(date, page.months);
+                uri += "/" + dataset;
+
+                TimeSeries page = (TimeSeries) compoundContentReader.getContent(uri);
+                logDebug("Removing TimeSeries entries").cdid(cdid).addParameter("uri", uri).log();
+
+                for (String date : dates) {
+                    removeLabel(date, page.years);
+                    removeLabel(date, page.quarters);
+                    removeLabel(date, page.months);
+                }
+
+                contentWriter.writeObject(page, uri + "/data.json");
             }
-
-            contentWriter.writeObject(page, uri + "/data.json");
         }
 
     }

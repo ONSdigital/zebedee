@@ -37,6 +37,7 @@ public class Builder {
     private static User publisher2Template;
     private static User reviewer1Template;
     private static User reviewer2Template;
+    private static User dataVisTemplate;
     private static boolean usersInitialised = false;
 
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
@@ -49,11 +50,13 @@ public class Builder {
     public User administrator;
     public User publisher1;
     public User publisher2;
+    public User dataVis;
     public User reviewer1;
     public User reviewer2;
     public Credentials administratorCredentials;
     public Credentials publisher1Credentials;
     public Credentials publisher2Credentials;
+    public Credentials dataVisCredentials;
     public Credentials reviewer1Credentials;
     public Credentials reviewer2Credentials;
     public Team labourMarketTeam;
@@ -69,8 +72,6 @@ public class Builder {
         setupUsers();
 
         Root.env = new HashMap<>();
-
-
 
         // Create the structure:
         parent = Files.createTempDirectory(Random.id());
@@ -135,11 +136,17 @@ public class Builder {
             Serialiser.serialise(outputStream, reviewer2);
         }
 
+        dataVis = clone(dataVisTemplate);
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(dataVis.email) + ".json"))) {
+            Serialiser.serialise(outputStream, dataVis);
+        }
+
         administratorCredentials = userCredentials(administrator);
         publisher1Credentials = userCredentials(publisher1);
         publisher2Credentials = userCredentials(publisher2);
         reviewer1Credentials = userCredentials(reviewer1);
         reviewer2Credentials = userCredentials(reviewer2);
+        dataVisCredentials = userCredentials(dataVis);
 
         Path sessions = zebedee.resolve(Zebedee.SESSIONS);
         Files.createDirectories(sessions);
@@ -154,10 +161,13 @@ public class Builder {
 
         accessMapping.administrators = new HashSet<>();
         accessMapping.digitalPublishingTeam = new HashSet<>();
+        accessMapping.dataVisualisationPublishers = new HashSet<>();
 
         accessMapping.administrators.add(administrator.email);
         accessMapping.digitalPublishingTeam.add(publisher1.email);
         accessMapping.digitalPublishingTeam.add(publisher2.email);
+
+        accessMapping.dataVisualisationPublishers.add(dataVis.email);
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.id = Random.id();
@@ -266,6 +276,12 @@ public class Builder {
             ronny.email = "ronny@example.com";
             ronny.inactive = false;
             reviewer2Template = ronny;
+
+            User dataVis = clone(jukesie);
+            dataVis.name = "dataVis";
+            dataVis.email = "datavis@example.com";
+            dataVis.inactive = false;
+            dataVisTemplate = dataVis;
         }
     }
 

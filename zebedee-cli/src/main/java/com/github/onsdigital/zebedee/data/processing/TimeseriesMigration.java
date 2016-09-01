@@ -20,11 +20,15 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TimeseriesMigration {
 
     public static void main(String[] args) throws ZebedeeException, IOException, InterruptedException, URISyntaxException {
-        migrateTimeseries(Paths.get("/Users/carlhembrough/dev/zebedee/zebedee/masterlive"), Paths.get("/Users/carlhembrough/dev/zebedee/migration"));
+        migrateTimeseries(
+                Paths.get("/Users/carlhembrough/dev/zebedee/zebedee/masterlive"),
+                Paths.get("/Users/carlhembrough/dev/zebedee/migration"),
+                "DRSI");
     }
 
     public static void migrateTimeseries(String[] args) throws InterruptedException, ZebedeeException, IOException, URISyntaxException {
@@ -34,15 +38,20 @@ public class TimeseriesMigration {
         Path source = Paths.get(args[1]);
         Path destination = Paths.get(args[2]);
 
+        String datasetId = null;
+        if (args.length > 3) {
+            datasetId = args[3];
+        }
+
         long start = System.currentTimeMillis();
 
-        migrateTimeseries(source, destination);
+        migrateTimeseries(source, destination, datasetId);
 
         long taken = System.currentTimeMillis() - start;
         System.out.println("seconds taken: " + taken / 1000);
     }
 
-    private static void migrateTimeseries(Path source, Path destination) throws ZebedeeException, IOException, InterruptedException, URISyntaxException {
+    private static void migrateTimeseries(Path source, Path destination, String datasetId) throws ZebedeeException, IOException, InterruptedException, URISyntaxException {
 
         // - build data index from existing timeseries structure
         // - find all datasets on the site so we can re-run them to generate timeseries
@@ -65,7 +74,7 @@ public class TimeseriesMigration {
 
         Map<String, TimeseriesMigrationData> migrationIndex = buildMigrationIndex(publishedContentReader, dataIndex);
 
-        doMigration(source, destination, publishedContentReader, destinationContentReader, destinationContentWriter, dataIndex, migrationIndex);
+        doMigration(source, destination, publishedContentReader, destinationContentReader, destinationContentWriter, dataIndex, migrationIndex, datasetId);
 
         // inject timeseries vales into the newly generated timeseries.
         TimeseriesFinder finder = new TimeseriesFinder();
@@ -94,9 +103,51 @@ public class TimeseriesMigration {
         }
     }
 
-    private static void doMigration(Path source, Path destination, ContentReader publishedContentReader, ContentReader destinationContentReader, ContentWriter destinationContentWriter, DataIndex dataIndex, Map<String, TimeseriesMigrationData> migrationIndex) throws ZebedeeException, IOException, URISyntaxException {
+    private static void PrintLastVersionOfEachDataset(Path source, ContentReader publishedContentReader) throws ZebedeeException, IOException {
+        List<TimeseriesDatasetFiles> datasetDownloads = getTimeseriesDatasets(source);
+        List<TimeseriesDatasetContainer> datasetContainers = loadPageObjectsForDatasets(publishedContentReader, datasetDownloads);
+        Map<String, Date> datasetIdToReleaseDate = new HashMap<>();
+        sortDatasetsByReleaseDate(datasetContainers);
+
+        System.out.println("=====================================================");
+        System.out.println("=====================================================");
+        System.out.println("=====================================================");
+
+        for (TimeseriesDatasetContainer datasetContainer : datasetContainers) {
+            System.out.println("id: " + datasetContainer.timeseriesDatasetFiles.getCsdbId());
+            System.out.println("date: " + datasetContainer.timeSeriesDataset.getDescription().getReleaseDate());
+            datasetIdToReleaseDate.put(datasetContainer.timeseriesDatasetFiles.getCsdbId(), datasetContainer.timeSeriesDataset.getDescription().getReleaseDate());
+        }
+
+        System.out.println("=====================================================");
+        System.out.println("=====================================================");
+        System.out.println("=====================================================");
+
+        for (Map.Entry<String, Date> dateEntry : datasetIdToReleaseDate.entrySet()) {
+            System.out.println(dateEntry);
+        }
+    }
+
+    private static void doMigration(
+            Path source,
+            Path destination,
+            ContentReader publishedContentReader,
+            ContentReader destinationContentReader,
+            ContentWriter destinationContentWriter,
+            DataIndex dataIndex,
+            Map<String, TimeseriesMigrationData> migrationIndex,
+            String datasetId
+    ) throws ZebedeeException, IOException, URISyntaxException {
+
         // find all dataset files on the site including versions.
         List<TimeseriesDatasetFiles> datasetDownloads = getTimeseriesDatasets(source);
+
+        if (datasetId != null && datasetId.length() > 0) {
+            System.out.println("Filtering datasets for ID: " + datasetId);
+            datasetDownloads = datasetDownloads.stream()
+                    .filter(dataset -> dataset.getCsdbId().equalsIgnoreCase(datasetId))
+                    .collect(Collectors.toList());
+        }
 
         // load the pages
         List<TimeseriesDatasetContainer> datasetContainers = loadPageObjectsForDatasets(publishedContentReader, datasetDownloads);

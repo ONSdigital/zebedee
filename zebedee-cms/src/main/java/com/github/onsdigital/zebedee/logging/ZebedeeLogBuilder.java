@@ -11,6 +11,8 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 
 import javax.ws.rs.core.Response;
 
@@ -31,6 +33,8 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     private static final String COLLECTION_LOG_DESC = "collectionLogDesc";
     private static final String TIME_TAKEN = "timeTaken(ms)";
     private static final String PATH = "path";
+    private static final String ROW = "row";
+    private static final String CELL = "cell";
 
     private ZebedeeLogBuilder(String description) {
         super(description);
@@ -154,6 +158,20 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public ZebedeeLogBuilder path(String path) {
         addParameter(PATH, path);
+        return this;
+    }
+
+    public ZebedeeLogBuilder row(Row row) {
+        if (row != null) {
+            addParameter(ROW, row.getRowNum());
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder cell(Cell cell) {
+        if (cell != null) {
+            addParameter(CELL, cell.getColumnIndex());
+        }
         return this;
     }
 

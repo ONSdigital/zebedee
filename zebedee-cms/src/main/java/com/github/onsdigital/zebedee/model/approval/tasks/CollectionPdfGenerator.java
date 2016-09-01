@@ -24,6 +24,7 @@ public class CollectionPdfGenerator {
         pagesWithPdf = new ArrayList<>();
         pagesWithPdf.add(PageType.article);
         pagesWithPdf.add(PageType.bulletin);
+        pagesWithPdf.add(PageType.compendium_landing_page);
         pagesWithPdf.add(PageType.compendium_chapter);
         pagesWithPdf.add(PageType.static_methodology);
     }

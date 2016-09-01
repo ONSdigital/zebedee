@@ -107,6 +107,7 @@
             <artifactId>dp-logging</artifactId>
             <version>master-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 
 

@@ -33,4 +33,16 @@ public class DataGridRow {
             cells.add(value);
         }
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public List<String> getCells() {
+        return cells;
+    }
 }

@@ -3,16 +3,8 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.ConflictException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
@@ -33,18 +25,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class CollectionsTest {
 
     private static final boolean recursive = false;
+    private static final boolean validateJson = false;
     Zebedee zebedee;
     Builder builder;
     Session session;
@@ -209,7 +196,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -368,7 +355,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -423,7 +410,7 @@ public class CollectionsTest {
         // When
         // We attempt to call the method
         zebedee.collections.writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED);
+                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -784,7 +771,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED);
+                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
         // We should get the expected exception
@@ -807,7 +794,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED);
+                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
         // We should get the expected exception
@@ -836,7 +823,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED);
+                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
         // We should get the expected exception
@@ -858,7 +845,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED);
+                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
         // We should see the file
@@ -939,7 +926,7 @@ public class CollectionsTest {
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         builder.createPublishedFile(uri);
-        zebedee.collections.createContent(collection, uri, null, null, null, null);
+        zebedee.collections.createContent(collection, uri, null, null, null, null, validateJson);
     }
 
     @Test(expected = ConflictException.class)
@@ -949,7 +936,7 @@ public class CollectionsTest {
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         builder.createInProgressFile(uri);
-        zebedee.collections.createContent(collection, uri, null, null, null, null);
+        zebedee.collections.createContent(collection, uri, null, null, null, null, validateJson);
     }
 
     @Test
@@ -1010,7 +997,7 @@ public class CollectionsTest {
         // When
         // We attempt to write to the directory as if it were a file
         zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED);
+                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
         // We should see the file

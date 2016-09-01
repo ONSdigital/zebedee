@@ -26,6 +26,7 @@ public class StaticArticle extends Page {
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
+    private List<FigureSection> equations = new ArrayList<>();
 
     private List<Alert> alerts;
 
@@ -96,6 +97,14 @@ public class StaticArticle extends Page {
 
     public void setAlerts(List<Alert> alerts) {
         this.alerts = alerts;
+    }
+
+    public List<FigureSection> getEquations() {
+        return equations;
+    }
+
+    public void setEquations(List<FigureSection> equations) {
+        this.equations = equations;
     }
 
     public List<DownloadSection> getDownloads() {

@@ -22,6 +22,7 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 
@@ -106,26 +107,30 @@ public class ModifyTable {
         IOUtils.copy(toInputStream(table), response.getOutputStream());
     }
 
-    private void writeData(HttpServletRequest request, Session session, CollectionReader collectionReader, Collection collection,
-                           String currentUri, String newUri, String htmlTableStr, Page tableJson) throws TableBuilderException {
+    private void writeData(
+            HttpServletRequest request, Session session, CollectionReader collectionReader, Collection collection,
+            String currentUri, String newUri, String htmlTableStr, Page tableJson
+    ) throws TableBuilderException {
         try (
                 Resource currentXlsResource = getResource(request, collectionReader, currentUri + XLS_FILE_EXT);
                 InputStream htmlInputStream = toInputStream(htmlTableStr);
                 InputStream jsonInputStream = toInputStream(tableJson)
         ) {
+            Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
+
             String newXlsFilename = Paths.get(newUri + XLS_FILE_EXT).getFileName().toString();
             String currentXlsFilename = Paths.get(currentUri + XLS_FILE_EXT).getFileName().toString();
 
             boolean recursive = false;
             if (!StringUtils.equals(newXlsFilename, currentXlsFilename)) {
                 Root.zebedee.collections.writeContent(collection, newUri + XLS_FILE_EXT, session, request,
-                        currentXlsResource.getData(), recursive, null);
+                        currentXlsResource.getData(), recursive, null, validateJson);
             }
 
             Root.zebedee.collections.writeContent(collection, newUri + HTML_FILE_EXT, session, request,
-                    htmlInputStream, recursive, null);
+                    htmlInputStream, recursive, null, validateJson);
             Root.zebedee.collections.writeContent(collection, newUri + JSON_FILE_EXT, session, request,
-                    jsonInputStream, recursive, null);
+                    jsonInputStream, recursive, null, validateJson);
 
             getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
                     COLLECTION_TABLE_MODIFIED, tableModified(newUri)));
@@ -158,8 +163,10 @@ public class ModifyTable {
         }
     }
 
-    private String generateXlsTable(HttpServletRequest request, CollectionReader collectionReader, String resourceUri,
-                                    TableModifications modifications) throws ZebedeeException, IOException,
+    private String generateXlsTable(
+            HttpServletRequest request, CollectionReader collectionReader, String resourceUri,
+            TableModifications modifications
+    ) throws ZebedeeException, IOException,
             TransformerException, ParserConfigurationException {
 
         try (Resource currentXlsResource = collectionReader.getResource(resourceUri)) {
@@ -193,7 +200,8 @@ public class ModifyTable {
     }
 
     private com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table getCurrentTable(
-            HttpServletRequest request, CollectionReader collectionReader, String uri)
+            HttpServletRequest request, CollectionReader collectionReader, String uri
+    )
             throws ZebedeeException, IOException {
         com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table table;
 

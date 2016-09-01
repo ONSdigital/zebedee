@@ -17,6 +17,7 @@ public class StaticPage extends BaseStaticPage {
     private List<FigureSection> charts = new ArrayList<>();
     private List<FigureSection> tables = new ArrayList<>();
     private List<FigureSection> images = new ArrayList<>();
+    private List<FigureSection> equations = new ArrayList<>();
 
     public List<FigureSection> getCharts() {
         return charts;
@@ -42,6 +43,13 @@ public class StaticPage extends BaseStaticPage {
         this.images = images;
     }
 
+    public List<FigureSection> getEquations() {
+        return equations;
+    }
+
+    public void setEquations(List<FigureSection> equations) {
+        this.equations = equations;
+    }
 
     @Override
     public PageType getType() {

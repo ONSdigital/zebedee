@@ -6,36 +6,36 @@
 
 #####The departments are indexed in the same order as it is in the mapping, that means if two departments match for a search query with the same score the ordering will be as it is ordered in this file.
 # e.g. for search query "nhs woodland";  "The NHS" will come before "The Forestry Commission"
-# or for search query "education"; "The Department for Education and Pensions" will be before "The Department for Business Innovation & Skills"
+# or for search query "education"; "The Department for Education and Pensions" will be before "The Department for Business Innovation and Skills"
 # Make sure the ordering is done accordingly
 
 
 ##########MAPPING#############
-dfe => The Department for Education and Pensions => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-education => dfe,education,a level,degree,nvq,school,college,university,curriculum,qualification,teacher training,pupil absence,exclusions,school workforce,key stage
+dfe => The Department for Education => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-for-education => dfe,education,a level,degree,nvq,school,college,university,curriculum,qualification,teacher training,pupil absence,exclusions,school workforce,key stage
 
-bis => The Department for Business Innovation & Skills => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-business-innovation-skills => bis,business,apprenticeship,building,construction,higher education,trade union,enterprise
+bis => The Department for Business Innovation and Skills => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-for-business-innovation-skills => bis,business,apprenticeship,building,construction,higher education,trade union,enterprise
 
-decc => The Department of Energy & Climate Change => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-of-energy-climate-change => decc, energy ,solar ,coal ,oil ,gas ,electricity ,fuel poverty ,renewables ,greenhouse gas
+decc => The Department of Energy and Climate Change => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-of-energy-climate-change => decc, energy ,solar ,coal ,oil ,gas ,electricity ,fuel poverty ,renewables ,greenhouse gas
 
-defra => The Department for Environment Food & Rural Affairs => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-environment-food-rural-affairs => defra,agriculture,farming,air quality,emissions,recycling,food,conservation,biodiversity,animals,wildlife,ecosystem
+defra => The Department for Environment Food and Rural Affairs => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-for-environment-food-rural-affairs => defra,agriculture,farming,air quality,emissions,recycling,food,conservation,biodiversity,animals,wildlife,ecosystem
 
-hmrc => HM Revenue & Customs => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=hm-revenue-customs => hmrc,tax,benefit,paye,national insurance,vat,tobacco
+hmrc => HM Revenue and Customs => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=hm-revenue-customs => hmrc,tax,benefit,paye,national insurance,vat,tobacco
 
-ho => The Home Office => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=home-office => ho,arrests,asylum,immigration,firearm,crime,visa,police,terrorism,detention
+ho => The Home Office => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=home-office => ho,arrests,asylum,immigration,firearm,crime,visa,police,terrorism,detention
 
-dclg => The Department for Communities & Local Government => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-communities-and-local-government => dclg,revenue expenditure,local authority,council tax,homelessness,social housing,help to buy
+dclg => The Department for Communities and Local Government => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-for-communities-and-local-government => dclg,revenue expenditure,local authority,council tax,homelessness,social housing,help to buy
 
-dcms => The Department for Culture, Media & Sports => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-culture-media-sport => dcms, charitable giving
+dcms => The Department for Culture, Media and Sports => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-for-culture-media-sport => dcms, charitable giving
 
-dft => The Department for Transport => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-transport => dft,bus,vehicle,driver,rider,freight,vehicle licensing,road,biofuel,road casualties,traffic congestion,road conditions
+dft => The Department for Transport => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-for-transport => dft,bus,vehicle,driver,rider,freight,vehicle licensing,road,biofuel,road casualties,traffic congestion,road conditions
 
-dwp => The Department for Work & Pensions => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-work-pensions =>dwp,social fund,child maintenance,lone parents,child support agency,benefit fraud,universal credit
+dwp => The Department for Work and Pensions => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-for-work-pensions =>dwp,social fund,child maintenance,lone parents,child support agency,benefit fraud,universal credit
 
-dh => The Department of Health => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-of-health =>dh,abortion
+dh => The Department of Health => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=department-of-health =>dh,abortion
 
-mod => The Ministry of Defence => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=home-office =>mod,defence,armed forces,military,veterans,war pensions
+mod => The Ministry of Defence => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=home-office =>mod,defence,armed forces,military,veterans,war pensions
 
-moj => The Ministry of Justice => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-defence =>moj,criminal justice,prison,offender,civil justice,knife possession,youth custody,probation,reoffence,asbo
+moj => The Ministry of Justice => https://www.gov.uk/government/statistics?keywords=andtopics%5B%5D=allanddepartments%5B%5D=ministry-of-defence =>moj,criminal justice,prison,offender,civil justice,knife possession,youth custody,probation,reoffence,asbo
 
 nhs => The NHS => https://www.gov.uk/government/statistics?departments%5B%5D=national-health-service =>nhs,dementia,waiting times,hospital,critical care,inpatient,outpatient,ambulance
 

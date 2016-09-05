@@ -28,7 +28,6 @@ public class SplunkConfigurationTest extends AbstractMetricsTest {
         clearSystemProperties();
     }
 
-    @Ignore
     @Test
     public void shouldReturnSplunkEnabledTrue() {
         assertThat("Expected Splunk to be enabled.", Configuration.SplunkConfiguration.isSplunkEnabled(), is(true));

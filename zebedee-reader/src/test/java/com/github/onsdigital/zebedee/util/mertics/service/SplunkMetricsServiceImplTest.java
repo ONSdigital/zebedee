@@ -13,11 +13,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpServletRequest;
-
-import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -68,9 +65,8 @@ public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
         when(requestMock.getRequestURI()).thenReturn("/data");
         when(requestMock.getParameter("uri")).thenReturn("/");
 
-        metricsService.captureRequest(requestMock);
-        metricsService.captureRequestResponseTimeMetrics();
-
+        captureRequestAndAssertInteractions();
+        captureXAndAssertInteractions(() -> metricsService.captureRequestResponseTimeMetrics());
         verify(splunkClientMock, times(1)).send(eq(SPLUNK_HEC_URI), any(SplunkRequest.class));
     }
 
@@ -100,8 +96,8 @@ public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
         when(requestMock.getRequestURI()).thenReturn("/data");
         when(requestMock.getParameter("uri")).thenReturn("/");
 
-        metricsService.captureRequest(requestMock);
-        metricsService.captureErrorMetrics();
+        captureRequestAndAssertInteractions();
+        captureXAndAssertInteractions(() -> metricsService.captureErrorMetrics());
 
         verify(splunkClientMock, times(1)).send(eq(SPLUNK_HEC_URI), any(SplunkRequest.class));
     }
@@ -110,5 +106,20 @@ public class SplunkMetricsServiceImplTest extends AbstractMetricsTest {
     public void shouldNotRecordError() {
         metricsService.captureErrorMetrics();
         verify(splunkClientMock, never()).send(any(), any());
+    }
+
+    private void captureRequestAndAssertInteractions() {
+        metricsService.captureRequest(requestMock);
+        // Verify these methods a not called when capturing the request.
+        verify(requestMock, never()).getRequestURI();
+        verify(requestMock, never()).getParameter("uri");
+        verify(requestMock, never()).getMethod();
+    }
+
+    private void captureXAndAssertInteractions(Runnable captureMetric) {
+        captureMetric.run();
+        verify(requestMock, times(2)).getRequestURI();
+        verify(requestMock, times(1)).getParameter("uri");
+        verify(requestMock, times(1)).getMethod();
     }
 }

@@ -4,10 +4,17 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -25,6 +32,8 @@ public class SplunkEvent {
     public static final String COLLECTION_PUBLISH_FILE_COUNT = "collectionsPublishFileCount";
     public static final String COLLECTION_ID = "collectionId";
     public static final String EVENT_KEY = "event";
+    public static final String URI_KEY = "uri";
+    private static final Path HOME_URI = Paths.get("/");
 
     private Map<String, Object> event;
 
@@ -56,9 +65,17 @@ public class SplunkEvent {
                 .toHashCode();
     }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(EVENT_KEY, event)
+                .toString();
+    }
+
     public static class Builder {
 
         private Map<String, Object> fields;
+        private HttpServletRequest request;
 
         public Builder() {
             this.fields = new HashMap<>();
@@ -109,6 +126,11 @@ public class SplunkEvent {
             return this;
         }
 
+        public Builder request(HttpServletRequest request) {
+            this.request = request;
+            return this;
+        }
+
         public Builder addField(String fieldName, Object value) {
             this.fields.put(fieldName, value);
             return this;
@@ -129,6 +151,7 @@ public class SplunkEvent {
          */
         public SplunkEvent build(MetricsType metricsType, String... excludeKeys) {
             requireNonNull(metricsType, "MetricsType is mandatory and cannot be null");
+            extractRequestDetails();
             fields.put(METRICS_TYPE_KEY, metricsType);
 
             for (String excludeKey : excludeKeys) {
@@ -137,6 +160,28 @@ public class SplunkEvent {
                 }
             }
             return new SplunkEvent(this.fields);
+        }
+
+        private void extractRequestDetails() {
+            if (this.request != null) {
+                this.httpMethod(request.getMethod())
+                        .requestedURI(request.getParameter(URI_KEY))
+                        .api(getApi(request).toString());
+            }
+        }
+
+        private Path getApi(HttpServletRequest request) {
+            if (request == null || HOME_URI.equals(request.getRequestURI())) {
+                return HOME_URI;
+            }
+            Path apiUri = Paths.get(request.getRequestURI());
+            List<Path> uriPaths = new ArrayList<>();
+            while (apiUri.getParent() != null) {
+                uriPaths.add(apiUri);
+                apiUri = apiUri.getParent();
+            }
+            Collections.reverse(uriPaths);
+            return uriPaths.get(0);
         }
 
     }

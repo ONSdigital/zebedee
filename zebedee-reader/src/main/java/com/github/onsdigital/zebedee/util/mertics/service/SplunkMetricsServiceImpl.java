@@ -25,9 +25,9 @@ import static com.github.onsdigital.zebedee.util.mertics.events.SplunkEvent.INTE
  */
 public class SplunkMetricsServiceImpl extends MetricsService {
 
-    private static final Path HOME_URI = Paths.get("/");
     protected static ExecutorService pool = Executors.newSingleThreadExecutor();
     protected static ThreadLocal<SplunkEvent.Builder> splunkEventThreadLocal = new ThreadLocal<>();
+
     private String httpEventCollectorURI;
     private SplunkClient splunkClient = null;
 
@@ -38,24 +38,10 @@ public class SplunkMetricsServiceImpl extends MetricsService {
 
     @Override
     public void captureRequest(HttpServletRequest request) {
-        Path apiUri = Paths.get(request.getRequestURI());
-
-        if (!HOME_URI.equals(apiUri)) {
-            List<Path> uriPaths = new ArrayList<>();
-
-            while (apiUri.getParent() != null) {
-                uriPaths.add(apiUri);
-                apiUri = apiUri.getParent();
-            }
-            Collections.reverse(uriPaths);
-            apiUri = uriPaths.get(0);
-        }
-
-        splunkEventThreadLocal.set(new SplunkEvent.Builder()
-                .interceptTime(System.currentTimeMillis())
-                .httpMethod(request.getMethod())
-                .requestedURI(request.getParameter("uri"))
-                .api(apiUri.toString()));
+        splunkEventThreadLocal.set(
+                new SplunkEvent.Builder()
+                        .interceptTime(System.currentTimeMillis())
+                        .request(request));
     }
 
     @Override

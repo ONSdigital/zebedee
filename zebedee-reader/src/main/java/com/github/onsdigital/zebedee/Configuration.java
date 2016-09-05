@@ -34,12 +34,11 @@ public class Configuration {
 
         public static boolean isSplunkEnabled() {
             // TODO DOES THIS FIX IT? CAN I GO HOME NOW?
-            /*try {
+            try {
                 return BooleanUtils.toBoolean(getValue(SPLUNK_ENABLED_ENV));
             } catch (Exception ex) {
                 return false;
-            }*/
-            return false;
+            }
         }
 
         /**

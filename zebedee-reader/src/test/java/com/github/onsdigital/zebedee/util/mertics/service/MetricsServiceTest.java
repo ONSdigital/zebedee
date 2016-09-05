@@ -21,7 +21,6 @@ public class MetricsServiceTest extends AbstractMetricsTest {
         assertThat("Expected Dummy Service.", MetricsService.getInstance() instanceof DummyMetricsServiceImpl);
     }
 
-    @Ignore
     @Test
     public void shouldReturnSplunkInstance() {
         setSystemProperties();

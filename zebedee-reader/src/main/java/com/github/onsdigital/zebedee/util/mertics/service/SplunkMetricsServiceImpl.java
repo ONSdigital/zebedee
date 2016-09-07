@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -86,11 +87,13 @@ public class SplunkMetricsServiceImpl extends MetricsService {
     }
 
     @Override
-    public void captureCollectionPublishMetrics(String collectionId, long publishTime, int numberOfFiles) {
+    public void captureCollectionPublishMetrics(String collectionId, long timeTaken, int numberOfFiles, String publishType, Date publishDate) {
         sendRequest(new SplunkEvent.Builder()
                 .collectionId(collectionId)
-                .collectionPublishTime(publishTime)
+                .collectionPublishTimeTaken(timeTaken)
                 .collectionPublishFileCount(numberOfFiles)
+                .collectionPublishType(publishType)
+                .collectionPublishTime(publishDate)
                 .build(MetricsType.COLLECTIONS_PUBLISH_TIME));
     }
 

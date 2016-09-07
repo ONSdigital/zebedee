@@ -39,7 +39,7 @@ public class SplunkEventTest {
                 .interceptTime(0)
                 .timeTaken(0)
                 .pingTime(0)
-                .collectionPublishTime(0)
+                .collectionPublishTimeTaken(0)
                 .collectionId("12345")
                 .build(MetricsType.REQUEST_TIME);
 
@@ -59,7 +59,7 @@ public class SplunkEventTest {
         SplunkEvent actual = new SplunkEvent.Builder()
                 .api(API_KEY)
                 .timeTaken(0)
-                .collectionPublishTime(0)
+                .collectionPublishTimeTaken(0)
                 .build(MetricsType.REQUEST_TIME, API_KEY);
 
         assertThat("Splunk event not as expected.", expected, equalTo(actual));
@@ -70,7 +70,7 @@ public class SplunkEventTest {
         new SplunkEvent.Builder()
                 .api(API_KEY)
                 .timeTaken(0)
-                .collectionPublishTime(0)
+                .collectionPublishTimeTaken(0)
                 .build(null, API_KEY);
     }
 

@@ -7,6 +7,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,8 +25,12 @@ public class SplunkEvent {
     public static final String METRICS_TYPE_KEY = "metricsType";
     public static final String COLLECTION_PUBLISH_TIME = "collectionsPublishTime";
     public static final String COLLECTION_PUBLISH_FILE_COUNT = "collectionsPublishFileCount";
+    public static final String COLLECTION_PUBLISH_TYPE = "collectionsPublishType";
+    public static final String COLLECTION_PUBLISH_START_TIME = "collectionsPublishStartTime";
     public static final String COLLECTION_ID = "collectionId";
     public static final String EVENT_KEY = "event";
+
+    private static final SimpleDateFormat publishTimeFormat = new SimpleDateFormat("HH:mm");
 
     private Map<String, Object> event;
 
@@ -99,13 +105,23 @@ public class SplunkEvent {
             return this;
         }
 
-        public Builder collectionPublishTime(long collectionPublishTime) {
+        public Builder collectionPublishTimeTaken(long collectionPublishTime) {
             fields.put(COLLECTION_PUBLISH_TIME, collectionPublishTime);
             return this;
         }
 
         public Builder collectionPublishFileCount(int collectionPublishFileCount) {
             fields.put(COLLECTION_PUBLISH_FILE_COUNT, collectionPublishFileCount);
+            return this;
+        }
+
+        public Builder collectionPublishType(String collectionType) {
+            fields.put(COLLECTION_PUBLISH_TYPE, collectionType);
+            return this;
+        }
+
+        public Builder collectionPublishTime(Date publishDate) {
+            fields.put(COLLECTION_PUBLISH_START_TIME, publishTimeFormat.format(publishDate));
             return this;
         }
 
@@ -138,7 +154,5 @@ public class SplunkEvent {
             }
             return new SplunkEvent(this.fields);
         }
-
     }
-
 }

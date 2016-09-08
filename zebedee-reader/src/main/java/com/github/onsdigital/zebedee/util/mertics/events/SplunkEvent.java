@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -30,7 +31,7 @@ public class SplunkEvent {
     public static final String COLLECTION_ID = "collectionId";
     public static final String EVENT_KEY = "event";
 
-    private static final SimpleDateFormat publishTimeFormat = new SimpleDateFormat("HH:mm");
+    private static final SimpleDateFormat publishTimeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
 
     private Map<String, Object> event;
 

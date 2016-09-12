@@ -65,7 +65,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         // read the versions array from the highest version
                         String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
 
-                        Path lastVersionPath = datasetPath.resolve("previous").resolve(lastVersionIdentifier);
+                        Path lastVersionPath = datasetPath.getParent().resolve("previous").resolve(lastVersionIdentifier);
                         String lastVersionUri = getUriFromPath(source, lastVersionPath);
                         Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionIdentifier);
 
@@ -95,7 +95,8 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
     private static String getUriFromPath(Path source, Path datasetPath) {
         String uri = "/" + source.relativize(datasetPath).toString();
-        uri = uri.substring(0, uri.length() - "/data.json".length()); // trim data.json off the end of the uri when using the reader.
+        if (uri.endsWith("/data.json"))
+            uri = uri.substring(0, uri.length() - "/data.json".length()); // trim data.json off the end of the uri when using the reader.
         return uri;
     }
 

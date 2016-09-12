@@ -11,11 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,10 +27,14 @@ public class SplunkEvent {
     public static final String METRICS_TYPE_KEY = "metricsType";
     public static final String COLLECTION_PUBLISH_TIME = "collectionsPublishTime";
     public static final String COLLECTION_PUBLISH_FILE_COUNT = "collectionsPublishFileCount";
+    public static final String COLLECTION_PUBLISH_TYPE = "collectionsPublishType";
+    public static final String COLLECTION_PUBLISH_START_TIME = "collectionsPublishStartTime";
     public static final String COLLECTION_ID = "collectionId";
     public static final String EVENT_KEY = "event";
     public static final String URI_KEY = "uri";
     private static final Path HOME_URI = Paths.get("/");
+
+    private static final SimpleDateFormat publishTimeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
 
     private Map<String, Object> event;
 
@@ -116,7 +117,7 @@ public class SplunkEvent {
             return this;
         }
 
-        public Builder collectionPublishTime(long collectionPublishTime) {
+        public Builder collectionPublishTimeTaken(long collectionPublishTime) {
             fields.put(COLLECTION_PUBLISH_TIME, collectionPublishTime);
             return this;
         }
@@ -128,6 +129,16 @@ public class SplunkEvent {
 
         public Builder request(HttpServletRequest request) {
             this.request = request;
+            return this;
+        }
+
+        public Builder collectionPublishType(String collectionType) {
+            fields.put(COLLECTION_PUBLISH_TYPE, collectionType);
+            return this;
+        }
+
+        public Builder collectionPublishTime(Date publishDate) {
+            fields.put(COLLECTION_PUBLISH_START_TIME, publishTimeFormat.format(publishDate));
             return this;
         }
 
@@ -183,7 +194,5 @@ public class SplunkEvent {
             Collections.reverse(uriPaths);
             return uriPaths.get(0);
         }
-
     }
-
 }

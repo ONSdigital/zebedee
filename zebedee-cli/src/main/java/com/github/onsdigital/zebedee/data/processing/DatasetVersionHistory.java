@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -55,7 +56,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
             try {
                 Page content = publishedContentReader.getContent(uri);
 
-                //if (content.getType() == PageType.dataset) {
+                if (content.getType() == PageType.dataset) {
 
                     Dataset dataset = (Dataset) content;
 
@@ -83,12 +84,12 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                                 Dataset versionPage = (Dataset) publishedContentReader.getContent(version.getUri().toString());
 
-                                System.out.println("versionPage.getVersions().size() = " + versionPage.getVersions().size());
 
                                 if (versionPage.getVersions() == null || versionPage.getVersions().size() == 0) {
                                     System.out.println("********* versions list should not be empty in this previous version");
+                                } else {
+                                    System.out.println("versionPage.getVersions().size() = " + versionPage.getVersions().size());
                                 }
-
                             }
                         } else {
                             System.out.println("***** no previous versions in current to use");
@@ -102,7 +103,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                         // ---------------------------------------------------------------------------------
                     }
-                // }
+                }
 
             } catch (ZebedeeException | IOException e) {
                 e.printStackTrace();

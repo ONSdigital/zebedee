@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.data.processing;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -35,8 +36,9 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
         Path source = Paths.get(args[1]);
 
-        findDatasetsWithMissingVersionHistory(source)
-                .forEach(System.out::println);
+        List<Path> paths = findDatasetsWithMissingVersionHistory(source);
+
+        System.out.println("paths.size() = " + paths.size());
     }
 
     private static List<Path> findDatasetsWithMissingVersionHistory(Path source) {
@@ -47,9 +49,8 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
         List<Path> datasetsToFix = new ArrayList<>();
 
-        for (Path versionedDataset : versionedDatasets) {
-            String uri = "/" + source.relativize(versionedDataset).toString();
-            uri = uri.substring(0, uri.length() - "/data.json".length()); // trim data.json off the end of the uri when using the reader.
+        for (Path datasetPath : versionedDatasets) {
+            String uri = getUriFromPath(source, datasetPath);
             try {
                 Page content = publishedContentReader.getContent(uri);
 
@@ -61,7 +62,24 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                         System.out.println("uri = " + uri);
 
-                        datasetsToFix.add(versionedDataset);
+                        // read the versions array from the highest version
+                        String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
+
+                        Path lastVersionPath = datasetPath.resolve("previous").resolve(lastVersionIdentifier);
+                        String lastVersionUri = getUriFromPath(source, lastVersionPath);
+                        Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionIdentifier);
+
+                        List<Version> newVersionsList = lastVersion.getVersions();
+
+                        System.out.println("lastVersionUri = " + lastVersionUri);
+                        for (Version version : newVersionsList) {
+                            System.out.println("versionUri = " + version.getUri());
+                        }
+
+                        // add another version for the last version
+
+
+                        datasetsToFix.add(datasetPath);
                     }
                 }
 
@@ -73,6 +91,12 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
         return datasetsToFix;
 
+    }
+
+    private static String getUriFromPath(Path source, Path datasetPath) {
+        String uri = "/" + source.relativize(datasetPath).toString();
+        uri = uri.substring(0, uri.length() - "/data.json".length()); // trim data.json off the end of the uri when using the reader.
+        return uri;
     }
 
     private static List<Path> filterDatasetsWithoutVersions(List<Path> datasets) {

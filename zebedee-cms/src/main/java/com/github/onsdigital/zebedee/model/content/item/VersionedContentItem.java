@@ -79,6 +79,34 @@ public class VersionedContentItem extends ContentItem {
         return basePath.toString();
     }
 
+    private static int getNextVersionNumber(Path versionSourcePath) {
+        int version = 1;
+
+        Path versionDirectory = versionSourcePath.resolve(getVersionDirectoryName());
+
+        if (Files.exists(versionDirectory)) {
+            version = versionDirectory.toFile().listFiles().length + 1;
+        }
+
+        String versionIdentifier = VERSION_PREFIX + version;
+
+        while (Files.exists(versionDirectory.resolve(versionIdentifier))) {
+            version++;
+            versionIdentifier = VERSION_PREFIX + version;
+        }
+        return version;
+    }
+
+    /**
+     * Return the identifier of the most recently added version.
+     * @param datasetPath
+     * @return
+     */
+    public static String getLastVersionIdentifier(Path datasetPath) {
+        int version = getNextVersionNumber(datasetPath);
+        return VERSION_PREFIX + (version - 1);
+    }
+
     /**
      * Create a version from the given source path. The source path is typically the path to the published content, so
      * it cannot be assumed the current version is in the root path of this VersionedContentItem.
@@ -130,7 +158,7 @@ public class VersionedContentItem extends ContentItem {
 
                     String filename = path.getFileName().toString();
                     Path versionPath = Paths.get(versionUri).resolve(filename);
-                    try (InputStream inputStream = source.getData()){
+                    try (InputStream inputStream = source.getData()) {
                         contentWriter.write(inputStream, versionPath.toString());
                     }
                 }
@@ -146,21 +174,8 @@ public class VersionedContentItem extends ContentItem {
      */
     private String createVersionIdentifier(Path versionSourcePath) {
 
-        int version = 1;
-
-        Path versionDirectory = versionSourcePath.resolve(getVersionDirectoryName());
-
-        if (Files.exists(versionDirectory)) {
-            version = versionDirectory.toFile().listFiles().length + 1;
-        }
-
+        int version = getNextVersionNumber(versionSourcePath);
         String versionIdentifier = VERSION_PREFIX + version;
-
-        while (Files.exists(versionDirectory.resolve(versionIdentifier))) {
-            version++;
-            versionIdentifier = VERSION_PREFIX + version;
-        }
-
         return versionIdentifier;
     }
 

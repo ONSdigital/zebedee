@@ -144,4 +144,21 @@ public class VersionedContentItemTest {
         // Then the result should be the same
         assertEquals(expectedBaseUri, baseUri);
     }
+
+    @Test
+    public void getLastVersionIdentifier() throws Exception {
+
+        // Given an instance of VersionedContentItem with a path to some content which has a v1 and V3 (explicitly missing v2).
+        Path rootPath = Files.createTempDirectory("VersionedContentItemTest");
+        String path = "economy";
+
+        Files.createDirectories(rootPath.resolve(path).resolve(VersionedContentItem.VERSION_DIRECTORY).resolve("v1"));
+        Files.createDirectories(rootPath.resolve(path).resolve(VersionedContentItem.VERSION_DIRECTORY).resolve("v3"));
+
+        // When we create a new version.
+        String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(rootPath.resolve(path));
+
+        // Then a it creates a version after the highest version, ignoring the gap.
+        assertEquals("v3", lastVersionIdentifier);
+    }
 }

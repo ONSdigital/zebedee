@@ -24,7 +24,6 @@ public class RequestMetricsFilter implements Filter {
                 metricsService.captureRequest(request);
             } catch (Exception ex) {
                 logError(ex).log();
-                return false;
             }
         }
         return true;

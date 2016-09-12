@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -49,12 +48,14 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
         List<Path> datasetsToFix = new ArrayList<>();
 
-        for (Path datasetPath : versionedDatasets) {
+        for (Path datasetJsonPath : versionedDatasets) {
+
+            Path datasetPath = datasetJsonPath.getParent();
             String uri = getUriFromPath(source, datasetPath);
             try {
                 Page content = publishedContentReader.getContent(uri);
 
-                if (content.getType() == PageType.dataset) {
+                //if (content.getType() == PageType.dataset) {
 
                     Dataset dataset = (Dataset) content;
 
@@ -65,23 +66,29 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         // read the versions array from the highest version
                         String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
 
-                        Path lastVersionPath = datasetPath.getParent().resolve("previous").resolve(lastVersionIdentifier);
+                        Path lastVersionPath = datasetPath.resolve("previous").resolve(lastVersionIdentifier);
                         String lastVersionUri = getUriFromPath(source, lastVersionPath);
-                        Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionIdentifier);
+                        Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionUri);
 
-                        List<Version> newVersionsList = lastVersion.getVersions();
 
                         System.out.println("lastVersionUri = " + lastVersionUri);
-                        for (Version version : newVersionsList) {
-                            System.out.println("versionUri = " + version.getUri());
-                        }
 
+
+                        if (lastVersion.getVersions() != null && lastVersion.getVersions().size() > 0) {
+                            List<Version> newVersionsList = lastVersion.getVersions();
+
+                            for (Version version : newVersionsList) {
+                                System.out.println("versionUri = " + version.getUri());
+                            }
+                        } else {
+                            System.out.println("** no previous versions to use");
+                        }
                         // add another version for the last version
 
 
                         datasetsToFix.add(datasetPath);
                     }
-                }
+                // }
 
             } catch (ZebedeeException | IOException e) {
                 e.printStackTrace();

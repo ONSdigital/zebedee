@@ -63,6 +63,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                         System.out.println("uri = " + uri);
 
+                        // ---------------------------------------------------------------------------------
                         // read the versions array from the highest version
                         String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
 
@@ -79,14 +80,27 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                             for (Version version : newVersionsList) {
                                 System.out.println("versionUri = " + version.getUri());
+
+                                Dataset versionPage = (Dataset) publishedContentReader.getContent(version.getUri().toString());
+
+                                System.out.println("versionPage.getVersions().size() = " + versionPage.getVersions().size());
+
+                                if (versionPage.getVersions() == null || versionPage.getVersions().size() == 0) {
+                                    System.out.println("********* versions list should not be empty in this previous version");
+                                }
+
                             }
                         } else {
-                            System.out.println("** no previous versions to use");
+                            System.out.println("***** no previous versions in current to use");
                         }
                         // add another version for the last version
 
-
                         datasetsToFix.add(datasetPath);
+
+                        // ---------------------------------------------------------------------------------
+
+
+                        // ---------------------------------------------------------------------------------
                     }
                 // }
 

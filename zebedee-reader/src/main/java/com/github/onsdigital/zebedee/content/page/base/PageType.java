@@ -43,5 +43,5 @@ public enum PageType {
     image,
     visualisation,
     equation,
-    feedback_received
+    feedback_page
 }

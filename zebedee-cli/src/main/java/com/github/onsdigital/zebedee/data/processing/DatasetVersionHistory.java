@@ -108,13 +108,15 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                         if (lastVersion.getVersions() == null) {
                             System.out.println("***** no versions for current version ");
+                        } else {
+
+                            String expectedFilename = "v" + (lastVersion.getVersions().size() + 1);
+
+                            if (!expectedFilename.equals(lastVersionIdentifier)) {
+                                System.out.println("***** unexpected number of versions for current version ");
+                            }
                         }
 
-                        String expectedFilename = "v" + (lastVersion.getVersions().size() + 1);
-
-                        if (!expectedFilename.equals(lastVersionIdentifier)) {
-                            System.out.println("***** unexpected number of versions for current version ");
-                        }
 
                         // ---------------------------------------------------------------------------------
                         // read the versions array from the most recent version

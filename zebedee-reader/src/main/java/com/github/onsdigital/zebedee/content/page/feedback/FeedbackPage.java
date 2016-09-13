@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 public class FeedbackPage extends BaseStaticPage {
 
     static final String FEEDBACK_URI = "/feedback";
-    static final String ACKNOWLEDGEMENT = "Thank you for your feedback";
+    static final String ACKNOWLEDGEMENT = "Thank you for your help. If you have more extensive feedback, please visit the <a href='aboutus/contactus'>contact page</a>.";
     static final String TITLE = "Feedback";
     static final String SUMMARY = "Share your thoughts to help us improve the site.";
 

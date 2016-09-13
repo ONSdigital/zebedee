@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
@@ -20,7 +22,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
     Path root;
 
     public static void main(String[] args) {
-        List<Path> paths = findDatasetsWithMissingVersionHistory(Paths.get("/Users/carlhembrough/dev/zebedee/zebedee/masterlive"));
+        Set<Path> paths = findDatasetsWithMissingVersionHistory(Paths.get("/Users/carlhembrough/dev/zebedee/zebedee/masterlive"));
 
 //        for (Path path : paths) {
 //            System.out.println(path);
@@ -35,18 +37,18 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
         Path source = Paths.get(args[1]);
 
-        List<Path> paths = findDatasetsWithMissingVersionHistory(source);
+        Set<Path> paths = findDatasetsWithMissingVersionHistory(source);
 
         System.out.println("paths.size() = " + paths.size());
     }
 
-    private static List<Path> findDatasetsWithMissingVersionHistory(Path source) {
+    private static Set<Path> findDatasetsWithMissingVersionHistory(Path source) {
         List<Path> datasets = new DatasetVersionHistory().findDatasets(source);
         List<Path> versionedDatasets = filterDatasetsWithoutVersions(datasets);
 
         ContentReader publishedContentReader = new FileSystemContentReader(source); // read dataset / timeseries content from master
 
-        List<Path> datasetsToFix = new ArrayList<>();
+        Set<Path> datasetsToFix = new HashSet<>();
 
         for (Path datasetJsonPath : versionedDatasets) {
 
@@ -77,11 +79,14 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                     String expectedFilename = "v" + (datasetVersion.getVersions().size() + 1);
 
                                     if (!expectedFilename.equals(versionFilename)) {
+                                        datasetsToFix.add(datasetPath);
                                         System.out.println("uri = " + uri);
                                         System.out.println("***** unexpected number of versions in " + versionFilename);
                                     }
 
                                 } else {
+                                    datasetsToFix.add(datasetPath);
+                                    System.out.println("uri = " + uri);
                                     System.out.println("***** no version history in previous version to use" + datasetVersion.getVersions().size());
                                 }
                             } else {
@@ -94,6 +99,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
 // check the current version for missing history
                     if (dataset.getVersions() == null || dataset.getVersions().size() == 0) {
+                        datasetsToFix.add(datasetPath);
                         System.out.println("uri = " + uri);
                         System.out.println("****** Current version has empty versions array");
                     } else {
@@ -101,11 +107,14 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         //System.out.println("Size of current version history: " + dataset.getVersions().size());
 
                         String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
+
+
                         Path lastVersionPath = datasetPath.resolve("previous").resolve(lastVersionIdentifier);
                         String lastVersionUri = getUriFromPath(source, lastVersionPath);
                         Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionUri);
 
                         if (lastVersion.getVersions() == null) {
+                            datasetsToFix.add(datasetPath);
                             System.out.println("uri = " + uri);
                             System.out.println("***** no versions for current version ");
                         } else {
@@ -113,6 +122,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                             String expectedFilename = "v" + (lastVersion.getVersions().size() + 1);
 
                             if (!expectedFilename.equals(lastVersionIdentifier)) {
+                                datasetsToFix.add(datasetPath);
                                 System.out.println("uri = " + uri);
                                 System.out.println("***** unexpected number of versions for current version ");
                             }
@@ -157,7 +167,6 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                     }
 
-                    datasetsToFix.add(datasetPath);
 
                 }
 

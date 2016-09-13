@@ -106,6 +106,10 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         String lastVersionUri = getUriFromPath(source, lastVersionPath);
                         Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionUri);
 
+                        if (lastVersion.getVersions() == null) {
+                            System.out.println("***** no versions for current version ");
+                        }
+
                         String expectedFilename = "v" + (lastVersion.getVersions().size() + 1);
 
                         if (!expectedFilename.equals(lastVersionIdentifier)) {

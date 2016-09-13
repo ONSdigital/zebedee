@@ -59,9 +59,6 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                 if (content.getType() == PageType.dataset) {
                     Dataset dataset = (Dataset) content;
 
-                    System.out.println(" **********************************************************************");
-                    System.out.println("uri = " + uri);
-
 // check the previous versions for missing history
                     Path versionDirectory = datasetPath.resolve(VersionedContentItem.getVersionDirectoryName());
                     Files.list(versionDirectory).forEach(path -> {
@@ -80,6 +77,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                     String expectedFilename = "v" + (datasetVersion.getVersions().size() + 1);
 
                                     if (!expectedFilename.equals(versionFilename)) {
+                                        System.out.println("uri = " + uri);
                                         System.out.println("***** unexpected number of versions in " + versionFilename);
                                     }
 
@@ -96,6 +94,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
 // check the current version for missing history
                     if (dataset.getVersions() == null || dataset.getVersions().size() == 0) {
+                        System.out.println("uri = " + uri);
                         System.out.println("****** Current version has empty versions array");
                     } else {
 
@@ -107,12 +106,14 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionUri);
 
                         if (lastVersion.getVersions() == null) {
+                            System.out.println("uri = " + uri);
                             System.out.println("***** no versions for current version ");
                         } else {
 
                             String expectedFilename = "v" + (lastVersion.getVersions().size() + 1);
 
                             if (!expectedFilename.equals(lastVersionIdentifier)) {
+                                System.out.println("uri = " + uri);
                                 System.out.println("***** unexpected number of versions for current version ");
                             }
                         }

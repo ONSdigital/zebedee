@@ -74,12 +74,12 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                             if (!datasetVersion.getUri().toString().endsWith("v1")) {
 
                                 if (datasetVersion.getVersions() != null) {
-                                    System.out.println("number of versions in history: " + datasetVersion.getVersions() + " " + versionUri);
+                                    System.out.println("number of versions in history: " + datasetVersion.getVersions().size());
                                 } else {
-                                    System.out.println("***** no version history in previous version to use " + versionUri);
+                                    System.out.println("***** no version history in previous version to use");
                                 }
                             } else {
-                                System.out.println("V1 Will not have a previous version " + versionUri);
+                                System.out.println("V1 Will not have a previous version");
                             }
                         } catch (ZebedeeException | IOException e) {
                             e.printStackTrace();

@@ -107,27 +107,13 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         //System.out.println("Size of current version history: " + dataset.getVersions().size());
 
                         String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
+                        String expectedFilename = "v" + (dataset.getVersions().size() + 1);
 
-
-                        Path lastVersionPath = datasetPath.resolve("previous").resolve(lastVersionIdentifier);
-                        String lastVersionUri = getUriFromPath(source, lastVersionPath);
-                        Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionUri);
-
-                        if (lastVersion.getVersions() == null) {
+                        if (!expectedFilename.equals(lastVersionIdentifier)) {
                             datasetsToFix.add(datasetPath);
                             System.out.println("uri = " + uri);
-                            System.out.println("***** no versions for current version ");
-                        } else {
-
-                            String expectedFilename = "v" + (lastVersion.getVersions().size() + 1);
-
-                            if (!expectedFilename.equals(lastVersionIdentifier)) {
-                                datasetsToFix.add(datasetPath);
-                                System.out.println("uri = " + uri);
-                                System.out.println("***** unexpected number of versions for current version ");
-                            }
+                            System.out.println("***** unexpected number of versions for current version ");
                         }
-
 
                         // ---------------------------------------------------------------------------------
                         // read the versions array from the most recent version

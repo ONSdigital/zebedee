@@ -3,14 +3,17 @@ package com.github.onsdigital.zebedee.data.processing;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
+import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -107,18 +110,32 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                             expectedVersion--;
                                             datasetVersion.getVersions().remove(datasetVersion.getVersions().size() - 1);
                                             collectionWriter.writeObject(datasetVersion, versionUri);
-
                                         }
                                     } else if (expectedVersion < version) {
                                         System.out.println("#### Need to repopulate some entries here");
-                                    }
 
+
+                                        try {
+                                            // read the previous version to copy entries from
+                                            String previousVersionUri = getUriFromPath(source, versionDirectory.resolve("v" + (version - 1)));
+                                            Dataset previousDatasetVersion = (Dataset) publishedContentReader.getContent(versionUri);
+
+                                            populateMissingDatasetData(datasetVersion, previousVersionUri, previousDatasetVersion);
+
+                                            collectionWriter.writeObject(datasetVersion, versionUri);
+
+                                        } catch (ZebedeeException | IOException e) {
+                                            e.printStackTrace();
+                                        }
+
+
+                                    } else {
+                                        datasetsToFix.add(datasetPath);
+                                        System.out.println("***** no version history in previous version to use" + datasetVersion.getVersions().size());
+                                    }
                                 } else {
-                                    datasetsToFix.add(datasetPath);
-                                    System.out.println("***** no version history in previous version to use" + datasetVersion.getVersions().size());
+                                    //System.out.println("V1 Will not have a previous version");
                                 }
-                            } else {
-                                //System.out.println("V1 Will not have a previous version");
                             }
                         } catch (ZebedeeException | IOException e) {
                             e.printStackTrace();
@@ -155,6 +172,11 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                             }
                         } else if (expectedVersion < lastVersion) {
                             System.out.println("##### Need to repopulate some entries for current version");
+
+                            String previousVersionUri = getUriFromPath(source, versionDirectory.resolve(lastVersionIdentifier));
+                            Dataset previousDatasetVersion = (Dataset) publishedContentReader.getContent(previousVersionUri);
+                            populateMissingDatasetData(dataset, previousVersionUri, previousDatasetVersion);
+                            collectionWriter.writeObject(dataset, uri);
                         }
                     }
                 }
@@ -167,6 +189,26 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
         return datasetsToFix;
 
+    }
+
+    private static void populateMissingDatasetData(Dataset datasetVersion, String previousVersionUri, Dataset previousDatasetVersion) {
+        datasetVersion.setVersions(previousDatasetVersion.getVersions());
+        Version missingVersion = new Version();
+        missingVersion.setUri(URI.create(previousVersionUri));
+        missingVersion.setUpdateDate(previousDatasetVersion.getDescription().getReleaseDate());
+        datasetVersion.getVersions().add(missingVersion);
+
+        if (StringUtils.isEmpty(datasetVersion.getDescription().getTitle()))
+            datasetVersion.getDescription().setTitle(previousDatasetVersion.getDescription().getTitle());
+
+        if (StringUtils.isEmpty(datasetVersion.getDescription().getSummary()))
+            datasetVersion.getDescription().setSummary(previousDatasetVersion.getDescription().getSummary());
+
+        if (StringUtils.isEmpty(datasetVersion.getDescription().getMetaDescription()))
+            datasetVersion.getDescription().setMetaDescription(previousDatasetVersion.getDescription().getMetaDescription());
+
+        if (datasetVersion.getDescription().getContact() == null)
+            datasetVersion.getDescription().setContact(previousDatasetVersion.getDescription().getContact());
     }
 
     private static String getUriFromPath(Path source, Path datasetPath) {

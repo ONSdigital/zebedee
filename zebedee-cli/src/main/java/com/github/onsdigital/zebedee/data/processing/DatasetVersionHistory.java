@@ -4,6 +4,7 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -20,13 +21,13 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
     Path root;
 
     public static void main(String[] args) {
-        Set<Path> paths = findDatasetsWithMissingVersionHistory(Paths.get("/Users/carlhembrough/dev/zebedee/zebedee/masterlive"));
+        //Set<Path> paths = findDatasetsWithMissingVersionHistory(Paths.get("/Users/carlhembrough/dev/zebedee/zebedee/masterlive"));
 
 //        for (Path path : paths) {
 //            System.out.println(path);
 //        }
 
-        System.out.println("paths.size() = " + paths.size());
+//        System.out.println("paths.size() = " + paths.size());
 
     }
 
@@ -34,17 +35,19 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
         // args[1] - source data directory.
 
         Path source = Paths.get(args[1]);
+        Path destination = Paths.get(args[2]);
 
-        Set<Path> paths = findDatasetsWithMissingVersionHistory(source);
+        Set<Path> paths = findDatasetsWithMissingVersionHistory(source, destination);
 
         System.out.println("paths.size() = " + paths.size());
     }
 
-    private static Set<Path> findDatasetsWithMissingVersionHistory(Path source) {
+    private static Set<Path> findDatasetsWithMissingVersionHistory(Path source, Path destination) {
         List<Path> datasets = new DatasetVersionHistory().findDatasets(source);
         List<Path> versionedDatasets = filterDatasetsWithoutVersions(datasets);
 
         ContentReader publishedContentReader = new FileSystemContentReader(source); // read dataset / timeseries content from master
+        ContentWriter collectionWriter = new ContentWriter(destination);
 
         Set<Path> datasetsToFix = new HashSet<>();
 
@@ -59,8 +62,6 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                 if (content.getType() == PageType.dataset) {
                     Dataset dataset = (Dataset) content;
 
-                    System.out.println("");
-                    System.out.println("uri = " + uri);
 
 // check the previous versions for missing history
                     Path versionDirectory = datasetPath.resolve(VersionedContentItem.getVersionDirectoryName());
@@ -78,10 +79,8 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                     for (File file : files) {
 
                         Path path = file.toPath();
-
                         String versionUri = getUriFromPath(source, path);
 
-                        System.out.print(":" + path.getFileName() + " ");
 
                         try {
                             Dataset datasetVersion = (Dataset) publishedContentReader.getContent(versionUri);
@@ -95,6 +94,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                     int expectedVersion = datasetVersion.getVersions().size() + 1;
 
                                     if (expectedVersion != version) {
+                                        System.out.println("uri = " + uri);
                                         datasetsToFix.add(datasetPath);
                                         System.out.println("***** unexpected number of versions in " + version + " was expecting " + expectedVersion);
                                     }
@@ -105,6 +105,9 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                         while (expectedVersion >= version) {
                                             System.out.println("##### Removing version entry from v" + version + " removing entry v" + expectedVersion);
                                             expectedVersion--;
+                                            datasetVersion.getVersions().remove(datasetVersion.getVersions().size() - 1);
+                                            collectionWriter.writeObject(datasetVersion, versionUri);
+
                                         }
                                     } else if (expectedVersion < version) {
                                         System.out.println("#### Need to repopulate some entries here");
@@ -124,6 +127,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
 // check the current version for missing history
                     if (dataset.getVersions() == null || dataset.getVersions().size() == 0) {
+                        System.out.println("uri = " + uri);
                         datasetsToFix.add(datasetPath);
                         System.out.println("****** Current version has empty versions array");
                     } else {
@@ -135,6 +139,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         int expectedVersion = dataset.getVersions().size();
 
                         if (expectedVersion != lastVersion) {
+                            System.out.println("uri = " + uri);
                             datasetsToFix.add(datasetPath);
                             System.out.println("***** unexpected number of versions for current version " + lastVersionIdentifier + " was expecting " + expectedVersion);
                         }
@@ -145,12 +150,12 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                             while (expectedVersion >= lastVersion) {
                                 System.out.println("##### Removing version entry from current version removing entry v" + expectedVersion);
                                 expectedVersion--;
+                                dataset.getVersions().remove(dataset.getVersions().size() - 1);
+                                collectionWriter.writeObject(dataset, uri);
                             }
                         } else if (expectedVersion < lastVersion) {
                             System.out.println("##### Need to repopulate some entries for current version");
                         }
-
-
                     }
                 }
 

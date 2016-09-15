@@ -81,7 +81,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                     if (!expectedFilename.equals(versionFilename)) {
                                         datasetsToFix.add(datasetPath);
                                         System.out.println("uri = " + uri);
-                                        System.out.println("***** unexpected number of versions in " + versionFilename);
+                                        System.out.println("***** unexpected number of versions in " + versionFilename + " was expecting " + expectedFilename);
                                     }
 
                                 } else {
@@ -112,7 +112,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         if (!expectedFilename.equals(lastVersionIdentifier)) {
                             datasetsToFix.add(datasetPath);
                             System.out.println("uri = " + uri);
-                            System.out.println("***** unexpected number of versions for current version ");
+                            System.out.println("***** unexpected number of versions for current version " + lastVersionIdentifier + " was expecting " + expectedFilename);
                         }
 
                         // ---------------------------------------------------------------------------------

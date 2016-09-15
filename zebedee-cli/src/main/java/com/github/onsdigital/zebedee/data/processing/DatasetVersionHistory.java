@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,13 +51,23 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                 // Read the data.json of the dataset and ensure its a csv dataset (not a timeseries dataset.)
                 Page content = publishedContentReader.getContent(uri);
-                if (content.getType() == PageType.dataset) {
+                if (content.getType() == PageType.dataset
+                        && uri.startsWith("/employmentandlabourmarket")) {
 
                     Path versionDirectory = datasetPath.resolve(VersionedContentItem.getVersionDirectoryName());
                     File[] files = getOrderedFileList(versionDirectory);
 
                     for (File file : files) {
-                        fixPreviousVersionDataset(source, publishedContentReader, collectionReader, collectionWriter, datasetsToFix, datasetPath, uri, versionDirectory, file);
+                        fixPreviousVersionDataset(
+                                source,
+                                publishedContentReader,
+                                collectionReader,
+                                collectionWriter,
+                                datasetsToFix,
+                                datasetPath,
+                                uri,
+                                versionDirectory,
+                                file);
                     }
 
                     fixCurrentVersion(source, publishedContentReader, collectionReader, collectionWriter, datasetPath, uri, versionDirectory);
@@ -103,7 +114,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                 String previousVersionUri = getUriFromPath(source, versionDirectory.resolve(lastVersionIdentifier));
                 Dataset previousDatasetVersion = getDataset(publishedContentReader, collectionReader, previousVersionUri);
-                populateMissingDatasetData(dataset, previousVersionUri, previousDatasetVersion);
+                populateMissingDatasetData(dataset, previousVersionUri, previousDatasetVersion, new DateTime(2016, 7, 20, 8, 30).toDate());
                 collectionWriter.writeObject(dataset, uri + "/data.json");
             }
         }
@@ -129,7 +140,6 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
         try {
 
             Dataset datasetVersion = getDataset(publishedContentReader, collectionReader, versionUri);
-
 
             if (!datasetVersion.getUri().toString().endsWith("v1")) {
 
@@ -164,7 +174,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                             Dataset previousDatasetVersion = getDataset(publishedContentReader, collectionReader, previousVersionUri);
 
-                            populateMissingDatasetData(datasetVersion, previousVersionUri, previousDatasetVersion);
+                            populateMissingDatasetData(datasetVersion, previousVersionUri, previousDatasetVersion, new DateTime(2016, 8, 17, 8, 30).toDate());
 
                             collectionWriter.writeObject(datasetVersion, versionUri + "/data.json");
 
@@ -197,11 +207,11 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
         return datasetVersion;
     }
 
-    private static void populateMissingDatasetData(Dataset datasetVersion, String previousVersionUri, Dataset previousDatasetVersion) {
+    private static void populateMissingDatasetData(Dataset datasetVersion, String previousVersionUri, Dataset previousDatasetVersion, Date updateDate) {
         datasetVersion.setVersions(previousDatasetVersion.getVersions());
         Version missingVersion = new Version();
         missingVersion.setUri(URI.create(previousVersionUri));
-        missingVersion.setUpdateDate(previousDatasetVersion.getDescription().getReleaseDate());
+        missingVersion.setUpdateDate(updateDate);
         missingVersion.setCorrectionNotice("");
         missingVersion.setLabel("");
         datasetVersion.getVersions().add(missingVersion);

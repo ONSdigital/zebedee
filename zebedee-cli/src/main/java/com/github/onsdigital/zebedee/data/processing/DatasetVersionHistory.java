@@ -66,7 +66,15 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                     Path versionDirectory = datasetPath.resolve(VersionedContentItem.getVersionDirectoryName());
 
                     File[] files = new File(versionDirectory.toString()).listFiles();
-                    Arrays.sort(files);
+                    Arrays.sort(files, (o1, o2) -> {
+
+                        int o1version = Integer.parseInt(o1.getName().toString().replace("v", ""));
+                        int o2version = Integer.parseInt(o2.getName().toString().replace("v", ""));
+
+                        return Integer.compare(o1version, o2version);
+                    });
+
+
                     for (File file : files) {
 
                         Path path = file.toPath();

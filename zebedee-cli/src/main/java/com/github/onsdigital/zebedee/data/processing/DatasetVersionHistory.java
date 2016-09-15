@@ -128,15 +128,16 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                             e.printStackTrace();
                                         }
 
-
-                                    } else {
-                                        datasetsToFix.add(datasetPath);
-                                        System.out.println("***** no version history in previous version to use" + datasetVersion.getVersions().size());
                                     }
+
                                 } else {
-                                    //System.out.println("V1 Will not have a previous version");
+                                    datasetsToFix.add(datasetPath);
+                                    System.out.println("***** no version history in previous version to use" + datasetVersion.getVersions().size());
                                 }
+                            } else {
+                                //System.out.println("V1 Will not have a previous version");
                             }
+
                         } catch (ZebedeeException | IOException e) {
                             e.printStackTrace();
                         }

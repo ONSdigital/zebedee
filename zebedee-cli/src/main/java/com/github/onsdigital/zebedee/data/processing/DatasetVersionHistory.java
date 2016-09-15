@@ -107,7 +107,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         //System.out.println("Size of current version history: " + dataset.getVersions().size());
 
                         String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
-                        String expectedFilename = "v" + (dataset.getVersions().size() + 1);
+                        String expectedFilename = "v" + (dataset.getVersions().size());
 
                         if (!expectedFilename.equals(lastVersionIdentifier)) {
                             datasetsToFix.add(datasetPath);

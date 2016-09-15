@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.util.mertics.service;
 import com.github.onsdigital.zebedee.util.mertics.client.SplunkClient;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 import static com.github.onsdigital.zebedee.Configuration.SplunkConfiguration.*;
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
@@ -59,5 +60,5 @@ public abstract class MetricsService {
     public abstract void capturePing(long ms);
 
 
-    public abstract void captureCollectionPublishMetrics(String collectionId, long publishTime, int numberOfFiles);
+    public abstract void captureCollectionPublishMetrics(String collectionId, long timeTaken, int numberOfFiles, String collectionType, Date publishDate);
 }

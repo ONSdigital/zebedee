@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.util.mertics.service;
 
 import com.github.onsdigital.zebedee.util.mertics.AbstractMetricsTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;

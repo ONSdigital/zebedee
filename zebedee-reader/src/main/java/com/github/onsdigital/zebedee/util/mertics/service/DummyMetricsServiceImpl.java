@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.util.mertics.service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 public class DummyMetricsServiceImpl extends MetricsService {
 
@@ -26,7 +27,7 @@ public class DummyMetricsServiceImpl extends MetricsService {
     }
 
     @Override
-    public void captureCollectionPublishMetrics(String collectionId, long publishTime, int numberOfFiles) {
+    public void captureCollectionPublishMetrics(String collectionId, long timeTaken, int numberOfFiles, String collectionType, Date publishDate) {
 
     }
 }

@@ -11,11 +11,9 @@
 
 
 ##########MAPPING#############
-dfe => The Department for Education and Pensions => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-education => DFE,education,A level,degree,NVQ,school,college,university,curriculum,qualification,teacher training,pupil absence,exclusions,school workforce,key stage
+dfe => The Department for Education => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-education => DFE,education,A level,degree,NVQ,school,college,university,curriculum,qualification,teacher training,pupil absence,exclusions,school workforce,key stage
 
-bis => The Department for Business Innovation & Skills => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-business-innovation-skills => BIS,business,apprenticeship,building,construction,higher education,trade union,enterprise
-
-decc => The Department of Energy & Climate Change => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-of-energy-climate-change => DECC, energy ,solar ,coal ,oil ,gas ,electricity ,fuel poverty ,renewables ,greenhouse gas
+beis => The Department for Business, Energy and Industrial Strategy => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-business-energy-and-industrial-strategy&from_date=&to_date= => BEIS,BIS,business,apprenticeship,building,construction,higher education,trade union,enterprise,DECC,energy,solar,coal,oil,gas,electricity,fuel poverty,renewables ,greenhouse gas
 
 defra => The Department for Environment Food & Rural Affairs => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-environment-food-rural-affairs => DEFRA,agriculture,farming,air quality,emissions,recycling,food,conservation,biodiversity,animals,wildlife,ecosystem
 
@@ -33,9 +31,9 @@ dwp => The Department for Work & Pensions => https://www.gov.uk/government/stati
 
 dh => The Department of Health => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-of-health =>DH,abortion
 
-mod => The Ministry of Defence => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=home-office =>MOD,defence,armed forces,military,veterans,war pensions
+mod => The Ministry of Defence => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-defence =>MOD,defence,armed forces,military,veterans,war pensions
 
-moj => The Ministry of Justice => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-defence =>MOJ,criminal justice,prison,offender,civil justice,knife possession,youth custody,probation,reoffence,asbo
+moj => The Ministry of Justice => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=ministry-of-justice&from_date=&to_date= =>MOJ,criminal justice,prison,offender,civil justice,knife possession,youth custody,probation,reoffence,asbo
 
 nhs => The NHS => https://www.gov.uk/government/statistics?departments%5B%5D=national-health-service =>NHS,dementia,waiting times,hospital,critical care,inpatient,outpatient,ambulance
 

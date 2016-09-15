@@ -407,7 +407,9 @@ public class Publisher {
         MetricsService.getInstance().captureCollectionPublishMetrics(
                 publishedCollection.id,
                 publishTimeMs,
-                publishedCollection.publishResults.get(0).transaction.uriInfos.size());
+                publishedCollection.publishResults.get(0).transaction.uriInfos.size(),
+                publishedCollection.type.toString(),
+                publishedCollection.publishDate);
     }
 
     public static PublishedCollection getPublishedCollection(Collection collection) throws IOException {
@@ -658,6 +660,9 @@ public class Publisher {
                         .setParameter("zip", Boolean.toString(zipped))
                         .setParameter("uri", publishUri);
 
+
+                System.out.println("uri = " + uri);
+                
                 Resource resource = reader.getResource(uri);
                 Response<Result> response = http.post(publish, resource.getData(), source.getFileName().toString(), Result.class);
                 checkResponse(response);

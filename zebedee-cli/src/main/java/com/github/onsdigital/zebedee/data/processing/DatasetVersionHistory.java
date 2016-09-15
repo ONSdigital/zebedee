@@ -118,7 +118,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                         try {
                                             // read the previous version to copy entries from
                                             String previousVersionUri = getUriFromPath(source, versionDirectory.resolve("v" + (version - 1)));
-                                            Dataset previousDatasetVersion = (Dataset) publishedContentReader.getContent(versionUri);
+                                            Dataset previousDatasetVersion = (Dataset) publishedContentReader.getContent(previousVersionUri);
 
                                             populateMissingDatasetData(datasetVersion, previousVersionUri, previousDatasetVersion);
 

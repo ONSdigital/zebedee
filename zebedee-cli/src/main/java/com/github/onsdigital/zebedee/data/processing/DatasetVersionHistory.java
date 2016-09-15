@@ -8,13 +8,11 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
@@ -61,32 +59,51 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                 if (content.getType() == PageType.dataset) {
                     Dataset dataset = (Dataset) content;
 
+                    System.out.println("");
+                    System.out.println("uri = " + uri);
+
 // check the previous versions for missing history
                     Path versionDirectory = datasetPath.resolve(VersionedContentItem.getVersionDirectoryName());
-                    Files.list(versionDirectory).forEach(path -> {
+
+                    File[] files = new File(versionDirectory.toString()).listFiles();
+                    Arrays.sort(files);
+                    for (File file : files) {
+
+                        Path path = file.toPath();
+
                         String versionUri = getUriFromPath(source, path);
+
+                        System.out.print(":" + path.getFileName() + " ");
+
                         try {
                             Dataset datasetVersion = (Dataset) publishedContentReader.getContent(versionUri);
-
-                            //System.out.println("Checking version: " + versionUri);
 
                             if (!datasetVersion.getUri().toString().endsWith("v1")) {
 
                                 if (datasetVersion.getVersions() != null) {
                                     //System.out.println("number of versions in history: " + datasetVersion.getVersions().size());
 
-                                    String versionFilename = path.getFileName().toString();
-                                    String expectedFilename = "v" + (datasetVersion.getVersions().size() + 1);
+                                    int version = Integer.parseInt(path.getFileName().toString().replace("v", ""));
+                                    int expectedVersion = datasetVersion.getVersions().size() + 1;
 
-                                    if (!expectedFilename.equals(versionFilename)) {
+                                    if (expectedVersion != version) {
                                         datasetsToFix.add(datasetPath);
-                                        System.out.println("uri = " + uri);
-                                        System.out.println("***** unexpected number of versions in " + versionFilename + " was expecting " + expectedFilename);
+                                        System.out.println("***** unexpected number of versions in " + version + " was expecting " + expectedVersion);
+                                    }
+
+                                    // if we have too many versions, then remove some
+                                    if (expectedVersion > version) {
+                                        expectedVersion--;
+                                        while (expectedVersion >= version) {
+                                            System.out.println("##### Removing version entry from v" + version + " removing entry v" + expectedVersion);
+                                            expectedVersion--;
+                                        }
+                                    } else if (expectedVersion < version) {
+                                        System.out.println("#### Need to repopulate some entries here");
                                     }
 
                                 } else {
                                     datasetsToFix.add(datasetPath);
-                                    System.out.println("uri = " + uri);
                                     System.out.println("***** no version history in previous version to use" + datasetVersion.getVersions().size());
                                 }
                             } else {
@@ -95,65 +112,38 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                         } catch (ZebedeeException | IOException e) {
                             e.printStackTrace();
                         }
-                    });
+                    }
 
 // check the current version for missing history
                     if (dataset.getVersions() == null || dataset.getVersions().size() == 0) {
                         datasetsToFix.add(datasetPath);
-                        System.out.println("uri = " + uri);
                         System.out.println("****** Current version has empty versions array");
                     } else {
 
                         //System.out.println("Size of current version history: " + dataset.getVersions().size());
 
                         String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
-                        String expectedFilename = "v" + (dataset.getVersions().size());
+                        int lastVersion = Integer.parseInt(lastVersionIdentifier.replace("v", ""));
+                        int expectedVersion = dataset.getVersions().size();
 
-                        if (!expectedFilename.equals(lastVersionIdentifier)) {
+                        if (expectedVersion != lastVersion) {
                             datasetsToFix.add(datasetPath);
-                            System.out.println("uri = " + uri);
-                            System.out.println("***** unexpected number of versions for current version " + lastVersionIdentifier + " was expecting " + expectedFilename);
+                            System.out.println("***** unexpected number of versions for current version " + lastVersionIdentifier + " was expecting " + expectedVersion);
                         }
 
-                        // ---------------------------------------------------------------------------------
-                        // read the versions array from the most recent version
+                        // if we have too many versions, then remove some
+                        if (expectedVersion > lastVersion) {
+                            expectedVersion--;
+                            while (expectedVersion >= lastVersion) {
+                                System.out.println("##### Removing version entry from current version removing entry v" + expectedVersion);
+                                expectedVersion--;
+                            }
+                        } else if (expectedVersion < lastVersion) {
+                            System.out.println("##### Need to repopulate some entries for current version");
+                        }
 
-//                        String lastVersionIdentifier = VersionedContentItem.getLastVersionIdentifier(datasetPath);
-//                        Path lastVersionPath = datasetPath.resolve("previous").resolve(lastVersionIdentifier);
-//                        String lastVersionUri = getUriFromPath(source, lastVersionPath);
-//                        Dataset lastVersion = (Dataset) publishedContentReader.getContent(lastVersionUri);
-//
-//                        System.out.println("lastVersionUri = " + lastVersionUri);
-//
-//                        if (lastVersion.getVersions() != null && lastVersion.getVersions().size() > 0) {
-//                            List<Version> newVersionsList = lastVersion.getVersions();
-//
-//                            for (Version version : newVersionsList) {
-//                                System.out.println("versionUri = " + version.getUri());
-//
-//                                Dataset versionPage = (Dataset) publishedContentReader.getContent(version.getUri().toString());
-//
-//                                if ((versionPage.getVersions() == null || versionPage.getVersions().size() == 0)) {
-//                                    if (!version.getUri().toString().endsWith("v1")) {
-//                                        System.out.println("********* versions list should not be empty in this previous version");
-//
-//                                        // - populate the versions list from the previous version, adding this version
-//
-//                                    } else {
-//                                        System.out.println("V1 Will not have a previous version");
-//                                    }
-//                                } else {
-//                                    System.out.println("versionPage.getVersions().size() = " + versionPage.getVersions().size());
-//                                }
-//                            }
-//                        } else {
-//                            System.out.println("***** no version history in previous version to use");
-//                        }
-                        // add another version for the last version
 
                     }
-
-
                 }
 
             } catch (ZebedeeException | IOException e) {

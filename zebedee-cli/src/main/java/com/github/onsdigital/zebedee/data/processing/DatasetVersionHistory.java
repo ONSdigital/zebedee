@@ -114,7 +114,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                 String previousVersionUri = getUriFromPath(source, versionDirectory.resolve(lastVersionIdentifier));
                 Dataset previousDatasetVersion = getDataset(publishedContentReader, collectionReader, previousVersionUri);
-                populateMissingDatasetData(dataset, previousVersionUri, previousDatasetVersion, new DateTime(2016, 7, 20, 8, 30).toDate());
+                populateMissingDatasetData(dataset, previousVersionUri, previousDatasetVersion, new DateTime(2016, 8, 17, 8, 30).toDate());
                 collectionWriter.writeObject(dataset, uri + "/data.json");
             }
         }
@@ -174,7 +174,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                             Dataset previousDatasetVersion = getDataset(publishedContentReader, collectionReader, previousVersionUri);
 
-                            populateMissingDatasetData(datasetVersion, previousVersionUri, previousDatasetVersion, new DateTime(2016, 8, 17, 8, 30).toDate());
+                            populateMissingDatasetData(datasetVersion, previousVersionUri, previousDatasetVersion, new DateTime(2016, 7, 20, 8, 30).toDate());
 
                             collectionWriter.writeObject(datasetVersion, versionUri + "/data.json");
 

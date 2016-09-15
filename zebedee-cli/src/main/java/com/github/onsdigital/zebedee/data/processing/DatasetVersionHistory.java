@@ -109,7 +109,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                             System.out.println("##### Removing version entry from v" + version + " removing entry v" + expectedVersion);
                                             expectedVersion--;
                                             datasetVersion.getVersions().remove(datasetVersion.getVersions().size() - 1);
-                                            collectionWriter.writeObject(datasetVersion, versionUri);
+                                            collectionWriter.writeObject(datasetVersion, versionUri + "/data.json");
                                         }
                                     } else if (expectedVersion < version) {
                                         System.out.println("#### Need to repopulate some entries here");
@@ -122,7 +122,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
 
                                             populateMissingDatasetData(datasetVersion, previousVersionUri, previousDatasetVersion);
 
-                                            collectionWriter.writeObject(datasetVersion, versionUri);
+                                            collectionWriter.writeObject(datasetVersion, versionUri + "/data.json");
 
                                         } catch (ZebedeeException | IOException e) {
                                             e.printStackTrace();
@@ -168,7 +168,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                                 System.out.println("##### Removing version entry from current version removing entry v" + expectedVersion);
                                 expectedVersion--;
                                 dataset.getVersions().remove(dataset.getVersions().size() - 1);
-                                collectionWriter.writeObject(dataset, uri);
+                                collectionWriter.writeObject(dataset, uri + "/data.json");
                             }
                         } else if (expectedVersion < lastVersion) {
                             System.out.println("##### Need to repopulate some entries for current version");
@@ -176,7 +176,7 @@ public class DatasetVersionHistory extends SimpleFileVisitor<Path> {
                             String previousVersionUri = getUriFromPath(source, versionDirectory.resolve(lastVersionIdentifier));
                             Dataset previousDatasetVersion = (Dataset) publishedContentReader.getContent(previousVersionUri);
                             populateMissingDatasetData(dataset, previousVersionUri, previousDatasetVersion);
-                            collectionWriter.writeObject(dataset, uri);
+                            collectionWriter.writeObject(dataset, uri + "/data.json");
                         }
                     }
                 }

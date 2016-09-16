@@ -7,10 +7,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
@@ -293,13 +290,13 @@ public class Collections {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        // nothing to do if the approved status is already false.
-        if (!collection.description.approvedStatus) {
+        // don't do anything if the approval status is not complete.
+        if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
             return true;
         }
 
         // Go ahead
-        collection.description.approvedStatus = false;
+        collection.description.approvalStatus = ApprovalStatus.NOT_STARTED;
         collection.description.AddEvent(new Event(new Date(), EventType.UNLOCKED, session.email));
         getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_UNLOCKED);
 
@@ -334,8 +331,8 @@ public class Collections {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        // Check approved status
-        if (!collection.description.approvedStatus) {
+        // Check approval status
+        if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
             throw new ConflictException("This collection cannot be published because it is not approved");
         }
 
@@ -498,7 +495,7 @@ public class Collections {
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
-        if (collection.description.approvedStatus == true) {
+        if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
         }
 

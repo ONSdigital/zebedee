@@ -100,6 +100,7 @@ public class CollectionTest {
         assertNotNull(createdCollectionDescription);
         assertEquals(collectionDescription.name, createdCollectionDescription.name);
         assertEquals(collectionDescription.publishDate, createdCollectionDescription.publishDate);
+        assertEquals(ApprovalStatus.NOT_STARTED, createdCollectionDescription.approvalStatus);
     }
 
     @Test

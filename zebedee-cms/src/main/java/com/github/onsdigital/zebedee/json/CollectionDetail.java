@@ -9,7 +9,7 @@ public class CollectionDetail extends CollectionBase {
     public List<ContentDetail> complete;
     public List<ContentDetail> reviewed;
     public List<String> timeseriesImportFiles;
-    public boolean approvedStatus;
+    public ApprovalStatus approvalStatus;
     public List<PendingDelete> pendingDeletes;
 
     public Events events;

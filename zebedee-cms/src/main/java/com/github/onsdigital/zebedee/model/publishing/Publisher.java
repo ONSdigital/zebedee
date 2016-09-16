@@ -8,10 +8,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
@@ -107,7 +104,7 @@ public class Publisher {
                     logInfo("Starting collection publish process").collectionName(collection).log();
 
 
-                    if (!collection.description.approvedStatus) {
+                    if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
                         logInfo("Collection cannot be published as it has not been approved").collectionName(collection).log();
                         return false;
                     }

@@ -60,7 +60,7 @@ public class Collection {
         result.completeUris = collection.completeUris();
         result.reviewedUris = collection.reviewedUris();
         result.eventsByUri = collection.description.eventsByUri;
-        result.approvedStatus = collection.description.approvedStatus;
+        result.approvalStatus = collection.description.approvalStatus;
         result.type = collection.description.type;
         result.teams = collection.description.teams;
         result.isEncrypted = collection.description.isEncrypted;

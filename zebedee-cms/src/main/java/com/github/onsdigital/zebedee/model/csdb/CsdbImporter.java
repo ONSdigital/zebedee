@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
@@ -196,7 +197,7 @@ public class CsdbImporter {
                         .addParameter("collectionName", collection.description.name)
                         .addParameter("CSDBIdentifier", csdbIdentifier).log();
 
-                if (collection.description.approvedStatus == true) {
+                if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
                     preProcessCollection(collection);
                 } else {
                     logInfo("Collection for CSDB identifier is not approved")

@@ -69,7 +69,7 @@ public class CollectionDetails {
         result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());
         result.reviewed = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
-        result.approvedStatus = collection.description.approvedStatus;
+        result.approvalStatus = collection.description.approvalStatus;
         result.events = collection.description.events;
         result.timeseriesImportFiles = collection.description.timeseriesImportFiles;
 

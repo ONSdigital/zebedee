@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -43,7 +44,7 @@ public class PublishTask implements Runnable {
         try {
             Collection collection = zebedee.collections.getCollection(this.collectionId);
 
-            if (collection.description.approvedStatus == false) {
+            if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
                 logInfo("Scheduled collection has not been approved - switching to manual")
                         .addParameter("collectionId", collectionId).log();
 

@@ -42,5 +42,6 @@ public enum PageType {
     table,
     image,
     visualisation,
-    equation
+    equation,
+    feedback_page
 }

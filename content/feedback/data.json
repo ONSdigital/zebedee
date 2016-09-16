@@ -1,0 +1,12 @@
+{
+  "acknowledgement": "Thank you for your help. If you have more extensive feedback, please visit the \u003ca href\u003d\u0027aboutus/contactus\u0027\u003econtact page\u003c/a\u003e.",
+  "type": "feedback_page",
+  "uri": "/feedback",
+  "description": {
+    "title": "Feedback",
+    "summary": "Share your thoughts to help us improve the site.",
+    "unit": "",
+    "preUnit": "",
+    "source": ""
+  }
+}

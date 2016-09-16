@@ -25,6 +25,7 @@ public class Content {
     public static final String REDIRECT = "redirect.txt";
     public static final String DATA_VIS_DIR = "visualisations";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
+    public static final String FEEDBACK_URL = "/feedback";
 
     public final Path path;
     public final Path dataVisualisationsPath;
@@ -58,6 +59,10 @@ public class Content {
     private static boolean isDataVisualisation(Path p) {
         // should be under visualisations but stop at the content directory.
         return p.getFileName().toString().equals(DATA_VIS_DIR) || p.getParent().getFileName().toString().equals(DATA_VIS_DIR);
+    }
+
+    private static boolean isNotFeedbackPage(Path p) {
+        return !p.toString().toLowerCase().contains(FEEDBACK_URL);
     }
 
     private static boolean isNotPreviousVersions(Path p) {
@@ -406,13 +411,15 @@ public class Content {
             return Files.isDirectory(entry)
                     && isDataVisualisation(entry)
                     && isNotTimeseries(entry)
-                    && isNotPreviousVersions(entry);
+                    && isNotPreviousVersions(entry)
+                    && isNotFeedbackPage(entry);
         } else {
             // PUBLISHING SUPPORT
             return Files.isDirectory(entry)
                     && isNotTimeseries(entry)
                     && isNotPreviousVersions(entry)
-                    && !isDataVisualisation(entry);
+                    && !isDataVisualisation(entry)
+                    && isNotFeedbackPage(entry);
         }
     }
 }

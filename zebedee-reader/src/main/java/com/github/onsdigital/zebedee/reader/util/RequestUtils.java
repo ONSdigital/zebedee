@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
 
@@ -67,5 +68,16 @@ public class RequestUtils {
      */
     public static ZebedeeReader getZebedeeReader(HttpServletRequest request) {
         return new ZebedeeReader(getRequestedLanguage(request));
+    }
+
+    public static Optional<String> getURIParameter(HttpServletRequest request) {
+        if (request == null) {
+            return Optional.empty();
+        }
+        String uri = request.getParameter("uri");
+        if (StringUtils.isEmpty(uri)) {
+            return Optional.empty();
+        }
+       return Optional.ofNullable(uri);
     }
 }

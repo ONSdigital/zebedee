@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.PublishScheduler;
 
 import javax.crypto.SecretKey;
@@ -62,8 +61,6 @@ public class PrePublishCollectionsTask extends ScheduledTask {
         // load collections into memory
         Set<Collection> collections = loadCollections(this, zebedee);
 
-        preProcessCollectionsForPublish(collections);
-
         // create a publish task for each collection ready to publish.
         List<PublishCollectionTask> collectionPublishTasks = createCollectionPublishTasks(collections);
 
@@ -76,16 +73,6 @@ public class PrePublishCollectionsTask extends ScheduledTask {
 
         logInfo("PRE-PUBLISH: Finished Pre-publish")
                 .addParameter("totalProcessTime", (System.currentTimeMillis() - startTime)).log();
-    }
-
-    private void preProcessCollectionsForPublish(Set<Collection> collections) {
-        logInfo("PRE-PUBLISH: Preprocessing collections").log();
-        for (Collection collection : collections) {
-            logInfo("PRE-PUBLISH: Preprocessing collection").collectionName(collection).log();
-            SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
-            CollectionPublishPreprocessor.preProcessCollectionForPublish(collection, key);
-            logInfo("PRE-PUBLISH: Preprocessing completed.").collectionName(collection).log();
-        }
     }
 
     /**
@@ -145,8 +132,6 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                 futures.add(pool.submit(() -> {
                     try {
                         logInfo("PRE-PUBLISH: creating collection publish task").collectionName(collection).log();
-                        SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
-                        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
 
                         String encryptionPassword = Random.password(100);
 
@@ -156,6 +141,8 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
                         Publisher.SendManifest(collection, encryptionPassword);
 
+                        SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
+                        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
 
                         logInfo("PRE-PUBLISH: Adding publish task").collectionName(collection).log();

@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -385,7 +386,7 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(publisherSession.email, jsonFile);
+        boolean result = collection.deleteContentDirectory(publisherSession.email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -408,7 +409,7 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(publisherSession.email, jsonFile);
+        boolean result = collection.deleteContentDirectory(publisherSession.email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -430,7 +431,7 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.REVIEWED);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContent(publisher1Email, jsonFile);
+        boolean result = collection.deleteContentDirectory(publisher1Email, jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -1353,5 +1354,27 @@ public class CollectionTest {
 
         // check an event has been created for the content being created.
         assertTrue(collection.description.eventsByUri.get(uri).hasEventForType(EventType.MOVED));
+    }
+
+    public static Collection CreateCollection(Path destination, String collectionName) throws CollectionNotFoundException, IOException {
+
+        CollectionDescription collection = new CollectionDescription(collectionName);
+        collection.type = CollectionType.manual;
+        collection.isEncrypted = false;
+        collection.name = collectionName;
+
+        String filename = PathUtils.toFilename(collectionName);
+        collection.id = filename + "-" + Random.id();
+        Collection.CreateCollectionFolders(filename, destination);
+
+        //collection.AddEvent(new Event(new Date(), EventType.CREATED, "admin"));
+
+        // Create the description:
+        Path collectionDescriptionPath = destination.resolve(filename + ".json");
+        try (OutputStream output = Files.newOutputStream(collectionDescriptionPath)) {
+            Serialiser.serialise(output, collection);
+        }
+
+        return new Collection(destination.resolve(filename), null);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.util;
 
+import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -114,5 +115,9 @@ public class ZebedeeCmsService {
 
     public InputStream objectAsInputStream(Object obj) {
         return new ByteArrayInputStream(ContentUtil.serialise(obj).getBytes());
+    }
+
+    public Zebedee getZebedee() {
+        return Root.zebedee;
     }
 }

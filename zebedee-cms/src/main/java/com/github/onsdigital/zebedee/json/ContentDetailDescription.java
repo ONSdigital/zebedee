@@ -23,4 +23,31 @@ public class ContentDetailDescription {
         contentDetailDescription.language = language;
         return contentDetailDescription;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public ContentDetailDescription setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public String getEdition() {
+        return edition;
+    }
+
+    public ContentDetailDescription setEdition(String edition) {
+        this.edition = edition;
+        return this;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public ContentDetailDescription setLanguage(String language) {
+        this.language = language;
+        return this;
+    }
 }

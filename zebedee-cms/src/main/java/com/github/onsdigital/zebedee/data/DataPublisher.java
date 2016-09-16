@@ -38,7 +38,7 @@ public class DataPublisher {
      * @throws ZebedeeException
      * @throws URISyntaxException
      */
-    public List<String> preprocessCollection(
+    public void preprocessCollection(
             ContentReader publishedContentReader,
             CollectionReader collectionReader,
             ContentWriter collectionContentWriter,
@@ -58,10 +58,6 @@ public class DataPublisher {
         }
 
         applyUpdateCommands(publishedContentReader, collectionReader, collectionContentWriter, dataIndex, updateCommands);
-
-        // Get the list of uris in reviewed
-        List<String> uris = collectionReader.getReviewed().listUris();
-        return uris;
     }
 
     public void applyUpdateCommands(ContentReader publishedContentReader, CollectionReader collectionReader, ContentWriter collectionContentWriter, DataIndex dataIndex, List<TimeseriesUpdateCommand> updateCommands) throws ZebedeeException, IOException {

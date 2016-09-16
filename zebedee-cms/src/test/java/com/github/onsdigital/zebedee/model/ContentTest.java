@@ -119,7 +119,7 @@ public class ContentTest {
     public void shouldGetNestedDetails() throws IOException {
 
         // Given an instance of content
-        Content content = new Content(basePath);
+        Content content = new Content(basePath, basePath);
 
         // When the nestedDetails method is called
         ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);
@@ -135,7 +135,7 @@ public class ContentTest {
     public void getNestedDetailsShouldAlphabeticallyOrderFiles() throws IOException {
 
         // Given an instance of content with three subdirectories
-        Content content = new Content(basePath);
+        Content content = new Content(basePath, basePath);
 
         // When the nestedDetails method is called
         ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);
@@ -154,7 +154,7 @@ public class ContentTest {
     public void shouldGetNestedDetailsWithNoDataJsonFile() throws IOException {
 
         // Given an instance of content
-        Content content = new Content(basePath);
+        Content content = new Content(basePath, basePath);
 
         // When the nestedDetails method is called
         ContentDetail root = content.nestedDetails(CollectionOwner.PUBLISHING_SUPPORT);

@@ -3,8 +3,10 @@ package com.github.onsdigital.zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
@@ -17,6 +19,7 @@ import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.Sessions;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.Users;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -27,9 +30,13 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
+import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 public class Zebedee {
 
@@ -45,6 +52,7 @@ public class Zebedee {
     static final String APPLICATION_KEYS = "application-keys";
 
     public final Path path;
+    public final Path publishedContentPath;
     public final Content published;
     public final Collections collections;
     public final PublishedCollections publishedCollections;
@@ -62,7 +70,8 @@ public class Zebedee {
 
         // Validate the directory:
         this.path = path;
-        Path published = path.resolve(PUBLISHED);
+        this.publishedContentPath = path.resolve(PUBLISHED);
+
         Path collections = path.resolve(COLLECTIONS);
         Path publishedCollections = path.resolve(PUBLISHED_COLLECTIONS);
         Path users = path.resolve(USERS);
@@ -71,7 +80,7 @@ public class Zebedee {
         Path teams = path.resolve(TEAMS);
         Path applicationKeysPath = path.resolve(APPLICATION_KEYS);
 
-        if (!Files.exists(published) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
+        if (!Files.exists(publishedContentPath) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
                             + path.toAbsolutePath());
@@ -79,7 +88,7 @@ public class Zebedee {
 
 
         // Create published and ensure redirect
-        this.published = new Content(published);
+        this.published = new Content(publishedContentPath);
         this.dataIndex = new DataIndex(new FileSystemContentReader(this.published.path));
 
         Path redirectPath = this.published.path.resolve(Content.REDIRECT);
@@ -193,6 +202,44 @@ public class Zebedee {
         }
 
         return result;
+    }
+
+    public void checkAllCollectionsForDeleteMarker(String uri) throws IOException, DeleteContentRequestDeniedException {
+        Path searchValue = Paths.get(uri);
+
+        for (Collection collection : collections.list()) {
+            if (collection.description.getPendingDeletes()
+                    .stream()
+                    .filter(existingDeleteRoot -> searchValue.startsWith(Paths.get(existingDeleteRoot.getRoot()
+                            .contentPath)))
+                    .findFirst().isPresent()) {
+                throw markedDeleteInAnotherCollectionError(collection, uri);
+            }
+        }
+    }
+
+/*    private List<ContentDetail> getAllPendingDeletes() throws IOException {
+        List<ContentDetail> allPendingDeletes = new ArrayList<>();
+        collections.list().forEach(collection -> allPendingDeletes.addAll(collection.description.getPendingDeletes()));
+        return allPendingDeletes;
+    }*/
+
+    public void isBeingEditedInAnotherCollection(Collection workingCollection, String uri, Session session) throws
+            IOException,
+            ZebedeeException {
+        Optional<Collection> blockingCollection = collections.list()
+                .stream()
+                .filter(collection -> collection.isInCollection(uri))
+                .findFirst();
+        if (blockingCollection.isPresent()) {
+            String title = new ZebedeeCollectionReader(this, blockingCollection.get(), session)
+                    .getContent(uri).getDescription().getTitle();
+
+            if (workingCollection.description.id.equals(blockingCollection.get().description.id)) {
+                throw beingEditedByThisCollectionError(title);
+            }
+            throw beingEditedByAnotherCollectionError(blockingCollection.get(), title);
+        }
     }
 
     public Path find(String uri) throws IOException {

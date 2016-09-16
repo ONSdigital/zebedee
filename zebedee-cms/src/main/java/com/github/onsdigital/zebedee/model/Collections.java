@@ -15,7 +15,6 @@ import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
-import com.github.onsdigital.zebedee.model.publishing.preprocess.CollectionPublishPreprocessor;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -28,9 +27,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
@@ -38,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.Future;
 
@@ -96,6 +96,36 @@ public class Collections {
         }
     }
 
+    public static void removeEmptyCollectionDirectories(Path path) throws IOException {
+        if (!Files.isDirectory(path)) {
+            path = path.getParent();
+        }
+        if (isEmpty(path)) {
+            Path temp = path;
+            while (!isCollectionRoot(temp.getFileName())) {
+                if (isEmpty(temp)) {
+                    Files.deleteIfExists(temp);
+                }
+                temp = temp.getParent();
+            }
+        }
+    }
+
+    private static boolean isCollectionRoot(Path path) {
+        return Collection.IN_PROGRESS.equals(path.toString())
+                || Collection.REVIEWED.equals(path.toString())
+                || Collection.COMPLETE.equals(path.toString());
+    }
+
+    private static boolean isEmpty(Path path) {
+        File[] files = path.toFile().listFiles();
+
+        if (files == null)
+            return true;
+
+        return Arrays.asList(files).isEmpty();
+    }
+
     /**
      * Mark a file in a collection as 'complete'
      *
@@ -138,6 +168,7 @@ public class Collections {
         CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, null, uri);
         // Attempt to complete:
         if (collection.complete(session.email, uri, recursive)) {
+            removeEmptyCollectionDirectories(path);
             collection.save();
             getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_ITEM_COMPLETED));
         } else {
@@ -317,8 +348,6 @@ public class Collections {
 
         Keyring keyring = zebedee.keyringCache.get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
-        SecretKey key = keyring.get(collection.description.id);
-        CollectionPublishPreprocessor.preProcessCollectionForPublish(collection, key);
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
         long publishStart = System.currentTimeMillis();
@@ -451,9 +480,14 @@ public class Collections {
             throw new ConflictException("This URI already exists");
         }
 
+        try {
+            zebedee.checkAllCollectionsForDeleteMarker(uri);
+        } catch (DeleteContentRequestDeniedException ex) {
+            throw new ConflictException("This URI already exists");
+        }
+
         writeContent(collection, uri, session, request, requestBody, false, eventType, validateJson);
     }
-
 
     public void writeContent(
             Collection collection, String uri,
@@ -499,7 +533,6 @@ public class Collections {
             }
         }
 
-        // Save collection metadata
         collection.save();
 
         path = collection.getInProgressPath(uri);
@@ -586,8 +619,7 @@ public class Collections {
             eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
         } else {
             if (Files.isDirectory(path)) {
-
-                deleted = collection.deleteContent(session.email, uri);
+                deleted = collection.deleteContentDirectory(session.email, uri);
             } else {
                 deleted = collection.deleteFile(uri);
             }
@@ -595,6 +627,7 @@ public class Collections {
         }
         collection.save();
         if (deleted) {
+            removeEmptyCollectionDirectories(path);
             getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
                     eventType, uri));
         }

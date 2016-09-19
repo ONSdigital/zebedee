@@ -59,34 +59,6 @@ public class ApproveTask implements Callable<Boolean> {
         this.dataIndex = dataIndex;
     }
 
-    @Override
-    public Boolean call() {
-
-        try {
-
-            List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
-
-            populateReleasePage(collectionContent);
-            generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-            generatePdfFiles(collectionContent);
-
-            PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
-
-            compressZipFiles(collection, collectionReader, collectionWriter);
-            approveCollection();
-
-            // Send a notification to the website with the publish date for caching.
-            publishNotification.sendNotification(EventType.APPROVED);
-
-            return true;
-
-        } catch (IOException | ZebedeeException | URISyntaxException e) {
-            logError(e, "Exception approving collection").collectionName(collection).log();
-            SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
-            return false;
-        }
-    }
-
     public static void generateTimeseries(
             Collection collection,
             ContentReader publishedReader,
@@ -149,6 +121,43 @@ public class ApproveTask implements Callable<Boolean> {
         }
 
         return new PublishNotification(collection, uriList, contentToDelete);
+    }
+
+    @Override
+    public Boolean call() {
+
+        try {
+
+            List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
+
+            populateReleasePage(collectionContent);
+            generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+            generatePdfFiles(collectionContent);
+
+            PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
+
+            compressZipFiles(collection, collectionReader, collectionWriter);
+            approveCollection();
+
+            // Send a notification to the website with the publish date for caching.
+            publishNotification.sendNotification(EventType.APPROVED);
+
+            return true;
+
+        } catch (IOException | ZebedeeException | URISyntaxException e) {
+
+            logError(e, "Exception approving collection").collectionName(collection).log();
+
+            collection.description.approvalStatus = ApprovalStatus.ERROR;
+            try {
+                collection.save();
+            } catch (IOException e1) {
+                logError(e, "Exception saving collection after approval exception").collectionName(collection).log();
+            }
+
+            SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
+            return false;
+        }
     }
 
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {

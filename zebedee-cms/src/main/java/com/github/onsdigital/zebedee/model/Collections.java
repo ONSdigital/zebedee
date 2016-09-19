@@ -259,6 +259,9 @@ public class Collections {
         ContentReader publishedReader = new FileSystemContentReader(zebedee.published.path);
         DataIndex dataIndex = zebedee.dataIndex;
 
+        collection.description.approvalStatus = ApprovalStatus.IN_PROGRESS;
+        collection.save();
+
         Future<Boolean> future = ApprovalQueue.add(
                 new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex));
 

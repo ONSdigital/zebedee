@@ -47,6 +47,11 @@ public class Cli {
                 .argName("source directory> <destination file> <optional datasetID")
                 .hasArgs()
                 .build());
+        options.addOption(Option.builder("datasetversionhistory")
+                .desc("Find missing entries in CSV dataset versions")
+                .argName("source directory")
+                .hasArgs()
+                .build());
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -68,6 +73,8 @@ public class Cli {
                 TimeseriesLister.listTimeseries(args);
             } else if (line.hasOption("migratetimeseries")) {
                 TimeseriesMigration.migrateTimeseries(args);
+            } else if (line.hasOption("datasetversionhistory")) {
+                DatasetVersionHistory.findDatasetsWithMissingVersionHistory(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

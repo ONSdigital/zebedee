@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.ContentDetailDescription;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
+import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,7 @@ public class Content {
     public final Path dataVisualisationsPath;
 
     public RedirectTablePartialMatch redirect = null;
+    private Path publishedContentPath;
 
     public Content(Path path) {
         this.path = path;
@@ -45,10 +47,14 @@ public class Content {
         }
     }
 
-    private static boolean isDirEmpty(final Path directory) throws IOException {
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
-            return !dirStream.iterator().hasNext();
-        }
+    /**
+     * Create a new instance using an injected publishedContentPath.
+     * @param path
+     * @param publishedContentPath
+     */
+    public Content(Path path, Path publishedContentPath) {
+        this(path);
+        this.publishedContentPath = publishedContentPath;
     }
 
     private static boolean isNotTimeseries(Path p) {
@@ -224,20 +230,21 @@ public class Content {
         return nestedDetails(path, collectionOwner);
     }
 
-    private ContentDetail nestedDetails(Path path, CollectionOwner collectionOwner) throws IOException {
-        ContentDetail detail = details(path.resolve("data.json"));
+    private ContentDetail nestedDetails(Path contentPath, CollectionOwner collectionOwner) throws IOException {
+        ContentDetail detail = details(contentPath.resolve("data.json"));
 
         // if the folder is empty put in an empty node with just a name.
         if (detail == null) {
             detail = new ContentDetail();
-            detail.description = new ContentDetailDescription(path.getFileName().toString());
+            detail.description = new ContentDetailDescription(contentPath.getFileName().toString());
             detail.uri = "";
         }
 
+        detail.contentPath = "/" + getPublishedContentPath().relativize(contentPath);
         detail.children = new ArrayList<>();
 
         // todo: remove timeseries filter once we are caching the browse tree.
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentPath)) {
             for (Path entry : stream) {
                 if (isVisibleForCollectionOwner(collectionOwner, entry)) {
                     ContentDetail child = nestedDetails(entry, collectionOwner);
@@ -265,7 +272,7 @@ public class Content {
                 });
             }
         } catch (IllegalArgumentException e) {
-            logError(e, "Failed to sort content detail items").addParameter("path", path.toString()).log();
+            logError(e, "Failed to sort content detail items").addParameter("path", contentPath.toString()).log();
         }
 
         return detail;
@@ -414,5 +421,13 @@ public class Content {
                     && isNotPreviousVersions(entry)
                     && !isDataVisualisation(entry);
         }
+    }
+
+    public Path getPublishedContentPath() {
+
+        if (publishedContentPath == null)
+            publishedContentPath = ZebedeeCmsService.getInstance().getZebedee().publishedContentPath;
+
+        return publishedContentPath;
     }
 }

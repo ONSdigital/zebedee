@@ -222,21 +222,19 @@ public class CsdbImporter {
      * @throws ZebedeeException
      */
     public void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
-        List<String> uriList = generateTimeseries(collection);
-        new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
-    }
-
-    private List<String> generateTimeseries(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
         SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
         ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.published.path);
         DataIndex dataIndex = Root.zebedee.dataIndex;
 
-        List<String> uriList = ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+        ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
+        PublishNotification publishNotification = ApproveTask.createPublishNotification(collectionReader, collection);
         compressZipFiles(collection, collectionReader, collectionWriter);
 
-        return uriList;
+        // Send a notification to the website with the publish date for caching.
+        publishNotification.sendNotification(EventType.APPROVED);
+
     }
 
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {

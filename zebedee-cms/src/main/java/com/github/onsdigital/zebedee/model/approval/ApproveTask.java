@@ -6,10 +6,7 @@ import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -20,6 +17,7 @@ import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 
@@ -31,8 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
 
 /**
  * Callable implementation for the approval process.
@@ -62,7 +59,7 @@ public class ApproveTask implements Callable<Boolean> {
         this.dataIndex = dataIndex;
     }
 
-    public static List<String> generateTimeseries(
+    public static void generateTimeseries(
             Collection collection,
             ContentReader publishedReader,
             CollectionReader collectionReader,
@@ -74,7 +71,7 @@ public class ApproveTask implements Callable<Boolean> {
         List<TimeseriesUpdateCommand> updateCommands = ImportUpdateCommandCsvs(collection, publishedReader, collectionReader);
 
         // Generate time series if required.
-        return new DataPublisher().preprocessCollection(
+        new DataPublisher().preprocessCollection(
                 publishedReader,
                 collectionReader,
                 collectionWriter.getReviewed(), true, dataIndex, updateCommands);
@@ -99,6 +96,33 @@ public class ApproveTask implements Callable<Boolean> {
         return updateCommands;
     }
 
+    public static PublishNotification createPublishNotification(CollectionReader collectionReader, Collection collection) {
+        List<String> uriList = collectionReader.getReviewed().listUris();
+
+        // only provide relevent uri's
+        //  - remove versioned uris
+        //  - add associated uris? /previous /data etc?
+
+        List<ContentDetail> contentToDelete = new ArrayList<>();
+        List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
+
+
+        for (PendingDelete pendingDelete : pendingDeletes) {
+
+            ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
+                logDebug("Adding uri to delete to the publish notification " + node.uri);
+                if (!contentToDelete.contains(node.uri)) {
+                    ContentDetail contentDetailToDelete = new ContentDetail();
+                    contentDetailToDelete.uri = node.uri;
+                    contentDetailToDelete.type = node.type;
+                    contentToDelete.add(contentDetailToDelete);
+                }
+            });
+        }
+
+        return new PublishNotification(collection, uriList, contentToDelete);
+    }
+
     private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
         TimeSeriesCompressionTask timeSeriesCompressionTask = new TimeSeriesCompressionTask();
         boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
@@ -118,13 +142,16 @@ public class ApproveTask implements Callable<Boolean> {
             List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
             populateReleasePage(collectionContent);
-            List<String> uriList = generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
-            compressZipFiles(collection, collectionReader, collectionWriter);
+            generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
             generatePdfFiles(collectionContent);
+
+            PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
+
+            compressZipFiles(collection, collectionReader, collectionWriter);
             approveCollection();
 
             // Send a notification to the website with the publish date for caching.
-            new PublishNotification(collection, uriList).sendNotification(EventType.APPROVED);
+            publishNotification.sendNotification(EventType.APPROVED);
 
             return true;
 

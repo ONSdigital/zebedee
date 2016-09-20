@@ -10,8 +10,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ManifestTest {
 
@@ -49,6 +49,7 @@ public class ManifestTest {
         // Given a new manifest
         Manifest manifest = new Manifest();
         manifest.addFileCopy("from/here", "to/there");
+        manifest.addDelete("from/here");
 
         // When the save method is called
         boolean saved = Manifest.save(manifest, collection);
@@ -58,7 +59,12 @@ public class ManifestTest {
 
         assertTrue(saved);
         assertEquals(manifest.filesToCopy.size(), loadedManifest.filesToCopy.size());
-        assertEquals(manifest.filesToCopy.get(0).source, loadedManifest.filesToCopy.get(0).source);
-        assertEquals(manifest.filesToCopy.get(0).target, loadedManifest.filesToCopy.get(0).target);
+
+        // check the file copy is persisted
+        assertEquals(manifest.filesToCopy.iterator().next().source, loadedManifest.filesToCopy.iterator().next().source);
+        assertEquals(manifest.filesToCopy.iterator().next().target, loadedManifest.filesToCopy.iterator().next().target);
+
+        // check the delete is persisted
+        assertEquals(manifest.urisToDelete.iterator().next(), loadedManifest.urisToDelete.iterator().next());
     }
 }

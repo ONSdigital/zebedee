@@ -33,6 +33,7 @@ public class Configuration {
         private SplunkConfiguration() { /** static methods only */}
 
         public static boolean isSplunkEnabled() {
+            // TODO DOES THIS FIX IT? CAN I GO HOME NOW?
             try {
                 return BooleanUtils.toBoolean(getValue(SPLUNK_ENABLED_ENV));
             } catch (Exception ex) {

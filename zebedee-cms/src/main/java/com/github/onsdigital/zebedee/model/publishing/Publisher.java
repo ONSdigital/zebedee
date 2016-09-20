@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
@@ -25,6 +26,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
+import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.*;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.FileUtils;
@@ -47,8 +49,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
@@ -190,15 +191,7 @@ public class Publisher {
 
     public static void SendManifest(Collection collection, String encryptionPassword) throws IOException {
 
-        Path manifestPath = Manifest.getManifestPath(collection);
-        Manifest manifest;
-
-        if (!Files.exists(manifestPath)) {
-            manifest = Manifest.create(collection);
-            Manifest.save(manifest, collection);
-        } else {
-            manifest = Manifest.load(collection);
-        }
+        Manifest manifest = Manifest.get(collection);
 
         long start = System.currentTimeMillis();
         List<Future<IOException>> futures = new ArrayList<>();
@@ -250,14 +243,14 @@ public class Publisher {
 
         long start = System.currentTimeMillis();
 
-        logInfo("Beginning collection publish").collectionName(collection).log();
+        logInfo("PRE-PUBLISH: Begin transaction").collectionName(collection).log();
+
         Map<String, String> hostToTransactionId = beginPublish(theTrainHosts, encryptionPassword);
         collection.description.publishTransactionIds = hostToTransactionId;
-        logInfo("Beginning collection publish end").collectionName(collection).log();
 
         collection.save();
 
-        logInfo("BeginPublish complete").timeTaken(System.currentTimeMillis() - start).log();
+        logInfo("PRE-PUBLISH: BeginPublish complete").timeTaken(System.currentTimeMillis() - start).log();
 
         return hostToTransactionId;
     }
@@ -375,6 +368,7 @@ public class Publisher {
             PublishedCollection publishedCollection = getPublishedCollection(collection);
 
             SlackNotification.publishNotification(publishedCollection);
+
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
                     COLLECTION_POST_PUBLISHED_CONFIRMATION);
 
@@ -386,8 +380,7 @@ public class Publisher {
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
-            logInfo("Post publish reindexing search").collectionName(collection).log();
-            reindexSearch(collection);
+            reindexPublishingSearch(collection);
 
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
 
@@ -409,12 +402,27 @@ public class Publisher {
     }
 
     public static void savePublishMetrics(PublishedCollection publishedCollection) {
-        long publishTimeMs = Math.round(publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime());
+        try {
+            long publishTimeMs = Math.round(publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime());
 
-        MetricsService.getInstance().captureCollectionPublishMetrics(
-                publishedCollection.id,
-                publishTimeMs,
-                publishedCollection.publishResults.get(0).transaction.uriInfos.size());
+            Date publishDate = publishedCollection.publishDate;
+
+            if (publishDate == null)
+                publishDate = publishedCollection.publishStartDate;
+
+            if (publishDate == null)
+                publishDate = new Date();
+
+            MetricsService.getInstance().captureCollectionPublishMetrics(
+                    publishedCollection.id,
+                    publishTimeMs,
+                    publishedCollection.publishResults.get(0).transaction.uriInfos.size(),
+                    publishedCollection.type.toString(),
+                    publishDate);
+        } catch (Exception exception) {
+            logError(exception, "An error occurred saving publish metrics")
+                    .collectionName(publishedCollection.name).collectionId(publishedCollection.id).log();
+        }
     }
 
     public static PublishedCollection getPublishedCollection(Collection collection) throws IOException {
@@ -428,7 +436,7 @@ public class Publisher {
     }
 
     private static void processManifestForMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
-        Manifest manifest = Manifest.load(collection);
+        Manifest manifest = Manifest.get(collection);
 
         for (FileCopy fileCopy : manifest.filesToCopy) {
             try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
@@ -476,7 +484,7 @@ public class Publisher {
     }
 
 
-    private static void reindexSearch(Collection collection) throws IOException {
+    private static void reindexPublishingSearch(Collection collection) throws IOException {
 
         logInfo("Reindexing search").collectionName(collection).log();
         try {
@@ -489,6 +497,20 @@ public class Publisher {
                     String contentUri = URIUtils.removeLastSegment(uri);
                     reIndexPublishingSearch(contentUri);
                 }
+            }
+
+            for (PendingDelete pendingDelete : collection.description.getPendingDeletes()) {
+
+                ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
+                    logDebug("Deleting index for uri " + node.uri);
+                    pool.submit(() -> {
+                        try {
+                            Indexer.getInstance().deleteContentIndex(node.type, node.uri);
+                        } catch (Exception e) {
+                            logError(e, "Exception reloading search index:").log();
+                        }
+                    });
+                });
             }
 
             logInfo("Redindex search completed").collectionName(collection)
@@ -651,6 +673,9 @@ public class Publisher {
                         .setParameter("zip", Boolean.toString(zipped))
                         .setParameter("uri", publishUri);
 
+
+                System.out.println("uri = " + uri);
+                
                 Resource resource = reader.getResource(uri);
                 Response<Result> response = http.post(publish, resource.getData(), source.getFileName().toString(), Result.class);
                 checkResponse(response);

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
 
@@ -26,6 +27,7 @@ public class CollectionDescription extends CollectionBase {
     public Date publishStartDate; // The date the publish process was actually started
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
+    private List<PendingDelete> pendingDeletes;
 
     // Default to PUBLISHING_SUPPORT_TEAM
     public CollectionOwner collectionOwner = PUBLISHING_SUPPORT;
@@ -132,5 +134,24 @@ public class CollectionDescription extends CollectionBase {
 
     public CollectionOwner getCollectionOwner() {
         return collectionOwner == null ? PUBLISHING_SUPPORT : collectionOwner;
+    }
+
+    public List<PendingDelete> getPendingDeletes() {
+        if (this.pendingDeletes == null) {
+            this.pendingDeletes = new ArrayList<>();
+        }
+        return pendingDeletes;
+    }
+
+    public void cancelPendingDelete(String uri) {
+        setPendingDeletes(getPendingDeletes()
+                .stream()
+                .filter(pd -> !pd.getRoot().contentPath.equals(uri))
+                .collect(Collectors.toList())
+        );
+    }
+
+    public void setPendingDeletes(List<PendingDelete> pendingDeletes) {
+        this.pendingDeletes = pendingDeletes;
     }
 }

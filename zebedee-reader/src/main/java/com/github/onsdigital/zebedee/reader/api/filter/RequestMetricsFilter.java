@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logError;
+
 /**
  * Created by dave on 8/8/16.
  */
@@ -18,7 +20,11 @@ public class RequestMetricsFilter implements Filter {
     @Override
     public boolean filter(HttpServletRequest request, HttpServletResponse response) {
         if (StringUtils.isEmpty(request.getHeader(IGNORE_METRICS_HEADER))) {
-            metricsService.captureRequest(request);
+            try {
+                metricsService.captureRequest(request);
+            } catch (Exception ex) {
+                logError(ex).log();
+            }
         }
         return true;
     }

@@ -11,6 +11,7 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
@@ -42,6 +43,37 @@ public class ReIndex {
                         Indexer.getInstance().reloadContent(uri);
                     }
                 }
+                response.setStatus(HttpStatus.OK_200);
+                return "Elasticsearch: indexing complete";
+            } else {
+                response.setStatus(HttpStatus.UNAUTHORIZED_401);
+                return "Wrong key, make sure you pass in the right key";
+            }
+        } catch (IndexInProgressException e) {
+            response.setStatus(HttpStatus.CONFLICT_409);
+            return "Indexing already in progress.";
+        } catch (IndexingException e) {
+            e.printStackTrace();
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+            return "Indexing failed! %s" + e.getMessage();
+        }
+    }
+
+    @DELETE
+    public Object deleteIndex(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
+
+        try {
+            String key = request.getParameter("key");
+            if (Password.verify(key, REINDEX_KEY_HASH)) {
+
+                String uri = request.getParameter("uri");
+                String pageType = request.getParameter("pageType");
+                if (StringUtils.isEmpty(uri)) {
+                    return "Please specify uri of the content to delete";
+                } else {
+                    Indexer.getInstance().deleteContentIndex(pageType, uri);
+                }
+
                 response.setStatus(HttpStatus.OK_200);
                 return "Elasticsearch: indexing complete";
             } else {

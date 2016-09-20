@@ -6,6 +6,7 @@ import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.SlackNotification;
@@ -26,6 +27,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 public class PublishNotification {
 
     private static final List<Host> websiteHosts;
+    private NotificationPayload payload;
 
     static {
         String[] websiteUrls = Configuration.getWebsiteUrls();
@@ -35,19 +37,17 @@ public class PublishNotification {
         }
     }
 
-    private NotificationPayload payload;
-
-    public PublishNotification(Collection collection, List<String> uriList) {
+    public PublishNotification(Collection collection, List<String> urisToUpdate, List<ContentDetail> urisToDelete) {
 
         // Delay the clearing of the cache after publish to minimise load on the server while publishing.
         Date clearCacheDate = new DateTime(collection.description.publishDate)
                 .plusSeconds(Configuration.getSecondsToCacheAfterScheduledPublish()).toDate();
 
-        this.payload = new NotificationPayload(collection.description.id, uriList, clearCacheDate);
+        this.payload = new NotificationPayload(collection.description.id, urisToUpdate, urisToDelete, clearCacheDate);
     }
 
     public PublishNotification(Collection collection) {
-        this(collection, null);
+        this(collection, null, null);
     }
 
     public void sendNotification(EventType eventType) {
@@ -102,16 +102,25 @@ public class PublishNotification {
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(date);
     }
 
+    public boolean hasUriToDelete(String uriToDelete) {
+        return this.payload.urisToDelete.stream()
+                .filter(contentDetail -> contentDetail.uri.equals(uriToDelete))
+                .findFirst()
+                .isPresent();
+    }
+
     class NotificationPayload {
         public String collectionId;
         public String publishDate;
-        public List<String> uriList;
+        public List<String> urisToUpdate;
+        public List<ContentDetail> urisToDelete;
         public String key = Configuration.getReindexKey();
 
-        NotificationPayload(String collectionId, List<String> uriList, Date publishDate) {
+        public NotificationPayload(String collectionId, List<String> urisToUpdate, List<ContentDetail> urisToDelete, Date publishDate) {
             this.collectionId = collectionId;
-            this.uriList = uriList;
             this.publishDate = format(publishDate);
+            this.urisToUpdate = urisToUpdate;
+            this.urisToDelete = urisToDelete;
         }
     }
 }

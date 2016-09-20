@@ -214,7 +214,9 @@ public class Teams {
         if (getTeamName(request) != null) {
             result = Root.zebedee.teams.findTeam(getTeamName(request));
         } else {
-            result = new TeamList(Root.zebedee.teams.listTeams());
+            List<Team> teams = Root.zebedee.teams.listTeams();
+            teams.sort((o1, o2) -> o1.name.toUpperCase().compareTo(o2.name.toUpperCase()));
+            result = new TeamList(teams);
         }
         return result;
     }

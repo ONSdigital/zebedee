@@ -368,6 +368,7 @@ public class Publisher {
             PublishedCollection publishedCollection = getPublishedCollection(collection);
 
             SlackNotification.publishNotification(publishedCollection);
+
             getCollectionHistoryDao().saveCollectionHistoryEvent(collection, getPublisherClassSession(),
                     COLLECTION_POST_PUBLISHED_CONFIRMATION);
 
@@ -379,7 +380,6 @@ public class Publisher {
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
-            logInfo("Post publish reindexing search").collectionName(collection).log();
             reindexPublishingSearch(collection);
 
             Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
@@ -402,14 +402,27 @@ public class Publisher {
     }
 
     public static void savePublishMetrics(PublishedCollection publishedCollection) {
-        long publishTimeMs = Math.round(publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime());
+        try {
+            long publishTimeMs = Math.round(publishedCollection.publishEndDate.getTime() - publishedCollection.publishStartDate.getTime());
 
-        MetricsService.getInstance().captureCollectionPublishMetrics(
-                publishedCollection.id,
-                publishTimeMs,
-                publishedCollection.publishResults.get(0).transaction.uriInfos.size(),
-                publishedCollection.type.toString(),
-                publishedCollection.publishDate);
+            Date publishDate = publishedCollection.publishDate;
+
+            if (publishDate == null)
+                publishDate = publishedCollection.publishStartDate;
+
+            if (publishDate == null)
+                publishDate = new Date();
+
+            MetricsService.getInstance().captureCollectionPublishMetrics(
+                    publishedCollection.id,
+                    publishTimeMs,
+                    publishedCollection.publishResults.get(0).transaction.uriInfos.size(),
+                    publishedCollection.type.toString(),
+                    publishDate);
+        } catch (Exception exception) {
+            logError(exception, "An error occurred saving publish metrics")
+                    .collectionName(publishedCollection.name).collectionId(publishedCollection.id).log();
+        }
     }
 
     public static PublishedCollection getPublishedCollection(Collection collection) throws IOException {

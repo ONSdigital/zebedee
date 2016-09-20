@@ -104,7 +104,7 @@ public class SlackNotification {
         try {
             String slackMessage = publicationMessage(publishedCollection);
             sendPublishNotification(slackMessage);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             logError(e, "Slack publish notification error").log();
         }
     }

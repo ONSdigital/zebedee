@@ -110,11 +110,6 @@ public class Permissions {
         return keyUsers;
     }
 
-    // TODO DELETE BEFORE COMMIT
-    public AccessMapping accessMapping() throws IOException {
-        return readAccessMapping();
-    }
-
     private boolean isCollectionKeyRecipient(AccessMapping accessMapping, List<Team> teamsList, User user, Collection collection) {
         boolean result = false;
         try {

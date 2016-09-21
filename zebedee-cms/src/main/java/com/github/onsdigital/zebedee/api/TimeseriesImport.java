@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
@@ -32,7 +33,7 @@ public class TimeseriesImport {
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
 
-        if (collection.description.approvedStatus == true) {
+        if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
         }
 

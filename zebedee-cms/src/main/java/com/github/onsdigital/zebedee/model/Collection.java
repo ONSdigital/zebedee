@@ -121,6 +121,7 @@ public class Collection {
             throws IOException, ZebedeeException {
 
         collectionDescription.isEncrypted = true; // force encryption on new collections.
+        collectionDescription.approvalStatus = ApprovalStatus.NOT_STARTED;
 
         Release release = checkForRelease(collectionDescription, zebedee);
 

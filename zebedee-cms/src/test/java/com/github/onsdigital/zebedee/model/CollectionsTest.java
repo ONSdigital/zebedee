@@ -545,7 +545,7 @@ public class CollectionsTest {
 
         // Then
         // The collection should be approved (reloading to make sure it's saved)
-        assertTrue(new Collection(builder.collections.get(0), zebedee).description.approvedStatus);
+        assertEquals(ApprovalStatus.COMPLETE, collection.description.approvalStatus);
         assertTrue(collection.description.events.hasEventForType(EventType.APPROVED));
     }
 
@@ -566,7 +566,7 @@ public class CollectionsTest {
 
         // Then
         // The collection should be unlocked (approved = false)
-        assertFalse(new Collection(builder.collections.get(0), zebedee).description.approvedStatus);
+        assertEquals(ApprovalStatus.NOT_STARTED, collection.description.approvalStatus);
 
         // And an unlocked event should exist.
         assertTrue(collection.description.events.hasEventForType(EventType.UNLOCKED));
@@ -586,8 +586,8 @@ public class CollectionsTest {
         zebedee.collections.unlock(collection, session);
 
         // Then
-        // The collection should be unlocked (approved = false)
-        assertFalse(new Collection(builder.collections.get(0), zebedee).description.approvedStatus);
+        // The collection should be unlocked (ApprovalStatus = not started)
+        assertEquals(ApprovalStatus.NOT_STARTED, collection.description.approvalStatus);
     }
 
     @Test(expected = UnauthorizedException.class)

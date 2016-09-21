@@ -74,7 +74,7 @@ public class Collections {
                     description.id = collection.description.id;
                     description.name = collection.description.name;
                     description.publishDate = collection.description.publishDate;
-                    description.approvedStatus = collection.description.approvedStatus;
+                    description.approvalStatus = collection.description.approvalStatus;
                     description.type = collection.description.type;
                     description.teams = collection.description.teams;
                     result.add(description);

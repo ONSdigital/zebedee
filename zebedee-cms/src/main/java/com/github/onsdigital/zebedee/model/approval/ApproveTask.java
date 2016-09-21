@@ -123,17 +123,6 @@ public class ApproveTask implements Callable<Boolean> {
         return new PublishNotification(collection, uriList, contentToDelete);
     }
 
-    private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
-        TimeSeriesCompressionTask timeSeriesCompressionTask = new TimeSeriesCompressionTask();
-        boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
-
-        if (!verified) {
-            String message = "Failed verification of time series zip files";
-            logInfo(message).collectionName(collection).log();
-            SlackNotification.alarm(message + " in collection " + collection.description.name + ". Unlock the collection and re-approve to try again.");
-        }
-    }
-
     @Override
     public Boolean call() {
 
@@ -156,15 +145,35 @@ public class ApproveTask implements Callable<Boolean> {
             return true;
 
         } catch (IOException | ZebedeeException | URISyntaxException e) {
+
             logError(e, "Exception approving collection").collectionName(collection).log();
+
+            collection.description.approvalStatus = ApprovalStatus.ERROR;
+            try {
+                collection.save();
+            } catch (IOException e1) {
+                logError(e, "Exception saving collection after approval exception").collectionName(collection).log();
+            }
+
             SlackNotification.alarm(String.format("Exception approving collection %s : %s", collection.description.name, e.getMessage()));
             return false;
         }
     }
 
+    private void compressZipFiles(Collection collection, CollectionReader collectionReader, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
+        TimeSeriesCompressionTask timeSeriesCompressionTask = new TimeSeriesCompressionTask();
+        boolean verified = timeSeriesCompressionTask.compressTimeseries(collection, collectionReader, collectionWriter);
+
+        if (!verified) {
+            String message = "Failed verification of time series zip files";
+            logInfo(message).collectionName(collection).log();
+            SlackNotification.alarm(message + " in collection " + collection.description.name + ". Unlock the collection and re-approve to try again.");
+        }
+    }
+
     public void approveCollection() throws IOException {
         // set the approved state on the collection
-        collection.description.approvedStatus = true;
+        collection.description.approvalStatus = ApprovalStatus.COMPLETE;
         collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
         collection.save();
     }

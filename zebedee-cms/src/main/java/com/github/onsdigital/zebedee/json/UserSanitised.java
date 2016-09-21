@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.json;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Represents a reduced view of user account, suitable for sending to clients via the API.
@@ -26,5 +28,31 @@ public class UserSanitised {
     @Override
     public String toString() {
         return name + ", " + email + (BooleanUtils.isTrue(inactive) ? " (inactive)" : "");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserSanitised that = (UserSanitised) o;
+
+        return new EqualsBuilder()
+                .append(name, that.name)
+                .append(email, that.email)
+                .append(inactive, that.inactive)
+                .append(lastAdmin, that.lastAdmin)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(name)
+                .append(email)
+                .append(inactive)
+                .append(lastAdmin)
+                .toHashCode();
     }
 }

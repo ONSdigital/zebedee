@@ -94,18 +94,7 @@ public class Collection {
         this.reviewed = new Content(reviewed);
         this.complete = new Content(complete);
         this.inProgress = new Content(inProgress);
-
-//        this.inProgress.redirect.setChild(this.complete.redirect);
-//        this.complete.redirect.setChild(this.reviewed.redirect);
-//        this.reviewed.redirect.setChild(this.zebedee.published.redirect);
-
-        // Set up redirect
-        // this compound redirect will retrieve
-//        redirect = this.inProgress.redirect;
     }
-
-    //public RedirectTableChained redirect = null;
-    //private RedirectTableChained collectionRedirect = null;
 
     /**
      * Deconstructs a {@link Collection} in the given {@link Zebedee},
@@ -156,7 +145,7 @@ public class Collection {
         // assign a key for the collection to the session user
         KeyManager.assignKeyToUser(zebedee, zebedee.users.get(session.email), collection.description.id, Keys.newSecretKey());
         // get the session user to distribute the key to all
-        KeyManager.distributeCollectionKey(zebedee, session, collection);
+        KeyManager.distributeCollectionKey(zebedee, session, collection, true);
 
         if (release != null) {
             collection.associateWithRelease(session.email, release, new ZebedeeCollectionWriter(zebedee, collection, session));
@@ -311,7 +300,7 @@ public class Collection {
 
         updatedCollection.save();
 
-        KeyManager.distributeCollectionKey(zebedee, session, collection);
+        KeyManager.distributeCollectionKey(zebedee, session, collection, false);
 
         return updatedCollection;
     }

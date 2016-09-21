@@ -129,7 +129,7 @@ public class Root {
                 SecretKey secretKey = zebedee.applicationKeys.generateNewKey(CsdbImporter.APPLICATION_KEY_ID);
 
                 // distribute private key to all users.
-                KeyManager.disributeApplicationKey(zebedee, CsdbImporter.APPLICATION_KEY_ID, secretKey);
+                KeyManager.distributeApplicationKey(zebedee, CsdbImporter.APPLICATION_KEY_ID, secretKey);
             } catch (IOException e) {
                 logError(e, "Failed to generate and save new application key for CSDB import.").log();
             }

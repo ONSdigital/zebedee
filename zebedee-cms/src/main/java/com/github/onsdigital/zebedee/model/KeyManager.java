@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
@@ -14,8 +13,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
@@ -25,27 +29,69 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 public class KeyManager {
 
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
+    static final ExecutorService executorService = Executors.newFixedThreadPool(25);
 
     /**
-     * Distributes an encryption key to all users
+     * Distribute the collection key to users that should have it.
      *
-     * @param session    session for a user that possesses the key
-     * @param collection a collection
+     * @param zebedee         the {@link Zebedee} instance to use.
+     * @param session         the users session.
+     * @param collection      the {@link Collection} the key belongs to.
+     * @param isNewCollection true if the collection is new, false otherwise.
+     * @throws IOException
      */
-    public static void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection) throws NotFoundException, BadRequestException, IOException, UnauthorizedException {
-        // Get the
+    public static void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection, boolean isNewCollection) throws IOException {
         SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
-
-        // Distribute to all users that should have access
-        for (User user : zebedee.users.list()) {
-            distributeKeyToUser(zebedee, collection, key, user);
+        try {
+            executorService.invokeAll(getKeyAssignmentTasks(zebedee, collection, key, isNewCollection));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-        // Add to the cached scheduler keyring
-        zebedee.keyringCache.schedulerCache.put(collection.description.id, key);
     }
 
-    public static void disributeApplicationKey(Zebedee zebedee, String application, SecretKey secretKey) throws IOException {
+    /**
+     * Creates a {@link List} of {@link Callable} tasks to distribute/remove the collection key. For each user creates
+     * either a key assignment task if they should have access to the collection, a key removal task if not and a single
+     * task to add the new key to {@link Zebedee#keyringCache}
+     *
+     * @param zebedee         the {@link Zebedee} instance to use.
+     * @param collection      the {@link Collection} the key belongs too.
+     * @param secretKey       the {@link SecretKey} object to read the collection.
+     * @param isNewCollection true if the collection is new, false otherwise.
+     * @return A list of {@link Callable}'s which will assign/remove/cache the key as necessary.
+     * @throws IOException
+     */
+    public static List<Callable<Boolean>> getKeyAssignmentTasks(Zebedee zebedee, Collection collection, SecretKey secretKey, boolean isNewCollection) throws IOException {
+        List<User> keyRecipients = zebedee.permissions.getCollectionAccessMapping(zebedee, collection);
+        List<Callable<Boolean>> collectionKeyTasks = new ArrayList<>();
+
+        if (!isNewCollection) {
+            // Filter out the users who are should not receive the key and take it from them [evil laugh].
+            zebedee.users.list().stream().filter(user -> !keyRecipients.contains(user)).forEach(nonKeyRecipient -> {
+                collectionKeyTasks.add(() -> {
+                    removeKeyFromUser(zebedee, nonKeyRecipient, collection.getDescription().id);
+                    return true;
+                });
+            });
+        }
+
+        // Add the key to each recipient user.
+        keyRecipients.stream().forEach(user -> {
+            collectionKeyTasks.add(() -> {
+                assignKeyToUser(zebedee, user, collection.getDescription().id, secretKey);
+                return true;
+            });
+        });
+
+        // Put the Key in the schedule cache.
+        collectionKeyTasks.add(() -> {
+            zebedee.keyringCache.schedulerCache.put(collection.description.id, secretKey);
+            return true;
+        });
+        return collectionKeyTasks;
+    }
+
+    public static void distributeApplicationKey(Zebedee zebedee, String application, SecretKey secretKey) throws IOException {
         for (User user : zebedee.users.list()) {
             distributeApplicationKeyToUser(zebedee, application, secretKey, user);
         }
@@ -107,8 +153,7 @@ public class KeyManager {
         if (session != null) {
             Keyring keyring = zebedee.keyringCache.get(session);
             try {
-                if (keyring != null)
-                    keyring.put(keyIdentifier, key);
+                if (keyring != null) keyring.put(keyIdentifier, key);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -137,8 +182,7 @@ public class KeyManager {
         if (session != null) {
             Keyring keyring = zebedee.keyringCache.get(session);
             try {
-                if (keyring != null)
-                    keyring.remove(keyIdentifier);
+                if (keyring != null) keyring.remove(keyIdentifier);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -174,35 +218,30 @@ public class KeyManager {
      * @throws BadRequestException
      * @throws IOException
      */
-    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring, CollectionOwner collectionOwner)
-            throws NotFoundException, BadRequestException, IOException {
+    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring, CollectionOwner collectionOwner) throws NotFoundException, BadRequestException, IOException {
         Set<String> collectionIds = new HashSet<>();
 
-        sourceKeyring.list()
-                .stream()
-                .forEach(collectionId -> {
-                    if (StringUtils.equals(collectionId, CsdbImporter.APPLICATION_KEY_ID)) {
-                        // csdb-import is a special case always add this.
+        sourceKeyring.list().stream().forEach(collectionId -> {
+            if (StringUtils.equals(collectionId, CsdbImporter.APPLICATION_KEY_ID)) {
+                // csdb-import is a special case always add this.
+                collectionIds.add(collectionId);
+            } else {
+                Collection collection = getCollection(collectionId);
+                if (collection != null && collection.description.collectionOwner != null && collection.description.collectionOwner.equals(collectionOwner)) {
+                    collectionIds.add(collectionId);
+                } else {
+                    if (CollectionOwner.PUBLISHING_SUPPORT.equals(collectionOwner)) {
                         collectionIds.add(collectionId);
-                    } else {
-                        Collection collection = getCollection(collectionId);
-                        if (collection != null
-                                && collection.description.collectionOwner != null
-                                && collection.description.collectionOwner.equals(collectionOwner)) {
-                            collectionIds.add(collectionId);
-                        } else {
-                            if (CollectionOwner.PUBLISHING_SUPPORT.equals(collectionOwner)) {
-                                collectionIds.add(collectionId);
-                            }
-                        }
                     }
-                });
+                }
+            }
+        });
         transferKeyring(targetKeyring, sourceKeyring, collectionIds);
     }
 
     private static boolean userShouldHaveKey(Zebedee zebedee, User user, Collection collection) throws IOException {
-        if (zebedee.permissions.isAdministrator(user.email)
-                || zebedee.permissions.canView(user, collection.description)) return true;
+        if (zebedee.permissions.isAdministrator(user.email) || zebedee.permissions.canView(user, collection.description))
+            return true;
         return false;
     }
 

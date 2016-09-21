@@ -4,9 +4,18 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionOwner;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.Permissions;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -55,15 +64,11 @@ public class ZebedeeCmsService {
         return new FileSystemContentReader(Root.zebedee.published.path);
     }
 
-    public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session)
-            throws ZebedeeException {
+    public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session) throws ZebedeeException {
         try {
             return new ZebedeeCollectionWriter(Root.zebedee, collection, session);
         } catch (IOException e) {
-            logError(e, COLLECTION_WRI_ERROR_MSG)
-                    .collectionId(collection)
-                    .user(session.email)
-                    .logAndThrow(BadRequestException.class);
+            logError(e, COLLECTION_WRI_ERROR_MSG).collectionId(collection).user(session.email).logAndThrow(BadRequestException.class);
         }
         return null;
     }
@@ -72,10 +77,7 @@ public class ZebedeeCmsService {
         try {
             return new ZebedeeCollectionReader(Root.zebedee, collection, session);
         } catch (IOException e) {
-            logError(e, COLLECTION_READ_ERROR_MSG)
-                    .collectionId(collection)
-                    .user(session.email)
-                    .logAndThrow(BadRequestException.class);
+            logError(e, COLLECTION_READ_ERROR_MSG).collectionId(collection).user(session.email).logAndThrow(BadRequestException.class);
         }
         return null;
     }
@@ -102,9 +104,7 @@ public class ZebedeeCmsService {
         try {
             return Root.zebedee.permissions.getUserCollectionGroup(email);
         } catch (IOException e) {
-            logError(e, "Error while trying to determined user collectionOwner.")
-                    .user(email)
-                    .logAndThrow(UnexpectedErrorException.class);
+            logError(e, "Error while trying to determined user collectionOwner.").user(email).logAndThrow(UnexpectedErrorException.class);
         }
         return null;
     }

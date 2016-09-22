@@ -41,11 +41,11 @@ public class KeyManager {
      * @throws IOException
      */
     public static void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection, boolean isNewCollection) throws IOException {
-        SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
+        SecretKey key = zebedee.getKeyringCache().get(session).get(collection.getDescription().id);
         try {
             executorService.invokeAll(getKeyAssignmentTasks(zebedee, collection, key, isNewCollection));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw logError(e).uncheckedException(e);
         }
     }
 
@@ -62,12 +62,12 @@ public class KeyManager {
      * @throws IOException
      */
     public static List<Callable<Boolean>> getKeyAssignmentTasks(Zebedee zebedee, Collection collection, SecretKey secretKey, boolean isNewCollection) throws IOException {
-        List<User> keyRecipients = zebedee.permissions.getCollectionAccessMapping(zebedee, collection);
+        List<User> keyRecipients = zebedee.getPermissions().getCollectionAccessMapping(zebedee, collection);
         List<Callable<Boolean>> collectionKeyTasks = new ArrayList<>();
 
         if (!isNewCollection) {
             // Filter out the users who are should not receive the key and take it from them [evil laugh].
-            zebedee.users.list().stream().filter(user -> !keyRecipients.contains(user)).forEach(nonKeyRecipient -> {
+            zebedee.getUsers().list().stream().filter(user -> !keyRecipients.contains(user)).forEach(nonKeyRecipient -> {
                 collectionKeyTasks.add(() -> {
                     removeKeyFromUser(zebedee, nonKeyRecipient, collection.getDescription().id);
                     return true;
@@ -85,14 +85,14 @@ public class KeyManager {
 
         // Put the Key in the schedule cache.
         collectionKeyTasks.add(() -> {
-            zebedee.keyringCache.schedulerCache.put(collection.description.id, secretKey);
+            zebedee.getKeyringCache().getSchedulerCache().put(collection.description.id, secretKey);
             return true;
         });
         return collectionKeyTasks;
     }
 
     public static void distributeApplicationKey(Zebedee zebedee, String application, SecretKey secretKey) throws IOException {
-        for (User user : zebedee.users.list()) {
+        for (User user : zebedee.getUsers().list()) {
             distributeApplicationKeyToUser(zebedee, application, secretKey, user);
         }
     }
@@ -108,7 +108,7 @@ public class KeyManager {
 
 
     private static boolean userShouldHaveApplicationKey(Zebedee zebedee, User user) throws IOException {
-        return zebedee.permissions.isAdministrator(user.email) || zebedee.permissions.canEdit(user.email);
+        return zebedee.getPermissions().isAdministrator(user.email) || zebedee.getPermissions().canEdit(user.email);
     }
 
     /**
@@ -121,7 +121,7 @@ public class KeyManager {
      * @throws IOException
      */
     public static void distributeKeyToUser(Zebedee zebedee, Collection collection, Session session, User user) throws IOException {
-        SecretKey key = zebedee.keyringCache.get(session).get(collection.description.id);
+        SecretKey key = zebedee.getKeyringCache().get(session).get(collection.description.id);
         distributeKeyToUser(zebedee, collection, key, user);
     }
 
@@ -142,16 +142,16 @@ public class KeyManager {
      */
     public static void assignKeyToUser(Zebedee zebedee, User user, String keyIdentifier, SecretKey key) throws IOException {
         // Escape in case user keyring has not been generated
-        if (user.keyring == null) return;
+        if (user.keyring() == null) return;
 
         // Add the key to the user keyring and save
-        user.keyring.put(keyIdentifier, key);
-        zebedee.users.updateKeyring(user);
+        user.keyring().put(keyIdentifier, key);
+        zebedee.getUsers().updateKeyring(user);
 
         // If the user is logged in assign the key to their cached keyring
-        Session session = zebedee.sessions.find(user.email);
+        Session session = zebedee.getSessions().find(user.email);
         if (session != null) {
-            Keyring keyring = zebedee.keyringCache.get(session);
+            Keyring keyring = zebedee.getKeyringCache().get(session);
             try {
                 if (keyring != null) keyring.put(keyIdentifier, key);
             } catch (Exception e) {
@@ -171,16 +171,16 @@ public class KeyManager {
      */
     private static void removeKeyFromUser(Zebedee zebedee, User user, String keyIdentifier) throws IOException {
         // Escape in case user keyring has not been generated
-        if (user.keyring == null) return;
+        if (user.keyring() == null) return;
 
         // Remove the key from the users keyring and save
-        user.keyring.remove(keyIdentifier);
-        zebedee.users.updateKeyring(user);
+        user.keyring().remove(keyIdentifier);
+        zebedee.getUsers().updateKeyring(user);
 
         // If the user is logged in remove the key from their cached keyring
-        Session session = zebedee.sessions.find(user.email);
+        Session session = zebedee.getSessions().find(user.email);
         if (session != null) {
-            Keyring keyring = zebedee.keyringCache.get(session);
+            Keyring keyring = zebedee.getKeyringCache().get(session);
             try {
                 if (keyring != null) keyring.remove(keyIdentifier);
             } catch (Exception e) {
@@ -240,7 +240,7 @@ public class KeyManager {
     }
 
     private static boolean userShouldHaveKey(Zebedee zebedee, User user, Collection collection) throws IOException {
-        if (zebedee.permissions.isAdministrator(user.email) || zebedee.permissions.canView(user, collection.description))
+        if (zebedee.getPermissions().isAdministrator(user.email) || zebedee.getPermissions().canView(user, collection.description))
             return true;
         return false;
     }

@@ -44,7 +44,7 @@ public class Equation {
             com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation
     ) throws IOException, ZebedeeException, FileUploadException, TranscoderException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
@@ -71,7 +71,7 @@ public class Equation {
         Path mmlPath = path.getParent().resolve(equation.getFilename() + ".mml");
         try (InputStream inputStream = new ByteArrayInputStream(equationServiceResponse.mml.getBytes())) {
             boolean validateJson = false;
-            Root.zebedee.collections.writeContent(collection, mmlPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, mmlPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
 
             String fileName = mmlPath.getFileName().toString();
             addAssociatedFileToEquation(equation, "generated-mml", fileName, "mml");
@@ -82,7 +82,7 @@ public class Equation {
         Path svgPath = path.getParent().resolve(equation.getFilename() + ".svg");
         try (InputStream inputStream = new ByteArrayInputStream(equationServiceResponse.svg.getBytes())) {
             boolean validateJson = false;
-            Root.zebedee.collections.writeContent(collection, svgPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, svgPath.toString(), session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
 
             String fileName = svgPath.getFileName().toString();
             addAssociatedFileToEquation(equation, "generated-svg", fileName, "svg");
@@ -95,7 +95,7 @@ public class Equation {
             HttpServletResponse response
     ) throws IOException, ZebedeeException, FileUploadException, TranscoderException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
@@ -119,7 +119,7 @@ public class Equation {
     }
 
     public void deleteFile(HttpServletRequest request, Session session, com.github.onsdigital.zebedee.model.Collection collection, String uriToDelete) throws IOException, ZebedeeException {
-        boolean result = Root.zebedee.collections.deleteContent(collection, uriToDelete, session);
+        boolean result = Root.zebedee.getCollections().deleteContent(collection, uriToDelete, session);
         if (result) {
             Audit.Event.CONTENT_DELETED
                     .parameters()
@@ -185,7 +185,7 @@ public class Equation {
         String serialisedEquation = ContentUtil.serialise(equation);
         try (InputStream inputStream = new ByteArrayInputStream(serialisedEquation.getBytes())) {
             boolean validateJson = true;
-            Root.zebedee.collections.writeContent(collection, uri, session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, false, CollectionEventType.COLLECTION_FILE_SAVED, validateJson);
             Audit.Event.CONTENT_OVERWRITTEN
                     .parameters()
                     .host(request)

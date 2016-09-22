@@ -65,7 +65,7 @@ public class ModifyTable {
     public void modifyTable(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException, ParserConfigurationException, TransformerException, FileUploadException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
         String currentUri = request.getParameter(CURRENT_URI);
@@ -97,7 +97,7 @@ public class ModifyTable {
     @GET
     public void getTableMetadata(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
@@ -123,13 +123,13 @@ public class ModifyTable {
 
             boolean recursive = false;
             if (!StringUtils.equals(newXlsFilename, currentXlsFilename)) {
-                Root.zebedee.collections.writeContent(collection, newUri + XLS_FILE_EXT, session, request,
+                Root.zebedee.getCollections().writeContent(collection, newUri + XLS_FILE_EXT, session, request,
                         currentXlsResource.getData(), recursive, null, validateJson);
             }
 
-            Root.zebedee.collections.writeContent(collection, newUri + HTML_FILE_EXT, session, request,
+            Root.zebedee.getCollections().writeContent(collection, newUri + HTML_FILE_EXT, session, request,
                     htmlInputStream, recursive, null, validateJson);
-            Root.zebedee.collections.writeContent(collection, newUri + JSON_FILE_EXT, session, request,
+            Root.zebedee.getCollections().writeContent(collection, newUri + JSON_FILE_EXT, session, request,
                     jsonInputStream, recursive, null, validateJson);
 
             getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,

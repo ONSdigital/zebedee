@@ -42,7 +42,7 @@ public class PublishTask implements Runnable {
                 .addParameter("collectionId", collectionId).log();
 
         try {
-            Collection collection = zebedee.collections.getCollection(this.collectionId);
+            Collection collection = zebedee.getCollections().getCollection(this.collectionId);
 
             if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
                 logInfo("Scheduled collection has not been approved - switching to manual")
@@ -55,7 +55,7 @@ public class PublishTask implements Runnable {
 
                 // and save
                 String filename = PathUtils.toFilename(collection.description.name) + ".json";
-                Path collectionPath = zebedee.collections.path.resolve(filename);
+                Path collectionPath = zebedee.getCollections().path.resolve(filename);
                 try (OutputStream output = Files.newOutputStream(collectionPath)) {
                     Serialiser.serialise(output, collection.description);
                 }
@@ -65,7 +65,7 @@ public class PublishTask implements Runnable {
                 // Publish the s
                 boolean skipVerification = false;
 
-                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.keyringCache.schedulerCache.get(collectionId));
+                ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.getKeyringCache().schedulerCache.get(collectionId));
                 long publishStart = System.currentTimeMillis();
                 boolean publishComplete = Publisher.Publish(collection, "System", collectionReader);
 

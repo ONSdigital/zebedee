@@ -35,9 +35,9 @@ public class Approve {
     public boolean approveCollection(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
-        Root.zebedee.collections.approve(collection, session);
+        Root.zebedee.getCollections().approve(collection, session);
 
         Audit.Event.COLLECTION_APPROVED
                 .parameters()

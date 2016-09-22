@@ -102,8 +102,8 @@ public class Permissions {
 
     public List<User> getCollectionAccessMapping(Zebedee zebedee, Collection collection) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
-        List<Team> teamsList = zebedee.teams.listTeams();
-        List<User> keyUsers = zebedee.users.list()
+        List<Team> teamsList = zebedee.getTeams().listTeams();
+        List<User> keyUsers = zebedee.getUsers().list()
                 .stream()
                 .filter(user -> isCollectionKeyRecipient(accessMapping, teamsList, user, collection))
                 .collect(Collectors.toList());
@@ -219,7 +219,7 @@ public class Permissions {
      */
     public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(session.email) && zebedee.keyringCache.get(session).list().contains(collectionDescription.id);
+            return canEdit(session.email) && zebedee.getKeyringCache().get(session).list().contains(collectionDescription.id);
         } else {
             return canEdit(session.email);
         }
@@ -252,7 +252,7 @@ public class Permissions {
      */
     public boolean canEdit(String email, CollectionDescription collectionDescription) throws IOException {
         try {
-            return canEdit(zebedee.users.get(email), collectionDescription);
+            return canEdit(zebedee.getUsers().get(email), collectionDescription);
         } catch (BadRequestException | NotFoundException e) {
             return false;
         }
@@ -342,7 +342,7 @@ public class Permissions {
     public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
 
         try {
-            return canView(zebedee.users.get(email), collectionDescription);
+            return canView(zebedee.getUsers().get(email), collectionDescription);
         } catch (NotFoundException | BadRequestException e) {
             return false;
         }
@@ -447,7 +447,7 @@ public class Permissions {
         // Check to see if the email is a member of a team associated with the given collection:
         Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
         if (teams != null) {
-            for (Team team : zebedee.teams.listTeams()) {
+            for (Team team : zebedee.getTeams().listTeams()) {
                 boolean isTeamMember = teams.contains(team.id) && team.members.contains(standardise(email));
                 boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping).equals(collectionDescription.collectionOwner);
                 if (isTeamMember && inCollectionGroup) {
@@ -623,10 +623,10 @@ public class Permissions {
      */
     private void updateKeyring(Session session, String email, CollectionOwner collectionOwner)
             throws IOException, NotFoundException, BadRequestException {
-        User user = zebedee.users.get(email);
+        User user = zebedee.getUsers().get(email);
         if (session != null && user.keyring != null) {
-            KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session), collectionOwner);
-            zebedee.users.updateKeyring(user);
+            KeyManager.transferKeyring(user.keyring, zebedee.getKeyringCache().get(session), collectionOwner);
+            zebedee.getUsers().updateKeyring(user);
         }
     }
 }

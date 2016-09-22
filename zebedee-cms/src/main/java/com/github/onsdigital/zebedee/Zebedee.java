@@ -51,20 +51,19 @@ public class Zebedee {
     static final String LAUNCHPAD = "launchpad";
     static final String APPLICATION_KEYS = "application-keys";
 
-    public final Path path;
-    public final Path publishedContentPath;
-    public final Content published;
-    public final Collections collections;
-    public final PublishedCollections publishedCollections;
-    public final Users users;
-    public final KeyringCache keyringCache;
-    public final ApplicationKeys applicationKeys;
-    public final Sessions sessions;
-    public final Permissions permissions;
-    public final Teams teams;
-    public final VerificationAgent verificationAgent;
-
-    public final DataIndex dataIndex;
+    private final VerificationAgent verificationAgent;
+    private final ApplicationKeys applicationKeys;
+    private final PublishedCollections publishedCollections;
+    private final Collections collections;
+    private final Content published;
+    private final KeyringCache keyringCache;
+    private final Path publishedContentPath;
+    private final Path path;
+    private final Permissions permissions;
+    private final Users users;
+    private final Teams teams;
+    private final Sessions sessions;
+    private final DataIndex dataIndex;
 
     public Zebedee(Path path, boolean useVerificationAgent) {
 
@@ -80,7 +79,8 @@ public class Zebedee {
         Path teams = path.resolve(TEAMS);
         Path applicationKeysPath = path.resolve(APPLICATION_KEYS);
 
-        if (!Files.exists(publishedContentPath) || !Files.exists(collections) || !Files.exists(users) || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
+        if (!Files.exists(publishedContentPath) || !Files.exists(collections) || !Files.exists(users)
+                || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
                             + path.toAbsolutePath());
@@ -342,5 +342,57 @@ public class Zebedee {
 
         // Return a session
         return session;
+    }
+
+    public Users getUsers() {
+        return this.users;
+    }
+
+    public Teams getTeams() {
+        return this.teams;
+    }
+
+    public Path getPath() {
+        return this.path;
+    }
+
+    public Permissions getPermissions() {
+        return this.permissions;
+    }
+
+    public Path getPublishedContentPath() {
+        return this.publishedContentPath;
+    }
+
+    public Content getPublished() {
+        return this.published;
+    }
+
+    public Collections getCollections() {
+        return this.collections;
+    }
+
+    public PublishedCollections getPublishedCollections() {
+        return this.publishedCollections;
+    }
+
+    public KeyringCache getKeyringCache() {
+        return this.keyringCache;
+    }
+
+    public ApplicationKeys getApplicationKeys() {
+        return this.applicationKeys;
+    }
+
+    public Sessions getSessions() {
+        return this.sessions;
+    }
+
+    public VerificationAgent getVerificationAgent() {
+        return this.verificationAgent;
+    }
+
+    public DataIndex getDataIndex() {
+        return this.dataIndex;
     }
 }

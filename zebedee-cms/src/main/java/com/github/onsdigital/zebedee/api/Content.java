@@ -76,7 +76,7 @@ public class Content {
         // otherwise the call to get a request parameter will actually consume the body:
         InputStream requestBody = request.getInputStream();
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         Collection collection = Collections.getCollection(request);
 
@@ -87,7 +87,7 @@ public class Content {
         Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
 
         if (overwriteExisting) {
-            Root.zebedee.collections.writeContent(collection, uri, session, request, requestBody, recursive, eventType, validateJson);
+            Root.zebedee.getCollections().writeContent(collection, uri, session, request, requestBody, recursive, eventType, validateJson);
             Audit.Event.CONTENT_OVERWRITTEN
                     .parameters()
                     .host(request)
@@ -95,7 +95,7 @@ public class Content {
                     .content(uri)
                     .user(session.email).log();
         } else {
-            Root.zebedee.collections.createContent(collection, uri, session, request, requestBody, eventType, validateJson);
+            Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, eventType, validateJson);
             Audit.Event.CONTENT_SAVED
                     .parameters()
                     .host(request)
@@ -123,12 +123,12 @@ public class Content {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
-        boolean result = Root.zebedee.collections.deleteContent(collection, uri, session);
+        boolean result = Root.zebedee.getCollections().deleteContent(collection, uri, session);
         if (result) {
             Audit.Event.CONTENT_DELETED
                     .parameters()

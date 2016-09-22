@@ -107,6 +107,11 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
         throw new RuntimeException(error);
     }
 
+    public RuntimeException uncheckedException(Throwable error) {
+        this.log();
+        return new RuntimeException(error);
+    }
+
     private String getStringProperty(String key) {
         return (String) this.parameters.getParameters().get(key);
     }

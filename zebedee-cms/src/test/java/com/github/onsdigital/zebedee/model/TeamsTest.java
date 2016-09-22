@@ -51,7 +51,7 @@ public class TeamsTest {
 
         // When
         // We list the teams
-        List<Team> teams = zebedee.teams.listTeams();
+        List<Team> teams = zebedee.getTeams().listTeams();
 
         // Then
         // We should have the two teams
@@ -70,8 +70,8 @@ public class TeamsTest {
 
         // When
         // We list the teams
-        Team economyTeam = zebedee.teams.findTeam(builder.teamNames[0]);
-        Team labourMarketTeam = zebedee.teams.findTeam(builder.teamNames[1]);
+        Team economyTeam = zebedee.getTeams().findTeam(builder.teamNames[0]);
+        Team labourMarketTeam = zebedee.getTeams().findTeam(builder.teamNames[1]);
 
         // Then
         // We should find the teams
@@ -93,11 +93,11 @@ public class TeamsTest {
         // When
         // We create the team
         Session session = zebedee.openSession(builder.administratorCredentials);
-        Team ukTradeAndIndustryTeam = zebedee.teams.createTeam(name, session);
+        Team ukTradeAndIndustryTeam = zebedee.getTeams().createTeam(name, session);
 
         // Then
         // We should be able to list the new team:
-        List<Team> teams = zebedee.teams.listTeams();
+        List<Team> teams = zebedee.getTeams().listTeams();
         assertEquals(3, teams.size());
         boolean checked = false;
         for (Team team : teams) {
@@ -121,13 +121,13 @@ public class TeamsTest {
         // We create a bunch of teams
         Session session = zebedee.openSession(builder.administratorCredentials);
         for (int i = 0; i < 10; i++) {
-            zebedee.teams.createTeam(name + " " + i, session);
+            zebedee.getTeams().createTeam(name + " " + i, session);
         }
 
         // Then
         // All teams should have a unique id
         Set<Integer> ids = new HashSet<>();
-        for (Team team : zebedee.teams.listTeams()) {
+        for (Team team : zebedee.getTeams().listTeams()) {
             assertFalse(ids.contains(team.id));
             ids.add(team.id);
         }
@@ -141,11 +141,11 @@ public class TeamsTest {
         // A new team
         String name = "The twin project team";
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.teams.createTeam(name, session);
+        zebedee.getTeams().createTeam(name, session);
 
         // When
         // We create a team with a duplicate name
-        zebedee.teams.createTeam(name, session);
+        zebedee.getTeams().createTeam(name, session);
 
         // Then
         // We should get a conflict exception
@@ -162,7 +162,7 @@ public class TeamsTest {
         // When
         // We create the team
         Session session = zebedee.openSession(builder.reviewer1Credentials);
-        Team ukTradeAndIndustryTeam = zebedee.teams.createTeam(name, session);
+        Team ukTradeAndIndustryTeam = zebedee.getTeams().createTeam(name, session);
 
         // Then
         // We should get an unauthorized exception
@@ -176,17 +176,17 @@ public class TeamsTest {
         // A new team name
         String oldName = builder.teamNames[0];
         String newName = "Renamed team";
-        Team team = zebedee.teams.findTeam(oldName);
+        Team team = zebedee.getTeams().findTeam(oldName);
 
         // When
         // We rename the team
         team.name = newName;
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.teams.renameTeam(team, session);
+        zebedee.getTeams().renameTeam(team, session);
 
         // Then
         // We should still have the two teams, but with the new name
-        List<Team> teams = zebedee.teams.listTeams();
+        List<Team> teams = zebedee.getTeams().listTeams();
         assertEquals(2, teams.size());
         for (Team candidate : teams) {
             assertTrue(newName.equals(team.name) || builder.teamNames[1].equals(team.name));
@@ -202,13 +202,13 @@ public class TeamsTest {
         // A new team name
         String oldName = builder.teamNames[0];
         String duplicateName = builder.teamNames[1];
-        Team team = zebedee.teams.findTeam(oldName);
+        Team team = zebedee.getTeams().findTeam(oldName);
 
         // When
         // We rename the team
         team.name = duplicateName;
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.teams.renameTeam(team, session);
+        zebedee.getTeams().renameTeam(team, session);
 
         // Then
         // We should get a conflict exception
@@ -227,7 +227,7 @@ public class TeamsTest {
         // When
         // We rename the team
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.teams.renameTeam(team, session);
+        zebedee.getTeams().renameTeam(team, session);
 
         // Then
         // We should get a not found exception
@@ -246,7 +246,7 @@ public class TeamsTest {
         // When
         // We rename the team
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.teams.renameTeam(team, session);
+        zebedee.getTeams().renameTeam(team, session);
 
         // Then
         // We should get a bad request exception
@@ -260,13 +260,13 @@ public class TeamsTest {
         // A new team name
         String oldName = builder.teamNames[0];
         String newName = "Renamed team";
-        Team team = zebedee.teams.findTeam(oldName);
+        Team team = zebedee.getTeams().findTeam(oldName);
 
         // When
         // We rename the team
         team.name = newName;
         Session session = zebedee.openSession(builder.reviewer2Credentials);
-        zebedee.teams.renameTeam(team, session);
+        zebedee.getTeams().renameTeam(team, session);
 
         // Then
         // We should have an unauthorized exception
@@ -278,16 +278,16 @@ public class TeamsTest {
 
         // Given
         // One of the teams
-        Team team = zebedee.teams.findTeam(builder.teamNames[0]);
+        Team team = zebedee.getTeams().findTeam(builder.teamNames[0]);
 
         // When
         // We delete the team
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.teams.deleteTeam(team, session);
+        zebedee.getTeams().deleteTeam(team, session);
 
         // Then
         // We should only have the other team left
-        List<Team> teams = zebedee.teams.listTeams();
+        List<Team> teams = zebedee.getTeams().listTeams();
         assertEquals(1, teams.size());
         assertTrue(builder.teamNames[1].equals(teams.get(0).name));
     }
@@ -305,7 +305,7 @@ public class TeamsTest {
         // When
         // We rename the team
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.teams.deleteTeam(team, session);
+        zebedee.getTeams().deleteTeam(team, session);
 
         // Then
         // We should get a not found exception
@@ -321,7 +321,7 @@ public class TeamsTest {
         // When
         // We rename the team
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.teams.renameTeam(team, session);
+        zebedee.getTeams().renameTeam(team, session);
 
         // Then
         // We should get a bad request exception
@@ -333,12 +333,12 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
 
         // Given
         // A team to delete
-        Team team = zebedee.teams.findTeam(builder.teamNames[0]);
+        Team team = zebedee.getTeams().findTeam(builder.teamNames[0]);
 
         // When
         // We attempt to delete the team
         Session session = zebedee.openSession(builder.reviewer2Credentials);
-        zebedee.teams.deleteTeam(team, session);
+        zebedee.getTeams().deleteTeam(team, session);
 
         // Then
         // We should have an unauthorized exception
@@ -352,15 +352,15 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
         // A new team
         String name = "My team";
         Session session = zebedee.openSession(builder.administratorCredentials);
-        Team team = zebedee.teams.createTeam(name, session);
+        Team team = zebedee.getTeams().createTeam(name, session);
 
         // When
         // We add a team member
-        zebedee.teams.addTeamMember(builder.reviewer2.email, team, session);
+        zebedee.getTeams().addTeamMember(builder.reviewer2.email, team, session);
 
         // Then
         // The member should be present in the team
-        Team read = zebedee.teams.findTeam(name);
+        Team read = zebedee.getTeams().findTeam(name);
         assertEquals(1, read.members.size());
         assertTrue(read.members.contains(builder.reviewer2.email));
     }
@@ -372,12 +372,12 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
         // A new team
         String name = "My team";
         Session adminSession = zebedee.openSession(builder.administratorCredentials);
-        Team team = zebedee.teams.createTeam(name, adminSession);
+        Team team = zebedee.getTeams().createTeam(name, adminSession);
 
         // When
         // We add a team member without being an administrator
         Session session = zebedee.openSession(builder.reviewer1Credentials);
-        zebedee.teams.addTeamMember(builder.reviewer1.email, team, session);
+        zebedee.getTeams().addTeamMember(builder.reviewer1.email, team, session);
 
         // Then
         // We should have an unauthorized exception
@@ -391,17 +391,17 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
         // A new team
         String name = "My team";
         Session session = zebedee.openSession(builder.administratorCredentials);
-        Team team = zebedee.teams.createTeam(name, session);
-        zebedee.teams.addTeamMember(builder.reviewer1.email, team, session);
-        zebedee.teams.addTeamMember(builder.reviewer2.email, team, session);
+        Team team = zebedee.getTeams().createTeam(name, session);
+        zebedee.getTeams().addTeamMember(builder.reviewer1.email, team, session);
+        zebedee.getTeams().addTeamMember(builder.reviewer2.email, team, session);
 
         // When
         // We remove a team member
-        zebedee.teams.removeTeamMember(builder.reviewer1.email, team, session);
+        zebedee.getTeams().removeTeamMember(builder.reviewer1.email, team, session);
 
         // Then
         // The member should be present in the team
-        Team read = zebedee.teams.findTeam(name);
+        Team read = zebedee.getTeams().findTeam(name);
         assertEquals(1, read.members.size());
         assertTrue(read.members.contains(builder.reviewer2.email));
     }
@@ -413,14 +413,14 @@ public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, Unauthor
         // A new team
         String name = "My team";
         Session adminSession = zebedee.openSession(builder.administratorCredentials);
-        Team team = zebedee.teams.createTeam(name, adminSession);
-        zebedee.teams.addTeamMember(builder.reviewer1.email, team, adminSession);
-        zebedee.teams.addTeamMember(builder.reviewer2.email, team, adminSession);
+        Team team = zebedee.getTeams().createTeam(name, adminSession);
+        zebedee.getTeams().addTeamMember(builder.reviewer1.email, team, adminSession);
+        zebedee.getTeams().addTeamMember(builder.reviewer2.email, team, adminSession);
 
         // When
         // We add a team member without being an administrator
         Session session = zebedee.openSession(builder.reviewer1Credentials);
-        zebedee.teams.removeTeamMember(builder.reviewer2.email, team, session);
+        zebedee.getTeams().removeTeamMember(builder.reviewer2.email, team, session);
 
         // Then
         // We should have an unauthorized exception

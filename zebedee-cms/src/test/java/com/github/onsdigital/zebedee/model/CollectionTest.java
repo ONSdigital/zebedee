@@ -55,7 +55,7 @@ public class CollectionTest {
 
         publisherSession = zebedee.openSession(builder.publisher1Credentials);
         publisher1Email = builder.publisher1.email;
-        collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
+        collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
     }
 
     @After
@@ -1113,8 +1113,8 @@ public class CollectionTest {
 
 
         // When we attempt to populate the release from the collection.
-        FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id);
-        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
+        FakeCollectionReader collectionReader = new FakeCollectionReader(zebedee.getCollections().path.toString(), collection.description.id);
+        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
         List<ContentDetail> collectionContent = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
         Release result = collection.populateRelease(
@@ -1288,7 +1288,7 @@ public class CollectionTest {
         release.setUri(URI.create(uri));
         String content = ContentUtil.serialise(release);
 
-        Path releasePath = zebedee.published.path.resolve(trimmedUri + "/data.json");
+        Path releasePath = zebedee.getPublished().path.resolve(trimmedUri + "/data.json");
         FileUtils.write(releasePath.toFile(), content);
         return release;
     }

@@ -36,12 +36,12 @@ public class Complete {
 
         // Locate the collection:
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String uri = request.getParameter("uri");
 
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
 
-        Root.zebedee.collections.complete(collection, uri, session, recursive);
+        Root.zebedee.getCollections().complete(collection, uri, session, recursive);
 
         Audit.Event.COLLECTION_MOVED_TO_REVIEWED
                 .parameters()

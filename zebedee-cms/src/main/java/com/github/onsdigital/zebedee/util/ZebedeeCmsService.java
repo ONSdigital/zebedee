@@ -53,7 +53,7 @@ public class ZebedeeCmsService {
 
     public Session getSession(HttpServletRequest request) throws ZebedeeException {
         try {
-            return Root.zebedee.sessions.get(request);
+            return Root.zebedee.getSessions().get(request);
         } catch (IOException e) {
             logError(e, SESSION_NOT_FOUND_MSG).logAndThrow(UnauthorizedException.class);
         }
@@ -61,7 +61,7 @@ public class ZebedeeCmsService {
     }
 
     public ContentReader getPublishedContentReader() {
-        return new FileSystemContentReader(Root.zebedee.published.path);
+        return new FileSystemContentReader(Root.zebedee.getPublished().path);
     }
 
     public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session) throws ZebedeeException {
@@ -93,7 +93,7 @@ public class ZebedeeCmsService {
 
     public Collection getCollection(String collectionId) throws ZebedeeException {
         try {
-            return Root.zebedee.collections.getCollection(collectionId);
+            return Root.zebedee.getCollections().getCollection(collectionId);
         } catch (IOException e) {
             logError(e, COLLECTION_NOT_FOUND_MSG).logAndThrow(NotFoundException.class);
         }
@@ -102,7 +102,7 @@ public class ZebedeeCmsService {
 
     public CollectionOwner getPublisherType(String email) throws ZebedeeException {
         try {
-            return Root.zebedee.permissions.getUserCollectionGroup(email);
+            return Root.zebedee.getPermissions().getUserCollectionGroup(email);
         } catch (IOException e) {
             logError(e, "Error while trying to determined user collectionOwner.").user(email).logAndThrow(UnexpectedErrorException.class);
         }
@@ -110,7 +110,7 @@ public class ZebedeeCmsService {
     }
 
     public Permissions getPermissions() {
-        return Root.zebedee.permissions;
+        return Root.zebedee.getPermissions();
     }
 
     public InputStream objectAsInputStream(Object obj) {

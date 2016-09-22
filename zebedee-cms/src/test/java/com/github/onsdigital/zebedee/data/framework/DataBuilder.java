@@ -54,8 +54,8 @@ public class DataBuilder {
         }
 
         // We have added pages directly to the master so need to reindex
-        zebedee.dataIndex.reindex();
-        zebedee.dataIndex.pauseUntilComplete(60);
+        zebedee.getDataIndex().reindex();
+        zebedee.getDataIndex().pauseUntilComplete(60);
     }
 
     /**
@@ -70,7 +70,7 @@ public class DataBuilder {
         String publishTo = uri;
         if (publishTo.startsWith("/"))
             publishTo = publishTo.substring(1);
-        ContentWriter writer = new ContentWriter(zebedee.published.path);
+        ContentWriter writer = new ContentWriter(zebedee.getPublished().path);
 
         writer.writeObject(page, publishTo + "/data.json");
     }

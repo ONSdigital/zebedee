@@ -92,7 +92,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
 
             logInfo("PRE-PUBLISH: Loading collection job").addParameter("collectionId", collectionId).log();
             try {
-                Collection collection = zebedee.collections.getCollection(collectionId);
+                Collection collection = zebedee.getCollections().getCollection(collectionId);
 
                 if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
                     logInfo("Scheduled collection has not been approved - switching to manual").log();
@@ -142,7 +142,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
                         Publisher.SendManifest(collection, encryptionPassword);
 
-                        SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
+                        SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
 

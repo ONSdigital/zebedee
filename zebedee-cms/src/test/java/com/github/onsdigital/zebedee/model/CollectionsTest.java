@@ -119,7 +119,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to approve
-        zebedee.collections.approve(collection, session);
+        zebedee.getCollections().approve(collection, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -138,7 +138,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to list directory
-        zebedee.collections.listDirectory(collection, uri, session);
+        zebedee.getCollections().listDirectory(collection, uri, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -156,7 +156,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to complete
-        zebedee.collections.complete(collection, uri, session, recursive);
+        zebedee.getCollections().complete(collection, uri, session, recursive);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -174,7 +174,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to delete
-        zebedee.collections.delete(collection, session);
+        zebedee.getCollections().delete(collection, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -195,7 +195,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.writeContent(collection, uri, session, request,
+        zebedee.getCollections().writeContent(collection, uri, session, request,
                 inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
@@ -214,7 +214,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.deleteContent(collection, uri, session);
+        zebedee.getCollections().deleteContent(collection, uri, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -231,7 +231,7 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.administratorCredentials);
 
         // When we attempt to call the method
-        zebedee.collections.moveContent(session, collection, uri, toUri);
+        zebedee.getCollections().moveContent(session, collection, uri, toUri);
 
         // Then we should get the expected exception, not a null pointer.
     }
@@ -247,7 +247,7 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.publisher1Credentials);
 
         // When we attempt to call the method
-        zebedee.collections.moveContent(session, collection, uri, toUri);
+        zebedee.getCollections().moveContent(session, collection, uri, toUri);
 
         // Then we should get the expected exception, not a null pointer.
     }
@@ -263,7 +263,7 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.publisher1Credentials);
 
         // When we attempt to call the method
-        zebedee.collections.moveContent(session, collection, uri, toUri);
+        zebedee.getCollections().moveContent(session, collection, uri, toUri);
 
         // Then we should get the expected exception, not a null pointer.
     }
@@ -279,7 +279,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to approve
-        zebedee.collections.approve(collection, session);
+        zebedee.getCollections().approve(collection, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -298,7 +298,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to list directory
-        zebedee.collections.listDirectory(collection, uri, session);
+        zebedee.getCollections().listDirectory(collection, uri, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -316,7 +316,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to complete
-        zebedee.collections.complete(collection, uri, session, recursive);
+        zebedee.getCollections().complete(collection, uri, session, recursive);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -334,7 +334,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to delete
-        zebedee.collections.delete(collection, session);
+        zebedee.getCollections().delete(collection, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -354,7 +354,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.writeContent(collection, uri, session, request,
+        zebedee.getCollections().writeContent(collection, uri, session, request,
                 inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
@@ -373,7 +373,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.deleteContent(collection, uri, session);
+        zebedee.getCollections().deleteContent(collection, uri, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -390,7 +390,7 @@ public class CollectionsTest {
         String toUri = "testnew.json";
 
         // When we attempt to call the method
-        zebedee.collections.moveContent(session, collection, uri, toUri);
+        zebedee.getCollections().moveContent(session, collection, uri, toUri);
 
         // Then we should get the expected exception, not a null pointer.
     }
@@ -409,7 +409,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.writeContent(collection, uri, session, request,
+        zebedee.getCollections().writeContent(collection, uri, session, request,
                 inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
@@ -428,7 +428,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.deleteContent(collection, uri, session);
+        zebedee.getCollections().deleteContent(collection, uri, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -446,7 +446,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.complete(collection, uri, session, recursive);
+        zebedee.getCollections().complete(collection, uri, session, recursive);
 
         // Then
         // We should get the expected exception
@@ -465,7 +465,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.complete(collection, uri, session, recursive);
+        zebedee.getCollections().complete(collection, uri, session, recursive);
 
         // Then
         // We should get the expected exception
@@ -484,7 +484,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to call the method
-        zebedee.collections.complete(collection, uri, session, recursive);
+        zebedee.getCollections().complete(collection, uri, session, recursive);
 
         // Then
         assertTrue(collection.isComplete(uri));
@@ -503,7 +503,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to approve
-        zebedee.collections.approve(collection, session);
+        zebedee.getCollections().approve(collection, session);
 
         // Then
         // We should get the expected exception
@@ -523,7 +523,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to approve
-        zebedee.collections.approve(collection, session);
+        zebedee.getCollections().approve(collection, session);
 
         // Then
         // We should get the expected exception
@@ -540,7 +540,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to approve
-        Future<Boolean> future = zebedee.collections.approve(collection, session);
+        Future<Boolean> future = zebedee.getCollections().approve(collection, session);
         future.get();
 
         // Then
@@ -557,12 +557,12 @@ public class CollectionsTest {
         // A collection that's approved.
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
-        Future<Boolean> future = zebedee.collections.approve(collection, session);
+        Future<Boolean> future = zebedee.getCollections().approve(collection, session);
         future.get();
 
         // When
         // We attempt to unlock
-        zebedee.collections.unlock(collection, session);
+        zebedee.getCollections().unlock(collection, session);
 
         // Then
         // The collection should be unlocked (approved = false)
@@ -583,7 +583,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to unlock
-        zebedee.collections.unlock(collection, session);
+        zebedee.getCollections().unlock(collection, session);
 
         // Then
         // The collection should be unlocked (ApprovalStatus = not started)
@@ -601,7 +601,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to unlock
-        zebedee.collections.unlock(collection, session);
+        zebedee.getCollections().unlock(collection, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -618,7 +618,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to approve
-        zebedee.collections.unlock(collection, session);
+        zebedee.getCollections().unlock(collection, session);
 
         // Then
         // We should get the expected exception, not a null pointer.
@@ -637,7 +637,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to list the directory
-        zebedee.collections.listDirectory(collection, uri, session);
+        zebedee.getCollections().listDirectory(collection, uri, session);
 
         // Then
         // We should get the expected exception
@@ -657,7 +657,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to list the file as a directory
-        zebedee.collections.listDirectory(collection, uri, session);
+        zebedee.getCollections().listDirectory(collection, uri, session);
 
         // Then
         // We should get the expected exception
@@ -680,7 +680,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to list the directory
-        DirectoryListing directoryListing = zebedee.collections.listDirectory(collection, uri, session);
+        DirectoryListing directoryListing = zebedee.getCollections().listDirectory(collection, uri, session);
 
         // Then
         // We should get the file
@@ -710,7 +710,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to list the directory
-        DirectoryListing directoryListing = zebedee.collections.listDirectoryOverlayed(collection, uri, session);
+        DirectoryListing directoryListing = zebedee.getCollections().listDirectoryOverlayed(collection, uri, session);
 
         // Then
         // We should get the file
@@ -731,7 +731,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to delete the collection
-        zebedee.collections.delete(collection, session);
+        zebedee.getCollections().delete(collection, session);
 
         // Then
         // We should get the expected exception
@@ -748,7 +748,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to delete the collection
-        zebedee.collections.delete(collection, session);
+        zebedee.getCollections().delete(collection, session);
 
         // Then
         // The collection folder should have been deleted
@@ -770,7 +770,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
                 CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
@@ -793,7 +793,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
                 CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
@@ -810,11 +810,11 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         Collection otherCollection = new Collection(builder.collections.get(1), zebedee);
-        Path path = zebedee.published.toPath(uri);
+        Path path = zebedee.getPublished().toPath(uri);
         Files.createDirectories(path.getParent());
         Files.createFile(path);
 
-        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), otherCollection.description.id);
+        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), otherCollection.description.id);
         assertTrue(otherCollection.edit(builder.publisher1.email, uri, collectionWriter, recursive));
 
         HttpServletRequest request = null;
@@ -822,7 +822,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
                 CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
@@ -844,7 +844,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
                 CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
@@ -866,7 +866,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to delete the nonexistent file
-        zebedee.collections.deleteContent(collection, uri, session);
+        zebedee.getCollections().deleteContent(collection, uri, session);
 
         // Then
         // We should get the expected exception
@@ -885,7 +885,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to delete the nonexistent file
-        boolean result = zebedee.collections.deleteContent(collection, uri, session);
+        boolean result = zebedee.getCollections().deleteContent(collection, uri, session);
 
         // Then
         // The file should be gone
@@ -907,7 +907,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to delete the nonexistent file
-        boolean result = zebedee.collections.deleteContent(collection, folderUri, session);
+        boolean result = zebedee.getCollections().deleteContent(collection, folderUri, session);
 
         // Then the file should be gone
         assertTrue(result);
@@ -921,7 +921,7 @@ public class CollectionsTest {
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         builder.createPublishedFile(uri);
-        zebedee.collections.createContent(collection, uri, null, null, null, null, validateJson);
+        zebedee.getCollections().createContent(collection, uri, null, null, null, null, validateJson);
     }
 
     @Test(expected = ConflictException.class)
@@ -931,7 +931,7 @@ public class CollectionsTest {
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
         builder.createInProgressFile(uri);
-        zebedee.collections.createContent(collection, uri, null, null, null, null, validateJson);
+        zebedee.getCollections().createContent(collection, uri, null, null, null, null, validateJson);
     }
 
     @Test
@@ -991,7 +991,7 @@ public class CollectionsTest {
 
         // When
         // We attempt to write to the directory as if it were a file
-        zebedee.collections.writeContent(collection, uri, session, request, inputStream, recursive,
+        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
                 CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
 
         // Then
@@ -1021,10 +1021,10 @@ public class CollectionsTest {
                 // When
                 // We attempt to get the session
 
-                Collection collectionToUpdate = collection.zebedee.collections.list().getCollection(collection.description.id);
+                Collection collectionToUpdate = collection.zebedee.getCollections().list().getCollection(collection.description.id);
                 collectionToUpdate.addEvent("/", new Event(new Date(), EventType.EDITED, "fred@testing.com"));
                 collectionToUpdate.save();
-                Collection updatedCollection = collection.zebedee.collections.list().getCollection(collection.description.id);
+                Collection updatedCollection = collection.zebedee.getCollections().list().getCollection(collection.description.id);
 
                 // Then
                 // The expected session should be returned

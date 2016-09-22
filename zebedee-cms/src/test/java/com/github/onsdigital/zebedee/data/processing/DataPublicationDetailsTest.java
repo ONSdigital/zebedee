@@ -63,7 +63,7 @@ public class DataPublicationDetailsTest {
         collectionDescription.publishDate = new Date();
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
-        publishedReader = new FileSystemContentReader(zebedee.published.path);
+        publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
     }

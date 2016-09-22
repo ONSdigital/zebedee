@@ -5,13 +5,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.util.Objects.requireNonNull;
@@ -34,7 +34,7 @@ public class SplunkEvent {
     public static final String URI_KEY = "uri";
     private static final Path HOME_URI = Paths.get("/");
 
-    private static final SimpleDateFormat publishTimeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+    private static FastDateFormat publishTimeFormat = FastDateFormat.getInstance("HH:mm", TimeZone.getTimeZone("Europe/London"));
 
     private Map<String, Object> event;
 

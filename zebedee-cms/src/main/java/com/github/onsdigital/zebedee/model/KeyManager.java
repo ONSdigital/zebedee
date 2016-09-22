@@ -41,11 +41,11 @@ public class KeyManager {
      * @throws IOException
      */
     public static void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection, boolean isNewCollection) throws IOException {
-        SecretKey key = zebedee.getKeyringCache().get(session).get(collection.description.id);
+        SecretKey key = zebedee.getKeyringCache().get(session).get(collection.getDescription().id);
         try {
             executorService.invokeAll(getKeyAssignmentTasks(zebedee, collection, key, isNewCollection));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw logError(e).uncheckedException(e);
         }
     }
 
@@ -85,7 +85,7 @@ public class KeyManager {
 
         // Put the Key in the schedule cache.
         collectionKeyTasks.add(() -> {
-            zebedee.getKeyringCache().schedulerCache.put(collection.description.id, secretKey);
+            zebedee.getKeyringCache().getSchedulerCache().put(collection.description.id, secretKey);
             return true;
         });
         return collectionKeyTasks;
@@ -142,10 +142,10 @@ public class KeyManager {
      */
     public static void assignKeyToUser(Zebedee zebedee, User user, String keyIdentifier, SecretKey key) throws IOException {
         // Escape in case user keyring has not been generated
-        if (user.keyring == null) return;
+        if (user.keyring() == null) return;
 
         // Add the key to the user keyring and save
-        user.keyring.put(keyIdentifier, key);
+        user.keyring().put(keyIdentifier, key);
         zebedee.getUsers().updateKeyring(user);
 
         // If the user is logged in assign the key to their cached keyring
@@ -171,10 +171,10 @@ public class KeyManager {
      */
     private static void removeKeyFromUser(Zebedee zebedee, User user, String keyIdentifier) throws IOException {
         // Escape in case user keyring has not been generated
-        if (user.keyring == null) return;
+        if (user.keyring() == null) return;
 
         // Remove the key from the users keyring and save
-        user.keyring.remove(keyIdentifier);
+        user.keyring().remove(keyIdentifier);
         zebedee.getUsers().updateKeyring(user);
 
         // If the user is logged in remove the key from their cached keyring

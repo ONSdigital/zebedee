@@ -8,18 +8,26 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import com.google.common.collect.ImmutableList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.assertEquals;
@@ -39,6 +47,39 @@ public class KeyManagerTest {
 
     @Mock
     private ZebedeeCmsService zebedeeHelperMock;
+
+    @Mock
+    private Session mockSession;
+
+    @Mock
+    private Zebedee zebedeeMock;
+
+    @Mock
+    private Collection collectionMock;
+
+    @Mock
+    private KeyringCache keyringCacheMock;
+
+    @Mock
+    private Keyring keyringMock;
+
+    @Mock
+    private SecretKey secretKeyMock;
+
+    @Mock
+    private Permissions permissionsMock;
+
+    @Mock
+    private User userOneMock;
+
+    @Mock
+    private User userTwoMock;
+
+    @Mock
+    private Users usersMock;
+
+    @Mock
+    private Sessions sessionsMock;
 
     @Before
     public void setUp() throws Exception {
@@ -293,6 +334,47 @@ public class KeyManagerTest {
         // keys are added to the schedulerCache keyring
         assertEquals(2, zebedee.getKeyringCache().schedulerCache.size());
 
+    }
+
+    @Test
+    public void shouldDistributeNewKeyToExpectedUsers() throws Exception {
+        CollectionDescription collectionDescription = collectionDescription();
+        collectionDescription.id = "0001";
+        List<User> keyRecipients = new ImmutableList.Builder<User>().add(userOneMock).build();
+
+        when(collectionMock.getDescription())
+                .thenReturn(collectionDescription);
+        when(zebedeeMock.getKeyringCache())
+                .thenReturn(keyringCacheMock);
+        when(keyringCacheMock.get(mockSession))
+                .thenReturn(keyringMock);
+        when(keyringMock.get(collectionDescription.id))
+                .thenReturn(secretKeyMock);
+        when(zebedeeMock.getPermissions())
+                .thenReturn(permissionsMock);
+        when(permissionsMock.getCollectionAccessMapping(zebedeeMock, collectionMock))
+                .thenReturn(keyRecipients);
+        when(userOneMock.keyring())
+                .thenReturn(keyringMock);
+        when(zebedeeMock.getUsers())
+                .thenReturn(usersMock);
+        when(zebedeeMock.getSessions())
+                .thenReturn(sessionsMock);
+        when(sessionsMock.find(anyString()))
+                .thenReturn(mockSession);
+
+        KeyManager.distributeCollectionKey(zebedeeMock, mockSession, collectionMock, true);
+
+        verify(zebedeeMock, times(3)).getKeyringCache();
+        verify(keyringCacheMock, times(2)).get(mockSession);
+        verify(keyringMock, times(1)).get(collectionDescription.id);
+        verify(zebedeeMock, times(1)).getPermissions();
+        verify(permissionsMock, times(1)).getCollectionAccessMapping(zebedeeMock, collectionMock);
+        verify(usersMock, times(1)).updateKeyring(userOneMock);
+        verify(zebedeeMock, times(1)).getSessions();
+        verify(keyringMock, times(2)).put("0001", secretKeyMock);
+
+        verify(keyringMock, never()).remove("0001");
     }
 
     private CollectionDescription collectionDescription() {

@@ -93,4 +93,8 @@ public class KeyringCache {
             keyringMap.remove(session);
         }
     }
+
+    public Map<String, SecretKey> getSchedulerCache() {
+        return this.schedulerCache;
+    }
 }

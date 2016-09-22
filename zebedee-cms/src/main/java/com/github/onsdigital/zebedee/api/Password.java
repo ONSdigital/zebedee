@@ -38,11 +38,11 @@ public class Password {
     public String setPassword(HttpServletRequest request, HttpServletResponse response, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
 
         // Get the user session
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         // If the user is not logged in, but they are attempting to change their password, authenticate using the old password
         if (session == null && credentials != null) {
-            User user = Root.zebedee.users.get(credentials.email);
+            User user = Root.zebedee.getUsers().get(credentials.email);
             if (user.authenticate(credentials.oldPassword)) {
                 Credentials oldPasswordCredentials = new Credentials();
                 oldPasswordCredentials.email = credentials.email;
@@ -52,7 +52,7 @@ public class Password {
         }
 
         // Attempt to change or reset the password:
-        if (Root.zebedee.users.setPassword(session, credentials)) {
+        if (Root.zebedee.getUsers().setPassword(session, credentials)) {
             Audit.Event.PASSWORD_CHANGED_SUCCESS
                     .parameters()
                     .host(request)

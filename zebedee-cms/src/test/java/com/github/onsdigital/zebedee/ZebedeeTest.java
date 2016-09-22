@@ -92,7 +92,7 @@ public class ZebedeeTest {
 		Zebedee zebedee = new Zebedee(expectedPath);
 
 		// When
-		List<Collection> releases = zebedee.collections.list();
+		List<Collection> releases = zebedee.getCollections().list();
 
 		// Then
 		assertEquals(builder.collections.size(), releases.size());
@@ -141,9 +141,9 @@ public class ZebedeeTest {
 
 		// When
 		// we convert these to URIs
-		String inProgressURI = zebedee.toUri(zebedee.path.resolve(inprogress));
-		String completeURI = zebedee.toUri(zebedee.path.resolve(complete));
-		String reviewedURI = zebedee.toUri(zebedee.path.resolve(reviewed));
+		String inProgressURI = zebedee.toUri(zebedee.getPath().resolve(inprogress));
+		String completeURI = zebedee.toUri(zebedee.getPath().resolve(complete));
+		String reviewedURI = zebedee.toUri(zebedee.getPath().resolve(reviewed));
 
 		// Then
 		// we expect the uri
@@ -164,9 +164,9 @@ public class ZebedeeTest {
 
 		// When
 		// we convert these to URIs
-		String inProgressURI = zebedee.toUri(zebedee.path.resolve(inprogress).toString());
-		String completeURI = zebedee.toUri(zebedee.path.resolve(complete).toString());
-		String reviewedURI = zebedee.toUri(zebedee.path.resolve(reviewed).toString());
+		String inProgressURI = zebedee.toUri(zebedee.getPath().resolve(inprogress).toString());
+		String completeURI = zebedee.toUri(zebedee.getPath().resolve(complete).toString());
+		String reviewedURI = zebedee.toUri(zebedee.getPath().resolve(reviewed).toString());
 
 		// Then
 		// we expect the uri

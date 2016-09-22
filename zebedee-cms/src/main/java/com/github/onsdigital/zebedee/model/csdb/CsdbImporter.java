@@ -223,11 +223,11 @@ public class CsdbImporter {
      * @throws ZebedeeException
      */
     public void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
-        SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
+        SecretKey collectionKey = Root.zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
-        ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.published.path);
-        DataIndex dataIndex = Root.zebedee.dataIndex;
+        ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.getPublished().path);
+        DataIndex dataIndex = Root.zebedee.getDataIndex();
 
         ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
         PublishNotification publishNotification = ApproveTask.createPublishNotification(collectionReader, collection);

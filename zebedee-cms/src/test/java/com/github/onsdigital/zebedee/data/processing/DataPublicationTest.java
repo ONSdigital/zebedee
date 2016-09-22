@@ -76,7 +76,7 @@ public class DataPublicationTest {
         collectionDescription.publishDate = new Date();
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
-        publishedReader = new FileSystemContentReader(zebedee.published.path);
+        publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
 
@@ -123,7 +123,7 @@ public class DataPublicationTest {
 
         // When
         // we initialise publication
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
 
         // Then
         // we expect it to be not null
@@ -147,7 +147,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
 
         // Then
         // we expect datasetId to be extracted using the [datasetId].csdb pattern
@@ -169,7 +169,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
 
         // Then
         // we expect datasetId to be extracted using the upload.[datasetId].csv pattern
@@ -190,7 +190,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
 
         // Then
         // we expect the csdb datalink to be called
@@ -211,7 +211,7 @@ public class DataPublicationTest {
 
         // When
         // we process the publish
-        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.dataIndex, updateCommands);
+        publication.process(publishedReader, collectionReader.getReviewed(), collectionWriter.getReviewed(), zebedee.getDataIndex(), updateCommands);
 
         // Then
         // we expect the csv datalink to be called

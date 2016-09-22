@@ -48,12 +48,12 @@ public class Users {
      * @throws IOException If a filesystem error occurs.
      */
     public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
-        zebedee.users.create(session, user);
+        zebedee.getUsers().create(session, user);
         Credentials credentials = new Credentials();
         credentials.email = user.email;
         credentials.password = password;
-        zebedee.users.setPassword(session, credentials);
-        zebedee.permissions.addEditor(user.email, session);
+        zebedee.getUsers().setPassword(session, credentials);
+        zebedee.getPermissions().addEditor(user.email, session);
     }
 
     /**
@@ -66,16 +66,16 @@ public class Users {
      */
     public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
-        if (zebedee.permissions.hasAdministrator()) {
+        if (zebedee.getPermissions().hasAdministrator()) {
             // An initial system user already exists
             return;
         }
 
         // Create the user at a lower level because we don't have a Session at this point:
-        zebedee.users.create(user, "system");
-        zebedee.users.resetPassword(user, password, "system");
-        zebedee.permissions.addEditor(user.email, null);
-        zebedee.permissions.addAdministrator(user.email, null);
+        zebedee.getUsers().create(user, "system");
+        zebedee.getUsers().resetPassword(user, password, "system");
+        zebedee.getPermissions().addEditor(user.email, null);
+        zebedee.getPermissions().addAdministrator(user.email, null);
     }
 
     /**
@@ -92,7 +92,7 @@ public class Users {
 
         int withKeyring = 0;
         int withoutKeyring = 0;
-        UserList users = zebedee.users.listAll();
+        UserList users = zebedee.getUsers().listAll();
         for (User otherUser : users) {
             if (user.keyring() != null) {
                 withKeyring++;
@@ -119,12 +119,12 @@ public class Users {
 
             List<String> keysToRemove = new ArrayList<>();
 
-            Collections.CollectionList collections = zebedee.collections.list();
+            Collections.CollectionList collections = zebedee.getCollections().list();
 
             for (String key : user.keyring.list()) {
                 boolean keyIsValid = false;
 
-                if (zebedee.applicationKeys.containsKey(key)) {
+                if (zebedee.getApplicationKeys().containsKey(key)) {
                     keyIsValid = true;
                 } else {
                     for (Collection collection : collections) {
@@ -145,7 +145,7 @@ public class Users {
             }
 
             if (keysToRemove.size() > 0)
-                zebedee.users.update(user, user, user.lastAdmin);
+                zebedee.getUsers().update(user, user, user.lastAdmin);
         }
     }
 
@@ -167,7 +167,7 @@ public class Users {
             logDebug("Generating keyring").addParameter("user", user.email).log();
             user.resetPassword(password);
 
-            zebedee.users.update(user, user, "Encryption migration");
+            zebedee.getUsers().update(user, user, "Encryption migration");
         }
         return result;
     }
@@ -179,7 +179,7 @@ public class Users {
      * @throws IOException If a general filesystem error occurs.
      */
     public UserList list() throws IOException {
-        return zebedee.users.listAll();
+        return zebedee.getUsers().listAll();
     }
 
     /**
@@ -216,11 +216,11 @@ public class Users {
     public User create(Session session, User user) throws UnauthorizedException, IOException, ConflictException, BadRequestException {
 
         // Check the user has create permissions
-        if (!zebedee.permissions.isAdministrator(session)) {
+        if (!zebedee.getPermissions().isAdministrator(session)) {
             throw new UnauthorizedException("This account is not permitted to create users.");
         }
 
-        if (zebedee.users.exists(user)) {
+        if (zebedee.getUsers().exists(user)) {
             throw new ConflictException("User " + user.email + " already exists");
         }
 
@@ -270,11 +270,11 @@ public class Users {
      */
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
-        if (zebedee.permissions.isAdministrator(session.email) == false) {
+        if (zebedee.getPermissions().isAdministrator(session.email) == false) {
             throw new UnauthorizedException("Administrator permissions required");
         }
 
-        if (!zebedee.users.exists(user)) {
+        if (!zebedee.getUsers().exists(user)) {
             throw new NotFoundException("User " + user.email + " could not be found");
         }
 
@@ -362,11 +362,11 @@ public class Users {
      */
     public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
 
-        if (zebedee.permissions.isAdministrator(session.email) == false) {
+        if (zebedee.getPermissions().isAdministrator(session.email) == false) {
             throw new UnauthorizedException("Administrator permissions required");
         }
 
-        if (!zebedee.users.exists(user)) {
+        if (!zebedee.getUsers().exists(user)) {
             throw new NotFoundException("User " + user.email + " does not exist");
         }
 
@@ -404,21 +404,21 @@ public class Users {
         }
 
         // Check the request
-        if (credentials == null || !zebedee.users.exists(credentials.email)) {
+        if (credentials == null || !zebedee.getUsers().exists(credentials.email)) {
             throw new BadRequestException("Please provide credentials (email, password[, oldPassword])");
         }
 
         User user = read(credentials.email);
 
         // If own user updating, ensure the old password is correct
-        if (!zebedee.permissions.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
+        if (!zebedee.getPermissions().isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
             throw new UnauthorizedException("Authentication failed with old password.");
         }
 
         if (credentials.email.equalsIgnoreCase(session.email) && StringUtils.isNotBlank(credentials.password)) {
             // User changing their own password
             result = changePassword(user, credentials.oldPassword, credentials.password);
-        } else if (zebedee.permissions.isAdministrator(session.email) || !zebedee.permissions.hasAdministrator()) {
+        } else if (zebedee.getPermissions().isAdministrator(session.email) || !zebedee.getPermissions().hasAdministrator()) {
             // Administrator reset, or system setup
 
             // Grab current keyring (null if this is system setup)
@@ -429,7 +429,7 @@ public class Users {
 
             // Restore the user keyring (or not if this is system setup)
             if (originalKeyring != null)
-                KeyManager.transferKeyring(user.keyring, zebedee.keyringCache.get(session), originalKeyring.list());
+                KeyManager.transferKeyring(user.keyring, zebedee.getKeyringCache().get(session), originalKeyring.list());
 
             // Save the user
             write(user);
@@ -483,7 +483,7 @@ public class Users {
     }
 
     private void refreshKeyring(Session session, Keyring keyring, Keyring originalKeyring) throws NotFoundException, BadRequestException, IOException {
-        Keyring adminKeyring = zebedee.keyringCache.get(session);
+        Keyring adminKeyring = zebedee.getKeyringCache().get(session);
 
         Set<String> collections = originalKeyring.list();
         for (String collectionId : collections) {

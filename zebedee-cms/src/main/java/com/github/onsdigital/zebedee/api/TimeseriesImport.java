@@ -28,7 +28,7 @@ public class TimeseriesImport {
         // otherwise the call to get a request parameter will actually consume the body:
         InputStream requestBody = request.getInputStream();
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
@@ -37,7 +37,7 @@ public class TimeseriesImport {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
         }
 
-        ServletFileUpload upload = Root.zebedee.collections.getServletFileUpload();
+        ServletFileUpload upload = Root.zebedee.getCollections().getServletFileUpload();
 
         boolean collectionUpdated = false;
         try {

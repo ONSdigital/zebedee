@@ -32,7 +32,7 @@ public class KeyringCacheTest {
     @Before
     public  void before() throws IOException, CollectionNotFoundException {
         zebedee = new Zebedee(builder.zebedee, false);
-         keyringCache = zebedee.keyringCache;
+         keyringCache = zebedee.getKeyringCache();
     }
 
     @Test
@@ -46,7 +46,7 @@ public class KeyringCacheTest {
         // When
         // We put the user's keyring
         keyringCache.put(user, session);
-        Keyring keyring = zebedee.keyringCache.get(user);
+        Keyring keyring = zebedee.getKeyringCache().get(user);
 
         // Then
         // We sholud be able to get the user's keyring
@@ -104,11 +104,11 @@ public class KeyringCacheTest {
 
         // When
         // We remove the user's keyring
-        zebedee.keyringCache.remove(session);
+        zebedee.getKeyringCache().remove(session);
 
         // Then
         // The user's keyring should not be present in the cache
-        assertNull(zebedee.keyringCache.get(user));
+        assertNull(zebedee.getKeyringCache().get(user));
     }
 
     @Test

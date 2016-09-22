@@ -28,13 +28,13 @@ public class ContentRename {
     public boolean RenameContent(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         String uri = request.getParameter("uri");
         String toUri = request.getParameter("toUri");
 
-        Root.zebedee.collections.renameContent(session, collection, uri, toUri);
+        Root.zebedee.getCollections().renameContent(session, collection, uri, toUri);
         Audit.Event.CONTENT_RENAMED
                 .parameters()
                 .host(request)

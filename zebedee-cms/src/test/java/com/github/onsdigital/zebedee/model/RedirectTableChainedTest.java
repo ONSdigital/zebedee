@@ -33,7 +33,7 @@ public class RedirectTableChainedTest {
     @After
     public void ripdownTests() throws IOException {
         bob = null;
-        FileUtils.deleteDirectory(zebedee.path.toFile());
+        FileUtils.deleteDirectory(zebedee.getPath().toFile());
         zebedee = null;
     }
 
@@ -52,7 +52,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic 301 table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
 
         // Then
         // we expect the original
@@ -66,7 +66,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic 301 table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
 
         // Then
         // we expect the original
@@ -80,7 +80,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic 301 table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
 
         // Then
         // we expect the original
@@ -94,7 +94,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic 301 table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
 
         // Then
         // we expect the original
@@ -118,7 +118,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic 301 table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
@@ -136,7 +136,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic 301 table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
@@ -154,7 +154,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
@@ -171,7 +171,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
@@ -187,7 +187,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
@@ -203,7 +203,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a basic redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
@@ -219,7 +219,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a populated redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
@@ -235,7 +235,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a populated redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, linkTo);
 
         // Then
@@ -262,7 +262,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a populated redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, chainOne);
         redirectTableChained.addRedirect(chainOne, chainTwo);
         redirectTableChained.addRedirect(chainTwo, chainThree);
@@ -284,7 +284,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a populated redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, chainOne);
         redirectTableChained.addRedirect(chainOne, chainTwo);
         redirectTableChained.addRedirect(chainTwo, chainThree);
@@ -306,7 +306,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a populated redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(linkFrom, chainOne);
         redirectTableChained.addRedirect(chainOne, chainTwo);
         redirectTableChained.addRedirect(chainTwo, chainThree);
@@ -326,7 +326,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we use a populated redirect table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect(one, two);
         redirectTableChained.addRedirect(two, three);
         redirectTableChained.addRedirect(three, one);
@@ -353,10 +353,10 @@ public class RedirectTableChainedTest {
 
         // When
         // we set up a parent-child redirect table
-        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.getPublished());
         parent.addRedirect(linkFrom, linkTo);
 
-        RedirectTableChained child = new RedirectTableChained(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.getPublished());
         child.addRedirect(childFrom, childTo);
 
         parent.setChild(child);
@@ -376,10 +376,10 @@ public class RedirectTableChainedTest {
 
         // When
         // we set up a parent-child redirect table
-        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.getPublished());
         parent.addRedirect(linkFrom, linkTo);
 
-        RedirectTableChained child = new RedirectTableChained(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.getPublished());
         child.addRedirect(childFrom, childTo);
 
         parent.setChild(child);
@@ -405,13 +405,13 @@ public class RedirectTableChainedTest {
 
         // When
         // we set up a parent-child redirect table
-        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.getPublished());
         parent.addRedirect(linkFrom, chainOne);
         parent.addRedirect(chainOne, chainTwo);
         parent.addRedirect(chainTwo, chainThree);
         parent.addRedirect(chainThree, linkTo);
 
-        RedirectTableChained child = new RedirectTableChained(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.getPublished());
         child.addRedirect(childFrom, childTo);
 
         parent.setChild(child);
@@ -434,10 +434,10 @@ public class RedirectTableChainedTest {
 
         // When
         // we set up a parent-child redirect table with a long chain
-        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.getPublished());
         parent.addRedirect(linkFrom, chainOne);
 
-        RedirectTableChained child = new RedirectTableChained(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.getPublished());
         child.addRedirect(chainOne, chainTwo);
         child.addRedirect(chainTwo, chainThree);
         child.addRedirect(chainThree, linkTo);
@@ -461,13 +461,13 @@ public class RedirectTableChainedTest {
 
         // When
         // we set up a parent-child-grandchild
-        RedirectTableChained parent = new RedirectTableChained(zebedee.published);
+        RedirectTableChained parent = new RedirectTableChained(zebedee.getPublished());
         parent.addRedirect(parentRedirect, "X");
 
-        RedirectTableChained child = new RedirectTableChained(zebedee.published);
+        RedirectTableChained child = new RedirectTableChained(zebedee.getPublished());
         child.addRedirect(childOneRedirect, "X");
 
-        RedirectTableChained grandchild = new RedirectTableChained(zebedee.published);
+        RedirectTableChained grandchild = new RedirectTableChained(zebedee.getPublished());
         grandchild.addRedirect(linkFrom, linkTo);
 
         child.setChild(grandchild);
@@ -490,7 +490,7 @@ public class RedirectTableChainedTest {
     public void fileSave_withSimpleTable_savesExpectedData() throws IOException {
         // Given
         // a one line table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect("a", "b");
 
         // When
@@ -509,7 +509,7 @@ public class RedirectTableChainedTest {
     public void fileSave_withMultipleLines_savesExpectedData() throws IOException {
         // Given
         // a two line table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         redirectTableChained.addRedirect("a", "b");
         redirectTableChained.addRedirect("c", "d");
 
@@ -532,7 +532,7 @@ public class RedirectTableChainedTest {
     public void fileSave_withRealData_savesExpected() throws IOException {
         // Given
         // a one line table
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         String linkFrom1 = "/from/one/data.json";
         String linkTo1 = "/themea/data.json";
         String linkFrom2 = "/from/two/data.json";
@@ -560,7 +560,7 @@ public class RedirectTableChainedTest {
     public void fileLoad_withRealData_loadsWorkingTable() throws IOException {
         // Given
         // a simple table that we save
-        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.published);
+        RedirectTableChained redirectTableChained = new RedirectTableChained(zebedee.getPublished());
         String linkFrom1 = "/from/one/data.json";
         String linkTo1 = "/themea/data.json";
         String linkFrom2 = "/from/two/data.json";
@@ -573,7 +573,7 @@ public class RedirectTableChainedTest {
 
         // When
         // we reload
-        RedirectTableChained loadedTable = new RedirectTableChained(zebedee.published, path);
+        RedirectTableChained loadedTable = new RedirectTableChained(zebedee.getPublished(), path);
 
         // Then
         // we expect the

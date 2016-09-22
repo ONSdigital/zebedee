@@ -13,6 +13,6 @@ import java.io.IOException;
 public class CsdbKey {
     @GET
     public String getPublicKey(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        return Root.zebedee.applicationKeys.getEncodedPublicKey(CsdbImporter.APPLICATION_KEY_ID);
+        return Root.zebedee.getApplicationKeys().getEncodedPublicKey(CsdbImporter.APPLICATION_KEY_ID);
     }
 }

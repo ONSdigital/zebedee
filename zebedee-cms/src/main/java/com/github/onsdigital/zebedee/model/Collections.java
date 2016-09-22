@@ -147,7 +147,7 @@ public class Collections {
         }
 
         // Check authorisation
-        if (!zebedee.permissions.canEdit(session)) {
+        if (!zebedee.getPermissions().canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -212,7 +212,7 @@ public class Collections {
             Collection collection = getCollectionByName(collectionName);
             return collection;
         } catch (IOException | CollectionNotFoundException e) {
-            return Root.zebedee.collections.list().getCollection(collectionId);
+            return Root.zebedee.getCollections().list().getCollection(collectionId);
         }
     }
 
@@ -242,7 +242,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -256,8 +256,8 @@ public class Collections {
         CollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
 
-        ContentReader publishedReader = new FileSystemContentReader(zebedee.published.path);
-        DataIndex dataIndex = zebedee.dataIndex;
+        ContentReader publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
+        DataIndex dataIndex = zebedee.getDataIndex();
 
         collection.description.approvalStatus = ApprovalStatus.IN_PROGRESS;
         collection.save();
@@ -289,7 +289,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -330,7 +330,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -346,7 +346,7 @@ public class Collections {
         }
         logInfo("Going ahead with publish").log();
 
-        Keyring keyring = zebedee.keyringCache.get(session);
+        Keyring keyring = zebedee.getKeyringCache().get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
 
         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
@@ -384,7 +384,7 @@ public class Collections {
         }
 
         // Check view permissions
-        if (!zebedee.permissions.canView(session,
+        if (!zebedee.getPermissions().canView(session,
                 collection.description)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -424,7 +424,7 @@ public class Collections {
 
         DirectoryListing listing = listDirectory(collection, uri, session);
 
-        Path publishedPath = zebedee.published.get(uri);
+        Path publishedPath = zebedee.getPublished().get(uri);
         DirectoryListing publishedListing = listDirectory(publishedPath);
 
         listing.files.putAll(publishedListing.files);
@@ -442,7 +442,7 @@ public class Collections {
         }
 
         // User has permission
-        if (!zebedee.permissions.canEdit(session)) {
+        if (!zebedee.getPermissions().canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -476,7 +476,7 @@ public class Collections {
     ) throws ZebedeeException, IOException,
             FileUploadException {
 
-        if (zebedee.published.exists(uri) || zebedee.isBeingEdited(uri) > 0) {
+        if (zebedee.getPublished().exists(uri) || zebedee.isBeingEdited(uri) > 0) {
             throw new ConflictException("This URI already exists");
         }
 
@@ -592,7 +592,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -718,7 +718,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -730,7 +730,7 @@ public class Collections {
             throw new BadRequestException("Please provide a new URI");
         }
 
-        if (zebedee.published.exists(uri)) {
+        if (zebedee.getPublished().exists(uri)) {
             throw new BadRequestException("You cannot move or rename a file that is already published.");
         }
 
@@ -748,7 +748,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.permissions.canEdit(session.email)) {
+        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -760,7 +760,7 @@ public class Collections {
             throw new BadRequestException("Please provide a new URI");
         }
 
-        if (zebedee.published.exists(uri)) {
+        if (zebedee.getPublished().exists(uri)) {
             throw new BadRequestException("You cannot move or rename a file that is already published.");
         }
 

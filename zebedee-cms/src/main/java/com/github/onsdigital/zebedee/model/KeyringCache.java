@@ -57,7 +57,7 @@ public class KeyringCache {
         Keyring result = null;
 
         if (user != null) {
-            Session session = zebedee.sessions.find(user.email);
+            Session session = zebedee.getSessions().find(user.email);
             if (session != null) {
                 result = keyringMap.get(session);
             }

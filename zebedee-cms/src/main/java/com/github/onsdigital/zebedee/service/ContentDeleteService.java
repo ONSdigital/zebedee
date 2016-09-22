@@ -144,7 +144,7 @@ public class ContentDeleteService {
         // For each collection -> iterate over its pending deletes -> for each pending delete add its path to the
         // result list & then do the same for each of its children recursively.
         List<Path> allDeleteMarkers = new ArrayList<>();
-        zebedeeCmsService.getZebedee().collections.list()
+        zebedeeCmsService.getZebedee().getCollections().list()
                 .stream()
                 .forEach(collection -> {
                     collection.description

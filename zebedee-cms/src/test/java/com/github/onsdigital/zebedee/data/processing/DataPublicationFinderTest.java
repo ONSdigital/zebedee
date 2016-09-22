@@ -63,7 +63,7 @@ public class DataPublicationFinderTest {
         collectionDescription.publishDate = new Date();
         collection = Collection.create(collectionDescription, zebedee, publisher);
 
-        publishedReader = new FileSystemContentReader(zebedee.published.path);
+        publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
     }
@@ -77,7 +77,7 @@ public class DataPublicationFinderTest {
     public void findPublications_givenCollectionWithNoData_returnsEmptyList() throws IOException, ZebedeeException {
         // Given
         // One of the default collections built by Builder
-        Collection collection = zebedee.collections.list().get(0);
+        Collection collection = zebedee.getCollections().list().get(0);
 
         // When
         // we search for publications

@@ -91,7 +91,7 @@ public class SessionsTest {
 
         // When
         // We attempt to get the session
-        Session session = zebedee.sessions.get(existingSession.id);
+        Session session = zebedee.getSessions().get(existingSession.id);
 
         // Then
         // The expected session should be returned
@@ -108,7 +108,7 @@ public class SessionsTest {
 
         // When
         // We try to get a session
-        Session session = zebedee.sessions.find(credentials.email);
+        Session session = zebedee.getSessions().find(credentials.email);
 
         // Then
         // No session should be returned
@@ -171,7 +171,7 @@ public class SessionsTest {
 
         // When
         // We attempt to get the session
-        Session session = zebedee.sessions.find(credentials.email);
+        Session session = zebedee.getSessions().find(credentials.email);
 
         // Then
         // The expected session should be returned
@@ -188,7 +188,7 @@ public class SessionsTest {
 
         // When
         // We try to get a session
-        Session session = zebedee.sessions.find(email);
+        Session session = zebedee.getSessions().find(email);
 
         // Then
         // No session should be returned
@@ -204,7 +204,7 @@ public class SessionsTest {
 
         // When
         // We try to find a session
-        Session session = zebedee.sessions.find(email);
+        Session session = zebedee.getSessions().find(email);
 
         // Then
         // No error should be thrown
@@ -218,16 +218,16 @@ public class SessionsTest {
         // A short expiry time and a session
         Credentials credentials = builder.administratorCredentials;
         Session session = zebedee.openSession(credentials);
-        zebedee.sessions.setExpiry(1, Calendar.MILLISECOND);
+        zebedee.getSessions().setExpiry(1, Calendar.MILLISECOND);
 
         // When
         // We clear out expired sessions
         Thread.sleep(10);
-        zebedee.sessions.deleteExpiredSessions();
+        zebedee.getSessions().deleteExpiredSessions();
 
         // Then
         // The session should be deleted
-        Assert.assertNull(zebedee.sessions.get(session.id));
+        Assert.assertNull(zebedee.getSessions().get(session.id));
     }
 
     public class GetSession implements Runnable {
@@ -244,7 +244,7 @@ public class SessionsTest {
                 // When
                 // We attempt to get the session
 
-                Session session = zebedee.sessions.get(this.session.id);
+                Session session = zebedee.getSessions().get(this.session.id);
 
                 System.out.println(session);
 

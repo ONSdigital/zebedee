@@ -47,7 +47,7 @@ public class Login {
             return "Please provide credentials (email, password).";
         }
 
-        User user = Root.zebedee.users.get(credentials.email);
+        User user = Root.zebedee.getUsers().get(credentials.email);
         boolean result = user.authenticate(credentials.password);
 
         if (!result) {

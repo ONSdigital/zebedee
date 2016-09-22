@@ -32,8 +32,8 @@ public class Unlock {
             ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.sessions.get(request);
-        boolean result = Root.zebedee.collections.unlock(collection, session);
+        Session session = Root.zebedee.getSessions().get(request);
+        boolean result = Root.zebedee.getCollections().unlock(collection, session);
         if (result) {
             Audit.Event.COLLECTION_UNLOCKED
                     .parameters()

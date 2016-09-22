@@ -118,7 +118,7 @@ public class Collection {
         collectionDescription.id = filename + "-" + Random.id();
 
         // Create the folders:
-        Path rootCollectionsPath = zebedee.collections.path;
+        Path rootCollectionsPath = zebedee.getCollections().path;
 
         CreateCollectionFolders(filename, rootCollectionsPath);
 
@@ -136,14 +136,14 @@ public class Collection {
 
         if (collectionDescription.teams != null) {
             for (String teamName : collectionDescription.teams) {
-                Team team = zebedee.teams.findTeam(teamName);
-                zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+                Team team = zebedee.getTeams().findTeam(teamName);
+                zebedee.getPermissions().addViewerTeam(collectionDescription, team, session);
             }
         }
 
         // Encryption
         // assign a key for the collection to the session user
-        KeyManager.assignKeyToUser(zebedee, zebedee.users.get(session.email), collection.description.id, Keys.newSecretKey());
+        KeyManager.assignKeyToUser(zebedee, zebedee.getUsers().get(session.email), collection.description.id, Keys.newSecretKey());
         // get the session user to distribute the key to all
         KeyManager.distributeCollectionKey(zebedee, session, collection, true);
 
@@ -205,13 +205,13 @@ public class Collection {
         String filename = PathUtils.toFilename(collectionDescription.name);
         String newFilename = PathUtils.toFilename(newName);
 
-        Path collection = zebedee.collections.path.resolve(filename);
-        Path newCollection = zebedee.collections.path.resolve(newFilename);
+        Path collection = zebedee.getCollections().path.resolve(filename);
+        Path newCollection = zebedee.getCollections().path.resolve(newFilename);
 
         new File(collection.toUri()).renameTo(new File(newCollection.toUri()));
 
         // Create the description:
-        Path newPath = zebedee.collections.path.resolve(newFilename
+        Path newPath = zebedee.getCollections().path.resolve(newFilename
                 + ".json");
 
         collectionDescription.name = newName;
@@ -220,13 +220,13 @@ public class Collection {
             Serialiser.serialise(output, collectionDescription);
         }
 
-        Files.delete(zebedee.collections.path.resolve(filename + ".json"));
+        Files.delete(zebedee.getCollections().path.resolve(filename + ".json"));
 
-        return new Collection(zebedee.collections.path.resolve(newFilename), zebedee);
+        return new Collection(zebedee.getCollections().path.resolve(newFilename), zebedee);
     }
 
     private static Release getPublishedRelease(String uri, Zebedee zebedee) throws IOException, ZebedeeException {
-        Release release = (Release) new ZebedeeReader(zebedee.published.path.toString(), null).getPublishedContent(uri);
+        Release release = (Release) new ZebedeeReader(zebedee.getPublished().path.toString(), null).getPublishedContent(uri);
         return release;
     }
 
@@ -311,13 +311,13 @@ public class Collection {
 
         if (collectionDescription.teams != null) {
             // work out which teams need to be removed from the existing teams.
-            Set<Integer> currentTeamIds = zebedee.permissions.listViewerTeams(collectionDescription, session);
-            List<Team> teams = zebedee.teams.listTeams();
+            Set<Integer> currentTeamIds = zebedee.getPermissions().listViewerTeams(collectionDescription, session);
+            Teams teams = zebedee.getTeams();
             for (Integer currentTeamId : currentTeamIds) { // for each current team ID
-                for (Team team : teams) { // iterate the teams list to find the team object
+                for (Team team : teams.listTeams()) { // iterate the teams list to find the team object
                     if (currentTeamId.equals(team.id)) { // if the ID's match
                         if (!collectionDescription.teams.contains(team.name)) { // if the team is not listed in the updated list
-                            zebedee.permissions.removeViewerTeam(collectionDescription, team, session);
+                            zebedee.getPermissions().removeViewerTeam(collectionDescription, team, session);
                         }
                     }
                 }
@@ -326,9 +326,9 @@ public class Collection {
             // Add all the new teams. The add is idempotent so we don't need to check if it already exists.
             for (String teamName : collectionDescription.teams) {
                 // We have already deserialised the teams list to its more efficient to iterate it again rather than deserialise by team name.
-                for (Team team : teams) { // iterate the teams list to find the team object
+                for (Team team : teams.listTeams()) { // iterate the teams list to find the team object
                     if (teamName.equals(team.name)) {
-                        zebedee.permissions.addViewerTeam(collectionDescription, team, session);
+                        zebedee.getPermissions().addViewerTeam(collectionDescription, team, session);
                         updatedTeams.add(teamName);
                     }
                 }
@@ -439,7 +439,7 @@ public class Collection {
         }
 
         if (result == null) {
-            result = zebedee.published.get(uri);
+            result = zebedee.getPublished().get(uri);
         }
 
         return result;
@@ -507,7 +507,7 @@ public class Collection {
         }
 
         // Does the current user have permission to edit?
-        boolean permission = zebedee.permissions.canEdit(email);
+        boolean permission = zebedee.getPermissions().canEdit(email);
 
         if (!isBeingEdited && !hasDeleteMarker && !exists && permission) {
             // Copy from Published to in progress:
@@ -551,7 +551,7 @@ public class Collection {
                 && zebedee.isBeingEdited(uri) > 0;
 
         // Does the user have permission to edit?
-        boolean permission = zebedee.permissions.canEdit(email, description);
+        boolean permission = zebedee.getPermissions().canEdit(email, description);
 
         if (source != null && !isBeingEditedElsewhere && permission) {
             // Copy to in progress:
@@ -563,7 +563,7 @@ public class Collection {
                     FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
                 } else {
                     PathUtils.moveFilesInDirectory(source, destination);
-                    zebedee.collections.removeEmptyCollectionDirectories(source);
+                    zebedee.getCollections().removeEmptyCollectionDirectories(source);
                 }
             } else {
                 try (InputStream inputStream = new FileInputStream(source.toFile())) {
@@ -593,7 +593,7 @@ public class Collection {
 
     public boolean complete(String email, String uri, boolean recursive) throws IOException {
         boolean result = false;
-        boolean permission = zebedee.permissions.canEdit(email);
+        boolean permission = zebedee.getPermissions().canEdit(email);
 
         if (isInProgress(uri) && permission) {
             // Move the in-progress copy to completed:
@@ -638,7 +638,7 @@ public class Collection {
         }
 
 
-        boolean permission = zebedee.permissions.canEdit(session.email);
+        boolean permission = zebedee.getPermissions().canEdit(session.email);
         if (!permission) {
             throw new UnauthorizedException("Insufficient permissions");
         }
@@ -677,7 +677,7 @@ public class Collection {
                 FileUtils.moveDirectory(source.getParent().toFile(), destination.getParent().toFile());
             } else {
                 PathUtils.moveFilesInDirectory(source, destination);
-                zebedee.collections.removeEmptyCollectionDirectories(source);
+                zebedee.getCollections().removeEmptyCollectionDirectories(source);
             }
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
@@ -922,12 +922,12 @@ public class Collection {
     public ContentItemVersion version(String email, String uri, CollectionWriter collectionWriter) throws ZebedeeException, IOException {
 
         // first ensure the content exists in published area so we can create a version from it.
-        Path versionSource = zebedee.published.get(uri);
+        Path versionSource = zebedee.getPublished().get(uri);
         if (versionSource == null) {
             throw new NotFoundException(String.format("The given URI %s was not found - it has not been published.", uri));
         }
 
-        ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
+        ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().path);
 
         VersionedContentItem versionedContentItem = new VersionedContentItem(uri);
 
@@ -935,7 +935,7 @@ public class Collection {
             throw new ConflictException("A previous version of this file already exists");
         }
 
-        ContentItemVersion version = versionedContentItem.createVersion(zebedee.published.path, contentReader, collectionWriter.getReviewed());
+        ContentItemVersion version = versionedContentItem.createVersion(zebedee.getPublished().path, contentReader, collectionWriter.getReviewed());
         addEvent(uri, new Event(new Date(), EventType.VERSIONED, email, version.getIdentifier()));
         return version;
     }

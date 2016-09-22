@@ -371,8 +371,8 @@ public class Publisher {
 
             savePublishMetrics(publishedCollection);
 
-            ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
-            ContentWriter contentWriter = new ContentWriter(zebedee.published.path);
+            ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().path);
+            ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().path);
 
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
@@ -448,9 +448,9 @@ public class Publisher {
     private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
         pool.submit(() -> {
             logInfo("Indexing publish report").log();
-            PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
+            PublishedCollection publishedCollection = zebedee.getPublishedCollections().add(collectionJsonPath);
             if (Configuration.isVerificationEnabled()) {
-                zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
+                zebedee.getVerificationAgent().submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
             }
         });
     }
@@ -470,7 +470,7 @@ public class Publisher {
             if (source != null) {
                 if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
                     String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
-                    Path publishPath = zebedee.published.path.resolve(publishUri);
+                    Path publishPath = zebedee.getPublished().path.resolve(publishUri);
                     logInfo("Unzipping TimeSeries").addParameter("source", source.toString()).addParameter("destination", publishPath.toString()).log();
 
                     Resource resource = collectionReader.getResource(uri);
@@ -547,7 +547,7 @@ public class Publisher {
         for (String uri : collection.reviewed.uris()) {
             if (!VersionedContentItem.isVersionedUri(uri)
                     && !FilenameUtils.getName(uri).equals("timeseries-to-publish.zip")) {
-                Path destination = zebedee.published.toPath(uri);
+                Path destination = zebedee.getPublished().toPath(uri);
                 Resource resource = collectionReader.getResource(uri);
                 FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
             }
@@ -558,9 +558,9 @@ public class Publisher {
 
         logInfo("Moving collection files to archive for collection").collectionName(collection).log();
         String filename = PathUtils.toFilename(collection.description.name);
-        Path collectionJsonSource = zebedee.collections.path.resolve(filename + ".json");
+        Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");
         Path collectionFilesSource = collection.reviewed.path;
-        Path logPath = zebedee.publishedCollections.path;
+        Path logPath = zebedee.getPublishedCollections().path;
 
         if (!Files.exists(logPath)) {
             Files.createDirectory(logPath);

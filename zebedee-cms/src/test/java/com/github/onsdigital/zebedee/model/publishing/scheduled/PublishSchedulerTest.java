@@ -104,7 +104,7 @@ public class PublishSchedulerTest {
         Date startDate = description.publishDate;
         Date prePublishStartDate = new DateTime(description.publishDate).minusSeconds(1).toDate();
         scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
-        zebedee.collections.delete(collection, session);
+        zebedee.getCollections().delete(collection, session);
 
         // When the collection is cancelled from the schuduler.
         scheduler.cancel(collection);
@@ -132,7 +132,7 @@ public class PublishSchedulerTest {
         scheduler.schedulePrePublish(collection, zebedee, prePublishStartDate, startDate);
 
         // When the collection is deleted but not removed from the scheduler.
-        zebedee.collections.delete(collection, session);
+        zebedee.getCollections().delete(collection, session);
 
         // Then getting collection data does not throw any exceptions.
         List<ScheduledPublishTaskData> prePublishTaskData = scheduler.getPrePublishTaskData(zebedee);

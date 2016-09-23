@@ -117,15 +117,16 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
+        </resources>
 
-            <!--Collections to be used in unit tests-->
-            <resource>
+        <testResources>
+            <testResource>
                 <directory>src/test/resources/test-content</directory>
                 <targetPath>
                     ${project.build.directory}/test-content
                 </targetPath>
-            </resource>
-        </resources>
+            </testResource>
+        </testResources>
 
         <plugins>
             <!-- A folder of dependencies is used in development when reloading classes: -->

@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.search.client;
 
 import com.github.onsdigital.zebedee.search.configuration.SearchConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -84,12 +85,18 @@ public class ElasticSearchClient {
         }
     }
 
-
     protected static void initTransportClient() throws IOException {
-        Settings settings = Settings.builder()
-                .put("cluster.name", getElasticSearchCluster()).build();
+        Settings.Builder builder = Settings.builder();
+
+        if (!StringUtils.isBlank(getElasticSearchCluster()))
+            builder.put("cluster.name", getElasticSearchCluster());
+
+        Settings settings = builder.build();
+
         client = TransportClient.builder().settings(settings).build()
-                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(getElasticSearchServer(), SearchConfiguration.getElasticSearchPort())));
+                .addTransportAddress(new InetSocketTransportAddress(
+                        new InetSocketAddress(getElasticSearchServer(),
+                                SearchConfiguration.getElasticSearchPort())));
     }
 
 

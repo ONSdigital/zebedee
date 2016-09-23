@@ -190,18 +190,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <!-- Standard resources -->
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <!-- Taxonomy structure -->
-            <resource>
-                <directory>../content</directory>
-                <targetPath>${project.build.directory}/content</targetPath>
-            </resource>
-        </resources>
-
 
         <plugins>
             <!-- A folder of dependencies is used in development when reloading classes: -->

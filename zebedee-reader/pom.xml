@@ -112,21 +112,6 @@
 
 
     <build>
-        <resources>
-            <!-- Standard resources -->
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-
-        <testResources>
-            <testResource>
-                <directory>src/test/resources/test-content</directory>
-                <targetPath>
-                    ${project.build.directory}/test-content
-                </targetPath>
-            </testResource>
-        </testResources>
 
         <plugins>
             <!-- A folder of dependencies is used in development when reloading classes: -->

@@ -71,7 +71,7 @@ public class Indexer {
             try {
                 lockGlobal();//lock in cluster
                 String searchAlias = getSearchAlias();
-                boolean aliasAvailable = searchUtils.isIndexAvailable(searchAlias);
+                boolean aliasAvailable = isIndexAvailable(searchAlias);
                 String oldIndex = searchUtils.getAliasIndex(searchAlias);
                 String newIndex = generateIndexName();
                 elasticSearchLog("Creating index").addParameter("newIndex", newIndex).log();
@@ -101,6 +101,10 @@ public class Indexer {
         }
     }
 
+    public boolean isIndexAvailable(String indexName) {
+        return searchUtils.isIndexAvailable(indexName);
+    }
+
     private void doLoad(String indexName) throws IOException {
         loadDepartments();
         loadContent(indexName);
@@ -119,7 +123,7 @@ public class Indexer {
 
     private void loadDepartments() throws IOException {
 
-        if (searchUtils.isIndexAvailable(DEPARTMENTS_INDEX)) {
+        if (isIndexAvailable(DEPARTMENTS_INDEX)) {
             searchUtils.deleteIndex(DEPARTMENTS_INDEX);
         }
 

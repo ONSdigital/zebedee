@@ -169,7 +169,7 @@ public class Sessions extends TimerTask {
      * @return If the ID is not blank and a corresponding session exists, true.
      * @throws IOException If a filesystem error occurs.
      */
-    private boolean exists(String id) throws IOException {
+    public boolean exists(String id) throws IOException {
         return StringUtils.isNotBlank(id) && Files.exists(sessionPath(id));
     }
 

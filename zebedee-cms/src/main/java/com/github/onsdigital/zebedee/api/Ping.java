@@ -35,20 +35,24 @@ public class Ping {
 
         PingResponse pingResponse = new PingResponse();
 
-        try {
-            Sessions sessions = Root.zebedee.getSessions();
-            String token = RequestUtils.getSessionId(request);
-            Session session = sessions.read(token);
-            if (session != null && !sessions.expired(session)) {
-                pingResponse.hasSession = true;
-                pingResponse.sessionExpiryDate = sessions.getExpiryDate(session);
-
-            }
-        } catch (IOException e) {
-            ZebedeeReaderLogBuilder.logError(e).log();
-        }
+        setSessionDetails(request, pingResponse);
 
         return pingResponse;
     }
 
+    private void setSessionDetails(HttpServletRequest request, PingResponse pingResponse) {
+        try {
+            Sessions sessions = Root.zebedee.getSessions();
+            String token = RequestUtils.getSessionId(request);
+            if (sessions.exists(token)) {
+                Session session = sessions.read(token);
+                if (session != null && !sessions.expired(session)) {
+                    pingResponse.hasSession = true;
+                    pingResponse.sessionExpiryDate = sessions.getExpiryDate(session);
+                }
+            }
+        } catch (IOException e) {
+            ZebedeeReaderLogBuilder.logError(e).log();
+        }
+    }
 }

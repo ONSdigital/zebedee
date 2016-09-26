@@ -33,13 +33,12 @@ import static org.junit.Assert.*;
 public class ZebedeeReaderTest {
     private final static String TEST_COLLECTION_ID = "testcollection-testid";
     private final static String TEST_SESSION_ID = "testcollection-session";
-    private final static String ZEBEDEE_ROOT = "target/test-content";
 
 
     //TODO: mime type resolving not working on Mac machines due to java bug in Files.probeContentType, use a lib to resolve mime type based on extension and enable test bits checking mime types
 
     static {
-        ReaderConfiguration.init(ZEBEDEE_ROOT);
+        ReaderConfiguration.init("target/test-classes/test-content/");
 
         if (ZebedeeReader.getCollectionReaderFactory() == null) {
             ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));

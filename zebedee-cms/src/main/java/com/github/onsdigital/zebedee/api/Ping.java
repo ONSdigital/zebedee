@@ -2,6 +2,11 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.PingRequest;
+import com.github.onsdigital.zebedee.json.PingResponse;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder;
+import com.github.onsdigital.zebedee.model.Sessions;
+import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,11 +28,27 @@ public class Ping {
      * Returns true if the session is alive, false otherwise
      */
     @POST
-    public boolean ping(HttpServletRequest request, HttpServletResponse response, PingRequest pingRequest) throws IOException {
+    public PingResponse ping(HttpServletRequest request, HttpServletResponse response, PingRequest pingRequest) throws IOException {
         if (pingRequest.lastPingTime != null && pingRequest.lastPingTime > 0) {
             metricsService.capturePing(pingRequest.lastPingTime);
         }
-        return true;
+
+        PingResponse pingResponse = new PingResponse();
+
+        try {
+            Sessions sessions = Root.zebedee.getSessions();
+            String token = RequestUtils.getSessionId(request);
+            Session session = sessions.read(token);
+            if (session != null && !sessions.expired(session)) {
+                pingResponse.hasSession = true;
+                pingResponse.sessionExpiryDate = sessions.getExpiryDate(session);
+
+            }
+        } catch (IOException e) {
+            ZebedeeReaderLogBuilder.logError(e).log();
+        }
+
+        return pingResponse;
     }
 
 }

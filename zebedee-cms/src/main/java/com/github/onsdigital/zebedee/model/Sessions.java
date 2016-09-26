@@ -211,7 +211,7 @@ public class Sessions extends TimerTask {
      * @return If the session is not null and the last access time is
      * more than 60 minutes in the past, true.
      */
-    private boolean expired(Session session) {
+    public boolean expired(Session session) {
         boolean result = false;
 
         if (session != null) {
@@ -222,6 +222,8 @@ public class Sessions extends TimerTask {
 
         return result;
     }
+
+
 
     /**
      * Updates the last access time and saves the session to disk.
@@ -261,7 +263,7 @@ public class Sessions extends TimerTask {
      * @return The session, or
      * @throws IOException
      */
-    private Session read(String id) throws IOException {
+    public Session read(String id) throws IOException {
         return read(sessionPath(id));
     }
 
@@ -298,5 +300,16 @@ public class Sessions extends TimerTask {
         }
     }
 
-    // TODO: Add an expiry method to delete old sessions.
+    public Date getExpiryDate(Session session) {
+        Date expiry = null;
+
+        if (session != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(session.lastAccess);
+            calendar.add(expiryUnit, expiryAmount);
+            expiry = calendar.getTime();
+        }
+
+        return expiry;
+    }
 }

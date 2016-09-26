@@ -86,21 +86,6 @@
             <version>2.3</version>
         </dependency>
 
-        <!-- New Relic -->
-        <dependency>
-            <groupId>com.newrelic.agent.java</groupId>
-            <artifactId>newrelic-java</artifactId>
-            <version>3.24.0</version>
-            <type>zip</type>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>com.github.ONSdigital</groupId>-->
-            <!--<artifactId>dp-logging</artifactId>-->
-            <!--<version>master-SNAPSHOT</version>-->
-        <!--</dependency>-->
-
         <!-- Logging -->
         <dependency>
             <groupId>com.github.ONSdigital</groupId>
@@ -109,7 +94,6 @@
         </dependency>
 
     </dependencies>
-
 
     <build>
 
@@ -126,23 +110,10 @@
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
-                        <!-- Default output folder is ${project.build.directory}/dependency -->
-                    </execution>
-                    <execution>
-                        <id>unpack-newrelic</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeGroupIds>com.newrelic.agent.java</includeGroupIds>
-                            <includeArtifactIds>newrelic-java</includeArtifactIds>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
-
 
     </build>
 

@@ -14,7 +14,7 @@ mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
 java $JAVA_OPTS \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Dcontent_dir=$CONTENT_DIR \
- -DSTART_EMBEDDED_SERVER=Y \
+ -DSTART_EMBEDDED_SERVER=N \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \
  -cp "zebedee-reader/target/dependency/*" \
  com.github.davidcarboni.restolino.Main

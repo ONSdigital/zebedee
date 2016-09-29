@@ -433,16 +433,39 @@ public class Publisher {
     }
 
     private static void processManifestForMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
-        Manifest manifest = Manifest.get(collection);
 
-        for (FileCopy fileCopy : manifest.filesToCopy) {
-            try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
-                contentWriter.write(inputStream, fileCopy.target);
-            } catch (ZebedeeException | IOException e) {
-                logError(e, "An error occurred during the publish manifiest proccessing")
-                        .collectionName(collection).collectionId(collection).log();
+        try {
+            Manifest manifest = Manifest.get(collection);
+
+            // Apply any deletes that are defined in the transaction first to ensure we do not delete updated files.
+            for (String uri : manifest.urisToDelete) {
+                Path target = contentReader.getRootFolder().resolve(StringUtils.removeStart(uri, "/"));
+                logDebug("Deleting directory: " + target.toString());
+                try {
+                    FileUtils.deleteDirectory(target.toFile());
+                } catch (IOException e) {
+                    logError(e, "An error occurred trying to delete directory "
+                            + target.toString())
+                            .collectionName(collection).collectionId(collection).log();
+                }
             }
+
+            for (FileCopy fileCopy : manifest.filesToCopy) {
+                try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
+                    contentWriter.write(inputStream, fileCopy.target);
+                } catch (ZebedeeException | IOException e) {
+                    logError(e, "An error occurred trying to copy file from "
+                            + fileCopy.source.toString()
+                            + " to "
+                            + fileCopy.target.toString())
+                            .collectionName(collection).collectionId(collection).log();
+                }
+            }
+        } catch (Exception e) {
+            logError(e, "An error occurred trying apply the publish manifest to publishing content ")
+                    .collectionName(collection).collectionId(collection).log();
         }
+
     }
 
     private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {

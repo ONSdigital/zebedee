@@ -73,11 +73,9 @@ public class TimeseriesUpdater {
                 logDebug("Updating timeseries.").cdid(cdid).addParameter("uri", uri).log();
 
                 timeSeries.setNotes(new ArrayList<>());
-                timeSeries.getNotes().add("Following a quality review of the Intellectual Property Products (IPP) asset in Gross Fixed Capital Formation (GFCF), analysis has shown that elements in the estimates of purchased software have been double counted from 2001 and this double counting has also uncovered a discrepancy in the modelled data prior to 2001.  Both these issues will be amended for Blue Book 17 and will have an impact on estimates of GFCF and consequently GDP and UK Economic Accounts.  The affected CDIDs are as follows:\\n\\n**IPP:** DLXP, TLPK, EQDT, EQDO\\n\\n**GFCF:** NPQX, NPQS, NPQR, NPQT\\n\\n**Business Investment:** NPEM, NPEK, NPEN, NPEL\\n\\n**GDP:** BKTL, YBHA, ABMI\\n\\n**Sectorised GFCF (In addition to above):** BKVT, DBGP, FCCJ, FCCZ, FDBM, FDCL, FDEH, IHYK, IHY6, IHYM, IHYN, IHYO, IHYP, IHYQ, IHYR, KG60, KG6I, KG6N, KG6R, KG6V, KG6W, KG6Z, KG75, KG76, KG79, KG7M, KG7N, KG7P, KG7Q, KG7S, KG7T, KH98, KH9I, KH9S, NHCJ, NHEG, NQFM, NSSU, RNZD, ROAW, RPYP, RPYQ, RPZW, RQBA, RQBB, RQBR, RQBZ, RQCM\\n\\nFurther detail can be found in [Business Investment: Quarter 2 (Apr to Jun) 2016 revised results][1]. We apologise for any inconvenience this may cause.\\n\\n\\n  [1]: http://www.ons.gov.uk/economy/grossdomesticproductgdp/bulletins/businessinvestment/previousReleases");
-
+                timeSeries.getNotes().add("Following a quality review it has been identified that the methodology used to estimate elements of purchased software within gross fixed capital formation (GFCF) has led to some double counting from 1997 onwards. When this issue is amended in The Blue Book 2017 it will reduce the level of GFCF across the period by around 1.1% per year. The average impact on quarter-on-quarter GFCF growth is negative 0.02% and the average impact on quarter-on-quarter GDP growth is 0.00%.");
                 contentWriter.writeObject(timeSeries, uri + "/data.json");
             }
         }
-
     }
 }

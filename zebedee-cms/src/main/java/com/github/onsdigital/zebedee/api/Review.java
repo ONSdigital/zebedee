@@ -43,7 +43,7 @@ public class Review {
             throw new NotFoundException("Collection not found");
         }
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String uri = request.getParameter("uri");
 
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));

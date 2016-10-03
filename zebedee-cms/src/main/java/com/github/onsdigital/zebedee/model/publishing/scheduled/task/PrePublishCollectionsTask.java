@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
@@ -91,9 +92,9 @@ public class PrePublishCollectionsTask extends ScheduledTask {
 
             logInfo("PRE-PUBLISH: Loading collection job").addParameter("collectionId", collectionId).log();
             try {
-                Collection collection = zebedee.collections.getCollection(collectionId);
+                Collection collection = zebedee.getCollections().getCollection(collectionId);
 
-                if (collection.description.approvedStatus == false) {
+                if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
                     logInfo("Scheduled collection has not been approved - switching to manual").log();
 
                     // Switch to manual
@@ -141,7 +142,7 @@ public class PrePublishCollectionsTask extends ScheduledTask {
                         // send versioned files manifest ahead of time. allowing files to be copied from the website into the transaction.
                         Publisher.SendManifest(collection, encryptionPassword);
 
-                        SecretKey key = zebedee.keyringCache.schedulerCache.get(collection.description.id);
+                        SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
                         ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, key);
                         PublishCollectionTask publishCollectionTask = new PublishCollectionTask(collection, collectionReader, encryptionPassword, hostToTransactionIdMap);
 

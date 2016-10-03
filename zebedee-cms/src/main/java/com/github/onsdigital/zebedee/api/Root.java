@@ -122,14 +122,14 @@ public class Root {
      */
     public static void initialiseCsdbImportKeys() {
         // if there is no key previously stored for CSDB import, generate a new one.
-        if (!zebedee.applicationKeys.containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
+        if (!zebedee.getApplicationKeys().containsKey(CsdbImporter.APPLICATION_KEY_ID)) {
             // create new key pair
             logDebug("No key pair found for CSDB import. Generating and saving a new key.").log();
             try {
-                SecretKey secretKey = zebedee.applicationKeys.generateNewKey(CsdbImporter.APPLICATION_KEY_ID);
+                SecretKey secretKey = zebedee.getApplicationKeys().generateNewKey(CsdbImporter.APPLICATION_KEY_ID);
 
                 // distribute private key to all users.
-                KeyManager.disributeApplicationKey(zebedee, CsdbImporter.APPLICATION_KEY_ID, secretKey);
+                KeyManager.distributeApplicationKey(zebedee, CsdbImporter.APPLICATION_KEY_ID, secretKey);
             } catch (IOException e) {
                 logError(e, "Failed to generate and save new application key for CSDB import.").log();
             }
@@ -138,7 +138,7 @@ public class Root {
 
     private static void cleanupStaleCollectionKeys() {
         try {
-            UserList users = zebedee.users.list();
+            UserList users = zebedee.getUsers().list();
 
             for (User user : users) {
                 com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(zebedee, user);
@@ -164,7 +164,7 @@ public class Root {
 
             Collections.CollectionList collections;
             try {
-                collections = zebedee.collections.list();
+                collections = zebedee.getCollections().list();
             } catch (IOException e) {
                 logError(e, "Failed to load collections list to schedule publishes").log();
                 return;
@@ -208,7 +208,7 @@ public class Root {
         // Copy to the master and launchpad content directories
         for (Path item : content) {
             Path source = taxonomy.resolve(item);
-            Path masterDestination = zebedee.published.path.resolve(item);
+            Path masterDestination = zebedee.getPublished().path.resolve(item);
             Files.createDirectories(masterDestination.getParent());
             try (InputStream input = Files.newInputStream(source);
                  OutputStream output = Files.newOutputStream(masterDestination)) {

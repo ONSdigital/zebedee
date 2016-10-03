@@ -29,20 +29,16 @@ public class Manifest {
      * @param collection
      * @return
      */
-    public static Manifest get(Collection collection) {
+    public static Manifest get(Collection collection) throws IOException {
 
         Path manifestPath = Manifest.getManifestPath(collection);
         Manifest manifest;
 
-        try {
-            if (!Files.exists(manifestPath)) {
-                manifest = Manifest.create(collection);
-                Manifest.save(manifest, collection);
-            } else {
-                manifest = Manifest.load(collection);
-            }
-        } catch (IOException e) {
-            return new Manifest();
+        if (!Files.exists(manifestPath)) {
+            manifest = Manifest.create(collection);
+            Manifest.save(manifest, collection);
+        } else {
+            manifest = Manifest.load(collection);
         }
 
         return manifest;

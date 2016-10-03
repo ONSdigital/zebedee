@@ -10,7 +10,6 @@
     <modules>
         <module>zebedee-cms</module>
         <module>zebedee-reader</module>
-        <module>zebedee-cli</module>
     </modules>
 
     <organization>
@@ -145,9 +144,8 @@
 
 
     <build>
-
         <plugins>
-            <!-- Java 1.7 -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -156,35 +154,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${encoding}</encoding>
-                </configuration>
-            </plugin>
-
-            <!--&lt;!&ndash; Parallel tests &ndash;&gt;-->
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-surefire-plugin</artifactId>-->
-            <!--<version>2.19</version>-->
-            <!--<configuration>-->
-            <!--<parallel>classes</parallel>-->
-            <!--<threadCount>5</threadCount>-->
-            <!--<perCoreThreadCount>true</perCoreThreadCount>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
-
-            <!-- Release configuration: -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
-            </plugin>
-
-            <!-- Disable deploy. We do not deploy to maven central or anywhere. Prevents release perform failure-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
-                <configuration>
-                    <skip>true</skip>
                 </configuration>
             </plugin>
 

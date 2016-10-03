@@ -21,10 +21,10 @@ public class PublishedCollections {
 
         if (StringUtils.isNotEmpty(collectionId)) {
 
-            return Root.zebedee.publishedCollections.search(ElasticSearchClient.getClient(), collectionId);
+            return Root.zebedee.getPublishedCollections().search(ElasticSearchClient.getClient(), collectionId);
 
         }
 
-        return Root.zebedee.publishedCollections.search(ElasticSearchClient.getClient());
+        return Root.zebedee.getPublishedCollections().search(ElasticSearchClient.getClient());
     }
 }

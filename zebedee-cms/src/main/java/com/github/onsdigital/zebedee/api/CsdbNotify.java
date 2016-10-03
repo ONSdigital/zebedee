@@ -35,7 +35,7 @@ public class CsdbNotify {
     public void csdbNotify(HttpServletRequest request, HttpServletResponse response, String csdbId) throws IOException, ZebedeeException {
         logInfo("Received csdb file notification").addParameter("filename", csdbId).log();
 
-        PrivateKey privateKey = Root.zebedee.applicationKeys.getPrivateKeyFromCache(CsdbImporter.APPLICATION_KEY_ID);
+        PrivateKey privateKey = Root.zebedee.getApplicationKeys().getPrivateKeyFromCache(CsdbImporter.APPLICATION_KEY_ID);
 
         if (privateKey == null) throw new IOException("An administrator needs to login to unlock the CSDB import key.");
 
@@ -43,8 +43,8 @@ public class CsdbNotify {
                 privateKey,
                 csdbId,
                 dylanClient,
-                Root.zebedee.collections,
-                Root.zebedee.keyringCache.schedulerCache);
+                Root.zebedee.getCollections(),
+                Root.zebedee.getKeyringCache().schedulerCache);
 
         Audit.Event.CSDB_NEW_FILE_NOTIFICATION
                 .parameters()

@@ -31,7 +31,7 @@ public class GeneratorTest {
 
     @Before
     public void initialize() {
-        ReaderConfiguration.init("target/test-content");
+        ReaderConfiguration.init("target/test-classes/test-content/");
         readRequestHandler = new ReadRequestHandler();
         generator = new DataGenerator();
     }

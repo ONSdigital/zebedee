@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
@@ -196,7 +197,7 @@ public class CsdbImporter {
                         .addParameter("collectionName", collection.description.name)
                         .addParameter("CSDBIdentifier", csdbIdentifier).log();
 
-                if (collection.description.approvedStatus == true) {
+                if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
                     preProcessCollection(collection);
                 } else {
                     logInfo("Collection for CSDB identifier is not approved")
@@ -222,11 +223,11 @@ public class CsdbImporter {
      * @throws ZebedeeException
      */
     public void preProcessCollection(Collection collection) throws IOException, ZebedeeException, URISyntaxException {
-        SecretKey collectionKey = Root.zebedee.keyringCache.schedulerCache.get(collection.description.id);
+        SecretKey collectionKey = Root.zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
         CollectionReader collectionReader = new ZebedeeCollectionReader(collection, collectionKey);
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(collection, collectionKey);
-        ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.published.path);
-        DataIndex dataIndex = Root.zebedee.dataIndex;
+        ContentReader publishedReader = new FileSystemContentReader(Root.zebedee.getPublished().path);
+        DataIndex dataIndex = Root.zebedee.getDataIndex();
 
         ApproveTask.generateTimeseries(collection, publishedReader, collectionReader, collectionWriter, dataIndex);
         PublishNotification publishNotification = ApproveTask.createPublishNotification(collectionReader, collection);

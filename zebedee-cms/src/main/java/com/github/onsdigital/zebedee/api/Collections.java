@@ -35,7 +35,7 @@ public class Collections {
     public static Collection getCollection(HttpServletRequest request)
             throws IOException {
         String collectionId = getCollectionId(request);
-        return Root.zebedee.collections.getCollection(collectionId);
+        return Root.zebedee.getCollections().getCollection(collectionId);
     }
 
     public static String getCollectionId(HttpServletRequest request) {
@@ -61,20 +61,20 @@ public class Collections {
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException {
         try {
-            Session session = Root.zebedee.sessions.get(request);
+            Session session = Root.zebedee.getSessions().get(request);
             CollectionDescriptions result = new CollectionDescriptions();
-            List<Collection> collections = Root.zebedee.collections.list();
+            List<Collection> collections = Root.zebedee.getCollections().list();
             CollectionOwner collectionOwner = zebedeeCmsService.getPublisherType(session.email);
 
             for (Collection collection : collections) {
-                if (Root.zebedee.permissions.canView(session, collection.description)
+                if (Root.zebedee.getPermissions().canView(session, collection.description)
                         && (collection.description.collectionOwner.equals(collectionOwner))) {
 
                     CollectionDescription description = new CollectionDescription();
                     description.id = collection.description.id;
                     description.name = collection.description.name;
                     description.publishDate = collection.description.publishDate;
-                    description.approvedStatus = collection.description.approvedStatus;
+                    description.approvalStatus = collection.description.approvalStatus;
                     description.type = collection.description.type;
                     description.teams = collection.description.teams;
                     result.add(description);

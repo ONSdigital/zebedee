@@ -47,8 +47,8 @@ public class CollectionDetails {
             return null;
         }
 
-        Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
+        Session session = Root.zebedee.getSessions().get(request);
+        if (Root.zebedee.getPermissions().canView(session.email, collection.description) == false) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
@@ -69,7 +69,7 @@ public class CollectionDetails {
         result.complete = ContentDetailUtil.resolveDetails(collection.complete, collectionReader.getComplete());
         result.reviewed = ContentDetailUtil.resolveDetails(collection.reviewed, collectionReader.getReviewed());
 
-        result.approvedStatus = collection.description.approvedStatus;
+        result.approvalStatus = collection.description.approvalStatus;
         result.events = collection.description.events;
         result.timeseriesImportFiles = collection.description.timeseriesImportFiles;
 
@@ -77,8 +77,8 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, result, collection);
         addEventsForDetails(result.reviewed, result, collection);
 
-        Set<Integer> teamIds = Root.zebedee.permissions.listViewerTeams(collection.description, session);
-        List<Team> teams = Root.zebedee.teams.resolveTeams(teamIds);
+        Set<Integer> teamIds = Root.zebedee.getPermissions().listViewerTeams(collection.description, session);
+        List<Team> teams = Root.zebedee.getTeams().resolveTeams(teamIds);
         teams.forEach(team -> {
             collection.description.teams.add(team.name);
         });

@@ -85,7 +85,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.getPermissions().isAdministrator(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -120,7 +120,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void renameTeam(Team update, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException, BadRequestException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.getPermissions().isAdministrator(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -169,7 +169,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email))
+        if (session == null || !zebedee.getPermissions().isAdministrator(session.email))
             throw new UnauthorizedException(getUnauthorizedMessage(session));
 
         if (delete != null) {
@@ -202,7 +202,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.getPermissions().isAdministrator(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -221,7 +221,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
-        if (session == null || !zebedee.permissions.isAdministrator(session.email)) {
+        if (session == null || !zebedee.getPermissions().isAdministrator(session.email)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

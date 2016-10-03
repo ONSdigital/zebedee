@@ -8,10 +8,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Event;
-import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
@@ -107,7 +104,7 @@ public class Publisher {
                     logInfo("Starting collection publish process").collectionName(collection).log();
 
 
-                    if (!collection.description.approvedStatus) {
+                    if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
                         logInfo("Collection cannot be published as it has not been approved").collectionName(collection).log();
                         return false;
                     }
@@ -374,8 +371,8 @@ public class Publisher {
 
             savePublishMetrics(publishedCollection);
 
-            ContentReader contentReader = new FileSystemContentReader(zebedee.published.path);
-            ContentWriter contentWriter = new ContentWriter(zebedee.published.path);
+            ContentReader contentReader = new FileSystemContentReader(zebedee.getPublished().path);
+            ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().path);
 
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
@@ -436,24 +433,47 @@ public class Publisher {
     }
 
     private static void processManifestForMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
-        Manifest manifest = Manifest.get(collection);
 
-        for (FileCopy fileCopy : manifest.filesToCopy) {
-            try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
-                contentWriter.write(inputStream, fileCopy.target);
-            } catch (ZebedeeException | IOException e) {
-                logError(e, "An error occurred during the publish manifiest proccessing")
-                        .collectionName(collection).collectionId(collection).log();
+        try {
+            Manifest manifest = Manifest.get(collection);
+
+            // Apply any deletes that are defined in the transaction first to ensure we do not delete updated files.
+            for (String uri : manifest.urisToDelete) {
+                Path target = contentReader.getRootFolder().resolve(StringUtils.removeStart(uri, "/"));
+                logDebug("Deleting directory: " + target.toString());
+                try {
+                    FileUtils.deleteDirectory(target.toFile());
+                } catch (IOException e) {
+                    logError(e, "An error occurred trying to delete directory "
+                            + target.toString())
+                            .collectionName(collection).collectionId(collection).log();
+                }
             }
+
+            for (FileCopy fileCopy : manifest.filesToCopy) {
+                try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
+                    contentWriter.write(inputStream, fileCopy.target);
+                } catch (ZebedeeException | IOException e) {
+                    logError(e, "An error occurred trying to copy file from "
+                            + fileCopy.source.toString()
+                            + " to "
+                            + fileCopy.target.toString())
+                            .collectionName(collection).collectionId(collection).log();
+                }
+            }
+        } catch (Exception e) {
+            logError(e, "An error occurred trying apply the publish manifest to publishing content ")
+                    .collectionName(collection).collectionId(collection).log();
         }
+
     }
 
     private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
         pool.submit(() -> {
             logInfo("Indexing publish report").log();
-            PublishedCollection publishedCollection = zebedee.publishedCollections.add(collectionJsonPath);
+            PublishedCollection publishedCollection = zebedee.getPublishedCollections().add(collectionJsonPath);
             if (Configuration.isVerificationEnabled()) {
-                zebedee.verificationAgent.submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
+                zebedee.getVerificationAgent().submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
             }
         });
     }
@@ -473,7 +493,7 @@ public class Publisher {
             if (source != null) {
                 if (source.getFileName().toString().equals("timeseries-to-publish.zip")) {
                     String publishUri = StringUtils.removeStart(StringUtils.removeEnd(uri, "-to-publish.zip"), "/");
-                    Path publishPath = zebedee.published.path.resolve(publishUri);
+                    Path publishPath = zebedee.getPublished().path.resolve(publishUri);
                     logInfo("Unzipping TimeSeries").addParameter("source", source.toString()).addParameter("destination", publishPath.toString()).log();
 
                     Resource resource = collectionReader.getResource(uri);
@@ -550,7 +570,7 @@ public class Publisher {
         for (String uri : collection.reviewed.uris()) {
             if (!VersionedContentItem.isVersionedUri(uri)
                     && !FilenameUtils.getName(uri).equals("timeseries-to-publish.zip")) {
-                Path destination = zebedee.published.toPath(uri);
+                Path destination = zebedee.getPublished().toPath(uri);
                 Resource resource = collectionReader.getResource(uri);
                 FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
             }
@@ -561,9 +581,9 @@ public class Publisher {
 
         logInfo("Moving collection files to archive for collection").collectionName(collection).log();
         String filename = PathUtils.toFilename(collection.description.name);
-        Path collectionJsonSource = zebedee.collections.path.resolve(filename + ".json");
+        Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");
         Path collectionFilesSource = collection.reviewed.path;
-        Path logPath = zebedee.publishedCollections.path;
+        Path logPath = zebedee.getPublishedCollections().path;
 
         if (!Files.exists(logPath)) {
             Files.createDirectory(logPath);

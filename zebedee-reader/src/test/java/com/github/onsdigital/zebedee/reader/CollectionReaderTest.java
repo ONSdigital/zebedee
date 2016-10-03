@@ -29,7 +29,7 @@ public class CollectionReaderTest {
     private final static String COLLECTION_ID = "testcollection-testid";
 
     static {
-        ReaderConfiguration.init("target/test-content/");
+        ReaderConfiguration.init("target/test-classes/test-content/");
 
         if (ZebedeeReader.getCollectionReaderFactory() == null) {
             ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));

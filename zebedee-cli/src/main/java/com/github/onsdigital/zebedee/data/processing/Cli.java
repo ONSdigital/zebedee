@@ -12,7 +12,7 @@ public class Cli {
                 .argName("collections directory> <collection name")
                 .numberOfArgs(2)
                 .build());
-        options.addOption(Option.builder("updatetimeseries")
+        options.addOption(Option.builder("updatetimeseriesfromcsv")
                 .desc("update timeseries metadata from the given CSV.")
                 .argName("source directory> <destination directory> <csv file")
                 .numberOfArgs(3)
@@ -52,6 +52,11 @@ public class Cli {
                 .argName("source directory")
                 .hasArgs()
                 .build());
+        options.addOption(Option.builder("updatetimeseries")
+                .desc("Update content for the specified timeseries.")
+                .argName("source directory> <destination directory> <CDID's> <dataset ID's")
+                .numberOfArgs(4)
+                .build());
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -59,8 +64,8 @@ public class Cli {
 
             if (line.hasOption("createcollection")) {
                 CollectionCreator.createCollection(args);
-            } else if (line.hasOption("updatetimeseries")) {
-                ExistingTimeseriesUpdater.updateTimeseriesData(args);
+            } else if (line.hasOption("updatetimeseriesfromcsv")) {
+                CsvTimeseriesUpdater.updateTimeseriesFromCsv(args);
             } else if (line.hasOption("removetimeseriesdata")) {
                 TimeseriesDataRemover.removeTimeseriesData(args);
             } else if (line.hasOption("removetimeseriesentries")) {
@@ -75,6 +80,8 @@ public class Cli {
                 TimeseriesMigration.migrateTimeseries(args);
             } else if (line.hasOption("datasetversionhistory")) {
                 DatasetVersionHistory.findDatasetsWithMissingVersionHistory(args);
+            } else if (line.hasOption("updatetimeseries")) {
+                TimeseriesUpdater.updateTimeseries(args);
             } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);

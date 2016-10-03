@@ -4,9 +4,18 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Collections;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.*;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionOwner;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.Permissions;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
@@ -44,7 +53,7 @@ public class ZebedeeCmsService {
 
     public Session getSession(HttpServletRequest request) throws ZebedeeException {
         try {
-            return Root.zebedee.sessions.get(request);
+            return Root.zebedee.getSessions().get(request);
         } catch (IOException e) {
             logError(e, SESSION_NOT_FOUND_MSG).logAndThrow(UnauthorizedException.class);
         }
@@ -52,18 +61,14 @@ public class ZebedeeCmsService {
     }
 
     public ContentReader getPublishedContentReader() {
-        return new FileSystemContentReader(Root.zebedee.published.path);
+        return new FileSystemContentReader(Root.zebedee.getPublished().path);
     }
 
-    public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session)
-            throws ZebedeeException {
+    public CollectionWriter getZebedeeCollectionWriter(Collection collection, Session session) throws ZebedeeException {
         try {
             return new ZebedeeCollectionWriter(Root.zebedee, collection, session);
         } catch (IOException e) {
-            logError(e, COLLECTION_WRI_ERROR_MSG)
-                    .collectionId(collection)
-                    .user(session.email)
-                    .logAndThrow(BadRequestException.class);
+            logError(e, COLLECTION_WRI_ERROR_MSG).collectionId(collection).user(session.email).logAndThrow(BadRequestException.class);
         }
         return null;
     }
@@ -72,10 +77,7 @@ public class ZebedeeCmsService {
         try {
             return new ZebedeeCollectionReader(Root.zebedee, collection, session);
         } catch (IOException e) {
-            logError(e, COLLECTION_READ_ERROR_MSG)
-                    .collectionId(collection)
-                    .user(session.email)
-                    .logAndThrow(BadRequestException.class);
+            logError(e, COLLECTION_READ_ERROR_MSG).collectionId(collection).user(session.email).logAndThrow(BadRequestException.class);
         }
         return null;
     }
@@ -91,7 +93,7 @@ public class ZebedeeCmsService {
 
     public Collection getCollection(String collectionId) throws ZebedeeException {
         try {
-            return Root.zebedee.collections.getCollection(collectionId);
+            return Root.zebedee.getCollections().getCollection(collectionId);
         } catch (IOException e) {
             logError(e, COLLECTION_NOT_FOUND_MSG).logAndThrow(NotFoundException.class);
         }
@@ -100,17 +102,15 @@ public class ZebedeeCmsService {
 
     public CollectionOwner getPublisherType(String email) throws ZebedeeException {
         try {
-            return Root.zebedee.permissions.getUserCollectionGroup(email);
+            return Root.zebedee.getPermissions().getUserCollectionGroup(email);
         } catch (IOException e) {
-            logError(e, "Error while trying to determined user collectionOwner.")
-                    .user(email)
-                    .logAndThrow(UnexpectedErrorException.class);
+            logError(e, "Error while trying to determined user collectionOwner.").user(email).logAndThrow(UnexpectedErrorException.class);
         }
         return null;
     }
 
     public Permissions getPermissions() {
-        return Root.zebedee.permissions;
+        return Root.zebedee.getPermissions();
     }
 
     public InputStream objectAsInputStream(Object obj) {

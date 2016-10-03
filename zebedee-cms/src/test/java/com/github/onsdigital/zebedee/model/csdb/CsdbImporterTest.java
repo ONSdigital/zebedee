@@ -59,10 +59,10 @@ public class CsdbImporterTest {
         zebedee = new Zebedee(bob.zebedee, false);
         publisher = bob.createSession(bob.publisher1);
 
-        collection = zebedee.collections.list().getCollection("collection");
+        collection = zebedee.getCollections().list().getCollection("collection");
 
-        collectionReader = new FakeCollectionReader(zebedee.collections.path.toString(), collection.description.id);
-        collectionWriter = new FakeCollectionWriter(zebedee.collections.path.toString(), collection.description.id);
+        collectionReader = new FakeCollectionReader(zebedee.getCollections().path.toString(), collection.description.id);
+        collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
 
         try (InputStream inputStream = Files.newInputStream(collection.reviewed.get(datasetPath).resolve("data.json"))) {
             unpublishedDataset = ContentUtil.deserialise(inputStream, Dataset.class);

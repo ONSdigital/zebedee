@@ -46,14 +46,14 @@ public class Users {
         Object result = null;
 
         String email = request.getParameter("email");
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         if (session != null) {
             // If email is empty
             if (StringUtils.isBlank(email)) {
-                result = sanitise(Root.zebedee.users.list());
+                result = sanitise(Root.zebedee.getUsers().list());
             } else {
-                result = sanitise(Root.zebedee.users.get(email));
+                result = sanitise(Root.zebedee.getUsers().get(email));
             }
         }
 
@@ -78,8 +78,8 @@ public class Users {
     @POST
     public UserSanitised create(HttpServletRequest request, HttpServletResponse response, User user) throws
             IOException, ConflictException, BadRequestException, UnauthorizedException {
-        Session session = Root.zebedee.sessions.get(request);
-        User created = Root.zebedee.users.create(session, user);
+        Session session = Root.zebedee.getSessions().get(request);
+        User created = Root.zebedee.getUsers().create(session, user);
 
         Audit.Event.USER_CREATED
                 .parameters()
@@ -102,12 +102,12 @@ public class Users {
     @PUT
     public UserSanitised update(HttpServletRequest request, HttpServletResponse response, User updatedUser) throws
             IOException, NotFoundException, BadRequestException, UnauthorizedException {
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         String email = request.getParameter("email");
-        User user = Root.zebedee.users.get(email);
+        User user = Root.zebedee.getUsers().get(email);
 
-        User updated = Root.zebedee.users.update(session, user, updatedUser);
+        User updated = Root.zebedee.getUsers().update(session, user, updatedUser);
 
         Audit.Event.USER_UPDATED
                 .parameters()
@@ -128,10 +128,10 @@ public class Users {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws
             UnauthorizedException, IOException, NotFoundException, BadRequestException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter("email");
-        User user = Root.zebedee.users.get(email);
-        boolean result = Root.zebedee.users.delete(session, user);
+        User user = Root.zebedee.getUsers().get(email);
+        boolean result = Root.zebedee.getUsers().delete(session, user);
         if(result) {
             Audit.Event.USER_DELETED
                     .parameters()

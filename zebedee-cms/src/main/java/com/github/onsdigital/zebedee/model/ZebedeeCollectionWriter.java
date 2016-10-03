@@ -37,12 +37,12 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
 
         // Authorisation
         if (session == null
-                || !zebedee.permissions.canEdit(session.email,
+                || !zebedee.getPermissions().canEdit(session.email,
                 collection.description)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        Keyring keyring = zebedee.keyringCache.get(session);
+        Keyring keyring = zebedee.getKeyringCache().get(session);
         if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
 
         SecretKey key = keyring.get(collection.description.id);

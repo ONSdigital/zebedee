@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class ReadRequestHandlerTest {
 
     static {
-        ReaderConfiguration.init("target/test-content");
+        ReaderConfiguration.init("target/test-classes/test-content/");
 
         if (ZebedeeReader.getCollectionReaderFactory() == null) {
             ZebedeeReader.setCollectionReaderFactory(new FakeCollectionReaderFactory(ReaderConfiguration.getConfiguration().getCollectionsFolder()));

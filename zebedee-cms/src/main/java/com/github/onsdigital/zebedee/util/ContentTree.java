@@ -36,7 +36,7 @@ public class ContentTree {
         if (contentTree == null) {
             synchronized (ContentTree.class) {
                 if (contentTree == null) {
-                    contentTree = Root.zebedee.published.nestedDetails(collectionOwner);
+                    contentTree = Root.zebedee.getPublished().nestedDetails(collectionOwner);
                     if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
                         publishedDataVisualisationsTree = contentTree;
                     } else {

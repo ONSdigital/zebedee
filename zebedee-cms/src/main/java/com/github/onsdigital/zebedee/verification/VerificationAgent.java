@@ -170,7 +170,7 @@ public class VerificationAgent {
 
     private void save(PublishedCollection publishedCollection, Path jsonPath) {
         try {
-            zebedee.publishedCollections.save(publishedCollection, jsonPath);
+            zebedee.getPublishedCollections().save(publishedCollection, jsonPath);
         } catch (IOException e) {
             logError(e, "Saving published collection failed")
                     .collectionName(publishedCollection.name).log();

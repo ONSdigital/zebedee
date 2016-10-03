@@ -12,6 +12,7 @@ export audit_db_enabled=false
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
 java $JAVA_OPTS \
+ -Dlogback.configurationFile=zebedee-cms/target/classes/logback.xml \
  -Dcolour_logging_enabled=$colour_logging_enabled \
  -Ddb_audit_url=$db_audit_url \
  -Daudit_db_enabled=$audit_db_enabled \
@@ -21,7 +22,7 @@ java $JAVA_OPTS \
  -Drestolino.files=$RESTOLINO_STATIC \
  -Drestolino.classes=$RESTOLINO_CLASSES \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \
- -DSTART_EMBEDDED_SERVER=Y \
+ -DSTART_EMBEDDED_SERVER=N \
  -cp "zebedee-cms/target/classes:zebedee-cms/target/dependency/*" \
  com.github.davidcarboni.restolino.Main
 

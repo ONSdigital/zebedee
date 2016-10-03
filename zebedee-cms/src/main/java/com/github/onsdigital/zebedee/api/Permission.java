@@ -43,11 +43,11 @@ public class Permission {
     public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition)
             throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         // Administrator
         if (BooleanUtils.isTrue(permissionDefinition.admin)) {
-            Root.zebedee.permissions.addAdministrator(permissionDefinition.email, session);
+            Root.zebedee.getPermissions().addAdministrator(permissionDefinition.email, session);
             // Admins must be publishers so update the permissions accordingly
             permissionDefinition.editor = true;
             Audit.Event.ADMIN_PERMISSION_ADDED
@@ -56,7 +56,7 @@ public class Permission {
                     .actionedByEffecting(session.email, permissionDefinition.email)
                     .log();
         } else if (BooleanUtils.isFalse(permissionDefinition.admin)) {
-            Root.zebedee.permissions.removeAdministrator(permissionDefinition.email, session);
+            Root.zebedee.getPermissions().removeAdministrator(permissionDefinition.email, session);
             Audit.Event.ADMIN_PERMISSION_REMOVED
                     .parameters()
                     .host(request)
@@ -65,12 +65,12 @@ public class Permission {
         }
 
         if (BooleanUtils.isTrue(permissionDefinition.dataVisPublisher)) {
-            Root.zebedee.permissions.addDataVisualisationPublisher(permissionDefinition.email, session);
+            Root.zebedee.getPermissions().addDataVisualisationPublisher(permissionDefinition.email, session);
             logInfo("Data Vis Publisher permission added to user.")
                     .user(permissionDefinition.email)
                     .addParameter("by", session.email).log();
         } else if (BooleanUtils.isFalse(permissionDefinition.dataVisPublisher)) {
-            Root.zebedee.permissions.removeDataVisualisationPublisher(permissionDefinition.email, session);
+            Root.zebedee.getPermissions().removeDataVisualisationPublisher(permissionDefinition.email, session);
             logInfo("Data Vis Publisher permission removed from user.")
                     .user(permissionDefinition.email)
                     .addParameter("by", session.email).log();
@@ -78,14 +78,14 @@ public class Permission {
 
         // Digital publishing
         if (BooleanUtils.isTrue(permissionDefinition.editor)) {
-            Root.zebedee.permissions.addEditor(permissionDefinition.email, session);
+            Root.zebedee.getPermissions().addEditor(permissionDefinition.email, session);
             Audit.Event.PUBLISHER_PERMISSION_ADDED
                     .parameters()
                     .host(request)
                     .actionedByEffecting(session.email, permissionDefinition.email)
                     .log();
         } else if (BooleanUtils.isFalse(permissionDefinition.editor)) {
-            Root.zebedee.permissions.removeEditor(permissionDefinition.email, session);
+            Root.zebedee.getPermissions().removeEditor(permissionDefinition.email, session);
             Audit.Event.PUBLISHER_PERMISSION_REMOVED
                     .parameters()
                     .host(request)
@@ -109,10 +109,10 @@ public class Permission {
     @GET
     public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter("email");
 
-        PermissionDefinition permissionDefinition = Root.zebedee.permissions.userPermissions(email, session);
+        PermissionDefinition permissionDefinition = Root.zebedee.getPermissions().userPermissions(email, session);
 
         return permissionDefinition;
     }

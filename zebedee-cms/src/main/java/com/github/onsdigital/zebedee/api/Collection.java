@@ -46,8 +46,8 @@ public class Collection {
             throw new NotFoundException("The collection you are trying to delete was not found.");
         }
         // Check whether we have access
-        Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.canView(session.email, collection.description) == false) {
+        Session session = Root.zebedee.getSessions().get(request);
+        if (Root.zebedee.getPermissions().canView(session.email, collection.description) == false) {
             throw new UnauthorizedException("You are not authorised to delete collections.");
         }
 
@@ -60,7 +60,7 @@ public class Collection {
         result.completeUris = collection.completeUris();
         result.reviewedUris = collection.reviewedUris();
         result.eventsByUri = collection.description.eventsByUri;
-        result.approvedStatus = collection.description.approvedStatus;
+        result.approvalStatus = collection.description.approvalStatus;
         result.type = collection.description.type;
         result.teams = collection.description.teams;
         result.isEncrypted = collection.description.isEncrypted;
@@ -94,18 +94,18 @@ public class Collection {
             return null;
         }
 
-        Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.canEdit(session.email) == false) {
+        Session session = Root.zebedee.getSessions().get(request);
+        if (Root.zebedee.getPermissions().canEdit(session.email) == false) {
             throw new UnauthorizedException("You are not authorised to create collections.");
         }
 
-        Keyring keyring = Root.zebedee.keyringCache.get(session);
+        Keyring keyring = Root.zebedee.getKeyringCache().get(session);
         if (keyring == null) {
             throw new UnauthorizedException("Keyring is not initialised.");
         }
 
         collectionDescription.name = StringUtils.trim(collectionDescription.name);
-        if (Root.zebedee.collections.list().hasCollection(
+        if (Root.zebedee.getCollections().list().hasCollection(
                 collectionDescription.name)) {
             throw new ConflictException("Could not create collection. A collection with this name already exists.");
         }
@@ -134,8 +134,8 @@ public class Collection {
             CollectionDescription collectionDescription
     ) throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.sessions.get(request);
-        if (Root.zebedee.permissions.canEdit(session.email) == false) {
+        Session session = Root.zebedee.getSessions().get(request);
+        if (Root.zebedee.getPermissions().canEdit(session.email) == false) {
             throw new UnauthorizedException("You are not authorised to update collections.");
         }
 
@@ -175,9 +175,9 @@ public class Collection {
             ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
-        Root.zebedee.collections.delete(collection, session);
+        Root.zebedee.getCollections().delete(collection, session);
 
         Root.cancelPublish(collection);
 

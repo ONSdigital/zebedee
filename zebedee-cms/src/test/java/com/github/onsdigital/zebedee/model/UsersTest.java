@@ -42,7 +42,7 @@ public class UsersTest {
         String name = "Patricia Pumpkin";
 
         // When
-        UserList users = zebedee.users.list();
+        UserList users = zebedee.getUsers().list();
 
         // Then
         assertNotNull(users);
@@ -67,7 +67,7 @@ public class UsersTest {
         String name = "Patricia Pumpkin";
 
         // When
-        User user = zebedee.users.get(email);
+        User user = zebedee.getUsers().get(email);
 
         // Then
         assertNotNull(user);
@@ -86,7 +86,7 @@ public class UsersTest {
         // When
         User user = null;
         try {
-            user = zebedee.users.get(null);
+            user = zebedee.getUsers().get(null);
         } catch (BadRequestException e) {
             // Expected - for now
         }
@@ -106,7 +106,7 @@ public class UsersTest {
         // When
         User user = null;
         try {
-            user = zebedee.users.get(email);
+            user = zebedee.getUsers().get(email);
         } catch (BadRequestException e) {
             // Expected - for now
         }
@@ -126,7 +126,7 @@ public class UsersTest {
         // When
         User user = null;
         try {
-            user = zebedee.users.get(email);
+            user = zebedee.getUsers().get(email);
 
         } catch (Exception e) {
             // Ignore
@@ -149,8 +149,8 @@ public class UsersTest {
         user.email = "mr.rusty@magic.roundabout.com";
 
         // When
-        User created = zebedee.users.create(user, builder.administrator.email);
-        User read = zebedee.users.get(email);
+        User created = zebedee.getUsers().create(user, builder.administrator.email);
+        User read = zebedee.getUsers().get(email);
 
         // Then
 
@@ -176,7 +176,7 @@ public class UsersTest {
 
         // When
         // We create the user
-        User created = zebedee.users.create(user, builder.administrator.email);
+        User created = zebedee.getUsers().create(user, builder.administrator.email);
 
         // Then
         // The password should not be set
@@ -194,7 +194,7 @@ public class UsersTest {
         user.inactive = false;
 
         // When
-        User created = zebedee.users.create(user, builder.administrator.email);
+        User created = zebedee.getUsers().create(user, builder.administrator.email);
 
         // Then
         assertTrue(created.inactive);
@@ -207,7 +207,7 @@ public class UsersTest {
         // No preconditions
 
         // When
-        User user = zebedee.users.create(null, builder.administrator.email);
+        User user = zebedee.getUsers().create(null, builder.administrator.email);
 
         // Then
         // We should not have an error
@@ -226,7 +226,7 @@ public class UsersTest {
         // When
         User created  = null;
         //try {
-            created = zebedee.users.create(user, builder.administrator.email);
+            created = zebedee.getUsers().create(user, builder.administrator.email);
         //} catch (BadRequestException e) {
             // Expected - for now
         //}
@@ -246,7 +246,7 @@ public class UsersTest {
         // When
         User user = null;
         try {
-            user = zebedee.users.get(null);
+            user = zebedee.getUsers().get(null);
         } catch (BadRequestException e) {
             // Expected - for now
         }
@@ -265,14 +265,14 @@ public class UsersTest {
         String name = "Sunnink ewse";
         String lastAdmin = "admin";
         boolean inactive = true;
-        User existing = zebedee.users.get(email);
+        User existing = zebedee.getUsers().get(email);
 
         // When
         // We update the user
         existing.name = name;
         existing.inactive = inactive;
-        User updated = zebedee.users.update(existing, existing, lastAdmin);
-        User read = zebedee.users.get(email);
+        User updated = zebedee.getUsers().update(existing, existing, lastAdmin);
+        User read = zebedee.getUsers().get(email);
 
         // Then
         // The expected fields should be set:
@@ -296,14 +296,14 @@ public class UsersTest {
         String email = builder.publisher1.email;
         String password = "new password";
         String lastAdmin = builder.administrator.email;
-        User existingUser = zebedee.users.get(email);
-        User updatedUser = zebedee.users.get(email);
+        User existingUser = zebedee.getUsers().get(email);
+        User updatedUser = zebedee.getUsers().get(email);
 
         // When
         // We update the user, even though we set the password
         updatedUser.resetPassword(password);
-        User updated = zebedee.users.update(existingUser, updatedUser, lastAdmin);
-        User read = zebedee.users.get(email);
+        User updated = zebedee.getUsers().update(existingUser, updatedUser, lastAdmin);
+        User read = zebedee.getUsers().get(email);
 
         // Then
         // The password should not be included in the update
@@ -323,16 +323,16 @@ public class UsersTest {
         String email = builder.publisher1.email;
         String newEmail = "new@email.com";
         String lastAdmin = builder.administrator.email;;
-        User existingUser = zebedee.users.get(email);
-        User updatedUser = zebedee.users.get(email);
+        User existingUser = zebedee.getUsers().get(email);
+        User updatedUser = zebedee.getUsers().get(email);
 
         // When
         updatedUser.email = newEmail;
-        User updated = zebedee.users.update(existingUser, updatedUser, lastAdmin);
-        User read = zebedee.users.get(email);
+        User updated = zebedee.getUsers().update(existingUser, updatedUser, lastAdmin);
+        User read = zebedee.getUsers().get(email);
         User readNew = null;
         try {
-            readNew = zebedee.users.get(newEmail);
+            readNew = zebedee.getUsers().get(newEmail);
         } catch (Exception e) {
             // Ignore
         }
@@ -364,12 +364,12 @@ public class UsersTest {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = newPassword;
-        boolean result = zebedee.users.setPassword(adminSession, credentials);
+        boolean result = zebedee.getUsers().setPassword(adminSession, credentials);
 
         // Then
         // Authentication should succeed with the new password
         assertTrue(result);
-        User user = zebedee.users.get(email);
+        User user = zebedee.getUsers().get(email);
         assertTrue(user.authenticate(newPassword));
         assertTrue(user.temporaryPassword);
     }
@@ -389,12 +389,12 @@ public class UsersTest {
         // We set the password
         credentials.password = newPassword;
         credentials.oldPassword = "password";
-        boolean result = zebedee.users.setPassword(selfSession, credentials);
+        boolean result = zebedee.getUsers().setPassword(selfSession, credentials);
 
         // Then
         // Authentication should succeed with the new password
         assertTrue(result);
-        User user = zebedee.users.get(email);
+        User user = zebedee.getUsers().get(email);
         assertTrue(user.authenticate(newPassword));
         assertFalse(user.temporaryPassword);
     }
@@ -414,12 +414,12 @@ public class UsersTest {
         // We set the password
         credentials.password = newPassword;
         credentials.oldPassword = "password";
-        boolean result = zebedee.users.setPassword(selfSession, credentials);
+        boolean result = zebedee.getUsers().setPassword(selfSession, credentials);
 
         // Then
         // Authentication should succeed with the new password
         assertTrue(result);
-        User user = zebedee.users.get(email);
+        User user = zebedee.getUsers().get(email);
         assertTrue(user.authenticate(newPassword));
         assertFalse(user.temporaryPassword);
     }
@@ -438,12 +438,12 @@ public class UsersTest {
         // When
         // We set the password and update
         credentials.password = newPassword;
-        boolean result = zebedee.users.setPassword(adminSession, credentials);
+        boolean result = zebedee.getUsers().setPassword(adminSession, credentials);
 
         // Then
         // Authentication should succeed with the new password
         assertTrue(result);
-        User user = zebedee.users.get(email);
+        User user = zebedee.getUsers().get(email);
         assertTrue(user.authenticate(newPassword));
         assertTrue(user.temporaryPassword);
     }
@@ -463,11 +463,11 @@ public class UsersTest {
 
         // When
         // We set the temporary flag expliticly and update
-        zebedee.users.setPassword(selfSession, credentials);
+        zebedee.getUsers().setPassword(selfSession, credentials);
 
         // Then
         // The temponary flag should not be set
-        User user = zebedee.users.get(email);
+        User user = zebedee.getUsers().get(email);
         assertFalse(user.temporaryPassword);
     }
 
@@ -480,7 +480,7 @@ public class UsersTest {
         // When
         // We attempt to set the password
         Credentials credentials = new Credentials();
-        zebedee.users.setPassword(session, credentials);
+        zebedee.getUsers().setPassword(session, credentials);
 
         // Then an UnauthorizedException is thrown
     }
@@ -499,12 +499,12 @@ public class UsersTest {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = newPassword;
-        boolean result = zebedee.users.setPassword(nonAdminSession, credentials);
+        boolean result = zebedee.getUsers().setPassword(nonAdminSession, credentials);
 
         // Then
         // Authentication should not succeed with the new password because it hasn't been changed
         assertFalse(result);
-        assertFalse(zebedee.users.get(email).authenticate(newPassword));
+        assertFalse(zebedee.getUsers().get(email).authenticate(newPassword));
     }
 
     @Test
@@ -512,17 +512,17 @@ public class UsersTest {
         // Given
         // An existing user and an admin session (as generated by Builder in setup)
         String email = "patricia@example.com";
-        User patricia = zebedee.users.get(email);
+        User patricia = zebedee.getUsers().get(email);
 
         Session adminSession = builder.createSession(builder.administrator);
 
         // When
         // We delete them
-        zebedee.users.delete(adminSession, patricia);
+        zebedee.getUsers().delete(adminSession, patricia);
 
         // Then
         // They should not exist
-        UserList users = zebedee.users.list();
+        UserList users = zebedee.getUsers().list();
 
         boolean userFound = false;
         for (User user : users) {

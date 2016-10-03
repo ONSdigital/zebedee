@@ -46,7 +46,7 @@ public class Publish {
             throws IOException, ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
 
         getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_MANUAL_PUBLISHED_TRIGGERED);
 
@@ -57,7 +57,7 @@ public class Publish {
         boolean doSkipVerification = BooleanUtils.toBoolean(skipVerification);
 
         try {
-            boolean result = Root.zebedee.collections.publish(collection, session, doBreakBeforeFileTransfer,
+            boolean result = Root.zebedee.getCollections().publish(collection, session, doBreakBeforeFileTransfer,
                     doSkipVerification);
             logPublishResult(request, collection, session, result, null);
             return result;

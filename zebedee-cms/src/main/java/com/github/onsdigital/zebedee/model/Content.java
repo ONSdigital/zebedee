@@ -426,7 +426,7 @@ public class Content {
     public Path getPublishedContentPath() {
 
         if (publishedContentPath == null)
-            publishedContentPath = ZebedeeCmsService.getInstance().getZebedee().publishedContentPath;
+            publishedContentPath = ZebedeeCmsService.getInstance().getZebedee().getPublishedContentPath();
 
         return publishedContentPath;
     }

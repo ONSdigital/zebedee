@@ -56,9 +56,9 @@ public class PermissionsTest {
         Collection.create(collectionDescription, zebedee, session);
 
         // A new team for the new collection
-        team = zebedee.teams.createTeam(this.getClass().getSimpleName() + "-team-" + Random.id(), session);
+        team = zebedee.getTeams().createTeam(this.getClass().getSimpleName() + "-team-" + Random.id(), session);
         viewerEmail = builder.reviewer1.email;
-        zebedee.teams.addTeamMember(viewerEmail, team, session);
+        zebedee.getTeams().addTeamMember(viewerEmail, team, session);
 
 
         when(zebedeeCmsService.getCollection(anyString()))
@@ -83,9 +83,9 @@ public class PermissionsTest {
 
         // When
         // We add the user as an administrator
-        boolean adminPermission = zebedee.permissions.isAdministrator(email);
-        boolean editPermission = zebedee.permissions.canEdit(email);
-        boolean viewPermission = zebedee.permissions.canView(email, labourMarketCollection.description);
+        boolean adminPermission = zebedee.getPermissions().isAdministrator(email);
+        boolean editPermission = zebedee.getPermissions().canEdit(email);
+        boolean viewPermission = zebedee.getPermissions().canView(email, labourMarketCollection.description);
 
         // Then
         // The new user should get only admin permission:
@@ -107,11 +107,11 @@ public class PermissionsTest {
 
         // When
         // We ask if they are administrators:
-        boolean adminIsAdministrator = zebedee.permissions.isAdministrator(administratorEmail);
-        boolean publisherIsAdministrator = zebedee.permissions.isAdministrator(publisherEmail);
-        boolean viewerIsAdministrator = zebedee.permissions.isAdministrator(viewerEmail);
-        boolean unknownIsAdministrator = zebedee.permissions.isAdministrator(unknownEmail);
-        boolean nullIsAdministrator = zebedee.permissions.isAdministrator(nullEmail);
+        boolean adminIsAdministrator = zebedee.getPermissions().isAdministrator(administratorEmail);
+        boolean publisherIsAdministrator = zebedee.getPermissions().isAdministrator(publisherEmail);
+        boolean viewerIsAdministrator = zebedee.getPermissions().isAdministrator(viewerEmail);
+        boolean unknownIsAdministrator = zebedee.getPermissions().isAdministrator(unknownEmail);
+        boolean nullIsAdministrator = zebedee.getPermissions().isAdministrator(nullEmail);
 
         // Then
         // Only the administrator should be, and null should not give an error
@@ -133,11 +133,11 @@ public class PermissionsTest {
 
         // When
         // We add the user as an administrator (NB case-insensitive)
-        zebedee.permissions.addAdministrator(email, session);
+        zebedee.getPermissions().addAdministrator(email, session);
 
         // Then
         // The new user should get only admin permission:
-        assertTrue(zebedee.permissions.isAdministrator(email));
+        assertTrue(zebedee.getPermissions().isAdministrator(email));
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -150,7 +150,7 @@ public class PermissionsTest {
 
         // When
         // We add the user as an administrator (NB case-insensitive)
-        zebedee.permissions.addAdministrator(email.toUpperCase(), session);
+        zebedee.getPermissions().addAdministrator(email.toUpperCase(), session);
 
         // Then
         // We should get unauthorized
@@ -166,7 +166,7 @@ public class PermissionsTest {
 
         // When
         // We add the user as an administrator (NB case-insensitive)
-        zebedee.permissions.addAdministrator(email.toUpperCase(), session);
+        zebedee.getPermissions().addAdministrator(email.toUpperCase(), session);
 
         // Then
         // We should get unauthorized
@@ -182,7 +182,7 @@ public class PermissionsTest {
 
         // When
         // We add the user as an administrator (NB case-insensitive)
-        zebedee.permissions.addAdministrator(email.toUpperCase(), session);
+        zebedee.getPermissions().addAdministrator(email.toUpperCase(), session);
 
         // Then
         // We should get unauthorized
@@ -195,15 +195,15 @@ public class PermissionsTest {
         // The Administrator user has been removed (NB case-insensitive)
         String email = builder.administrator.email;
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.permissions.removeAdministrator(email.toUpperCase(), session);
+        zebedee.getPermissions().removeAdministrator(email.toUpperCase(), session);
 
         // When
         // We add an administrator with any session
-        zebedee.permissions.addAdministrator(email.toUpperCase(), null);
+        zebedee.getPermissions().addAdministrator(email.toUpperCase(), null);
 
         // Then
         // The system should now have an administrator
-        assertTrue(zebedee.permissions.hasAdministrator());
+        assertTrue(zebedee.getPermissions().hasAdministrator());
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -215,7 +215,7 @@ public class PermissionsTest {
 
         // When
         // We attempt to add a second administrator without having a session
-        zebedee.permissions.addAdministrator(email, null);
+        zebedee.getPermissions().addAdministrator(email, null);
 
         // Then
         // We should get unauthorized
@@ -228,15 +228,15 @@ public class PermissionsTest {
         // A short-lived Administrator user (NB case-insensitive)
         String email = builder.reviewer1.email;
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.permissions.addAdministrator(email.toUpperCase(), session);
+        zebedee.getPermissions().addAdministrator(email.toUpperCase(), session);
 
         // When
         // We remove the user as an administrator
-        zebedee.permissions.removeAdministrator(email, session);
+        zebedee.getPermissions().removeAdministrator(email, session);
 
         // Then
         // The new user should get no admin permission
-        assertFalse(zebedee.permissions.isAdministrator(email));
+        assertFalse(zebedee.getPermissions().isAdministrator(email));
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -248,7 +248,7 @@ public class PermissionsTest {
 
         // When
         // We remove the user as an administrator
-        zebedee.permissions.removeAdministrator(builder.administrator.email, publisher);
+        zebedee.getPermissions().removeAdministrator(builder.administrator.email, publisher);
 
         // Then
         // The administrator should not have been removed
@@ -263,7 +263,7 @@ public class PermissionsTest {
 
         // When
         // We remove the user as an administrator
-        zebedee.permissions.removeAdministrator(builder.administrator.email, viewer);
+        zebedee.getPermissions().removeAdministrator(builder.administrator.email, viewer);
 
         // Then
         // The administrator should not have been removed
@@ -278,7 +278,7 @@ public class PermissionsTest {
 
         // When
         // We remove the user as an administrator
-        zebedee.permissions.removeAdministrator(builder.administrator.email, notLoggedIn);
+        zebedee.getPermissions().removeAdministrator(builder.administrator.email, notLoggedIn);
 
         // Then
         // The administrator should not have been removed
@@ -292,7 +292,7 @@ public class PermissionsTest {
 
         // When
         // We ask if there is an administrator
-        boolean result = zebedee.permissions.hasAdministrator();
+        boolean result = zebedee.getPermissions().hasAdministrator();
 
         // Then
         // There should be an administrator
@@ -306,11 +306,11 @@ public class PermissionsTest {
         // The Administrator user has been removed
         String email = builder.administrator.email;
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.permissions.removeAdministrator(email, session);
+        zebedee.getPermissions().removeAdministrator(email, session);
 
         // When
         // We ask if there is an administrator
-        boolean result = zebedee.permissions.hasAdministrator();
+        boolean result = zebedee.getPermissions().hasAdministrator();
 
         // Then
         // There should be no administrator
@@ -329,9 +329,9 @@ public class PermissionsTest {
 
         // When
         // We check the user's permissions
-        boolean adminPermission = zebedee.permissions.isAdministrator(email);
-        boolean editPermission = zebedee.permissions.canEdit(email);
-        boolean viewPermission = zebedee.permissions.canView(email, labourMarketCollection.description);
+        boolean adminPermission = zebedee.getPermissions().isAdministrator(email);
+        boolean editPermission = zebedee.getPermissions().canEdit(email);
+        boolean viewPermission = zebedee.getPermissions().canView(email, labourMarketCollection.description);
 
         // Then
         // The new should get edit and view:
@@ -351,7 +351,7 @@ public class PermissionsTest {
         Session session = zebedee.openSession(credentials);
 
         // When we attempt to get user permissions for that data vis publisher.
-        PermissionDefinition permissionDefinition = zebedee.permissions.userPermissions(email, session);
+        PermissionDefinition permissionDefinition = zebedee.getPermissions().userPermissions(email, session);
 
         // Then no exception is thrown.
         Assert.notNull(permissionDefinition);
@@ -370,11 +370,11 @@ public class PermissionsTest {
 
         // When
         // We ask if they are publishers:
-        boolean adminIsPublisher = zebedee.permissions.canEdit(administratorEmail);
-        boolean publisherIsPublisher = zebedee.permissions.canEdit(publisherEmail);
-        boolean viewerIsPublisher = zebedee.permissions.canEdit(viewerEmail);
-        boolean unknownIsPublisher = zebedee.permissions.canEdit(unknownEmail);
-        boolean nullIsPublisher = zebedee.permissions.canEdit(nullEmail);
+        boolean adminIsPublisher = zebedee.getPermissions().canEdit(administratorEmail);
+        boolean publisherIsPublisher = zebedee.getPermissions().canEdit(publisherEmail);
+        boolean viewerIsPublisher = zebedee.getPermissions().canEdit(viewerEmail);
+        boolean unknownIsPublisher = zebedee.getPermissions().canEdit(unknownEmail);
+        boolean nullIsPublisher = zebedee.getPermissions().canEdit(nullEmail);
 
         // Then
         // Only the publisher should be, and null should not give an error
@@ -396,11 +396,11 @@ public class PermissionsTest {
 
         // When
         // We add the user as a publisher (NB case-insensitive)
-        zebedee.permissions.addEditor(email.toUpperCase(), session);
+        zebedee.getPermissions().addEditor(email.toUpperCase(), session);
 
         // Then
         // The new user should get publish permission:
-        assertTrue(zebedee.permissions.canEdit(email));
+        assertTrue(zebedee.getPermissions().canEdit(email));
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -413,7 +413,7 @@ public class PermissionsTest {
 
         // When
         // We add the user as a publisher (NB case-insensitive)
-        zebedee.permissions.addEditor(email.toUpperCase(), session);
+        zebedee.getPermissions().addEditor(email.toUpperCase(), session);
 
         // Then
         // We should get unauthorized
@@ -429,7 +429,7 @@ public class PermissionsTest {
 
         // When
         // We add the user as a publisher (NB case-insensitive)
-        zebedee.permissions.addEditor(email.toUpperCase(), session);
+        zebedee.getPermissions().addEditor(email.toUpperCase(), session);
 
         // Then
         // We should get unauthorized
@@ -445,7 +445,7 @@ public class PermissionsTest {
 
         // When
         // We add the user as a publisher (NB case-insensitive)
-        zebedee.permissions.addEditor(email.toUpperCase(), session);
+        zebedee.getPermissions().addEditor(email.toUpperCase(), session);
 
         // Then
         // We should get unauthorized
@@ -458,15 +458,15 @@ public class PermissionsTest {
         // A short-lived publisher user (NB case-insensitive)
         String email = "Pearson.Longman@whitehouse.gov";
         Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.permissions.addAdministrator(email.toUpperCase(), session);
+        zebedee.getPermissions().addAdministrator(email.toUpperCase(), session);
 
         // When
         // We remove the user as a publisher
-        zebedee.permissions.removeEditor(email, session);
+        zebedee.getPermissions().removeEditor(email, session);
 
         // Then
         // The new user should get no publish permission
-        assertFalse(zebedee.permissions.canEdit(email));
+        assertFalse(zebedee.getPermissions().canEdit(email));
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -478,7 +478,7 @@ public class PermissionsTest {
 
         // When
         // We remove the user as an editor
-        zebedee.permissions.removeEditor(builder.publisher1.email, publisher);
+        zebedee.getPermissions().removeEditor(builder.publisher1.email, publisher);
 
         // Then
         // The publisher should not have been removed
@@ -493,7 +493,7 @@ public class PermissionsTest {
 
         // When
         // We remove the user as an publisher
-        zebedee.permissions.removeEditor(builder.publisher1.email, viewer);
+        zebedee.getPermissions().removeEditor(builder.publisher1.email, viewer);
 
         // Then
         // The publisher should not have been removed
@@ -508,7 +508,7 @@ public class PermissionsTest {
 
         // When
         // We remove the user as an publisher
-        zebedee.permissions.removeEditor(builder.publisher1.email, notLoggedIn);
+        zebedee.getPermissions().removeEditor(builder.publisher1.email, notLoggedIn);
 
         // Then
         // The publisher should not have been removed

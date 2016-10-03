@@ -32,11 +32,11 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logE
  * Given as CSV indexed with the timeseries CDID, update each timeseries with the given data
  * and update any CSV / XLS download files with the new titles.
  */
-public class ExistingTimeseriesUpdater {
+public class CsvTimeseriesUpdater {
 
     private static FastDateFormat outputDateFormat = FastDateFormat.getInstance("dd-MM-yyyy", TimeZone.getTimeZone("Europe/London"));
 
-    public static void updateTimeseriesData(String[] args) throws Exception {
+    public static void updateTimeseriesFromCsv(String[] args) throws Exception {
 
         // args[1] - source data directory
         // args[2] - destination directory to save the updated timeseries (can be a collection or master)
@@ -46,10 +46,10 @@ public class ExistingTimeseriesUpdater {
         Path destination = Paths.get(args[2]);
         Path csvInput = Paths.get(args[3]);
 
-        updateTimeseries(source, destination, csvInput);
+        updateTimeseriesFromCsv(source, destination, csvInput);
     }
 
-    public static void updateTimeseries(Path source, Path destination, Path csvInput) throws IOException, InterruptedException {
+    public static void updateTimeseriesFromCsv(Path source, Path destination, Path csvInput) throws IOException, InterruptedException {
 
         // build the data index so we know where to find timeseries files given the CDID
         ContentReader contentReader = new FileSystemContentReader(source);

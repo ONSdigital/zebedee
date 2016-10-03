@@ -21,7 +21,7 @@ public class CollectionDescription extends CollectionBase {
     public List<String> inProgressUris;
     public List<String> completeUris;
     public List<String> reviewedUris;
-    public boolean approvedStatus;
+    public ApprovalStatus approvalStatus = ApprovalStatus.NOT_STARTED;
     public boolean publishComplete;
     public Map<String, String> publishTransactionIds;
     public Date publishStartDate; // The date the publish process was actually started

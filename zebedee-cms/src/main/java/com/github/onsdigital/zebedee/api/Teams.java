@@ -75,10 +75,10 @@ public class Teams {
 
     public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException {
 
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String teamName = getTeamName(request);
 
-        Root.zebedee.teams.createTeam(teamName, session);
+        Root.zebedee.getTeams().createTeam(teamName, session);
 
         Audit.Event.TEAM_CREATED
                 .parameters()
@@ -91,14 +91,14 @@ public class Teams {
 
     public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
         Zebedee zebedee = Root.zebedee;
-        Session session = zebedee.sessions.get(request);
+        Session session = zebedee.getSessions().get(request);
 
         String teamName = getTeamName(request);
 
         String email = request.getParameter("email");
-        Team team = zebedee.teams.findTeam(teamName);
+        Team team = zebedee.getTeams().findTeam(teamName);
 
-        Root.zebedee.teams.addTeamMember(email, team, session);
+        Root.zebedee.getTeams().addTeamMember(email, team, session);
         evaluateCollectionKeys(zebedee, session, team, email);
 
         Audit.Event.TEAM_MEMBER_ADDED
@@ -139,9 +139,9 @@ public class Teams {
         String teamName = getTeamName(request);
 
         Zebedee zebedee = Root.zebedee;
-        Session session = zebedee.sessions.get(request);
-        Team team = zebedee.teams.findTeam(teamName);
-        zebedee.teams.deleteTeam(team, session);
+        Session session = zebedee.getSessions().get(request);
+        Team team = zebedee.getTeams().findTeam(teamName);
+        zebedee.getTeams().deleteTeam(team, session);
 
         evaluateCollectionKeys(zebedee, session, team, team.members.toArray(new String[team.members.size()]));
 
@@ -159,11 +159,11 @@ public class Teams {
         String teamName = getTeamName(request);
 
         Zebedee zebedee = Root.zebedee;
-        Session session = Root.zebedee.sessions.get(request);
+        Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter("email");
-        Team team = zebedee.teams.findTeam(teamName);
+        Team team = zebedee.getTeams().findTeam(teamName);
 
-        zebedee.teams.removeTeamMember(email, team, session);
+        zebedee.getTeams().removeTeamMember(email, team, session);
         evaluateCollectionKeys(zebedee, session, team, email);
 
         Audit.Event.TEAM_MEMBER_REMOVED
@@ -188,11 +188,11 @@ public class Teams {
      * @throws BadRequestException
      */
     private void evaluateCollectionKeys(Zebedee zebedee, Session session, Team team, String... emails) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
-        for (Collection collection : zebedee.collections.list()) {
-            Set<Integer> teamIds = Root.zebedee.permissions.listViewerTeams(collection.description, session);
+        for (Collection collection : zebedee.getCollections().list()) {
+            Set<Integer> teamIds = Root.zebedee.getPermissions().listViewerTeams(collection.description, session);
             if (teamIds != null && teamIds.contains(team.id)) {
                 for (String memberEmail : emails) {
-                    KeyManager.distributeKeyToUser(zebedee, collection, session, zebedee.users.get(memberEmail));
+                    KeyManager.distributeKeyToUser(zebedee, collection, session, zebedee.getUsers().get(memberEmail));
                 }
             }
         }
@@ -212,9 +212,9 @@ public class Teams {
     public Object get(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException {
         Object result = null;
         if (getTeamName(request) != null) {
-            result = Root.zebedee.teams.findTeam(getTeamName(request));
+            result = Root.zebedee.getTeams().findTeam(getTeamName(request));
         } else {
-            List<Team> teams = Root.zebedee.teams.listTeams();
+            List<Team> teams = Root.zebedee.getTeams().listTeams();
             teams.sort((o1, o2) -> o1.name.toUpperCase().compareTo(o2.name.toUpperCase()));
             result = new TeamList(teams);
         }

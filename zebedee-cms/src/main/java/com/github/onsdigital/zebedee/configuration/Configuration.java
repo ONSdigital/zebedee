@@ -111,6 +111,10 @@ public class Configuration {
         return Boolean.valueOf(StringUtils.defaultIfBlank(getValue(AUDIT_DB_ENABLED_ENV_VAR), "true"));
     }
 
+    public static boolean storeDeletedContent() {
+        return Boolean.valueOf(StringUtils.defaultIfBlank(getValue("store_deleted_content"), "true"));
+    }
+
     public static String getAuditDBURL() {
         return StringUtils.defaultIfBlank(getValue("db_audit_url"), "");
     }

@@ -11,7 +11,7 @@ public class DeletedContentEventTest {
     public void testAddFileInitialisesList() throws Exception {
 
         // Given a DeletedContentEvent
-        DeletedContentEvent event = new DeletedContentEvent("collectionid", "collectionNAme", new Date(), "user", "/some/uri", "Page title");
+        DeletedContentEvent event = new DeletedContentEvent("collectionid", "collectionNAme", new Date(), "/some/uri", "Page title");
 
         // When the addFile method is called without having initialised the files list
         event.addDeletedFile("/some/uri");

@@ -30,9 +30,6 @@ public class DeletedContentEvent {
     @Column(name = "event_date", nullable = false)
     private Date eventDate;
 
-    @Column(name = "florence_user", nullable = false)
-    private String user;
-
     @Column(name = "uri")
     private String uri;
 
@@ -42,17 +39,16 @@ public class DeletedContentEvent {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "deletedContentEvent")
     private List<DeletedFile> deletedFiles;
 
-    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String user, String uri, String pageTitle) {
+    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle) {
         this.collectionId = collectionId;
         this.collectionName = collectionName;
         this.eventDate = eventDate;
-        this.user = user;
         this.uri = uri;
         this.pageTitle = pageTitle;
     }
 
-    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String user, String uri, String pageTitle, Collection<String> deletedUrls) {
-        this(collectionId, collectionName, eventDate, user, uri, pageTitle);
+    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle, Collection<String> deletedUrls) {
+        this(collectionId, collectionName, eventDate, uri, pageTitle);
         deletedUrls.forEach(this::addDeletedFile);
     }
 
@@ -113,14 +109,6 @@ public class DeletedContentEvent {
 
     public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
     }
 
     public String getUri() {

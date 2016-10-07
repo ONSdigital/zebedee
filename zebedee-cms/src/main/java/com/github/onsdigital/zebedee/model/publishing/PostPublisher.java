@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PendingDelete;
@@ -18,6 +19,8 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
+import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentService;
+import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentServiceFactory;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.SlackNotification;
@@ -40,9 +43,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
@@ -56,6 +57,8 @@ public class PostPublisher {
     private static Session zebdeePublisherSession = null;
 
     private static final ExecutorService pool = Executors.newFixedThreadPool(10);
+
+    private static final DeletedContentService deletedContentService = DeletedContentServiceFactory.createInstance();
 
     /**
      * Do tasks required after a publish takes place.
@@ -121,7 +124,7 @@ public class PostPublisher {
     }
 
     private static void applyDeletesToPublishing(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
-        archiveContentToBeDeleted(collection);
+        archiveContentToBeDeleted(collection, contentReader);
         applyManifestDeletesToMaster(collection, contentReader, contentWriter);
     }
 
@@ -159,21 +162,28 @@ public class PostPublisher {
         return publishedCollection;
     }
 
-    private static void archiveContentToBeDeleted(Collection collection) {
-        // archive content to be deleted.
+    private static void archiveContentToBeDeleted(Collection collection, ContentReader contentReader) {
 
         List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
 
-        for (PendingDelete pendingDelete : pendingDeletes) {
+        if (pendingDeletes.size() > 0) {
 
-            Set<String> urisToDelete = new HashSet<>();
-            ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                logDebug("Adding uri " + node.uri + " to be archived as part of deleting uri: " + pendingDelete.getRoot().uri);
-                urisToDelete.add(node.uri);
-            });
+            for (PendingDelete pendingDelete : pendingDeletes) {
 
+                Set<String> urisToDelete = new HashSet<>();
+                ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
+                    logDebug("Adding uri " + node.uri + " to be archived as part of deleting uri: " + pendingDelete.getRoot().uri);
+                    urisToDelete.add(node.uri);
+                });
+
+                try {
+                    Page page = ContentUtil.deserialiseContent(contentReader.getResource(pendingDelete.getRoot().uri).getData());
+                    deletedContentService.storeDeletedContent(page, new Date(), urisToDelete, contentReader, collection);
+                } catch (ZebedeeException | IOException e) {
+                    logError(e, "Failed to stored deleted content for URI: " + pendingDelete.getRoot().uri);
+                }
+            }
         }
-
     }
 
     private static void applyManifestDeletesToMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.persistence.model;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -50,14 +51,16 @@ public class DeletedContentEvent {
         this.pageTitle = pageTitle;
     }
 
-    /**
-     * Default constructor required by hibernate.
-     */
+    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String user, String uri, String pageTitle, Collection<String> deletedUrls) {
+        this(collectionId, collectionName, eventDate, user, uri, pageTitle);
+        deletedUrls.forEach(this::addDeletedFile);
+    }
+
     public DeletedContentEvent() {
     }
 
     public void addDeletedFile(String uri) {
-        if(deletedFiles == null) {
+        if (deletedFiles == null) {
             deletedFiles = new ArrayList<>();
         }
 

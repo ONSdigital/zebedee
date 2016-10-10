@@ -27,11 +27,10 @@ public class DeleteContentFileStoreImplTest {
     public void testSaveFilesAddsFilesToTheExpectedDirectory() throws Exception {
 
         // Given a source file that we want to save as deleted content.
-        Path filePath = Paths.get("some/uri/data.json");
-        ContentReader sourceContentReader = getSourceContentReader(filePath);
+        Path filePath = Paths.get("some/uri");
+        ContentReader sourceContentReader = getSourceContentReader(filePath.resolve("data.json"));
         DeletedContentFileStoreImpl deletedContentFileStore = getDeletedContentFileStore();
         DeletedContentEvent deleteContentEvent = getDeletedContentEvent(filePath);
-
 
         // When files are stored in an deleted content file store
         deletedContentFileStore.storeFiles(deleteContentEvent, sourceContentReader);
@@ -47,8 +46,8 @@ public class DeleteContentFileStoreImplTest {
     public void testRetrieveFiles() throws Exception {
 
         // Given some content that has already been stored as deleted content.
-        Path filePath = Paths.get("some/uri/data.json");
-        ContentReader sourceContentReader = getSourceContentReader(filePath);
+        Path filePath = Paths.get("some/uri");
+        ContentReader sourceContentReader = getSourceContentReader(filePath.resolve("data.json"));
         DeletedContentFileStore deletedContentFileStore = getDeletedContentFileStore();
         DeletedContentEvent deleteContentEvent = getDeletedContentEvent(filePath);
         deletedContentFileStore.storeFiles(deleteContentEvent, sourceContentReader);

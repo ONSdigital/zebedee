@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.persistence.dao.DeletedContentEventDao;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,9 +39,12 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
      */
     @Override
     public DeletedContentEvent saveDeletedContentEvent(DeletedContentEvent deletedContentEvent) {
+
+        com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent eventToSave = mapToDatabaseObject(deletedContentEvent);
+
         Session session = hibernateService.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        session.save(deletedContentEvent);
+        session.save(eventToSave);
         session.getTransaction().commit();
 
         return deletedContentEvent;
@@ -56,17 +60,24 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
         Session session = hibernateService.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
-        List<DeletedContentEvent> events = session
+        List<com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent> events = session
                 .createSQLQuery("SELECT * FROM deleted_content ORDER BY event_date ASC LIMIT 50")
-                .addEntity(DeletedContentEvent.class)
+                .addEntity(com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent.class)
                 .list();
 
-        for (DeletedContentEvent event : events) {
+        for (com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent event : events) {
             Hibernate.initialize(event.getDeletedFiles()); // the deleted files have lazy instantiation, so ensure they are in the result here
         }
 
         session.getTransaction().commit();
-        return events;
+
+        List<DeletedContentEvent> deletedContentEvents = new ArrayList<>();
+        for (com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent event : events) {
+            DeletedContentEvent deletedContentEvent = mapToDto(event);
+            deletedContentEvents.add(deletedContentEvent);
+        }
+
+        return deletedContentEvents;
     }
 
     /**
@@ -81,15 +92,17 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
         Session session = hibernateService.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
-        DeletedContentEvent event = (DeletedContentEvent) session
+        com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent event = (com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent) session
                 .createSQLQuery("SELECT * FROM deleted_content ORDER BY event_date ASC LIMIT 50")
-                .addEntity(DeletedContentEvent.class)
+                .addEntity(com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent.class)
                 .uniqueResult();
 
         Hibernate.initialize(event.getDeletedFiles()); // the deleted files have lazy instantiation, so ensure they are in the result here
         session.getTransaction().commit();
 
-        return event;
+        DeletedContentEvent deletedContentEvent = mapToDto(event);
+
+        return deletedContentEvent;
     }
 
     /**
@@ -114,5 +127,47 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
                 System.out.println(" - deletedFile = " + deletedFile.getUri());
             }
         }
+    }
+
+    private com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent mapToDatabaseObject(DeletedContentEvent deletedContentEvent) {
+
+        com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent databaseRepresentation = new com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent(
+                deletedContentEvent.getCollectionId(),
+                deletedContentEvent.getCollectionName(),
+                deletedContentEvent.getEventDate(),
+                deletedContentEvent.getUri(),
+                deletedContentEvent.getPageTitle());
+
+        ArrayList<com.github.onsdigital.zebedee.persistence.model.DeletedFile> deletedFiles = new ArrayList<>();
+
+        for (com.github.onsdigital.zebedee.model.content.deleted.DeletedFile deletedFile : deletedContentEvent.getDeletedFiles()) {
+            deletedFiles.add(new com.github.onsdigital.zebedee.persistence.model.DeletedFile(deletedFile.getUri(), databaseRepresentation));
+        }
+
+        databaseRepresentation.setDeletedFiles(deletedFiles);
+
+        return databaseRepresentation;
+    }
+
+    private DeletedContentEvent mapToDto(com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent deletedContentEvent) {
+
+        DeletedContentEvent dto = new DeletedContentEvent(
+                deletedContentEvent.getCollectionId(),
+                deletedContentEvent.getCollectionName(),
+                deletedContentEvent.getEventDate(),
+                deletedContentEvent.getUri(),
+                deletedContentEvent.getPageTitle());
+
+        ArrayList<DeletedFile> deletedFiles = new ArrayList<>();
+
+        for (com.github.onsdigital.zebedee.persistence.model.DeletedFile deletedFile : deletedContentEvent.getDeletedFiles()) {
+            DeletedFile deletedFileDto = new DeletedFile(deletedFile.getUri());
+            deletedFileDto.setId(deletedFile.getId());
+            deletedFiles.add(deletedFileDto);
+        }
+
+        dto.setDeletedFiles(deletedFiles);
+
+        return dto;
     }
 }

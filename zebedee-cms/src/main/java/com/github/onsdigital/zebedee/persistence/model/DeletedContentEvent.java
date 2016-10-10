@@ -37,6 +37,16 @@ public class DeletedContentEvent {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "deletedContentEvent")
     private List<DeletedFile> deletedFiles;
 
+    public DeletedContentEvent() { }
+
+    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle) {
+        this.collectionId = collectionId;
+        this.collectionName = collectionName;
+        this.eventDate = eventDate;
+        this.uri = uri;
+        this.pageTitle = pageTitle;
+    }
+
     public String getPageTitle() {
         return pageTitle;
     }

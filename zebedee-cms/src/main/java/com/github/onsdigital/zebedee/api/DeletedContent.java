@@ -5,9 +5,10 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent;
+import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
+import com.github.onsdigital.zebedee.model.content.deleted.DeletedContentEvent;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentService;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentServiceFactory;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -39,8 +40,9 @@ public class DeletedContent {
     public List<DeletedContentEvent> listDeletedContent(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         Session session = getSession(request, "You must be a publisher or admin to view deleted content.");
+        List<DeletedContentEvent> deletedContentEvents = deletedContentService.listDeletedContent();
 
-        return deletedContentService.listDeletedContent();
+        return deletedContentEvents;
     }
 
     /**

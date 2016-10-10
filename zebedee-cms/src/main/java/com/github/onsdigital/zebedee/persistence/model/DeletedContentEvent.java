@@ -1,8 +1,6 @@
 package com.github.onsdigital.zebedee.persistence.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -38,30 +36,6 @@ public class DeletedContentEvent {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "deletedContentEvent")
     private List<DeletedFile> deletedFiles;
-
-    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle) {
-        this.collectionId = collectionId;
-        this.collectionName = collectionName;
-        this.eventDate = eventDate;
-        this.uri = uri;
-        this.pageTitle = pageTitle;
-    }
-
-    public DeletedContentEvent(String collectionId, String collectionName, Date eventDate, String uri, String pageTitle, Collection<String> deletedUrls) {
-        this(collectionId, collectionName, eventDate, uri, pageTitle);
-        deletedUrls.forEach(this::addDeletedFile);
-    }
-
-    public DeletedContentEvent() {
-    }
-
-    public void addDeletedFile(String uri) {
-        if (deletedFiles == null) {
-            deletedFiles = new ArrayList<>();
-        }
-
-        deletedFiles.add(new DeletedFile(uri, this));
-    }
 
     public String getPageTitle() {
         return pageTitle;

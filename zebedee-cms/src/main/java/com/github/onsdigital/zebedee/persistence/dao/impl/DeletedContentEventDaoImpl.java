@@ -1,10 +1,10 @@
 package com.github.onsdigital.zebedee.persistence.dao.impl;
 
+import com.github.onsdigital.zebedee.model.content.deleted.DeletedContentEvent;
+import com.github.onsdigital.zebedee.model.content.deleted.DeletedFile;
 import com.github.onsdigital.zebedee.persistence.HibernateService;
 import com.github.onsdigital.zebedee.persistence.HibernateServiceImpl;
 import com.github.onsdigital.zebedee.persistence.dao.DeletedContentEventDao;
-import com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent;
-import com.github.onsdigital.zebedee.persistence.model.DeletedFile;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 

@@ -4,7 +4,7 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent;
+import com.github.onsdigital.zebedee.model.content.deleted.DeletedContentEvent;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 
 import java.io.IOException;

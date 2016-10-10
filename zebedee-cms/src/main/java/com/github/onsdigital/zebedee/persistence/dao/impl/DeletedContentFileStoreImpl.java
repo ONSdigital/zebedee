@@ -2,14 +2,15 @@ package com.github.onsdigital.zebedee.persistence.dao.impl;
 
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent;
-import com.github.onsdigital.zebedee.persistence.model.DeletedFile;
+import com.github.onsdigital.zebedee.model.content.deleted.DeletedContentEvent;
+import com.github.onsdigital.zebedee.model.content.deleted.DeletedFile;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.TimeZone;
 
@@ -45,7 +46,7 @@ public class DeletedContentFileStoreImpl implements DeletedContentFileStore {
         ContentWriter contentWriter = new ContentWriter(deletedContentRootPath.resolve(formattedEventDate));
 
         for (DeletedFile file : deletedContentEvent.getDeletedFiles()) {
-            this.copyFile(file.getUri(), contentReader, contentWriter);
+            this.copyFiles(file.getUri(), contentReader, contentWriter);
         }
     }
 
@@ -61,7 +62,7 @@ public class DeletedContentFileStoreImpl implements DeletedContentFileStore {
         ContentReader contentReader = new FileSystemContentReader(deletedContentRootPath.resolve(formattedEventDate));
 
         for (DeletedFile file : deletedContentEvent.getDeletedFiles()) {
-            this.copyFile(file.getUri(), contentReader, contentWriter);
+            this.copyFiles(file.getUri(), contentReader, contentWriter);
         }
     }
 
@@ -74,8 +75,15 @@ public class DeletedContentFileStoreImpl implements DeletedContentFileStore {
      * @throws ZebedeeException
      * @throws IOException
      */
-    private void copyFile(String uri, ContentReader contentReader, ContentWriter contentWriter) throws ZebedeeException, IOException {
-        InputStream inputStream = contentReader.getResource(uri).getData();
-        contentWriter.write(inputStream, uri);
+    private void copyFiles(String uri, ContentReader contentReader, ContentWriter contentWriter) throws ZebedeeException, IOException {
+
+        try (DirectoryStream<Path> stream = contentReader.getDirectoryStream(uri)) {
+            for (Path path : stream) {
+                if (!Files.isDirectory(path)) {
+                    String relativePath = "/" + contentReader.getRootFolder().relativize(path).toString();
+                    contentWriter.write(contentReader.getResource(relativePath).getData(), relativePath);
+                }
+            }
+        }
     }
 }

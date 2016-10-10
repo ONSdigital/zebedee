@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.persistence.dao;
 
-import com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent;
+import com.github.onsdigital.zebedee.model.content.deleted.DeletedContentEvent;
 
 import java.util.List;
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source ./export-default-env-vars.sh
+
 export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
 export PORT="8082"
 

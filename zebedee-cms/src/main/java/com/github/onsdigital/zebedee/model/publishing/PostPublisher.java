@@ -124,8 +124,14 @@ public class PostPublisher {
     }
 
     private static void applyDeletesToPublishing(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
-        archiveContentToBeDeleted(collection, contentReader);
-        applyManifestDeletesToMaster(collection, contentReader, contentWriter);
+
+        try {
+            archiveContentToBeDeleted(collection, contentReader);
+            applyManifestDeletesToMaster(collection, contentReader, contentWriter);
+        } catch (Exception e) {
+            logError(e, "An error occurred trying apply the deletes to publishing content ")
+                    .collectionName(collection).collectionId(collection).log();
+        }
     }
 
     public static void savePublishMetrics(PublishedCollection publishedCollection) {
@@ -178,7 +184,7 @@ public class PostPublisher {
 
                 try {
                     Page page = ContentUtil.deserialiseContent(contentReader.getResource(pendingDelete.getRoot().uri + "/data.json").getData());
-                    deletedContentService.storeDeletedContent(page, new Date(), urisToDelete, contentReader, collection);
+                    getDeletedContentService().storeDeletedContent(page, new Date(), urisToDelete, contentReader, collection);
                 } catch (ZebedeeException | IOException e) {
                     logError(e, "Failed to stored deleted content for URI: " + pendingDelete.getRoot().uri);
                 }

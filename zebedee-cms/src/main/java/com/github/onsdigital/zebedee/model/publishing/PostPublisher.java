@@ -58,7 +58,7 @@ public class PostPublisher {
 
     private static final ExecutorService pool = Executors.newFixedThreadPool(10);
 
-    private static final DeletedContentService deletedContentService = DeletedContentServiceFactory.createInstance();
+    private static DeletedContentService deletedContentService;
 
     /**
      * Do tasks required after a publish takes place.
@@ -377,6 +377,14 @@ public class PostPublisher {
         }
 
         return collectionJsonDestination;
+    }
+
+    public synchronized static DeletedContentService getDeletedContentService() {
+
+        if (deletedContentService == null)
+            deletedContentService = DeletedContentServiceFactory.createInstance();
+
+        return deletedContentService;
     }
 
 }

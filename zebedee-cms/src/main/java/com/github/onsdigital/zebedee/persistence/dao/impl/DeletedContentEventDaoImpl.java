@@ -93,8 +93,9 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
         session.beginTransaction();
 
         com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent event = (com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent) session
-                .createSQLQuery("SELECT * FROM deleted_content ORDER BY event_date ASC LIMIT 50")
+                .createSQLQuery("SELECT * FROM deleted_content WHERE deleted_content_event_id = :event_id ORDER BY event_date ASC LIMIT 50")
                 .addEntity(com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent.class)
+                .setLong("event_id", deletedContentEventId)
                 .uniqueResult();
 
         Hibernate.initialize(event.getDeletedFiles()); // the deleted files have lazy instantiation, so ensure they are in the result here
@@ -158,6 +159,7 @@ public class DeletedContentEventDaoImpl implements DeletedContentEventDao {
                 deletedContentEvent.getUri(),
                 deletedContentEvent.getPageTitle());
 
+        dto.setId(deletedContentEvent.getId());
         ArrayList<DeletedFile> deletedFiles = new ArrayList<>();
 
         for (com.github.onsdigital.zebedee.persistence.model.DeletedFile deletedFile : deletedContentEvent.getDeletedFiles()) {

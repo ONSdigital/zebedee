@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.persistence.dao.impl;
 
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent;
+import com.github.onsdigital.zebedee.model.content.deleted.DeletedContentEvent;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.google.common.io.Files;

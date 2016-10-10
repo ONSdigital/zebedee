@@ -177,7 +177,7 @@ public class PostPublisher {
                 });
 
                 try {
-                    Page page = ContentUtil.deserialiseContent(contentReader.getResource(pendingDelete.getRoot().uri).getData());
+                    Page page = ContentUtil.deserialiseContent(contentReader.getResource(pendingDelete.getRoot().uri + "/data.json").getData());
                     deletedContentService.storeDeletedContent(page, new Date(), urisToDelete, contentReader, collection);
                 } catch (ZebedeeException | IOException e) {
                     logError(e, "Failed to stored deleted content for URI: " + pendingDelete.getRoot().uri);

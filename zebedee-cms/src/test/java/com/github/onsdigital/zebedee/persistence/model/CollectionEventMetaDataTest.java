@@ -4,17 +4,26 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.COLLECTION_OWNER;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.DELETE_MARKER_ADDED;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.DELETE_MARKER_REMOVED;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.DELETE_ROOT;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.DELETE_ROOT_REMOVED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.PREVIOUS_PUBLISH_DATE;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.PUBLISH_DATE;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.PUBLISH_TYPE;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.create;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Tests verify the correct {@link CollectionEventMetaData} objects are created for the values provided.
@@ -115,6 +124,46 @@ public class CollectionEventMetaDataTest {
 
         assertThat(results.length, equalTo(1));
         assertThat(results[0], equalTo(newPubDate));
+    }
+
+    @Test
+    public void shouldReturnListOfDeleteMarkerAddedValues() throws Exception {
+        List<String> uris = new ImmutableList.Builder<String>()
+                .add("one", "two", "three").build();
+
+        ImmutableList.Builder<CollectionEventMetaData> expectedListBuilder =
+                new ImmutableList.Builder<CollectionEventMetaData>().add(create(DELETE_ROOT, DELETE_ROOT));
+
+        expectedListBuilder.addAll(uris
+                .stream().map(uri -> CollectionEventMetaData.create(DELETE_MARKER_ADDED, uri))
+                .collect(Collectors.toList()));
+
+        CollectionEventMetaData[] expected = expectedListBuilder.build().toArray(new CollectionEventMetaData[uris.size()]);
+        CollectionEventMetaData[] results = CollectionEventMetaData.deleteMarkerAdded(DELETE_ROOT, uris);
+
+        assertThat("Result was null... not what I was expecting.", null == results, is(false));
+        assertThat("Expected results size to match that of the input list", results.length, equalTo(uris.size() + 1));
+        assertThat("Not as expected.", results, equalTo(expected));
+    }
+
+    @Test
+    public void shouldReturnListOfDeleteMarkerRemovedValues() throws Exception {
+        List<String> uris = new ImmutableList.Builder<String>()
+                .add("one", "two", "three").build();
+
+        ImmutableList.Builder<CollectionEventMetaData> expectedListBuilder =
+                new ImmutableList.Builder<CollectionEventMetaData>().add(create(DELETE_ROOT_REMOVED, DELETE_ROOT_REMOVED));
+
+        expectedListBuilder.addAll(uris
+                .stream().map(uri -> CollectionEventMetaData.create(DELETE_MARKER_REMOVED, uri))
+                .collect(Collectors.toList()));
+
+        CollectionEventMetaData[] expected = expectedListBuilder.build().toArray(new CollectionEventMetaData[uris.size()]);
+        CollectionEventMetaData[] results = CollectionEventMetaData.deleteMarkerRemoved(DELETE_ROOT_REMOVED, uris);
+
+        assertThat("Result was null... not what I was expecting.", null == results, is(false));
+        assertThat("Expected results size to match that of the input list", results.length, equalTo(uris.size() + 1));
+        assertThat("Not as expected.", results, equalTo(expected));
     }
 
 }

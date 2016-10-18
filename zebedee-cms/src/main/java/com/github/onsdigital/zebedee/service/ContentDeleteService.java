@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentTree;
@@ -51,6 +52,7 @@ public class ContentDeleteService {
     private static final String JSON_FILE_EXT = ".json";
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
     private static ContentTreeNavigator contentTreeNavigator = ContentTreeNavigator.getInstance();
+    private static CollectionHistoryDao collectionHistoryDao = CollectionHistoryDaoFactory.getCollectionHistoryDao();
 
     private static final ImmutableList<PageType> NON_DELETABLE_PAGE_TYPES =
             ImmutableList.of(home_page, taxonomy_landing_page, product_page);
@@ -121,8 +123,8 @@ public class ContentDeleteService {
         );
         collection.description.getPendingDeletes().add(new PendingDelete(marker.getUser(), deleteImpact));
         collection.addEvent(deleteImpact.contentPath, collectionEvent(session, MARKED_DELETE));
-        CollectionHistoryDaoFactory.getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session,
-                DELETE_MARKED_ADDED, deleteMarkerAdded(deletedUris));
+        collectionHistoryDao.saveCollectionHistoryEvent(
+                collection, session, DELETE_MARKED_ADDED, deleteMarkerAdded(deleteImpact.contentPath, deletedUris));
         saveManifest(collection);
     }
 
@@ -151,8 +153,8 @@ public class ContentDeleteService {
 
         collection.description.cancelPendingDelete(contentUri);
         collection.addEvent(contentUri, collectionEvent(session, DELETE_MARKER_REMOVED));
-        CollectionHistoryDaoFactory.getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session,
-                DELETE_MARKED_REMOVED, deleteMarkerRemoved(cancelledDeleteUris));
+        collectionHistoryDao.saveCollectionHistoryEvent(collection, session,
+                DELETE_MARKED_REMOVED, deleteMarkerRemoved(contentUri, cancelledDeleteUris));
         saveManifest(collection);
     }
 

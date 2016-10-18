@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Provides functionality for created the necessary meta data items for each event history scenario.
@@ -48,6 +49,8 @@ public class CollectionEventMetaData {
     static final String INDEX_PAGE = "indexPage";
     static final String URI = "uri";
     static final String TABLE_MODIFICATIONS = "tableModifications";
+    static final String DELETE_MARKER_ADDED = "deleteMarkerAdded";
+    static final String DELETE_MARKER_REMOVED = "deleteMarkerRemoved";
 
     private static final String HTML = ".html";
     private static final String XLS = ".xls";
@@ -268,6 +271,20 @@ public class CollectionEventMetaData {
             return toArray(list);
         }
         return null;
+    }
+
+    public static CollectionEventMetaData[] deleteMarkerAdded(List<String> uris) {
+        return toArray(uris
+                .stream()
+                .map(uri -> new CollectionEventMetaData(DELETE_MARKER_ADDED, uri))
+                .collect(Collectors.toList()));
+    }
+
+    public static CollectionEventMetaData[] deleteMarkerRemoved(List<String> uris) {
+        return toArray(uris
+                .stream()
+                .map(uri -> new CollectionEventMetaData(DELETE_MARKER_REMOVED, uri))
+                .collect(Collectors.toList()));
     }
 
     private static String fileIndex(int index) {

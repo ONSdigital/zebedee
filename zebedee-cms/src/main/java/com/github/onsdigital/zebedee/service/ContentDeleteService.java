@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.service;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -12,8 +13,10 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
+import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -36,8 +39,6 @@ import static com.github.onsdigital.zebedee.content.page.base.PageType.product_p
 import static com.github.onsdigital.zebedee.content.page.base.PageType.taxonomy_landing_page;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.alreadyMarkedDeleteInCurrentCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.deleteForbiddenForPageTypeError;
-import static com.github.onsdigital.zebedee.json.EventType.DELETE_MARKER_REMOVED;
-import static com.github.onsdigital.zebedee.json.EventType.MARKED_DELETE;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DELETE_MARKED_ADDED;
@@ -53,6 +54,12 @@ public class ContentDeleteService {
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
     private static ContentTreeNavigator contentTreeNavigator = ContentTreeNavigator.getInstance();
     private static CollectionHistoryDao collectionHistoryDao = CollectionHistoryDaoFactory.getCollectionHistoryDao();
+
+    private static DeleteEventType DELETED_ADDED = new DeleteEventType(Audit.Event.DELETE_MARKER_ADDED,
+            DELETE_MARKED_ADDED, EventType.DELETE_MARKER_ADDED);
+
+    private static DeleteEventType DELETE_REMOVED = new DeleteEventType(Audit.Event.DELETE_MARKER_REMOVED,
+            DELETE_MARKED_REMOVED, EventType.DELETE_MARKER_REMOVED);
 
     private static final ImmutableList<PageType> NON_DELETABLE_PAGE_TYPES =
             ImmutableList.of(home_page, taxonomy_landing_page, product_page);
@@ -122,9 +129,8 @@ public class ContentDeleteService {
                 }
         );
         collection.description.getPendingDeletes().add(new PendingDelete(marker.getUser(), deleteImpact));
-        collection.addEvent(deleteImpact.contentPath, collectionEvent(session, MARKED_DELETE));
-        collectionHistoryDao.saveCollectionHistoryEvent(
-                collection, session, DELETE_MARKED_ADDED, deleteMarkerAdded(deleteImpact.contentPath, deletedUris));
+        logDeleteEvent(collection, session, deleteImpact.contentPath, DELETED_ADDED,
+                deleteMarkerAdded(deleteImpact.contentPath, deletedUris));
         saveManifest(collection);
     }
 
@@ -151,10 +157,9 @@ public class ContentDeleteService {
                 .forEach(pd -> contentTreeNavigator.applyAndPropagate(pd.getRoot(),
                         (node) -> cancelledDeleteUris.add(node.contentPath)));
 
+        logDeleteEvent(collection, session, contentUri, DELETE_REMOVED,
+                deleteMarkerRemoved(contentUri, cancelledDeleteUris));
         collection.description.cancelPendingDelete(contentUri);
-        collection.addEvent(contentUri, collectionEvent(session, DELETE_MARKER_REMOVED));
-        collectionHistoryDao.saveCollectionHistoryEvent(collection, session,
-                DELETE_MARKED_REMOVED, deleteMarkerRemoved(contentUri, cancelledDeleteUris));
         saveManifest(collection);
     }
 
@@ -241,5 +246,25 @@ public class ContentDeleteService {
 
     private Event collectionEvent(Session session, EventType eventType) {
         return new Event(DateTime.now().toDate(), eventType, session.email);
+    }
+
+    private void logDeleteEvent(Collection collection, Session session, String contentUri,
+                                DeleteEventType event, CollectionEventMetaData[] collectionEventMetaData) {
+        collectionHistoryDao.saveCollectionHistoryEvent(collection, session,
+                event.collectionEventType, collectionEventMetaData);
+        collection.addEvent(contentUri, collectionEvent(session, event.eventType));
+        event.auditEvent.parameters().collection(collection).user(session.email).content(contentUri).log();
+    }
+
+    private static class DeleteEventType {
+        private Audit.Event auditEvent;
+        private CollectionEventType collectionEventType;
+        private EventType eventType;
+
+        public DeleteEventType(Audit.Event auditEvent, CollectionEventType collectionEventType, EventType eventType) {
+            this.auditEvent = auditEvent;
+            this.collectionEventType = collectionEventType;
+            this.eventType = eventType;
+        }
     }
 }

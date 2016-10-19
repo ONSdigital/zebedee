@@ -1,20 +1,28 @@
 package com.github.onsdigital.zebedee.service;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
+import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
+import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +41,10 @@ import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDenie
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.deleteForbiddenForPageTypeError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DELETE_MARKED_ADDED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DELETE_MARKED_REMOVED;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.deleteMarkerAdded;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.deleteMarkerRemoved;
 
 // TODO THIS MUST HAVE decent audit / collection history logging.
 
@@ -41,6 +53,13 @@ public class ContentDeleteService {
     private static final String JSON_FILE_EXT = ".json";
     private static ZebedeeCmsService zebedeeCmsService = ZebedeeCmsService.getInstance();
     private static ContentTreeNavigator contentTreeNavigator = ContentTreeNavigator.getInstance();
+    private static CollectionHistoryDao collectionHistoryDao = CollectionHistoryDaoFactory.getCollectionHistoryDao();
+
+    private static DeleteEventType DELETED_ADDED = new DeleteEventType(Audit.Event.DELETE_MARKER_ADDED,
+            DELETE_MARKED_ADDED, EventType.DELETE_MARKER_ADDED);
+
+    private static DeleteEventType DELETE_REMOVED = new DeleteEventType(Audit.Event.DELETE_MARKER_REMOVED,
+            DELETE_MARKED_REMOVED, EventType.DELETE_MARKER_REMOVED);
 
     private static final ImmutableList<PageType> NON_DELETABLE_PAGE_TYPES =
             ImmutableList.of(home_page, taxonomy_landing_page, product_page);
@@ -101,14 +120,17 @@ public class ContentDeleteService {
         // Check they can all be deleted.
         isNodeDeletable(collection, deleteImpact, session);
         //updates all the children with deleted.
+        List<String> deletedUris = new ArrayList<>();
         contentTreeNavigator.applyAndPropagate(deleteImpact,
                 (node) -> {
                     node.setDeleteMarker(true);
+                    deletedUris.add(node.contentPath);
                     logDebug("Marking node as deleted").path(node.contentPath).log();
                 }
         );
         collection.description.getPendingDeletes().add(new PendingDelete(marker.getUser(), deleteImpact));
-        // TODO collection.addEvent(deleteImpact.contentPath, new Event());
+        logDeleteEvent(collection, session, deleteImpact.contentPath, DELETED_ADDED,
+                deleteMarkerAdded(deleteImpact.contentPath, deletedUris));
         saveManifest(collection);
     }
 
@@ -127,7 +149,16 @@ public class ContentDeleteService {
     }
 
 
-    public void cancelPendingDelete(Collection collection, String contentUri) throws ZebedeeException {
+    public void cancelPendingDelete(Collection collection, Session session, String contentUri) throws ZebedeeException {
+        List<String> cancelledDeleteUris = new ArrayList<>();
+        collection.getDescription()
+                .getPendingDeletes()
+                .stream()
+                .forEach(pd -> contentTreeNavigator.applyAndPropagate(pd.getRoot(),
+                        (node) -> cancelledDeleteUris.add(node.contentPath)));
+
+        logDeleteEvent(collection, session, contentUri, DELETE_REMOVED,
+                deleteMarkerRemoved(contentUri, cancelledDeleteUris));
         collection.description.cancelPendingDelete(contentUri);
         saveManifest(collection);
     }
@@ -210,6 +241,30 @@ public class ContentDeleteService {
 
         public int getCount() {
             return count;
+        }
+    }
+
+    private Event collectionEvent(Session session, EventType eventType) {
+        return new Event(DateTime.now().toDate(), eventType, session.email);
+    }
+
+    private void logDeleteEvent(Collection collection, Session session, String contentUri,
+                                DeleteEventType event, CollectionEventMetaData[] collectionEventMetaData) {
+        collectionHistoryDao.saveCollectionHistoryEvent(collection, session,
+                event.collectionEventType, collectionEventMetaData);
+        collection.addEvent(contentUri, collectionEvent(session, event.eventType));
+        event.auditEvent.parameters().collection(collection).user(session.email).content(contentUri).log();
+    }
+
+    private static class DeleteEventType {
+        private Audit.Event auditEvent;
+        private CollectionEventType collectionEventType;
+        private EventType eventType;
+
+        public DeleteEventType(Audit.Event auditEvent, CollectionEventType collectionEventType, EventType eventType) {
+            this.auditEvent = auditEvent;
+            this.collectionEventType = collectionEventType;
+            this.eventType = eventType;
         }
     }
 }

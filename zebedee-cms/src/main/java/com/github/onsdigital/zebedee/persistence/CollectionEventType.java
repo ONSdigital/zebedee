@@ -129,7 +129,17 @@ public enum CollectionEventType {
     /**
      * Collection content moved.
      */
-    COLLECTION_CONTENT_MOVED("collection.content.moved.description");
+    COLLECTION_CONTENT_MOVED("collection.content.moved.description"),
+
+    /**
+     * Delete marker added to content.
+     */
+    DELETE_MARKED_ADDED("delete.marker.added.description"),
+
+    /**
+     * Delete marker removed from content.
+     */
+    DELETE_MARKED_REMOVED("delete.marker.removed.description");
 
     private final String descriptionKey;
 

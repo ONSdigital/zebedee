@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.content.dynamic.DescriptionWrapper;
 import com.github.onsdigital.zebedee.content.dynamic.timeseries.Point;
 import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
 import com.github.onsdigital.zebedee.content.page.base.Page;
-import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -103,9 +102,7 @@ public class FilterUtil {
 
         Series series = new Series();
         series.setUri(page.getUri());
-        series.setDescription(new PageDescription());// only setting title and cdid of description
-        series.getDescription().setCdid(page.getDescription().getCdid());
-        series.getDescription().setTitle(page.getDescription().getTitle());
+        series.setDescription(page.getDescription());
         for (TimeSeriesValue timeSeriesValue : set) {
             series.add(new Point(isNotEmpty(timeSeriesValue.label) ? timeSeriesValue.label : timeSeriesValue.date, timeSeriesValue.value));
         }

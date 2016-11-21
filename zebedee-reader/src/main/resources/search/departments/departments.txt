@@ -27,7 +27,7 @@ dcms => The Department for Culture, Media & Sports => https://www.gov.uk/governm
 
 dft => The Department for Transport => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-transport => DFT,bus,vehicle,driver,rider,freight,vehicle licensing,road,biofuel,road casualties,traffic congestion,road conditions,transport,car
 
-dwp => The Department for Work & Pensions => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-work-pensions =>DWP,social fund,child maintenance,lone parents,child support agency,benefit fraud,universal credit
+dwp => The Department for Work & Pensions => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-work-pensions =>DWP,social fund,child maintenance,lone parents,child support agency,benefit fraud,universal credit,pensions,pensioners
 
 dh => The Department of Health => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-of-health =>DH,abortion
 

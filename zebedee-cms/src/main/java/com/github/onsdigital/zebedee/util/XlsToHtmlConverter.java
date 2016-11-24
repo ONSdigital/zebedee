@@ -40,12 +40,16 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import static java.text.MessageFormat.format;
 
 /**
  * Helper class to convert an xls file to a html table.
  */
 public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
+    private static final String CSS_ROW_PREFIX = "r-{0}-";
     private static final String ROW = "row";
     private static final String COL = "col";
     private static final String SCOPE_ATTR = "scope";
@@ -58,6 +62,7 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
         this.htmlDocument = htmlDocument;
         this.document = document;
         this.tableModifications = Optional.empty();
+        this.setCssClassPrefixRow(format(CSS_ROW_PREFIX, UUID.randomUUID().toString()));
     }
 
     /**
@@ -734,9 +739,9 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
     private static boolean isEmptyCell(HSSFCell cell) {
         switch (cell.getCellType()) {
-            case (HSSFCell.CELL_TYPE_STRING) :
+            case (HSSFCell.CELL_TYPE_STRING):
                 return StringUtils.isEmpty(cell.getStringCellValue());
-            case (HSSFCell.CELL_TYPE_BLANK) :
+            case (HSSFCell.CELL_TYPE_BLANK):
                 return true;
             default:
                 return false;

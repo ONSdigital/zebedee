@@ -36,4 +36,20 @@ public class ApproveTaskTest {
         Assert.assertNotNull(publishNotification);
         Assert.assertTrue(publishNotification.hasUriToDelete(uriToDelete));
     }
+
+    @Test
+    public void createPublishNotificationShouldIncludeHomepageUri() throws Exception {
+
+        // Given a collection
+        Path collectionPath = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
+        CollectionReader collectionReader = new DummyCollectionReader(collectionPath);
+        Collection collection = CollectionTest.CreateCollection(collectionPath, "createPublishNotificationShouldIncludePendingDeletes");
+
+        // When the publish notification is created as part of the approval process.
+        PublishNotification publishNotification = ApproveTask.createPublishNotification(collectionReader, collection);
+
+        // Then the publish notification contains the homepage uri.
+        Assert.assertNotNull(publishNotification);
+        Assert.assertTrue(publishNotification.hasUriToUpdate("/"));
+    }
 }

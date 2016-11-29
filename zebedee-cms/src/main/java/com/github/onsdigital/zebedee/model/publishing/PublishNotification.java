@@ -109,6 +109,15 @@ public class PublishNotification {
                 .isPresent();
     }
 
+    /**
+     * return true if this PublishNotification has the given URI to update.
+     * @param uri - the URI to check.
+     * @return - true if the URI is in the list of URI's to update
+     */
+    public boolean hasUriToUpdate(String uri) {
+        return this.payload.urisToUpdate.contains(uri);
+    }
+
     class NotificationPayload {
         public String collectionId;
         public String publishDate;

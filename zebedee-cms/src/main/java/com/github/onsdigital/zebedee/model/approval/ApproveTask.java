@@ -43,6 +43,8 @@ public class ApproveTask implements Callable<Boolean> {
     private final ContentReader publishedReader;
     private final DataIndex dataIndex;
 
+    private static final String HOMEPAGE_URI = "/";
+
     public ApproveTask(
             Collection collection,
             Session session,
@@ -99,6 +101,10 @@ public class ApproveTask implements Callable<Boolean> {
     public static PublishNotification createPublishNotification(CollectionReader collectionReader, Collection collection) {
         List<String> uriList = collectionReader.getReviewed().listUris();
 
+        if (!uriList.contains(HOMEPAGE_URI)) {
+            uriList.add(HOMEPAGE_URI);
+        }
+
         // only provide relevent uri's
         //  - remove versioned uris
         //  - add associated uris? /previous /data etc?
@@ -106,9 +112,7 @@ public class ApproveTask implements Callable<Boolean> {
         List<ContentDetail> contentToDelete = new ArrayList<>();
         List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
 
-
         for (PendingDelete pendingDelete : pendingDeletes) {
-
             ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
                 logDebug("Adding uri to delete to the publish notification " + node.uri);
                 if (!contentToDelete.contains(node.uri)) {

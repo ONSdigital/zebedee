@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.model.approval;
 
+import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.data.DataPublisher;
 import com.github.onsdigital.zebedee.data.importing.CsvTimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
@@ -42,8 +43,6 @@ public class ApproveTask implements Callable<Boolean> {
     private final CollectionWriter collectionWriter;
     private final ContentReader publishedReader;
     private final DataIndex dataIndex;
-
-    private static final String HOMEPAGE_URI = "/";
 
     public ApproveTask(
             Collection collection,
@@ -101,8 +100,9 @@ public class ApproveTask implements Callable<Boolean> {
     public static PublishNotification createPublishNotification(CollectionReader collectionReader, Collection collection) {
         List<String> uriList = collectionReader.getReviewed().listUris();
 
-        if (!uriList.contains(HOMEPAGE_URI)) {
-            uriList.add(HOMEPAGE_URI);
+        String homepageUri = Configuration.getHomepageUri();
+        if (!uriList.contains(homepageUri)) {
+            uriList.add(homepageUri);
         }
 
         // only provide relevent uri's

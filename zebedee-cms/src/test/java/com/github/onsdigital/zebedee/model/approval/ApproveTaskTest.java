@@ -50,6 +50,6 @@ public class ApproveTaskTest {
 
         // Then the publish notification contains the homepage uri.
         Assert.assertNotNull(publishNotification);
-        Assert.assertTrue(publishNotification.hasUriToUpdate("/"));
+        Assert.assertTrue(publishNotification.hasUriToUpdate(""));
     }
 }

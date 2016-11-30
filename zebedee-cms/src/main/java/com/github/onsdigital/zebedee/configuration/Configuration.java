@@ -18,7 +18,6 @@ public class Configuration {
     private static final String INFLUXDB_URL = "http://influxdb:8086";
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";
-    private static final String HOMEPAGE_URI = "";
 
     private static final int VERIFY_RETRTY_DELAY = 5000; //milliseconds
     private static final int VERIFY_RETRTY_COUNT = 10;
@@ -73,10 +72,6 @@ public class Configuration {
 
     public static String getMathjaxServiceUrl() {
         return StringUtils.defaultIfBlank(getValue("MATHJAX_SERVICE_URL"), MATHJAX_SERVICE_URL);
-    }
-
-    public static String getHomepageUri() {
-        return StringUtils.defaultIfBlank(getValue("HOMEPAGE_URI"), HOMEPAGE_URI);
     }
 
     public static String[] getTheTrainUrls() {

@@ -11,9 +11,9 @@
 
 
 ##########MAPPING#############
-dfe => The Department for Education => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-education => DFE,education,A level,degree,NVQ,school,college,university,curriculum,qualification,teacher training,pupil absence,exclusions,school workforce,key stage
+dfe => The Department for Education => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-education => DFE,education,A level,degree,NVQ,school,college,university,curriculum,qualification,teacher training,pupil absence,exclusions,school workforce,key stage,higher education
 
-beis => The Department for Business, Energy and Industrial Strategy => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-business-energy-and-industrial-strategy&from_date=&to_date= => BEIS,BIS,business,apprenticeship,building,construction,higher education,trade union,enterprise,DECC,energy,solar,coal,oil,gas,electricity,fuel poverty,renewables ,greenhouse gas
+beis => The Department for Business, Energy and Industrial Strategy => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-business-energy-and-industrial-strategy&from_date=&to_date= => BEIS,BIS,business,apprenticeship,building,construction,trade union,enterprise,DECC,energy,solar,coal,oil,gas,electricity,fuel poverty,renewables ,greenhouse gas
 
 defra => The Department for Environment Food & Rural Affairs => https://www.gov.uk/government/statistics?keywords=&topics%5B%5D=all&departments%5B%5D=department-for-environment-food-rural-affairs => DEFRA,agriculture,farming,air quality,emissions,recycling,food,conservation,biodiversity,animals,wildlife,ecosystem
 

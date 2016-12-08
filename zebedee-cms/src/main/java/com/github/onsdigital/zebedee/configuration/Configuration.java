@@ -70,7 +70,6 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("BABBAGE_URL"), DEFAULT_WEBSITE_URL);
     }
 
-
     public static String getMathjaxServiceUrl() {
         return StringUtils.defaultIfBlank(getValue("MATHJAX_SERVICE_URL"), MATHJAX_SERVICE_URL);
     }

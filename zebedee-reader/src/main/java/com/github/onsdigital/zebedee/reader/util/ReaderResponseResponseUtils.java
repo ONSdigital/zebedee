@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.reader.util;
 
 import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
@@ -24,6 +25,12 @@ public class ReaderResponseResponseUtils {
         if (content instanceof Content) {
             response.setHeader("Etag", ContentUtil.hash((Content) content));
         }
+
+        if (content instanceof Page) {
+            Page page = (Page) content;
+            response.setHeader("ONS-Page-Type", page.getType().toString());
+        }
+
         IOUtils.copy(new StringReader(ContentUtil.serialise(content)), response.getOutputStream());
         metricsService.captureRequestResponseTimeMetrics();
     }

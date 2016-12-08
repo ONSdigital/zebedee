@@ -36,4 +36,5 @@
 /peoplepopulationandcommunity/populationandmigration/internationalmigration/*=>immigration,emigration
 /peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/bulletins/childhoodinfantandperinatalmortalityinenglandandwales/*=>child mortality
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/regionallabourmarket/*=>regional labour, regional unemployment, regional employment
+/employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivity/*=>productivity
 /aboutus/whatwedo/statistics/requestingstatistics=>adhoc, ad-hoc, ad hoc, user requested data

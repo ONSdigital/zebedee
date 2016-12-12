@@ -4,9 +4,15 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +57,7 @@ public class ZipUtils {
 
     /**
      * Unzip the given input stream into the given content writer.
+     *
      * @param inputStream
      * @param uri
      * @param contentWriter
@@ -163,7 +170,10 @@ public class ZipUtils {
             if (file.isFile() && !shouldBeFiltered(filters, file.toString())) {
                 final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
                 zipOutputStream.putNextEntry(zipEntry);
-                try (InputStream inputStream = contentReader.getResource(fileUri).getData()) {
+                try (
+                        Resource resource = contentReader.getResource(fileUri);
+                        InputStream inputStream = resource.getData()
+                ) {
                     IOUtils.copy(inputStream, zipOutputStream);
                 }
                 zipOutputStream.closeEntry();

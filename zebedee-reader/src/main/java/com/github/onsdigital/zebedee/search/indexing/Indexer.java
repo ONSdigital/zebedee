@@ -42,6 +42,7 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
 public class Indexer {
     private final static String DEPARTMENTS_INDEX = "departments";
     private final static String DEPARTMENT_TYPE = "departments";
+    private final static String DEPARTMENTS_PATH = "/search/departments/departments.txt";
     private static Indexer instance = new Indexer();
     private final Lock LOCK = new ReentrantLock();
     private final Client client = ElasticSearchClient.getClient();
@@ -131,8 +132,10 @@ public class Indexer {
 
         elasticSearchLog("Indexing departments").log();
         long start = System.currentTimeMillis();
-        InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream("/search/departments/departments.txt");
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))) {
+        try (
+                InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream(DEPARTMENTS_PATH);
+                BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))
+        ) {
             for (String line; (line = br.readLine()) != null; ) {
                 processDepartment(line);
             }

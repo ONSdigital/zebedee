@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
@@ -29,9 +30,8 @@ public class DataLinkBrian implements DataLink {
     /**
      * Post a csdb file to the brian Services/ConvertCSDB endpoint
      *
-     * @param uri the path to the file that will be sent to brian
+     * @param uri              the path to the file that will be sent to brian
      * @param collectionReader a collectionReader
-     *
      * @return a list of TimeSeries objects found by Brian
      * @throws IOException
      */
@@ -62,8 +62,10 @@ public class DataLinkBrian implements DataLink {
 
 
     private TimeSerieses callBrian(String fileUri, ContentReader contentReader, URI endpointUri) throws ZebedeeException, IOException {
-        Resource resource = contentReader.getResource(fileUri);
-        try (InputStream input = resource.getData()) {
+        try (
+                Resource resource = contentReader.getResource(fileUri);
+                InputStream input = resource.getData()
+        ) {
             return getTimeSeries(endpointUri, input, resource.getName());
         }
     }
@@ -78,7 +80,10 @@ public class DataLinkBrian implements DataLink {
         post.setEntity(multipartEntityBuilder.build());
 
         // Post to the endpoint
-        try (CloseableHttpResponse response = HttpClients.createDefault().execute(post)) {
+        try (
+                CloseableHttpClient client = HttpClients.createDefault();
+                CloseableHttpResponse response = client.execute(post)
+        ) {
             TimeSerieses result = null;
             HttpEntity entity = response.getEntity();
 

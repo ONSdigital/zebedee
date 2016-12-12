@@ -4,9 +4,9 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.URIUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.IOException;
@@ -31,6 +31,7 @@ public class BabbagePdfService implements PdfService {
 
     /**
      * Render a PDF for the given page URI.
+     *
      * @param uri - the uri to generate the PDF for.
      * @return - the input stream containing the PDF data.
      * @throws IOException
@@ -48,19 +49,20 @@ public class BabbagePdfService implements PdfService {
 
         logInfo("Reading PDF").addParameter("src", src).log();
 
-        // if the url is absolute, go get it using HTTP client.
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpGet httpGet = new HttpGet(src);
-        httpGet.addHeader("Cookie", "access_token=" + session.id);
-        httpGet.addHeader("Cookie", "collection=" + collection.description.id);
-        HttpResponse response = client.execute(httpGet);
+        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+            HttpGet httpGet = new HttpGet(src);
+            httpGet.addHeader("Cookie", "access_token=" + session.id);
+            httpGet.addHeader("Cookie", "collection=" + collection.description.id);
 
-        if (response.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("Failed to generate PDF for URI " + uri +
-                    ". Response: " + response.getStatusLine().getStatusCode() +
-                    " " + response.toString());
+            try (CloseableHttpResponse response = client.execute(httpGet)) {
+
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    throw new IOException("Failed to generate PDF for URI " + uri +
+                            ". Response: " + response.getStatusLine().getStatusCode() +
+                            " " + response.toString());
+                }
+                return response.getEntity().getContent();
+            }
         }
-
-        return response.getEntity().getContent();
     }
 }

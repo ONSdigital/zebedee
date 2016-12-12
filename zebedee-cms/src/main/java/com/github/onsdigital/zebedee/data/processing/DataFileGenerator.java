@@ -108,9 +108,10 @@ public class DataFileGenerator {
      * @param csvPath
      */
     private DownloadSection writeCSV(DataGrid grid, ContentWriter contentWriter, String csvPath) throws IOException, BadRequestException {
-
-        OutputStream outputStream = contentWriter.getOutputStream(csvPath);
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(outputStream, Charset.forName("UTF8")), ',')) {
+        try (
+                OutputStream outputStream = contentWriter.getOutputStream(csvPath);
+                CSVWriter writer = new CSVWriter(new OutputStreamWriter(outputStream, Charset.forName("UTF8")), ',')
+        ) {
             for (DataGridRow dataGridRow : grid.metadata) {
                 String[] row = new String[dataGridRow.cells.size() + 1];
                 row[0] = dataGridRow.label;

@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.verification.http.ClientConfiguration;
 import com.github.onsdigital.zebedee.verification.http.PooledHttpClient;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -65,12 +64,9 @@ public class EquationService {
     }
 
     private EquationServiceResponse sendPost(String path, String input) throws IOException {
-        CloseableHttpResponse response = null;
-        try {
-            String responseString = EntityUtils.toString(client.sendPost(path, new HashMap<>(), input).getEntity());
+        try (CloseableHttpResponse response = client.sendPost(path, new HashMap<>(), input)) {
+            String responseString = EntityUtils.toString(response.getEntity());
             return ContentUtil.deserialise(responseString, EquationServiceResponse.class);
-        } finally {
-            IOUtils.closeQuietly(response);
         }
     }
 }

@@ -5,7 +5,6 @@ import com.github.onsdigital.zebedee.content.page.statistics.base.Statistics;
 import com.github.onsdigital.zebedee.content.partial.Link;
 import com.github.onsdigital.zebedee.content.partial.markdown.MarkdownSection;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +20,7 @@ public class DatasetLandingPage extends Statistics {
     private List<Link> relatedDocuments;
     private List<Link> datasets;
     private Boolean timeseries;
+    private List<Link> links;
 
     @Override
     public PageType getType() {
@@ -81,5 +81,13 @@ public class DatasetLandingPage extends Statistics {
 
     public void setTimeseries(Boolean timeseries) {
         this.timeseries = timeseries;
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
     }
 }

@@ -47,6 +47,7 @@ For my local dev environment I use docker to run the postgres database
 
 (4)
     To connect to the container to view/query the DB run:
+
         $ docker run -it --rm --link some-postgres:postgres postgres psql -h postgres -U postgres
 
     Or if using Docker Compose script:

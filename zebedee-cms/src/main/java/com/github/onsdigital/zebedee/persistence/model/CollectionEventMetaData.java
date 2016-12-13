@@ -11,6 +11,8 @@ import com.github.onsdigital.zebedee.json.Team;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,6 +23,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Provides functionality for created the necessary meta data items for each event history scenario.
@@ -48,6 +51,10 @@ public class CollectionEventMetaData {
     static final String INDEX_PAGE = "indexPage";
     static final String URI = "uri";
     static final String TABLE_MODIFICATIONS = "tableModifications";
+    static final String DELETE_MARKER_ADDED = "deleteMarkerAdded";
+    static final String DELETE_MARKER_REMOVED = "deleteMarkerRemoved";
+    static final String DELETE_ROOT = "deleteRoot";
+    static final String DELETE_ROOT_REMOVED = "deleteRootRemoved";
 
     private static final String HTML = ".html";
     private static final String XLS = ".xls";
@@ -270,6 +277,24 @@ public class CollectionEventMetaData {
         return null;
     }
 
+    public static CollectionEventMetaData[] deleteMarkerAdded(String deleteRoot, List<String> uris) {
+        List<CollectionEventMetaData> markedDelete = new ArrayList<>();
+        markedDelete.add(create(DELETE_ROOT, deleteRoot));
+        markedDelete.addAll(uris.stream()
+                .map(uri -> new CollectionEventMetaData(DELETE_MARKER_ADDED, uri))
+                .collect(Collectors.toList()));
+        return toArray(markedDelete);
+    }
+
+    public static CollectionEventMetaData[] deleteMarkerRemoved(String deleteRoot, List<String> uris) {
+        List<CollectionEventMetaData> markedDelete = new ArrayList<>();
+        markedDelete.add(create(DELETE_ROOT_REMOVED, deleteRoot));
+        markedDelete.addAll(uris.stream()
+                .map(uri -> new CollectionEventMetaData(DELETE_MARKER_REMOVED, uri))
+                .collect(Collectors.toList()));
+        return toArray(markedDelete);
+    }
+
     private static String fileIndex(int index) {
         return MessageFormat.format(FILE_INDEX_KEY, index);
     }
@@ -287,5 +312,10 @@ public class CollectionEventMetaData {
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
     }
 }

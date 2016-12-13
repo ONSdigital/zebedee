@@ -107,7 +107,14 @@ public class Audit {
         /**
          * CSDB events.
          */
-        CSDB_NEW_FILE_NOTIFICATION("CSDB file notification received");
+        CSDB_NEW_FILE_NOTIFICATION("CSDB file notification received"),
+
+        /**
+         * Content Delete Markers
+         */
+        DELETE_MARKER_ADDED("Delete Marker added to content."),
+
+        DELETE_MARKER_REMOVED("Delete marker removed from content.");
 
         /**
          * The event description.

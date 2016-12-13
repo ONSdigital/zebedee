@@ -106,9 +106,7 @@ public class ApproveTask implements Callable<Boolean> {
         List<ContentDetail> contentToDelete = new ArrayList<>();
         List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
 
-
         for (PendingDelete pendingDelete : pendingDeletes) {
-
             ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
                 logDebug("Adding uri to delete to the publish notification " + node.uri);
                 if (!contentToDelete.contains(node.uri)) {

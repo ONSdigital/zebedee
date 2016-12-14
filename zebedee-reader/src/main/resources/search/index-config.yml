@@ -1,3 +1,6 @@
+index :
+    number_of_shards : 3
+    number_of_replicas : 0
 analysis :
   analyzer :
     #Overwriting default index analyzer
@@ -23,7 +26,7 @@ analysis :
         - ons_synonyms
         - standard
         - stop
-        - porter_stem
+        - snowball
     ons_synonym :
       tokenizer : standard
       filter :
@@ -37,7 +40,7 @@ analysis :
         - lowercase
         - standard
         - stop
-        - porter_stem
+        - snowball
     ons_synonym_stem_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
       tokenizer : standard
       char_filter : clear_dates
@@ -46,7 +49,15 @@ analysis :
         - ons_synonyms
         - standard
         - stop
-        - porter_stem
+        - snowball
+    ons_stem_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
+      tokenizer : standard
+      char_filter : clear_dates
+      filter :
+        - lowercase
+        - standard
+        - stop
+        - snowball
     first_letter :
       #Extracts first letter, elastic search does not seem to have a prefix aggregation, as a workaround first letter is indexed for a to z tool
       #Not that the pattern skips any non-letter character at the beginning

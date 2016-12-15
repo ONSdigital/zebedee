@@ -26,6 +26,7 @@ analysis :
         - ons_synonyms
         - standard
         - stop
+        - stem_exclusion
         - snowball
     ons_synonym :
       tokenizer : standard
@@ -40,6 +41,7 @@ analysis :
         - lowercase
         - standard
         - stop
+        - stem_exclusion
         - snowball
     ons_synonym_stem_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
       tokenizer : standard
@@ -49,6 +51,7 @@ analysis :
         - ons_synonyms
         - standard
         - stop
+        - stem_exclusion
         - snowball
     ons_stem_clear_dates : #used for clearing out dates from title, moving title into another field in content wasn't doable, this is the ultimate hacky solution
       tokenizer : standard
@@ -57,6 +60,7 @@ analysis :
         - lowercase
         - standard
         - stop
+        - stem_exclusion
         - snowball
     first_letter :
       #Extracts first letter, elastic search does not seem to have a prefix aggregation, as a workaround first letter is indexed for a to z tool
@@ -70,6 +74,12 @@ analysis :
       type: pattern_replace
       pattern : "([1|2]\\d{3})|((?i)january|february|march|april|may|june|july|august|september|october|november|december)"
   filter :
+    stem_exclusion :
+        type : keyword_marker
+        keywords : [
+                      "productivity",
+                      "production"
+                   ]
     first_letter :
       type : pattern_replace
       pattern: "^[^a-zA-Z]*(.).*"
@@ -80,7 +90,7 @@ analysis :
       # there are 2 possible formats
       # 1. term => another term = items on lhs are mapped to items on rhs
       # 2. term,another term,and another term = all terms are synonymous with each other,
-      #careful with the second one, messes up relevancy by creating same words multiple times in the index, try direct mapping of abbreveation to what it stands for
+      #careful with the second one, messes up relevancy by creating same words multiple times in the index, try direct mapping of abbreviation to what it stands for
       synonyms :
         - "cpi, consumer price inflation, consumer price index"
         - "rpi,  retail price index"

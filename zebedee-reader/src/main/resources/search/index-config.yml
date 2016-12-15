@@ -162,7 +162,7 @@ analysis :
         - "oa, output area"
         - "wz, workplace zone"
         - "npp, national population projections"
-        - "snpp, sub national population projections"
+        - "snpp, subnational population projections"
         - "suid, sudden unexpected/unexplained infant deaths"
         - "drd, drug related deaths"
         - "c diff, clostridium difficile"

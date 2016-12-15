@@ -12,6 +12,11 @@
 # /economy/grossdomesticproductgdp/bulletins/grossdomesticproductpreliminaryestimate/2015-10-27 => preliminary, estimates
 
 
+########### NOTES ###########
+# Spaces at the beginning or end of the `uri` are ignored and do not affect the matching
+# Spaces in and around the terms is ignored does not affect the setting of the search boost fields
+# Check the root [base] of the content path; if the content path has a 'master' root directory include this in the CONTENT_DIR env variable i.e. CONTENT_DIR=c:\temp\content\master
+#           essentially the URI are matched to the folder structure under $CONTENT_PATH therefore $CONTENT_PATH/<URI> must be valid
 ##########MAPPING#############
 
 #/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections/* => poopulation, projection, age

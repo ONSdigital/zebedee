@@ -76,6 +76,7 @@ analysis :
   filter :
     stem_exclusion :
         type : keyword_marker
+        # Add words to the 'keywords' array below to stop the words being stemmed and to keep the words in thier original form
         keywords : [
                       "productivity",
                       "production"

@@ -76,7 +76,8 @@
       },
       "searchBoost": {
         "type": "string",
-        "analyzer": "ons_stem",
+        "analyzer": "ons_synonym_stem",
+        "search_analyzer": "ons_stem",
         "norms": {
           "enabled": false
         }

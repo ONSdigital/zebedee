@@ -5,7 +5,7 @@ import org.junit.Test;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 
-public class PublisherTest {
+public class PostPublisherTest {
 
     @Test
     public void isIndexedUriShouldBeTrueIfNotVersioned() {
@@ -14,7 +14,7 @@ public class PublisherTest {
         String uri = "/some/unversioned/uri";
 
         // When the isIndexedUri method is called
-        boolean isIndexed = Publisher.isIndexedUri(uri);
+        boolean isIndexed = PostPublisher.isIndexedUri(uri);
 
         // Then the result should be true, ie, it should be indexed.
         assertTrue(isIndexed);
@@ -27,7 +27,7 @@ public class PublisherTest {
         String uri = "/some/versioned/uri/previous/v1";
 
         // When the isIndexedUri method is called
-        boolean isIndexed = Publisher.isIndexedUri(uri);
+        boolean isIndexed = PostPublisher.isIndexedUri(uri);
 
         // Then the result should be false, ie, it should not be indexed.
         assertFalse(isIndexed);

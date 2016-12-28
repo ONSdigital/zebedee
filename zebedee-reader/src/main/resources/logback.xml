@@ -29,7 +29,13 @@
         <!--</encoder>-->
     <!--</appender>-->
 
-    <logger name="com.github.onsdigital.logging" level="debug" additivity="false">
+    <logger name="com.github.onsdigital.zebedee" level="debug" additivity="false">
+        <!--<appender-ref ref="JSON"/>-->
+        <!--<appender-ref ref="PRETTY_JSON"/>-->
+        <appender-ref ref="PLAIN_TEXT"/>
+    </logger>
+
+    <logger name="com.github.onsdigital.zebedee-reader" level="debug" additivity="false">
         <!--<appender-ref ref="JSON"/>-->
         <!--<appender-ref ref="PRETTY_JSON"/>-->
         <appender-ref ref="PLAIN_TEXT"/>

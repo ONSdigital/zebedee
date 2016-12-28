@@ -17,17 +17,17 @@
     </appender>
 
     <!-- Use this appender if you want the log output in json -->
-    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.JsonLayout" />
-        </encoder>
-    </appender>
+    <!--<appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">-->
+        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
+            <!--<layout class="com.github.onsdigital.logging.layouts.JsonLayout" />-->
+        <!--</encoder>-->
+    <!--</appender>-->
 
-    <appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />
-        </encoder>
-    </appender>
+    <!--<appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">-->
+        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
+            <!--<layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />-->
+        <!--</encoder>-->
+    <!--</appender>-->
 
     <logger name="com.github.onsdigital.logging" level="debug" additivity="false">
         <!--<appender-ref ref="JSON"/>-->

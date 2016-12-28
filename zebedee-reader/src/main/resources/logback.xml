@@ -29,7 +29,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.github.onsdigital.logging" level="info" additivity="false">
+    <logger name="com.github.onsdigital.logging" level="debug" additivity="false">
         <!--<appender-ref ref="JSON"/>-->
         <!--<appender-ref ref="PRETTY_JSON"/>-->
         <appender-ref ref="PLAIN_TEXT"/>

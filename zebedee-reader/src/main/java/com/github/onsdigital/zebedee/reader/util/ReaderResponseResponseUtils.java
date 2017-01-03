@@ -3,14 +3,18 @@ package com.github.onsdigital.zebedee.reader.util;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.IOUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.StringReader;
+
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logInfo;
 
 /**
  * Created by bren on 31/07/15.
@@ -53,4 +57,13 @@ public class ReaderResponseResponseUtils {
         sendResponse(resource, response, null);
     }
 
+
+    public static void sendNotFound(NotFoundException exception, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        logInfo(exception.getMessage())
+                .uri(request.getRequestURI() + "?" + request.getQueryString())
+                .addParameter("statusCode", exception.statusCode)
+                .log();
+        response.setStatus(exception.statusCode);
+        IOUtils.copy(new StringReader(exception.getMessage()), response.getOutputStream());
+    }
 }

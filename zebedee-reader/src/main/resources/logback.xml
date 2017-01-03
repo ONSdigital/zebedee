@@ -2,11 +2,11 @@
 <configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-            </Pattern>
-        </layout>
+        <encoder>
+            <pattern>
+                %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
     </appender>
 
     <!-- Use this appender if you want the log output in plain/standard log format. -->
@@ -17,19 +17,25 @@
     </appender>
 
     <!-- Use this appender if you want the log output in json -->
-    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.JsonLayout" />
-        </encoder>
-    </appender>
+    <!--<appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">-->
+        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
+            <!--<layout class="com.github.onsdigital.logging.layouts.JsonLayout" />-->
+        <!--</encoder>-->
+    <!--</appender>-->
 
-    <appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />
-        </encoder>
-    </appender>
+    <!--<appender name="PRETTY_JSON" class="ch.qos.logback.core.ConsoleAppender">-->
+        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
+            <!--<layout class="com.github.onsdigital.logging.layouts.PrettyJsonLayout" />-->
+        <!--</encoder>-->
+    <!--</appender>-->
 
-    <logger name="com.github.onsdigital.logging" level="info" additivity="false">
+    <logger name="com.github.onsdigital.zebedee" level="debug" additivity="false">
+        <!--<appender-ref ref="JSON"/>-->
+        <!--<appender-ref ref="PRETTY_JSON"/>-->
+        <appender-ref ref="PLAIN_TEXT"/>
+    </logger>
+
+    <logger name="com.github.onsdigital.zebedee-reader" level="debug" additivity="false">
         <!--<appender-ref ref="JSON"/>-->
         <!--<appender-ref ref="PRETTY_JSON"/>-->
         <appender-ref ref="PLAIN_TEXT"/>

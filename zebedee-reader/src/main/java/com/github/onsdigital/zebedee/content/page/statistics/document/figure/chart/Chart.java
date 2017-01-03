@@ -15,6 +15,9 @@ public class Chart extends FigureBase {
     private String altText;
     private String labelInterval;
     private String decimalPlaces;
+    private String palette;
+    private String xAxisPos;
+    private String yAxisPos;
 
     private String unit;
     private String xAxisLabel;
@@ -28,6 +31,8 @@ public class Chart extends FigureBase {
     private List<List<String>> groups;
     private Boolean startFromZero;
     private Boolean finishAtHundred;
+    private Boolean showTooltip;
+    private Boolean showMarker;
 
     @Override
     public PageType getType() {
@@ -162,6 +167,30 @@ public class Chart extends FigureBase {
         this.decimalPlaces = decimalPlaces;
     }
 
+    public String getPalette() {
+        return palette;
+    }
+
+    public void setPalette(String palette) {
+        this.palette = palette;
+    }
+
+    public String getxAxisPos() {
+        return xAxisPos;
+    }
+
+    public void setxAxisPos(String xAxisPos) {
+        this.xAxisPos = xAxisPos;
+    }
+
+    public String getyAxisPos() {
+        return yAxisPos;
+    }
+
+    public void setyAxisPos(String yAxisPos) {
+        this.yAxisPos = yAxisPos;
+    }
+
     public String getxAxisLabel() {
         return xAxisLabel;
     }
@@ -184,5 +213,21 @@ public class Chart extends FigureBase {
 
     public void setFinishAtHundred(Boolean finishAtHundred) {
         this.finishAtHundred = finishAtHundred;
+    }
+
+    public Boolean getShowTooltip() {
+        return showTooltip;
+    }
+
+    public void setShowTooltip(Boolean showTooltip) {
+        this.showTooltip = showTooltip;
+    }
+
+    public Boolean getShowMarker() {
+        return showMarker;
+    }
+
+    public void setShowMarker(Boolean showMarker) {
+        this.showMarker = showMarker;
     }
 }

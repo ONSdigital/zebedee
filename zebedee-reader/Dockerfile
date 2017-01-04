@@ -10,7 +10,6 @@ EXPOSE 9200
 
 # Update the entry point script
 ENTRYPOINT java -Xmx2048m \
-          -javaagent:/usr/src/target/dependency/newrelic/newrelic.jar \
           -Drestolino.classes=target/classes \
           -Drestolino.packageprefix=com.github.onsdigital.zebedee.reader.api \
           -cp "target/dependency/*:target/classes/" \

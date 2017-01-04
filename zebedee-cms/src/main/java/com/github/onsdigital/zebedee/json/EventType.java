@@ -15,5 +15,6 @@ public enum EventType {
     VERSIONED,
     MOVED,
     RENAMED,
-    MARKED_DELETE
+    DELETE_MARKER_ADDED,
+    DELETE_MARKER_REMOVED
 }

@@ -200,11 +200,11 @@ public class Indexer {
 
 
     public void deleteContentIndex(String pageType, String uri) {
-        elasticSearchLog("Triggering reindex").addParameter("uri", uri).log();
+        elasticSearchLog("Triggering delete index on publishing search index").addParameter("uri", uri).log();
         long start = System.currentTimeMillis();
         searchUtils.deleteDocument(getSearchAlias(), pageType, uri);
         long end = System.currentTimeMillis();
-        elasticSearchLog("Reindexing complete")
+        elasticSearchLog("Delete index complete")
                 .addParameter("uri", uri)
                 .addParameter("totalTime(ms)", (start - end))
                 .log();

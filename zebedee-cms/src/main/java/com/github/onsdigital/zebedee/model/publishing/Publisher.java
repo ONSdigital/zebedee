@@ -456,7 +456,9 @@ public class Publisher {
             // Apply any deletes that are defined in the transaction first to ensure we do not delete updated files.
             for (String uri : manifest.urisToDelete) {
                 Path target = contentReader.getRootFolder().resolve(StringUtils.removeStart(uri, "/"));
-                logDebug("Deleting directory: " + target.toString());
+                logDebug("Deleting directory on publishing content: ")
+                        .addParameter("path", target.toString())
+                        .log();
                 try {
                     FileUtils.deleteDirectory(target.toFile());
                 } catch (IOException e) {
@@ -545,7 +547,7 @@ public class Publisher {
             for (PendingDelete pendingDelete : collection.description.getPendingDeletes()) {
 
                 ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                    logDebug("Deleting index for uri " + node.uri);
+                    logDebug("Deleting index from publishing search ").addParameter("uri", node.uri).log();
                     pool.submit(() -> {
                         try {
                             Indexer.getInstance().deleteContentIndex(node.type, node.uri);
@@ -722,8 +724,6 @@ public class Publisher {
                         .setParameter("encryptionPassword", encryptionPassword)
                         .setParameter("zip", Boolean.toString(zipped))
                         .setParameter("uri", publishUri);
-
-
                 System.out.println("uri = " + uri);
                 try (
                         Resource resource = reader.getResource(uri);

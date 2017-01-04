@@ -134,7 +134,8 @@ public class Indexer {
         long start = System.currentTimeMillis();
         try (
                 InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream(DEPARTMENTS_PATH);
-                BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))
+                InputStreamReader inputStreamReader = new InputStreamReader(resourceStream);
+                BufferedReader br = new BufferedReader(inputStreamReader)
         ) {
             for (String line; (line = br.readLine()) != null; ) {
                 processDepartment(line);

@@ -24,6 +24,7 @@ import javax.ws.rs.POST;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,10 +69,13 @@ public class Table {
             response.setContentType(contentType);
         }
 
-        try (Resource resource = collectionReader.getResource(uri)) {
+        try (
+                Resource resource = collectionReader.getResource(uri);
+                InputStream inputStream = resource.getData()
+        ) {
 
             TableModifications modifications = getTableModifications(request);
-            Node table = XlsToHtmlConverter.convertToHtmlPageWithModifications(resource.getData(), modifications);
+            Node table = XlsToHtmlConverter.convertToHtmlPageWithModifications(inputStream, modifications);
             String output = XlsToHtmlConverter.docToString(table);
 
             // Write the file to the response

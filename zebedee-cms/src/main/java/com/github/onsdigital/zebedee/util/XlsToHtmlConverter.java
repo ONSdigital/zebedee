@@ -120,11 +120,12 @@ public class XlsToHtmlConverter extends ExcelToHtmlConverter {
 
     public static Node convertToHtmlPageWithModifications(InputStream stream, TableModifications modifications)
             throws IOException, ParserConfigurationException, TableBuilderException {
-        final HSSFWorkbook workbook = new HSSFWorkbook(stream);
-        XlsToHtmlConverter converter = createConverter();
-        converter.addTableModifications(modifications);
-        converter.processWorkbook(workbook);
-        return converter.getDocument();
+        try (HSSFWorkbook workbook = new HSSFWorkbook(stream)) {
+            XlsToHtmlConverter converter = createConverter();
+            converter.addTableModifications(modifications);
+            converter.processWorkbook(workbook);
+            return converter.getDocument();
+        }
     }
 
     /**

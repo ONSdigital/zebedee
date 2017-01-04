@@ -39,7 +39,8 @@ public class SearchBoostTermsResolver {
     static void loadTerms(String fileName) throws IOException {
         try (
                 InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream(fileName);
-                BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))
+                InputStreamReader inputStreamReader = new InputStreamReader(resourceStream);
+                BufferedReader br = new BufferedReader(inputStreamReader)
         ) {
             for (String line; (line = br.readLine()) != null; ) {
                 processMapping(line);

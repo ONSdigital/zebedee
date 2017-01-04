@@ -1,8 +1,10 @@
 package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.util.URIUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -10,8 +12,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.function.Supplier;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
@@ -20,6 +23,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 public class BabbagePdfService implements PdfService {
 
     private static final String pdfEndpoint = "/pdf-new"; // only ever reading from local babbage instance
+    private static final String PAGE_PDF_EXT = "/page.pdf";
 
     private final Session session;
     private Collection collection;
@@ -37,15 +41,13 @@ public class BabbagePdfService implements PdfService {
      * @throws IOException
      */
     @Override
-    public InputStream generatePdf(String uri) throws IOException {
-
+    public void generatePdf(ContentWriter contentWriter, String uri) throws IOException {
         // no need to check locally here as on publishing we will always want to generate one for preview
         // we will check if one exists already in babbage
-
         // loop back to babbage to render PDF until we break out the HTML rendering / PDF generation into its own service.
-
         String trimmedUri = URIUtils.removeTrailingSlash(uri);
         String src = Configuration.getBabbageUrl() + trimmedUri + pdfEndpoint;
+        String pdfURI = uri + PAGE_PDF_EXT;
 
         logInfo("Reading PDF").addParameter("src", src).log();
 
@@ -61,7 +63,9 @@ public class BabbagePdfService implements PdfService {
                             ". Response: " + response.getStatusLine().getStatusCode() +
                             " " + response.toString());
                 }
-                return response.getEntity().getContent();
+                contentWriter.write(response.getEntity().getContent(), pdfURI);
+            } catch (BadRequestException e) {
+                logError(e, "Error while generating collection PDF").path(pdfURI).log();
             }
         }
     }

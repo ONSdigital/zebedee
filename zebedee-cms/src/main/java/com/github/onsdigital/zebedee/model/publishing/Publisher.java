@@ -110,10 +110,8 @@ public class Publisher {
             // We specify WRITE so we can get a lock and
             // CREATE to ensure the file is created if it
             // doesn't exist.
-            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-
-                // If the lock can't be acquired, we'll get null:
-                FileLock lock = channel.tryLock();
+            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+                 FileLock lock = channel.tryLock()) {
                 if (lock != null) {
                     logInfo("Collection lock acquired").collectionId(collection).log();
 

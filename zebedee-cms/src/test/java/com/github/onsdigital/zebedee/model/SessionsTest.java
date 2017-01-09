@@ -14,8 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,10 +31,6 @@ public class SessionsTest {
     Zebedee zebedee;
     Builder builder;
 
-    int expiryUnit;
-    int expiryAmount;
-
-
     @Before
     public void setUp() throws Exception {
         builder = new Builder();
@@ -42,7 +41,6 @@ public class SessionsTest {
     public void tearDown() throws Exception {
         builder.delete();
     }
-
 
     @Test
     public void shouldCreateSession() throws IOException, NotFoundException, BadRequestException {
@@ -228,6 +226,20 @@ public class SessionsTest {
         // Then
         // The session should be deleted
         Assert.assertNull(zebedee.getSessions().get(session.id));
+    }
+
+    @Test
+    public void shouldGetExpiryDate() throws Exception {
+
+        Session session = new Session();
+
+        LocalDateTime lastaccess = LocalDateTime.of(2016,06,22,10,30);
+        session.lastAccess = Date.from(lastaccess.toInstant(ZoneOffset.UTC));
+
+        Date expected = Date.from(lastaccess.plusMinutes(60).toInstant(ZoneOffset.UTC));
+        Date actual = zebedee.getSessions().getExpiryDate(session);
+
+        Assert.assertEquals(expected, actual);
     }
 
     public class GetSession implements Runnable {

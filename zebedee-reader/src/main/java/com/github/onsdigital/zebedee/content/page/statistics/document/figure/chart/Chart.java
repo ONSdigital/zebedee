@@ -34,6 +34,16 @@ public class Chart extends FigureBase {
     private Boolean showTooltip;
     private Boolean showMarker;
 
+    private List<Annotation> annotations;
+
+    public List<Annotation> getAnnotations() {
+        return annotations;
+    }
+
+    public void setAnnotations(List<Annotation> annotations) {
+        this.annotations = annotations;
+    }
+
     @Override
     public PageType getType() {
         return PageType.chart;

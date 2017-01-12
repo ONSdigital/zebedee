@@ -10,7 +10,11 @@ import java.util.Map;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.elasticSearchLog;
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.endsWith;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.startsWith;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
  * Created by bren on 25/01/16.
@@ -33,8 +37,11 @@ public class SearchBoostTermsResolver {
 
 
     static void loadTerms(String fileName) throws IOException {
-        InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream(fileName);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))) {
+        try (
+                InputStream resourceStream = SearchBoostTermsResolver.class.getResourceAsStream(fileName);
+                InputStreamReader inputStreamReader = new InputStreamReader(resourceStream);
+                BufferedReader br = new BufferedReader(inputStreamReader)
+        ) {
             for (String line; (line = br.readLine()) != null; ) {
                 processMapping(line);
             }

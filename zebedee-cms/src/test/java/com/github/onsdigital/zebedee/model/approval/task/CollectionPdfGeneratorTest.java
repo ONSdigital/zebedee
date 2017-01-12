@@ -1,58 +1,62 @@
 package com.github.onsdigital.zebedee.model.approval.task;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.DummyCollectionReader;
-import com.github.onsdigital.zebedee.model.DummyCollectionWriter;
+import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
-import com.github.onsdigital.zebedee.reader.CollectionReader;
-import com.github.onsdigital.zebedee.service.DummyPdfService;
+import com.github.onsdigital.zebedee.service.PdfService;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 public class CollectionPdfGeneratorTest {
 
-    CollectionPdfGenerator generator = new CollectionPdfGenerator(new DummyPdfService());
+    @Mock
+    private PdfService mockPDFService;
+
+    @Mock
+    private CollectionWriter mockCollectionWriter;
+
+    @Mock
+    private ContentWriter mockContentWriter;
+
+    private CollectionPdfGenerator generator;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        generator = new CollectionPdfGenerator(mockPDFService);
+    }
+
 
     @Test
-    public void shouldGenerateNothingForAnEmptyCollection() throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
-
-        String id = Random.id();
-        Path tempDirectory = Files.createTempDirectory(id);
-        Path collectionDirectory = tempDirectory.resolve("collectionId");
-        Files.createDirectory(collectionDirectory);
-        Files.createFile(tempDirectory.resolve("collectionId.json"));
-        CollectionWriter collectionWriter =  new DummyCollectionWriter(tempDirectory);
-
-        generator.generatePdfsInCollection(collectionWriter, new ArrayList<>());
+    public void shouldGenerateNothingForAnEmptyCollection() throws IOException {
+        generator.generatePdfsInCollection(mockCollectionWriter, new ArrayList<>());
+        verifyZeroInteractions(mockPDFService);
     }
 
     @Test
     public void shouldGeneratePdfForArticle() throws IOException, ZebedeeException {
+        when(mockCollectionWriter.getReviewed())
+                .thenReturn(mockContentWriter);
 
-        // given a faked collection with an article
-        Path tempDirectory = Files.createTempDirectory(Random.id()); // create a temp directory to generate content into
-        CollectionWriter collectionWriter =  new DummyCollectionWriter(tempDirectory);
         ArrayList<ContentDetail> collectionContent = new ArrayList<>();
         String uri = "/the/uri";
         collectionContent.add(new ContentDetail("Some article", uri, PageType.article.toString()));
 
-        // when the generate PDF method is called.
-        generator.generatePdfsInCollection(collectionWriter, collectionContent);
+        generator.generatePdfsInCollection(mockCollectionWriter, collectionContent);
 
-        // the expected file is generated in the reviewed section of the collection
-        CollectionReader collectionReader = new DummyCollectionReader(tempDirectory);
-        collectionReader.getResource(uri + "/page.pdf"); // would throw not found exception if not there.
+        verify(mockCollectionWriter, times(1)).getReviewed();
     }
-
 }

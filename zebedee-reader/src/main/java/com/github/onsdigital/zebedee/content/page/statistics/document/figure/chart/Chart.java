@@ -18,6 +18,7 @@ public class Chart extends FigureBase {
     private String palette;
     private String xAxisPos;
     private String yAxisPos;
+    private String highlight;
 
     private String unit;
     private String xAxisLabel;
@@ -199,6 +200,14 @@ public class Chart extends FigureBase {
 
     public void setyAxisPos(String yAxisPos) {
         this.yAxisPos = yAxisPos;
+    }
+
+    public String getHighlight() {
+        return highlight;
+    }
+
+    public void setHighlight(String highlight) {
+        this.highlight = highlight;
     }
 
     public String getxAxisLabel() {

@@ -48,9 +48,12 @@ public class Data {
 
     @GET
     public void read(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
-        ReaderResponseResponseUtils.sendResponse(
-                new ReadRequestHandler(getRequestedLanguage(request))
-                        .findContent(request, extractFilter(request)), response);
+        try {
+            ReaderResponseResponseUtils.sendResponse(
+                    new ReadRequestHandler(getRequestedLanguage(request))
+                            .findContent(request, extractFilter(request)), response);
+        } catch (NotFoundException exception) {
+            ReaderResponseResponseUtils.sendNotFound(exception, request, response);
+        }
     }
-
 }

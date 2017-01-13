@@ -18,6 +18,8 @@ public class Chart extends FigureBase {
     private String palette;
     private String xAxisPos;
     private String yAxisPos;
+    private String yMin;
+    private String yMax;
     private String highlight;
 
     private String unit;
@@ -200,6 +202,22 @@ public class Chart extends FigureBase {
 
     public void setyAxisPos(String yAxisPos) {
         this.yAxisPos = yAxisPos;
+    }
+
+    public String getyMin() {
+        return yMin;
+    }
+
+    public void setyMin(String yMin) {
+        this.yMin = yMin;
+    }
+
+    public String getyMax() {
+        return yMax;
+    }
+
+    public void setyMax(String yMax) {
+        this.yMax = yMax;
     }
 
     public String getHighlight() {

@@ -43,22 +43,21 @@ public class DataGenerator {
      * @throws IOException
      */
     static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) throws IOException {
+        try (
+                Workbook wb = new SXSSFWorkbook(30);
+                OutputStream stream = Files.newOutputStream(xlsPath)
+        ) {
+            Sheet sheet = wb.createSheet("data");
 
-        Workbook wb = new SXSSFWorkbook(30);
+            int rownum = 0;
+            for (List<String> gridRow : grid) {
+                Row row = sheet.createRow(rownum++);
 
-        Sheet sheet = wb.createSheet("data");
-
-        int rownum = 0;
-        for (List<String> gridRow : grid) {
-            Row row = sheet.createRow(rownum++);
-
-            int colnum = 0;
-            for (String gridCell : gridRow) {
-                row.createCell(colnum++).setCellValue(gridCell);
+                int colnum = 0;
+                for (String gridCell : gridRow) {
+                    row.createCell(colnum++).setCellValue(gridCell);
+                }
             }
-        }
-
-        try (OutputStream stream = Files.newOutputStream(xlsPath)) {
             wb.write(stream);
         }
     }
@@ -72,21 +71,22 @@ public class DataGenerator {
      */
     static void writeDataGridToXls(Path xlsPath, List<List<String>> grid) throws IOException {
 
-        Workbook wb = new HSSFWorkbook();
+        try (
+                Workbook wb = new HSSFWorkbook();
+                OutputStream stream = Files.newOutputStream(xlsPath)
+        ) {
 
-        Sheet sheet = wb.createSheet("data");
+            Sheet sheet = wb.createSheet("data");
 
-        int rownum = 0;
-        for (List<String> gridRow : grid) {
-            Row row = sheet.createRow(rownum++);
+            int rownum = 0;
+            for (List<String> gridRow : grid) {
+                Row row = sheet.createRow(rownum++);
 
-            int colnum = 0;
-            for (String gridCell : gridRow) {
-                row.createCell(colnum++).setCellValue(gridCell);
+                int colnum = 0;
+                for (String gridCell : gridRow) {
+                    row.createCell(colnum++).setCellValue(gridCell);
+                }
             }
-        }
-
-        try (OutputStream stream = Files.newOutputStream(xlsPath)) {
             wb.write(stream);
         }
     }

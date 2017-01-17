@@ -203,12 +203,18 @@ public class ModifyTable {
             HttpServletRequest request, CollectionReader collectionReader, String uri
     )
             throws ZebedeeException, IOException {
-        com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table table;
 
-        table = (com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table)
-                deserialiseContent(getResource(request, collectionReader, uri).getData());
-        table.getModifications().sorted();
-        return table;
+        try (
+                Resource resource = getResource(request, collectionReader, uri);
+                InputStream dataStream = resource.getData()
+        ) {
+            com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table table;
+            table = (com.github.onsdigital.zebedee.content.page.statistics.document.figure.table.Table)
+                    deserialiseContent(dataStream);
+            table.getModifications().sorted();
+            return table;
+        }
+
     }
 
     private Resource getResource(HttpServletRequest request, CollectionReader collectionReader, String resourceUri)

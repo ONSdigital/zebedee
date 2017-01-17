@@ -156,17 +156,16 @@ public class DataVisualisationZip {
         CollectionWriter collectionWriter = zebedeeCmsService.getZebedeeCollectionWriter(collection, session);
         ContentReader publishedContentReader = zebedeeCmsService.getPublishedContentReader();
 
-        Resource zipRes;
-        try {
-            zipRes = collectionReader.getResource(zipPath);
+        try (
+                Resource zipRes = collectionReader.getResource(zipPath)
+        ) {
+            unzipContent(collectionWriter.getInProgress(), zipRes, zipPath);
+            updatePageJson(collection, collectionReader, publishedContentReader, collectionWriter, Paths.get(zipPath), session);
+            return unzipSuccessResponse;
         } catch (IOException e) {
             logError(e, COLLECTION_RES_ERROR_MSG).path(zipPath).log();
             throw new NotFoundException(COLLECTION_RES_ERROR_MSG);
         }
-
-        unzipContent(collectionWriter.getInProgress(), zipRes, zipPath);
-        updatePageJson(collection, collectionReader, publishedContentReader, collectionWriter, Paths.get(zipPath), session);
-        return unzipSuccessResponse;
     }
 
     /**

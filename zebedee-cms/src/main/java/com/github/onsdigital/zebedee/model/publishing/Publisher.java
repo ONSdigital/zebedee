@@ -8,7 +8,11 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.PendingDelete;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.UriInfo;
@@ -24,7 +28,11 @@ import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
-import com.github.onsdigital.zebedee.util.*;
+import com.github.onsdigital.zebedee.util.ContentTree;
+import com.github.onsdigital.zebedee.util.Http;
+import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.URIUtils;
+import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -41,12 +49,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_POST_PUBLISHED_CONFIRMATION;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 
@@ -92,10 +110,8 @@ public class Publisher {
             // We specify WRITE so we can get a lock and
             // CREATE to ensure the file is created if it
             // doesn't exist.
-            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-
-                // If the lock can't be acquired, we'll get null:
-                FileLock lock = channel.tryLock();
+            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+                 FileLock lock = channel.tryLock()) {
                 if (lock != null) {
                     logInfo("Collection lock acquired").collectionId(collection).log();
 
@@ -453,7 +469,10 @@ public class Publisher {
             }
 
             for (FileCopy fileCopy : manifest.filesToCopy) {
-                try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
+                try (
+                        Resource resource = contentReader.getResource(fileCopy.source);
+                        InputStream inputStream = resource.getData()
+                ) {
                     contentWriter.write(inputStream, fileCopy.target);
                 } catch (ZebedeeException | IOException e) {
                     logError(e, "An error occurred trying to copy file from "
@@ -498,8 +517,12 @@ public class Publisher {
                     Path publishPath = zebedee.getPublished().path.resolve(publishUri);
                     logInfo("Unzipping TimeSeries").addParameter("source", source.toString()).addParameter("destination", publishPath.toString()).log();
 
-                    Resource resource = collectionReader.getResource(uri);
-                    ZipUtils.unzip(resource.getData(), publishPath.toString());
+                    try (
+                            Resource resource = collectionReader.getResource(uri);
+                            InputStream dataStream = resource.getData()
+                    ) {
+                        ZipUtils.unzip(dataStream, publishPath.toString());
+                    }
                 }
             }
         }
@@ -564,17 +587,20 @@ public class Publisher {
         });
     }
 
-    public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
-
+    public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader)
+            throws IOException, ZebedeeException {
         logInfo("Moving files from collection into master").collectionName(collection).log();
-
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
             if (!VersionedContentItem.isVersionedUri(uri)
                     && !FilenameUtils.getName(uri).equals("timeseries-to-publish.zip")) {
                 Path destination = zebedee.getPublished().toPath(uri);
-                Resource resource = collectionReader.getResource(uri);
-                FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
+                try (
+                        Resource resource = collectionReader.getResource(uri);
+                        InputStream dataStream = resource.getData()
+                ) {
+                    FileUtils.copyInputStreamToFile(dataStream, destination.toFile());
+                }
             }
         }
     }
@@ -609,9 +635,13 @@ public class Publisher {
         logInfo("Moving collection files").addParameter("from", collectionFilesSource.toString())
                 .addParameter("to", collectionFilesDestination.toString()).log();
         for (String uri : collection.reviewed.uris()) {
-            Resource resource = collectionReader.getResource(uri);
-            File destination = collectionFilesDestination.resolve(URIUtils.removeLeadingSlash(uri)).toFile();
-            FileUtils.copyInputStreamToFile(resource.getData(), destination);
+            try (
+                    Resource resource = collectionReader.getResource(uri);
+                    InputStream inputStream = resource.getData();
+            ) {
+                File destination = collectionFilesDestination.resolve(URIUtils.removeLeadingSlash(uri)).toFile();
+                FileUtils.copyInputStreamToFile(inputStream, destination);
+            }
         }
 
         return collectionJsonDestination;
@@ -694,14 +724,14 @@ public class Publisher {
                         .setParameter("encryptionPassword", encryptionPassword)
                         .setParameter("zip", Boolean.toString(zipped))
                         .setParameter("uri", publishUri);
-
-
                 System.out.println("uri = " + uri);
-
-                Resource resource = reader.getResource(uri);
-                Response<Result> response = http.post(publish, resource.getData(), source.getFileName().toString(), Result.class);
-                checkResponse(response);
-
+                try (
+                        Resource resource = reader.getResource(uri);
+                        InputStream dataStream = resource.getData()
+                ) {
+                    Response<Result> response = http.post(publish, dataStream, source.getFileName().toString(), Result.class);
+                    checkResponse(response);
+                }
             } catch (IOException e) {
                 result = e;
             }

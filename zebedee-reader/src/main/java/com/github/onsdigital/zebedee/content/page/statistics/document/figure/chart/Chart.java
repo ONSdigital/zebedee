@@ -25,6 +25,8 @@ public class Chart extends FigureBase {
     private String unit;
     private String xAxisLabel;
     private String aspectRatio;
+    private String aspectRatioMobile;
+    private String aspectRatioTablet;
     private String chartType;
     private List<Map<String, String>> data;
     private List<String> headers;
@@ -106,6 +108,20 @@ public class Chart extends FigureBase {
 
     public void setAspectRatio(String aspectRatio) {
         this.aspectRatio = aspectRatio;
+    }
+    public String getAspectRatioMobile() {
+        return aspectRatioMobile;
+    }
+
+    public void setAspectRatioMobile(String aspectRatioMobile) {
+        this.aspectRatioMobile = aspectRatioMobile;
+    }
+    public String getAspectRatioTablet() {
+        return aspectRatioTablet;
+    }
+
+    public void setAspectRatioTablet(String aspectRatioTablet) {
+        this.aspectRatioTablet = aspectRatioTablet;
     }
 
     public String getChartType() {

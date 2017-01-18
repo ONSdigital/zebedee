@@ -21,6 +21,7 @@ public class Chart extends FigureBase {
     private String yMin;
     private String yMax;
     private String highlight;
+    private String alpha;
 
     private String unit;
     private String xAxisLabel;
@@ -36,6 +37,7 @@ public class Chart extends FigureBase {
     private List<List<String>> groups;
     private Boolean startFromZero;
     private Boolean finishAtHundred;
+    private Boolean isStacked;
     private Boolean showTooltip;
     private Boolean showMarker;
 
@@ -244,6 +246,14 @@ public class Chart extends FigureBase {
         this.highlight = highlight;
     }
 
+    public String getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(String alpha) {
+        this.alpha = alpha;
+    }
+
     public String getxAxisLabel() {
         return xAxisLabel;
     }
@@ -282,5 +292,13 @@ public class Chart extends FigureBase {
 
     public void setShowMarker(Boolean showMarker) {
         this.showMarker = showMarker;
+    }
+
+    public Boolean getIsStacked() {
+        return isStacked;
+    }
+
+    public void setIsStacked(Boolean isStacked) {
+        this.isStacked = isStacked;
     }
 }

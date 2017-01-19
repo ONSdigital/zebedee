@@ -38,9 +38,9 @@ public class Chart extends FigureBase {
     private Boolean isStacked;
     private Boolean showTooltip;
     private Boolean showMarker;
+    private Boolean hasLineBreak;
 
     private List<Annotation> annotations;
-    private List<Device> devices;
 
     public List<Annotation> getAnnotations() {
         return annotations;
@@ -48,14 +48,6 @@ public class Chart extends FigureBase {
 
     public void setAnnotations(List<Annotation> annotations) {
         this.annotations = annotations;
-    }
-
-    public List<Device> getDevices() {
-        return devices;
-    }
-
-    public void setDevices(List<Device> devices) {
-        this.devices = devices;
     }
 
     @Override
@@ -293,5 +285,13 @@ public class Chart extends FigureBase {
 
     public void setIsStacked(Boolean isStacked) {
         this.isStacked = isStacked;
+    }
+
+    public Boolean getHasLineBreak() {
+        return hasLineBreak;
+    }
+
+    public void setHasLineBreak(Boolean hasLineBreak) {
+        this.hasLineBreak = hasLineBreak;
     }
 }

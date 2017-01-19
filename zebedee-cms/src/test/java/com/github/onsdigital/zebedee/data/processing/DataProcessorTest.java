@@ -307,30 +307,6 @@ public class DataProcessorTest {
     }
 
     @Test
-    public void syncMetadata_overExistingTimeSeries_shouldNotTransferNameIfNameExists() throws IOException, ParseException, URISyntaxException, ZebedeeException {
-        // Given
-        // We create a publish over an existing dataset
-        DataPagesSet republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
-        dataBuilder.addReviewedDataPagesSet(republish, collection, collectionWriter);
-
-        DataPublicationDetails details = republish.getDetails(publishedReader, collectionReader.getReviewed());
-        TimeSeries timeSeries = republish.timeSeriesList.get(0);
-        TimeSeries publishedTimeseries = published.timeSeriesList.get(0);
-
-        DataProcessor processor = new DataProcessor();
-        TimeSeries initial = processor.initialTimeseries(timeSeries, publishedReader, details, zebedee.getDataIndex());
-
-        // When
-        // we sync details
-        TimeSeries synced = processor.syncLandingPageMetadata(initial, details);
-        synced = processor.syncTimeSeriesMetadata(synced, timeSeries);
-
-        // Then
-        // we expect the name to come from the old timeseries
-        assertEquals(publishedTimeseries.getDescription().getTitle(), synced.getDescription().getTitle());
-    }
-
-    @Test
     public void syncMetadata_overExistingTimeSeries_shouldTransferDatasetUri() throws IOException, ParseException, URISyntaxException, ZebedeeException {
         // Given
         // We create a publish over an existing dataset

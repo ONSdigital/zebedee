@@ -26,8 +26,6 @@ public class Chart extends FigureBase {
     private String unit;
     private String xAxisLabel;
     private String aspectRatio;
-    private String aspectRatioMobile;
-    private String aspectRatioTablet;
     private String chartType;
     private List<Map<String, String>> data;
     private List<String> headers;
@@ -42,6 +40,7 @@ public class Chart extends FigureBase {
     private Boolean showMarker;
 
     private List<Annotation> annotations;
+    private List<Device> devices;
 
     public List<Annotation> getAnnotations() {
         return annotations;
@@ -49,6 +48,14 @@ public class Chart extends FigureBase {
 
     public void setAnnotations(List<Annotation> annotations) {
         this.annotations = annotations;
+    }
+
+    public List<Device> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(List<Device> devices) {
+        this.devices = devices;
     }
 
     @Override
@@ -110,20 +117,6 @@ public class Chart extends FigureBase {
 
     public void setAspectRatio(String aspectRatio) {
         this.aspectRatio = aspectRatio;
-    }
-    public String getAspectRatioMobile() {
-        return aspectRatioMobile;
-    }
-
-    public void setAspectRatioMobile(String aspectRatioMobile) {
-        this.aspectRatioMobile = aspectRatioMobile;
-    }
-    public String getAspectRatioTablet() {
-        return aspectRatioTablet;
-    }
-
-    public void setAspectRatioTablet(String aspectRatioTablet) {
-        this.aspectRatioTablet = aspectRatioTablet;
     }
 
     public String getChartType() {

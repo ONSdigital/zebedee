@@ -91,15 +91,15 @@ public class JSONToFileConverter {
      * @throws IOException
      */
     public static void writeChartToXLSX(ChartObject chartObject, OutputStream output) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet meta = workbook.createSheet("meta");
+            Sheet sheet = workbook.createSheet("data");
 
-        Workbook workbook = new XSSFWorkbook();
-        Sheet meta = workbook.createSheet("meta");
-        Sheet sheet = workbook.createSheet("data");
+            writeChartMetadataXLSX(chartObject, meta);
+            writeChartDataXLSX(chartObject, sheet);
 
-        writeChartMetadataXLSX(chartObject, meta);
-        writeChartDataXLSX(chartObject, sheet);
-
-        workbook.write(output);
+            workbook.write(output);
+        }
     }
 
     private static void writeChartMetadataXLSX(ChartObject chartObject, Sheet sheet) {

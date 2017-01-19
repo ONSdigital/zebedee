@@ -1,5 +1,7 @@
 package com.github.onsdigital.zebedee.service;
 
+import com.github.onsdigital.zebedee.model.ContentWriter;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,5 +13,5 @@ public interface PdfService {
      * @return - the input stream containing the PDF data.
      * @throws IOException
      */
-    InputStream generatePdf(String uri) throws IOException;
+    void generatePdf(ContentWriter contentWriter, String uri) throws IOException;
 }

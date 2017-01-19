@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee.service;
 
-import java.io.ByteArrayInputStream;
+import com.github.onsdigital.zebedee.model.ContentWriter;
+
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * dummy implementation of the PDF service to return an empty PDF.
@@ -10,7 +10,7 @@ import java.io.InputStream;
 public class DummyPdfService implements PdfService {
 
     @Override
-    public InputStream generatePdf(String uri) throws IOException {
-        return new ByteArrayInputStream(new byte[]{});
+    public void generatePdf(ContentWriter contentWriter, String uri) throws IOException {
+        //return new ByteArrayInputStream(new byte[]{});
     }
 }

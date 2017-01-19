@@ -4,6 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
@@ -22,6 +23,7 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -405,6 +407,28 @@ public class DataProcessorTest {
         // Then
         // we expect the title to be that of the update command.
         assertEquals(title, processor.timeSeries.getDescription().getTitle());
+    }
+
+    @Test
+    public void metadataIsSynced() {
+
+        // Given an existing timeseries
+        TimeSeries existingSeries = new TimeSeries();
+        existingSeries.setDescription(new PageDescription());
+        existingSeries.getDescription().setTitle("oldTitle");
+
+        // and a new time series with a new title
+        TimeSeries newSeries = new TimeSeries();
+        newSeries.setDescription(new PageDescription());
+        newSeries.getDescription().setTitle("newTitle");
+        newSeries.getDescription().setCdid("WUT");
+
+        // When sync is called
+        new DataProcessor().syncTimeSeriesMetadata(existingSeries, newSeries);
+
+        // Then the title is updated.
+        Assert.assertEquals("newTitle", existingSeries.getDescription().getTitle());
+        Assert.assertEquals("WUT", existingSeries.getDescription().getCdid());
     }
 
     /**

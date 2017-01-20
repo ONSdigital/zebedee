@@ -41,6 +41,7 @@ public class Chart extends FigureBase {
     private Boolean hasLineBreak;
 
     private List<Annotation> annotations;
+    private Map<String, Device> devices;
 
     public List<Annotation> getAnnotations() {
         return annotations;
@@ -50,6 +51,14 @@ public class Chart extends FigureBase {
         this.annotations = annotations;
     }
 
+    public Map<String, Device> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(Map<String, Device> devices) {
+        this.devices = devices;
+    }
+    
     @Override
     public PageType getType() {
         return PageType.chart;

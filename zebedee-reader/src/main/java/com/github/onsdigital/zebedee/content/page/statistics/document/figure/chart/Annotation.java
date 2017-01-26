@@ -10,6 +10,7 @@ public class Annotation {
     private int y;
     private String title;
     private boolean isHidden;
+    private boolean isPlotline;
     private int width;
     private int height;
 
@@ -51,6 +52,14 @@ public class Annotation {
 
     public void setHidden(boolean hidden) {
         isHidden = hidden;
+    }
+
+    public boolean isPlotline() {
+        return isPlotline;
+    }
+
+    public void setPlotline(boolean plotline) {
+        isPlotline = plotline;
     }
 
     public int getWidth() {

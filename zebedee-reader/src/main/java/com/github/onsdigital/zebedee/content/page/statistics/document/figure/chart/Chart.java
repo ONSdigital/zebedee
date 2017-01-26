@@ -15,6 +15,7 @@ public class Chart extends FigureBase {
     private String altText;
     private String labelInterval;
     private String decimalPlaces;
+    private String decimalPlacesYaxis;
     private String palette;
     private String xAxisPos;
     private String yAxisPos;
@@ -190,6 +191,14 @@ public class Chart extends FigureBase {
 
     public void setDecimalPlaces(String decimalPlaces) {
         this.decimalPlaces = decimalPlaces;
+    }
+
+    public String getDecimalPlacesYaxis() {
+        return decimalPlacesYaxis;
+    }
+
+    public void setDecimalPlacesYaxis(String decimalPlacesYaxis) {
+        this.decimalPlacesYaxis = decimalPlacesYaxis;
     }
 
     public String getPalette() {

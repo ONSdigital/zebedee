@@ -12,6 +12,7 @@ public class Annotation {
     private String orientation;
     private boolean isHidden;
     private boolean isPlotline;
+    private int bandWidth;
     private int width;
     private int height;
 
@@ -85,5 +86,13 @@ public class Annotation {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public int getBandWidth() {
+        return bandWidth;
+    }
+
+    public void setBandWidth(int bandWidth) {
+        this.bandWidth = bandWidth;
     }
 }

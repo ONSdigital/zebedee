@@ -9,6 +9,7 @@ public class Annotation {
     private int x;
     private int y;
     private String title;
+    private String orientation;
     private boolean isHidden;
     private boolean isPlotline;
     private int width;
@@ -44,6 +45,14 @@ public class Annotation {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+    
+    public String getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(String orientation) {
+        this.orientation = orientation;
     }
 
     public boolean isHidden() {

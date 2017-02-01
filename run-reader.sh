@@ -18,6 +18,6 @@ java $JAVA_OPTS \
  -Dcontent_dir=$CONTENT_DIR \
  -DSTART_EMBEDDED_SERVER=N \
  -Drestolino.packageprefix=$PACKAGE_PREFIX \
- -cp "zebedee-reader/target/dependency/*" \
+ -cp "zebedee-reader/target/classes/:zebedee-reader/target/dependency/*" \
  com.github.davidcarboni.restolino.Main
 

@@ -12,18 +12,21 @@
 # /economy/grossdomesticproductgdp/bulletins/grossdomesticproductpreliminaryestimate/2015-10-27 => preliminary, estimates
 
 
+########### NOTES ###########
+# Spaces at the beginning or end of the `uri` are ignored and do not affect the matching
+# Spaces in and around the terms is ignored does not affect the setting of the search boost fields
+# Check the root [base] of the content path; if the content path has a 'master' root directory include this in the CONTENT_DIR env variable i.e. CONTENT_DIR=c:\temp\content\master
+#           essentially the URI are matched to the folder structure under $CONTENT_PATH therefore $CONTENT_PATH/<URI> must be valid
 ##########MAPPING#############
 
-#/peoplepopulationandcommunity/populationandmigration/populationprojections/bulletins/nationalpopulationprojections/* => poopulation, projection, age
 /census=>census
-/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/*=>Flow of funds
-/economy/inflationandpriceindices/timeseries/chaw/mm23=>RPI
-/economy/inflationandpriceindices/timeseries/czbh/mm23=>RPI
-/economy/inflationandpriceindices/bulletins/consumerpriceinflation/*=>RPI
-/economy/inflationandpriceindices/bulletins/producerpriceinflation/*=>Producer Price Indices
-/economy/inflationandpriceindices/timeseries/chmk=>rpix
-/economy/inflationandpriceindices/timeseries/cdkq=>rpix
-/economy/inflationandpriceindices/datasets/consumerpriceinflation=>RPI
+/economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/*=>flow of funds
+/economy/inflationandpriceindices/bulletins/consumerpriceinflation/*=>rpi, inflation
+/businessindustryandtrade/retailindustry/bulletins/retailsales/*=>retail
+/economy/inflationandpriceindices/bulletins/producerpriceinflation/*=>psi
+/economy/inflationandpriceindices/datasets/consumerpriceinflation=>rpi
+/economy/inflationandpriceindices/timeseries/chaw/*=>rpi
+/economy/inflationandpriceindices/timeseries/czbh/*=>rpi
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/*=>average earnings index,Labour Force Survey,unemployment,labour market statistics,employment,Claimant Count,average weekly earnings
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/summaryoflabourmarketstatistics=>unemployment,employment
 /employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearningsearn01=>average earnings index
@@ -38,3 +41,4 @@
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/regionallabourmarket/*=>regional labour, regional unemployment, regional employment
 /employmentandlabourmarket/peopleinwork/labourproductivity/bulletins/labourproductivity/*=>productivity
 /aboutus/whatwedo/statistics/requestingstatistics=>adhoc, ad-hoc, ad hoc, user requested data
+/economy/grossdomesticproductgdp/bulletins/*=>gdp

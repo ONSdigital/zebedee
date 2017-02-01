@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.content.util;
 
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -101,7 +102,14 @@ public class ContentUtil {
      * @return
      */
     public static Page deserialiseContent(InputStream stream) {
-        return createBuilder(ContentConstants.JSON_DATE_PATTERN).registerTypeAdapter(Page.class, new PageTypeResolver()).create().fromJson(new InputStreamReader(stream), Page.class);
+        try (InputStreamReader inputStreamReader = new InputStreamReader(stream)) {
+            return createBuilder(ContentConstants.JSON_DATE_PATTERN)
+                    .registerTypeAdapter(Page.class, new PageTypeResolver())
+                    .create().fromJson(inputStreamReader, Page.class);
+        } catch (IOException ex) {
+            ZebedeeReaderLogBuilder.logError(ex, "Failed to close inputstream reader.").log();
+            throw new RuntimeException(ex);
+        }
     }
 
 

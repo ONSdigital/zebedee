@@ -44,7 +44,7 @@ public class TimeseriesUpdater {
                 logInfo("CDID not found in data index").addParameter("CDID", command.cdid).log();
                 continue;
             } else {
-                command.uri = uri;
+                command.uri = uri + "/" + command.dataset.toLowerCase();
                 updateCommands.add(command);
             }
         }

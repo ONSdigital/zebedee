@@ -20,6 +20,7 @@ import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
@@ -28,12 +29,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+
 
 public class Publisher {
 
@@ -73,10 +79,8 @@ public class Publisher {
             // We specify WRITE so we can get a lock and
             // CREATE to ensure the file is created if it
             // doesn't exist.
-            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-
-                // If the lock can't be acquired, we'll get null:
-                FileLock lock = channel.tryLock();
+            try (FileChannel channel = FileChannel.open(collection.path.resolve(".lock"), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+                 FileLock lock = channel.tryLock()) {
                 if (lock != null) {
                     logInfo("Collection lock acquired").collectionId(collection).log();
 
@@ -408,14 +412,14 @@ public class Publisher {
                         .setParameter("encryptionPassword", encryptionPassword)
                         .setParameter("zip", Boolean.toString(zipped))
                         .setParameter("uri", publishUri);
-
-
                 System.out.println("uri = " + uri);
-                
-                Resource resource = reader.getResource(uri);
-                Response<Result> response = http.post(publish, resource.getData(), source.getFileName().toString(), Result.class);
-                checkResponse(response);
-
+                try (
+                        Resource resource = reader.getResource(uri);
+                        InputStream dataStream = resource.getData()
+                ) {
+                    Response<Result> response = http.post(publish, dataStream, source.getFileName().toString(), Result.class);
+                    checkResponse(response);
+                }
             } catch (IOException e) {
                 result = e;
             }

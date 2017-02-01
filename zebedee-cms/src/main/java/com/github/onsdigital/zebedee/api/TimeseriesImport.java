@@ -26,40 +26,41 @@ public class TimeseriesImport {
     public boolean importTimeseries(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // otherwise the call to get a request parameter will actually consume the body:
-        InputStream requestBody = request.getInputStream();
+        try (InputStream requestBody = request.getInputStream()) {
 
-        Session session = Root.zebedee.getSessions().get(request);
-        com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
+            Session session = Root.zebedee.getSessions().get(request);
+            com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
-        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
+            CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
 
-        if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
-            throw new BadRequestException("This collection has been approved and cannot be saved to.");
-        }
-
-        ServletFileUpload upload = Root.zebedee.getCollections().getServletFileUpload();
-
-        boolean collectionUpdated = false;
-        try {
-            for (FileItem item : upload.parseRequest(request)) {
-                try (InputStream inputStream = item.getInputStream()) {
-                    collectionWriter.getRoot().write(inputStream, item.getName());
-
-                    // update the collection json with the file upload.
-                    if (collection.description.timeseriesImportFiles == null)
-                        collection.description.timeseriesImportFiles = new ArrayList<>();
-                    collection.description.timeseriesImportFiles.add(item.getName());
-                    collectionUpdated = true;
-                }
+            if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
+                throw new BadRequestException("This collection has been approved and cannot be saved to.");
             }
-        } catch (Exception e) {
-            throw new IOException("Error processing uploaded file", e);
-        }
 
-        if (collectionUpdated) {
-            collection.save();
-        }
+            ServletFileUpload upload = Root.zebedee.getCollections().getServletFileUpload();
 
-        return true;
+            boolean collectionUpdated = false;
+            try {
+                for (FileItem item : upload.parseRequest(request)) {
+                    try (InputStream inputStream = item.getInputStream()) {
+                        collectionWriter.getRoot().write(inputStream, item.getName());
+
+                        // update the collection json with the file upload.
+                        if (collection.description.timeseriesImportFiles == null)
+                            collection.description.timeseriesImportFiles = new ArrayList<>();
+                        collection.description.timeseriesImportFiles.add(item.getName());
+                        collectionUpdated = true;
+                    }
+                }
+            } catch (Exception e) {
+                throw new IOException("Error processing uploaded file", e);
+            }
+
+            if (collectionUpdated) {
+                collection.save();
+            }
+
+            return true;
+        }
     }
 }

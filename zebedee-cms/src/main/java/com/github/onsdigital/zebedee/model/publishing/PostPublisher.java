@@ -85,8 +85,7 @@ public class PostPublisher {
             ContentWriter contentWriter = new ContentWriter(zebedee.getPublished().path);
 
             applyDeletesToPublishing(collection, contentReader, contentWriter);
-
-            applyManifestCopiesToMaster(collection, contentReader, contentWriter);
+            processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
 
             reindexPublishingSearch(collection);
@@ -109,6 +108,7 @@ public class PostPublisher {
 
         return false;
     }
+
 
 
     /**
@@ -216,13 +216,32 @@ public class PostPublisher {
 
     }
 
-    private static void applyManifestCopiesToMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
+
+    private static void processManifestForMaster(Collection collection, ContentReader contentReader, ContentWriter contentWriter) {
 
         try {
             Manifest manifest = Manifest.get(collection);
 
+            // Apply any deletes that are defined in the transaction first to ensure we do not delete updated files.
+            for (String uri : manifest.urisToDelete) {
+                Path target = contentReader.getRootFolder().resolve(StringUtils.removeStart(uri, "/"));
+                logDebug("Deleting directory on publishing content: ")
+                        .addParameter("path", target.toString())
+                        .log();
+                try {
+                    FileUtils.deleteDirectory(target.toFile());
+                } catch (IOException e) {
+                    logError(e, "An error occurred trying to delete directory "
+                            + target.toString())
+                            .collectionName(collection).collectionId(collection).log();
+                }
+            }
+
             for (FileCopy fileCopy : manifest.filesToCopy) {
-                try (InputStream inputStream = contentReader.getResource(fileCopy.source).getData()) {
+                try (
+                        Resource resource = contentReader.getResource(fileCopy.source);
+                        InputStream inputStream = resource.getData()
+                ) {
                     contentWriter.write(inputStream, fileCopy.target);
                 } catch (ZebedeeException | IOException e) {
                     logError(e, "An error occurred trying to copy file from "
@@ -233,10 +252,12 @@ public class PostPublisher {
                 }
             }
         } catch (Exception e) {
-            logError(e, "An error occurred trying apply the publish manifest copies to publishing content ")
+            logError(e, "An error occurred trying apply the publish manifest to publishing content ")
                     .collectionName(collection).collectionId(collection).log();
         }
+
     }
+
 
     private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
         pool.submit(() -> {
@@ -266,12 +287,17 @@ public class PostPublisher {
                     Path publishPath = zebedee.getPublished().path.resolve(publishUri);
                     logInfo("Unzipping TimeSeries").addParameter("source", source.toString()).addParameter("destination", publishPath.toString()).log();
 
-                    Resource resource = collectionReader.getResource(uri);
-                    ZipUtils.unzip(resource.getData(), publishPath.toString());
+                    try (
+                            Resource resource = collectionReader.getResource(uri);
+                            InputStream dataStream = resource.getData()
+                    ) {
+                        ZipUtils.unzip(dataStream, publishPath.toString());
+                    }
                 }
             }
         }
     }
+
 
 
     private static void reindexPublishingSearch(Collection collection) throws IOException {
@@ -292,7 +318,7 @@ public class PostPublisher {
             for (PendingDelete pendingDelete : collection.description.getPendingDeletes()) {
 
                 ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                    logDebug("Deleting index for uri " + node.uri);
+                    logDebug("Deleting index from publishing search ").addParameter("uri", node.uri).log();
                     pool.submit(() -> {
                         try {
                             Indexer.getInstance().deleteContentIndex(node.type, node.uri);
@@ -332,17 +358,20 @@ public class PostPublisher {
         });
     }
 
-    public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader) throws IOException, ZebedeeException {
-
+    public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader)
+            throws IOException, ZebedeeException {
         logInfo("Moving files from collection into master").collectionName(collection).log();
-
         // Move each item of content:
         for (String uri : collection.reviewed.uris()) {
             if (!VersionedContentItem.isVersionedUri(uri)
                     && !FilenameUtils.getName(uri).equals("timeseries-to-publish.zip")) {
                 Path destination = zebedee.getPublished().toPath(uri);
-                Resource resource = collectionReader.getResource(uri);
-                FileUtils.copyInputStreamToFile(resource.getData(), destination.toFile());
+                try (
+                        Resource resource = collectionReader.getResource(uri);
+                        InputStream dataStream = resource.getData()
+                ) {
+                    FileUtils.copyInputStreamToFile(dataStream, destination.toFile());
+                }
             }
         }
     }
@@ -377,9 +406,13 @@ public class PostPublisher {
         logInfo("Moving collection files").addParameter("from", collectionFilesSource.toString())
                 .addParameter("to", collectionFilesDestination.toString()).log();
         for (String uri : collection.reviewed.uris()) {
-            Resource resource = collectionReader.getResource(uri);
-            File destination = collectionFilesDestination.resolve(URIUtils.removeLeadingSlash(uri)).toFile();
-            FileUtils.copyInputStreamToFile(resource.getData(), destination);
+            try (
+                    Resource resource = collectionReader.getResource(uri);
+                    InputStream inputStream = resource.getData();
+            ) {
+                File destination = collectionFilesDestination.resolve(URIUtils.removeLeadingSlash(uri)).toFile();
+                FileUtils.copyInputStreamToFile(inputStream, destination);
+            }
         }
 
         return collectionJsonDestination;

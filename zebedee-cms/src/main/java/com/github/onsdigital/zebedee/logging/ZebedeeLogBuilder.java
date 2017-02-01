@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
  */
 public class ZebedeeLogBuilder extends LogMessageBuilder {
 
-    public static final String LOG_NAME = "com.github.onsdigital.logging";
+    public static final String LOG_NAME = "com.github.onsdigital.zebedee";
     private static final String ZEBEDEE_EXCEPTION = "Zebedee Exception";
     private static final String STACK_TRACE_KEY = "stackTrace";
     private static final String ERROR_CONTEXT = "exception";

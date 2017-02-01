@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart;
 
+import java.util.Map;
 /**
  * Created by carlhembrough on 10/01/2017.
  */
@@ -15,6 +16,8 @@ public class Annotation {
     private int bandWidth;
     private int width;
     private int height;
+
+    private Map<String, AnnotationDevice> devices;
 
     public int getId() {
         return id;
@@ -94,5 +97,13 @@ public class Annotation {
 
     public void setBandWidth(int bandWidth) {
         this.bandWidth = bandWidth;
+    }
+    
+    public Map<String, AnnotationDevice> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(Map<String, AnnotationDevice> devices) {
+        this.devices = devices;
     }
 }

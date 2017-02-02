@@ -4,8 +4,8 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
-import com.github.onsdigital.zebedee.model.publishing.Publisher;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -52,7 +52,7 @@ public class PostPublishCollectionTask implements Callable<Boolean> {
         boolean result = false;
 
         try {
-            result = Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
+            result = PostPublisher.postPublish(zebedee, collection, skipVerification, collectionReader);
         } catch (IOException e) {
             logError(e, "Error while Running collection post publish process").collectionName(collection).log();
         }

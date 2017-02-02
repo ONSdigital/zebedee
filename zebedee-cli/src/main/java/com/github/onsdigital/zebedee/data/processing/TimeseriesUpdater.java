@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
 /**
  * Created by carlhembrough on 29/09/2016.

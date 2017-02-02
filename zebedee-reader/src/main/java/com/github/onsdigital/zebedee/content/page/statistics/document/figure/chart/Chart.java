@@ -41,6 +41,7 @@ public class Chart extends FigureBase {
     private Boolean showTooltip;
     private Boolean showMarker;
     private Boolean hasLineBreak;
+    private Boolean hasConnectNull;
 
     private List<Annotation> annotations;
     private Map<String, Device> devices;
@@ -320,5 +321,12 @@ public class Chart extends FigureBase {
 
     public void setHasLineBreak(Boolean hasLineBreak) {
         this.hasLineBreak = hasLineBreak;
+    }
+    public Boolean getHasConnectNull() {
+        return hasConnectNull;
+    }
+
+    public void setHasConnectNull(Boolean hasConnectNull) {
+        this.hasConnectNull = hasConnectNull;
     }
 }

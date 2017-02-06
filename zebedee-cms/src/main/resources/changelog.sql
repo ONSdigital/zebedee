@@ -25,4 +25,22 @@ CREATE TABLE history_event_meta_data
 );
 --rollback drop table history_event_meta_data;
 
+--changeset carl:3
+CREATE TABLE deleted_content (
+    deleted_content_event_id serial PRIMARY KEY NOT NULL,
+    collection_id character varying(255) NOT NULL,
+    collection_name character varying(255) NOT NULL,
+    event_date timestamp without time zone NOT NULL,
+    page_title character varying(255),
+    uri character varying(255)
+);
+--rollback drop table deleted_content;
 
+--changeset carl:4
+CREATE TABLE deleted_file (
+    deleted_file_id serial PRIMARY KEY NOT NULL,
+    uri character varying(255),
+    deleted_content_event_id BIGINT,
+    FOREIGN KEY (deleted_content_event_id) REFERENCES deleted_content(deleted_content_event_id)
+);
+--rollback drop table deleted_file;

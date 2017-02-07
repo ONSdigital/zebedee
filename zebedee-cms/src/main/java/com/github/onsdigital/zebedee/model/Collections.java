@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
+import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
@@ -358,7 +359,7 @@ public class Collections {
 
             new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
 
-            Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
+            PostPublisher.postPublish(zebedee, collection, skipVerification, collectionReader);
 
             logInfo("Collection postPublish process finished")
                     .collectionName(collection)

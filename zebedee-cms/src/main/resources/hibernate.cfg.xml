@@ -41,6 +41,8 @@
 
         <mapping class="com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent"/>
         <mapping class="com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEventMetaData"/>
+        <mapping class="com.github.onsdigital.zebedee.persistence.model.DeletedContentEvent"/>
+        <mapping class="com.github.onsdigital.zebedee.persistence.model.DeletedFile"/>
 
     </session-factory>
 

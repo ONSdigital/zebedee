@@ -10,18 +10,15 @@ node {
 
     def branch   = env.JOB_NAME.replaceFirst('.+/', '')
     def revision = revisionFrom(readFile('git-tag').trim(), readFile('git-commit').trim())
-    def registry = registry(branch, revision)
 
     stage('Build') {
         sh "${tool 'm3'}/bin/mvn clean package dependency:copy-dependencies"
     }
 
     stage('Image') {
-        docker.withRegistry(registry['uri'], { ->
-            if (registry.containsKey('login')) sh registry['login']
-
-            for (image in registry['images']) {
-                docker.build(image['name'], image['dir']).push(registry['tag'])
+        docker.withRegistry("https://${env.ECR_REPOSITORY_URI}", { ->
+            for (image in images()) {
+                docker.build(image['name'], image['dir']).push(revision)
             }
         })
     }
@@ -58,38 +55,17 @@ node {
     }
 }
 
-def registry(branch, tag) {
+def images() {
     [
-        hub: [
-            login: 'docker --config .dockerhub login --username=$DOCKERHUB_USER --password=$DOCKERHUB_PASS',
-            images: [
-                [
-                    name: "${env.DOCKERHUB_REPOSITORY}/zebedee",
-                    dir: '.',
-                ],
-                [
-                    name: "${env.DOCKERHUB_REPOSITORY}/zebedee-reader",
-                    dir: './zebedee-reader/',
-                ],
-            ],
-            tag: 'live',
-            uri: "https://${env.DOCKERHUB_REPOSITORY_URI}",
+        [
+            name: 'zebedee',
+            dir: '.',
         ],
-        ecr: [
-            images: [
-                [
-                    name: 'zebedee',
-                    dir: '.',
-                ],
-                [
-                    name: 'zebedee-reader',
-                    dir: './zebedee-reader/',
-                ],
-            ],
-            tag: tag,
-            uri: "https://${env.ECR_REPOSITORY_URI}",
+        [
+            name: 'zebedee-reader',
+            dir: './zebedee-reader/',
         ],
-    ][branch == 'live' ? 'hub' : 'ecr']
+    ]
 }
 
 @NonCPS

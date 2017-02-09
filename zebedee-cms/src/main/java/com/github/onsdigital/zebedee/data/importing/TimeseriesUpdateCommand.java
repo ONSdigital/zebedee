@@ -15,6 +15,8 @@ public class TimeseriesUpdateCommand {
     public String cdid; // The CDID to define the timeseries to update.
     public String dataset;
     public String title; // The title to update to.
+    public String unit;
+    public String preunit;
     public Date releaseDate;
     public String uri;
     public Map<String, Integer> datasetCsvColumn = new HashMap<>(); // the csv column to update for each dataset.

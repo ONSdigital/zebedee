@@ -9,6 +9,8 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
+import com.github.onsdigital.zebedee.util.publish.pipeline.PublishCollection;
+import com.github.onsdigital.zebedee.util.publish.pipeline.Scheduler;
 import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -28,7 +30,7 @@ public class Publish {
     /**
      * @param request  the file request
      * @param response <ul>
-     *                 <li>If publish succeeds: {@link HttpStatus#OK_200}</li>
+     *                 <li>If schedule succeeds: {@link HttpStatus#OK_200}</li>
      *                 <li>If credentials are not provided:  {@link HttpStatus#BAD_REQUEST_400}</li>
      *                 <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
      *                 <li>If the collection doesn't exist:  {@link HttpStatus#BAD_REQUEST_400}</li>
@@ -56,15 +58,19 @@ public class Publish {
         boolean doBreakBeforeFileTransfer = BooleanUtils.toBoolean(breakBeforePublish);
         boolean doSkipVerification = BooleanUtils.toBoolean(skipVerification);
 
-        try {
-            boolean result = Root.zebedee.getCollections().publish(collection, session, doBreakBeforeFileTransfer,
-                    doSkipVerification);
-            logPublishResult(request, collection, session, result, null);
-            return result;
-        } catch (ZebedeeException | IOException ex) {
-            logPublishResult(request, collection, session, false, ex);
-            throw ex;
-        }
+       // try {
+       //     boolean result = Root.zebedee.getCollections().schedule(collection, session, doBreakBeforeFileTransfer,
+       //             doSkipVerification);
+       //     logPublishResult(request, collection, session, result, null);
+       //     return result;
+       // } catch (ZebedeeException | IOException ex) {
+       //     logPublishResult(request, collection, session, false, ex);
+       //     throw ex;
+       // }
+
+        Scheduler.add(collection);
+
+        return true;
     }
 
     private void logPublishResult(HttpServletRequest request, com.github.onsdigital.zebedee.model.Collection collection,

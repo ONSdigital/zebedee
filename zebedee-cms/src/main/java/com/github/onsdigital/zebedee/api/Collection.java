@@ -10,6 +10,7 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.util.publish.pipeline.Scheduler;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -114,7 +115,8 @@ public class Collection {
                 collectionDescription, Root.zebedee, session);
 
         if (collection.description.type.equals(CollectionType.scheduled)) {
-            Root.schedulePublish(collection);
+            //Root.schedulePublish(collection);
+            Scheduler.add(collection);
         }
 
         Audit.Event.COLLECTION_CREATED

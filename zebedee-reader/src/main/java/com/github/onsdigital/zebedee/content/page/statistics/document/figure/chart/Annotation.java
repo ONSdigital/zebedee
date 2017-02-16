@@ -7,8 +7,8 @@ import java.util.Map;
 public class Annotation {
 
     private int id;
-    private int x;
-    private int y;
+    private String x;
+    private String y;
     private String title;
     private String orientation;
     private boolean isHidden;
@@ -27,19 +27,19 @@ public class Annotation {
         this.id = id;
     }
 
-    public int getX() {
+    public String getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(String x) {
         this.x = x;
     }
 
-    public int getY() {
+    public String getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(String y) {
         this.y = y;
     }
 

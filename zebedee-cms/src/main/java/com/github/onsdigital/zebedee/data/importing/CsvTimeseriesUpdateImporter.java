@@ -47,9 +47,11 @@ public class CsvTimeseriesUpdateImporter implements TimeseriesUpdateImporter {
                     command.cdid = strings[0];
                     command.dataset = strings[1];
 
-                    if (strings.length > 2)
-                        command.title = strings[2];//command.releaseDate = dateSerializer.deserialize(strings[1]);
+//                    if (strings.length > 2)
+//                        command.title = strings[2];//command.releaseDate = dateSerializer.deserialize(strings[1]);
 
+                    command.preunit = strings[2];
+                    command.unit = strings[3];
 
                     commands.add(command);
                 }

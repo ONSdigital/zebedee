@@ -63,6 +63,16 @@ public class TimeseriesUpdater {
                     updated = true;
                 }
 
+                if (command.preunit != null && command.preunit.length() > 0) {
+                    page.getDescription().setPreUnit(command.preunit);
+                    updated = true;
+                }
+
+                if (command.unit != null && command.unit.length() > 0) {
+                    page.getDescription().setUnit(command.unit);
+                    updated = true;
+                }
+
                 if (command.releaseDate != null) {
                     page.getDescription().setReleaseDate(command.releaseDate);
                     updated = true;

@@ -1,0 +1,26 @@
+---
+
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: onsdigital/dp-concourse-tools-git
+
+inputs:
+  - name: target
+  - name: zebedee
+  - name: zebedee-cms
+
+outputs:
+  - name: artifacts
+  - name: revisions
+
+params:
+  AWS_REGION:
+  CODEDEPLOY_USER:
+  CONFIGURATION_BUCKET:
+  ECR_REPOSITORY_URI:
+
+run:
+  path: zebedee/ci/scripts/replace-vars.sh

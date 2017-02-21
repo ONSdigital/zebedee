@@ -76,25 +76,26 @@ public class DataFileGenerator {
      */
     DownloadSection writeXLS(DataGrid dataGrid, ContentWriter contentWriter, String xlsPath) throws IOException, BadRequestException {
         logDebug("Writing XLS file from DataGrid.").path(xlsPath).log();
-        Workbook wb = new SXSSFWorkbook(30);
-        Sheet sheet = wb.createSheet("data");
+        try (
+                Workbook wb = new SXSSFWorkbook(30);
+                OutputStream stream = contentWriter.getOutputStream(xlsPath)
+        ) {
+            Sheet sheet = wb.createSheet("data");
 
-        // Add the metadata
-        for (DataGridRow dataGridRow : dataGrid.metadata) {
-            xlsCellWriter.writeCells(dataGridRow, sheet.createRow(getNextRowIndex(sheet)));
-        }
+            // Add the metadata
+            for (DataGridRow dataGridRow : dataGrid.metadata) {
+                xlsCellWriter.writeCells(dataGridRow, sheet.createRow(getNextRowIndex(sheet)));
+            }
 
-        // Write the data
-        for (DataGridRow dataGridRow : dataGrid.rows) {
-            xlsCellWriter.writeCells(dataGridRow, sheet.createRow(getNextRowIndex(sheet)));
-        }
-
-        try (OutputStream stream = contentWriter.getOutputStream(xlsPath)) {
+            // Write the data
+            for (DataGridRow dataGridRow : dataGrid.rows) {
+                xlsCellWriter.writeCells(dataGridRow, sheet.createRow(getNextRowIndex(sheet)));
+            }
             wb.write(stream);
-        }
 
-        logDebug("Complete.").path(xlsPath).log();
-        return newDownloadSection("xlsx download", xlsPath);
+            logDebug("Complete.").path(xlsPath).log();
+            return newDownloadSection("xlsx download", xlsPath);
+        }
     }
 
     private int getNextRowIndex(Sheet sheet) {
@@ -108,9 +109,11 @@ public class DataFileGenerator {
      * @param csvPath
      */
     private DownloadSection writeCSV(DataGrid grid, ContentWriter contentWriter, String csvPath) throws IOException, BadRequestException {
-
-        OutputStream outputStream = contentWriter.getOutputStream(csvPath);
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(outputStream, Charset.forName("UTF8")), ',')) {
+        try (
+                OutputStream outputStream = contentWriter.getOutputStream(csvPath);
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, Charset.forName("UTF8"));
+                CSVWriter writer = new CSVWriter(outputStreamWriter)
+        ) {
             for (DataGridRow dataGridRow : grid.metadata) {
                 String[] row = new String[dataGridRow.cells.size() + 1];
                 row[0] = dataGridRow.label;

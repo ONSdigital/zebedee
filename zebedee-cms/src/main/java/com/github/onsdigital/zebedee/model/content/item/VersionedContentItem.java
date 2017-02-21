@@ -99,6 +99,7 @@ public class VersionedContentItem extends ContentItem {
 
     /**
      * Return the identifier of the most recently added version.
+     *
      * @param datasetPath
      * @return
      */
@@ -147,18 +148,20 @@ public class VersionedContentItem extends ContentItem {
      * @throws IOException
      * @throws ZebedeeException
      */
-    private void copyFilesIntoVersionDirectory(Path contentRoot, String versionUri, ContentReader contentReader, ContentWriter contentWriter) throws IOException, ZebedeeException {
-
+    private void copyFilesIntoVersionDirectory(Path contentRoot, String versionUri, ContentReader contentReader,
+                                               ContentWriter contentWriter) throws IOException, ZebedeeException {
         // Iterate the files in the source directory.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri().toString())))) {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) { // ignore directories
                     String uri = contentRoot.relativize(path).toString();
-                    Resource source = contentReader.getResource(uri);
 
-                    String filename = path.getFileName().toString();
-                    Path versionPath = Paths.get(versionUri).resolve(filename);
-                    try (InputStream inputStream = source.getData()) {
+                    try (
+                            Resource source = contentReader.getResource(uri);
+                            InputStream inputStream = source.getData()
+                    ) {
+                        String filename = path.getFileName().toString();
+                        Path versionPath = Paths.get(versionUri).resolve(filename);
                         contentWriter.write(inputStream, versionPath.toString());
                     }
                 }

@@ -70,7 +70,6 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("BABBAGE_URL"), DEFAULT_WEBSITE_URL);
     }
 
-
     public static String getMathjaxServiceUrl() {
         return StringUtils.defaultIfBlank(getValue("MATHJAX_SERVICE_URL"), MATHJAX_SERVICE_URL);
     }
@@ -109,6 +108,10 @@ public class Configuration {
 
     public static boolean isAuditDatabaseEnabled() {
         return Boolean.valueOf(StringUtils.defaultIfBlank(getValue(AUDIT_DB_ENABLED_ENV_VAR), "true"));
+    }
+
+    public static boolean storeDeletedContent() {
+        return Boolean.valueOf(StringUtils.defaultIfBlank(getValue("store_deleted_content"), "true"));
     }
 
     public static String getAuditDBURL() {

@@ -97,7 +97,7 @@ public class DeleteContent {
             return new DeleteContentResponse(HttpStatus.SC_BAD_REQUEST);
         }
 
-        deleteService.cancelPendingDelete(collection, contentUri.get());
+        deleteService.cancelPendingDelete(collection, session, contentUri.get());
         return new DeleteContentResponse(HttpStatus.SC_OK);
     }
 }

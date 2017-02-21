@@ -24,6 +24,7 @@ import javax.ws.rs.POST;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,24 +69,29 @@ public class Table {
             response.setContentType(contentType);
         }
 
-        Resource resource = collectionReader.getResource(uri);
-        TableModifications modifications = getTableModifications(request);
-        Node table = XlsToHtmlConverter.convertToHtmlPageWithModifications(resource.getData(), modifications);
-        String output = XlsToHtmlConverter.docToString(table);
+        try (
+                Resource resource = collectionReader.getResource(uri);
+                InputStream inputStream = resource.getData()
+        ) {
 
-        // Write the file to the response
-        org.apache.commons.io.IOUtils.copy(new StringReader(output),
-                response.getOutputStream());
+            TableModifications modifications = getTableModifications(request);
+            Node table = XlsToHtmlConverter.convertToHtmlPageWithModifications(inputStream, modifications);
+            String output = XlsToHtmlConverter.docToString(table);
 
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_TABLE_CREATED,
-                tableCreated(uri, modifications));
+            // Write the file to the response
+            org.apache.commons.io.IOUtils.copy(new StringReader(output),
+                    response.getOutputStream());
 
-        Audit.Event.COLLECTION_TABLE_CREATED
-                .parameters()
-                .host(request)
-                .collection(collection)
-                .user(session.email)
-                .log();
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_TABLE_CREATED,
+                    tableCreated(uri, modifications));
+
+            Audit.Event.COLLECTION_TABLE_CREATED
+                    .parameters()
+                    .host(request)
+                    .collection(collection)
+                    .user(session.email)
+                    .log();
+        }
     }
 
     private TableModifications getTableModifications(HttpServletRequest request) throws IOException {

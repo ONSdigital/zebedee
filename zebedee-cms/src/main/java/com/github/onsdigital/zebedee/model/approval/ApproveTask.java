@@ -6,7 +6,12 @@ import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateCommand;
 import com.github.onsdigital.zebedee.data.importing.TimeseriesUpdateImporter;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.PendingDelete;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -16,6 +21,7 @@ import com.github.onsdigital.zebedee.model.content.CompoundContentReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
@@ -29,7 +35,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.*;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 /**
  * Callable implementation for the approval process.
@@ -84,13 +92,16 @@ public class ApproveTask implements Callable<Boolean> {
                 CompoundContentReader compoundContentReader = new CompoundContentReader(publishedReader);
                 compoundContentReader.add(collectionReader.getReviewed());
 
-                InputStream csvInput = collectionReader.getRoot().getResource(importFile).getData();
+                try (
+                        Resource resource = collectionReader.getRoot().getResource(importFile);
+                        InputStream csvInput = resource.getData()
+                ) {
+                    // read the CSV and update the timeseries titles.
+                    TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
 
-                // read the CSV and update the timeseries titles.
-                TimeseriesUpdateImporter importer = new CsvTimeseriesUpdateImporter(csvInput);
-
-                logInfo("Importing CSV file").addParameter("filename", importFile).log();
-                updateCommands.addAll(importer.importData());
+                    logInfo("Importing CSV file").addParameter("filename", importFile).log();
+                    updateCommands.addAll(importer.importData());
+                }
             }
         }
         return updateCommands;
@@ -106,9 +117,7 @@ public class ApproveTask implements Callable<Boolean> {
         List<ContentDetail> contentToDelete = new ArrayList<>();
         List<PendingDelete> pendingDeletes = collection.getDescription().getPendingDeletes();
 
-
         for (PendingDelete pendingDelete : pendingDeletes) {
-
             ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
                 logDebug("Adding uri to delete to the publish notification " + node.uri);
                 if (!contentToDelete.contains(node.uri)) {

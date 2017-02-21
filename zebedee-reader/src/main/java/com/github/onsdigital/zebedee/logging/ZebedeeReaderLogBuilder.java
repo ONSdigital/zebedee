@@ -10,7 +10,7 @@ import java.nio.file.Path;
  */
 public class ZebedeeReaderLogBuilder extends LogMessageBuilder {
 
-    private static final String LOG_NAME = "com.github.onsdigital.logging";
+    private static final String LOG_NAME = "com.github.onsdigital.zebedee-reader";
 
     private static final String ELASTIC_SEARCH_PREFIX = "[ElasticSearch] ";
     private static final String ZEBEDEE_READER_EXCEPTION = "Zebedee Reader Exception";

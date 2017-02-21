@@ -271,6 +271,7 @@ public class CsvTimeseriesUpdater {
                     logDebug("UpdateCommand added to dataset")
                             .addParameter("cdid", updateCommand.cdid)
                             .addParameter("csdbid", timeseriesDatasetFiles.getCsdbId())
+                            .addParameter("url", updateCommand.uri)
                             .log();
                     commandsForThisDataset.add(updateCommand);
                 }
@@ -289,7 +290,6 @@ public class CsvTimeseriesUpdater {
 
             for (TimeseriesDatasetFiles datasetDownload : datasetDownloads) {
                 if (command.dataset.equalsIgnoreCase(datasetDownload.getCsdbId())) {
-                    logDebug("datasetDownload to update").addParameter("CSDBID", datasetDownload.getCsdbId()).log();
                     datasetDownloadsToUpdate.add(datasetDownload);
                 }
             }

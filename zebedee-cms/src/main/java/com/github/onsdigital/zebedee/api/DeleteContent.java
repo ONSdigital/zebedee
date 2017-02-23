@@ -67,6 +67,7 @@ public class DeleteContent {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
+// TODO CLOSE-IO
         InputStream inputStream = zebedeeCmsService.objectAsInputStream(
                 deleteService.getDeleteItemsByCollection(collection));
         IOUtils.copy(inputStream, response.getOutputStream());

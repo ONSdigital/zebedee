@@ -74,6 +74,8 @@ public class Content {
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
+
+        // TODO CLOSE-IO
         InputStream requestBody = request.getInputStream();
 
         Session session = Root.zebedee.getSessions().get(request);

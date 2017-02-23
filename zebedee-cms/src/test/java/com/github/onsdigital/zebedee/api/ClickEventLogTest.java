@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.onsdigital.zebedee.logging.click.event.ClickEventLogFactory;
 import com.github.onsdigital.zebedee.model.ClickEvent;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.After;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.mock.web.DelegatingServletInputStream;
@@ -26,6 +27,7 @@ public class ClickEventLogTest extends ZebedeeAPIBaseTestCase {
     private ClickEventLog endpoint;
     private List<String> elementClasses;
     private ClickEvent clickEvent;
+    private InputStream inputStream;
 
     @Mock
     private ClickEventLogFactory clickEventLogFactoryMock;
@@ -54,7 +56,7 @@ public class ClickEventLogTest extends ZebedeeAPIBaseTestCase {
         String clickEventJson = new ObjectMapper().writeValueAsString(clickEvent);
 
         // Convert the ClickEvent object to a JSON string and then convert that to an inputStream.
-        InputStream inputStream = new ByteArrayInputStream(clickEventJson.getBytes(StandardCharsets.UTF_8));
+        inputStream = new ByteArrayInputStream(clickEventJson.getBytes(StandardCharsets.UTF_8));
 
         // Return this input stream from the request.
         when(mockRequest.getInputStream())
@@ -74,5 +76,10 @@ public class ClickEventLogTest extends ZebedeeAPIBaseTestCase {
 
         verify(mockRequest, times(1)).getInputStream();
         verify(clickEventLogFactoryMock, times(1)).log(clickEvent);
+    }
+
+    @After
+    public void cleanup() throws Exception {
+        inputStream.close();
     }
 }

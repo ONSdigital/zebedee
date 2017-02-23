@@ -324,6 +324,7 @@ public class Indexer {
     }
 
     private String getDefaultMapping() throws IOException {
+        // TODO CLOSE-IO
         InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/default-mapping.json");
         String mappingSource = IOUtils.toString(mappingSourceStream);
         elasticSearchLog("defaultMapping").addParameter("mappingSource", mappingSource).log();
@@ -331,6 +332,7 @@ public class Indexer {
     }
 
     private String getDepartmentsMapping() throws IOException {
+        // TODO CLOSE-IO
         InputStream mappingSourceStream = Indexer.class.getResourceAsStream("/search/departments/departments-mapping.json");
         String mappingSource = IOUtils.toString(mappingSourceStream);
         elasticSearchLog("departmentsMapping").addParameter("mappingSource", mappingSource).log();

@@ -118,6 +118,16 @@ public class Configuration {
         return StringUtils.defaultIfBlank(getValue("db_audit_url"), "");
     }
 
+    public static Integer getFileDescriptorIntervalTime() {
+        String strValue = StringUtils.defaultIfBlank(getValue("file_descriptor_interval_time"), "30");
+        return Integer.parseInt(strValue);
+    }
+
+    public static Integer getFileDescriptorThreshholdLimit() {
+        String strValue = StringUtils.defaultIfBlank(getValue("file_descriptor_threshhold_limit"), "90");
+        return Integer.parseInt(strValue);
+    }
+
     /**
      * Gets a configured value for the given key from either the system
      * properties or an environment variable.

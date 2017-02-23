@@ -18,6 +18,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
@@ -161,8 +162,11 @@ public class VerificationAgent {
     private void setHash(UriInfo uriInfo, CollectionReader reader) {
         String uri = uriInfo.uri;
         try {
-            try (Resource resource = reader.getResource(uri)) {
-                uriInfo.sha = ContentUtil.hash(resource.getData());
+            try (
+                    Resource resource = reader.getResource(uri);
+                    InputStream in = resource.getData()
+            ) {
+                uriInfo.sha = ContentUtil.hash(in);
             }
         } catch (Exception e) {
             logError(e, "Failed resolving hash for content").addParameter("uri", uri).log();

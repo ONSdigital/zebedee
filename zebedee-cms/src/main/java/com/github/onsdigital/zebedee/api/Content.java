@@ -74,39 +74,37 @@ public class Content {
 
         // We have to get the request InputStream before reading any request parameters
         // otherwise the call to get a request parameter will actually consume the body:
+        try (InputStream requestBody = request.getInputStream()) {
 
-        // TODO CLOSE-IO
-        InputStream requestBody = request.getInputStream();
+            Session session = Root.zebedee.getSessions().get(request);
+            Collection collection = Collections.getCollection(request);
 
-        Session session = Root.zebedee.getSessions().get(request);
+            String uri = request.getParameter("uri");
+            Boolean overwriteExisting = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("overwriteExisting"), "true"));
+            Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
+            CollectionEventType eventType = getEventType(Paths.get(uri));
+            Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
 
-        Collection collection = Collections.getCollection(request);
+            if (overwriteExisting) {
+                Root.zebedee.getCollections().writeContent(collection, uri, session, request, requestBody, recursive, eventType, validateJson);
+                Audit.Event.CONTENT_OVERWRITTEN
+                        .parameters()
+                        .host(request)
+                        .collection(collection)
+                        .content(uri)
+                        .user(session.email).log();
+            } else {
+                Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, eventType, validateJson);
+                Audit.Event.CONTENT_SAVED
+                        .parameters()
+                        .host(request)
+                        .collection(collection)
+                        .content(uri)
+                        .user(session.email).log();
+            }
 
-        String uri = request.getParameter("uri");
-        Boolean overwriteExisting = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("overwriteExisting"), "true"));
-        Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
-        CollectionEventType eventType = getEventType(Paths.get(uri));
-        Boolean validateJson = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("validateJson"), "true"));
-
-        if (overwriteExisting) {
-            Root.zebedee.getCollections().writeContent(collection, uri, session, request, requestBody, recursive, eventType, validateJson);
-            Audit.Event.CONTENT_OVERWRITTEN
-                    .parameters()
-                    .host(request)
-                    .collection(collection)
-                    .content(uri)
-                    .user(session.email).log();
-        } else {
-            Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, eventType, validateJson);
-            Audit.Event.CONTENT_SAVED
-                    .parameters()
-                    .host(request)
-                    .collection(collection)
-                    .content(uri)
-                    .user(session.email).log();
+            return true;
         }
-
-        return true;
     }
 
     /**

@@ -1,0 +1,19 @@
+---
+
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: onsdigital/dp-concourse-tools-git
+
+inputs:
+  - name: artifacts
+  - name: revisions
+  - name: zebedee
+
+outputs:
+  - name: cms-deployment
+
+run:
+  path: zebedee/ci/scripts/cms-deployment-bundle.sh

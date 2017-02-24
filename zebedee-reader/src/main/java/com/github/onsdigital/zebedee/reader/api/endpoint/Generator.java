@@ -61,7 +61,6 @@ public class Generator {
         }
     }
 
-
     private Resource getResource(Content content, String format) throws IOException, BadRequestException {
         if (content instanceof Chart) {
             // If page is a chart write the chart spreadsheet requested to response

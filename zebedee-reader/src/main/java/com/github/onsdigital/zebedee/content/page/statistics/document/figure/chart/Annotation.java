@@ -13,9 +13,9 @@ public class Annotation {
     private String orientation;
     private boolean isHidden;
     private boolean isPlotline;
-    private int bandWidth;
-    private int width;
-    private int height;
+    private String bandWidth;
+    private String width;
+    private String height;
 
     private Map<String, AnnotationDevice> devices;
 
@@ -75,27 +75,27 @@ public class Annotation {
         isPlotline = plotline;
     }
 
-    public int getWidth() {
+    public String getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(String width) {
         this.width = width;
     }
 
-    public int getHeight() {
+    public String getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(String height) {
         this.height = height;
     }
 
-    public int getBandWidth() {
+    public String getBandWidth() {
         return bandWidth;
     }
 
-    public void setBandWidth(int bandWidth) {
+    public void setBandWidth(String bandWidth) {
         this.bandWidth = bandWidth;
     }
     

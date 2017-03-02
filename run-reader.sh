@@ -3,7 +3,7 @@
 source ./export-default-env-vars.sh
 
 export JAVA_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
-export PORT="8082"
+export PORT="${PORT:-8082}"
 
 # Restolino configuration
 export RESTOLINO_CLASSES="zebedee-reader/target/classes"

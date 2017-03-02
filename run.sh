@@ -3,7 +3,7 @@
 source ./export-default-env-vars.sh
 
 export JAVA_OPTS=" -Xmx512m -Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
-export PORT="8082"
+export PORT="${PORT:-8082}"
 
 # Restolino configuration
 export RESTOLINO_STATIC="src/main/resources/files"

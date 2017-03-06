@@ -18,11 +18,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,14 +26,15 @@ public class PublishCollection {
 
     private final Properties kafkaProducer = new Properties();
     private final Properties kafkaConsumer = new Properties();
-
-    // CollectionId is different between the pipeline and zebedee.
-    private static final ConcurrentHashMap<String, String> workaround = new ConcurrentHashMap<>();
+    private final String producerTopic;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public PublishCollection() {
-        kafkaProducer.put("bootstrap.servers", "localhost:9092");
+    PublishCollection() {
+        final String kafkaAddress = findEnv("KAFKA_ADDR", "localhost:9092");
+        producerTopic = findEnv("PRODUCER_TOPIC", "uk.gov.ons.dp.web.schedule");
+
+        kafkaProducer.put("bootstrap.servers", kafkaAddress);
         kafkaProducer.put("acks", "all");
         kafkaProducer.put("retries", 0);
         kafkaProducer.put("batch.size", 16384);
@@ -45,18 +42,21 @@ public class PublishCollection {
         kafkaProducer.put("buffer.memory", 33554432);
         kafkaProducer.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         kafkaProducer.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        kafkaConsumer.put("bootstrap.servers", "localhost:9092");
+
+        kafkaConsumer.put("bootstrap.servers", kafkaAddress);
         kafkaConsumer.put("group.id", "uk.gov.ons.dp.web.zebedee.cms");
         kafkaConsumer.put("enable.auto.commit", "true");
         kafkaConsumer.put("auto.commit.interval.ms", "1000");
         kafkaConsumer.put("session.timeout.ms", "30000");
         kafkaConsumer.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         kafkaConsumer.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
         executor.submit(this::pollForCompleteMessages);
     }
 
     public void schedule(Collection collection, Zebedee zebedee) {
-        final String collectionId = collection.path.getFileName().toString();
+        final String collectionId = collection.description.id;
+        final String collectionPath = collection.path.getFileName().toString();
         String epoch = "0";
         if (collection.description.publishDate != null) {
             epoch = Long.toString(collection.description.publishDate.getTime());
@@ -65,49 +65,47 @@ public class PublishCollection {
         final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
         final String encrytionKey = Base64.getEncoder().encodeToString(key.getEncoded());
 
-        final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, epoch, encrytionKey);
-        workaround.putIfAbsent(collectionId, collection.description.id);
+        final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, collectionPath, epoch, encrytionKey);
         System.out.println("Sending kafka message : " + kafkaMessage);
         collection.description.publishStartDate = new Date(Instant.now().getEpochSecond());
         try (Producer<String, String> producer = new KafkaProducer<>(kafkaProducer)) {
-            producer.send(new ProducerRecord<>("uk.gov.ons.dp.web.schedule", kafkaMessage));
+            producer.send(new ProducerRecord<>(producerTopic, kafkaMessage));
         }
     }
 
     private void pollForCompleteMessages() {
-        final KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumer);
-        consumer.subscribe(Arrays.asList("uk.gov.ons.dp.web.complete"));
-        while (true) {
-            final ConsumerRecords<String, String> records = consumer.poll(100);
-            for (ConsumerRecord<String, String> record : records) {
-                System.out.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(), record.value());
-                final Gson gson = new Gson();
-                final CompleteMessage message = gson.fromJson(record.value(), CompleteMessage.class);
-                System.out.println("message.getCollectionId()");
-                onCompleteCollection(message.getCollectionId());
+        final String consumeTopic = findEnv("CONSUME_TOPIC", "uk.gov.ons.dp.web.complete");
+        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumer)) {
+            consumer.subscribe(Collections.singleton(consumeTopic));
+            while (true) {
+                final ConsumerRecords<String, String> records = consumer.poll(100);
+                for (ConsumerRecord<String, String> record : records) {
+                    final Gson gson = new Gson();
+                    final CompleteMessage message = gson.fromJson(record.value(), CompleteMessage.class);
+                    onCompleteCollection(message);
+                }
             }
         }
     }
 
-    private void onCompleteCollection(String collectionId) {
-        System.out.println("onCompleteCollection");
+    private void onCompleteCollection(final CompleteMessage completeMessage) {
         Zebedee zebedee = Root.zebedee;
-        System.out.println("String realCollectionId = workaround.get(collectionId);");
-        String realCollectionId = workaround.get(collectionId);
-        if (realCollectionId == null) return;
-        workaround.remove(collectionId);
         try {
-            System.out.println("Collection collection = Root.zebedee.getCollections()");
-            Collection collection = Root.zebedee.getCollections().getCollection(realCollectionId);
+            Collection collection = Root.zebedee.getCollections().getCollection(completeMessage.getCollectionId());
             new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
             collection.description.publishEndDate = new Date(Instant.now().getEpochSecond());
-            ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.getKeyringCache().schedulerCache.get(realCollectionId));
+            ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.getKeyringCache().schedulerCache.get(completeMessage.getCollectionId()));
             Publisher.postPublish(zebedee, collection, true, collectionReader);
-            System.out.println("Complete publishing for : " + collectionId);
+            System.out.println("Complete publishing collectionId : " + completeMessage.getCollectionId() + ", jobId : " + completeMessage.getScheduleID());
 
         } catch (final Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String findEnv(String name, String defaultValue) {
+        String value = System.getenv(name);
+        return value == null? defaultValue : value;
     }
 
 }

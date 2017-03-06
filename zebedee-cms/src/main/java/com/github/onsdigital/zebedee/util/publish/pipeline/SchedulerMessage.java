@@ -7,14 +7,16 @@ public class SchedulerMessage {
 
     private String collectionId;
 
+    private String collectionPath;
+
     private String scheduleTime;
 
     private String encryptionKey;
 
-
-    public static String createSchedulerMessage(String collectionId, String publishTime, String encryptionKey) {
+    public static String createSchedulerMessage(String collectionId, String collectionPath, String publishTime, String encryptionKey) {
         SchedulerMessage message = new SchedulerMessage();
         message.setCollectionId(collectionId);
+        message.setCollectionPath(collectionPath);
         message.setScheduleTime(publishTime);
         message.setEncryptionKey(encryptionKey);
         final Gson gson = new Gson();
@@ -33,7 +35,7 @@ public class SchedulerMessage {
         return scheduleTime;
     }
 
-    public void setScheduleTime(String publishTime) {
+    void setScheduleTime(String publishTime) {
         this.scheduleTime = publishTime;
     }
 
@@ -41,7 +43,15 @@ public class SchedulerMessage {
         return encryptionKey;
     }
 
-    public void setEncryptionKey(String encryptionKey) {
+    void setEncryptionKey(String encryptionKey) {
         this.encryptionKey = encryptionKey;
+    }
+
+    public String getCollectionPath() {
+        return collectionPath;
+    }
+
+    void setCollectionPath(String collectionPath) {
+        this.collectionPath = collectionPath;
     }
 }

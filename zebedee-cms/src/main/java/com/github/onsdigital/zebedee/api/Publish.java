@@ -46,7 +46,6 @@ public class Publish {
     @POST
     public boolean publish(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException {
-
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         Session session = Root.zebedee.getSessions().get(request);
 

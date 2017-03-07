@@ -13,6 +13,7 @@ public class Annotation {
     private String orientation;
     private boolean isHidden;
     private boolean isPlotline;
+    private boolean isPlotband;
     private String bandWidth;
     private String width;
     private String height;
@@ -73,6 +74,14 @@ public class Annotation {
 
     public void setPlotline(boolean plotline) {
         isPlotline = plotline;
+    }
+
+    public boolean isPlotband() {
+        return isPlotband;
+    }
+
+    public void setPlotband(boolean plotband) {
+        isPlotband = plotband;
     }
 
     public String getWidth() {

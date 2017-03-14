@@ -34,6 +34,7 @@ public class Chart extends FigureBase {
     private List<String> series;
     private List<String> categories;
     private Map<String, String> chartTypes;
+    private Map<String, String> lineTypes;
     private List<List<String>> groups;
     private Boolean startFromZero;
     private Boolean finishAtHundred;
@@ -169,6 +170,14 @@ public class Chart extends FigureBase {
 
     public void setChartTypes(Map<String, String> chartTypes) {
         this.chartTypes = chartTypes;
+    }
+
+    public Map<String, String> getLineTypes() {
+        return lineTypes;
+    }
+
+    public void setLineTypes(Map<String, String> lineTypes) {
+        this.lineTypes = lineTypes;
     }
 
     public List<List<String>> getGroups() {

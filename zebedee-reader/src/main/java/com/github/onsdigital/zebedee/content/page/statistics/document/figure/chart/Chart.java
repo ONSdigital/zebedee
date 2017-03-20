@@ -39,6 +39,7 @@ public class Chart extends FigureBase {
     private Boolean startFromZero;
     private Boolean finishAtHundred;
     private Boolean isStacked;
+    private Boolean isReversed;
     private Boolean showTooltip;
     private Boolean showMarker;
     private Boolean hasLineBreak;
@@ -323,6 +324,14 @@ public class Chart extends FigureBase {
 
     public void setIsStacked(Boolean isStacked) {
         this.isStacked = isStacked;
+    }
+
+    public Boolean getIsReversed() {
+        return isReversed;
+    }
+
+    public void setIsReversed(Boolean isReversed) {
+        this.isReversed = isReversed;
     }
 
     public Boolean getHasLineBreak() {

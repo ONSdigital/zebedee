@@ -4,6 +4,7 @@ package com.github.onsdigital.zebedee.util.publish.pipeline;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
@@ -17,6 +18,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -57,15 +59,21 @@ public class PublishCollection {
     public void schedule(Collection collection, Zebedee zebedee) {
         final String collectionId = collection.description.id;
         final String collectionPath = collection.path.getFileName().toString();
+        final Manifest manifest;
+        try {
+            manifest = Manifest.get(collection);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         String epoch = "0";
         if (collection.description.publishDate != null) {
             epoch = Long.toString(collection.description.publishDate.getTime());
         }
-
+        final Set<String> filesToDelete = manifest.urisToDelete;
         final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
         final String encrytionKey = Base64.getEncoder().encodeToString(key.getEncoded());
-
-        final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, collectionPath, epoch, encrytionKey);
+        final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, collectionPath,
+                epoch, encrytionKey, filesToDelete);
         System.out.println("Sending kafka message : " + kafkaMessage);
         collection.description.publishStartDate = new Date(Instant.now().getEpochSecond());
         try (Producer<String, String> producer = new KafkaProducer<>(kafkaProducer)) {

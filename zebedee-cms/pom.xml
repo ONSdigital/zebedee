@@ -76,6 +76,13 @@
             <version>0.10.0.0</version>
         </dependency>
 
+        <!-- minio (L3 / S3) -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>

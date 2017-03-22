@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.util.publish.pipeline;
 
 import com.google.gson.Gson;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class SchedulerMessage {
@@ -17,14 +18,17 @@ public class SchedulerMessage {
 
     private Set<String> urisToDelete;
 
+    private Set<PublishedFile> files;
+
     static String createSchedulerMessage(String collectionId, String collectionPath, String publishTime,
-                                         String encryptionKey, Set<String> urisToDelete) {
+                                         String encryptionKey, Set<String> urisToDelete, Set<PublishedFile> files) {
         SchedulerMessage message = new SchedulerMessage();
         message.setCollectionId(collectionId);
         message.setCollectionPath(collectionPath);
         message.setScheduleTime(publishTime);
         message.setEncryptionKey(encryptionKey);
         message.setUrisToDelete(urisToDelete);
+        message.setFiles(files);
         final Gson gson = new Gson();
         return gson.toJson(message);
     }
@@ -68,4 +72,13 @@ public class SchedulerMessage {
     public void setUrisToDelete(Set<String> urisToDelete) {
         this.urisToDelete = urisToDelete;
     }
+
+    public Set<PublishedFile> getFiles() {
+        return files;
+    }
+
+    public void setFiles(Set<PublishedFile> files) {
+        this.files = files;
+    }
+
 }

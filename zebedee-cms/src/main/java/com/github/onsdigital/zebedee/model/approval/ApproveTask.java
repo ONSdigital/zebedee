@@ -20,10 +20,17 @@ import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.upstream.UpstreamContent;
+import io.minio.MinioClient;
+import io.minio.errors.*;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -135,6 +142,10 @@ public class ApproveTask implements Callable<Boolean> {
             PublishNotification publishNotification = createPublishNotification(collectionReader, collection);
 
             compressZipFiles(collection, collectionReader, collectionWriter);
+
+            // Move data to minio / S3
+            moveCollectionToObjectStore(collection);
+
             approveCollection();
 
             // Send a notification to the website with the publish date for caching.
@@ -184,5 +195,34 @@ public class ApproveTask implements Callable<Boolean> {
     public void generatePdfFiles(List<ContentDetail> collectionContent) {
         CollectionPdfGenerator pdfGenerator = new CollectionPdfGenerator(new BabbagePdfService(session, collection));
         pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
+    }
+
+    private void moveCollectionToObjectStore(Collection collectionContent) {
+        final String accessKey = UpstreamContent.ACCESS_KEY;
+        final String secretKey = UpstreamContent.SECRET_ACCESS_KEY;
+        final String s3Host = UpstreamContent.S3_HOST;
+        final String s3Bucket = UpstreamContent.S3_BUCKET;
+        try {
+            final MinioClient minioClient = new MinioClient(s3Host, accessKey, secretKey);
+            Files.walk(collection.reviewed.getPath()).forEach(file -> {
+                if (!Files.isDirectory(file)) {
+                    final String fileUri = file.toString().split("/reviewed/")[1];
+                    try {
+                        if (!minioClient.bucketExists(s3Bucket)) {
+                            minioClient.makeBucket(s3Bucket);
+                        }
+                        minioClient.putObject(s3Bucket, UpstreamContent.buildS3Location(collection, fileUri), file.toString());
+                    } catch (InvalidBucketNameException | NoSuchAlgorithmException | InsufficientDataException | IOException |
+                            InvalidKeyException | NoResponseException | XmlPullParserException | ErrorResponseException |
+                            InternalException | InvalidArgumentException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
+        } catch (IOException | MinioException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

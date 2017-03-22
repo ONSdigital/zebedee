@@ -5,10 +5,11 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
+import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.util.upstream.UpstreamContent;
 import com.google.gson.Gson;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -19,8 +20,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -56,7 +60,7 @@ public class PublishCollection {
         executor.submit(this::pollForCompleteMessages);
     }
 
-    public void schedule(Collection collection, Zebedee zebedee) {
+    public void schedule(Collection collection, Zebedee zebedee)  {
         final String collectionId = collection.description.id;
         final String collectionPath = collection.path.getFileName().toString();
         final Manifest manifest;
@@ -69,11 +73,12 @@ public class PublishCollection {
         if (collection.description.publishDate != null) {
             epoch = Long.toString(collection.description.publishDate.getTime());
         }
+
         final Set<String> filesToDelete = manifest.urisToDelete;
         final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
         final String encrytionKey = Base64.getEncoder().encodeToString(key.getEncoded());
         final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, collectionPath,
-                epoch, encrytionKey, filesToDelete);
+                epoch, encrytionKey, filesToDelete, findAllFiles(collection));
         System.out.println("Sending kafka message : " + kafkaMessage);
         collection.description.publishStartDate = new Date(Instant.now().getEpochSecond());
         try (Producer<String, String> producer = new KafkaProducer<>(kafkaProducer)) {
@@ -82,7 +87,7 @@ public class PublishCollection {
     }
 
     private void pollForCompleteMessages() {
-        final String consumeTopic = findEnv("CONSUME_TOPIC", "uk.gov.ons.dp.web.complete");
+        final String consumeTopic = findEnv("CONSUME_TOPIC", "uk.gov.ons.dp.web.complete1");
         try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumer)) {
             consumer.subscribe(Collections.singleton(consumeTopic));
             while (true) {
@@ -114,6 +119,22 @@ public class PublishCollection {
     private String findEnv(String name, String defaultValue) {
         String value = System.getenv(name);
         return value == null? defaultValue : value;
+    }
+
+    private Set<PublishedFile> findAllFiles(Collection collection) {
+        final Path dir = collection.reviewed.getPath();
+        final Set<PublishedFile> files = new HashSet<>();
+        try {
+            Files.walk(dir).forEach(file -> {
+                if (!Files.isDirectory(file)) {
+                    final String uri = file.toString().split("/reviewed")[1];
+                    files.add(new PublishedFile(uri, UpstreamContent.buildS3Address(collection, uri)));
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return files;
     }
 
 }

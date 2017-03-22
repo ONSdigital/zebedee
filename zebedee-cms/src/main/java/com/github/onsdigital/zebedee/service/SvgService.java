@@ -25,7 +25,7 @@ public class SvgService {
     public static void convertSvgToPng(InputStream inputStream, OutputStream outputStream) throws TranscoderException {
         Transcoder transcoder = new PNGTranscoder();
 
-        transcoder.addTranscodingHint(ImageTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, new Float(0.2f));
+        transcoder.addTranscodingHint(ImageTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, new Float(0.08f));
 
         TranscoderInput transcoderInput = new TranscoderInput(inputStream);
         TranscoderOutput transcoderOutput = new TranscoderOutput(outputStream);

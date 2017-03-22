@@ -69,10 +69,7 @@ public class PublishCollection {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String epoch = "0";
-        if (collection.description.publishDate != null) {
-            epoch = Long.toString(collection.description.publishDate.getTime());
-        }
+        final String epoch = getPublishTime(collection);
 
         final Set<String> filesToDelete = manifest.urisToDelete;
         final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
@@ -84,10 +81,11 @@ public class PublishCollection {
         sendKafkaMessage(kafkaMessage);
     }
 
-    public void cancel(Collection collection, Zebedee zebedee) {
+    public void cancel(Collection collection) {
         final String collectionId = collection.description.id;
         final String collectionPath = collection.path.getFileName().toString();
-        final String kafkaMessage = SchedulerMessage.createCancelSchedulerMessage(collectionId, collectionPath,
+        final String epoch = getPublishTime(collection);
+        final String kafkaMessage = SchedulerMessage.createCancelSchedulerMessage(collectionId, epoch,
                 SchedulerMessage.ACTION_CANCEL);
         sendKafkaMessage(kafkaMessage);
     }
@@ -96,6 +94,14 @@ public class PublishCollection {
         try (Producer<String, String> producer = new KafkaProducer<>(kafkaProducer)) {
             producer.send(new ProducerRecord<>(producerTopic, message));
         }
+    }
+
+    private String getPublishTime(Collection collection) {
+        String epoch = "0";
+        if (collection.description.publishDate != null) {
+            epoch = Long.toString(collection.description.publishDate.getTime());
+        }
+        return epoch;
     }
 
     private void pollForCompleteMessages() {

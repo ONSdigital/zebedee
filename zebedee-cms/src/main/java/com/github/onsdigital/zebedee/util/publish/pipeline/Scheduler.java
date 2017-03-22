@@ -12,7 +12,7 @@ public class Scheduler {
     }
 
     public static void cancel(Collection collection) {
-        publishCollection.cancel(collection, Root.zebedee);
+        publishCollection.cancel(collection);
     }
 
 }

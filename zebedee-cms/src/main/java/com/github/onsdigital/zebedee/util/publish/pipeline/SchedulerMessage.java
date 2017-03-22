@@ -41,11 +41,11 @@ public class SchedulerMessage {
         return gson.toJson(message);
     }
 
-    static String createCancelSchedulerMessage(String collectionId, String collectionPath,
+    static String createCancelSchedulerMessage(String collectionId, String epochTime,
                                          String action) {
         SchedulerMessage message = new SchedulerMessage();
         message.setCollectionId(collectionId);
-        message.setCollectionPath(collectionPath);
+        message.setScheduleTime(epochTime);
         message.setAction(action);
         final Gson gson = new Gson();
         return gson.toJson(message);

@@ -7,8 +7,12 @@ public class Scheduler {
 
     private static final PublishCollection publishCollection = new PublishCollection();
 
-    public static void add(Collection collection) {
+    public static void schedule(Collection collection) {
         publishCollection.schedule(collection, Root.zebedee);
+    }
+
+    public static void cancel(Collection collection) {
+        publishCollection.cancel(collection, Root.zebedee);
     }
 
 }

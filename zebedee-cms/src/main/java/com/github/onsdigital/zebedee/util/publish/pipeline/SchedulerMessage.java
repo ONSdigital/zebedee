@@ -8,6 +8,10 @@ import java.util.Set;
 
 public class SchedulerMessage {
 
+    public static final String ACTION_SCHEDULE = "schedule";
+
+    public static final String ACTION_CANCEL = "cancel";
+
     private String collectionId;
 
     private String collectionPath;
@@ -20,8 +24,11 @@ public class SchedulerMessage {
 
     private Set<PublishedFile> files;
 
+    private String action;
+
     static String createSchedulerMessage(String collectionId, String collectionPath, String publishTime,
-                                         String encryptionKey, Set<String> urisToDelete, Set<PublishedFile> files) {
+                                         String encryptionKey, Set<String> urisToDelete, Set<PublishedFile> files,
+                                         String action) {
         SchedulerMessage message = new SchedulerMessage();
         message.setCollectionId(collectionId);
         message.setCollectionPath(collectionPath);
@@ -29,6 +36,17 @@ public class SchedulerMessage {
         message.setEncryptionKey(encryptionKey);
         message.setUrisToDelete(urisToDelete);
         message.setFiles(files);
+        message.setAction(action);
+        final Gson gson = new Gson();
+        return gson.toJson(message);
+    }
+
+    static String createCancelSchedulerMessage(String collectionId, String collectionPath,
+                                         String action) {
+        SchedulerMessage message = new SchedulerMessage();
+        message.setCollectionId(collectionId);
+        message.setCollectionPath(collectionPath);
+        message.setAction(action);
         final Gson gson = new Gson();
         return gson.toJson(message);
     }
@@ -81,4 +99,11 @@ public class SchedulerMessage {
         this.files = files;
     }
 
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String acction) {
+        this.action = acction;
+    }
 }

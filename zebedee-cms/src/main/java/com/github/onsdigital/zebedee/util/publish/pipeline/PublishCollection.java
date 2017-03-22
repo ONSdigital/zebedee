@@ -78,16 +78,28 @@ public class PublishCollection {
         final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
         final String encrytionKey = Base64.getEncoder().encodeToString(key.getEncoded());
         final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, collectionPath,
-                epoch, encrytionKey, filesToDelete, findAllFiles(collection));
+                epoch, encrytionKey, filesToDelete, findAllFiles(collection), SchedulerMessage.ACTION_SCHEDULE);
         System.out.println("Sending kafka message : " + kafkaMessage);
         collection.description.publishStartDate = new Date(Instant.now().getEpochSecond());
+        sendKafkaMessage(kafkaMessage);
+    }
+
+    public void cancel(Collection collection, Zebedee zebedee) {
+        final String collectionId = collection.description.id;
+        final String collectionPath = collection.path.getFileName().toString();
+        final String kafkaMessage = SchedulerMessage.createCancelSchedulerMessage(collectionId, collectionPath,
+                SchedulerMessage.ACTION_CANCEL);
+        sendKafkaMessage(kafkaMessage);
+    }
+
+    private void sendKafkaMessage(String message) {
         try (Producer<String, String> producer = new KafkaProducer<>(kafkaProducer)) {
-            producer.send(new ProducerRecord<>(producerTopic, kafkaMessage));
+            producer.send(new ProducerRecord<>(producerTopic, message));
         }
     }
 
     private void pollForCompleteMessages() {
-        final String consumeTopic = findEnv("CONSUME_TOPIC", "uk.gov.ons.dp.web.complete1");
+        final String consumeTopic = findEnv("CONSUME_TOPIC", "uk.gov.ons.dp.web.complete");
         try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumer)) {
             consumer.subscribe(Collections.singleton(consumeTopic));
             while (true) {

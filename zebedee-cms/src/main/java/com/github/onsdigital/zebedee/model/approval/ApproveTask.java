@@ -20,6 +20,7 @@ import com.github.onsdigital.zebedee.service.BabbagePdfService;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
+import com.github.onsdigital.zebedee.util.publish.pipeline.Scheduler;
 import com.github.onsdigital.zebedee.util.upstream.UpstreamContent;
 import io.minio.MinioClient;
 import io.minio.errors.*;
@@ -147,6 +148,10 @@ public class ApproveTask implements Callable<Boolean> {
             moveCollectionToObjectStore(collection);
 
             approveCollection();
+
+            if (collection.description.type.equals(CollectionType.scheduled)) {
+                Scheduler.schedule(collection);
+            }
 
             // Send a notification to the website with the publish date for caching.
             publishNotification.sendNotification(EventType.APPROVED);

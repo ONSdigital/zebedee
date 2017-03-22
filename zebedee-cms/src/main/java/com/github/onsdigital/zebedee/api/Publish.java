@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
-import com.github.onsdigital.zebedee.util.publish.pipeline.PublishCollection;
 import com.github.onsdigital.zebedee.util.publish.pipeline.Scheduler;
 import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -67,7 +66,7 @@ public class Publish {
        //     throw ex;
        // }
 
-        Scheduler.add(collection);
+        Scheduler.schedule(collection);
 
         return true;
     }

@@ -116,7 +116,6 @@ public class Collection {
 
         if (collection.description.type.equals(CollectionType.scheduled)) {
             //Root.schedulePublish(collection);
-            Scheduler.add(collection);
         }
 
         Audit.Event.COLLECTION_CREATED

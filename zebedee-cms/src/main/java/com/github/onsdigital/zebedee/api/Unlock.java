@@ -2,11 +2,12 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.util.publish.pipeline.Scheduler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +42,9 @@ public class Unlock {
                     .collection(collection)
                     .actionedBy(session.email)
                     .log();
+            if (collection.description.type.equals(CollectionType.scheduled)) {
+                Scheduler.cancel(collection);
+            }
         }
 
         return result;

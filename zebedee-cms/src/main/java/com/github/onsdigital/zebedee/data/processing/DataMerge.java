@@ -4,7 +4,9 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by thomasridd on 1/21/16.
@@ -66,6 +68,14 @@ public class DataMerge {
                 this.insertions += 1;
             }
         }
+
+        // Find values that have been suppressed, i.e, they are in the current values but not in the updated values
+        List<TimeSeriesValue> suppressed = currentValues.stream()
+                .filter(current -> !updateValues.contains(current))
+                .collect(Collectors.toList());
+
+        suppressed.forEach(current -> current.value = "");
+        this.corrections += suppressed.size();
     }
 
     /**

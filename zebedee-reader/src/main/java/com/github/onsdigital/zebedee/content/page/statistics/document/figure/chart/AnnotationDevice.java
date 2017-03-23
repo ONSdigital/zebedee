@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart;
 
-
+/**
+ * Store the chart coordinates for each annotation for different devices/breakpoints
+ */
 public class AnnotationDevice {
 
     private String id;

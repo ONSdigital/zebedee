@@ -50,19 +50,18 @@ public class Generator {
             throw new BadRequestException("Please specify format (csv, xls or xlsx)");
         }
 
-
         // Try to get a content page
         ReadRequestHandler readRequestHandler = new ReadRequestHandler((getRequestedLanguage(request)));
         Content content = readRequestHandler.findContent(request, extractFilter(request));
 
         if (content != null) {
-            try (Resource resource = toResource(content, format)) {
-                sendResponse(resource, response, UTF_8);
+            try (Resource res = getResource(content, format)) {
+                sendResponse(res, response, UTF_8);
             }
         }
     }
 
-    private Resource toResource(Content content, String format) throws IOException, BadRequestException {
+    private Resource getResource(Content content, String format) throws IOException, BadRequestException {
         if (content instanceof Chart) {
             // If page is a chart write the chart spreadsheet requested to response
             return new DataGenerator().generateData((Chart) content, format);

@@ -67,11 +67,12 @@ public class DeleteContent {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
-        InputStream inputStream = zebedeeCmsService.objectAsInputStream(
-                deleteService.getDeleteItemsByCollection(collection));
-        IOUtils.copy(inputStream, response.getOutputStream());
+        try (InputStream inputStream = zebedeeCmsService.objectAsInputStream(
+                deleteService.getDeleteItemsByCollection(collection))) {
+            IOUtils.copy(inputStream, response.getOutputStream());
 
-        return new DeleteContentResponse(HttpStatus.SC_OK);
+            return new DeleteContentResponse(HttpStatus.SC_OK);
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.util.FileDescriptorStats;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -176,6 +177,15 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     public ZebedeeLogBuilder cell(Cell cell) {
         if (cell != null) {
             addParameter(CELL, cell.getColumnIndex());
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder fileDescriptorStats(FileDescriptorStats fds) {
+        if (fds != null) {
+            addParameter("openCount", fds.getOpenCount());
+            addParameter("percentUsed", fds.getPercentageUsed());
+            addParameter("maxAvailable", fds.getMaxAvailable());
         }
         return this;
     }

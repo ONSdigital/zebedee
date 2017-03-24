@@ -19,6 +19,7 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URLConnection;
 import java.nio.file.DirectoryStream;
@@ -336,12 +337,16 @@ public class FileSystemContentReader implements ContentReader {
     }
 
     protected Page deserialize(Resource resource) {
-        try {
-            return ContentUtil.deserialiseContent(resource.getData());
+        try (InputStream in = resource.getData()) {
+            return ContentUtil.deserialiseContent(in);
         } catch (JsonSyntaxException e) {
             logError(e, "Failed to deserialise resource")
                     .addParameter("resourceUri", resource.getUri()).log();
             throw e;
+        } catch (IOException io) {
+            logError(io, "Failed to close resource data stream")
+                    .addParameter("resourceUri", resource.getUri()).log();
+            throw new RuntimeException("Failed to close resource data stream");
         }
     }
 

@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +37,12 @@ public class ContentDetailUtil {
             if (!VersionedContentItem.isVersionedUri(uri)) {
 
                 Page page = null;
-                try (Resource resource = reader.getResource(uri)) {
+                try (
+                        Resource resource = reader.getResource(uri);
+                        InputStream in = resource.getData()
+                ) {
                     try {
-                        page = ContentUtil.deserialiseContent(resource.getData());
+                        page = ContentUtil.deserialiseContent(in);
 
                         String pageUri = resource.getUri().toString();
                         page.setUri(resolveUri(pageUri, page));

@@ -103,8 +103,11 @@ public class CsdbImporter {
                 try {
 
                     if (FilenameUtils.getExtension(uri).equals("json")) {
-                        try (Resource resource = collectionReader.getReviewed().getResource(uri)) {
-                            Page page = ContentUtil.deserialiseContent(resource.getData());
+                        try (
+                                Resource resource = collectionReader.getReviewed().getResource(uri);
+                                InputStream resourceIn = resource.getData()
+                        ) {
+                            Page page = ContentUtil.deserialiseContent(resourceIn);
 
                             if (page.getType().equals(PageType.timeseries_dataset)) {
 

@@ -589,7 +589,7 @@ public class Collection {
 
         Path source = find(uri);
 
-        Optional<Collection> blockingCollection = zebedee.isContentInAnotherCollection(this, uri);
+        Optional<Collection> blockingCollection = zebedee.getBlockingCollectionIfExists(this, uri);
         if (blockingCollection.isPresent()) {
             Collection collection = blockingCollection.get();
 

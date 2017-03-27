@@ -205,10 +205,10 @@ public class Zebedee {
     }
 
 
-    public Optional<Collection> isContentInAnotherCollection(Collection target, String uri) throws IOException {
+    public Optional<Collection> getBlockingCollectionIfExists(Collection workingCollection, String uri) throws IOException {
         return collections.list()
                 .stream()
-                .filter(c -> c.isInCollection(uri) && !target.getDescription().id.equals(c.getDescription().id))
+                .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().id.equals(c.getDescription().id))
                 .findFirst();
     }
 

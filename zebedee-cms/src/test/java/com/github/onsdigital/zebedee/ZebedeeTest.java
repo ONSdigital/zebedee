@@ -2,8 +2,10 @@ package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -17,8 +19,16 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static com.github.onsdigital.zebedee.Builder.COLLECTION_ONE_NAME;
+import static com.github.onsdigital.zebedee.Builder.COLLECTION_TWO_NAME;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class ZebedeeTest {
 
@@ -190,5 +200,44 @@ public class ZebedeeTest {
 		// Then
 		// we expect the uri to be null
 		assertNull(notZebedeeUri);
+	}
+
+	@Test
+	public void shouldReturnCollectionThatContainsSpecifiedURIIfExists() throws IOException, CollectionNotFoundException {
+		Zebedee zebedee = new Zebedee(builder.zebedee);
+		Collection collectionOne = zebedee.getCollections().getCollectionByName(COLLECTION_ONE_NAME);
+		Collection collectionTwo = zebedee.getCollections().getCollectionByName(COLLECTION_TWO_NAME);
+
+		String contentPath = "/aboutus/data.json";
+
+		// create content in collection 01.
+		builder.createInProgressFile(contentPath);
+
+		Session session = new Session();
+		session.email = "makingData@greatagain.com";
+		Optional<Collection> blockingCollection = zebedee.getBlockingCollectionIfExists(collectionOne, contentPath);
+
+		assertThat(blockingCollection.isPresent(), is(true));
+		assertThat(blockingCollection.get().getDescription().name, equalTo(collectionTwo.getDescription().name));
+		assertThat(collectionTwo.inProgressUris().contains(contentPath), is(true));
+		assertThat(collectionTwo.completeUris().contains(contentPath), is(false));
+		assertThat(collectionTwo.reviewedUris().contains(contentPath), is(false));
+	}
+
+	@Test
+	public void shouldReturnEmptyOptionalIfNoCollectionContainsSpecifiedURI() throws IOException, CollectionNotFoundException {
+		Zebedee zebedee = new Zebedee(builder.zebedee);
+		String contentPath = "/aboutus/data.json";
+		Collection collectionOne = zebedee.getCollections().getCollectionByName(COLLECTION_ONE_NAME);
+
+		Session session = new Session();
+		session.email = "makingData@greatagain.com";
+		Optional<Collection> blockingCollection = zebedee.getBlockingCollectionIfExists(collectionOne, contentPath);
+		assertThat(blockingCollection.isPresent(), is(false));
+
+		Collection collectionTwo = zebedee.getCollections().getCollectionByName(COLLECTION_TWO_NAME);
+		assertThat(collectionTwo.inProgressUris().contains(contentPath), is(false));
+		assertThat(collectionTwo.completeUris().contains(contentPath), is(false));
+		assertThat(collectionTwo.reviewedUris().contains(contentPath), is(false));
 	}
 }

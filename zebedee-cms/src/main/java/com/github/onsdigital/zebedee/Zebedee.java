@@ -204,6 +204,14 @@ public class Zebedee {
         return result;
     }
 
+
+    public Optional<Collection> isContentInAnotherCollection(Collection target, String uri) throws IOException {
+        return collections.list()
+                .stream()
+                .filter(c -> c.isInCollection(uri) && !target.getDescription().id.equals(c.getDescription().id))
+                .findFirst();
+    }
+
     public void checkAllCollectionsForDeleteMarker(String uri) throws IOException, DeleteContentRequestDeniedException {
         Path searchValue = Paths.get(uri);
 

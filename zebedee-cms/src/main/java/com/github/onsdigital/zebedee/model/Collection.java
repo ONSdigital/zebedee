@@ -22,6 +22,7 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -50,6 +51,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -587,14 +589,26 @@ public class Collection {
 
         Path source = find(uri);
 
-        // Is the path being edited anywhere but here?
-        boolean isBeingEditedElsewhere = !isInCollection(uri)
-                && zebedee.isBeingEdited(uri) > 0;
+        Optional<Collection> blockingCollection = zebedee.isContentInAnotherCollection(this, uri);
+        if (blockingCollection.isPresent()) {
+            Collection collection = blockingCollection.get();
+
+            ZebedeeLogBuilder.logInfo("Content was not saved as it currently in another collection.")
+                    .addParameter("blockingCollectionName", collection.getDescription().name)
+                    .addParameter("blockingContentPath", collection.getDescription().name + "/" + collection.path.relativize(collection.find(uri)))
+                    .addParameter("attemptedSavePath", this.getDescription().name + "/" + this.path.relativize(this.getInProgressPath(uri)))
+                    .user(email)
+                    .log();
+
+            // return false as the content is blocked by another collection.
+            return result;
+        }
+
 
         // Does the user have permission to edit?
         boolean permission = zebedee.getPermissions().canEdit(email, description);
 
-        if (source != null && !isBeingEditedElsewhere && permission) {
+        if (source != null && permission) {
             // Copy to in progress:
             if (this.isInCollection(uri)) {
                 Path destination = inProgress.toPath(uri);

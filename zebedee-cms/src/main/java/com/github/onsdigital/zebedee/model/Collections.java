@@ -498,6 +498,11 @@ public class Collections {
     ) throws IOException, ZebedeeException, FileUploadException {
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
+        logInfo("Attempting to write content.")
+                .collectionName(collection)
+                .path(uri)
+                .user(session.email)
+                .log();
 
         if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
@@ -535,6 +540,7 @@ public class Collections {
         }
 
         collection.save();
+        logInfo("content save successful.").collectionName(collection).path(uri).user(session.email).log();
 
         path = collection.getInProgressPath(uri);
         if (!Files.exists(path)) {

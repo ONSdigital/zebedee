@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -920,6 +921,7 @@ public class CollectionsTest {
 
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
+
         builder.createPublishedFile(uri);
         zebedee.getCollections().createContent(collection, uri, null, null, null, null, validateJson);
     }
@@ -929,9 +931,18 @@ public class CollectionsTest {
         String uri = "/this/is/a/directory/file.json";
 
         Collection collection = new Collection(builder.collections.get(0), zebedee);
+        Collection blockingCollection = new Collection(builder.collections.get(1), zebedee);
 
         builder.createInProgressFile(uri);
-        zebedee.getCollections().createContent(collection, uri, null, null, null, null, validateJson);
+        Session session = new Session();
+        session.email = "makingdata@greatagain.com";
+        zebedee.getCollections().createContent(collection, uri, session, null, null, null, validateJson);
+
+        assertThat(collection.inProgressUris().contains(uri), is(false));
+        assertThat(blockingCollection.inProgressUris().contains(uri), is(true));
+
+        assertThat(collection.reviewedUris().contains(uri), is(false));
+        assertThat(collection.completeUris().contains(uri), is(false));
     }
 
     @Test

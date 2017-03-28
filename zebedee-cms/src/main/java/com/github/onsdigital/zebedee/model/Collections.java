@@ -37,6 +37,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
@@ -477,8 +478,18 @@ public class Collections {
     ) throws ZebedeeException, IOException,
             FileUploadException {
 
-        if (zebedee.getPublished().exists(uri) || zebedee.isBeingEdited(uri) > 0) {
+        if (zebedee.getPublished().exists(uri)) {
             throw new ConflictException("This URI already exists");
+        }
+
+        Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collection, uri);
+        if (blockingCollection.isPresent()) {
+            Collection blocker = blockingCollection.get();
+            logInfo("Cannot create content as it existings in another collection.")
+                    .saveOrEditConflict(collection, blocker, uri)
+                    .user(session.email)
+                    .log();
+            throw new ConflictException("This URI exists in another collection.");
         }
 
         try {

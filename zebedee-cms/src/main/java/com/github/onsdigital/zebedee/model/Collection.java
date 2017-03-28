@@ -22,7 +22,6 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -589,14 +588,12 @@ public class Collection {
 
         Path source = find(uri);
 
-        Optional<Collection> blockingCollection = zebedee.getBlockingCollectionIfExists(this, uri);
+        Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(this, uri);
         if (blockingCollection.isPresent()) {
             Collection collection = blockingCollection.get();
 
-            ZebedeeLogBuilder.logInfo("Content was not saved as it currently in another collection.")
-                    .addParameter("blockingCollectionName", collection.getDescription().name)
-                    .addParameter("blockingContentPath", collection.getDescription().name + "/" + collection.path.relativize(collection.find(uri)))
-                    .addParameter("attemptedSavePath", this.getDescription().name + "/" + this.path.relativize(this.getInProgressPath(uri)))
+            logInfo("Content was not saved as it currently in another collection.")
+                    .saveOrEditConflict(this, collection, uri)
                     .user(email)
                     .log();
 
@@ -607,6 +604,13 @@ public class Collection {
 
         // Does the user have permission to edit?
         boolean permission = zebedee.getPermissions().canEdit(email, description);
+        if (!permission) {
+            logInfo("Content was not saved as user does not have EDIT permission")
+                    .path(uri)
+                    .collectionName(this)
+                    .user(email)
+                    .log();
+        }
 
         if (source != null && permission) {
             // Copy to in progress:

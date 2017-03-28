@@ -215,7 +215,7 @@ public class ZebedeeTest {
 
 		Session session = new Session();
 		session.email = "makingData@greatagain.com";
-		Optional<Collection> blockingCollection = zebedee.getBlockingCollectionIfExists(collectionOne, contentPath);
+		Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
 
 		assertThat(blockingCollection.isPresent(), is(true));
 		assertThat(blockingCollection.get().getDescription().name, equalTo(collectionTwo.getDescription().name));
@@ -232,7 +232,7 @@ public class ZebedeeTest {
 
 		Session session = new Session();
 		session.email = "makingData@greatagain.com";
-		Optional<Collection> blockingCollection = zebedee.getBlockingCollectionIfExists(collectionOne, contentPath);
+		Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
 		assertThat(blockingCollection.isPresent(), is(false));
 
 		Collection collectionTwo = zebedee.getCollections().getCollectionByName(COLLECTION_TWO_NAME);

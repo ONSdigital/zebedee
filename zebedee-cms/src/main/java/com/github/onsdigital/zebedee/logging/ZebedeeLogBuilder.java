@@ -15,11 +15,19 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.function.BiFunction;
 
 /**
  * Created by dave on 5/5/16.
  */
 public class ZebedeeLogBuilder extends LogMessageBuilder {
+
+    private static BiFunction<String, String, String> COLLECTION_CONTENT_PATH = (collectioName, uri) -> {
+        uri = uri.startsWith("/") ? uri.substring(1) : uri;
+        return Paths.get(collectioName).resolve("inprogress").resolve(uri).toString();
+    };
 
     public static final String LOG_NAME = "com.github.onsdigital.zebedee";
     private static final String ZEBEDEE_EXCEPTION = "Zebedee Exception";
@@ -35,6 +43,10 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     private static final String PATH = "path";
     private static final String ROW = "row";
     private static final String CELL = "cell";
+    private static final String BLOCKING_PATH = "blockingPath";
+    private static final String BLOCKING_COLLECTION = "blockingCollection";
+    private static final String TARGET_PATH = "targetPath";
+    private static final String TARGET_COLLECTION = "targetCollection";
 
     private ZebedeeLogBuilder(String description) {
         super(description);
@@ -176,6 +188,21 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     public ZebedeeLogBuilder cell(Cell cell) {
         if (cell != null) {
             addParameter(CELL, cell.getColumnIndex());
+        }
+        return this;
+    }
+
+    public ZebedeeLogBuilder saveOrEditConflict(Collection targetCollection, Collection blockingCollection, String targetURI) throws IOException {
+        if (targetCollection != null) {
+            String name = targetCollection.getDescription().name;
+            addParameter(TARGET_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
+            addParameter(TARGET_COLLECTION, name);
+        }
+        if (blockingCollection != null) {
+            String name = blockingCollection.getDescription().name;
+
+            addParameter(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
+            addParameter(BLOCKING_COLLECTION, name);
         }
         return this;
     }

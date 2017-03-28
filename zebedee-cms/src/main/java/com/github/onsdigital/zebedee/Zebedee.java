@@ -205,7 +205,7 @@ public class Zebedee {
     }
 
 
-    public Optional<Collection> getBlockingCollectionIfExists(Collection workingCollection, String uri) throws IOException {
+    public Optional<Collection> checkForCollectionBlockingChange(Collection workingCollection, String uri) throws IOException {
         return collections.list()
                 .stream()
                 .filter(c -> c.isInCollection(uri) && !workingCollection.getDescription().id.equals(c.getDescription().id))

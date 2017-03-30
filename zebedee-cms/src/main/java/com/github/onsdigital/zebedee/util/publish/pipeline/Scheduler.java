@@ -5,7 +5,11 @@ import com.github.onsdigital.zebedee.model.Collection;
 
 public class Scheduler {
 
-    private static final PublishCollection publishCollection = new PublishCollection();
+    private static final ScheduleCollection publishCollection = new ScheduleCollection();
+
+    public static void init() {
+        // Setup the ScheduleCollection.
+    }
 
     public static void schedule(Collection collection) {
         publishCollection.schedule(collection, Root.zebedee);

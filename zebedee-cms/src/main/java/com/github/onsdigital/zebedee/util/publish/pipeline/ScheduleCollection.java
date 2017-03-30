@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
+import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
@@ -28,7 +29,7 @@ import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class PublishCollection {
+public class ScheduleCollection {
 
     private final Properties kafkaProducer = new Properties();
     private final Properties kafkaConsumer = new Properties();
@@ -36,7 +37,9 @@ public class PublishCollection {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    PublishCollection() {
+    private final EncryptionKeyWriter encryptionKeyWriter = new EncryptionKeyWriter();
+
+    ScheduleCollection() {
         final String kafkaAddress = findEnv("KAFKA_ADDR", "localhost:9092");
         producerTopic = findEnv("PRODUCER_TOPIC", "uk.gov.ons.dp.web.schedule");
 
@@ -72,6 +75,7 @@ public class PublishCollection {
         final String epoch = getPublishTime(collection);
 
         final Set<String> filesToDelete = manifest.urisToDelete;
+
         final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
         final String encryptionKey;
         if (collection.description.isEncrypted) {
@@ -79,20 +83,21 @@ public class PublishCollection {
         } else {
             encryptionKey = null;
         }
+        encryptionKeyWriter.writeKey(collection, zebedee);
         final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, collectionPath,
-                epoch, encryptionKey, filesToDelete, findAllFiles(collection), SchedulerMessage.ACTION_SCHEDULE);
-        System.out.println("Sending kafka message : " + kafkaMessage);
+                epoch, filesToDelete, findAllFiles(collection), SchedulerMessage.ACTION_SCHEDULE);
         collection.description.publishStartDate = new Date(Instant.now().getEpochSecond());
         sendKafkaMessage(kafkaMessage);
+        ZebedeeLogBuilder.logInfo("Collection sent to publish scheduler").collectionId(collectionId).log();
     }
 
     public void cancel(Collection collection) {
         final String collectionId = collection.description.id;
-        final String collectionPath = collection.path.getFileName().toString();
         final String epoch = getPublishTime(collection);
         final String kafkaMessage = SchedulerMessage.createCancelSchedulerMessage(collectionId, epoch,
                 SchedulerMessage.ACTION_CANCEL);
         sendKafkaMessage(kafkaMessage);
+        ZebedeeLogBuilder.logInfo("Cancel message sent to publish scheduler").collectionId(collectionId).log();
     }
 
     private void sendKafkaMessage(String message) {
@@ -132,7 +137,7 @@ public class PublishCollection {
             collection.description.publishEndDate = new Date(Instant.now().getEpochSecond());
             ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.getKeyringCache().schedulerCache.get(completeMessage.getCollectionId()));
             Publisher.postPublish(zebedee, collection, true, collectionReader);
-            System.out.println("Complete publishing collectionId : " + completeMessage.getCollectionId() + ", jobId : " + completeMessage.getScheduleID());
+            ZebedeeLogBuilder.logInfo("Complete publishing collection").collectionId(collection.description.id).log();
 
         } catch (final Exception e) {
             e.printStackTrace();

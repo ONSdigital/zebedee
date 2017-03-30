@@ -18,8 +18,6 @@ public class SchedulerMessage {
 
     private String scheduleTime;
 
-    private String encryptionKey;
-
     private Set<String> urisToDelete;
 
     private Set<PublishedFile> files;
@@ -27,15 +25,12 @@ public class SchedulerMessage {
     private String action;
 
     static String createSchedulerMessage(String collectionId, String collectionPath, String publishTime,
-                                         String encryptionKey, Set<String> urisToDelete, Set<PublishedFile> files,
+                                         Set<String> urisToDelete, Set<PublishedFile> files,
                                          String action) {
         SchedulerMessage message = new SchedulerMessage();
         message.setCollectionId(collectionId);
         message.setCollectionPath(collectionPath);
         message.setScheduleTime(publishTime);
-        if (encryptionKey != null) {
-            message.setEncryptionKey(encryptionKey);
-        }
         message.setUrisToDelete(urisToDelete);
         message.setFiles(files);
         message.setAction(action);
@@ -67,14 +62,6 @@ public class SchedulerMessage {
 
     void setScheduleTime(String publishTime) {
         this.scheduleTime = publishTime;
-    }
-
-    public String getEncryptionKey() {
-        return encryptionKey;
-    }
-
-    void setEncryptionKey(String encryptionKey) {
-        this.encryptionKey = encryptionKey;
     }
 
     public String getCollectionPath() {

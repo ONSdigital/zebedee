@@ -115,6 +115,7 @@ public class Root {
         initialiseCsdbImportKeys();
         indexPublishedCollections();
         cleanupStaleCollectionKeys();
+        com.github.onsdigital.zebedee.util.publish.pipeline.Scheduler.init();
     }
 
     /**

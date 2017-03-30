@@ -585,7 +585,7 @@ public class PermissionsTest {
      * <b>Then</b> {@link AccessMapping#dataVisualisationPublishers} is initialised to an empty {@link HashSet}.<br/>
      */
     @Test
-    public void shouldCreateEmptySetIfDataVisNoDataVisPublishers() throws Exception {
+    public void shouldDefaultDataVisPublishersToEmptySetIfNotPresent() throws Exception {
         Permissions permissions = new Permissions(accessMappingPath, zebedee);
         String adminEmail = "admin-daenerys@targaryen.net";
         String editorEmail = "editor-daenerys@targaryen.net";

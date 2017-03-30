@@ -6,8 +6,15 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.json.AccessMapping;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.zebedee.json.PermissionDefinition;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
+import com.google.gson.Gson;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,15 +22,30 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.util.Assert;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class PermissionsTest {
+
+    private Path accessMappingPath;
+    private Path accessMappingJSONPath;
 
     Zebedee zebedee;
     Builder builder;
@@ -60,6 +82,11 @@ public class PermissionsTest {
         viewerEmail = builder.reviewer1.email;
         zebedee.getTeams().addTeamMember(viewerEmail, team, session);
 
+        accessMappingPath = Files.createTempDirectory("");
+        accessMappingPath.toFile().deleteOnExit();
+
+        accessMappingJSONPath = accessMappingPath.resolve("accessMapping.json");
+        accessMappingJSONPath.toFile().deleteOnExit();
 
         when(zebedeeCmsService.getCollection(anyString()))
                 .thenReturn(inflationCollection);
@@ -518,5 +545,77 @@ public class PermissionsTest {
 
 
     // TODO All viewer permission tests have been removed until Teams are implemented
+
+    @Test
+    public void shouldInitialiseAccessMappingJsonAsExpected() throws Exception {
+        Permissions permissions = new Permissions(accessMappingPath, zebedee);
+
+        // Verify that no mapping file exists.
+        assertThat("accessMaping.json should not exist yet.", Files.exists(accessMappingJSONPath), is(false));
+
+        // The accessMapping.json will not initially exist, calling this method will trigger the initial creation in
+        // memory which is then written to the FS.
+        permissions.hasAdministrator();
+
+        assertThat("accessMaping.json should now exist.", Files.exists(accessMappingJSONPath), is(true));
+
+        // I am aware this is a bit naughty but its the easiest way to get the accessMapping without making huge
+        // changes ;-)
+        Method readAccessMapping = Permissions.class.getDeclaredMethod("readAccessMapping");
+        readAccessMapping.setAccessible(true);
+        AccessMapping am = (AccessMapping) readAccessMapping.invoke(permissions);
+
+        assertThat(am.dataVisualisationPublishers, is(notNullValue()));
+        assertThat(new HashSet<String>(), equalTo(am.dataVisualisationPublishers));
+
+        assertThat(am.digitalPublishingTeam, is(notNullValue()));
+        assertThat(new HashSet<String>(), equalTo(am.digitalPublishingTeam));
+
+        assertThat(am.administrators, is(notNullValue()));
+        assertThat(new HashSet<String>(), equalTo(am.administrators));
+
+        assertThat(am.collections, is(notNullValue()));
+        assertThat(new HashMap<String, Set<Integer>>(), equalTo(am.collections));
+    }
+
+    /**
+     * <b>Given</b> the accessMapping.json does not contain a data visualisation publishers array (no element
+     * rather than an empty array).<br/>
+     *<b>When</b> the {@link Permissions#readAccessMapping()} is invoked.<br/>
+     * <b>Then</b> {@link AccessMapping#dataVisualisationPublishers} is initialised to an empty {@link HashSet}.<br/>
+     */
+    @Test
+    public void shouldCreateEmptySetIfDataVisNoDataVisPublishers() throws Exception {
+        Permissions permissions = new Permissions(accessMappingPath, zebedee);
+        String adminEmail = "admin-daenerys@targaryen.net";
+        String editorEmail = "editor-daenerys@targaryen.net";
+
+        // The accessMapping.json will not initially exist, calling this method will trigger the initial creation in
+        // memory which is then written to the FS.
+        permissions.hasAdministrator();
+
+        Set<String> admins = new HashSet<>();
+        Set<String> editors = new HashSet<>();
+        Set<String> dataVizers = new HashSet<>();
+
+        admins.add(adminEmail);
+        editors.add(editorEmail);
+
+        AccessMapping mapping = new AccessMapping();
+        mapping.administrators = admins;
+        mapping.digitalPublishingTeam = editors;
+
+        // Create an access mapping without any data viz publishers.
+        try (OutputStream out = new FileOutputStream(accessMappingJSONPath.toFile())) {
+            String json = new Gson().toJson(mapping);
+            out.write(json.getBytes());
+            out.flush();
+        }
+
+        Method readAccessMapping = Permissions.class.getDeclaredMethod("readAccessMapping");
+        readAccessMapping.setAccessible(true);
+        AccessMapping actualMapping = (AccessMapping) readAccessMapping.invoke(permissions);
+        assertThat(actualMapping.dataVisualisationPublishers, equalTo(dataVizers));
+    }
 
 }

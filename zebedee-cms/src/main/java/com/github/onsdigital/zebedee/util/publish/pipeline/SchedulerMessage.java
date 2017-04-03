@@ -33,7 +33,9 @@ public class SchedulerMessage {
         message.setCollectionId(collectionId);
         message.setCollectionPath(collectionPath);
         message.setScheduleTime(publishTime);
-        message.setEncryptionKey(encryptionKey);
+        if (encryptionKey != null) {
+            message.setEncryptionKey(encryptionKey);
+        }
         message.setUrisToDelete(urisToDelete);
         message.setFiles(files);
         message.setAction(action);

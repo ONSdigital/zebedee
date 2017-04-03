@@ -73,7 +73,12 @@ public class PublishCollection {
 
         final Set<String> filesToDelete = manifest.urisToDelete;
         final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
-        final String encryptionKey = Base64.getEncoder().encodeToString(key.getEncoded());
+        final String encryptionKey;
+        if (collection.description.isEncrypted) {
+            encryptionKey = Base64.getEncoder().encodeToString(key.getEncoded());
+        } else {
+            encryptionKey = null;
+        }
         final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, collectionPath,
                 epoch, encryptionKey, filesToDelete, findAllFiles(collection), SchedulerMessage.ACTION_SCHEDULE);
         System.out.println("Sending kafka message : " + kafkaMessage);

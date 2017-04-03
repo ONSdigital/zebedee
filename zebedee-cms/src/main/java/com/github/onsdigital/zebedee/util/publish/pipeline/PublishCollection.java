@@ -99,7 +99,7 @@ public class PublishCollection {
     private String getPublishTime(Collection collection) {
         String epoch = "0";
         if (collection.description.publishDate != null) {
-            epoch = Long.toString((long) (collection.description.publishDate.getTime() / 1000));
+            epoch = Long.toString(collection.description.publishDate.getTime() / 1000);
         }
         return epoch;
     }

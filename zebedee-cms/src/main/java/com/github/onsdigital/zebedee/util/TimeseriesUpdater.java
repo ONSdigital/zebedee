@@ -44,7 +44,7 @@ public class TimeseriesUpdater {
                 logInfo("CDID not found in data index").addParameter("CDID", command.cdid).log();
                 continue;
             } else {
-                command.uri = uri;
+                command.uri = uri + "/" + command.dataset.toLowerCase();
                 updateCommands.add(command);
             }
         }
@@ -60,6 +60,16 @@ public class TimeseriesUpdater {
 
                 if (command.title != null && command.title.length() > 0) {
                     page.getDescription().setTitle(command.title);
+                    updated = true;
+                }
+
+                if (command.preunit != null && command.preunit.length() > 0) {
+                    page.getDescription().setPreUnit(command.preunit);
+                    updated = true;
+                }
+
+                if (command.unit != null && command.unit.length() > 0) {
+                    page.getDescription().setUnit(command.unit);
                     updated = true;
                 }
 

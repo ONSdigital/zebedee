@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.util.upstream.UpstreamContent;
@@ -136,7 +137,7 @@ public class ScheduleCollection {
             new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
             collection.description.publishEndDate = new Date(Instant.now().getEpochSecond());
             ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.getKeyringCache().schedulerCache.get(completeMessage.getCollectionId()));
-            Publisher.postPublish(zebedee, collection, true, collectionReader);
+            PostPublisher.postPublish(zebedee, collection, true, collectionReader);
             ZebedeeLogBuilder.logInfo("Complete publishing collection").collectionId(collection.description.id).log();
 
         } catch (final Exception e) {

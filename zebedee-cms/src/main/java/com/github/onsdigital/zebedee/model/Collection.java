@@ -6,8 +6,22 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.ContentDetail;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Events;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -16,15 +30,29 @@ import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -32,9 +60,18 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.*;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_NAME_CHANGED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_PUBLISH_RESCHEDULED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_TYPE_CHANGED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
-import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.*;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.collectionCreated;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentReviewed;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.renamed;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.reschedule;
+import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.typeChanged;
 
 public class Collection {
     public static final String REVIEWED = "reviewed";
@@ -176,7 +213,7 @@ public class Collection {
             // TODO does this check need to be here.
             try {
                 zebedee.checkAllCollectionsForDeleteMarker(release.getUri().toString());
-            }  catch (DeleteContentRequestDeniedException ex) {
+            } catch (DeleteContentRequestDeniedException ex) {
                 throw new ConflictException(
                         "Cannot use this release. It is being deleted as part of another collection.");
             }
@@ -355,20 +392,25 @@ public class Collection {
         }
 
         String uri = this.description.releaseUri + "/data.json";
-        Release release = (Release) ContentUtil.deserialiseContent(reader.getResource(uri).getData());
-        logInfo("Release identified for collection")
-                .collectionName(this.description.name)
-                .addParameter("title", release.getDescription().getTitle())
-                .log();
+        try (
+                Resource resource = reader.getResource(uri);
+                InputStream dataStream = resource.getData()
+        ) {
+            Release release = (Release) ContentUtil.deserialiseContent(dataStream);
+            logInfo("Release identified for collection")
+                    .collectionName(this.description.name)
+                    .addParameter("title", release.getDescription().getTitle())
+                    .log();
 
-        if (release == null) {
-            throw new BadRequestException("This collection is not associated with a release.");
+            if (release == null) {
+                throw new BadRequestException("This collection is not associated with a release.");
+            }
+
+            release = ReleasePopulator.populate(release, collectionContent);
+            collectionWriter.getReviewed().writeObject(release, uri);
+
+            return release;
         }
-
-        release = ReleasePopulator.populate(release, collectionContent);
-        collectionWriter.getReviewed().writeObject(release, uri);
-
-        return release;
     }
 
     /**
@@ -499,7 +541,7 @@ public class Collection {
         // Is someone creating the same file in another collection?
         boolean isBeingEdited = zebedee.isBeingEdited(uri) > 0;
 
-       boolean hasDeleteMarker = false;
+        boolean hasDeleteMarker = false;
         try {
             zebedee.checkAllCollectionsForDeleteMarker(uri);
         } catch (DeleteContentRequestDeniedException ex) {
@@ -546,14 +588,31 @@ public class Collection {
 
         Path source = find(uri);
 
-        // Is the path being edited anywhere but here?
-        boolean isBeingEditedElsewhere = !isInCollection(uri)
-                && zebedee.isBeingEdited(uri) > 0;
+        Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(this, uri);
+        if (blockingCollection.isPresent()) {
+            Collection collection = blockingCollection.get();
+
+            logInfo("Content was not saved as it currently in another collection.")
+                    .saveOrEditConflict(this, collection, uri)
+                    .user(email)
+                    .log();
+
+            // return false as the content is blocked by another collection.
+            return result;
+        }
+
 
         // Does the user have permission to edit?
         boolean permission = zebedee.getPermissions().canEdit(email, description);
+        if (!permission) {
+            logInfo("Content was not saved as user does not have EDIT permission")
+                    .path(uri)
+                    .collectionName(this)
+                    .user(email)
+                    .log();
+        }
 
-        if (source != null && !isBeingEditedElsewhere && permission) {
+        if (source != null && permission) {
             // Copy to in progress:
             if (this.isInCollection(uri)) {
                 Path destination = inProgress.toPath(uri);
@@ -1048,14 +1107,19 @@ public class Collection {
             }
 
             String content;
-            try (Scanner scanner = new Scanner(contentReader.getResource(uri).getData())) {
+            try (
+                    Resource resource = contentReader.getResource(uri);
+                    InputStream inputStream = resource.getData();
+                    Scanner scanner = new Scanner(inputStream)
+            ) {
                 content = scanner.useDelimiter("//Z").next();
+                content = content.replaceAll("\"" + oldUri + "\"", "\"" + newUri + "\"");
+                content = content.replaceAll(oldUri + "/", newUri + "/");
+
+                try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(content.getBytes())) {
+                    contentWriter.write(byteArrayInputStream, uri);
+                }
             }
-
-            content = content.replaceAll("\"" + oldUri + "\"", "\"" + newUri + "\"");
-            content = content.replaceAll(oldUri + "/", newUri + "/");
-
-            contentWriter.write(new ByteArrayInputStream(content.getBytes()), uri);
 
         } catch (NoSuchElementException e) {
             // do nothing if its not found.

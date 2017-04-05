@@ -15,6 +15,15 @@ public class Chart extends FigureBase {
     private String altText;
     private String labelInterval;
     private String decimalPlaces;
+    private String decimalPlacesYaxis;
+    private String palette;
+    private String xAxisPos;
+    private String yAxisPos;
+    private String yAxisMax;
+    private String yMin;
+    private String yMax;
+    private String highlight;
+    private String alpha;
 
     private String unit;
     private String xAxisLabel;
@@ -25,10 +34,37 @@ public class Chart extends FigureBase {
     private List<String> series;
     private List<String> categories;
     private Map<String, String> chartTypes;
+    private Map<String, String> lineTypes;
     private List<List<String>> groups;
     private Boolean startFromZero;
     private Boolean finishAtHundred;
+    private Boolean isStacked;
+    private Boolean isReversed;
+    private Boolean showTooltip;
+    private Boolean showMarker;
+    private Boolean hasLineBreak;
+    private Boolean hasConnectNull;
+    private Boolean isEditor;
 
+    private List<Annotation> annotations;
+    private Map<String, Device> devices;
+
+    public List<Annotation> getAnnotations() {
+        return annotations;
+    }
+
+    public void setAnnotations(List<Annotation> annotations) {
+        this.annotations = annotations;
+    }
+
+    public Map<String, Device> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(Map<String, Device> devices) {
+        this.devices = devices;
+    }
+    
     @Override
     public PageType getType() {
         return PageType.chart;
@@ -138,6 +174,14 @@ public class Chart extends FigureBase {
         this.chartTypes = chartTypes;
     }
 
+    public Map<String, String> getLineTypes() {
+        return lineTypes;
+    }
+
+    public void setLineTypes(Map<String, String> lineTypes) {
+        this.lineTypes = lineTypes;
+    }
+
     public List<List<String>> getGroups() {
         return groups;
     }
@@ -162,6 +206,78 @@ public class Chart extends FigureBase {
         this.decimalPlaces = decimalPlaces;
     }
 
+    public String getDecimalPlacesYaxis() {
+        return decimalPlacesYaxis;
+    }
+
+    public void setDecimalPlacesYaxis(String decimalPlacesYaxis) {
+        this.decimalPlacesYaxis = decimalPlacesYaxis;
+    }
+
+    public String getPalette() {
+        return palette;
+    }
+
+    public void setPalette(String palette) {
+        this.palette = palette;
+    }
+
+    public String getxAxisPos() {
+        return xAxisPos;
+    }
+
+    public void setxAxisPos(String xAxisPos) {
+        this.xAxisPos = xAxisPos;
+    }
+
+    public String getyAxisPos() {
+        return yAxisPos;
+    }
+
+    public void setyAxisPos(String yAxisPos) {
+        this.yAxisPos = yAxisPos;
+    }
+
+    public String getyAxisMax() {
+        return yAxisMax;
+    }
+
+    public void setyAxisMax(String yAxisMax) {
+        this.yAxisMax = yAxisMax;
+    }
+
+    public String getyMin() {
+        return yMin;
+    }
+
+    public void setyMin(String yMin) {
+        this.yMin = yMin;
+    }
+
+    public String getyMax() {
+        return yMax;
+    }
+
+    public void setyMax(String yMax) {
+        this.yMax = yMax;
+    }
+
+    public String getHighlight() {
+        return highlight;
+    }
+
+    public void setHighlight(String highlight) {
+        this.highlight = highlight;
+    }
+
+    public String getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(String alpha) {
+        this.alpha = alpha;
+    }
+
     public String getxAxisLabel() {
         return xAxisLabel;
     }
@@ -184,5 +300,61 @@ public class Chart extends FigureBase {
 
     public void setFinishAtHundred(Boolean finishAtHundred) {
         this.finishAtHundred = finishAtHundred;
+    }
+
+    public Boolean getShowTooltip() {
+        return showTooltip;
+    }
+
+    public void setShowTooltip(Boolean showTooltip) {
+        this.showTooltip = showTooltip;
+    }
+
+    public Boolean getShowMarker() {
+        return showMarker;
+    }
+
+    public void setShowMarker(Boolean showMarker) {
+        this.showMarker = showMarker;
+    }
+
+    public Boolean getIsStacked() {
+        return isStacked;
+    }
+
+    public void setIsStacked(Boolean isStacked) {
+        this.isStacked = isStacked;
+    }
+
+    public Boolean getIsReversed() {
+        return isReversed;
+    }
+
+    public void setIsReversed(Boolean isReversed) {
+        this.isReversed = isReversed;
+    }
+
+    public Boolean getHasLineBreak() {
+        return hasLineBreak;
+    }
+
+    public void setHasLineBreak(Boolean hasLineBreak) {
+        this.hasLineBreak = hasLineBreak;
+    }
+    
+    public Boolean getHasConnectNull() {
+        return hasConnectNull;
+    }
+
+    public void setHasConnectNull(Boolean hasConnectNull) {
+        this.hasConnectNull = hasConnectNull;
+    }
+
+    public Boolean getIsEditor() {
+        return isEditor;
+    }
+
+    public void setIsEditor(Boolean isEditor) {
+        this.isEditor = isEditor;
     }
 }

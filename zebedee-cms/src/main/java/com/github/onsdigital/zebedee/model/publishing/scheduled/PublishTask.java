@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 
@@ -72,7 +73,7 @@ public class PublishTask implements Runnable {
                 if (publishComplete) {
                     long onPublishCompleteStart = System.currentTimeMillis();
                     new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
-                    Publisher.postPublish(zebedee, collection, skipVerification, collectionReader);
+                    PostPublisher.postPublish(zebedee, collection, skipVerification, collectionReader);
 
                     logInfo("Collection postPublish process finished").collectionName(collection)
                             .timeTaken((System.currentTimeMillis() - onPublishCompleteStart)).log();

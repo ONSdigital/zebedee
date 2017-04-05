@@ -1,13 +1,11 @@
 package com.github.onsdigital.zebedee.model.approval.tasks;
 
 import com.github.onsdigital.zebedee.content.page.base.PageType;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.service.PdfService;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +27,11 @@ public class CollectionPdfGenerator {
         pagesWithPdf.add(PageType.static_methodology);
     }
 
-    private final PdfService pdfService;
+    private PdfService pdfService;
 
     /**
      * Create a new instance to use the provided PdfService.
+     *
      * @param pdfService
      */
     public CollectionPdfGenerator(PdfService pdfService) {
@@ -46,11 +45,9 @@ public class CollectionPdfGenerator {
 
             if (pdfShouldBeAdded) {
                 String pdfUri = null;
-                try (InputStream inputStream = pdfService.generatePdf(contentDetail.uri)) {
-                    pdfUri = contentDetail.uri + "/page.pdf";
-                    collectionWriter.getReviewed().write(inputStream, pdfUri);
-
-                } catch (IOException | BadRequestException e) {
+                try {
+                    pdfService.generatePdf(collectionWriter.getReviewed(), contentDetail.uri);
+                } catch (IOException e) {
                     logError(e, "Error while generating collection PDF").addParameter("uri", pdfUri).log();
                 }
             }

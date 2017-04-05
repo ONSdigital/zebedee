@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.data.json.TimeSerieses;
 import com.github.onsdigital.zebedee.data.processing.xls.TimeSeriesCellWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
-import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -132,6 +131,8 @@ public class DataFileGeneratorTest {
         this.timeSeriesList.add(timeSeries);
         this.dataGrid = new DataGrid(timeSeriesList);
         this.dataFileGenerator = new DataFileGenerator(null);
+        //reset xslCellWriter.. some how as its static it gets substituted for an invalid one.
+        DataFileGenerator.xlsCellWriter  = TimeSeriesCellWriter.getInstance();
         this.xlsExpectations = XLSExpectations.get(timeSeries);
     }
 

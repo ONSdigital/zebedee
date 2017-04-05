@@ -3,13 +3,13 @@
 source ./export-default-env-vars.sh
 
 export JAVA_OPTS=" -Xmx512m -Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"
-export PORT="8082"
+export PORT="${PORT:-8082}"
 
 # Restolino configuration
 export RESTOLINO_STATIC="src/main/resources/files"
 export RESTOLINO_CLASSES="zebedee-cms/target/classes"
 export PACKAGE_PREFIX=com.github.onsdigital.zebedee
-export audit_db_enabled=false
+export audit_db_enabled=true
 
 # Development: reloadable
 mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \

@@ -48,7 +48,9 @@ public class Resource implements Closeable {
     @Override
     public void close() throws IOException {
         if (data != null) {
-            getData().close();
+            try (InputStream inputStream = data) {
+                inputStream.close();
+            }
         }
     }
 

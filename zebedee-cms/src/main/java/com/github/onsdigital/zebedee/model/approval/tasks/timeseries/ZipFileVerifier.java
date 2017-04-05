@@ -5,6 +5,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.Tim
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.ZipUtils;
 import org.apache.commons.io.FileUtils;
 
@@ -57,27 +58,26 @@ public class ZipFileVerifier {
             ContentWriter verificationContentWriter,
             TimeseriesCompressionResult zipData
     ) throws ZebedeeException, IOException {
-        String verificationPath = "verification/" + Random.id();
-        InputStream inputStream = contentReader.getResource(zipData.zipPath.toString()).getData();
-        List<String> unzipped = ZipUtils.unzip(inputStream, verificationPath, verificationContentWriter);
+        try (
+                Resource resource = contentReader.getResource(zipData.zipPath.toString());
+                InputStream inputStream = resource.getData()
+        ) {
+            String verificationPath = "verification/" + Random.id();
+            List<String> unzipped = ZipUtils.unzip(inputStream, verificationPath, verificationContentWriter);
 
-        // count number of files?
-        if (zipData.numberOfFiles == 0)
-            return false;
+            // count number of files?
+            if (zipData.numberOfFiles == 0)
+                return false;
 
-        if (unzipped.size() != zipData.numberOfFiles) {
-            return false;
+            if (unzipped.size() != zipData.numberOfFiles) {
+                return false;
+            }
+
+            // deserialise file and check its a timeseries?
+            String verificationPageUri = Paths.get(unzipped.get(0)).getParent().toString();
+            TimeSeries page = (TimeSeries) verificationContentReader.getContent(verificationPageUri);
+            logInfo("Verified " + unzipped.size() + " files in zip file: " + zipData.zipPath).log();
+            return page != null;
         }
-
-        // deserialise file and check its a timeseries?
-        String verificationPageUri = Paths.get(unzipped.get(0)).getParent().toString();
-        TimeSeries page = (TimeSeries) verificationContentReader.getContent(verificationPageUri);
-
-        if (page == null)
-            return false;
-
-        logInfo("Verified " + unzipped.size() + " files in zip file: " + zipData.zipPath).log();
-
-        return true;
     }
 }

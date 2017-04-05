@@ -151,9 +151,11 @@ public class VerificationAgent {
     private boolean isPublished(UriInfo uriInfo) throws IOException {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("If-None-Match", uriInfo.sha);
-        CloseableHttpResponse response = verificationProxyClient.sendGet("/hash", headers, asList((NameValuePair) new BasicNameValuePair("uri", uriInfo.uri)));
-        String websiteHash = EntityUtils.toString(response.getEntity());
-        return uriInfo.sha.equals(websiteHash);
+        try (CloseableHttpResponse response = verificationProxyClient.sendGet("/hash", headers,
+                asList((NameValuePair) new BasicNameValuePair("uri", uriInfo.uri)))) {
+            String websiteHash = EntityUtils.toString(response.getEntity());
+            return uriInfo.sha.equals(websiteHash);
+        }
     }
 
     private void setHash(UriInfo uriInfo, CollectionReader reader) {

@@ -184,14 +184,7 @@ public class DataProcessor {
             logInfo("Error copying metadata in data publisher").log();
         }
         inProgress.getDescription().setCdid(newSeries.getDescription().getCdid());
-
-        // Copy across the title if it is currently blank (so if it has been set manually do not overwrite)
-        if (inProgress.getDescription().getTitle() == null || inProgress.getDescription().getTitle().equalsIgnoreCase("")) {
-            inProgress.getDescription().setTitle(newSeries.getDescription().getTitle());
-        } else if (inProgress.getDescription().getTitle().equalsIgnoreCase(inProgress.getCdid())) {
-            inProgress.getDescription().setTitle(newSeries.getDescription().getTitle());
-        }
-
+        inProgress.getDescription().setTitle(newSeries.getDescription().getTitle());
         inProgress.getDescription().setDate(newSeries.getDescription().getDate());
         inProgress.getDescription().setNumber(newSeries.getDescription().getNumber());
 

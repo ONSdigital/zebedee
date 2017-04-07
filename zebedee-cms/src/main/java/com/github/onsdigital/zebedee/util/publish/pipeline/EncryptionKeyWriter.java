@@ -41,20 +41,22 @@ public class EncryptionKeyWriter {
     }
 
     public void writeKey(Collection collection, Zebedee zebedee) {
-        final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
-        final String encrytionKey = Base64.getEncoder().encodeToString(key.getEncoded());
-        final Map<String, String> values = new HashMap<>();
-        final String path =  "secret/zebedee-cms/" + collection.description.id;
-        values.put("encryption_key", encrytionKey);
-        final Vault vault = new Vault(config);
-        try {
-            List<String> keyExists = vault.logical().list(path);
-            if (keyExists.size() == 0) {
-                vault.logical()
-                        .write(path, values);
+        if (collection.description.isEncrypted) {
+            final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
+            final String encrytionKey = Base64.getEncoder().encodeToString(key.getEncoded());
+            final Map<String, String> values = new HashMap<>();
+            final String path = "secret/zebedee-cms/" + collection.description.id;
+            values.put("encryption_key", encrytionKey);
+            final Vault vault = new Vault(config);
+            try {
+                List<String> keyExists = vault.logical().list(path);
+                if (keyExists.size() == 0) {
+                    vault.logical()
+                            .write(path, values);
+                }
+            } catch (VaultException e) {
+                throw new RuntimeException(e);
             }
-        } catch (VaultException e) {
-            throw new RuntimeException(e);
         }
     }
 

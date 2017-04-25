@@ -40,13 +40,44 @@ public class KeyManager {
      * @param isNewCollection true if the collection is new, false otherwise.
      * @throws IOException
      */
-    public static void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection, boolean isNewCollection) throws IOException {
+    public static synchronized void distributeCollectionKey(Zebedee zebedee, Session session, Collection collection,
+                                                            boolean isNewCollection) throws IOException {
         SecretKey key = zebedee.getKeyringCache().get(session).get(collection.getDescription().id);
-        try {
-            executorService.invokeAll(getKeyAssignmentTasks(zebedee, collection, key, isNewCollection));
-        } catch (InterruptedException e) {
-            throw logError(e).uncheckedException(e);
+
+        List<User> keyRecipients = zebedee.getPermissions().getCollectionAccessMapping(zebedee, collection);
+        List<User> removals = new ArrayList<>();
+        List<User> additions = new ArrayList<>();
+
+        if (!isNewCollection) {
+            zebedee.getUsers().list().stream().forEach(user -> {
+                if (!keyRecipients.contains(user)) {
+                    removals.add(user);
+                }
+            });
         }
+
+        zebedee.getUsers().list().stream().forEach(user -> {
+            if (!removals.contains(user)) {
+                additions.add(user);
+            }
+        });
+
+        long start = System.nanoTime();
+        for (User removedUser : removals) {
+            System.out.println("Removing " + collection.getDescription().id + " from user " + removedUser.email);
+            removeKeyFromUser(zebedee, removedUser, collection.getDescription().id);
+        }
+
+        for (User addedUser : additions) {
+            System.out.println("Adding " + collection.getDescription().id + " to user " + addedUser.email);
+            assignKeyToUser(zebedee, addedUser, collection.getDescription().id, key);
+        }
+
+        zebedee.getKeyringCache().getSchedulerCache().put(collection.description.id, key);
+
+        long timeElapsed = System.nanoTime() - start;
+        double total = timeElapsed / 1000000000.0;
+        System.out.println("\nTIME to assign keys to users " + String.valueOf(total));
     }
 
     /**

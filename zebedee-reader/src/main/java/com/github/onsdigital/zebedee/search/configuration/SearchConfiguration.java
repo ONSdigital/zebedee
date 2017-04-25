@@ -10,7 +10,8 @@ public class SearchConfiguration {
 
     private static String elasticSearchServer = defaultIfBlank(getVariableValue("ELASTIC_SEARCH_SERVER"), "localhost");
     private static String elasticSearchAlias = defaultIfBlank(getVariableValue("ELASTIC_SEARCH_ALIAS"), "ons");
-    private static Integer elasticSearchPort = Integer.parseInt(defaultIfBlank(getVariableValue("ELASTIC_SEARCH_PORT"), "9300"));
+    private static Integer elasticSearchPort = Integer.parseInt(defaultIfBlank(getVariableValue
+            ("ELASTIC_SEARCH_PORT"), "9500"));
     private static String elasticSearchCluster = defaultIfBlank(getVariableValue("ELASTIC_SEARCH_CLUSTER"), "");
     private static boolean startEmbeddedSearch = "Y".equals(defaultIfBlank(getVariableValue("START_EMBEDDED_SERVER"), "N"));
 

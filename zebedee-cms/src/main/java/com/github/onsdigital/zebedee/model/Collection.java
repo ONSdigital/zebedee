@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -587,14 +588,31 @@ public class Collection {
 
         Path source = find(uri);
 
-        // Is the path being edited anywhere but here?
-        boolean isBeingEditedElsewhere = !isInCollection(uri)
-                && zebedee.isBeingEdited(uri) > 0;
+        Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(this, uri);
+        if (blockingCollection.isPresent()) {
+            Collection collection = blockingCollection.get();
+
+            logInfo("Content was not saved as it currently in another collection.")
+                    .saveOrEditConflict(this, collection, uri)
+                    .user(email)
+                    .log();
+
+            // return false as the content is blocked by another collection.
+            return result;
+        }
+
 
         // Does the user have permission to edit?
         boolean permission = zebedee.getPermissions().canEdit(email, description);
+        if (!permission) {
+            logInfo("Content was not saved as user does not have EDIT permission")
+                    .path(uri)
+                    .collectionName(this)
+                    .user(email)
+                    .log();
+        }
 
-        if (source != null && !isBeingEditedElsewhere && permission) {
+        if (source != null && permission) {
             // Copy to in progress:
             if (this.isInCollection(uri)) {
                 Path destination = inProgress.toPath(uri);

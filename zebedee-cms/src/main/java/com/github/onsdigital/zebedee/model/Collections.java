@@ -37,6 +37,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
@@ -477,8 +478,18 @@ public class Collections {
     ) throws ZebedeeException, IOException,
             FileUploadException {
 
-        if (zebedee.getPublished().exists(uri) || zebedee.isBeingEdited(uri) > 0) {
+        if (zebedee.getPublished().exists(uri)) {
             throw new ConflictException("This URI already exists");
+        }
+
+        Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collection, uri);
+        if (blockingCollection.isPresent()) {
+            Collection blocker = blockingCollection.get();
+            logInfo("Cannot create content as it existings in another collection.")
+                    .saveOrEditConflict(collection, blocker, uri)
+                    .user(session.email)
+                    .log();
+            throw new ConflictException("This URI exists in another collection.");
         }
 
         try {
@@ -498,6 +509,11 @@ public class Collections {
     ) throws IOException, ZebedeeException, FileUploadException {
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
+        logInfo("Attempting to write content.")
+                .collectionName(collection)
+                .path(uri)
+                .user(session.email)
+                .log();
 
         if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
@@ -535,6 +551,7 @@ public class Collections {
         }
 
         collection.save();
+        logInfo("content save successful.").collectionName(collection).path(uri).user(session.email).log();
 
         path = collection.getInProgressPath(uri);
         if (!Files.exists(path)) {

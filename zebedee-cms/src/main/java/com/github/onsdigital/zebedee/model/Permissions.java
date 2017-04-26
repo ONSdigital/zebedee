@@ -498,6 +498,9 @@ public class Permissions {
             if (result.collections == null) {
                 result.collections = new HashMap<>();
             }
+            if (result.dataVisualisationPublishers == null) {
+                result.dataVisualisationPublishers = new HashSet<>();
+            }
 
         } else {
 
@@ -506,6 +509,7 @@ public class Permissions {
             result.administrators = new HashSet<>();
             result.digitalPublishingTeam = new HashSet<>();
             result.collections = new HashMap<>();
+            result.dataVisualisationPublishers = new HashSet<>();
             writeAccessMapping(result);
         }
 

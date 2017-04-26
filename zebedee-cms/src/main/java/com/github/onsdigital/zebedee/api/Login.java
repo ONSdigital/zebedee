@@ -47,7 +47,9 @@ public class Login {
             return "Please provide credentials (email, password).";
         }
 
-        User user = Root.zebedee.getUsers().get(credentials.email);
+        //User user = Root.zebedee.getUsers().get(credentials.email);
+        User user = Root.zebedee.getUsersDao().getByEmail(credentials.email);
+
         boolean result = user.authenticate(credentials.password);
 
         if (!result) {
@@ -60,7 +62,9 @@ public class Login {
         // Temponary whilst encryption is being put in place.
         // This can be removed once all users have keyrings.
         com.github.onsdigital.zebedee.model.Users.migrateToEncryption(Root.zebedee, user, credentials.password);
-        com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
+        //com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
+        Root.zebedee.getUsersDao().removeStaleCollectionKeys(user.email);
+
 
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);

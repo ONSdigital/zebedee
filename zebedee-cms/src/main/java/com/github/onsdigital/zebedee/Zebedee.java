@@ -1,6 +1,8 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
+import com.github.onsdigital.zebedee.dao.UsersDao;
+import com.github.onsdigital.zebedee.dao.UsersDaoImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
@@ -61,6 +63,7 @@ public class Zebedee {
     private final Path path;
     private final Permissions permissions;
     private final Users users;
+    private final UsersDao usersDao;
     private final Teams teams;
     private final Sessions sessions;
     private final DataIndex dataIndex;
@@ -108,6 +111,9 @@ public class Zebedee {
         this.collections = new Collections(collections, this);
         this.publishedCollections = new PublishedCollections(publishedCollections);
         this.users = new Users(users, this);
+        this.usersDao = UsersDaoImpl.init(users, this);
+
+
         this.keyringCache = new KeyringCache(this);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.sessions = new Sessions(sessions);
@@ -402,5 +408,9 @@ public class Zebedee {
 
     public DataIndex getDataIndex() {
         return this.dataIndex;
+    }
+
+    public UsersDao getUsersDao() {
+        return usersDao;
     }
 }

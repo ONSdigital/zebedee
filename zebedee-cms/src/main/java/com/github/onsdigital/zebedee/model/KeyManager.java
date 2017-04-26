@@ -62,22 +62,15 @@ public class KeyManager {
             }
         });
 
-        long start = System.nanoTime();
         for (User removedUser : removals) {
-            System.out.println("Removing " + collection.getDescription().id + " from user " + removedUser.email);
             removeKeyFromUser(zebedee, removedUser, collection.getDescription().id);
         }
 
         for (User addedUser : additions) {
-            System.out.println("Adding " + collection.getDescription().id + " to user " + addedUser.email);
             assignKeyToUser(zebedee, addedUser, collection.getDescription().id, key);
         }
 
         zebedee.getKeyringCache().getSchedulerCache().put(collection.description.id, key);
-
-        long timeElapsed = System.nanoTime() - start;
-        double total = timeElapsed / 1000000000.0;
-        System.out.println("\nTIME to assign keys to users " + String.valueOf(total));
     }
 
     /**
@@ -176,8 +169,10 @@ public class KeyManager {
         if (user.keyring() == null) return;
 
         // Add the key to the user keyring and save
-        user.keyring().put(keyIdentifier, key);
-        zebedee.getUsers().updateKeyring(user);
+//        user.keyring().put(keyIdentifier, key);
+//        zebedee.getUsers().addKeyToKeyring(user);
+
+        zebedee.getUsersDao().addKeyToKeyring(user.email, keyIdentifier, key);
 
         // If the user is logged in assign the key to their cached keyring
         Session session = zebedee.getSessions().find(user.email);
@@ -205,8 +200,10 @@ public class KeyManager {
         if (user.keyring() == null) return;
 
         // Remove the key from the users keyring and save
-        user.keyring().remove(keyIdentifier);
-        zebedee.getUsers().updateKeyring(user);
+/*        user.keyring().remove(keyIdentifier);
+        zebedee.getUsers().updateKeyring(user);*/
+
+        zebedee.getUsersDao().removeKeyFromKeyring(user.email, keyIdentifier);
 
         // If the user is logged in remove the key from their cached keyring
         Session session = zebedee.getSessions().find(user.email);

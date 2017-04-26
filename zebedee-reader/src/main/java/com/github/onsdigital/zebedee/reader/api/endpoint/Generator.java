@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.cha
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.DataGenerator;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import org.apache.commons.lang3.StringUtils;
 
@@ -55,17 +56,23 @@ public class Generator {
         Content content = readRequestHandler.findContent(request, extractFilter(request));
 
         if (content != null) {
-            if (content instanceof Chart) {
-                // If page is a chart write the chart spreadsheet requested to response
-                sendResponse(new DataGenerator().generateData((Chart) content, format), response, UTF_8);
-            } else if(content instanceof TimeSeries){
-                // If page then write the timeseries spreadsheet requested to response
-                sendResponse(new DataGenerator().generateData((TimeSeries) content, format), response,UTF_8);
-            } else if (content instanceof Series) {
-                sendResponse(new DataGenerator().generateData((Series) content, format), response,UTF_8);
-            } else {
-                throw new BadRequestException("Invalid file request");
+            try (Resource resource = toResource(content, format)) {
+                sendResponse(resource, response, UTF_8);
             }
+        }
+    }
+
+    private Resource toResource(Content content, String format) throws IOException, BadRequestException {
+        if (content instanceof Chart) {
+            // If page is a chart write the chart spreadsheet requested to response
+            return new DataGenerator().generateData((Chart) content, format);
+        } else if (content instanceof TimeSeries) {
+            // If page then write the timeseries spreadsheet requested to response
+            return new DataGenerator().generateData((TimeSeries) content, format);
+        } else if (content instanceof Series) {
+            return new DataGenerator().generateData((Series) content, format);
+        } else {
+            throw new BadRequestException("Invalid file request");
         }
     }
 }

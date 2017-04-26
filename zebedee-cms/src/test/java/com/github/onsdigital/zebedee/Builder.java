@@ -31,6 +31,9 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
  */
 public class Builder {
 
+    public static final String COLLECTION_ONE_NAME = "inflationq22015";
+    public static final String COLLECTION_TWO_NAME = "labourmarketq22015";
+
     private static int teamId;
     private static User administratorTemplate;
     private static User publisher1Template;

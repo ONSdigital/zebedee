@@ -185,23 +185,41 @@ public class CsvTimeseriesUpdater {
 
                 while (strings != null) {
 
-                    if (rowIndex == 0) { // the row with all the titles in
+//                    if (rowIndex == 0) { // the row with all the titles in
+//                        // set the updated titles
+//                        for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+//                            Integer index = command.datasetCsvColumn.get(timeseriesDatasetFiles.getCsdbId());
+//                            if (index != null) {
+//                                logDebug("Generating CSV")
+//                                        .addParameter("fromTitle", strings[index])
+//                                        .addParameter("toTitle", command.title)
+//                                        .addParameter("index", index)
+//                                        .addParameter("csdb", command.cdid)
+//                                        .addParameter("CSDB", timeseriesDatasetFiles.getCsdbId())
+//                                        .log();
+//                                strings[index] = command.title;
+//                            }
+//                        }
+//                    }
+
+                    if (rowIndex == 2) { // the row with all the titles in
                         // set the updated titles
                         for (TimeseriesUpdateCommand command : commandsForThisDataset) {
                             Integer index = command.datasetCsvColumn.get(timeseriesDatasetFiles.getCsdbId());
                             if (index != null) {
-                                logDebug("Generating CSV")
-                                        .addParameter("fromTitle", strings[index])
-                                        .addParameter("toTitle", command.title)
-                                        .addParameter("index", index)
-                                        .addParameter("csdb", command.cdid)
-                                        .addParameter("CSDB", timeseriesDatasetFiles.getCsdbId())
-                                        .log();
-                                strings[index] = command.title;
+                                strings[index] = command.preunit;
                             }
                         }
                     }
-
+                    if (rowIndex == 3) { // the row with all the titles in
+                        // set the updated titles
+                        for (TimeseriesUpdateCommand command : commandsForThisDataset) {
+                            Integer index = command.datasetCsvColumn.get(timeseriesDatasetFiles.getCsdbId());
+                            if (index != null) {
+                                strings[index] = command.unit;
+                            }
+                        }
+                    }
 //                    if (rowIndex == 4) { // the row with all the release dates in
 //                        // set the updated titles
 //                        for (TimeseriesUpdateCommand command : commandsForThisDataset) {

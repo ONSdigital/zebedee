@@ -20,7 +20,6 @@ public class DataMergeTest {
 
     @Before
     public void setUp() throws Exception {
-
         generator = new DataPagesGenerator();
     }
 
@@ -80,7 +79,7 @@ public class DataMergeTest {
         // Then
         // we expect the merge to include 3 points including 2003
         assertEquals(3, merged.years.size());
-        assertEquals(1, dataMerge.corrections);
+        assertEquals(3, dataMerge.corrections);
         assertEquals("4", valueForTime("2002", merged).value);
     }
 
@@ -101,10 +100,30 @@ public class DataMergeTest {
         // we expect the merge to include 3 points including 2003
         assertEquals(4, merged.years.size());
         assertEquals(1, dataMerge.insertions);
-        assertEquals("1", valueForTime("2000", merged).value);
-        assertEquals("2", valueForTime("2001", merged).value);
-        assertEquals("3", valueForTime("2002", merged).value);
+        assertEquals("", valueForTime("2000", merged).value);
+        assertEquals("", valueForTime("2001", merged).value);
+        assertEquals("", valueForTime("2002", merged).value);
         assertEquals("4", valueForTime("2003", merged).value);
+    }
+
+    @Test
+    public void mergeValues_overExistingTimeSeries_shouldBlankOutSuppressedValues() throws IOException {
+        // Given a timeseries for 2000-2002 and an set of updates that suppresses the 2002 value
+        TimeSeries initial = simplifyTimeSeries(generator.exampleTimeseries("cdid", "dataset"));
+        TimeSeries updates = simplifyTimeSeries(generator.exampleTimeseries("cdid", "dataset"));
+
+        TimeSeriesValue suppressedEntry = updates.years.last();
+        updates.years.remove(suppressedEntry);
+
+        // When a merge is done
+        DataMerge dataMerge = new DataMerge();
+        TimeSeries merged = dataMerge.merge(initial, updates, "update");
+
+        // Then the merged data should have a blank value for the suppressed 2002 entry
+        // counted as a correction.
+        assertEquals(3, merged.years.size());
+        assertEquals("", valueForTime("2002", merged).value);
+        assertEquals(1, dataMerge.corrections);
     }
 
 

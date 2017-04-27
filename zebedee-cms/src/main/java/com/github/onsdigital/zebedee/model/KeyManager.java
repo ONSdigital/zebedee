@@ -49,14 +49,14 @@ public class KeyManager {
         List<User> additions = new ArrayList<>();
 
         if (!isNewCollection) {
-            zebedee.getUsers().list().stream().forEach(user -> {
+            zebedee.getUsersDao().list().stream().forEach(user -> {
                 if (!keyRecipients.contains(user)) {
                     removals.add(user);
                 }
             });
         }
 
-        zebedee.getUsers().list().stream().forEach(user -> {
+        zebedee.getUsersDao().list().stream().forEach(user -> {
             if (!removals.contains(user)) {
                 additions.add(user);
             }
@@ -91,7 +91,7 @@ public class KeyManager {
 
         if (!isNewCollection) {
             // Filter out the users who are should not receive the key and take it from them [evil laugh].
-            zebedee.getUsers().list().stream().filter(user -> !keyRecipients.contains(user)).forEach(nonKeyRecipient -> {
+            zebedee.getUsersDao().list().stream().filter(user -> !keyRecipients.contains(user)).forEach(nonKeyRecipient -> {
                 collectionKeyTasks.add(() -> {
                     removeKeyFromUser(zebedee, nonKeyRecipient, collection.getDescription().id);
                     return true;
@@ -116,7 +116,7 @@ public class KeyManager {
     }
 
     public static void distributeApplicationKey(Zebedee zebedee, String application, SecretKey secretKey) throws IOException {
-        for (User user : zebedee.getUsers().list()) {
+        for (User user : zebedee.getUsersDao().list()) {
             distributeApplicationKeyToUser(zebedee, application, secretKey, user);
         }
     }

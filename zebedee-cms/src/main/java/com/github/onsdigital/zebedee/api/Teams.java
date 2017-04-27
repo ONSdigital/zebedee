@@ -192,7 +192,8 @@ public class Teams {
             Set<Integer> teamIds = Root.zebedee.getPermissions().listViewerTeams(collection.description, session);
             if (teamIds != null && teamIds.contains(team.id)) {
                 for (String memberEmail : emails) {
-                    KeyManager.distributeKeyToUser(zebedee, collection, session, zebedee.getUsers().get(memberEmail));
+                    KeyManager.distributeKeyToUser(zebedee, collection, session,
+                            zebedee.getUsersDao().getUserByEmail(memberEmail));
                 }
             }
         }

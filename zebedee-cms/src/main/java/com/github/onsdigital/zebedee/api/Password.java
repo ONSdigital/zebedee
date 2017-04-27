@@ -42,7 +42,7 @@ public class Password {
 
         // If the user is not logged in, but they are attempting to change their password, authenticate using the old password
         if (session == null && credentials != null) {
-            User user = Root.zebedee.getUsers().get(credentials.email);
+            User user = Root.zebedee.getUsersDao().getUserByEmail(credentials.email);
             if (user.authenticate(credentials.oldPassword)) {
                 Credentials oldPasswordCredentials = new Credentials();
                 oldPasswordCredentials.email = credentials.email;
@@ -52,7 +52,7 @@ public class Password {
         }
 
         // Attempt to change or reset the password:
-        if (Root.zebedee.getUsers().setPassword(session, credentials)) {
+        if (Root.zebedee.getUsersDao().setPassword(session, credentials)) {
             Audit.Event.PASSWORD_CHANGED_SUCCESS
                     .parameters()
                     .host(request)

@@ -103,7 +103,8 @@ public class Permissions {
     public List<User> getCollectionAccessMapping(Zebedee zebedee, Collection collection) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         List<Team> teamsList = zebedee.getTeams().listTeams();
-        List<User> keyUsers = zebedee.getUsers().list()
+        List<User> keyUsers = zebedee.getUsersDao()
+                .list()
                 .stream()
                 .filter(user -> isCollectionKeyRecipient(accessMapping, teamsList, user, collection))
                 .collect(Collectors.toList());
@@ -252,7 +253,7 @@ public class Permissions {
      */
     public boolean canEdit(String email, CollectionDescription collectionDescription) throws IOException {
         try {
-            return canEdit(zebedee.getUsers().get(email), collectionDescription);
+            return canEdit(zebedee.getUsersDao().getUserByEmail(email), collectionDescription);
         } catch (BadRequestException | NotFoundException e) {
             return false;
         }
@@ -342,7 +343,7 @@ public class Permissions {
     public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
 
         try {
-            return canView(zebedee.getUsers().get(email), collectionDescription);
+            return canView(zebedee.getUsersDao().getUserByEmail(email), collectionDescription);
         } catch (NotFoundException | BadRequestException e) {
             return false;
         }
@@ -627,7 +628,7 @@ public class Permissions {
      */
     private void updateKeyring(Session session, String email, CollectionOwner collectionOwner)
             throws IOException, NotFoundException, BadRequestException {
-        User user = zebedee.getUsers().get(email);
+        User user = zebedee.getUsersDao().getUserByEmail(email);
         if (session != null && user.keyring != null) {
             KeyManager.transferKeyring(user.keyring, zebedee.getKeyringCache().get(session), collectionOwner);
             zebedee.getUsers().updateKeyring(user);

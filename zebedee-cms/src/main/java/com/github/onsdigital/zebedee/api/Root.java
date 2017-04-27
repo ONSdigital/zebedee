@@ -8,7 +8,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -107,7 +106,7 @@ public class Root {
         }
 
         //Setting zebedee root as system property for zebedee reader module, since zebedee root is not set as environment variable on develop environment
-        System.setProperty("zebedee_root", root.toString());
+        System.setProperty(ZEBEDEE_ROOT, root.toString());
 
         SlackNotification.alarm("Zebedee has just started. Ensure an administrator has logged in.");
 
@@ -138,13 +137,10 @@ public class Root {
 
     private static void cleanupStaleCollectionKeys() {
         try {
-            UserList users = zebedee.getUsers().list();
-
-            for (User user : users) {
-                com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(zebedee, user);
+            for (User user : zebedee.getUsersDao().list()) {
+                zebedee.getUsersDao().removeStaleCollectionKeys(user.email);
             }
-
-        } catch (IOException e) {
+        } catch (IOException | NotFoundException | BadRequestException e) {
             logError(e).log();
         }
     }

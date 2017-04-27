@@ -180,7 +180,7 @@ public class Collection {
 
         // Encryption
         // assign a key for the collection to the session user
-        KeyManager.assignKeyToUser(zebedee, zebedee.getUsers().get(session.email), collection.description.id, Keys.newSecretKey());
+        KeyManager.assignKeyToUser(zebedee, zebedee.getUsersDao().getUserByEmail(session.email), collection.description.id, Keys.newSecretKey());
         // get the session user to distribute the key to all
         KeyManager.distributeCollectionKey(zebedee, session, collection, true);
 

@@ -180,8 +180,7 @@ public class Zebedee {
         user.email = "florence@magicroundabout.ons.gov.uk";
         user.name = "Florence";
         String password = "Doug4l";
-        Users.createSystemUser(zebedee, user, password);
-
+        zebedee.getUsersDao().createSystemUser(user, password);
         return zebedee;
     }
 
@@ -339,7 +338,7 @@ public class Zebedee {
         }
 
         // Get the user
-        User user = users.get(credentials.email);
+        User user = usersDao.getUserByEmail(credentials.email);
 
         if (user == null) {
             logDebug("Null session due to users.get returning null").log();
@@ -358,6 +357,7 @@ public class Zebedee {
         return session;
     }
 
+    @Deprecated
     public Users getUsers() {
         return this.users;
     }

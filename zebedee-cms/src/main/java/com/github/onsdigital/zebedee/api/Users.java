@@ -29,6 +29,8 @@ import java.util.List;
 @Api
 public class Users {
 
+    private static final String EMAIL_PARAM = "email";
+
     /**
      * Get a user or list of users
      *
@@ -45,18 +47,17 @@ public class Users {
     public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException {
         Object result = null;
 
-        String email = request.getParameter("email");
+        String email = request.getParameter(EMAIL_PARAM);
         Session session = Root.zebedee.getSessions().get(request);
 
         if (session != null) {
             // If email is empty
             if (StringUtils.isBlank(email)) {
-                result = sanitise(Root.zebedee.getUsers().list());
+                result = sanitise(Root.zebedee.getUsersDao().list());
             } else {
-                result = sanitise(Root.zebedee.getUsers().get(email));
+                result = sanitise(Root.zebedee.getUsersDao().getUserByEmail(email));
             }
         }
-
         return result;
     }
 
@@ -79,7 +80,7 @@ public class Users {
     public UserSanitised create(HttpServletRequest request, HttpServletResponse response, User user) throws
             IOException, ConflictException, BadRequestException, UnauthorizedException {
         Session session = Root.zebedee.getSessions().get(request);
-        User created = Root.zebedee.getUsers().create(session, user);
+        User created = Root.zebedee.getUsersDao().create(session, user);
 
         Audit.Event.USER_CREATED
                 .parameters()
@@ -104,10 +105,10 @@ public class Users {
             IOException, NotFoundException, BadRequestException, UnauthorizedException {
         Session session = Root.zebedee.getSessions().get(request);
 
-        String email = request.getParameter("email");
-        User user = Root.zebedee.getUsers().get(email);
+        String email = request.getParameter(EMAIL_PARAM);
+        User user = Root.zebedee.getUsersDao().getUserByEmail(email);
 
-        User updated = Root.zebedee.getUsers().update(session, user, updatedUser);
+        User updated = Root.zebedee.getUsersDao().update(session, user, updatedUser);
 
         Audit.Event.USER_UPDATED
                 .parameters()
@@ -129,9 +130,9 @@ public class Users {
             UnauthorizedException, IOException, NotFoundException, BadRequestException {
 
         Session session = Root.zebedee.getSessions().get(request);
-        String email = request.getParameter("email");
-        User user = Root.zebedee.getUsers().get(email);
-        boolean result = Root.zebedee.getUsers().delete(session, user);
+        String email = request.getParameter(EMAIL_PARAM);
+        User user = Root.zebedee.getUsersDao().getUserByEmail(email);
+        boolean result = Root.zebedee.getUsersDao().delete(session, user);
         if(result) {
             Audit.Event.USER_DELETED
                     .parameters()

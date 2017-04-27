@@ -48,7 +48,7 @@ public class Login {
         }
 
         //User user = Root.zebedee.getUsers().get(credentials.email);
-        User user = Root.zebedee.getUsersDao().getByEmail(credentials.email);
+        User user = Root.zebedee.getUsersDao().getUserByEmail(credentials.email);
 
         boolean result = user.authenticate(credentials.password);
 

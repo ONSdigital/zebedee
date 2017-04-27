@@ -29,6 +29,7 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
  * <p/>
  * Class to handle user management functions
  */
+@Deprecated
 public class Users {
     private Path users;
     private Zebedee zebedee;
@@ -47,6 +48,7 @@ public class Users {
      * @param session  An administrator session.
      * @throws IOException If a filesystem error occurs.
      */
+    @Deprecated
     public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
         zebedee.getUsers().create(session, user);
         Credentials credentials = new Credentials();
@@ -64,6 +66,7 @@ public class Users {
      * @param password The plaintext password for the user.
      * @throws IOException If a filesystem error occurs.
      */
+    @Deprecated
     public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         if (zebedee.getPermissions().hasAdministrator()) {
@@ -114,6 +117,7 @@ public class Users {
     /**
      * Remove keys for collections that no longer exist.
      */
+    @Deprecated
     public static void cleanupCollectionKeys(Zebedee zebedee, User user) throws IOException {
         if (user.keyring != null) {
 
@@ -178,6 +182,7 @@ public class Users {
      * @return The list of users on the system.
      * @throws IOException If a general filesystem error occurs.
      */
+    @Deprecated
     public UserList list() throws IOException {
         return zebedee.getUsers().listAll();
     }
@@ -191,6 +196,7 @@ public class Users {
      * @throws NotFoundException   If the email cannot be found
      * @throws BadRequestException If the email is left blank
      */
+    @Deprecated
     public User get(String email) throws IOException, NotFoundException, BadRequestException {
 
         // Check email isn't blank (though this should redirect to userlist)
@@ -213,6 +219,7 @@ public class Users {
      * @return The newly created user, unless a user already exists, or the supplied {@link com.github.onsdigital.zebedee.json.User} is not valid.
      * @throws IOException If a filesystem error occurs.
      */
+    @Deprecated
     public User create(Session session, User user) throws UnauthorizedException, IOException, ConflictException, BadRequestException {
 
         // Check the user has create permissions
@@ -239,6 +246,7 @@ public class Users {
      * @return The newly created user, unless a user already exists, or the supplied {@link com.github.onsdigital.zebedee.json.User User} is not valid.
      * @throws IOException If a filesystem error occurs.
      */
+    @Deprecated
     User create(User user, String lastAdmin) throws IOException {
         User result = null;
 
@@ -268,6 +276,7 @@ public class Users {
      * @throws NotFoundException     - user account does not exist
      * @throws BadRequestException   - problem with the update
      */
+    @Deprecated
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
         if (zebedee.getPermissions().isAdministrator(session.email) == false) {
@@ -303,6 +312,7 @@ public class Users {
      * @return
      * @throws IOException
      */
+    @Deprecated
     synchronized User update(User user, User updatedUser, String lastAdmin) throws IOException {
 
         if (user != null) {
@@ -360,6 +370,7 @@ public class Users {
      * @throws IOException
      * @throws NotFoundException
      */
+    @Deprecated
     public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
 
         if (zebedee.getPermissions().isAdministrator(session.email) == false) {
@@ -381,21 +392,25 @@ public class Users {
      * @return If the given user can be mapped to a user record, true.
      * @throws IOException If a filesystem error occurs.
      */
+    @Deprecated
     public boolean exists(User user) throws IOException {
         return user != null && exists(user.email);
     }
 
     /**
+     * DONE.
      * Determines whether a {@link com.github.onsdigital.zebedee.json.User} record exists for the given email.
      *
      * @param email Can be null.
      * @return If the given email can be mapped to a user record, true.
      * @throws IOException If a filesystem error occurs.
      */
+    @Deprecated
     public boolean exists(String email) throws IOException {
         return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
     }
 
+    @Deprecated
     public boolean setPassword(Session session, Credentials credentials) throws IOException, UnauthorizedException, BadRequestException, NotFoundException {
         boolean result = false;
 
@@ -441,6 +456,7 @@ public class Users {
     }
 
     /**
+     * Done.
      * Changes the user's password and sets the account to active.
      * This is done by the user themselves so the password is marked as not temporary.
      *
@@ -449,6 +465,7 @@ public class Users {
      * @param oldPassword The new password to set.
      * @throws IOException If a filesystem error occurs.
      */
+    @Deprecated
     private boolean changePassword(User user, String oldPassword, String newPassword) throws IOException {
         boolean result = false;
 
@@ -465,6 +482,7 @@ public class Users {
     }
 
     /**
+     * Done.
      * Resets the specified user's password and sets the account to active.
      * This is done by an admin so the password is marked as temporary.
      *
@@ -473,7 +491,7 @@ public class Users {
      * @param adminEmail The user resetting the password.
      * @throws IOException If a filesystem error occurs.
      */
-
+    @Deprecated
     private void resetPassword(User user, String password, String adminEmail) throws IOException {
         user.resetPassword(password);
         user.inactive = false;
@@ -500,6 +518,7 @@ public class Users {
      * @param user The object to check.
      * @return If the user is not null and neither email nor name ar blank, true.
      */
+    @Deprecated
     private boolean valid(User user) {
         return user != null && StringUtils.isNoneBlank(user.email, user.name);
     }
@@ -511,6 +530,7 @@ public class Users {
      * @return The read user, if any.
      * @throws IOException
      */
+    @Deprecated
     private User read(String email) throws IOException {
         User result = null;
         if (exists(email)) {
@@ -526,6 +546,7 @@ public class Users {
      * @param user The record to be written.
      * @throws IOException If a filesystem error occurs.
      */
+    @Deprecated
     private void write(User user) throws IOException {
         user.email = normalise(user.email);
         Path userPath = userPath(user.email);
@@ -538,6 +559,7 @@ public class Users {
      * @param email The email address to generate a {@link java.nio.file.Path} for.
      * @return A {@link java.nio.file.Path} to the specified user record.
      */
+    @Deprecated
     private Path userPath(String email) {
         Path result = null;
 
@@ -554,15 +576,18 @@ public class Users {
      * @param email An email address to be standardised.
      * @return The given email, trimmed and lowercased.
      */
+    @Deprecated
     private String normalise(String email) {
         return StringUtils.lowerCase(StringUtils.trim(email));
     }
 
     /**
+     * DONE.
      * Return a collection of all users registered in the system
      *
      * @return A list of all users.
      */
+    @Deprecated
     public UserList listAll() throws IOException {
         UserList result = new UserList();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(users)) {

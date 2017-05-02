@@ -61,11 +61,12 @@ public class Login {
 
         // Temponary whilst encryption is being put in place.
         // This can be removed once all users have keyrings.
-        com.github.onsdigital.zebedee.model.Users.migrateToEncryption(Root.zebedee, user, credentials.password);
+        Root.zebedee.getUsersDao().migrateToEncryption(user, credentials.password);
+        //com.github.onsdigital.zebedee.model.Users.migrateToEncryption(Root.zebedee, user, credentials.password);
         //com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
         Root.zebedee.getUsersDao().removeStaleCollectionKeys(user.email);
 
-
+        // TODO why is boolean utils necessary here?
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
             Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.email).log();

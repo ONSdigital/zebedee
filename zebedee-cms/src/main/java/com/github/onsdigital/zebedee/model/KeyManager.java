@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
 
 /**
  * Created by thomasridd on 18/11/15.
@@ -166,7 +167,13 @@ public class KeyManager {
      */
     public static void assignKeyToUser(Zebedee zebedee, User user, String keyIdentifier, SecretKey key) throws IOException {
         // Escape in case user keyring has not been generated
-        if (user.keyring() == null) return;
+        if (user.keyring() == null) {
+            logWarn("Skipping assigning collection key to user as their keyring has not been initialized.")
+                    .user(user.email)
+                    .collectionId(keyIdentifier)
+                    .log();
+            return;
+        }
 
         // Add the key to the user keyring and save
 //        user.keyring().put(keyIdentifier, key);

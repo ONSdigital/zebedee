@@ -6,8 +6,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.AdminOptions;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
@@ -15,9 +13,12 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
 import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.KeyManager;
+import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
+import com.github.onsdigital.zebedee.model.Permissions;
+import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,24 +43,54 @@ import static java.text.MessageFormat.format;
  */
 public class UsersDaoImpl implements UsersDao {
 
-    private static UsersDao instance = null;
-
+    private static final Object MUTEX = new Object();
     private static final String JSON_EXT = ".json";
     private static final String SYSTEM_USER = "system";
 
+    private static UsersDao INSTANCE = null;
     private final ReentrantLock lock = new ReentrantLock();
-    private Path users;
-    private Zebedee zebedee;
 
-    // TODO Need to think about this need to implement a thread safe singleton.
-    public static UsersDao init(Path users, Zebedee zebedee) {
-        instance = new UsersDaoImpl(users, zebedee);
-        return instance;
+    private Path users;
+    private Permissions permissions;
+    private ApplicationKeys applicationKeys;
+    private KeyringCache keyringCache;
+    private Collections collections;
+
+    /**
+     *
+     * @param users
+     * @param collections
+     * @param permissions
+     * @param applicationKeys
+     * @param keyringCache
+     * @return
+     */
+    public static UsersDao getInstance(Path users, Collections collections, Permissions permissions,
+                                       ApplicationKeys applicationKeys, KeyringCache keyringCache) {
+        if (INSTANCE == null) {
+            synchronized (MUTEX) {
+                if (INSTANCE == null) {
+                    INSTANCE = new UsersDaoImpl(users, collections, permissions, applicationKeys, keyringCache);
+                }
+            }
+        }
+        return INSTANCE;
     }
 
-    private UsersDaoImpl(Path users, Zebedee zebedee) {
+    /**
+     *
+     * @param users
+     * @param collections
+     * @param permissions
+     * @param applicationKeys
+     * @param keyringCache
+     */
+    UsersDaoImpl(Path users, Collections collections, Permissions permissions, ApplicationKeys
+            applicationKeys, KeyringCache keyringCache) {
         this.users = users;
-        this.zebedee = zebedee;
+        this.permissions = permissions;
+        this.applicationKeys = applicationKeys;
+        this.collections = collections;
     }
 
     @Override
@@ -105,7 +136,7 @@ public class UsersDaoImpl implements UsersDao {
     @Override
     public void createSystemUser(User user, String password) throws IOException, UnauthorizedException,
             NotFoundException, BadRequestException {
-        if (zebedee.getPermissions().hasAdministrator()) {
+        if (permissions.hasAdministrator()) {
             logDebug(SYSTEM_USER_ALREADY_EXISTS_MSG).log();
             return;
         }
@@ -113,8 +144,8 @@ public class UsersDaoImpl implements UsersDao {
         // Create the user at a lower level because we don't have a Session at this point:
         create(user, SYSTEM_USER);
         write(resetPassword(user, password, SYSTEM_USER));
-        zebedee.getPermissions().addEditor(user.email, null);
-        zebedee.getPermissions().addAdministrator(user.email, null);
+        permissions.addEditor(user.email, null);
+        permissions.addAdministrator(user.email, null);
     }
 
     @Override
@@ -125,13 +156,13 @@ public class UsersDaoImpl implements UsersDao {
         credentials.email = user.email;
         credentials.password = password;
         setPassword(session, credentials);
-        zebedee.getPermissions().addEditor(user.email, session);
+        permissions.addEditor(user.email, session);
     }
 
     @Override
     public User create(Session session, User user) throws UnauthorizedException, IOException, ConflictException,
             BadRequestException {
-        if (!zebedee.getPermissions().isAdministrator(session)) {
+        if (!permissions.isAdministrator(session)) {
             throw new UnauthorizedException(CREATE_USER_AUTH_ERROR_MSG);
         }
         if (exists(user)) {
@@ -140,7 +171,7 @@ public class UsersDaoImpl implements UsersDao {
         if (!valid(user)) {
             throw new BadRequestException(USER_DETAILS_INVALID_MSG);
         }
-        return create(user, session.email);
+        return create(user, session.getEmail());
     }
 
     @Override
@@ -156,21 +187,20 @@ public class UsersDaoImpl implements UsersDao {
         }
 
         User user = read(credentials.email);
-        if (!zebedee.getPermissions().isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
+        if (!permissions.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
             throw new UnauthorizedException("Authentication failed with old password.");
         }
 
         lock.lock();
         try {
-            boolean settingOwnPwd = credentials.email.equalsIgnoreCase(session.email)
+            boolean settingOwnPwd = credentials.email.equalsIgnoreCase(session.getEmail())
                     && StringUtils.isNotBlank(credentials.password);
 
             if (settingOwnPwd) {
                 isSuccess = changePassword(user, credentials.oldPassword, credentials.password);
             } else {
                 // Only an admin can update another users password.
-                if (zebedee.getPermissions().isAdministrator(session.email) || !zebedee.getPermissions()
-                        .hasAdministrator()) {
+                if (permissions.isAdministrator(session.getEmail()) || !permissions.hasAdministrator()) {
 
                     // Administrator reset, or system setup Grab current keyring (null if this is system setup)
                     Keyring originalKeyring = null;
@@ -178,17 +208,17 @@ public class UsersDaoImpl implements UsersDao {
                         originalKeyring = user.keyring.clone();
                     }
 
-                    user = resetPassword(user, credentials.password, session.email);
+                    user = resetPassword(user, credentials.password, session.getEmail());
                     // Restore the user keyring (or not if this is system setup)
                     if (originalKeyring != null) {
-                        KeyManager.transferKeyring(user.keyring, zebedee.getKeyringCache().get(session), originalKeyring.list());
+                        KeyManager.transferKeyring(user.keyring, keyringCache.get(session), originalKeyring.list());
                     }
                     write(user);
                     isSuccess = true;
                 } else {
                     // Set password unsuccessful.
                     logInfo("Set password unsuccessful, only admin users can set another users password.")
-                            .addParameter("callingUser", session.email)
+                            .addParameter("callingUser", session.getEmail())
                             .addParameter("targetedUser", credentials.email)
                             .log();
                 }
@@ -226,17 +256,13 @@ public class UsersDaoImpl implements UsersDao {
             User user = getUserByEmail(userEmail);
 
             if (user.keyring != null) {
-                // TODO this could be moved to the collections class for reuse.
-                Map<String, Collection> collectionMap = zebedee.getCollections()
-                        .list()
-                        .stream()
-                        .collect(Collectors.toMap(collection -> collection.getDescription().getId(), collection -> collection));
+                Map<String, Collection> collectionMap = collections.mapByID();
 
                 List<String> keysToRemove = user.keyring()
                         .list()
                         .stream()
                         .filter(key -> {
-                            if (zebedee.getApplicationKeys().containsKey(key)) {
+                            if (applicationKeys.containsKey(key)) {
                                 return false;
                             }
                             return !collectionMap.containsKey(key);
@@ -277,19 +303,19 @@ public class UsersDaoImpl implements UsersDao {
     @Override
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException,
             NotFoundException, BadRequestException {
-        if (!zebedee.getPermissions().isAdministrator(session.email)) {
+        if (!permissions.isAdministrator(session.getEmail())) {
             throw new UnauthorizedException("Administrator permissions required");
         }
 
         if (!exists(user.email)) {
             throw new NotFoundException("User " + user.email + " could not be found");
         }
-        return update(user, updatedUser, session.email);
+        return update(user, updatedUser, session.getEmail());
     }
 
     @Override
     public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
-        if (zebedee.getPermissions().isAdministrator(session.email) == false) {
+        if (permissions.isAdministrator(session.getEmail()) == false) {
             throw new UnauthorizedException("Administrator permissions required");
         }
 
@@ -306,6 +332,35 @@ public class UsersDaoImpl implements UsersDao {
         }
     }
 
+    // TODO don't think this is required anymore.
+    @Override
+    public void migrateToEncryption(User user, String password) throws IOException {
+
+        // Update this user if necessary:
+        migrateUserToEncryption(user, password);
+
+        int withKeyring = 0;
+        int withoutKeyring = 0;
+        // TODO Was listAll
+        UserList users = list();
+        for (User otherUser : users) {
+            if (user.keyring() != null) {
+                withKeyring++;
+            } else {
+                // Migrate test users automatically:
+                if (migrateUserToEncryption(otherUser, "Dou4gl") || migrateUserToEncryption(otherUser, "password"))
+                    withKeyring++;
+                else
+                    withoutKeyring++;
+            }
+        }
+
+        logDebug("User info")
+                .addParameter("numberOfUsers", users.size())
+                .addParameter("withKeyRing", withKeyring)
+                .addParameter("withoutKeyRing", withoutKeyring).log();
+    }
+
     User create(User user, String lastAdmin) throws IOException {
         User result = null;
 
@@ -319,6 +374,28 @@ public class UsersDaoImpl implements UsersDao {
             write(result);
         }
         return result;
+    }
+
+    private boolean migrateUserToEncryption(User user, String password) throws IOException {
+        boolean result = false;
+        lock.lock();
+        try {
+            if (user.keyring() == null && user.authenticate(password)) {
+
+                System.out.println("\nUSER KEYRING IS NULL GENERATING NEW KEYRING\n");
+
+                user = read(user.email);
+                // The keyring has not been generated yet,
+                // so reset the password to the current password
+                // in order to generate a keyring and associated key pair:
+                logDebug("Generating keyring").user(user.email).log();
+                user.resetPassword(password);
+                update(user, user, "Encryption migration");
+            }
+            return result;
+        } finally {
+            lock.unlock();
+        }
     }
 
     private User update(User user, User updatedUser, String lastAdmin) throws IOException {
@@ -411,6 +488,14 @@ public class UsersDaoImpl implements UsersDao {
         return result;
     }
 
+    /**
+     * CALLER IS RESPONSIBLE FOR PERSISTING THIS.
+     * @param user
+     * @param password
+     * @param adminEmail
+     * @return
+     * @throws IOException
+     */
     private User resetPassword(User user, String password, String adminEmail) throws IOException {
         lock.lock();
         try {
@@ -419,8 +504,6 @@ public class UsersDaoImpl implements UsersDao {
             current.inactive = false;
             current.lastAdmin = adminEmail;
             current.temporaryPassword = true;
-            // Caller is responsible for write.
-            //write(current);
             return current;
         } catch (IOException ex) {
             logError(ex).log();

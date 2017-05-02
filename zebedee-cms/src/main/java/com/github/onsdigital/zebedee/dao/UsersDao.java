@@ -162,4 +162,13 @@ public interface UsersDao {
      */
     boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException;
 
+    /**
+     *
+     * @param zebedee
+     * @param user
+     * @param password
+     * @throws IOException
+     */
+    void migrateToEncryption(User user, String password) throws IOException;
+
 }

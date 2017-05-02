@@ -30,6 +30,23 @@ public class Session {
      */
     public Date lastAccess = new Date();
 
+
+    public String getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Date getStart() {
+        return start;
+    }
+
+    public Date getLastAccess() {
+        return lastAccess;
+    }
+
     @Override
     public String toString() {
         return email + " (" + StringUtils.abbreviate(id, 8) + ")";

@@ -37,8 +37,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
@@ -198,6 +200,11 @@ public class Collections {
         }
 
         return result;
+    }
+
+    public Map<String, Collection> mapByID() throws IOException {
+        return list().stream().collect(Collectors.toMap(
+                collection -> collection.getDescription().getId(), collection -> collection));
     }
 
     /**

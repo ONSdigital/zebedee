@@ -76,13 +76,13 @@ public class Zebedee {
 
         Path collections = path.resolve(COLLECTIONS);
         Path publishedCollections = path.resolve(PUBLISHED_COLLECTIONS);
-        Path users = path.resolve(USERS);
+        Path userPath = path.resolve(USERS);
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
         Path teams = path.resolve(TEAMS);
         Path applicationKeysPath = path.resolve(APPLICATION_KEYS);
 
-        if (!Files.exists(publishedContentPath) || !Files.exists(collections) || !Files.exists(users)
+        if (!Files.exists(publishedContentPath) || !Files.exists(collections) || !Files.exists(userPath)
                 || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
@@ -110,15 +110,17 @@ public class Zebedee {
 
         this.collections = new Collections(collections, this);
         this.publishedCollections = new PublishedCollections(publishedCollections);
-        this.users = new Users(users, this);
-        this.usersDao = UsersDaoImpl.init(users, this);
-
+        this.users = new Users(userPath, this);
 
         this.keyringCache = new KeyringCache(this);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
+
+        this.usersDao = UsersDaoImpl.getInstance(userPath, getCollections(), getPermissions(), getApplicationKeys(),
+                getKeyringCache());
+
         if (useVerificationAgent && Configuration.isVerificationEnabled()) {
             this.verificationAgent = new VerificationAgent(this);
         } else {

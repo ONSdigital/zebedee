@@ -88,6 +88,7 @@ public class Users {
      * @param user     The user who has just logged in
      * @param password The user's plaintext password
      */
+    @Deprecated
     public static void migrateToEncryption(Zebedee zebedee, User user, String password) throws IOException {
 
         // Update this user if necessary:
@@ -162,6 +163,7 @@ public class Users {
      *                 otherwise there's no point because the user's {@link java.security.PrivateKey}
      *                 will be encrypted using this password, so would be unrecoverable with their actual password.
      */
+    @Deprecated
     private static boolean migrateUserToEncryption(Zebedee zebedee, User user, String password) throws IOException {
         boolean result = false;
         if (user.keyring() == null && user.authenticate(password)) {

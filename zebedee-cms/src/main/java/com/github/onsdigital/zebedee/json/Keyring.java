@@ -28,7 +28,7 @@ public class Keyring implements Cloneable {
     private String privateKeySalt;
     private String privateKey;
     private String publicKey;
-    public Map<String, String> keyring = new ConcurrentHashMap<>();
+    private Map<String, String> keyring = new ConcurrentHashMap<>();
     // Runtime cache of decrypted keys:
     private transient KeyPair keyPair;
 

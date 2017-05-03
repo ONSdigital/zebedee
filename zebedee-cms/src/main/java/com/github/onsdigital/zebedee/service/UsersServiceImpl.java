@@ -39,7 +39,14 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static java.text.MessageFormat.format;
 
 /**
- *
+ * File system implementation of {@link UsersService} replacing legacy implmentation
+ * {@link com.github.onsdigital.zebedee.model.Users}. This implemention uses a {@link ReentrantLock} to ensure that
+ * only the thread which currently has the lock can execute a method that will modify a user file. The previous
+ * implementation allowed 2 or more threads to potentially read the same user into memory, apply different in memory
+ * updates before
+ * writing the user back to the File system. In such cases the version of the user version written first would be
+ * overwridden by subsequent updates - leading to data missing from user.<br/> The obvious performance implications
+ * are outweighed by the correctness of data. The long term plan is to use a database.
  */
 public class UsersServiceImpl implements UsersService {
 
@@ -58,13 +65,7 @@ public class UsersServiceImpl implements UsersService {
     private Collections collections;
 
     /**
-     *
-     * @param users
-     * @param collections
-     * @param permissions
-     * @param applicationKeys
-     * @param keyringCache
-     * @return
+     * Get a singleton instance of {@link UsersServiceImpl}.
      */
     public static UsersService getInstance(Path users, Collections collections, Permissions permissions,
                                            ApplicationKeys applicationKeys, KeyringCache keyringCache) {
@@ -382,17 +383,21 @@ public class UsersServiceImpl implements UsersService {
 
     User create(User user, String lastAdmin) throws IOException {
         User result = null;
-
-        if (valid(user) && !exists(user.email)) {
-            result = new User();
-            result.email = user.email;
-            result.name = user.name;
-            result.inactive = true;
-            result.temporaryPassword = true;
-            result.lastAdmin = lastAdmin;
-            write(result);
+        lock.lock();
+        try {
+            if (valid(user) && !exists(user.email)) {
+                result = new User();
+                result.email = user.email;
+                result.name = user.name;
+                result.inactive = true;
+                result.temporaryPassword = true;
+                result.lastAdmin = lastAdmin;
+                write(result);
+            }
+            return result;
+        } finally {
+            lock.unlock();
         }
-        return result;
     }
 
     private boolean migrateUserToEncryption(User user, String password) throws IOException {

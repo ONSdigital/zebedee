@@ -400,7 +400,6 @@ public class Users {
     }
 
     /**
-     * DONE.
      * Determines whether a {@link com.github.onsdigital.zebedee.json.User} record exists for the given email.
      *
      * @param email Can be null.
@@ -458,7 +457,6 @@ public class Users {
     }
 
     /**
-     * Done.
      * Changes the user's password and sets the account to active.
      * This is done by the user themselves so the password is marked as not temporary.
      *
@@ -484,7 +482,6 @@ public class Users {
     }
 
     /**
-     * Done.
      * Resets the specified user's password and sets the account to active.
      * This is done by an admin so the password is marked as temporary.
      *
@@ -584,7 +581,6 @@ public class Users {
     }
 
     /**
-     * DONE.
      * Return a collection of all users registered in the system
      *
      * @return A list of all users.
@@ -599,7 +595,7 @@ public class Users {
                         User user = Serialiser.deserialise(input, User.class);
                         result.add(user);
                     } catch (JsonSyntaxException e) {
-                        logError(e, "Error deserialising user").addParameter("path", path.toString()).log();
+                        logError(e, "Error deserialising user").path(path.toString()).log();
                     }
                 }
             }

@@ -8,6 +8,8 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.UsersService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +21,12 @@ import java.io.IOException;
  */
 @Api
 public class Password {
+
+    /**
+     * Wrap static method calls to obtain service in function makes testing easier - class member can be
+     * replaced with a mocked giving control of desired behaviour.
+     */
+    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
     /**
      * Update password
@@ -42,7 +50,7 @@ public class Password {
 
         // If the user is not logged in, but they are attempting to change their password, authenticate using the old password
         if (session == null && credentials != null) {
-            User user = Root.zebedee.getUsersDao().getUserByEmail(credentials.email);
+            User user = usersServiceSupplier.getService().getUserByEmail(credentials.email);
             if (user.authenticate(credentials.oldPassword)) {
                 Credentials oldPasswordCredentials = new Credentials();
                 oldPasswordCredentials.email = credentials.email;
@@ -52,7 +60,7 @@ public class Password {
         }
 
         // Attempt to change or reset the password:
-        if (Root.zebedee.getUsersDao().setPassword(session, credentials)) {
+        if (usersServiceSupplier.getService().setPassword(session, credentials)) {
             Audit.Event.PASSWORD_CHANGED_SUCCESS
                     .parameters()
                     .host(request)

@@ -7,6 +7,8 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.UsersService;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -25,6 +27,12 @@ public class Login {
     private static final String LOGIN_SUCCESS_MSG = "Florence login success";
     private static final String LOGIN_AUTH_FAILURE_MSG = "Login authentication failure";
     private static final String PASSWORD_CHANGE_REQUIRED_MSG = "Florence password change required";
+
+    /**
+     * Wrap static method calls to obtain service in function makes testing easier - class member can be
+     * replaced with a mocked giving control of desired behaviour.
+     */
+    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
     /**
      * Authenticates with Zebedee.
@@ -47,9 +55,7 @@ public class Login {
             return "Please provide credentials (email, password).";
         }
 
-        //User user = Root.zebedee.getUsers().get(credentials.email);
-        User user = Root.zebedee.getUsersDao().getUserByEmail(credentials.email);
-
+        User user = usersServiceSupplier.getService().getUserByEmail(credentials.email);
         boolean result = user.authenticate(credentials.password);
 
         if (!result) {
@@ -61,12 +67,11 @@ public class Login {
 
         // Temponary whilst encryption is being put in place.
         // This can be removed once all users have keyrings.
-        Root.zebedee.getUsersDao().migrateToEncryption(user, credentials.password);
+        usersServiceSupplier.getService().migrateToEncryption(user, credentials.password);
         //com.github.onsdigital.zebedee.model.Users.migrateToEncryption(Root.zebedee, user, credentials.password);
         //com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
-        Root.zebedee.getUsersDao().removeStaleCollectionKeys(user.email);
+        usersServiceSupplier.getService().removeStaleCollectionKeys(user.email);
 
-        // TODO why is boolean utils necessary here?
         if (BooleanUtils.isTrue(user.temporaryPassword)) {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
             Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.email).log();

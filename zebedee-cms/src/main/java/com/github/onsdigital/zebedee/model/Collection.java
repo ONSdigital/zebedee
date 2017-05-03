@@ -4,6 +4,7 @@ import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -32,6 +33,8 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.UsersService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -180,7 +183,8 @@ public class Collection {
 
         // Encryption
         // assign a key for the collection to the session user
-        KeyManager.assignKeyToUser(zebedee, zebedee.getUsersDao().getUserByEmail(session.email), collection.description.id, Keys.newSecretKey());
+        KeyManager.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.email),
+                collection.description.id, Keys.newSecretKey());
         // get the session user to distribute the key to all
         KeyManager.distributeCollectionKey(zebedee, session, collection, true);
 

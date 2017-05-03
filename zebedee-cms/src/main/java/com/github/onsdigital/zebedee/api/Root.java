@@ -137,8 +137,8 @@ public class Root {
 
     private static void cleanupStaleCollectionKeys() {
         try {
-            for (User user : zebedee.getUsersDao().list()) {
-                zebedee.getUsersDao().removeStaleCollectionKeys(user.email);
+            for (User user : zebedee.getUsersService().list()) {
+                zebedee.getUsersService().removeStaleCollectionKeys(user.email);
             }
         } catch (IOException | NotFoundException | BadRequestException e) {
             logError(e).log();

@@ -13,6 +13,8 @@ import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.json.TeamList;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyManager;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.UsersService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,18 +39,12 @@ import java.util.Set;
 @Api
 public class Teams {
 
-    private static String getTeamName(HttpServletRequest request)
-            throws IOException {
+    /**
+     * Wrap static method calls to obtain service in function makes testing easier - class member can be
+     * replaced with a mocked giving control of desired behaviour.
+     */
+    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
-        Path path = Path.newInstance(request);
-        List<String> segments = path.segments();
-
-        if (segments.size() > 1) {
-            return segments.get(1);
-        }
-
-        return null;
-    }
 
     /**
      * POST {@code /teams/[teamname]} creates a team with name {@code teamname}
@@ -193,7 +189,7 @@ public class Teams {
             if (teamIds != null && teamIds.contains(team.id)) {
                 for (String memberEmail : emails) {
                     KeyManager.distributeKeyToUser(zebedee, collection, session,
-                            zebedee.getUsersDao().getUserByEmail(memberEmail));
+                            usersServiceSupplier.getService().getUserByEmail(memberEmail));
                 }
             }
         }
@@ -220,5 +216,19 @@ public class Teams {
             result = new TeamList(teams);
         }
         return result;
+    }
+
+
+    private static String getTeamName(HttpServletRequest request)
+            throws IOException {
+
+        Path path = Path.newInstance(request);
+        List<String> segments = path.segments();
+
+        if (segments.size() > 1) {
+            return segments.get(1);
+        }
+
+        return null;
     }
 }

@@ -11,6 +11,8 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
 import com.github.onsdigital.zebedee.json.UserSanitised;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +32,12 @@ import java.util.List;
 public class Users {
 
     private static final String EMAIL_PARAM = "email";
+
+    /**
+     * Wrap static method calls to obtain service in function makes testing easier - class member can be
+     * replaced with a mocked giving control of desired behaviour.
+     */
+    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
     /**
      * Get a user or list of users
@@ -53,9 +61,9 @@ public class Users {
         if (session != null) {
             // If email is empty
             if (StringUtils.isBlank(email)) {
-                result = sanitise(Root.zebedee.getUsersDao().list());
+                result = sanitise(usersServiceSupplier.getService().list());
             } else {
-                result = sanitise(Root.zebedee.getUsersDao().getUserByEmail(email));
+                result = sanitise(usersServiceSupplier.getService().getUserByEmail(email));
             }
         }
         return result;
@@ -80,7 +88,7 @@ public class Users {
     public UserSanitised create(HttpServletRequest request, HttpServletResponse response, User user) throws
             IOException, ConflictException, BadRequestException, UnauthorizedException {
         Session session = Root.zebedee.getSessions().get(request);
-        User created = Root.zebedee.getUsersDao().create(session, user);
+        User created = usersServiceSupplier.getService().create(session, user);
 
         Audit.Event.USER_CREATED
                 .parameters()
@@ -106,9 +114,8 @@ public class Users {
         Session session = Root.zebedee.getSessions().get(request);
 
         String email = request.getParameter(EMAIL_PARAM);
-        User user = Root.zebedee.getUsersDao().getUserByEmail(email);
-
-        User updated = Root.zebedee.getUsersDao().update(session, user, updatedUser);
+        User user = usersServiceSupplier.getService().getUserByEmail(email);
+        User updated = usersServiceSupplier.getService().update(session, user, updatedUser);
 
         Audit.Event.USER_UPDATED
                 .parameters()
@@ -131,8 +138,8 @@ public class Users {
 
         Session session = Root.zebedee.getSessions().get(request);
         String email = request.getParameter(EMAIL_PARAM);
-        User user = Root.zebedee.getUsersDao().getUserByEmail(email);
-        boolean result = Root.zebedee.getUsersDao().delete(session, user);
+        User user = usersServiceSupplier.getService().getUserByEmail(email);
+        boolean result = usersServiceSupplier.getService().delete(session, user);
         if(result) {
             Audit.Event.USER_DELETED
                     .parameters()

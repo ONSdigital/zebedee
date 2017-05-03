@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -14,6 +15,8 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.UsersService;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -42,9 +45,15 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
  * Created by david on 12/03/2015.
  */
 public class Permissions {
+
     private Zebedee zebedee;
     private Path accessMappingPath;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
+    /**
+     * Wrap static method calls to obtain service in function makes testing easier - class member can be
+     * replaced with a mocked giving control of desired behaviour.
+     */
+    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
 
     public Permissions(Path permissions, Zebedee zebedee) {
         this.zebedee = zebedee;
@@ -103,7 +112,8 @@ public class Permissions {
     public List<User> getCollectionAccessMapping(Zebedee zebedee, Collection collection) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         List<Team> teamsList = zebedee.getTeams().listTeams();
-        List<User> keyUsers = zebedee.getUsersDao()
+        List<User> keyUsers = usersServiceSupplier
+                .getService()
                 .list()
                 .stream()
                 .filter(user -> isCollectionKeyRecipient(accessMapping, teamsList, user, collection))
@@ -253,7 +263,7 @@ public class Permissions {
      */
     public boolean canEdit(String email, CollectionDescription collectionDescription) throws IOException {
         try {
-            return canEdit(zebedee.getUsersDao().getUserByEmail(email), collectionDescription);
+            return canEdit(usersServiceSupplier.getService().getUserByEmail(email), collectionDescription);
         } catch (BadRequestException | NotFoundException e) {
             return false;
         }
@@ -343,7 +353,7 @@ public class Permissions {
     public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
 
         try {
-            return canView(zebedee.getUsersDao().getUserByEmail(email), collectionDescription);
+            return canView(usersServiceSupplier.getService().getUserByEmail(email), collectionDescription);
         } catch (NotFoundException | BadRequestException e) {
             return false;
         }
@@ -628,10 +638,10 @@ public class Permissions {
      */
     private void updateKeyring(Session session, String email, CollectionOwner collectionOwner)
             throws IOException, NotFoundException, BadRequestException {
-        User user = zebedee.getUsersDao().getUserByEmail(email);
+        User user = usersServiceSupplier.getService().getUserByEmail(email);
         if (session != null && user.keyring != null) {
             KeyManager.transferKeyring(user.keyring, zebedee.getKeyringCache().get(session), collectionOwner);
-            zebedee.getUsers().updateKeyring(user);
+            usersServiceSupplier.getService().updateKeyring(user);
         }
     }
 }

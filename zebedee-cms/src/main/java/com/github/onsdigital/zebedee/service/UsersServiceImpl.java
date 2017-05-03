@@ -1,7 +1,6 @@
-package com.github.onsdigital.zebedee.dao;
+package com.github.onsdigital.zebedee.service;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -20,6 +19,7 @@ import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.google.gson.JsonSyntaxException;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -41,13 +41,14 @@ import static java.text.MessageFormat.format;
 /**
  *
  */
-public class UsersDaoImpl implements UsersDao {
+public class UsersServiceImpl implements UsersService {
 
     private static final Object MUTEX = new Object();
     private static final String JSON_EXT = ".json";
     private static final String SYSTEM_USER = "system";
 
-    private static UsersDao INSTANCE = null;
+    private static UsersService INSTANCE = null;
+
     private final ReentrantLock lock = new ReentrantLock();
 
     private Path users;
@@ -65,12 +66,12 @@ public class UsersDaoImpl implements UsersDao {
      * @param keyringCache
      * @return
      */
-    public static UsersDao getInstance(Path users, Collections collections, Permissions permissions,
-                                       ApplicationKeys applicationKeys, KeyringCache keyringCache) {
+    public static UsersService getInstance(Path users, Collections collections, Permissions permissions,
+                                           ApplicationKeys applicationKeys, KeyringCache keyringCache) {
         if (INSTANCE == null) {
             synchronized (MUTEX) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UsersDaoImpl(users, collections, permissions, applicationKeys, keyringCache);
+                    INSTANCE = new UsersServiceImpl(users, collections, permissions, applicationKeys, keyringCache);
                 }
             }
         }
@@ -85,7 +86,7 @@ public class UsersDaoImpl implements UsersDao {
      * @param applicationKeys
      * @param keyringCache
      */
-    UsersDaoImpl(Path users, Collections collections, Permissions permissions, ApplicationKeys
+    UsersServiceImpl(Path users, Collections collections, Permissions permissions, ApplicationKeys
             applicationKeys, KeyringCache keyringCache) {
         this.users = users;
         this.permissions = permissions;
@@ -359,6 +360,24 @@ public class UsersDaoImpl implements UsersDao {
                 .addParameter("numberOfUsers", users.size())
                 .addParameter("withKeyRing", withKeyring)
                 .addParameter("withoutKeyRing", withoutKeyring).log();
+    }
+
+    @Override
+    public User updateKeyring(User user) throws IOException {
+        lock.lock();
+        try {
+            User updated = read(user.email);
+            if (updated != null) {
+                updated.keyring = user.keyring.clone();
+
+                // Only set this to true if explicitly set:
+                updated.inactive = BooleanUtils.isTrue(user.inactive);
+                write(updated);
+            }
+            return updated;
+        } finally {
+            lock.unlock();
+        }
     }
 
     User create(User user, String lastAdmin) throws IOException {

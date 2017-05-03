@@ -50,14 +50,14 @@ public class KeyManager {
         List<User> additions = new ArrayList<>();
 
         if (!isNewCollection) {
-            zebedee.getUsersDao().list().stream().forEach(user -> {
+            zebedee.getUsersService().list().stream().forEach(user -> {
                 if (!keyRecipients.contains(user)) {
                     removals.add(user);
                 }
             });
         }
 
-        zebedee.getUsersDao().list().stream().forEach(user -> {
+        zebedee.getUsersService().list().stream().forEach(user -> {
             if (!removals.contains(user)) {
                 additions.add(user);
             }
@@ -92,7 +92,7 @@ public class KeyManager {
 
         if (!isNewCollection) {
             // Filter out the users who are should not receive the key and take it from them [evil laugh].
-            zebedee.getUsersDao().list().stream().filter(user -> !keyRecipients.contains(user)).forEach(nonKeyRecipient -> {
+            zebedee.getUsersService().list().stream().filter(user -> !keyRecipients.contains(user)).forEach(nonKeyRecipient -> {
                 collectionKeyTasks.add(() -> {
                     removeKeyFromUser(zebedee, nonKeyRecipient, collection.getDescription().id);
                     return true;
@@ -117,7 +117,7 @@ public class KeyManager {
     }
 
     public static void distributeApplicationKey(Zebedee zebedee, String application, SecretKey secretKey) throws IOException {
-        for (User user : zebedee.getUsersDao().list()) {
+        for (User user : zebedee.getUsersService().list()) {
             distributeApplicationKeyToUser(zebedee, application, secretKey, user);
         }
     }
@@ -179,7 +179,7 @@ public class KeyManager {
 //        user.keyring().put(keyIdentifier, key);
 //        zebedee.getUsers().addKeyToKeyring(user);
 
-        zebedee.getUsersDao().addKeyToKeyring(user.email, keyIdentifier, key);
+        zebedee.getUsersService().addKeyToKeyring(user.email, keyIdentifier, key);
 
         // If the user is logged in assign the key to their cached keyring
         Session session = zebedee.getSessions().find(user.email);
@@ -210,7 +210,7 @@ public class KeyManager {
 /*        user.keyring().remove(keyIdentifier);
         zebedee.getUsers().updateKeyring(user);*/
 
-        zebedee.getUsersDao().removeKeyFromKeyring(user.email, keyIdentifier);
+        zebedee.getUsersService().removeKeyFromKeyring(user.email, keyIdentifier);
 
         // If the user is logged in remove the key from their cached keyring
         Session session = zebedee.getSessions().find(user.email);

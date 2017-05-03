@@ -1,11 +1,9 @@
-package com.github.onsdigital.zebedee.dao;
+package com.github.onsdigital.zebedee.service;
 
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.User;
@@ -15,7 +13,7 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 
 
-public interface UsersDao {
+public interface UsersService {
 
     String BLACK_EMAIL_MSG = "User email cannot be blank";
     String UNKNOWN_USER_MSG = "User for email {0} not found";
@@ -170,5 +168,13 @@ public interface UsersDao {
      * @throws IOException
      */
     void migrateToEncryption(User user, String password) throws IOException;
+
+    /**
+     *
+     * @param user
+     * @return
+     * @throws IOException
+     */
+    User updateKeyring(User user) throws IOException;
 
 }

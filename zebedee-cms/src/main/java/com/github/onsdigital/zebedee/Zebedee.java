@@ -1,8 +1,8 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.dao.UsersDao;
-import com.github.onsdigital.zebedee.dao.UsersDaoImpl;
+import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
@@ -63,7 +63,7 @@ public class Zebedee {
     private final Path path;
     private final Permissions permissions;
     private final Users users;
-    private final UsersDao usersDao;
+    private final UsersService usersService;
     private final Teams teams;
     private final Sessions sessions;
     private final DataIndex dataIndex;
@@ -118,7 +118,7 @@ public class Zebedee {
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
 
-        this.usersDao = UsersDaoImpl.getInstance(userPath, getCollections(), getPermissions(), getApplicationKeys(),
+        this.usersService = UsersServiceImpl.getInstance(userPath, getCollections(), getPermissions(), getApplicationKeys(),
                 getKeyringCache());
 
         if (useVerificationAgent && Configuration.isVerificationEnabled()) {
@@ -182,7 +182,7 @@ public class Zebedee {
         user.email = "florence@magicroundabout.ons.gov.uk";
         user.name = "Florence";
         String password = "Doug4l";
-        zebedee.getUsersDao().createSystemUser(user, password);
+        zebedee.getUsersService().createSystemUser(user, password);
         return zebedee;
     }
 
@@ -340,7 +340,7 @@ public class Zebedee {
         }
 
         // Get the user
-        User user = usersDao.getUserByEmail(credentials.email);
+        User user = usersService.getUserByEmail(credentials.email);
 
         if (user == null) {
             logDebug("Null session due to users.get returning null").log();
@@ -412,7 +412,7 @@ public class Zebedee {
         return this.dataIndex;
     }
 
-    public UsersDao getUsersDao() {
-        return usersDao;
+    public UsersService getUsersService() {
+        return usersService;
     }
 }

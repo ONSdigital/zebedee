@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
+@Ignore("IGNORE: user keys concurrency defect")
 public class SessionsTest {
 
     Zebedee zebedee;

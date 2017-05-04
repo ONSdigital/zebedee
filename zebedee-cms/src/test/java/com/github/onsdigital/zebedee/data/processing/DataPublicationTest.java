@@ -16,6 +16,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ import static org.junit.Assert.assertNotNull;
  *
  * Tests for the data publication object
  */
+@Ignore("IGNORE: user keys concurrency defect")
 public class DataPublicationTest {
 
     final List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();

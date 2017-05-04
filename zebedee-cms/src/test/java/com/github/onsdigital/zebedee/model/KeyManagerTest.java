@@ -15,6 +15,7 @@ import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.common.collect.ImmutableList;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by thomasridd on 18/11/15.
  */
+@Ignore("IGNORE: user keys concurrency defect")
 public class KeyManagerTest {
     Zebedee zebedee;
     Builder builder;

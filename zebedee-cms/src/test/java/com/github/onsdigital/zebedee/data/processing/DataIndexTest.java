@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -62,6 +63,7 @@ public class DataIndexTest {
         bob.delete();
     }
 
+    @Ignore("IGNORE: user keys concurrency defect")
     @Test
     public void dataIndex_givenContent_buildsIndex() throws IOException, InterruptedException, BadRequestException {
         // Given

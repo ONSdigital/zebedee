@@ -21,12 +21,11 @@
 
 /census=>census
 /economy/grossdomesticproductgdp/compendium/unitedkingdomnationalaccountsthebluebook/*=>flow of funds
-/economy/inflationandpriceindices/bulletins/consumerpriceinflation/*=>rpi, inflation
-/businessindustryandtrade/retailindustry/bulletins/retailsales/*=>retail
 /economy/inflationandpriceindices/bulletins/producerpriceinflation/*=>psi
 /economy/inflationandpriceindices/datasets/consumerpriceinflation=>rpi
 /economy/inflationandpriceindices/timeseries/chaw/*=>rpi
 /economy/inflationandpriceindices/timeseries/czbh/*=>rpi
+/businessindustryandtrade/retailindustry/bulletins/retailsales/*=>retail
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/*=>average earnings index,Labour Force Survey,unemployment,labour market statistics,employment,Claimant Count,average weekly earnings
 /employmentandlabourmarket/peopleinwork/employmentandemployeetypes/datasets/summaryoflabourmarketstatistics=>unemployment,employment
 /employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/averageweeklyearningsearn01=>average earnings index

@@ -30,7 +30,7 @@ import static com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUt
 @Api
 public class Generator {
 
-    private static final DataGenerator DATA_GENERATOR = DataGenerator.getInstance();
+    private static final DataGenerator DATA_GENERATOR = new DataGenerator();
     private static final String UTF_8 = "UTF-8";
     private static final String FORMAT_PARAM = "format";
 

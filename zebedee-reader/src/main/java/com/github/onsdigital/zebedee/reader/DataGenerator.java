@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.probeContentType;
+import static java.util.Arrays.asList;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
@@ -53,32 +54,31 @@ public class DataGenerator {
     private static final Pattern DECIMAL_REGEX = Pattern.compile("^-?\\d+\\.\\d+$");
     private static final String[] MONTHS = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
     private static final String[] QUARTERS = "Q1,Q2,Q3,Q4".split(",");
-    private static final String TITLE_COL = "Title";
-    private static final String CDID_COL = "CDID";
-    private static final String SOURCE_DATASET_COL = "Source dataset ID";
-    private static final String PRE_UNIT_COL = "PreUnit";
-    private static final String UNIT_COL = "Unit";
-    private static final String RELEASE_DATE_COL = "Release date";
-    private static final String NEXT_RELEASE_COL = "Next release";
-    private static final String NOTES_COL = "Important notes";
-    private static final String SHEET_NAME = "data";
+
+
     private static final String BASE_FORMAT = "#.";
     private static final String DECIMAL_PLACEHOLDER = "0";
     private static final String UTF8 = "UTF8";
-    private static final String XLS_EXT = "xls";
-    private static final String XLSX_EXT = "xlsx";
-    private static final String CSV_EXT = "csv";
+
     private static final String MIME_TYPE = "application/octet-stream";
     private static final int METADATA_ROWS = 8;
 
-    private static final DataGenerator INSTANCE = new DataGenerator();
+    static final String XLS_EXT = "xls";
+    static final String XLSX_EXT = "xlsx";
+    static final String CSV_EXT = "csv";
+    static final String SHEET_NAME = "data";
+    static final String TITLE_COL = "Title";
+    static final String CDID_COL = "CDID";
+    static final String SOURCE_DATASET_COL = "Source dataset ID";
+    static final String PRE_UNIT_COL = "PreUnit";
+    static final String UNIT_COL = "Unit";
+    static final String RELEASE_DATE_COL = "Release date";
+    static final String NEXT_RELEASE_COL = "Next release";
+    static final String NOTES_COL = "Important notes";
 
     private Supplier<Workbook> xlsWorkbookSupplier = () -> new HSSFWorkbook();
     private Supplier<Workbook> xlsxWorkbookSupplier = () -> new SXSSFWorkbook(30);
 
-    public static DataGenerator getInstance() {
-        return INSTANCE;
-    }
 
     /**
      * Output a grid of strings to XLSX
@@ -146,7 +146,9 @@ public class DataGenerator {
         String decimals = segments[segments.length - 1];
 
         StringBuilder format = new StringBuilder(BASE_FORMAT);
-        Arrays.asList(decimals.toCharArray()).stream().forEach(dp -> format.append(DECIMAL_PLACEHOLDER));
+        asList(decimals.split(""))
+                .stream()
+                .forEach(decimalValue -> format.append(DECIMAL_PLACEHOLDER));
         return format.toString();
     }
 
@@ -747,5 +749,11 @@ public class DataGenerator {
         return generateTimeseriesData(serieses, format);
     }
 
+    void setXlsWorkbookSupplier(Supplier<Workbook> xlsWorkbookSupplier) {
+        this.xlsWorkbookSupplier = xlsWorkbookSupplier;
+    }
 
+    void setXlsxWorkbookSupplier(Supplier<Workbook> xlsxWorkbookSupplier) {
+        this.xlsxWorkbookSupplier = xlsxWorkbookSupplier;
+    }
 }

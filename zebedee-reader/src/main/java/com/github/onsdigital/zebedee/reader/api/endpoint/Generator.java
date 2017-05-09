@@ -10,12 +10,15 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.DataGenerator;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
+import com.github.onsdigital.zebedee.reader.api.ReadRequestHandlerFactory;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import java.io.IOException;
+import java.util.List;
 
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.extractFilter;
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
@@ -27,7 +30,22 @@ import static com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUt
 @Api
 public class Generator {
 
-    private final String UTF_8 = "UTF-8";
+    private static final DataGenerator DATA_GENERATOR = DataGenerator.getInstance();
+    private static final String UTF_8 = "UTF-8";
+    private static final String FORMAT_PARAM = "format";
+
+    private static final List<String> SUPPORTED_FORMATS = new ImmutableList.Builder<String>()
+            .add("csv")
+            .add("xls")
+            .add("xlsx").build();
+
+    private static final String UNSUPPORTED_FORMAT_MSG = "The requested format is not supported.";
+    private static final String UNDEFINED_FORMAT_MSG = "Please specify a format. Supported formats are " +
+            SUPPORTED_FORMATS.toString();
+    private static final String GENERIC_BAD_REQUEST_MSG = "Invalid file request";
+
+    // Wrap in a lambda function so it can be replaced with a mock in testing.
+    private ReadRequestHandlerFactory readRequestHandlerFactory = (contentLanguage) -> new ReadRequestHandler((contentLanguage));
 
     /**
      * Generates on the fly resources for data in csv or xls format
@@ -45,14 +63,16 @@ public class Generator {
     @GET
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
         // Check format string
-        String format = request.getParameter("format");
+        String format = request.getParameter(FORMAT_PARAM);
         if (StringUtils.isEmpty(format)) {
-            throw new BadRequestException("Please specify format (csv, xls or xlsx)");
+            throw new BadRequestException(UNDEFINED_FORMAT_MSG);
         }
 
+        if (!SUPPORTED_FORMATS.contains(format.toLowerCase())) {
+            throw new BadRequestException(UNSUPPORTED_FORMAT_MSG);
+        }
 
-        // Try to get a content page
-        ReadRequestHandler readRequestHandler = new ReadRequestHandler((getRequestedLanguage(request)));
+        ReadRequestHandler readRequestHandler = readRequestHandlerFactory.get(getRequestedLanguage(request));
         Content content = readRequestHandler.findContent(request, extractFilter(request));
 
         if (content != null) {
@@ -65,14 +85,18 @@ public class Generator {
     private Resource toResource(Content content, String format) throws IOException, BadRequestException {
         if (content instanceof Chart) {
             // If page is a chart write the chart spreadsheet requested to response
-            return new DataGenerator().generateData((Chart) content, format);
+            return DATA_GENERATOR.generateData((Chart) content, format);
         } else if (content instanceof TimeSeries) {
             // If page then write the timeseries spreadsheet requested to response
-            return new DataGenerator().generateData((TimeSeries) content, format);
+            return DATA_GENERATOR.generateData((TimeSeries) content, format);
         } else if (content instanceof Series) {
-            return new DataGenerator().generateData((Series) content, format);
+            return DATA_GENERATOR.generateData((Series) content, format);
         } else {
-            throw new BadRequestException("Invalid file request");
+            throw new BadRequestException(GENERIC_BAD_REQUEST_MSG);
         }
+    }
+
+    public void setReadRequestHandlerFactory(ReadRequestHandlerFactory readRequestHandlerFactory) {
+        this.readRequestHandlerFactory = readRequestHandlerFactory;
     }
 }

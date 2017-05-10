@@ -34,6 +34,7 @@ import java.util.TimeZone;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.probeContentType;
 import static java.util.Arrays.asList;
@@ -117,7 +118,7 @@ public class DataGenerator {
                 for (String cellValueStr : gridRow) {
                     Cell cell = r.createCell(columnIndex);
 
-                    if (CELL_TYPE_NUMERIC == determineCellType(rowIndex, columnIndex, cellValueStr)) {
+                    if (CELL_TYPE_NUMERIC == determineCellType(filePath, rowIndex, columnIndex, cellValueStr)) {
                         if (DECIMAL_REGEX.matcher(cellValueStr).matches()) {
                             // Little bit nasty but even with the cell type set as numeric adding a value where
                             // the decimal value is 0 it will remove the decimal value displaying it as an int
@@ -152,9 +153,18 @@ public class DataGenerator {
         return format.toString();
     }
 
-    private int determineCellType(int rowIndex, int cellIndex, String callValue) {
+    private int determineCellType(Path filePath, int rowIndex, int cellIndex, String callValue) {
         if (rowIndex <= METADATA_ROWS || cellIndex == 0 || StringUtils.isEmpty(callValue)) {
             return Cell.CELL_TYPE_STRING;
+        }
+        try {
+            Float.parseFloat(callValue);
+        } catch (NumberFormatException e) {
+            logDebug("XLS Cell value could not be parsed to Float, value will be written as String.")
+                    .addParameter("xlsFile", filePath.toString())
+                    .addParameter("nonNumericValue", callValue)
+                    .log();
+            return CELL_TYPE_STRING;
         }
         return CELL_TYPE_NUMERIC;
     }

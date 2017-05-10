@@ -96,20 +96,10 @@ public class DataGeneratorTest {
     @Test
     public void shouldCreateXLSWithNumericalCellsCorrectlyFormatted() throws Exception {
         testDataGrid.add(Arrays.asList(new String[]{"1990", "12.34"}));
-
-        when(xlsWorkbookMock.createSheet(SHEET_NAME))
-                .thenReturn(sheetMock);
-        when(sheetMock.createRow(anyInt()))
-                .thenReturn(rowMock);
-        when(rowMock.createCell(anyInt()))
-                .thenReturn(cellMock);
-        when(xlsWorkbookMock.createCellStyle())
-                .thenReturn(styleMock);
-        when(xlsWorkbookMock.createDataFormat())
-                .thenReturn(dataFormatMock);
-
         String fileName = UUID.randomUUID().toString() + XLS_EXT;
         temporaryFolder.getRoot().toPath().resolve(fileName);
+
+        setUpMockBehaviours();
 
         generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
 
@@ -127,20 +117,10 @@ public class DataGeneratorTest {
     @Test
     public void shouldWriteIntergersAsIntergers() throws Exception {
         testDataGrid.add(Arrays.asList(new String[]{"1990", "12"}));
-
-        when(xlsWorkbookMock.createSheet(SHEET_NAME))
-                .thenReturn(sheetMock);
-        when(sheetMock.createRow(anyInt()))
-                .thenReturn(rowMock);
-        when(rowMock.createCell(anyInt()))
-                .thenReturn(cellMock);
-        when(xlsWorkbookMock.createCellStyle())
-                .thenReturn(styleMock);
-        when(xlsWorkbookMock.createDataFormat())
-                .thenReturn(dataFormatMock);
-
         String fileName = UUID.randomUUID().toString() + XLS_EXT;
         temporaryFolder.getRoot().toPath().resolve(fileName);
+
+        setUpMockBehaviours();
 
         generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
 
@@ -158,20 +138,10 @@ public class DataGeneratorTest {
     @Test
     public void shouldHandleNullAsEmptyString() throws Exception {
         testDataGrid.add(Arrays.asList(new String[]{"1990", null}));
-
-        when(xlsWorkbookMock.createSheet(SHEET_NAME))
-                .thenReturn(sheetMock);
-        when(sheetMock.createRow(anyInt()))
-                .thenReturn(rowMock);
-        when(rowMock.createCell(anyInt()))
-                .thenReturn(cellMock);
-        when(xlsWorkbookMock.createCellStyle())
-                .thenReturn(styleMock);
-        when(xlsWorkbookMock.createDataFormat())
-                .thenReturn(dataFormatMock);
-
         String fileName = UUID.randomUUID().toString() + XLS_EXT;
         temporaryFolder.getRoot().toPath().resolve(fileName);
+
+        setUpMockBehaviours();
 
         generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
 
@@ -186,7 +156,40 @@ public class DataGeneratorTest {
     @Test
     public void shouldHandleEmptyString() throws Exception {
         testDataGrid.add(Arrays.asList(new String[]{"1990", ""}));
+        String fileName = UUID.randomUUID().toString() + XLS_EXT;
+        temporaryFolder.getRoot().toPath().resolve(fileName);
 
+        setUpMockBehaviours();
+
+        generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
+
+        verify(sheetMock, times(9)).createRow(anyInt());
+        verify(xlsWorkbookMock, never()).createCellStyle();
+        verify(dataFormatMock, never()).getFormat(any());
+        verify(cellMock, times(18)).setCellType(Cell.CELL_TYPE_STRING);
+        verify(cellMock, never()).setCellType(Cell.CELL_TYPE_NUMERIC);
+        verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
+    }
+
+    @Test
+    public void shouldWriteNonNumericsAsStrings() throws Exception {
+        testDataGrid.add(Arrays.asList(new String[]{"1990", "abcdefg"}));
+        String fileName = UUID.randomUUID().toString() + XLS_EXT;
+        temporaryFolder.getRoot().toPath().resolve(fileName);
+
+        setUpMockBehaviours();
+
+        generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
+
+        verify(sheetMock, times(9)).createRow(anyInt());
+        verify(xlsWorkbookMock, never()).createCellStyle();
+        verify(dataFormatMock, never()).getFormat(any());
+        verify(cellMock, times(18)).setCellType(Cell.CELL_TYPE_STRING);
+        verify(cellMock, never()).setCellType(Cell.CELL_TYPE_NUMERIC);
+        verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
+    }
+
+    private void setUpMockBehaviours() {
         when(xlsWorkbookMock.createSheet(SHEET_NAME))
                 .thenReturn(sheetMock);
         when(sheetMock.createRow(anyInt()))
@@ -197,17 +200,5 @@ public class DataGeneratorTest {
                 .thenReturn(styleMock);
         when(xlsWorkbookMock.createDataFormat())
                 .thenReturn(dataFormatMock);
-
-        String fileName = UUID.randomUUID().toString() + XLS_EXT;
-        temporaryFolder.getRoot().toPath().resolve(fileName);
-
-        generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
-
-        verify(sheetMock, times(9)).createRow(anyInt());
-        verify(xlsWorkbookMock, never()).createCellStyle();
-        verify(dataFormatMock, never()).getFormat(any());
-        verify(cellMock, times(18)).setCellType(Cell.CELL_TYPE_STRING);
-        verify(cellMock, never()).setCellType(Cell.CELL_TYPE_NUMERIC);
-        verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
     }
 }

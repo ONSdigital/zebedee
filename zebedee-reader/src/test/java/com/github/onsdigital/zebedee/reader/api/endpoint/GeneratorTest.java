@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.reader.api.endpoint;
 import com.github.onsdigital.zebedee.content.base.Content;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.DataGenerator;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -10,13 +11,18 @@ import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +30,15 @@ import static org.mockito.Mockito.when;
  * Created by thomasridd on 07/10/15.
  */
 public class GeneratorTest {
+
+    @Mock
+    private HttpServletRequest requestMock;
+
+    @Mock
+    private HttpServletResponse responseMock;
+
+    private int readRequestHandlerFactoryInvocationCount = 0;
+
     private final String uri = "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2014-07-02/1fff043a";
     HttpServletRequest request = mock(HttpServletRequest.class);
     DataGenerator generator;
@@ -31,6 +46,7 @@ public class GeneratorTest {
 
     @Before
     public void initialize() {
+        MockitoAnnotations.initMocks(this);
         ReaderConfiguration.init("target/test-classes/test-content/");
         readRequestHandler = new ReadRequestHandler();
         generator = new DataGenerator();
@@ -126,5 +142,28 @@ public class GeneratorTest {
             assertNotNull(generated);
             assertNotNull(generated.getName());
         }
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestExeForUnsupportedFormats() throws Exception {
+        Generator api = new Generator();
+
+        api.setReadRequestHandlerFactory((language) -> {
+            incrementInvocationCount();
+            return null;
+        });
+
+        when(requestMock.getParameter("format"))
+                .thenReturn("pdf");
+        try {
+            api.get(requestMock, responseMock);
+        } catch (Exception e) {
+            assertThat(this.readRequestHandlerFactoryInvocationCount, equalTo(0));
+            throw e;
+        }
+    }
+
+    private void incrementInvocationCount() {
+        this.readRequestHandlerFactoryInvocationCount++;
     }
 }

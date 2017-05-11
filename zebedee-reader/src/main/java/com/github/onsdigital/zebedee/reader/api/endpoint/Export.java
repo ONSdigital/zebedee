@@ -28,6 +28,7 @@ import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRe
 @Api
 public class Export {
 
+    private static final DataGenerator DATA_GENERATOR = new DataGenerator();
     private static final String UTF_8 = "UTF-8";
 
     @POST
@@ -50,7 +51,7 @@ public class Export {
             String uri = uris[i];
             timeSeriesList.add((TimeSeries) readRequestHandler.find(request, null, uri));
         }
-        ReaderResponseResponseUtils.sendResponse(new DataGenerator().generateData(timeSeriesList, format), response, UTF_8);
+        ReaderResponseResponseUtils.sendResponse(DATA_GENERATOR.generateData(timeSeriesList, format), response, UTF_8);
     }
 
 }

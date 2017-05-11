@@ -10,6 +10,8 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.cha
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -21,10 +23,23 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder.logDebug;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.probeContentType;
+import static java.util.Arrays.asList;
+import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
+import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
 /**
  * Created by thomasridd on 07/10/15.
@@ -35,60 +50,123 @@ public class DataGenerator {
     private static FastDateFormat format = FastDateFormat.getInstance("dd-MM-yyyy", TimeZone.getTimeZone("Europe/London"));
 
     /**
+     * Regex to match a decimal number
+     */
+    private static final Pattern DECIMAL_REGEX = Pattern.compile("^-?\\d+\\.\\d+$");
+    private static final String[] MONTHS = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
+    private static final String[] QUARTERS = "Q1,Q2,Q3,Q4".split(",");
+
+
+    private static final String BASE_FORMAT = "#.";
+    private static final String DECIMAL_PLACEHOLDER = "0";
+    private static final String UTF8 = "UTF8";
+
+    private static final String MIME_TYPE = "application/octet-stream";
+    private static final int METADATA_ROWS = 8;
+
+    static final String XLS_EXT = "xls";
+    static final String XLSX_EXT = "xlsx";
+    static final String CSV_EXT = "csv";
+    static final String SHEET_NAME = "data";
+    static final String TITLE_COL = "Title";
+    static final String CDID_COL = "CDID";
+    static final String SOURCE_DATASET_COL = "Source dataset ID";
+    static final String PRE_UNIT_COL = "PreUnit";
+    static final String UNIT_COL = "Unit";
+    static final String RELEASE_DATE_COL = "Release date";
+    static final String NEXT_RELEASE_COL = "Next release";
+    static final String NOTES_COL = "Important notes";
+
+    private Supplier<Workbook> xlsWorkbookSupplier = () -> new HSSFWorkbook();
+    private Supplier<Workbook> xlsxWorkbookSupplier = () -> new SXSSFWorkbook(30);
+
+
+    /**
      * Output a grid of strings to XLSX
      * ( Excel format for generator is currently xls )
+     *
+     * @param xlsxPath
+     * @param grid
+     * @throws IOException
+     */
+    void writeDataGridToXlsx(Path xlsxPath, List<List<String>> grid) throws IOException {
+        generateSpreadSheet(xlsxPath, grid, xlsxWorkbookSupplier);
+    }
+
+    /**
      *
      * @param xlsPath
      * @param grid
      * @throws IOException
      */
-    static void writeDataGridToXlsx(Path xlsPath, List<List<String>> grid) throws IOException {
+    void writeDataGridToXls(Path xlsPath, List<List<String>> grid) throws IOException {
+        generateSpreadSheet(xlsPath, grid, xlsWorkbookSupplier);
+    }
+
+    private void generateSpreadSheet(Path filePath, List<List<String>> grid, Supplier<Workbook> workbookSupplier)
+            throws IOException {
         try (
-                Workbook wb = new SXSSFWorkbook(30);
-                OutputStream stream = Files.newOutputStream(xlsPath)
+                Workbook wb = workbookSupplier.get();
+                OutputStream stream = Files.newOutputStream(filePath)
         ) {
-            Sheet sheet = wb.createSheet("data");
-
-            int rownum = 0;
+            Sheet sheet = wb.createSheet(SHEET_NAME);
+            int rowIndex = 0;
             for (List<String> gridRow : grid) {
-                Row row = sheet.createRow(rownum++);
 
-                int colnum = 0;
-                for (String gridCell : gridRow) {
-                    row.createCell(colnum++).setCellValue(gridCell);
+                Row r = sheet.createRow(rowIndex++);
+                int columnIndex = 0;
+                for (String cellValueStr : gridRow) {
+                    Cell cell = r.createCell(columnIndex);
+
+                    if (CELL_TYPE_NUMERIC == determineCellType(filePath, rowIndex, columnIndex, cellValueStr)) {
+                        if (DECIMAL_REGEX.matcher(cellValueStr).matches()) {
+                            // Little bit nasty but even with the cell type set as numeric adding a value where
+                            // the decimal value is 0 it will remove the decimal value displaying it as an int
+                            // not a float. Example '55.0' will be displayed as '55'.
+                            // To combat this we create a custom data format for each string value to force it to
+                            // display the decimal places even if they are all zero.
+                            CellStyle style = wb.createCellStyle();
+                            style.setDataFormat(wb.createDataFormat().getFormat(getDataFormat(cellValueStr)));
+                            cell.setCellStyle(style);
+                        }
+                        cell.setCellType(CELL_TYPE_NUMERIC);
+                        cell.setCellValue(Double.parseDouble(cellValueStr));
+                    } else {
+                        cell.setCellType(CELL_TYPE_STRING);
+                        cell.setCellValue(cellValueStr);
+                    }
+                    columnIndex++;
                 }
             }
             wb.write(stream);
         }
     }
 
-    /**
-     * Output a grid of strings to XLS
-     *
-     * @param xlsPath
-     * @param grid
-     * @throws IOException
-     */
-    static void writeDataGridToXls(Path xlsPath, List<List<String>> grid) throws IOException {
+    private String getDataFormat(String cellValueStr) {
+        String[] segments = cellValueStr.split("\\.");
+        String decimals = segments[segments.length - 1];
 
-        try (
-                Workbook wb = new HSSFWorkbook();
-                OutputStream stream = Files.newOutputStream(xlsPath)
-        ) {
+        StringBuilder format = new StringBuilder(BASE_FORMAT);
+        asList(decimals.split(""))
+                .stream()
+                .forEach(decimalValue -> format.append(DECIMAL_PLACEHOLDER));
+        return format.toString();
+    }
 
-            Sheet sheet = wb.createSheet("data");
-
-            int rownum = 0;
-            for (List<String> gridRow : grid) {
-                Row row = sheet.createRow(rownum++);
-
-                int colnum = 0;
-                for (String gridCell : gridRow) {
-                    row.createCell(colnum++).setCellValue(gridCell);
-                }
-            }
-            wb.write(stream);
+    private int determineCellType(Path filePath, int rowIndex, int cellIndex, String callValue) {
+        if (rowIndex <= METADATA_ROWS || cellIndex == 0 || StringUtils.isEmpty(callValue)) {
+            return Cell.CELL_TYPE_STRING;
         }
+        try {
+            Float.parseFloat(callValue);
+        } catch (NumberFormatException e) {
+            logDebug("XLS Cell value could not be parsed to Float, value will be written as String.")
+                    .addParameter("xlsFile", filePath.toString())
+                    .addParameter("nonNumericValue", callValue)
+                    .log();
+            return CELL_TYPE_STRING;
+        }
+        return CELL_TYPE_NUMERIC;
     }
 
     /**
@@ -99,7 +177,7 @@ public class DataGenerator {
      * @throws IOException
      */
     static void writeDataGridToCsv(Path csvPath, List<List<String>> grid) throws IOException {
-        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(csvPath), Charset.forName("UTF8")), ',')) {
+        try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(Files.newOutputStream(csvPath), Charset.forName(UTF8)), ',')) {
             for (List<String> gridRow : grid) {
                 String[] row = new String[gridRow.size()];
                 row = gridRow.toArray(row);
@@ -110,7 +188,7 @@ public class DataGenerator {
 
     /**
      * Get a data grid for multiple time series
-     *
+     * <p>
      * Lots of
      *
      * @param serieses
@@ -172,25 +250,25 @@ public class DataGenerator {
 
     static void addTimeSeriesDetails(List<List<String>> rows, List<String> timeseriesId, Map<String, Map<String, String>> mapOfData) {
         // Add detail rows
-        List<String> titleRow = newRow("Title");
-        List<String> cdidRow = newRow("CDID");
-        List<String> datasetIdRow = newRow("Source dataset ID");
-        List<String> preunit = newRow("PreUnit");
-        List<String> unit = newRow("Unit");
-        List<String> releaseDate = newRow("Release date");
-        List<String> nextRelease = newRow("Next release");
-        List<String> importantNotes = newRow("Important notes");
+        List<String> titleRow = newRow(TITLE_COL);
+        List<String> cdidRow = newRow(CDID_COL);
+        List<String> datasetIdRow = newRow(SOURCE_DATASET_COL);
+        List<String> preunit = newRow(PRE_UNIT_COL);
+        List<String> unit = newRow(UNIT_COL);
+        List<String> releaseDate = newRow(RELEASE_DATE_COL);
+        List<String> nextRelease = newRow(NEXT_RELEASE_COL);
+        List<String> importantNotes = newRow(NOTES_COL);
 
         // Write details for each cdid
         for (String id : timeseriesId) {
-            titleRow.add(mapOfData.get("Title").get(id));
-            cdidRow.add(mapOfData.get("CDID").get(id));
-            datasetIdRow.add(mapOfData.get("Source dataset ID").get(id));
-            preunit.add(mapOfData.get("PreUnit").get(id));
-            unit.add(mapOfData.get("Unit").get(id));
-            releaseDate.add(mapOfData.get("Release date").get(id));
-            nextRelease.add(mapOfData.get("Next release").get(id));
-            importantNotes.add(mapOfData.get("Important notes").get(id));
+            titleRow.add(mapOfData.get(TITLE_COL).get(id));
+            cdidRow.add(mapOfData.get(CDID_COL).get(id));
+            datasetIdRow.add(mapOfData.get(SOURCE_DATASET_COL).get(id));
+            preunit.add(mapOfData.get(PRE_UNIT_COL).get(id));
+            unit.add(mapOfData.get(UNIT_COL).get(id));
+            releaseDate.add(mapOfData.get(RELEASE_DATE_COL).get(id));
+            nextRelease.add(mapOfData.get(NEXT_RELEASE_COL).get(id));
+            importantNotes.add(mapOfData.get(NOTES_COL).get(id));
         }
 
         rows.add(titleRow);
@@ -227,21 +305,20 @@ public class DataGenerator {
         for (TimeSeries series : serieses) {
             String seriesIdentifier = series.getUri().toString();
 
-            putCombination(seriesIdentifier, "Title", series.getDescription().getTitle(), map);
-            putCombination(seriesIdentifier, "CDID", series.getDescription().getCdid(), map);
-            putCombination(seriesIdentifier, "Source dataset ID", series.getDescription().getDatasetId(), map);
-            putCombination(seriesIdentifier, "PreUnit", series.getDescription().getPreUnit(), map);
-            putCombination(seriesIdentifier, "Unit", series.getDescription().getUnit(), map);
+            putCombination(seriesIdentifier, TITLE_COL, series.getDescription().getTitle(), map);
+            putCombination(seriesIdentifier, CDID_COL, series.getDescription().getCdid(), map);
+            putCombination(seriesIdentifier, SOURCE_DATASET_COL, series.getDescription().getDatasetId(), map);
+            putCombination(seriesIdentifier, PRE_UNIT_COL, series.getDescription().getPreUnit(), map);
+            putCombination(seriesIdentifier, UNIT_COL, series.getDescription().getUnit(), map);
 
             if (series.getDescription().getReleaseDate() == null) {
-                putCombination(seriesIdentifier, "Release date", "", map);
+                putCombination(seriesIdentifier, RELEASE_DATE_COL, "", map);
             } else {
-                putCombination(seriesIdentifier, "Release date", format.format(series.getDescription().getReleaseDate()), map);
+                putCombination(seriesIdentifier, RELEASE_DATE_COL, format.format(series.getDescription().getReleaseDate()), map);
             }
 
-            putCombination(seriesIdentifier, "Next release", series.getDescription().getNextRelease(), map);
-
-            putCombination(seriesIdentifier, "Important notes", StringUtils.join(series.getNotes(), ", "), map);
+            putCombination(seriesIdentifier, NEXT_RELEASE_COL, series.getDescription().getNextRelease(), map);
+            putCombination(seriesIdentifier, NOTES_COL, StringUtils.join(series.getNotes(), ", "), map);
 
             if (series.years != null) {
                 for (TimeSeriesValue value : series.years) {
@@ -265,7 +342,7 @@ public class DataGenerator {
 
     /**
      * Get an ordered list of years that ought to be written on a spreadsheet
-     *
+     * <p>
      * Correctly orders and fills holes for the list
      *
      * @param seriesList
@@ -338,22 +415,20 @@ public class DataGenerator {
         int maxYear = cal.get(Calendar.YEAR);
         int maxQuarter = cal.get(Calendar.MONTH) / 3;
 
-        String[] quarters = "Q1,Q2,Q3,Q4".split(",");
-
         List<String> quarterLabels = new ArrayList<>();
 
         for (int i = minYear; i <= maxYear; i++) {
             for (int q = 0; q < 4; q++) {
                 if (i == minYear) {
                     if (q >= minQuarter) {
-                        quarterLabels.add(i + " " + quarters[q]);
+                        quarterLabels.add(i + " " + QUARTERS[q]);
                     }
                 } else if (i == maxYear) {
                     if (q <= maxQuarter) {
-                        quarterLabels.add(i + " " + quarters[q]);
+                        quarterLabels.add(i + " " + QUARTERS[q]);
                     }
                 } else {
-                    quarterLabels.add(i + " " + quarters[q]);
+                    quarterLabels.add(i + " " + QUARTERS[q]);
                 }
             }
         }
@@ -396,22 +471,20 @@ public class DataGenerator {
         int maxYear = cal.get(Calendar.YEAR);
         int maxMonth = cal.get(Calendar.MONTH);
 
-        String[] months = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC".split(",");
-
         List<String> monthLabels = new ArrayList<>();
 
         for (int i = minYear; i <= maxYear; i++) {
             for (int q = 0; q < 12; q++) {
                 if (i == minYear) {
                     if (q >= minMonth) {
-                        monthLabels.add(i + " " + months[q]);
+                        monthLabels.add(i + " " + MONTHS[q]);
                     }
                 } else if (i == maxYear) {
                     if (q <= maxMonth) {
-                        monthLabels.add(i + " " + months[q]);
+                        monthLabels.add(i + " " + MONTHS[q]);
                     }
                 } else {
-                    monthLabels.add(i + " " + months[q]);
+                    monthLabels.add(i + " " + MONTHS[q]);
                 }
             }
         }
@@ -421,7 +494,7 @@ public class DataGenerator {
 
     /**
      * get a list of series Urls
-     *
+     * <p>
      * This is used to define headings for our spreadsheet
      *
      * @param serieses
@@ -523,11 +596,11 @@ public class DataGenerator {
 
         List<List<String>> grid = chartDataGrid(chart);
 
-        if (format.equalsIgnoreCase("xls")) {
+        if (format.equalsIgnoreCase(XLS_EXT)) {
             writeDataGridToXls(filePath, grid);
-        } else if (format.equalsIgnoreCase("xlsx")) {
+        } else if (format.equalsIgnoreCase(XLSX_EXT)) {
             writeDataGridToXlsx(filePath, grid);
-        } else if (format.equalsIgnoreCase("csv")) {
+        } else if (format.equalsIgnoreCase(CSV_EXT)) {
             writeDataGridToCsv(filePath, grid);
         }
         return buildResource(filePath);
@@ -547,7 +620,7 @@ public class DataGenerator {
         resource.setData(newInputStream(path));
 
         if (resource.getMimeType() == null) {
-            resource.setMimeType("application/octet-stream");
+            resource.setMimeType(MIME_TYPE);
         }
 
         return resource;
@@ -605,15 +678,15 @@ public class DataGenerator {
      */
     Resource generateTimeseriesData(List<TimeSeries> series, String format) throws IOException {
 
-        Path filePath = Files.createTempFile("data", "." + format);
+        Path filePath = Files.createTempFile(SHEET_NAME, "." + format);
 
         List<List<String>> grid = timeSeriesDataGrid(series);
 
-        if (format.equalsIgnoreCase("xls")) {
+        if (format.equalsIgnoreCase(XLS_EXT)) {
             writeDataGridToXls(filePath, grid);
-        } else if (format.equalsIgnoreCase("xlsx")) {
-            writeDataGridToXls(filePath, grid);
-        } else if (format.equalsIgnoreCase("csv")) {
+        } else if (format.equalsIgnoreCase(XLSX_EXT)) {
+            writeDataGridToXlsx(filePath, grid);
+        } else if (format.equalsIgnoreCase(CSV_EXT)) {
             writeDataGridToCsv(filePath, grid);
         }
 
@@ -621,7 +694,6 @@ public class DataGenerator {
     }
 
     /**
-     *
      * Generate a file for time series filtered data
      *
      * @param series
@@ -634,11 +706,11 @@ public class DataGenerator {
 
         List<List<String>> grid = generateSeriesGrid(series);
 
-        if (format.equalsIgnoreCase("xls")) {
+        if (format.equalsIgnoreCase(XLS_EXT)) {
             writeDataGridToXls(filePath, grid);
-        } else if (format.equalsIgnoreCase("xlsx")) {
+        } else if (format.equalsIgnoreCase(XLSX_EXT)) {
             writeDataGridToXls(filePath, grid);
-        } else if (format.equalsIgnoreCase("csv")) {
+        } else if (format.equalsIgnoreCase(CSV_EXT)) {
             writeDataGridToCsv(filePath, grid);
         }
 
@@ -650,17 +722,17 @@ public class DataGenerator {
 
         PageDescription description = series.getDescription();
 
-        grid.add(rowFromPair("Title", description.getTitle()));
-        grid.add(rowFromPair("CDID", description.getCdid()));
-        grid.add(rowFromPair("PreUnit", description.getPreUnit()));
-        grid.add(rowFromPair("Unit", description.getUnit()));
+        grid.add(rowFromPair(TITLE_COL, description.getTitle()));
+        grid.add(rowFromPair(CDID_COL, description.getCdid()));
+        grid.add(rowFromPair(PRE_UNIT_COL, description.getPreUnit()));
+        grid.add(rowFromPair(UNIT_COL, description.getUnit()));
 
         if (description.getReleaseDate() == null) {
-            grid.add(rowFromPair("Release date", ""));
+            grid.add(rowFromPair(RELEASE_DATE_COL, ""));
         } else {
-            grid.add(rowFromPair("Release date", format.format(description.getReleaseDate())));
+            grid.add(rowFromPair(RELEASE_DATE_COL, format.format(description.getReleaseDate())));
         }
-        grid.add(rowFromPair("Next release", description.getNextRelease()));
+        grid.add(rowFromPair(NEXT_RELEASE_COL, description.getNextRelease()));
 
         Set<Point> points = series.getSeries();
         for (Point point : points) {
@@ -687,5 +759,11 @@ public class DataGenerator {
         return generateTimeseriesData(serieses, format);
     }
 
+    void setXlsWorkbookSupplier(Supplier<Workbook> xlsWorkbookSupplier) {
+        this.xlsWorkbookSupplier = xlsWorkbookSupplier;
+    }
 
+    void setXlsxWorkbookSupplier(Supplier<Workbook> xlsxWorkbookSupplier) {
+        this.xlsxWorkbookSupplier = xlsxWorkbookSupplier;
+    }
 }

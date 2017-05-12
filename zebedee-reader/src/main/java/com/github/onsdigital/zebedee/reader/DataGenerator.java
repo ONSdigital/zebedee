@@ -8,7 +8,9 @@ import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeriesValue;
 import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
+import com.github.onsdigital.zebedee.reader.util.factory.CSVWriterFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -64,6 +66,8 @@ public class DataGenerator {
     private static final int METADATA_ROWS = 8;
     private static DateFormat FILE_NAME_DATE = new SimpleDateFormat("ddMMyy");
 
+    static final String UNSUPPORTED_CONTENT_TYPE_MSG = "Cannot generate dowload data for provided Content type";
+    static final String UNSUPPORTED_FORMAT_MSG = "Requested format is not currently supported.";
     static final String XLS_EXT = "xls";
     static final String XLSX_EXT = "xlsx";
     static final String CSV_EXT = "csv";
@@ -81,15 +85,18 @@ public class DataGenerator {
 
     private Supplier<Workbook> xlsWorkbookSupplier = () -> new HSSFWorkbook();
     private Supplier<Workbook> xlsxWorkbookSupplier = () -> new SXSSFWorkbook(30);
+    private CSVWriterFactory csvWriterFactory = (writer, separator) -> new CSVWriter(writer, separator);
 
     /**
-     * @param content
-     * @param format
-     * @return
-     * @throws IOException
+     * Generate download data for the requested content.
+     *
+     * @param content the content to generate the download {@link Resource} for.
+     * @param format  of the download to generate.
+     * @return {@link Resource} containing the content of the in the requested format.
+     * @throws IOException              problem generating the download data.
      * @throws UnexpectedErrorException
      */
-    public Resource generateData(Content content, String format) throws IOException, UnexpectedErrorException {
+    public Resource generateData(Content content, String format) throws IOException, BadRequestException {
         if (content instanceof Chart) {
             return generateChartData((Chart) content, format);
         }
@@ -99,18 +106,14 @@ public class DataGenerator {
         if (content instanceof Series) {
             return generateSeriesData((Series) content, format);
         }
-        // TODO LOG MESSAGE.
-        throw new UnexpectedErrorException("TODO", 500);
+        logDebug(UNSUPPORTED_CONTENT_TYPE_MSG)
+                .addParameter("class", content.getClass().getSimpleName())
+                .log();
+        throw new BadRequestException(UNSUPPORTED_CONTENT_TYPE_MSG);
     }
 
-    /**
-     * @param series
-     * @param format
-     * @return
-     * @throws IOException
-     * @throws UnexpectedErrorException
-     */
-    Resource generateTimeseriesData(List<TimeSeries> series, String format) throws IOException, UnexpectedErrorException {
+
+    Resource generateTimeseriesData(List<TimeSeries> series, String format) throws IOException, BadRequestException {
         List<List<String>> grid = timeSeriesDataGrid(series);
         String filename = new StringBuilder(SERIES_NAME)
                 .append("-")
@@ -121,14 +124,8 @@ public class DataGenerator {
         return generateResourceFromDataGrid(grid, filename);
     }
 
-    /**
-     * @param series
-     * @param format
-     * @return
-     * @throws IOException
-     * @throws UnexpectedErrorException
-     */
-    Resource generateSeriesData(Series series, String format) throws IOException, UnexpectedErrorException {
+
+    Resource generateSeriesData(Series series, String format) throws IOException, BadRequestException {
         List<List<String>> grid = generateSeriesGrid(series);
         String filename = new StringBuilder(series.getDescription().getCdid())
                 .append("-")
@@ -146,7 +143,7 @@ public class DataGenerator {
      * @throws IOException
      * @throws UnexpectedErrorException
      */
-    Resource generateChartData(Chart chart, String format) throws IOException, UnexpectedErrorException {
+    Resource generateChartData(Chart chart, String format) throws IOException, BadRequestException {
         List<List<String>> grid = chartDataGrid(chart);
         String filename = new StringBuilder(chart.getTitle().replace(" ", "_"))
                 .append(".")
@@ -163,7 +160,7 @@ public class DataGenerator {
      * @throws UnexpectedErrorException
      */
     Resource generateResourceFromDataGrid(List<List<String>> grid, String fileName) throws IOException,
-            UnexpectedErrorException {
+            BadRequestException {
         switch (getExtension(fileName)) {
             case XLS_EXT:
                 return createResource(fileName, workbookToBytes(grid, xlsWorkbookSupplier));
@@ -172,11 +169,14 @@ public class DataGenerator {
             case CSV_EXT:
                 return createResource(fileName, csvToBytes(grid));
             default:
-                throw new UnexpectedErrorException("TODO", 500);
+                logDebug(UNSUPPORTED_FORMAT_MSG)
+                        .addParameter("format", getExtension(fileName))
+                        .log();
+                throw new BadRequestException(UNSUPPORTED_FORMAT_MSG);
         }
     }
 
-    Resource generateTimeseriesData(TimeSeries series, String format) throws IOException, UnexpectedErrorException {
+    Resource generateTimeseriesData(TimeSeries series, String format) throws IOException, BadRequestException {
         List<TimeSeries> serieses = new ArrayList<>();
         serieses.add(series);
         return generateTimeseriesData(serieses, format);
@@ -189,7 +189,7 @@ public class DataGenerator {
      * @throws IOException
      * @throws UnexpectedErrorException
      */
-    public Resource generateData(List<TimeSeries> timeSerieses, String format) throws IOException, UnexpectedErrorException {
+    public Resource generateData(List<TimeSeries> timeSerieses, String format) throws IOException, BadRequestException {
         return generateTimeseriesData(timeSerieses, format);
     }
 
@@ -244,11 +244,11 @@ public class DataGenerator {
     byte[] csvToBytes(List<List<String>> grid) throws IOException {
         try (
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                CSVWriter writer = new CSVWriter(new OutputStreamWriter(baos, Charset.forName(UTF8)), ',')
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(baos, Charset.forName(UTF8));
+                CSVWriter writer = csvWriterFactory.getCSVWriter(outputStreamWriter, ',');
         ) {
             for (List<String> gridRow : grid) {
-                String[] row = new String[gridRow.size()];
-                row = gridRow.toArray(row);
+                String[] row = gridRow.toArray(new String[gridRow.size()]);
                 writer.writeNext(row);
             }
             writer.flush();
@@ -701,11 +701,15 @@ public class DataGenerator {
         return grid;
     }
 
-    void setXlsWorkbookSupplier(Supplier<Workbook> xlsWorkbookSupplier) {
+    void setXLSWorkbookSupplier(Supplier<Workbook> xlsWorkbookSupplier) {
         this.xlsWorkbookSupplier = xlsWorkbookSupplier;
     }
 
-    void setXlsxWorkbookSupplier(Supplier<Workbook> xlsxWorkbookSupplier) {
+    void setXLSXWorkbookSupplier(Supplier<Workbook> xlsxWorkbookSupplier) {
         this.xlsxWorkbookSupplier = xlsxWorkbookSupplier;
+    }
+
+    void setCsvWriterFactory(CSVWriterFactory csvWriterFactory) {
+        this.csvWriterFactory = csvWriterFactory;
     }
 }

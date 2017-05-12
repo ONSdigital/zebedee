@@ -1,5 +1,9 @@
 package com.github.onsdigital.zebedee.reader;
 
+import au.com.bytecode.opencsv.CSVWriter;
+import com.github.onsdigital.zebedee.content.base.Content;
+import com.github.onsdigital.zebedee.content.page.statistics.document.bulletin.Bulletin;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
@@ -30,8 +34,11 @@ import static com.github.onsdigital.zebedee.reader.DataGenerator.SOURCE_DATASET_
 import static com.github.onsdigital.zebedee.reader.DataGenerator.TITLE_COL;
 import static com.github.onsdigital.zebedee.reader.DataGenerator.UNIT_COL;
 import static com.github.onsdigital.zebedee.reader.DataGenerator.XLS_EXT;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,6 +51,12 @@ public class DataGeneratorTest {
 
     @Mock
     private Workbook xlsWorkbookMock;
+
+    @Mock
+    private Workbook xlsxWorkbookMock;
+
+    @Mock
+    private CSVWriter csvWriterMock;
 
     @Mock
     private Sheet sheetMock;
@@ -66,6 +79,10 @@ public class DataGeneratorTest {
     private DataGenerator generator;
     private List<List<String>> testDataGrid;
 
+    private int xlsSupplierInvocations = 0;
+    private int xlsxSupplierInvocations = 0;
+    private int csvWriterFactoryInvocations = 0;
+
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -74,7 +91,21 @@ public class DataGeneratorTest {
         temporaryFolder.create();
 
         generator = new DataGenerator();
-        generator.setXlsWorkbookSupplier(() -> xlsWorkbookMock);
+
+        generator.setXLSWorkbookSupplier(() -> {
+            xlsSupplierInvoked();
+            return xlsWorkbookMock;
+        });
+
+        generator.setXLSXWorkbookSupplier(() -> {
+            xlsSupplierInvoked();
+            return xlsxWorkbookMock;
+        });
+
+        generator.setCsvWriterFactory((w, sep) -> {
+            csvWriteFactoryInvoked();
+            return csvWriterMock;
+        });
 
         // Create the mandatory rows & data
         testDataGrid = new ArrayList<>();
@@ -93,6 +124,31 @@ public class DataGeneratorTest {
         temporaryFolder.delete();
     }
 
+    private void setUpMockBehaviours() {
+        when(xlsWorkbookMock.createSheet(SHEET_NAME))
+                .thenReturn(sheetMock);
+        when(sheetMock.createRow(anyInt()))
+                .thenReturn(rowMock);
+        when(rowMock.createCell(anyInt()))
+                .thenReturn(cellMock);
+        when(xlsWorkbookMock.createCellStyle())
+                .thenReturn(styleMock);
+        when(xlsWorkbookMock.createDataFormat())
+                .thenReturn(dataFormatMock);
+    }
+
+    private void xlsSupplierInvoked() {
+        xlsSupplierInvocations++;
+    }
+
+    private void xlsxSupplierInvoked() {
+        xlsxSupplierInvocations++;
+    }
+
+    private void csvWriteFactoryInvoked() {
+        csvWriterFactoryInvocations++;
+    }
+
     @Test
     public void shouldCreateXLSWithNumericalCellsCorrectlyFormatted() throws Exception {
         testDataGrid.add(Arrays.asList(new String[]{"1990", "12.34"}));
@@ -101,7 +157,11 @@ public class DataGeneratorTest {
 
         setUpMockBehaviours();
 
-        generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
+        generator.generateResourceFromDataGrid(testDataGrid, "test.xls");
+
+        assertThat(xlsSupplierInvocations, equalTo(1));
+        assertThat(xlsxSupplierInvocations, equalTo(0));
+        assertThat(csvWriterFactoryInvocations, equalTo(0));
 
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, times(1)).createCellStyle();
@@ -122,7 +182,11 @@ public class DataGeneratorTest {
 
         setUpMockBehaviours();
 
-        generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
+        generator.generateResourceFromDataGrid(testDataGrid, "test.xls");
+
+        assertThat(xlsSupplierInvocations, equalTo(1));
+        assertThat(xlsxSupplierInvocations, equalTo(0));
+        assertThat(csvWriterFactoryInvocations, equalTo(0));
 
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, never()).createCellStyle();
@@ -143,7 +207,11 @@ public class DataGeneratorTest {
 
         setUpMockBehaviours();
 
-        generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
+        generator.generateResourceFromDataGrid(testDataGrid, "test.xls");
+
+        assertThat(xlsSupplierInvocations, equalTo(1));
+        assertThat(xlsxSupplierInvocations, equalTo(0));
+        assertThat(csvWriterFactoryInvocations, equalTo(0));
 
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, never()).createCellStyle();
@@ -161,7 +229,11 @@ public class DataGeneratorTest {
 
         setUpMockBehaviours();
 
-        generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
+        generator.generateResourceFromDataGrid(testDataGrid, "test.xls");
+
+        assertThat(xlsSupplierInvocations, equalTo(1));
+        assertThat(xlsxSupplierInvocations, equalTo(0));
+        assertThat(csvWriterFactoryInvocations, equalTo(0));
 
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, never()).createCellStyle();
@@ -179,7 +251,11 @@ public class DataGeneratorTest {
 
         setUpMockBehaviours();
 
-        generator.writeDataGridToXls(temporaryFolder.getRoot().toPath().resolve(fileName), testDataGrid);
+        generator.generateResourceFromDataGrid(testDataGrid, "test.xls");
+
+        assertThat(xlsSupplierInvocations, equalTo(1));
+        assertThat(xlsxSupplierInvocations, equalTo(0));
+        assertThat(csvWriterFactoryInvocations, equalTo(0));
 
         verify(sheetMock, times(9)).createRow(anyInt());
         verify(xlsWorkbookMock, never()).createCellStyle();
@@ -189,16 +265,27 @@ public class DataGeneratorTest {
         verify(xlsWorkbookMock, times(1)).write(any(OutputStream.class));
     }
 
-    private void setUpMockBehaviours() {
-        when(xlsWorkbookMock.createSheet(SHEET_NAME))
-                .thenReturn(sheetMock);
-        when(sheetMock.createRow(anyInt()))
-                .thenReturn(rowMock);
-        when(rowMock.createCell(anyInt()))
-                .thenReturn(cellMock);
-        when(xlsWorkbookMock.createCellStyle())
-                .thenReturn(styleMock);
-        when(xlsWorkbookMock.createDataFormat())
-                .thenReturn(dataFormatMock);
+    @Test (expected = BadRequestException.class)
+    public void shouldthrowExceptionForUnsupportedFormat() throws Exception {
+        generator.generateData(mock(Content.class), "pdf");
+    }
+
+    @Test (expected = BadRequestException.class)
+    public void shouldThrowExceptionForUnsupportedContent() throws Exception {
+        generator.generateData(mock(Bulletin.class), "xls");
+    }
+
+    @Test
+    public void shouldGenerateCSVForValidInput() throws Exception {
+        testDataGrid.add(Arrays.asList(new String[]{"1990", "12.34"}));
+
+        generator.csvToBytes(testDataGrid);
+
+        assertThat(csvWriterFactoryInvocations, equalTo(1));
+
+        testDataGrid.stream().forEach(row -> {
+            verify(csvWriterMock, times(1)).writeNext(row.toArray(new String[row.size()]));
+        });
+        verify(csvWriterMock, times(1)).flush();
     }
 }

@@ -6,7 +6,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.DataGenerator;
 import com.github.onsdigital.zebedee.reader.api.ReadRequestHandler;
-import com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,17 +17,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.onsdigital.zebedee.reader.util.ReaderRequestUtils.getRequestedLanguage;
+import static com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUtils.sendResponse;
 
 /**
  * Created by bren on 27/11/15.
- *
+ * <p>
  * Generates excel or csv for a list of time series using a uri list passed in as http request
- *
  */
 @Api
 public class Export {
 
-    private static final DataGenerator DATA_GENERATOR = new DataGenerator();
+    private static final DataGenerator dataGenerator = new DataGenerator();
     private static final String UTF_8 = "UTF-8";
 
     @POST
@@ -51,7 +50,9 @@ public class Export {
             String uri = uris[i];
             timeSeriesList.add((TimeSeries) readRequestHandler.find(request, null, uri));
         }
-        ReaderResponseResponseUtils.sendResponse(DATA_GENERATOR.generateData(timeSeriesList, format), response, UTF_8);
+        try (com.github.onsdigital.zebedee.reader.Resource resource = dataGenerator.generateData(timeSeriesList,
+                format)) {
+            sendResponse(resource, response, UTF_8);
+        }
     }
-
 }

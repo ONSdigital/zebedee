@@ -2,9 +2,6 @@ package com.github.onsdigital.zebedee.reader.api.endpoint;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.content.base.Content;
-import com.github.onsdigital.zebedee.content.dynamic.timeseries.Series;
-import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
-import com.github.onsdigital.zebedee.content.page.statistics.document.figure.chart.Chart;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.DataGenerator;
@@ -30,7 +27,7 @@ import static com.github.onsdigital.zebedee.reader.util.ReaderResponseResponseUt
 @Api
 public class Generator {
 
-    private static final DataGenerator DATA_GENERATOR = new DataGenerator();
+    private static final DataGenerator dataGenerator = new DataGenerator();
     private static final String UTF_8 = "UTF-8";
     private static final String FORMAT_PARAM = "format";
 
@@ -76,23 +73,9 @@ public class Generator {
         Content content = readRequestHandler.findContent(request, extractFilter(request));
 
         if (content != null) {
-            try (Resource resource = toResource(content, format)) {
+            try (Resource resource = dataGenerator.generateData(content, format)) {
                 sendResponse(resource, response, UTF_8);
             }
-        }
-    }
-
-    private Resource toResource(Content content, String format) throws IOException, BadRequestException {
-        if (content instanceof Chart) {
-            // If page is a chart write the chart spreadsheet requested to response
-            return DATA_GENERATOR.generateData((Chart) content, format);
-        } else if (content instanceof TimeSeries) {
-            // If page then write the timeseries spreadsheet requested to response
-            return DATA_GENERATOR.generateData((TimeSeries) content, format);
-        } else if (content instanceof Series) {
-            return DATA_GENERATOR.generateData((Series) content, format);
-        } else {
-            throw new BadRequestException(GENERIC_BAD_REQUEST_MSG);
         }
     }
 

@@ -93,6 +93,7 @@ public class UsersServiceImpl implements UsersService {
         this.permissions = permissions;
         this.applicationKeys = applicationKeys;
         this.collections = collections;
+        this.keyringCache = keyringCache;
     }
 
     @Override
@@ -144,7 +145,7 @@ public class UsersServiceImpl implements UsersService {
         }
 
         // Create the user at a lower level because we don't have a Session at this point:
-        create(user, SYSTEM_USER);
+        user = create(user, SYSTEM_USER);
         write(resetPassword(user, password, SYSTEM_USER));
         permissions.addEditor(user.email, null);
         permissions.addAdministrator(user.email, null);
@@ -182,19 +183,23 @@ public class UsersServiceImpl implements UsersService {
         boolean isSuccess = false;
 
         if (session == null) {
-            throw new UnauthorizedException("Not authenticated.");
+            new UnauthorizedException("Cannot set password as user is not authenticated.");
         }
-        if (credentials == null || !exists(credentials.email)) {
-            throw new BadRequestException(USER_DETAILS_INVALID_MSG);
+        if (credentials == null) {
+            throw new BadRequestException("Cannot set password for user as credentials is null.");
         }
-
-        User user = read(credentials.email);
-        if (!permissions.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
-            throw new UnauthorizedException("Authentication failed with old password.");
+        if (!exists(credentials.email)) {
+            throw new BadRequestException("Cannot set password as user does not exist");
         }
 
         lock.lock();
         try {
+            User user = read(credentials.email);
+
+            if (!permissions.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
+                throw new UnauthorizedException("Authentication failed with old password.");
+            }
+
             boolean settingOwnPwd = credentials.email.equalsIgnoreCase(session.getEmail())
                     && StringUtils.isNotBlank(credentials.password);
 
@@ -225,12 +230,10 @@ public class UsersServiceImpl implements UsersService {
                             .log();
                 }
             }
-        } catch (Exception ex) {
-            logError(ex).user(user.email).addMessage("Error while attempting to set user password").log();
+            return isSuccess;
         } finally {
             lock.unlock();
         }
-        return isSuccess;
     }
 
     @Override
@@ -495,25 +498,26 @@ public class UsersServiceImpl implements UsersService {
     }
 
     private boolean changePassword(User user, String oldPassword, String newPassword) throws IOException {
-        boolean result = user.changePassword(oldPassword, newPassword);
-        if (result) {
-            lock.lock();
-            try {
-                // Make sure we have the latest before we save.
-                user = read(user.email);
+        lock.lock();
+        try {
+            if (user.changePassword(oldPassword, newPassword)) {
+/*                // Make sure we have the latest before we save.
+                user = read(user.email);*/
                 user.inactive = false;
                 user.lastAdmin = user.email;
                 user.temporaryPassword = false;
                 write(user);
-            } finally {
-                lock.unlock();
+                return true;
             }
+            return false;
+        } finally {
+            lock.unlock();
         }
-        return result;
     }
 
     /**
      * CALLER IS RESPONSIBLE FOR PERSISTING THIS.
+     *
      * @param user
      * @param password
      * @param adminEmail
@@ -523,16 +527,11 @@ public class UsersServiceImpl implements UsersService {
     private User resetPassword(User user, String password, String adminEmail) throws IOException {
         lock.lock();
         try {
-            User current = read(user.email);
-            current.resetPassword(password);
-            current.inactive = false;
-            current.lastAdmin = adminEmail;
-            current.temporaryPassword = true;
-            return current;
-        } catch (IOException ex) {
-            logError(ex).log();
-            // TODO return a proper exception here.
-            throw new RuntimeException(ex);
+            user.resetPassword(password);
+            user.inactive = false;
+            user.lastAdmin = adminEmail;
+            user.temporaryPassword = true;
+            return user;
         } finally {
             lock.unlock();
         }

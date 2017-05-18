@@ -82,9 +82,9 @@ analysis :
                       "production"
                    ]
     first_letter :
-      type : pattern_replace
-      pattern: "^[^a-zA-Z]*(.).*"
-      replacement: "$1"
+      type : pattern_capture
+      preserve_original: false
+      patterns : ["^[^a-zA-Z]*([a-zA-Z]).*"]
     ons_synonyms :
       type : synonym
       # stores synonyms for search engine

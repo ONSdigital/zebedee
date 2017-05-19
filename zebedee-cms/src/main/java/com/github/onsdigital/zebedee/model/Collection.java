@@ -356,8 +356,9 @@ public class Collection {
             Teams teams = zebedee.getTeams();
             for (Integer currentTeamId : currentTeamIds) { // for each current team ID
                 for (Team team : teams.listTeams()) { // iterate the teams list to find the team object
-                    if (currentTeamId.equals(team.id)) { // if the ID's match
-                        if (!collectionDescription.teams.contains(team.name)) { // if the team is not listed in the updated list
+                    if (currentTeamId.equals(team.getId())) { // if the ID's match
+                        if (!collectionDescription.teams.contains(team.getName())) { // if the team is not listed in the
+                            // updated list
                             zebedee.getPermissions().removeViewerTeam(collectionDescription, team, session);
                         }
                     }
@@ -368,7 +369,7 @@ public class Collection {
             for (String teamName : collectionDescription.teams) {
                 // We have already deserialised the teams list to its more efficient to iterate it again rather than deserialise by team name.
                 for (Team team : teams.listTeams()) { // iterate the teams list to find the team object
-                    if (teamName.equals(team.name)) {
+                    if (teamName.equals(team.getName())) {
                         zebedee.getPermissions().addViewerTeam(collectionDescription, team, session);
                         updatedTeams.add(teamName);
                     }

@@ -297,18 +297,17 @@ public class Builder {
 
     private Set<Integer> set(Team team) {
         Set<Integer> ids = new HashSet<>();
-        ids.add(team.id);
+        ids.add(team.getId());
         return ids;
     }
 
     private Team createTeam(User user, String name, Path teams) throws IOException {
         Team team = new Team();
 
-        team.id = ++teamId;
-        team.name = name;
-        team.members = new HashSet<>();
-        team.members.add(user.email);
-        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.name + ".json"));
+        team.setId(++teamId);
+        team.setName(name);
+        team.addMember(user.email);
+        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.getName() + ".json"));
         try (OutputStream output = Files.newOutputStream(labourMarketTeamPath)) {
             Serialiser.serialise(output, team);
         }

@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -30,15 +29,14 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
  * Created by david on 12/03/2015.
  */
 public class Teams {
-    // TODO Delete errors - have been getting errors in Rusty when deleting - could be to do with the access mapping
 
     private Path teamsPath;
-    private Zebedee zebedee;
+    private Permissions permissions;
     private ReadWriteLock teamLock = new ReentrantReadWriteLock();
 
-    public Teams(Path teams, Zebedee zebedee) {
+    public Teams(Path teams, Permissions permissions) {
         this.teamsPath = teams;
-        this.zebedee = zebedee;
+        this.permissions = permissions;
     }
 
     public List<Team> listTeams() throws IOException {
@@ -63,7 +61,7 @@ public class Teams {
         List<Team> resolvedTeams = new ArrayList<>();
         for (Integer currentTeamId : teamIds) { // for each current team ID
             for (Team team : teams) { // iterate the teams list to find the team object
-                if (currentTeamId.equals(team.id)) { // if the ID's match
+                if (currentTeamId.equals(team.getId())) { // if the ID's match
                     resolvedTeams.add(team);
                 }
             }
@@ -85,7 +83,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException {
-        if (session == null || !zebedee.getPermissions().isAdministrator(session.email)) {
+        if (session == null || !permissions.isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -99,66 +97,15 @@ public class Teams {
 
         // Work out the next id:
         for (Team team : listTeams()) {
-            id = Math.max(id, team.id);
+            id = Math.max(id, team.getId());
         }
 
         // Create the team object:
-        Team team = new Team();
-        team.name = teamName;
-        team.id = ++id;
-        team.members = new HashSet<>();
+        Team team = new Team()
+                .setName(teamName)
+                .setId(++id);
         writeTeam(team);
-
         return team;
-    }
-
-    /**
-     * Renames a team.
-     *
-     * @param update  The team with the updated name. The ID will be used to find the existing team.
-     * @param session Only administrators can rename a team.
-     * @throws IOException If a filesystem error occurs.
-     */
-    public void renameTeam(Team update, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException, BadRequestException {
-        if (session == null || !zebedee.getPermissions().isAdministrator(session.email)) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
-        }
-
-        if (update != null && StringUtils.isNotBlank(update.name)) {
-
-            // Check for duplicate
-            if (teamExists(update.name)) {
-
-                // NB this makes attempting to rename a team to the same name a no-op
-                Team team = findTeam(update.name);
-                if (team.id != update.id) {
-                    throw new ConflictException("Cannot rename: a team already exists with this name.");
-                }
-
-            } else {
-
-                // Find the team to update:
-                Team existing = null;
-                List<Team> teams = listTeams();
-                for (Team team : teams) {
-                    if (update.id == team.id) {
-                        existing = update;
-                    }
-                }
-                if (existing == null) {
-                    throw new NotFoundException("Team ID not found: " + update);
-                }
-
-                // Create a file with the new name and then delete the old one:
-                if (!Files.exists(teamPath(update))) {
-                    writeTeam(update);
-                    Files.delete(teamPath(existing));
-                }
-            }
-
-        } else {
-            throw new BadRequestException("Invalid team: " + update);
-        }
     }
 
     /**
@@ -169,7 +116,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
-        if (session == null || !zebedee.getPermissions().isAdministrator(session.email))
+        if (session == null || !permissions.isAdministrator(session.getEmail()))
             throw new UnauthorizedException(getUnauthorizedMessage(session));
 
         if (delete != null) {
@@ -178,7 +125,7 @@ public class Teams {
             Team existing = null;
             List<Team> teams = listTeams();
             for (Team team : teams) {
-                if (delete.id == team.id) {
+                if (delete.getId() == team.getId()) {
                     existing = delete;
                 }
             }
@@ -202,12 +149,12 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
-        if (session == null || !zebedee.getPermissions().isAdministrator(session.email)) {
+        if (session == null || !permissions.isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         if (!StringUtils.isBlank(email) && team != null) {
-            team.members.add(PathUtils.standardise(email));
+            team.addMember(PathUtils.standardise(email));
             writeTeam(team);
         }
 
@@ -221,12 +168,12 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
-        if (session == null || !zebedee.getPermissions().isAdministrator(session.email)) {
+        if (session == null || !permissions.isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         if (!StringUtils.isBlank(email) && team != null) {
-            team.members.remove(PathUtils.standardise(email));
+            team.getMembers().remove(PathUtils.standardise(email));
             writeTeam(team);
         }
     }
@@ -240,7 +187,6 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     private boolean teamExists(String teamName) throws IOException {
-
         Path path = teamPath(teamName);
         return path != null && Files.exists(path);
     }
@@ -268,8 +214,8 @@ public class Teams {
             }
 
             // Initialise the memers set if it's missing:
-            if (result.members == null) {
-                result.members = new HashSet<>();
+            if (result.getMembers() == null) {
+                result.setMembers(new HashSet<>());
             }
 
         } else {
@@ -298,7 +244,7 @@ public class Teams {
     private Path teamPath(Team team) {
         Path result = null;
         if (team != null) {
-            result = teamPath(team.name);
+            result = teamPath(team.getName());
         }
         return result;
     }

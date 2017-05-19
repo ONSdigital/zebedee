@@ -1,8 +1,5 @@
 package com.github.onsdigital.zebedee;
 
-import com.github.onsdigital.zebedee.configuration.Configuration;
-import com.github.onsdigital.zebedee.service.UsersService;
-import com.github.onsdigital.zebedee.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
@@ -25,6 +22,8 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -34,6 +33,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import static com.github.onsdigital.zebedee.configuration.Configuration.isVerificationEnabled;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByAnotherCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.beingEditedByThisCollectionError;
 import static com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException.markedDeleteInAnotherCollectionError;
@@ -44,14 +44,24 @@ public class Zebedee {
 
     public static final String PUBLISHED = "master";
     public static final String COLLECTIONS = "collections";
-    static final String PUBLISHED_COLLECTIONS = "publish-log";
-    static final String ZEBEDEE = "zebedee";
-    static final String USERS = "users";
-    static final String SESSIONS = "sessions";
-    static final String PERMISSIONS = "permissions";
-    static final String TEAMS = "teams";
-    static final String LAUNCHPAD = "launchpad";
-    static final String APPLICATION_KEYS = "application-keys";
+    public static final String PUBLISHED_COLLECTIONS = "publish-log";
+    public static final String ZEBEDEE = "zebedee";
+    public static final String USERS = "users";
+    public static final String SESSIONS = "sessions";
+    public static final String PERMISSIONS = "permissions";
+    public static final String TEAMS = "teams";
+    public static final String LAUNCHPAD = "launchpad";
+    public static final String APPLICATION_KEYS = "application-keys";
+
+
+    private final Path publishedCollectionsPath;
+    private final Path collectionsPath;
+    private final Path usersPath;
+    private final Path sessionsPath;
+    private final Path permissionsPath;
+    private final Path teamsPath;
+    private final Path applicationKeysPath;
+    private final Path redirectPath;
 
     private final VerificationAgent verificationAgent;
     private final ApplicationKeys applicationKeys;
@@ -62,11 +72,39 @@ public class Zebedee {
     private final Path publishedContentPath;
     private final Path path;
     private final Permissions permissions;
-    private final Users users;
+
     private final UsersService usersService;
     private final Teams teams;
     private final Sessions sessions;
     private final DataIndex dataIndex;
+    private Users users;
+
+
+    public Zebedee(ZebedeeConfiguration cgf) {
+        this.path = cgf.getZebedeeRootPath();
+        this.publishedContentPath = cgf.getPublishedContentPath();
+        this.collectionsPath = cgf.getCollectionsPath();
+        this.publishedCollectionsPath = cgf.getPublishedCollectionsPath();
+        this.usersPath = cgf.getUsersPath();
+        this.sessionsPath = cgf.getSessionsPath();
+        this.permissionsPath = cgf.getPermissionsPath();
+        this.teamsPath = cgf.getTeamsPath();
+        this.applicationKeysPath = cgf.getApplicationKeysPath();
+        this.redirectPath = cgf.getRedirectPath();
+
+        this.published = cgf.getPublished();
+        this.dataIndex = cgf.getDataIndex();
+        this.collections = cgf.getCollections(this);
+        this.publishedCollections = cgf.getPublishCollections();
+        this.keyringCache = cgf.getKeyringCache(this);
+        this.applicationKeys = cgf.getApplicationKeys();
+        this.sessions = cgf.getSessions();
+        this.permissions = cgf.getPermissions(this);
+        this.teams = cgf.getTeams(this.permissions);
+        this.usersService = cgf.getUsersService(collections, permissions, applicationKeys, keyringCache);
+        this.verificationAgent = cgf.getVerificationAgent(isVerificationEnabled(), this);
+    }
+
 
     public Zebedee(Path path, boolean useVerificationAgent) {
 
@@ -74,27 +112,26 @@ public class Zebedee {
         this.path = path;
         this.publishedContentPath = path.resolve(PUBLISHED);
 
-        Path collections = path.resolve(COLLECTIONS);
-        Path publishedCollections = path.resolve(PUBLISHED_COLLECTIONS);
-        Path userPath = path.resolve(USERS);
-        Path sessions = path.resolve(SESSIONS);
-        Path permissions = path.resolve(PERMISSIONS);
-        Path teams = path.resolve(TEAMS);
-        Path applicationKeysPath = path.resolve(APPLICATION_KEYS);
+        this.collectionsPath = path.resolve(COLLECTIONS);
+        this.publishedCollectionsPath = path.resolve(PUBLISHED_COLLECTIONS);
+        this.usersPath = path.resolve(USERS);
+        this.sessionsPath = path.resolve(SESSIONS);
+        this.permissionsPath = path.resolve(PERMISSIONS);
+        this.teamsPath = path.resolve(TEAMS);
+        this.applicationKeysPath = path.resolve(APPLICATION_KEYS);
 
-        if (!Files.exists(publishedContentPath) || !Files.exists(collections) || !Files.exists(userPath)
-                || !Files.exists(sessions) || !Files.exists(permissions) || !Files.exists(teams)) {
+        if (!Files.exists(publishedContentPath) || !Files.exists(collectionsPath) || !Files.exists(usersPath)
+                || !Files.exists(sessionsPath) || !Files.exists(permissionsPath) || !Files.exists(teamsPath)) {
             throw new IllegalArgumentException(
                     "This folder doesn't look like a zebedee folder: "
                             + path.toAbsolutePath());
         }
 
-
         // Create published and ensure redirect
         this.published = new Content(publishedContentPath);
         this.dataIndex = new DataIndex(new FileSystemContentReader(this.published.path));
 
-        Path redirectPath = this.published.path.resolve(Content.REDIRECT);
+        this.redirectPath = this.published.path.resolve(Content.REDIRECT);
         if (!Files.exists(redirectPath)) {
             this.published.redirect = new RedirectTablePartialMatch(this.published);
             try {
@@ -108,20 +145,21 @@ public class Zebedee {
             this.published.redirect = new RedirectTablePartialMatch(this.published, redirectPath);
         }
 
-        this.collections = new Collections(collections, this);
-        this.publishedCollections = new PublishedCollections(publishedCollections);
-        this.users = new Users(userPath, this);
+        this.collections = new Collections(collectionsPath, this);
+        this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
+        //this.users = new Users(userPath, this);
 
         this.keyringCache = new KeyringCache(this);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
-        this.sessions = new Sessions(sessions);
-        this.permissions = new Permissions(permissions, this);
-        this.teams = new Teams(teams, this);
+        this.sessions = new Sessions(sessionsPath);
+        this.permissions = new Permissions(permissionsPath, this);
+        this.teams = new Teams(teamsPath, this.permissions);
 
-        this.usersService = UsersServiceImpl.getInstance(userPath, getCollections(), getPermissions(), getApplicationKeys(),
+        this.usersService = UsersServiceImpl.getInstance(usersPath, getCollections(), getPermissions(),
+                getApplicationKeys(),
                 getKeyringCache());
 
-        if (useVerificationAgent && Configuration.isVerificationEnabled()) {
+        if (useVerificationAgent && isVerificationEnabled()) {
             this.verificationAgent = new VerificationAgent(this);
         } else {
             this.verificationAgent = null;
@@ -359,9 +397,8 @@ public class Zebedee {
         return session;
     }
 
-    @Deprecated
     public Users getUsers() {
-        return this.users;
+        return users;
     }
 
     public Teams getTeams() {

@@ -139,7 +139,7 @@ public class Teams {
         Team team = zebedee.getTeams().findTeam(teamName);
         zebedee.getTeams().deleteTeam(team, session);
 
-        evaluateCollectionKeys(zebedee, session, team, team.members.toArray(new String[team.members.size()]));
+        evaluateCollectionKeys(zebedee, session, team, team.getMembers().toArray(new String[team.getMembers().size()]));
 
         Audit.Event.TEAM_DELETED
                 .parameters()
@@ -186,7 +186,7 @@ public class Teams {
     private void evaluateCollectionKeys(Zebedee zebedee, Session session, Team team, String... emails) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
         for (Collection collection : zebedee.getCollections().list()) {
             Set<Integer> teamIds = Root.zebedee.getPermissions().listViewerTeams(collection.description, session);
-            if (teamIds != null && teamIds.contains(team.id)) {
+            if (teamIds != null && teamIds.contains(team.getId())) {
                 for (String memberEmail : emails) {
                     KeyManager.distributeKeyToUser(zebedee, collection, session,
                             usersServiceSupplier.getService().getUserByEmail(memberEmail));
@@ -212,7 +212,7 @@ public class Teams {
             result = Root.zebedee.getTeams().findTeam(getTeamName(request));
         } else {
             List<Team> teams = Root.zebedee.getTeams().listTeams();
-            teams.sort((o1, o2) -> o1.name.toUpperCase().compareTo(o2.name.toUpperCase()));
+            teams.sort((t1, t2) -> t1.getName().toUpperCase().compareTo(t2.getName().toUpperCase()));
             result = new TeamList(teams);
         }
         return result;

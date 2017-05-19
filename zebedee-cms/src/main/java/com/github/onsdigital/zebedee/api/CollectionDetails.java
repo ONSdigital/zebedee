@@ -80,7 +80,7 @@ public class CollectionDetails {
         Set<Integer> teamIds = Root.zebedee.getPermissions().listViewerTeams(collection.description, session);
         List<Team> teams = Root.zebedee.getTeams().resolveTeams(teamIds);
         teams.forEach(team -> {
-            collection.description.teams.add(team.name);
+            collection.description.teams.add(team.getName());
         });
 
         return result;

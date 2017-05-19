@@ -93,8 +93,8 @@ public class CollectionEventMetaData {
     public static CollectionEventMetaData[] teamRemoved(CollectionDescription collectionDescription,
                                                         Session session, Team team) throws IOException, ZebedeeException {
         List<CollectionEventMetaData> list = new ArrayList<>();
-        if (team != null && StringUtils.isNotEmpty(team.name)) {
-            list.add(new CollectionEventMetaData(TEAM_REMOVED_KEY, team.name));
+        if (team != null && StringUtils.isNotEmpty(team.getName())) {
+            list.add(new CollectionEventMetaData(TEAM_REMOVED_KEY, team.getName()));
         }
 
         if (collectionDescription != null && session != null) {
@@ -111,8 +111,8 @@ public class CollectionEventMetaData {
                                                       Team team) throws IOException, ZebedeeException {
 
         List<CollectionEventMetaData> list = new ArrayList<>();
-        if (team != null && StringUtils.isNotEmpty(team.name)) {
-            list.add(new CollectionEventMetaData(TEAM_ADDED_KEY, team.name));
+        if (team != null && StringUtils.isNotEmpty(team.getName())) {
+            list.add(new CollectionEventMetaData(TEAM_ADDED_KEY, team.getName()));
         }
 
         if (collectionDescription != null && session != null) {
@@ -130,7 +130,7 @@ public class CollectionEventMetaData {
         StringBuilder teamsListStr = new StringBuilder();
 
         while (iterator.hasNext()) {
-            teamsListStr.append(iterator.next().name).append(iterator.hasNext() ? ", " : "");
+            teamsListStr.append(iterator.next().getName()).append(iterator.hasNext() ? ", " : "");
         }
         return teamsListStr.toString();
     }

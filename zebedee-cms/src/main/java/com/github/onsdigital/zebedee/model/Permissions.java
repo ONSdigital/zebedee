@@ -379,8 +379,8 @@ public class Permissions {
             accessMapping.collections.put(collectionDescription.id, collectionTeams);
         }
 
-        Team teamAdded = !collectionTeams.contains(team.id) ? team : null;
-        collectionTeams.add(team.id);
+        Team teamAdded = !collectionTeams.contains(team.getId()) ? team : null;
+        collectionTeams.add(team.getId());
         writeAccessMapping(accessMapping);
 
         if (teamAdded != null) {
@@ -431,8 +431,8 @@ public class Permissions {
         }
 
 
-        Team teamRemoved = collectionTeams.contains(team.id) ? team : null;
-        collectionTeams.remove(team.id);
+        Team teamRemoved = collectionTeams.contains(team.getId()) ? team : null;
+        collectionTeams.remove(team.getId());
         writeAccessMapping(accessMapping);
 
         if (teamRemoved != null) {
@@ -459,7 +459,7 @@ public class Permissions {
         Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
         if (teams != null) {
             for (Team team : zebedee.getTeams().listTeams()) {
-                boolean isTeamMember = teams.contains(team.id) && team.members.contains(standardise(email));
+                boolean isTeamMember = teams.contains(team.getId()) && team.getMembers().contains(standardise(email));
                 boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping).equals(collectionDescription.collectionOwner);
                 if (isTeamMember && inCollectionGroup) {
                     return true;
@@ -476,7 +476,8 @@ public class Permissions {
         Set<Integer> teamsOnCollection = accessMapping.collections.get(collectionDescription.id);
         if (teamsOnCollection != null) {
             for (Team team : teamsList) {
-                boolean isTeamMember = teamsOnCollection.contains(team.id) && team.members.contains(standardise(email));
+                boolean isTeamMember = teamsOnCollection.contains(team.getId()) && team.getMembers()
+                        .contains(standardise(email));
                 boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping).equals(collectionDescription.collectionOwner);
                 if (isTeamMember && inCollectionGroup) {
                     return true;

@@ -1,430 +1,370 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.json.Team;
+import com.google.gson.Gson;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
- * Created by david on 24/04/2015.
+ * Tests verifing the behaviour of the {@link Teams} in both success and failure scenarios.
  */
-@Ignore("IGNORE: user keys concurrency defect")
 public class TeamsTest {
 
-    Zebedee zebedee;
-    Builder builder;
-    Collection inflationCollection;
-    Collection labourMarketCollection;
+    private static final String TEST_EMAIL = "test@ons.gov.uk";
 
+    @Mock
+    private Session sessionMock;
+
+    @Mock
+    private Permissions permissionsMock;
+
+    @Rule
+    public TemporaryFolder zebedeeRoot;
+
+    private Teams teamsService;
+    private Path teamsPath;
+    private Team teamA;
+    private Team teamB;
+
+    /**
+     * Set up the test.
+     */
     @Before
-    public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
-        inflationCollection = new Collection(builder.collections.get(0), zebedee);
-        labourMarketCollection = new Collection(builder.collections.get(1), zebedee);
+    public void setup() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
+        zebedeeRoot = new TemporaryFolder();
+        zebedeeRoot.create();
+        zebedeeRoot.newFolder("teams");
+
+        teamsPath = zebedeeRoot.getRoot().toPath().resolve(TEAMS);
+        teamsService = new Teams(teamsPath, permissionsMock);
+
+        teamA = new Team()
+                .setId(123)
+                .setName("Team-A")
+                .setMembers(new HashSet<>())
+                .addMember("Dave")
+                .addMember("Adrian")
+                .addMember("Janick");
+
+        teamB = new Team()
+                .setId(456)
+                .setName("Team-B")
+                .setMembers(new HashSet<>())
+                .addMember("Bruce")
+                .addMember("Steve")
+                .addMember("Nicko");
     }
 
+    /**
+     * Clean up.
+     */
     @After
-    public void tearDown() throws Exception {
-        builder.delete();
+    public void cleanUp() {
+        zebedeeRoot.delete();
     }
-
 
     @Test
-    public void shouldListTeams() throws IOException {
-
-        // Given
-        // The teams set up by the builder
-
-        // When
-        // We list the teams
-        List<Team> teams = zebedee.getTeams().listTeams();
-
-        // Then
-        // We should have the two teams
-        assertEquals(2, teams.size());
-        for (Team team : teams) {
-            assertTrue(builder.teamNames[0].equals(team.name) || builder.teamNames[1].equals(team.name));
-        }
+    public void shouldListTeams() throws Exception {
+        List<Team> teamsList = createTeams();
+        assertThat(teamsService.listTeams(), equalTo(teamsList));
     }
-
 
     @Test
     public void shouldFindTeamByName() throws IOException, NotFoundException {
-
-        // Given
-        // The teams set up by the builder
-
-        // When
-        // We list the teams
-        Team economyTeam = zebedee.getTeams().findTeam(builder.teamNames[0]);
-        Team labourMarketTeam = zebedee.getTeams().findTeam(builder.teamNames[1]);
-
-        // Then
-        // We should find the teams
-        assertNotNull(economyTeam);
-        assertNotNull(labourMarketTeam);
-        // and they should be the expected teams
-        assertEquals(builder.teamNames[0], economyTeam.name);
-        assertEquals(builder.teamNames[1], labourMarketTeam.name);
+        List<Team> teamsList = createTeams();
+        assertThat(teamsService.findTeam(teamA.getName()), equalTo(teamA));
     }
 
+    @Test
+    public void shouldCreateTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException,
+            NotFoundException {
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(true);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        Team result = teamsService.createTeam("TeamONS", sessionMock);
+        assertThat(teamsPath.resolve("teamons.json").toFile().exists(), equalTo(true));
+
+        Team target = teamsService.findTeam("TeamONS");
+        assertThat(result, equalTo(target));
+
+        verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+        verify(sessionMock, times(1)).getEmail();
+    }
 
     @Test
-    public void shouldCreateTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
+    public void shouldCreateTeamWithUniqueId() throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(true);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
 
-        // Given
-        // A new team name
-        String name = "UK Trade and Intustry team";
+        Set<Integer> ids = new HashSet<>();
+        String name = "team%d";
 
-        // When
-        // We create the team
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        Team ukTradeAndIndustryTeam = zebedee.getTeams().createTeam(name, session);
+        // Create 20 teams and add their ID to the set.
+        for (int i = 0; i < 20; i++) {
+            ids.add(teamsService.createTeam(String.format(name, i), sessionMock).getId());
+        }
 
-        // Then
-        // We should be able to list the new team:
-        List<Team> teams = zebedee.getTeams().listTeams();
-        assertEquals(3, teams.size());
-        boolean checked = false;
-        for (Team team : teams) {
-            if (team.id == ukTradeAndIndustryTeam.id) {
-                assertEquals(name, team.name);
-                checked = true;
+        // If there are 20 unique IDS the set will have the same number of entries as teams created.
+        assertThat(ids.size(), equalTo(20));
+
+        verify(permissionsMock, times(20)).isAdministrator(TEST_EMAIL);
+        verify(sessionMock, times(20)).getEmail();
+    }
+
+    @Test(expected = ConflictException.class)
+    public void shouldNotCreateTeamWithDuplicateName() throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+        createTeams();
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(true);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        try {
+            teamsService.createTeam("Team-A", sessionMock);
+        } catch (ConflictException e) {
+            assertThat(teamsService.listTeams().size(), equalTo(2));
+            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            throw e;
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotCreateTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(false);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        try {
+            teamsService.createTeam("Non Admin team", sessionMock);
+        } catch (UnauthorizedException e) {
+            assertThat(teamsService.listTeams().isEmpty(), is(true));
+            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            throw e;
+        }
+    }
+
+    @Test
+    public void shouldDeleteTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException,
+            NotFoundException {
+        createTeams();
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(true);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        teamsService.deleteTeam(teamA, sessionMock);
+
+        List<Team> afterDelete = teamsService.listTeams();
+        assertThat(afterDelete.size(), equalTo(1));
+        assertThat(afterDelete
+                        .stream()
+                        .filter(t -> t.getName().equals(teamA.getName()) || t.getId() == teamA.getId())
+                        .findAny()
+                        .isPresent(),
+                equalTo(false));
+
+        verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+        verify(sessionMock, times(1)).getEmail();
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowExceptionIfTeamToDeleteDoesNotExist() throws IOException, UnauthorizedException,
+            BadRequestException, ConflictException, NotFoundException {
+        List<Team> initialTeams = createTeams();
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(true);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        try {
+            teamsService.deleteTeam(new Team().setId(999).setName("AGirlIsNoOne"), sessionMock);
+        } catch (NotFoundException e) {
+            assertThat(initialTeams, equalTo(teamsService.listTeams()));
+            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            throw e;
+        }
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldNotDeleteNullTeam() throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(true);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        try {
+            teamsService.deleteTeam(null, sessionMock);
+        } catch (BadRequestException e) {
+            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            throw e;
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+        List<Team> initialTeams = createTeams();
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(false);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        try {
+            teamsService.deleteTeam(teamA, sessionMock);
+        } catch (UnauthorizedException e) {
+            List<Team> afterDelete = teamsService.listTeams();
+            assertThat(afterDelete, equalTo(initialTeams));
+            assertThat(afterDelete.contains(teamA), is(true));
+            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            throw e;
+        }
+    }
+
+    @Test
+    public void shouldAddTeamMember() throws IOException, UnauthorizedException, BadRequestException, ConflictException,
+            NotFoundException {
+        List<Team> initial = createTeams();
+        int teamAMembers = teamA.getMembers().size();
+
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(true);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        teamsService.addTeamMember(TEST_EMAIL, teamA, sessionMock);
+        Team teamAUpdated = teamsService.findTeam(teamA.getName());
+        assertThat(teamAUpdated.getMembers().contains(TEST_EMAIL), equalTo(true));
+        assertThat(teamAUpdated.getMembers().size(), equalTo(++teamAMembers));
+
+        verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+        verify(sessionMock, times(1)).getEmail();
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotAddTeamMemberIfNotAdministrator() throws IOException, UnauthorizedException,
+            BadRequestException, ConflictException, NotFoundException {
+        createTeams();
+        Team initial = teamA;
+
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(false);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        try {
+            teamsService.addTeamMember(TEST_EMAIL, teamA, sessionMock);
+        } catch (UnauthorizedException e) {
+            Team updated = teamsService.findTeam(teamA.getName());
+            assertThat(updated.getMembers(), equalTo(initial.getMembers()));
+            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            throw e;
+        }
+    }
+
+    @Test
+    public void shouldRemoveTeamMember() throws IOException, UnauthorizedException, BadRequestException,
+            ConflictException, NotFoundException {
+        createTeams();
+        Team inital = teamA;
+
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(true);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        teamsService.removeTeamMember("Dave", teamA, sessionMock);
+
+        Team updated = teamsService.findTeam(teamA.getName());
+        assertThat(!updated.getMembers().contains("Dave"), is(false));
+
+        verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+        verify(sessionMock, times(1)).getEmail();
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldNotRemoveTeamMemberIfNotAdministrator() throws IOException, UnauthorizedException,
+            BadRequestException, ConflictException, NotFoundException {
+        createTeams();
+        Team inital = teamA;
+
+        when(permissionsMock.isAdministrator(TEST_EMAIL))
+                .thenReturn(false);
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        try {
+            teamsService.removeTeamMember("Dave", teamA, sessionMock);
+        } catch (UnauthorizedException e) {
+            Team updated = teamsService.findTeam(teamA.getName());
+            assertThat(updated.getMembers().contains("Dave"), is(true));
+
+            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            throw e;
+        }
+    }
+
+    private void writeTeams(List<Team> teanList) throws IOException {
+        for (Team t : teanList) {
+            File f = teamsPath.resolve(t.getName().replace("-", "").toLowerCase().trim() + ".json").toFile();
+            f.createNewFile();
+
+            try (FileOutputStream fos = new FileOutputStream(f, false)) {
+                fos.write(new Gson().toJson(t).getBytes());
+                fos.flush();
             }
         }
-        assertTrue(checked);
     }
 
-
-    @Test
-    public void shouldCreateTeamWithUniqueId() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A team name
-        String name = "The Magic Roundabout Team";
-
-        // When
-        // We create a bunch of teams
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        for (int i = 0; i < 10; i++) {
-            zebedee.getTeams().createTeam(name + " " + i, session);
-        }
-
-        // Then
-        // All teams should have a unique id
-        Set<Integer> ids = new HashSet<>();
-        for (Team team : zebedee.getTeams().listTeams()) {
-            assertFalse(ids.contains(team.id));
-            ids.add(team.id);
-        }
-    }
-
-
-    @Test(expected = ConflictException.class)
-    public void shouldNotCreateTeamWithDuplicateName() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team
-        String name = "The twin project team";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.getTeams().createTeam(name, session);
-
-        // When
-        // We create a team with a duplicate name
-        zebedee.getTeams().createTeam(name, session);
-
-        // Then
-        // We should get a conflict exception
-    }
-
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldNotCreateTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team name
-        String name = "UK Trade and Intustry team";
-
-        // When
-        // We create the team
-        Session session = zebedee.openSession(builder.reviewer1Credentials);
-        Team ukTradeAndIndustryTeam = zebedee.getTeams().createTeam(name, session);
-
-        // Then
-        // We should get an unauthorized exception
-    }
-
-
-    @Test
-    public void shouldRenameTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team name
-        String oldName = builder.teamNames[0];
-        String newName = "Renamed team";
-        Team team = zebedee.getTeams().findTeam(oldName);
-
-        // When
-        // We rename the team
-        team.name = newName;
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.getTeams().renameTeam(team, session);
-
-        // Then
-        // We should still have the two teams, but with the new name
-        List<Team> teams = zebedee.getTeams().listTeams();
-        assertEquals(2, teams.size());
-        for (Team candidate : teams) {
-            assertTrue(newName.equals(team.name) || builder.teamNames[1].equals(team.name));
-            assertFalse(oldName.equals(team.name));
-        }
-    }
-
-
-    @Test(expected = ConflictException.class)
-    public void shouldNotRenameTeamToDuplicateName() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team name
-        String oldName = builder.teamNames[0];
-        String duplicateName = builder.teamNames[1];
-        Team team = zebedee.getTeams().findTeam(oldName);
-
-        // When
-        // We rename the team
-        team.name = duplicateName;
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.getTeams().renameTeam(team, session);
-
-        // Then
-        // We should get a conflict exception
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void shouldNotRenameNonexistentTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // An updated team with an ID that doesn't exist
-        Team team = new Team();
-        team.name = "nonexistent";
-        team.id = -1;
-        team.members = new HashSet<>();
-
-        // When
-        // We rename the team
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.getTeams().renameTeam(team, session);
-
-        // Then
-        // We should get a not found exception
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldNotRenameToBlankName() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // An updated team with an ID that doesn't exist
-        Team team = new Team();
-        team.name = "";
-        team.id = -1;
-        team.members = new HashSet<>();
-
-        // When
-        // We rename the team
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.getTeams().renameTeam(team, session);
-
-        // Then
-        // We should get a bad request exception
-    }
-
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldNotRenameTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team name
-        String oldName = builder.teamNames[0];
-        String newName = "Renamed team";
-        Team team = zebedee.getTeams().findTeam(oldName);
-
-        // When
-        // We rename the team
-        team.name = newName;
-        Session session = zebedee.openSession(builder.reviewer2Credentials);
-        zebedee.getTeams().renameTeam(team, session);
-
-        // Then
-        // We should have an unauthorized exception
-    }
-
-
-    @Test
-    public void shouldDeleteTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // One of the teams
-        Team team = zebedee.getTeams().findTeam(builder.teamNames[0]);
-
-        // When
-        // We delete the team
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.getTeams().deleteTeam(team, session);
-
-        // Then
-        // We should only have the other team left
-        List<Team> teams = zebedee.getTeams().listTeams();
-        assertEquals(1, teams.size());
-        assertTrue(builder.teamNames[1].equals(teams.get(0).name));
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void shouldNotDeleteNonexistentTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // An updated team with an ID that doesn't exist
-        Team team = new Team();
-        team.name = "nonexistent";
-        team.id = -1;
-        team.members = new HashSet<>();
-
-        // When
-        // We rename the team
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.getTeams().deleteTeam(team, session);
-
-        // Then
-        // We should get a not found exception
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldNotDeleteNullTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // An updated team with an ID that doesn't exist
-        Team team = null;
-
-        // When
-        // We rename the team
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        zebedee.getTeams().renameTeam(team, session);
-
-        // Then
-        // We should get a bad request exception
-    }
-
-
-    @Test(expected = UnauthorizedException.class)
-public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A team to delete
-        Team team = zebedee.getTeams().findTeam(builder.teamNames[0]);
-
-        // When
-        // We attempt to delete the team
-        Session session = zebedee.openSession(builder.reviewer2Credentials);
-        zebedee.getTeams().deleteTeam(team, session);
-
-        // Then
-        // We should have an unauthorized exception
-    }
-
-
-    @Test
-    public void shouldAddTeamMember() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team
-        String name = "My team";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        Team team = zebedee.getTeams().createTeam(name, session);
-
-        // When
-        // We add a team member
-        zebedee.getTeams().addTeamMember(builder.reviewer2.email, team, session);
-
-        // Then
-        // The member should be present in the team
-        Team read = zebedee.getTeams().findTeam(name);
-        assertEquals(1, read.members.size());
-        assertTrue(read.members.contains(builder.reviewer2.email));
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldNotAddTeamMemberIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team
-        String name = "My team";
-        Session adminSession = zebedee.openSession(builder.administratorCredentials);
-        Team team = zebedee.getTeams().createTeam(name, adminSession);
-
-        // When
-        // We add a team member without being an administrator
-        Session session = zebedee.openSession(builder.reviewer1Credentials);
-        zebedee.getTeams().addTeamMember(builder.reviewer1.email, team, session);
-
-        // Then
-        // We should have an unauthorized exception
-    }
-
-
-    @Test
-    public void shouldRemoveTeamMember() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team
-        String name = "My team";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        Team team = zebedee.getTeams().createTeam(name, session);
-        zebedee.getTeams().addTeamMember(builder.reviewer1.email, team, session);
-        zebedee.getTeams().addTeamMember(builder.reviewer2.email, team, session);
-
-        // When
-        // We remove a team member
-        zebedee.getTeams().removeTeamMember(builder.reviewer1.email, team, session);
-
-        // Then
-        // The member should be present in the team
-        Team read = zebedee.getTeams().findTeam(name);
-        assertEquals(1, read.members.size());
-        assertTrue(read.members.contains(builder.reviewer2.email));
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldNotRemoveTeamMemberIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException, ConflictException, NotFoundException {
-
-        // Given
-        // A new team
-        String name = "My team";
-        Session adminSession = zebedee.openSession(builder.administratorCredentials);
-        Team team = zebedee.getTeams().createTeam(name, adminSession);
-        zebedee.getTeams().addTeamMember(builder.reviewer1.email, team, adminSession);
-        zebedee.getTeams().addTeamMember(builder.reviewer2.email, team, adminSession);
-
-        // When
-        // We add a team member without being an administrator
-        Session session = zebedee.openSession(builder.reviewer1Credentials);
-        zebedee.getTeams().removeTeamMember(builder.reviewer2.email, team, session);
-
-        // Then
-        // We should have an unauthorized exception
+    private List<Team> createTeams() throws IOException {
+        List<Team> teamsList = new ArrayList<>();
+        teamsList.add(teamA);
+        teamsList.add(teamB);
+        writeTeams(teamsList);
+        return teamsList;
     }
 }

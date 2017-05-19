@@ -8,6 +8,7 @@ public class UpstreamContent {
     public static final String ACCESS_KEY =  System.getenv().getOrDefault("S3_ACCESS_KEY", "123");
     public static final String SECRET_ACCESS_KEY =  System.getenv().getOrDefault("S3_SECRET_ACCESS_KEY", "321");
     public static final String S3_HOST = System.getenv().getOrDefault("S3_URL", "http://localhost:4000");
+    public static final String REGION = System.getenv().getOrDefault("S3_REGION", "eu-west-1");
 
 
     public static String buildS3Address(Collection collection, String uri) {

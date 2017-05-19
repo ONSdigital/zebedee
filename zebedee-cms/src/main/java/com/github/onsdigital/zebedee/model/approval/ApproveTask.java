@@ -29,6 +29,7 @@ import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import com.github.onsdigital.zebedee.util.publish.pipeline.Scheduler;
 import com.github.onsdigital.zebedee.util.upstream.UpstreamContent;
+
 import io.minio.MinioClient;
 import io.minio.errors.*;
 import org.xmlpull.v1.XmlPullParserException;
@@ -220,7 +221,7 @@ public class ApproveTask implements Callable<Boolean> {
         final String s3Host = UpstreamContent.S3_HOST;
         final String s3Bucket = UpstreamContent.S3_BUCKET;
         try {
-            final MinioClient minioClient = new MinioClient(s3Host, accessKey, secretKey);
+            final MinioClient minioClient = new MinioClient(s3Host, accessKey, secretKey, UpstreamContent.REGION);
             Files.walk(collection.reviewed.getPath()).forEach(file -> {
                 if (!Files.isDirectory(file)) {
                     final String fileUri = file.toString().split("/reviewed/")[1];
@@ -231,7 +232,7 @@ public class ApproveTask implements Callable<Boolean> {
                         minioClient.putObject(s3Bucket, UpstreamContent.buildS3Location(collection, fileUri), file.toString());
                     } catch (InvalidBucketNameException | NoSuchAlgorithmException | InsufficientDataException | IOException |
                             InvalidKeyException | NoResponseException | XmlPullParserException | ErrorResponseException |
-                            InternalException | InvalidArgumentException e) {
+                            InternalException | InvalidArgumentException | RegionConflictException e) {
                         e.printStackTrace();
                         throw new RuntimeException(e);
                     }

@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.util.publish.pipeline;
 
 import com.google.gson.Gson;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class SchedulerMessage {

@@ -4,13 +4,13 @@ package com.github.onsdigital.zebedee.util.publish.pipeline;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.publishing.Result;
 import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
 import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
-import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.util.upstream.UpstreamContent;
 import com.google.gson.Gson;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -20,7 +20,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,7 +63,7 @@ public class ScheduleCollection {
         executor.submit(this::pollForCompleteMessages);
     }
 
-    public void schedule(Collection collection, Zebedee zebedee)  {
+    public void schedule(Collection collection, Zebedee zebedee) {
         final String collectionId = collection.description.id;
         final String collectionPath = collection.path.getFileName().toString();
         final Manifest manifest;
@@ -76,18 +75,15 @@ public class ScheduleCollection {
         final String epoch = getPublishTime(collection);
 
         final Set<String> filesToDelete = manifest.urisToDelete;
-
-        final SecretKey key = zebedee.getKeyringCache().schedulerCache.get(collection.description.id);
-        final String encryptionKey;
-        if (collection.description.isEncrypted) {
-            encryptionKey = Base64.getEncoder().encodeToString(key.getEncoded());
-        } else {
-            encryptionKey = null;
-        }
         encryptionKeyWriter.writeKey(collection, zebedee);
         final String kafkaMessage = SchedulerMessage.createSchedulerMessage(collectionId, collectionPath,
                 epoch, filesToDelete, findAllFiles(collection), SchedulerMessage.ACTION_SCHEDULE);
         collection.description.publishStartDate = new Date(Instant.now().getEpochSecond());
+        try {
+            collection.save();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         sendKafkaMessage(kafkaMessage);
         ZebedeeLogBuilder.logInfo("Collection sent to publish scheduler").collectionId(collectionId).log();
     }
@@ -135,9 +131,16 @@ public class ScheduleCollection {
         try {
             Collection collection = Root.zebedee.getCollections().getCollection(completeMessage.getCollectionId());
             new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
-            collection.description.publishEndDate = new Date(Instant.now().getEpochSecond());
+            final Date now = new Date(Instant.now().getEpochSecond());
+            collection.description.publishEndDate = now;
+            if (collection.description.publishDate == null) {
+                collection.description.publishDate = now;
+            }
+            collection.description.publishResults = new ArrayList<>();
+            collection.description.publishResults.add(new Result());
+            collection.save();
             ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(collection, zebedee.getKeyringCache().schedulerCache.get(completeMessage.getCollectionId()));
-            PostPublisher.postPublish(zebedee, collection, true, collectionReader);
+            PostPublisher.postPublish(zebedee, collection, false, collectionReader);
             ZebedeeLogBuilder.logInfo("Complete publishing collection").collectionId(collection.description.id).log();
 
         } catch (final Exception e) {

@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.util.publish.pipeline;
 import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
-import com.bettercloud.vault.response.AuthResponse;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.model.Collection;

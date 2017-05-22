@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model.publishing;
 
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -90,12 +89,7 @@ public class PostPublisher {
 
             reindexPublishingSearch(collection);
 
-            Path collectionJsonPath = moveCollectionToArchive(zebedee, collection, collectionReader);
-
-            if (!skipVerification) {
-                // add to published collections list
-                indexPublishReport(zebedee, collectionJsonPath, collectionReader);
-            }
+            moveCollectionToArchive(zebedee, collection, collectionReader);
 
             collection.delete();
             ContentTree.dropCache();
@@ -258,17 +252,6 @@ public class PostPublisher {
 
     }
 
-
-    private static void indexPublishReport(final Zebedee zebedee, final Path collectionJsonPath, final CollectionReader collectionReader) {
-        pool.submit(() -> {
-            logInfo("Indexing publish report").log();
-            PublishedCollection publishedCollection = zebedee.getPublishedCollections().add(collectionJsonPath);
-            if (Configuration.isVerificationEnabled()) {
-                zebedee.getVerificationAgent().submitForVerification(publishedCollection, collectionJsonPath, collectionReader);
-            }
-        });
-    }
-
     /**
      * Timeseries are zipped for the publish to the website, and then need to be unzipped before moving into master
      * on the publishing side
@@ -382,7 +365,7 @@ public class PostPublisher {
         String filename = PathUtils.toFilename(collection.description.name);
         Path collectionJsonSource = zebedee.getCollections().path.resolve(filename + ".json");
         Path collectionFilesSource = collection.reviewed.path;
-        Path logPath = zebedee.getPublishedCollections().path;
+        Path logPath = zebedee.getPublishedCollectionPath();
 
         if (!Files.exists(logPath)) {
             Files.createDirectory(logPath);

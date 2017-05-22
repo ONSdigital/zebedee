@@ -21,9 +21,7 @@ import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.Users;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
-import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -51,9 +49,7 @@ public class Zebedee {
     static final String LAUNCHPAD = "launchpad";
     static final String APPLICATION_KEYS = "application-keys";
 
-    private final VerificationAgent verificationAgent;
     private final ApplicationKeys applicationKeys;
-    private final PublishedCollections publishedCollections;
     private final Collections collections;
     private final Content published;
     private final KeyringCache keyringCache;
@@ -72,7 +68,6 @@ public class Zebedee {
         this.publishedContentPath = path.resolve(PUBLISHED);
 
         Path collections = path.resolve(COLLECTIONS);
-        Path publishedCollections = path.resolve(PUBLISHED_COLLECTIONS);
         Path users = path.resolve(USERS);
         Path sessions = path.resolve(SESSIONS);
         Path permissions = path.resolve(PERMISSIONS);
@@ -106,18 +101,12 @@ public class Zebedee {
         }
 
         this.collections = new Collections(collections, this);
-        this.publishedCollections = new PublishedCollections(publishedCollections);
         this.users = new Users(users, this);
         this.keyringCache = new KeyringCache(this);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.sessions = new Sessions(sessions);
         this.permissions = new Permissions(permissions, this);
         this.teams = new Teams(teams, this);
-        if (useVerificationAgent && Configuration.isVerificationEnabled()) {
-            this.verificationAgent = new VerificationAgent(this);
-        } else {
-            this.verificationAgent = null;
-        }
     }
 
     public Zebedee(Path path) {
@@ -380,10 +369,6 @@ public class Zebedee {
         return this.collections;
     }
 
-    public PublishedCollections getPublishedCollections() {
-        return this.publishedCollections;
-    }
-
     public KeyringCache getKeyringCache() {
         return this.keyringCache;
     }
@@ -396,11 +381,11 @@ public class Zebedee {
         return this.sessions;
     }
 
-    public VerificationAgent getVerificationAgent() {
-        return this.verificationAgent;
-    }
-
     public DataIndex getDataIndex() {
         return this.dataIndex;
+    }
+
+    public Path getPublishedCollectionPath() {
+        return path.resolve(PUBLISHED_COLLECTIONS);
     }
 }

@@ -17,7 +17,6 @@ import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
-import com.github.onsdigital.zebedee.search.indexing.Indexer;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentService;
 import com.github.onsdigital.zebedee.service.DeletedContent.DeletedContentServiceFactory;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
@@ -28,7 +27,6 @@ import com.github.onsdigital.zebedee.util.ZipUtils;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
@@ -86,8 +84,6 @@ public class PostPublisher {
             applyDeletesToPublishing(collection, contentReader, contentWriter);
             processManifestForMaster(collection, contentReader, contentWriter);
             copyFilesToMaster(zebedee, collection, collectionReader);
-
-            reindexPublishingSearch(collection);
 
             moveCollectionToArchive(zebedee, collection, collectionReader);
 
@@ -281,46 +277,6 @@ public class PostPublisher {
         }
     }
 
-
-
-    private static void reindexPublishingSearch(Collection collection) throws IOException {
-
-        logInfo("Reindexing search").collectionName(collection).log();
-        try {
-
-            long start = System.currentTimeMillis();
-
-            List<String> uris = collection.reviewed.uris("*data.json");
-            for (String uri : uris) {
-                if (isIndexedUri(uri)) {
-                    String contentUri = URIUtils.removeLastSegment(uri);
-                    reIndexPublishingSearch(contentUri);
-                }
-            }
-
-            for (PendingDelete pendingDelete : collection.description.getPendingDeletes()) {
-
-                ContentTreeNavigator.getInstance().search(pendingDelete.getRoot(), node -> {
-                    logDebug("Deleting index from publishing search ").addParameter("uri", node.uri).log();
-                    pool.submit(() -> {
-                        try {
-                            Indexer.getInstance().deleteContentIndex(node.type, node.uri);
-                        } catch (Exception e) {
-                            logError(e, "Exception reloading search index:").log();
-                        }
-                    });
-                });
-            }
-
-            logInfo("Redindex search completed").collectionName(collection)
-                    .timeTaken((System.currentTimeMillis() - start)).log();
-
-        } catch (Exception exception) {
-            logError(exception, "An error occurred during the search reindex").collectionName(collection).log();
-            ExceptionUtils.printRootCauseStackTrace(exception);
-        }
-    }
-
     /**
      * Method to determine if a URI is one that should be indexed in search.
      *
@@ -329,16 +285,6 @@ public class PostPublisher {
      */
     static boolean isIndexedUri(String uri) {
         return !VersionedContentItem.isVersionedUri(uri);
-    }
-
-    private static void reIndexPublishingSearch(final String uri) throws IOException {
-        pool.submit(() -> {
-            try {
-                Indexer.getInstance().reloadContent(uri);
-            } catch (Exception e) {
-                logError(e, "Exception reloading search index:").log();
-            }
-        });
     }
 
     public static void copyFilesToMaster(Zebedee zebedee, Collection collection, CollectionReader collectionReader)

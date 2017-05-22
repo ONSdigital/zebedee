@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
@@ -158,7 +159,7 @@ public class ApproveTask implements Callable<Boolean> {
             compressZipFiles(collection, collectionReader, collectionWriter);
 
             // Move data to minio / S3
-            moveCollectionToObjectStore(collection);
+            moveCollectionToObjectStore();
 
             approveCollection();
 
@@ -215,7 +216,7 @@ public class ApproveTask implements Callable<Boolean> {
         pdfGenerator.generatePdfsInCollection(collectionWriter, collectionContent);
     }
 
-    private void moveCollectionToObjectStore(Collection collectionContent) {
+    private void moveCollectionToObjectStore() {
         final String accessKey = UpstreamContent.ACCESS_KEY;
         final String secretKey = UpstreamContent.SECRET_ACCESS_KEY;
         final String s3Host = UpstreamContent.S3_HOST;

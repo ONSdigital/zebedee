@@ -5,12 +5,15 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
 import com.github.onsdigital.zebedee.exceptions.*;
 import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.google.common.util.concurrent.Futures;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -24,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -539,6 +543,10 @@ public class CollectionsTest {
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
 
+        Function<ApproveTask, Future<Boolean>> mock = this::mockApprovedCollection;
+
+        ReflectionTestUtils.setField(zebedee.getCollections(), "addTaskToQueue", mock);
+
         // When
         // We attempt to approve
         Future<Boolean> future = zebedee.getCollections().approve(collection, session);
@@ -558,6 +566,9 @@ public class CollectionsTest {
         // A collection that's approved.
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
+        Function<ApproveTask, Future<Boolean>> mock = this::mockApprovedCollection;
+
+        ReflectionTestUtils.setField(zebedee.getCollections(), "addTaskToQueue", mock);
         Future<Boolean> future = zebedee.getCollections().approve(collection, session);
         future.get();
 
@@ -1016,6 +1027,15 @@ public class CollectionsTest {
         CollectionDescription collectionDescription = new CollectionDescription(name);
         collectionDescription.type = type;
         return collectionDescription;
+    }
+
+    private Future<Boolean> mockApprovedCollection(ApproveTask task) {
+        try {
+            task.approveCollection();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Futures.immediateFuture(true);
     }
 
     public class UpdateCollection implements Runnable {

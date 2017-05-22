@@ -42,30 +42,6 @@
             <artifactId>reflections</artifactId>
         </dependency>
 
-        <!-- Elastic Search -->
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-
-        <!-- Elastic search multicast, used for discovering elastic search  instances-->
-        <dependency>
-            <groupId>org.elasticsearch.plugin</groupId>
-            <artifactId>discovery-multicast</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-
-        <!-- Elasticsearch 2.1.1 uses guava 18 whereas reflections library uses 15.
-        This does not cause any problems on compile time but fails on runtime to init elasticsearch client.
-        That's why explicitly adding guava version 18-->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
-
-
         <!-- Encryption -->
         <dependency>
             <groupId>com.github.davidcarboni</groupId>

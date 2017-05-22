@@ -65,7 +65,7 @@ public class ScheduleCollection {
 
     public void schedule(Collection collection, Zebedee zebedee) {
         final String collectionId = collection.description.id;
-        final String collectionPath = collection.path.getFileName().toString();
+        final String collectionPath = collection.description.name;
         final Manifest manifest;
         try {
             manifest = Manifest.get(collection);

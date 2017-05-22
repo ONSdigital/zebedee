@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
@@ -51,6 +52,8 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 public class Collections {
     public final Path path;
     Zebedee zebedee;
+
+    private Function<ApproveTask, Future<Boolean>> addTaskToQueue = (task) -> ApprovalQueue.add(task);
 
     public Collections(Path path, Zebedee zebedee) {
         this.path = path;
@@ -264,7 +267,7 @@ public class Collections {
         collection.description.approvalStatus = ApprovalStatus.IN_PROGRESS;
         collection.save();
 
-        Future<Boolean> future = ApprovalQueue.add(
+        Future<Boolean> future = addTaskToQueue.apply(
                 new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex));
 
         getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);

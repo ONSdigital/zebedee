@@ -22,6 +22,7 @@ public class Chart extends FigureBase {
     private String yAxisMax;
     private String yMin;
     private String yMax;
+    private String yAxisInterval;
     private String highlight;
     private String alpha;
 
@@ -64,7 +65,7 @@ public class Chart extends FigureBase {
     public void setDevices(Map<String, Device> devices) {
         this.devices = devices;
     }
-    
+
     @Override
     public PageType getType() {
         return PageType.chart;
@@ -262,6 +263,14 @@ public class Chart extends FigureBase {
         this.yMax = yMax;
     }
 
+    public String getyAxisInterval() {
+        return yAxisInterval;
+    }
+
+    public void setyAxisInterval(String yAxisInterval) {
+        this.yAxisInterval = yAxisInterval;
+    }
+
     public String getHighlight() {
         return highlight;
     }
@@ -341,7 +350,7 @@ public class Chart extends FigureBase {
     public void setHasLineBreak(Boolean hasLineBreak) {
         this.hasLineBreak = hasLineBreak;
     }
-    
+
     public Boolean getHasConnectNull() {
         return hasConnectNull;
     }

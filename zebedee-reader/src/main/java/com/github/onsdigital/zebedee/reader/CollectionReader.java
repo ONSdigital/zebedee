@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.reader;
 
 import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.content.page.base.Page;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
@@ -59,7 +60,11 @@ public abstract class CollectionReader {
 
 
     public Resource getResource(String path) throws ZebedeeException, IOException {
-        return findResource(path);
+        try {
+            return findResource(path);
+        } catch (BadRequestException e) {
+            return findResource(path + "/index.html");
+        }
     }
 
     public long getContentLength(String path) throws ZebedeeException, IOException {

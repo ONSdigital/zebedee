@@ -32,16 +32,16 @@ public class PublishedCollectionService {
                 try(final InputStream content = entity.getContent()) {
                     responseBytes = IOUtils.toByteArray(content);
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new PublishedCollectionException(e);
             }
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new PublishedCollectionException(e);
         }
          return gson.fromJson(new String(responseBytes), PublishedCollection[].class);
     }
 
-    public PublishedCollection[] getCollection(final String collectionId) throws PublishedCollectionException {
+    public PublishedCollection getCollection(final String collectionId) throws PublishedCollectionException {
         byte[] responseBytes;
         try {
             final HttpGet httpget = new HttpGet(buildUri(collectionId));
@@ -50,16 +50,14 @@ public class PublishedCollectionService {
                 try(final InputStream content = entity.getContent()) {
                     responseBytes = IOUtils.toByteArray(content);
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new PublishedCollectionException(e);
             }
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new PublishedCollectionException(e);
         }
         final PublishedCollection pubCollection =  gson.fromJson(new String(responseBytes), PublishedCollection.class);
-        final PublishedCollection[] results = new PublishedCollection[1];
-        results[0] = pubCollection;
-        return results;
+        return pubCollection;
     }
 
     private URI buildUri(final String collectionId) throws URISyntaxException {

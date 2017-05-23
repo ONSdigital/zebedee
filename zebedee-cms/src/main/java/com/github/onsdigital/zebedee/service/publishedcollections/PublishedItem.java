@@ -1,25 +1,16 @@
 package com.github.onsdigital.zebedee.service.publishedcollections;
 
 public class PublishedItem {
-    private String startTime;
-    private String endTime;
+    private long duration;
     private String uri;
     private int size;
 
-    public String getStartTime() {
-        return startTime;
+    public long getDuration() {
+        return duration;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
     public String getUri() {

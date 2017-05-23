@@ -16,7 +16,7 @@ public class PublishedCollections {
     private static final PublishedCollectionService reportService = new PublishedCollectionService();
 
     @GET
-    public PublishedCollection[] get(HttpServletRequest request, HttpServletResponse response)
+    public Object get(HttpServletRequest request, HttpServletResponse response)
             throws PublishedCollectionException {
 
         String collectionId = Collections.getCollectionId(request);

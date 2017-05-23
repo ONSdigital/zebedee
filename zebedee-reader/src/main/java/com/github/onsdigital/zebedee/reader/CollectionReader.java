@@ -63,7 +63,10 @@ public abstract class CollectionReader {
         try {
             return findResource(path);
         } catch (BadRequestException e) {
-            return findResource(path + "/index.html");
+            if(path.startsWith("/visualisations/")) {
+                return findResource(path + "/index.html");
+            }
+            throw e;
         }
     }
 

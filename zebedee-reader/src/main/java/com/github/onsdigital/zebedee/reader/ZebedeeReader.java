@@ -124,7 +124,10 @@ public class ZebedeeReader {
         try {
             return publishedContentReader.getResource(path);
         } catch (BadRequestException e) {
-            return publishedContentReader.getResource(path + "/index.html");
+            if(path.startsWith("/visualisations/")) {
+                return publishedContentReader.getResource(path + "/index.html");
+            }
+            throw e;
         }
     }
 

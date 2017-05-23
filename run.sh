@@ -12,8 +12,9 @@ export PACKAGE_PREFIX=com.github.onsdigital.zebedee
 export audit_db_enabled=true
 
 # Development: reloadable
-mvn clean package dependency:copy-dependencies -Dmaven.test.skip=true && \
+mvn clean package dependency:copy-dependencies
 java $JAVA_OPTS \
+ -Duser.timezone=UTC \
  -Dlogback.configurationFile=zebedee-cms/target/classes/logback.xml \
  -Dcolour_logging_enabled=$colour_logging_enabled \
  -Ddb_audit_url=$db_audit_url \

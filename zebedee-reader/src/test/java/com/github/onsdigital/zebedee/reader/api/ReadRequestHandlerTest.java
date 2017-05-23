@@ -98,7 +98,7 @@ public class ReadRequestHandlerTest {
 
     private void shouldResolveTaxonomyFirstLevel() throws Exception {
         Collection<ContentNode> children = readRequestHandler.getTaxonomy(request, 1);
-        assertTrue(children.size() == 4);
+        assertTrue(children.size() == 5);
         ContentNode child = children.iterator().next();
         assertNull(child.getChildren());
         assertEquals("Economy", child.getDescription().getTitle());

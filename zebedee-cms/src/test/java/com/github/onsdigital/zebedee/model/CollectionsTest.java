@@ -1,1054 +1,1024 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
+import com.github.onsdigital.zebedee.model.approval.ApproveTask;
+import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.reader.ContentReader;
+import com.github.onsdigital.zebedee.service.UsersService;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
-@Ignore("IGNORE: user keys concurrency defect")
+/**
+ * Created by dave on 19/05/2017.
+ */
 public class CollectionsTest {
 
-    private static final boolean recursive = false;
-    private static final boolean validateJson = false;
-    Zebedee zebedee;
-    Builder builder;
-    Session session;
+    private static final String COLLECTION_FILE_NAME = "{0}-{1}.json";
+    private static final String TEST_EMAIL = "TEST@ons.gov.uk";
+
+    @Rule
+    public TemporaryFolder rootDir = new TemporaryFolder();
+
+    @Mock
+    private Permissions permissionsMock;
+
+    @Mock
+    private Zebedee zebedeeMock;
+
+    @Mock
+    private Session sessionMock;
+
+    @Mock
+    private UsersService usersServiceMock;
+
+    @Mock
+    private Collection collectionMock;
+
+    @Mock
+    private CollectionDescription collectionDescriptionMock;
+
+    @Mock
+    private CollectionHistoryDao collectionHistoryDaoMock;
+
+    @Mock
+    public KeyManangerUtil keyManagerUtilMock;
+
+    @Mock
+    private Content publishedContentMock;
+
+    @Mock
+    private HttpServletRequest requestMock;
+
+    @Mock
+    private CollectionReaderWriterFactory collectionReaderWriterFactoryMock;
+
+    @Mock
+    private CollectionWriter collectionWriterMock;
+
+    @Mock
+    private CollectionReader collectionReaderMock;
+
+    @Mock
+    private PublishNotification publishNotification;
+
+    @Mock
+    private ContentWriter contentWriterMock;
+
+    @Mock
+    private ContentReader contentReaderMock;
+
+    @Mock
+    private Future<Boolean> futureMock;
+
+    private Collections collections;
+    private Path collectionsPath;
+    private User testUser;
+    private Supplier<Zebedee> zebedeeSupplier;
+    private BiConsumer<Collection, EventType> publishingNotificationConsumer;
 
     @Before
-    public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
-        session = zebedee.openSession(builder.administratorCredentials);
-    }
+    public void setUp() throws IOException {
+        MockitoAnnotations.initMocks(this);
+        Collection.setKeyManagerUtil(keyManagerUtilMock);
 
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
+        System.setProperty("audit_db_enabled", "false");
+        testUser = new User();
+        testUser.email = TEST_EMAIL;
+        rootDir.create();
+        collectionsPath = rootDir.newFolder("collections").toPath();
+
+        // Test target.
+        collections = new Collections(collectionsPath, permissionsMock, publishedContentMock);
+
+        zebedeeSupplier = () -> zebedeeMock;
+        publishingNotificationConsumer = (c, e) -> publishNotification.sendNotification(e);
+
+        when(sessionMock.getEmail())
+                .thenReturn(TEST_EMAIL);
+
+        when(collectionMock.getDescription())
+                .thenReturn(collectionDescriptionMock);
+
+        ReflectionTestUtils.setField(collections, "zebedeeSupplier", zebedeeSupplier);
+        ReflectionTestUtils.setField(collections, "collectionReaderWriterFactory", collectionReaderWriterFactoryMock);
+        ReflectionTestUtils.setField(collections, "publishingNotificationConsumer", publishingNotificationConsumer);
     }
 
     @Test
     public void shouldFindCollection() throws Exception {
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        Collections.CollectionList collections = new Collections.CollectionList();
+        CollectionDescription desc = new CollectionDescription();
+        desc.name = "test";
+        desc.type = CollectionType.manual;
 
-        Collection firstCollection = Collection.create(collectionDescription("FirstCollection", CollectionType.manual), zebedee, session);
-        Collection secondCollection = Collection.create(collectionDescription("SecondCollection", CollectionType.manual), zebedee, session);
+        when(zebedeeMock.getCollections())
+                .thenReturn(collections);
+        when(zebedeeMock.getUsersService())
+                .thenReturn(usersServiceMock);
+        when(usersServiceMock.getUserByEmail(anyString()))
+                .thenReturn(testUser);
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
 
-        collections.add(firstCollection);
-        collections.add(secondCollection);
+        Collection created = Collection.create(desc, zebedeeMock, sessionMock);
+        Collection found = collections.getCollection(created.getDescription().id);
 
-        Collection firstCollectionFound = collections
-                .getCollection(firstCollection.description.id);
-        Collection secondCollectionFound = collections
-                .getCollection(secondCollection.description.id);
-
-        assertEquals(firstCollection.description.id,
-                firstCollectionFound.description.id);
-        assertEquals(firstCollection.description.name,
-                firstCollectionFound.description.name);
-        assertEquals(secondCollection.description.id,
-                secondCollectionFound.description.id);
-        assertEquals(secondCollection.description.name,
-                secondCollectionFound.description.name);
+        assertThat(created.getDescription().id, equalTo(found.getDescription().id));
+        assertThat(created.getDescription().name, equalTo(found.getDescription().name));
+        assertThat(created.getDescription().type, equalTo(found.getDescription().type));
     }
 
     @Test
     public void shouldReturnNullIfNotFound() throws Exception {
-
-        Collections.CollectionList collections = new Collections.CollectionList();
-
-        Session session = zebedee.openSession(builder.administratorCredentials);
-
-        Collection firstCollection = Collection.create(
-                collectionDescription("FirstCollection", CollectionType.manual), zebedee, session);
-
-        collections.add(firstCollection);
-
-        assertNull(collections.getCollection("SecondCollection"));
-    }
-
-    @Test
-    public void shouldHaveCollectionForName() throws Exception {
-        Collections.CollectionList collectionList = new Collections.CollectionList();
-        Session session = zebedee.openSession(builder.administratorCredentials);
-
-        Collection firstCollection = Collection.create(
-                collectionDescription("FirstCollection", CollectionType.manual), zebedee, session);
-        Collection secondCollection = Collection.create(
-                collectionDescription("SecondCollection", CollectionType.manual), zebedee, session);
-
-        collectionList.add(firstCollection);
-        collectionList.add(secondCollection);
-
-        assertTrue(collectionList.hasCollection("FirstCollection"));
-        assertTrue(collectionList.hasCollection("SecondCollection"));
-        assertFalse(collectionList
-                .hasCollection("SomeCollectionThatDoesNotExist"));
+        assertThat(collections.getCollection("A_Girl_Is_No_One"), equalTo(null));
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnApprove()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null collection
-        Collection collection = null;
-        Session session = zebedee.openSession(builder.administratorCredentials);
-
-        // When
-        // We attempt to approve
-        zebedee.getCollections().approve(collection, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
+    public void shouldThrowBadRequestForNullCollectionOnApprove() throws IOException, ZebedeeException {
+        collections.approve(null, sessionMock);
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnListDirectory()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A null collection
-        Collection collection = null;
-        String uri = "test.json";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-
-        // When
-        // We attempt to list directory
-        zebedee.getCollections().listDirectory(collection, uri, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
+    public void shouldThrowBadRequestForNullCollectionOnListDirectory() throws IOException, UnauthorizedException,
+            BadRequestException, ConflictException, NotFoundException {
+        collections.listDirectory(null, "somefile.json", sessionMock);
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnComplete()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null collection
-        Collection collection = null;
-        String uri = "test.json";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-
-        // When
-        // We attempt to complete
-        zebedee.getCollections().complete(collection, uri, session, recursive);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
+    public void shouldThrowBadRequestForNullCollectionOnComplete() throws IOException, ZebedeeException {
+        collections.complete(null, "someURI", sessionMock, false);
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnDelete()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null collection
-        Collection collection = null;
-        String uri = "test.json";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-
-        // When
-        // We attempt to delete
-        zebedee.getCollections().delete(collection, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-
-    @Test(expected = NotFoundException.class)
-    public void shouldThrowNotFoundForNullCollectionOnWriteContent()
-            throws IOException, ZebedeeException, FileUploadException {
-
-        // Given
-        // A null collection
-        Collection collection = null;
-        String uri = "test.json";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        HttpServletRequest request = null;
-        InputStream inputStream = null;
-
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnDeleteContent()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null collection
-        Collection collection = null;
-        String uri = "test.json";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().deleteContent(collection, uri, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnMoveContent()
-            throws IOException, ZebedeeException {
-
-        // Given a null collection
-        Collection collection = null;
-        String uri = "test.json";
-        String toUri = "testnew.json";
-        Session session = zebedee.openSession(builder.administratorCredentials);
-
-        // When we attempt to call the method
-        zebedee.getCollections().moveContent(session, collection, uri, toUri);
-
-        // Then we should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForBlankUriOnMoveContent()
-            throws IOException, ZebedeeException {
-
-        // Given an empty URI.
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "";
-        String toUri = "testnew.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-
-        // When we attempt to call the method
-        zebedee.getCollections().moveContent(session, collection, uri, toUri);
-
-        // Then we should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForBlankToUriOnMoveContent()
-            throws IOException, ZebedeeException {
-
-        // Given an empty to URI.
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "test";
-        String toUri = "";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-
-        // When we attempt to call the method
-        zebedee.getCollections().moveContent(session, collection, uri, toUri);
-
-        // Then we should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnApprove()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-
-        // When
-        // We attempt to approve
-        zebedee.getCollections().approve(collection, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnListDirectory()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "test.json";
-
-        // When
-        // We attempt to list directory
-        zebedee.getCollections().listDirectory(collection, uri, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnComplete()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "test.json";
-
-        // When
-        // We attempt to complete
-        zebedee.getCollections().complete(collection, uri, session, recursive);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnDelete()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "test.json";
-
-        // When
-        // We attempt to delete
-        zebedee.getCollections().delete(collection, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnWriteContent()
-            throws IOException, ZebedeeException, FileUploadException {
-
-        // Given
-        // A null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "test.json";
-        HttpServletRequest request = null;
-        InputStream inputStream = null;
-
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnDeleteContent()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "test.json";
-
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().deleteContent(collection, uri, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnMoveContent()
-            throws IOException, ZebedeeException {
-
-        // Given a null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = "test.json";
-        String toUri = "testnew.json";
-
-        // When we attempt to call the method
-        zebedee.getCollections().moveContent(session, collection, uri, toUri);
-
-        // Then we should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestIfNoUriOnWriteContent()
-            throws IOException, ZebedeeException, FileUploadException {
-
-        // Given
-        // A null session
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = null;
-        HttpServletRequest request = null;
-        InputStream inputStream = null;
-
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().writeContent(collection, uri, session, request,
-                inputStream, recursive, CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestIfNoUriOnDeleteContent()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A null session
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        String uri = null;
-
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().deleteContent(collection, uri, session);
-
-        // Then
-        // We should get the expected exception, not a null pointer.
+    public void shouldThrowBadRequestForNullCollectionOnDelete() throws IOException, ZebedeeException {
+        collections.delete(null, sessionMock);
     }
 
     @Test(expected = NotFoundException.class)
-    public void shouldThrowNotFoundIfUriNotInProgressOnComplete()
-            throws IOException, ZebedeeException {
+    public void shouldThrowNotFoundForNullCollectionOnWriteContent() throws IOException, ZebedeeException,
+            FileUploadException {
+        HttpServletRequest request = null;
+        InputStream inputStream = null;
 
-        // Given
-        // A URI that is not in progress
-        String uri = "/this/content/is/not/in/progress.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, null, sessionMock))
+                .thenThrow(new NotFoundException(""));
 
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().complete(collection, uri, session, recursive);
-
-        // Then
-        // We should get the expected exception
+        collections.writeContent(null, "someURI", sessionMock, request,
+                inputStream, false, CollectionEventType.COLLECTION_PAGE_SAVED, false);
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestIfUriIsADirectoryOnComplete()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A URI that indicates a directory
-        String uri = "/this/is/a/directory";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri + "/file.json"));
-
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().complete(collection, uri, session, recursive);
-
-        // Then
-        // We should get the expected exception
+    public void shouldThrowBadRequestForNullCollectionOnDeleteContent() throws IOException, ZebedeeException {
+        collections.deleteContent(null, "someURI", sessionMock);
     }
 
-    @Test
-    public void shouldCompleteContent()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // A URI that indicates a file
-        String uri = "/this/is/valid/content.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri));
-
-        // When
-        // We attempt to call the method
-        zebedee.getCollections().complete(collection, uri, session, recursive);
-
-        // Then
-        assertTrue(collection.isComplete(uri));
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForNullCollectionOnMoveContent() throws IOException, ZebedeeException {
+        collections.moveContent(sessionMock, null, "to", "from");
     }
 
-    @Test(expected = ConflictException.class)
-    public void shouldNotApproveIfAUriIsInProgress()
-            throws IOException, ZebedeeException {
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForBlankUriOnMoveContent() throws IOException, ZebedeeException {
 
-        // Given
-        // A URI that is in progress
-        String uri = "/this/is/in/progress.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri));
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
 
-        // When
-        // We attempt to approve
-        zebedee.getCollections().approve(collection, session);
-
-        // Then
-        // We should get the expected exception
+        try {
+            collections.moveContent(sessionMock, collectionMock, "", "toURI");
+        } catch (BadRequestException e) {
+            verify(permissionsMock, times(1))
+                    .canEdit(TEST_EMAIL);
+            verify(sessionMock, times(1))
+                    .getEmail();
+            verifyZeroInteractions(collectionMock, publishedContentMock);
+            throw e;
+        }
     }
 
-    @Test(expected = ConflictException.class)
-    public void shouldNotApproveIfAUriIsComplete()
-            throws IOException, ZebedeeException {
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForBlankToUriOnMoveContent() throws IOException, ZebedeeException {
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
 
-        // Given
-        // A URI that is in progress
-        String uri = "/this/is/complete.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri));
-        assertTrue(collection.complete(builder.publisher1.email, uri, recursive));
-
-        // When
-        // We attempt to approve
-        zebedee.getCollections().approve(collection, session);
-
-        // Then
-        // We should get the expected exception
-    }
-
-    @Test
-    public void shouldApproveCollection()
-            throws IOException, ZebedeeException, ExecutionException, InterruptedException {
-
-        // Given
-        // A collection that's ready to approve
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-
-        // When
-        // We attempt to approve
-        Future<Boolean> future = zebedee.getCollections().approve(collection, session);
-        future.get();
-
-        // Then
-        // The collection should be approved (reloading to make sure it's saved)
-        assertEquals(ApprovalStatus.COMPLETE, collection.description.approvalStatus);
-        assertTrue(collection.description.events.hasEventForType(EventType.APPROVED));
-    }
-
-    @Test
-    public void shouldUnlockCollection()
-            throws IOException, ZebedeeException, ExecutionException, InterruptedException {
-
-        // Given
-        // A collection that's approved.
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        Future<Boolean> future = zebedee.getCollections().approve(collection, session);
-        future.get();
-
-        // When
-        // We attempt to unlock
-        zebedee.getCollections().unlock(collection, session);
-
-        // Then
-        // The collection should be unlocked (approved = false)
-        assertEquals(ApprovalStatus.NOT_STARTED, collection.description.approvalStatus);
-
-        // And an unlocked event should exist.
-        assertTrue(collection.description.events.hasEventForType(EventType.UNLOCKED));
-    }
-
-    @Test
-    public void shouldUnlockWithoutAddingEventIfAlreadyUnlocked()
-            throws Exception {
-
-        // Given
-        // A collection that's not been approved.
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-
-        // When
-        // We attempt to unlock
-        zebedee.getCollections().unlock(collection, session);
-
-        // Then
-        // The collection should be unlocked (ApprovalStatus = not started)
-        assertEquals(ApprovalStatus.NOT_STARTED, collection.description.approvalStatus);
+        try {
+            collections.moveContent(sessionMock, collectionMock, "fromURI", "");
+        } catch (BadRequestException e) {
+            verify(permissionsMock, times(1))
+                    .canEdit(TEST_EMAIL);
+            verify(sessionMock, times(1))
+                    .getEmail();
+            verifyZeroInteractions(collectionMock, publishedContentMock);
+            throw e;
+        }
     }
 
     @Test(expected = UnauthorizedException.class)
-    public void shouldThrowUnauthorizedIfNotLoggedInOnUnlock()
-            throws Exception {
+    public void shouldThrowUnauthorizedIfNotLoggedInOnApprove() throws IOException, ZebedeeException {
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(false);
+        try {
+            collections.approve(collectionMock, sessionMock);
+        } catch (UnauthorizedException e) {
+            verify(permissionsMock, times(1))
+                    .canEdit(TEST_EMAIL);
+            verify(sessionMock, times(1))
+                    .getEmail();
+            verifyZeroInteractions(collectionMock, publishedContentMock, zebedeeMock);
+            throw e;
+        }
+    }
 
-        // Given
-        // A null session
-        Session session = null;
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnListDirectory() throws IOException, UnauthorizedException,
+            BadRequestException,
+            ConflictException, NotFoundException {
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(false);
 
-        // When
-        // We attempt to unlock
-        zebedee.getCollections().unlock(collection, session);
+        try {
+            collections.listDirectory(collectionMock, "someURI", sessionMock);
+        } catch (UnauthorizedException e) {
+            verify(permissionsMock, times(1))
+                    .canView(sessionMock, collectionDescriptionMock);
+            verify(collectionMock, times(1))
+                    .getDescription();
+            verify(collectionMock, never())
+                    .find(any());
+            throw e;
+        }
+    }
 
-        // Then
-        // We should get the expected exception, not a null pointer.
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnComplete() throws IOException, ZebedeeException {
+        when(permissionsMock.canEdit(sessionMock))
+                .thenReturn(false);
+
+        try {
+            collections.complete(collectionMock, "someURI", sessionMock, false);
+        } catch (UnauthorizedException e) {
+            verify(permissionsMock, times(1)).canEdit(sessionMock);
+            verifyZeroInteractions(collectionMock);
+            throw e;
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnDelete() throws IOException, ZebedeeException {
+        when(permissionsMock.canEdit(sessionMock))
+                .thenReturn(false);
+        try {
+            collections.delete(collectionMock, sessionMock);
+        } catch (UnauthorizedException e) {
+            verify(permissionsMock, times(1)).canEdit(sessionMock);
+            verifyZeroInteractions(collectionMock);
+            throw e;
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnWriteContent() throws IOException, ZebedeeException,
+            FileUploadException {
+        InputStream inputStreamMock = mock(InputStream.class);
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenThrow(new UnauthorizedException(""));
+        try {
+            collections.writeContent(collectionMock, "someURI", sessionMock, requestMock,
+                    inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED, true);
+        } catch (UnauthorizedException e) {
+            verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
+            verifyZeroInteractions(collectionMock);
+            throw e;
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnDeleteContent() throws IOException, ZebedeeException {
+        try {
+            when(permissionsMock.canEdit(TEST_EMAIL))
+                    .thenReturn(false);
+            collections.deleteContent(collectionMock, "someURI", sessionMock);
+        } catch (UnauthorizedException e) {
+            verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+            verifyZeroInteractions(collectionMock);
+            throw e;
+        }
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnMoveContent() throws IOException, ZebedeeException {
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(false);
+        try {
+            collections.moveContent(sessionMock, collectionMock, "from", "to");
+        } catch (UnauthorizedException e) {
+            verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+            verifyZeroInteractions(collectionMock, publishedContentMock);
+            throw e;
+        }
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForNullCollectionOnUnlock()
-            throws IOException, ZebedeeException {
+    public void shouldThrowBadRequestIfNoUriOnWriteContent() throws IOException, ZebedeeException, FileUploadException {
+        InputStream inputStreamMock = mock(InputStream.class);
 
-        // Given
-        // A null collection
-        Collection collection = null;
-        Session session = zebedee.openSession(builder.administratorCredentials);
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
+        when(collectionDescriptionMock.getName())
+                .thenReturn("AGirlIsNoOne");
+        when(collectionDescriptionMock.getApprovalStatus())
+                .thenReturn(ApprovalStatus.IN_PROGRESS);
 
-        // When
-        // We attempt to approve
-        zebedee.getCollections().unlock(collection, session);
+        try {
+            collections.writeContent(collectionMock, null, sessionMock, requestMock,
+                    inputStreamMock, false, CollectionEventType.COLLECTION_PAGE_SAVED, true);
+        } catch (BadRequestException e) {
+            verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
+            verify(sessionMock, times(1)).getEmail();
+            verify(collectionMock, times(2)).getDescription();
+            verify(collectionDescriptionMock, times(1)).getName();
+            verifyZeroInteractions(permissionsMock);
+            verify(collectionMock, never()).find(anyString());
+            verify(collectionMock, never()).create(anyString(), anyString());
+            verify(collectionMock, never()).edit(anyString(), anyString(), eq(collectionWriterMock), anyBoolean());
+            throw e;
+        }
+    }
 
-        // Then
-        // We should get the expected exception, not a null pointer.
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestIfNoUriOnDeleteContent() throws IOException, ZebedeeException {
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        try {
+            collections.deleteContent(collectionMock, null, sessionMock);
+        } catch (BadRequestException e) {
+            verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+            verifyZeroInteractions(collectionMock, collectionDescriptionMock, zebedeeMock);
+            throw e;
+        }
     }
 
     @Test(expected = NotFoundException.class)
-    public void shouldGetNotFoundIfAttemptingToListNonexistentDirectory()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+    public void shouldThrowNotFoundIfUriNotInProgressOnComplete() throws IOException, ZebedeeException {
+        Content inProg = mock(Content.class);
 
-        // Given
-        // A directory that doesn't exist
-        String uri = "/this/directory/doesnt/exist";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-
-        // When
-        // We attempt to list the directory
-        zebedee.getCollections().listDirectory(collection, uri, session);
-
-        // Then
-        // We should get the expected exception
+        when(permissionsMock.canEdit(sessionMock))
+                .thenReturn(true);
+        when(collectionMock.getInProgress())
+                .thenReturn(inProg);
+        try {
+            collections.complete(collectionMock, "someURI", sessionMock, false);
+        } catch (NotFoundException e) {
+            verify(permissionsMock, times(1)).canEdit(sessionMock);
+            verify(collectionMock, times(1)).getInProgress();
+            verify(inProg, times(1)).get(anyString());
+            verify(collectionMock, never()).complete(anyString(), anyString(), anyBoolean());
+            verify(collectionMock, never()).save();
+            throw e;
+        }
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldGetBadRequestIfAttemptingToListDirectoryOnAFile()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+    public void shouldThrowBadRequestIfUriIsADirectoryOnComplete() throws IOException, ZebedeeException {
+        String uri = "someURI";
+        Path p = rootDir.newFolder("test").toPath();
+        Content inProg = mock(Content.class);
 
-        // Given
-        // A URI that points to a file
-        String uri = "/this/is/a/file.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri));
+        when(permissionsMock.canEdit(sessionMock))
+                .thenReturn(true);
+        when(collectionMock.getInProgress())
+                .thenReturn(inProg);
+        when(inProg.get(uri))
+                .thenReturn(p);
 
-        // When
-        // We attempt to list the file as a directory
-        zebedee.getCollections().listDirectory(collection, uri, session);
-
-        // Then
-        // We should get the expected exception
+        try {
+            collections.complete(collectionMock, uri, sessionMock, false);
+        } catch (NotFoundException e) {
+            verify(permissionsMock, times(1)).canEdit(sessionMock);
+            verify(collectionMock, times(1)).getInProgress();
+            verify(inProg, times(1)).get(uri);
+            verify(collectionMock, never()).complete(anyString(), anyString(), anyBoolean());
+            verify(collectionMock, never()).save();
+            throw e;
+        }
     }
 
     @Test
-    public void shouldListDirectory()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
+    public void shouldCompleteContent() throws IOException, ZebedeeException {
+        Path p = rootDir.newFile("data.json").toPath();
+        Content inProg = mock(Content.class);
 
-        // Given
-        // A URI that points to a valid directory
-        String uri = "/this/is/a/directory";
-        String file = "file.json";
-        String folder = "folder";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri + "/" + file));
-        assertTrue(collection.create(builder.publisher1.email, uri + "/" + folder + "/" + file));
+        when(permissionsMock.canEdit(sessionMock))
+                .thenReturn(true);
+        when(collectionMock.getInProgress())
+                .thenReturn(inProg);
+        when(inProg.get(p.toString()))
+                .thenReturn(p);
+        ;
+        when(collectionDescriptionMock.getName())
+                .thenReturn("AGirlIsNoOne");
+        when(collectionDescriptionMock.getId())
+                .thenReturn("1234567890");
+        when(collectionMock.complete(TEST_EMAIL, p.toString(), false))
+                .thenReturn(true);
 
-        // When
-        // We attempt to list the directory
-        DirectoryListing directoryListing = zebedee.getCollections().listDirectory(collection, uri, session);
+        collections.complete(collectionMock, p.toString(), sessionMock, false);
 
-        // Then
-        // We should get the file
-        assertEquals(1, directoryListing.files.size());
-        assertEquals(1, directoryListing.folders.size());
-    }
-
-    @Test
-    public void shouldListDirectoryOverlayed()
-            throws IOException, UnauthorizedException, BadRequestException,
-            ConflictException, NotFoundException {
-
-        // Given
-        // A URI that points to a valid directory
-        String uri = "/this/is/a/directory";
-        String file = "file.json";
-        String folder = "folder";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri + "/" + file));
-        assertTrue(collection.create(builder.publisher1.email, uri + "/" + folder + "/" + file));
-
-        builder.createPublishedFile(uri + "/" + file); // this file is in both published and the collection so there should be only one entry for it
-        builder.createPublishedFile(uri + "/publishedFile.json"); // This file is only in published and should be in the over layed listing.
-        builder.createPublishedFile(uri + "/publishedFolder/" + file); // This folder is only in published and should be in the overlayed listing
-
-        // When
-        // We attempt to list the directory
-        DirectoryListing directoryListing = zebedee.getCollections().listDirectoryOverlayed(collection, uri, session);
-
-        // Then
-        // We should get the file
-        assertEquals(2, directoryListing.files.size());
-        assertEquals(2, directoryListing.folders.size());
+        verify(permissionsMock, times(1)).canEdit(sessionMock);
+        verify(collectionMock, times(1)).getInProgress();
+        verify(inProg, times(1)).get(p.toString());
+        verify(collectionMock, times(1)).complete(TEST_EMAIL, p.toString(), false);
+        verify(collectionMock, times(1)).save();
     }
 
     @Test(expected = BadRequestException.class)
-    public void shouldNotDeleteCollectionIfNotEmpty()
-            throws IOException, ZebedeeException {
+    public void shouldThrowErrorIfCompleteUnsucessful() throws IOException, ZebedeeException {
+        Path p = rootDir.newFile("data.json").toPath();
+        Content inProg = mock(Content.class);
 
-        // Given
-        // A collection with some content in it
-        String uri = "/this/is/some/content.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri));
+        when(permissionsMock.canEdit(sessionMock))
+                .thenReturn(true);
+        when(collectionMock.getInProgress())
+                .thenReturn(inProg);
+        when(inProg.get(p.toString()))
+                .thenReturn(p);
+        when(collectionDescriptionMock.getName())
+                .thenReturn("AGirlIsNoOne");
+        when(collectionDescriptionMock.getId())
+                .thenReturn("1234567890");
+        when(collectionMock.complete(TEST_EMAIL, p.toString(), false))
+                .thenReturn(false);
 
-        // When
-        // We attempt to delete the collection
-        zebedee.getCollections().delete(collection, session);
-
-        // Then
-        // We should get the expected exception
-    }
-
-    @Test
-    public void shouldDeleteCollection()
-            throws IOException, ZebedeeException {
-
-        // Given
-        // An empty collection
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-
-        // When
-        // We attempt to delete the collection
-        zebedee.getCollections().delete(collection, session);
-
-        // Then
-        // The collection folder should have been deleted
-        assertFalse(Files.exists(builder.collections.get(0)));
-    }
-
-    @Test(expected = BadRequestException.class)
-    public void shouldThrowBadRequestForWritingADirectoryAsAFile()
-            throws IOException, ZebedeeException, FileUploadException {
-
-        // Given
-        // A directory instead of a file
-        String uri = "/this/is/a/directory/";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri + "file.json"));
-        HttpServletRequest request = null;
-        InputStream inputStream = null;
-
-        // When
-        // We attempt to write to the directory as if it were a file
-        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
-
-        // Then
-        // We should get the expected exception
+        try {
+            collections.complete(collectionMock, p.toString(), sessionMock, false);
+        } catch (BadRequestException e) {
+            verify(permissionsMock, times(1)).canEdit(sessionMock);
+            verify(collectionMock, times(1)).getInProgress();
+            verify(inProg, times(1)).get(p.toString());
+            verify(collectionMock, times(1)).complete(TEST_EMAIL, p.toString(), false);
+            verify(collectionMock, never()).save();
+            throw e;
+        }
     }
 
     @Test(expected = ConflictException.class)
-    public void shouldThrowConflictForCreatingFileBeingEditedElsewhere()
-            throws IOException, ZebedeeException, FileUploadException {
+    public void shouldNotApproveIfAUriIsInProgress() throws IOException, ZebedeeException {
+        List<String> inProgressURIS = new ArrayList();
+        inProgressURIS.add("data.json");
 
-        // Given
-        // A file in a different collection
-        String uri = "/this/is/a/file/in/another/collection.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        Collection otherCollection = new Collection(builder.collections.get(1), zebedee);
-        assertTrue(otherCollection.create(builder.publisher1.email, uri));
-        HttpServletRequest request = null;
-        InputStream inputStream = null;
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        when(collectionMock.inProgressUris())
+                .thenReturn(inProgressURIS);
+        when(collectionMock.completeUris())
+                .thenReturn(new ArrayList<String>());
 
-        // When
-        // We attempt to write to the directory as if it were a file
-        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
-
-        // Then
-        // We should get the expected exception
+        try {
+            collections.approve(collectionMock, sessionMock);
+        } catch (ConflictException e) {
+            verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            verify(collectionMock, times(1)).inProgressUris();
+            verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
+            verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
+            throw e;
+        }
     }
 
     @Test(expected = ConflictException.class)
-    public void shouldThrowConflictForEditingFileBeingEditedElsewhere()
-            throws IOException, ZebedeeException, FileUploadException {
+    public void shouldNotApproveIfAUriIsComplete() throws IOException, ZebedeeException {
+        List<String> completeURIS = new ArrayList();
+        completeURIS.add("data.json");
 
-        // Given
-        // A file being edited in a different collection
-        String uri = "/this/is/a/file/in/another/collection.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        Collection otherCollection = new Collection(builder.collections.get(1), zebedee);
-        Path path = zebedee.getPublished().toPath(uri);
-        Files.createDirectories(path.getParent());
-        Files.createFile(path);
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        when(collectionMock.inProgressUris())
+                .thenReturn(new ArrayList<String>());
+        when(collectionMock.completeUris())
+                .thenReturn(completeURIS);
 
-        FakeCollectionWriter collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), otherCollection.description.id);
-        assertTrue(otherCollection.edit(builder.publisher1.email, uri, collectionWriter, recursive));
-
-        HttpServletRequest request = null;
-        InputStream inputStream = null;
-
-        // When
-        // We attempt to write to the directory as if it were a file
-        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
-
-        // Then
-        // We should get the expected exception
+        try {
+            collections.approve(collectionMock, sessionMock);
+        } catch (ConflictException e) {
+            verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+            verify(sessionMock, times(1)).getEmail();
+            verify(collectionMock, times(1)).inProgressUris();
+            verify(collectionMock, times(1)).completeUris();
+            verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
+            verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
+            throw e;
+        }
     }
 
     @Test
-    public void shouldWriteContent()
-            throws IOException, ZebedeeException, FileUploadException {
+    public void shouldApproveCollection() throws IOException, ZebedeeException, ExecutionException,
+            InterruptedException {
+        Function<Path, ContentReader> contentReaderFunction = (p) -> contentReaderMock;
+        Function<ApproveTask, Future<Boolean>> addTaskToQueue = (t) -> futureMock;
 
-        // Given
-        // A new file
-        String uri = "/this/a/file.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        InputStream inputStream = mock(InputStream.class);
-        when(inputStream.read(any(byte[].class))).thenReturn(-1);
+        ReflectionTestUtils.setField(collections, "contentReaderFactory", contentReaderFunction);
+        ReflectionTestUtils.setField(collections, "addTaskToQueue", addTaskToQueue);
 
-        // When
-        // We attempt to write to the directory as if it were a file
-        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        when(collectionMock.inProgressUris())
+                .thenReturn(new ArrayList<String>());
+        when(collectionMock.completeUris())
+                .thenReturn(new ArrayList<String>());
+        when(collectionReaderWriterFactoryMock.getReader(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionReaderMock);
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
 
-        // Then
-        // We should see the file
-        Path path = collection.getInProgressPath(uri);
-        assertNotNull(path);
-        assertTrue(Files.exists(path));
+        assertThat(futureMock, equalTo(collections.approve(collectionMock, sessionMock)));
+
+        verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+        verify(collectionMock, times(1)).inProgressUris();
+        verify(collectionMock, times(1)).completeUris();
+        verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
+        verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
+    }
+
+    @Test
+    public void shouldUnlockCollection() throws IOException, ZebedeeException, ExecutionException, InterruptedException {
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        when(collectionDescriptionMock.getApprovalStatus())
+                .thenReturn(ApprovalStatus.COMPLETE);
+        when(collectionMock.save())
+                .thenReturn(true);
+
+        boolean result = collections.unlock(collectionMock, sessionMock);
+
+        assertThat(result, is(true));
+        verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+        verify(collectionMock, times(3)).getDescription();
+        verify(collectionDescriptionMock, times(1)).getApprovalStatus();
+        verify(collectionDescriptionMock, times(1)).setApprovalStatus(ApprovalStatus.NOT_STARTED);
+        verify(collectionDescriptionMock, times(1)).addEvent(any(Event.class));
+        verify(publishNotification, times(1)).sendNotification(EventType.UNLOCKED);
+        verify(collectionMock, times(1)).save();
+    }
+
+    @Test
+    public void shouldUnlockWithoutAddingEventIfAlreadyUnlocked() throws Exception {
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        when(collectionDescriptionMock.getApprovalStatus())
+                .thenReturn(ApprovalStatus.IN_PROGRESS);
+        when(collectionMock.save())
+                .thenReturn(true);
+
+        boolean result = collections.unlock(collectionMock, sessionMock);
+
+        assertThat(result, is(true));
+        verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+        verify(collectionMock, times(1)).getDescription();
+        verify(collectionDescriptionMock, times(1)).getApprovalStatus();
+        verify(collectionDescriptionMock, never()).setApprovalStatus(any(ApprovalStatus.class));
+        verify(collectionDescriptionMock, never()).addEvent(any(Event.class));
+        verify(publishNotification, never()).sendNotification(any(EventType.class));
+        verify(collectionMock, never()).save();
+    }
+
+    @Test(expected = UnauthorizedException.class)
+    public void shouldThrowUnauthorizedIfNotLoggedInOnUnlock() throws Exception {
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(false);
+        try {
+            collections.unlock(collectionMock, sessionMock);
+        } catch (UnauthorizedException e) {
+            verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+            verify(collectionMock, never()).getDescription();
+            verify(collectionDescriptionMock, never()).getApprovalStatus();
+            verify(collectionDescriptionMock, never()).setApprovalStatus(any(ApprovalStatus.class));
+            verify(collectionDescriptionMock, never()).addEvent(any(Event.class));
+            verify(publishNotification, never()).sendNotification(any(EventType.class));
+            verify(collectionMock, never()).save();
+            throw e;
+        }
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForNullCollectionOnUnlock() throws IOException, ZebedeeException {
+        try {
+            collections.unlock(null, sessionMock);
+        } catch (UnauthorizedException e) {
+            verify(permissionsMock, never()).canEdit(TEST_EMAIL);
+            verify(collectionMock, never()).getDescription();
+            verify(collectionDescriptionMock, never()).getApprovalStatus();
+            verify(collectionDescriptionMock, never()).setApprovalStatus(any(ApprovalStatus.class));
+            verify(collectionDescriptionMock, never()).addEvent(any(Event.class));
+            verify(publishNotification, never()).sendNotification(any(EventType.class));
+            verify(collectionMock, never()).save();
+            throw e;
+        }
     }
 
     @Test(expected = NotFoundException.class)
-    public void shouldThrowNotFoundForDeletingNonexistentFile()
-            throws IOException, ZebedeeException {
+    public void shouldGetNotFoundIfAttemptingToListNonexistentDirectory() throws IOException, UnauthorizedException,
+            BadRequestException, ConflictException, NotFoundException {
+        String uri = "someURI";
+        when(permissionsMock.canView(sessionMock, collectionDescriptionMock))
+                .thenReturn(true);
+        when(collectionMock.find(uri))
+                .thenReturn(null);
+        try {
+            collections.listDirectory(collectionMock, uri, sessionMock);
+        } catch (NotFoundException e) {
+            verify(permissionsMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+            verify(collectionMock, times(1)).find(uri);
+            throw e;
+        }
+    }
 
-        // Given
-        // A file that doesn't exist in the collection
-        String uri = "/this/file/does/not/exist.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-
-        // When
-        // We attempt to delete the nonexistent file
-        zebedee.getCollections().deleteContent(collection, uri, session);
-
-        // Then
-        // We should get the expected exception
+    @Test(expected = BadRequestException.class)
+    public void shouldGetBadRequestIfAttemptingToListDirectoryOnAFile() throws IOException, UnauthorizedException,
+            BadRequestException, ConflictException, NotFoundException {
+        Path uri = rootDir.newFile("data.json").toPath();
+        when(permissionsMock.canView(sessionMock, collectionDescriptionMock))
+                .thenReturn(true);
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(uri);
+        try {
+            collections.listDirectory(collectionMock, uri.toString(), sessionMock);
+        } catch (BadRequestException e) {
+            verify(permissionsMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+            verify(collectionMock, times(1)).find(uri.toString());
+            throw e;
+        }
     }
 
     @Test
-    public void shouldDeleteFile()
-            throws IOException, ZebedeeException {
+    public void shouldListDirectory() throws IOException, UnauthorizedException, BadRequestException, ConflictException,
+            NotFoundException {
+        Path file1 = rootDir.newFile("data.json").toPath();
+        Path file2 = rootDir.newFile("chart.png").toPath();
 
-        // Given
-        // A file that doesn't exist in the collection
-        String uri = "/this/is/a/file.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        collection.create(builder.publisher1.email, uri);
+        DirectoryListing expected = new DirectoryListing();
+        expected.getFiles().put(file1.getFileName().toString(), file1.toString());
+        expected.getFiles().put(file2.getFileName().toString(), file2.toString());
+        expected.getFolders().put(collectionsPath.getFileName().toString(), collectionsPath.toString());
 
-        // When
-        // We attempt to delete the nonexistent file
-        boolean result = zebedee.getCollections().deleteContent(collection, uri, session);
+        when(permissionsMock.canView(sessionMock, collectionDescriptionMock))
+                .thenReturn(true);
+        when(collectionMock.find(rootDir.getRoot().toString()))
+                .thenReturn(rootDir.getRoot().toPath());
 
-        // Then
-        // The file should be gone
-        assertTrue(result);
-        assertNull(collection.find(uri));
+        DirectoryListing result = collections.listDirectory(collectionMock, rootDir.getRoot().toString(), sessionMock);
+
+        assertThat(result, equalTo(expected));
+        verify(permissionsMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+        verify(collectionMock, times(1)).find(rootDir.getRoot().toString());
     }
 
     @Test
-    public void shouldDeleteFolderRecursively()
-            throws IOException, ZebedeeException {
+    public void shouldListDirectoryOverlayed() throws IOException, ZebedeeException {
+        Path uri = rootDir.getRoot().toPath().resolve("economy");
+        uri.toFile().mkdir();
 
-        // Given
-        // A file that doesn't exist in the collection
-        String folderUri = "/this/is/a/folder/";
-        String fileUri = folderUri + "file.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        collection.create(builder.publisher1.email, fileUri);
+        File f1 = uri.resolve("data.json").toFile();
+        File f2 = uri.resolve("data1.json").toFile();
+        f1.createNewFile();
+        f2.createNewFile();
 
-        // When
-        // We attempt to delete the nonexistent file
-        boolean result = zebedee.getCollections().deleteContent(collection, folderUri, session);
+        DirectoryListing expected = new DirectoryListing();
+        expected.getFiles().put(f1.getName(), f1.toPath().toString());
+        expected.getFiles().put(f2.getName(), f2.toPath().toString());
 
-        // Then the file should be gone
-        assertTrue(result);
-        assertNull(collection.find(fileUri));
+        when(permissionsMock.canView(sessionMock, collectionDescriptionMock))
+                .thenReturn(true);
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(uri);
+        when(publishedContentMock.get(uri.toString()))
+                .thenReturn(uri);
+
+        DirectoryListing result = collections.listDirectoryOverlayed(collectionMock, uri.toString(), sessionMock);
+
+        assertThat(result, equalTo(expected));
+        verify(permissionsMock, times(1)).canView(sessionMock, collectionDescriptionMock);
+        verify(collectionMock, times(1)).find(uri.toString());
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldNotDeleteCollectionIfNotEmpty() throws IOException, ZebedeeException {
+        when(permissionsMock.canEdit(sessionMock))
+                .thenReturn(true);
+        when(collectionMock.isEmpty())
+                .thenReturn(false);
+        try {
+            collections.delete(collectionMock, sessionMock);
+        } catch (BadRequestException e) {
+            verify(permissionsMock, times(1)).canEdit(sessionMock);
+            verify(collectionMock, times(1)).isEmpty();
+            verify(collectionMock, never()).delete();
+            throw e;
+        }
+    }
+
+    @Test
+    public void shouldDeleteCollection() throws IOException, ZebedeeException {
+        when(permissionsMock.canEdit(sessionMock))
+                .thenReturn(true);
+        when(collectionMock.isEmpty())
+                .thenReturn(true);
+
+        collections.delete(collectionMock, sessionMock);
+
+        verify(permissionsMock, times(1)).canEdit(sessionMock);
+        verify(collectionMock, times(1)).isEmpty();
+        verify(collectionMock, times(1)).delete();
+    }
+
+    @Test(expected = BadRequestException.class)
+    public void shouldThrowBadRequestForWritingADirectoryAsAFile() throws IOException, ZebedeeException,
+            FileUploadException {
+        Path uri = rootDir.newFolder("test").toPath();
+
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
+        when(collectionDescriptionMock.getApprovalStatus())
+                .thenReturn(ApprovalStatus.IN_PROGRESS);
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(uri);
+        try {
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
+                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+        } catch (BadRequestException e) {
+            verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
+            verify(collectionDescriptionMock, times(1)).getApprovalStatus();
+            verify(collectionMock, times(1)).find(uri.toString());
+            verify(collectionMock, never()).save();
+            verify(collectionMock, never()).edit(anyString(), anyString(), any(), anyBoolean());
+            verify(collectionMock, never()).create(anyString(), anyString());
+            verify(collectionMock, never()).getInProgressPath(anyString());
+            verify(collectionWriterMock, never()).getInProgress();
+            throw e;
+        }
+    }
+
+
+    @Test(expected = ConflictException.class)
+    public void shouldThrowConflictForCreatingFileBeingEditedElsewhere() throws IOException, ZebedeeException,
+            FileUploadException {
+        Path uri = rootDir.newFile("data.json").toPath();
+
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
+        when(collectionDescriptionMock.getApprovalStatus())
+                .thenReturn(ApprovalStatus.IN_PROGRESS);
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(null);
+        when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
+                .thenReturn(false);
+        try {
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
+                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+        } catch (BadRequestException e) {
+            verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
+            verify(collectionDescriptionMock, times(1)).getApprovalStatus();
+            verify(collectionMock, times(1)).find(uri.toString());
+            verify(collectionMock, times(1)).edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false);
+            verify(collectionMock, never()).save();
+            verify(collectionMock, never()).create(anyString(), anyString());
+            verify(collectionMock, never()).edit(anyString(), anyString(), any(), anyBoolean());
+            verify(collectionMock, never()).getInProgressPath(anyString());
+            verify(collectionWriterMock, never()).getInProgress();
+            throw e;
+        }
+    }
+
+    @Test(expected = ConflictException.class)
+    public void shouldThrowConflictForEditingFileBeingEditedElsewhere() throws IOException, ZebedeeException,
+            FileUploadException {
+        Path uri = rootDir.newFile("data.json").toPath();
+
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
+        when(collectionDescriptionMock.getApprovalStatus())
+                .thenReturn(ApprovalStatus.IN_PROGRESS);
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(uri);
+        when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
+                .thenReturn(false);
+        try {
+            collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, mock(InputStream.class), false,
+                    CollectionEventType.COLLECTION_PAGE_SAVED, false);
+        } catch (BadRequestException e) {
+            verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
+            verify(collectionDescriptionMock, times(1)).getApprovalStatus();
+            verify(collectionMock, times(1)).find(uri.toString());
+            verify(collectionMock, times(1)).edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false);
+            verify(collectionMock, never()).save();
+            verify(collectionMock, never()).create(anyString(), anyString());
+            verify(collectionMock, never()).edit(anyString(), anyString(), any(), anyBoolean());
+            verify(collectionMock, never()).getInProgressPath(anyString());
+            verify(collectionWriterMock, never()).getInProgress();
+            throw e;
+        }
+    }
+
+    @Test
+    public void shouldWriteContent() throws IOException, ZebedeeException, FileUploadException {
+        Path uri = rootDir.newFile("data.json").toPath();
+        InputStream in = mock(InputStream.class);
+
+        when(collectionReaderWriterFactoryMock.getWriter(zebedeeMock, collectionMock, sessionMock))
+                .thenReturn(collectionWriterMock);
+        when(collectionDescriptionMock.getApprovalStatus())
+                .thenReturn(ApprovalStatus.IN_PROGRESS);
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(uri);
+        when(collectionMock.edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false))
+                .thenReturn(true);
+        when(collectionMock.getInProgressPath(uri.toString()))
+                .thenReturn(uri);
+        when(collectionWriterMock.getInProgress())
+                .thenReturn(contentWriterMock);
+
+        collections.writeContent(collectionMock, uri.toString(), sessionMock, requestMock, in, false,
+                CollectionEventType.COLLECTION_PAGE_SAVED, false);
+
+        verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
+        verify(collectionDescriptionMock, times(1)).getApprovalStatus();
+        verify(collectionMock, times(1)).find(uri.toString());
+        verify(collectionMock, times(1)).edit(TEST_EMAIL, uri.toString(), collectionWriterMock, false);
+        verify(collectionMock, times(1)).save();
+        verify(collectionMock, never()).create(anyString(), anyString());
+        verify(collectionMock, times(1)).getInProgressPath(uri.toString());
+        verify(collectionWriterMock, times(1)).getInProgress();
+        verify(contentWriterMock, times(1)).write(in, uri.toString());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowNotFoundForDeletingNonexistentFile() throws IOException, ZebedeeException {
+        String uri = "someURI";
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        try {
+            collections.deleteContent(collectionMock, uri, sessionMock);
+        } catch (NotFoundException e) {
+            verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+            verify(collectionMock, times(1)).find(uri);
+            verify(collectionMock, never()).isInCollection(anyString());
+            verify(collectionMock, never()).getDescription();
+            verify(collectionMock, never()).deleteDataVisContent(any(), any());
+            verify(collectionMock, never()).deleteContentDirectory(anyString(), anyString());
+            verify(collectionMock, never()).deleteFile(anyString());
+            verify(collectionMock, never()).save();
+            throw e;
+        }
+    }
+
+    @Test
+    public void shouldDeleteFile() throws IOException, ZebedeeException {
+        Path uri = rootDir.newFile("data.json").toPath();
+
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(uri);
+        when(collectionMock.isInCollection(uri.toString()))
+                .thenReturn(true);
+        when(collectionDescriptionMock.getCollectionOwner())
+                .thenReturn(CollectionOwner.PUBLISHING_SUPPORT);
+        when(collectionMock.deleteFile(uri.toString()))
+                .thenReturn(true);
+
+
+        assertThat(collections.deleteContent(collectionMock, uri.toString(), sessionMock), is(true));
+        verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+        verify(collectionMock, times(1)).find(uri.toString());
+        verify(collectionMock, times(1)).isInCollection(uri.toString());
+        verify(collectionMock, times(3)).getDescription();
+        verify(collectionMock, never()).deleteDataVisContent(any(), any());
+        verify(collectionMock, never()).deleteContentDirectory(anyString(), anyString());
+        verify(collectionMock, times(1)).deleteFile(uri.toString());
+        verify(collectionMock, times(1)).save();
+    }
+
+    @Test
+    public void shouldDeleteFolderRecursively() throws IOException, ZebedeeException {
+        Path uri = collectionsPath.resolve("inprogress");
+        uri.toFile().mkdir();
+        uri = uri.resolve("test");
+        uri.toFile().mkdir();
+
+        when(permissionsMock.canEdit(TEST_EMAIL))
+                .thenReturn(true);
+        when(collectionMock.find(uri.toString()))
+                .thenReturn(uri);
+        when(collectionMock.isInCollection(uri.toString()))
+                .thenReturn(true);
+        when(collectionDescriptionMock.getCollectionOwner())
+                .thenReturn(CollectionOwner.PUBLISHING_SUPPORT);
+        when(collectionMock.deleteContentDirectory(TEST_EMAIL, uri.toString()))
+                .thenReturn(true);
+
+        assertThat(collections.deleteContent(collectionMock, uri.toString(), sessionMock), is(true));
+        assertThat(uri.toFile().exists(), is(false));
+        assertThat(uri.getParent().toFile().exists(), is(true));
+        verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
+        verify(collectionMock, times(1)).find(uri.toString());
+        verify(collectionMock, times(1)).isInCollection(uri.toString());
+        verify(collectionMock, times(3)).getDescription();
+        verify(collectionMock, never()).deleteDataVisContent(any(), any());
+        verify(collectionMock, times(1)).deleteContentDirectory(TEST_EMAIL, uri.toString());
+        verify(collectionMock, never()).deleteFile(uri.toString());
+        verify(collectionMock, times(1)).save();
     }
 
     @Test(expected = ConflictException.class)
     public void shouldThrowConflictExceptionOnCreateContentIfAlreadyPublished() throws Exception {
-        String uri = "/this/is/a/directory/file.json";
-
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-
-
-        builder.createPublishedFile(uri);
-        zebedee.getCollections().createContent(collection, uri, null, null, null, null, validateJson);
+        String uri = "someURI";
+        when(publishedContentMock.exists(uri))
+                .thenReturn(true);
+        try {
+            collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
+        } catch (ConflictException e) {
+            verify(publishedContentMock, times(1)).exists(uri);
+            verifyZeroInteractions(zebedeeMock, collectionReaderWriterFactoryMock, collectionDescriptionMock,
+                    collectionWriterMock, collectionMock);
+            throw e;
+        }
     }
 
     @Test(expected = ConflictException.class)
     public void shouldThrowConflictExceptionOnCreateContentIfAlreadyInCollection() throws Exception {
-        String uri = "/this/is/a/directory/file.json";
+        String uri = "someURI";
+        Collection blocker = mock(Collection.class);
 
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        Collection blockingCollection = new Collection(builder.collections.get(1), zebedee);
-
-        builder.createInProgressFile(uri);
-        Session session = new Session();
-        session.email = "makingdata@greatagain.com";
-        zebedee.getCollections().createContent(collection, uri, session, null, null, null, validateJson);
-
-        assertThat(collection.inProgressUris().contains(uri), is(false));
-        assertThat(blockingCollection.inProgressUris().contains(uri), is(true));
-
-        assertThat(collection.reviewedUris().contains(uri), is(false));
-        assertThat(collection.completeUris().contains(uri), is(false));
-    }
-
-    @Test
-    public void shouldEditCollectionConcurrently() throws Exception {
-
-        // Given
-        // A collection
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        CollectionDescription collectionDescription = new CollectionDescription("collection");
-        collectionDescription.type = CollectionType.manual;
-        collectionDescription.publishDate = new Date();
-        Collection collection = Collection.create(collectionDescription, zebedee, session);
-
-        // When the collection is updated concurrently.
-        ExecutorService executor = Executors.newCachedThreadPool();
-        List<UpdateCollection> runnables = new ArrayList<>();
-
-        long startTime = System.currentTimeMillis();
-
-
-        for (int i = 0; i < 20; ++i) {
-            runnables.add(new UpdateCollection(collection));
-        }
-
-        for (UpdateCollection runnable : runnables) {
-            executor.execute(runnable);
-        }
-
-        executor.shutdown();
-        while (!executor.isTerminated()) {
-        }
-
-
-        long endTime = System.currentTimeMillis();
-        long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
-        System.out.println("duration: " + duration);
-
-        // Then the collection file should still be readable.
-        for (UpdateCollection runnable : runnables) {
-            assertFalse(runnable.failed);
-        }
-    }
-
-    @Test
-    public void shouldWriteEncryptedContent()
-            throws IOException, ZebedeeException, FileUploadException {
-
-        // Given
-        // A new file
-        String uri = "/this/a/file.json";
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-
-        Collection collection = new Collection(builder.collections.get(0), zebedee);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        InputStream inputStream = mock(InputStream.class);
-        when(inputStream.read(any(byte[].class))).thenReturn(-1);
-
-        // When
-        // We attempt to write to the directory as if it were a file
-        zebedee.getCollections().writeContent(collection, uri, session, request, inputStream, recursive,
-                CollectionEventType.COLLECTION_PAGE_SAVED, validateJson);
-
-        // Then
-        // We should see the file
-        Path path = collection.getInProgressPath(uri);
-        assertNotNull(path);
-        assertTrue(Files.exists(path));
-    }
-
-    private CollectionDescription collectionDescription(String name, CollectionType type) {
-        CollectionDescription collectionDescription = new CollectionDescription(name);
-        collectionDescription.type = type;
-        return collectionDescription;
-    }
-
-    public class UpdateCollection implements Runnable {
-        public boolean failed = false;
-        private Collection collection;
-
-        public UpdateCollection(Collection collection) throws IOException {
-            this.collection = collection;
-        }
-
-        @Override
-        public void run() {
-            try {
-                // When
-                // We attempt to get the session
-
-                Collection collectionToUpdate = collection.zebedee.getCollections().list().getCollection(collection.description.id);
-                collectionToUpdate.addEvent("/", new Event(new Date(), EventType.EDITED, "fred@testing.com"));
-                collectionToUpdate.save();
-                Collection updatedCollection = collection.zebedee.getCollections().list().getCollection(collection.description.id);
-
-                // Then
-                // The expected session should be returned
-                if (updatedCollection == null || !StringUtils.equals(updatedCollection.description.id, this.collection.description.id))
-                    failed = true;
-
-            } catch (Exception e) {
-                failed = true;
-                e.printStackTrace();
-                System.out.println();
-            }
+        when(publishedContentMock.exists(uri))
+                .thenReturn(false);
+        when(zebedeeMock.checkForCollectionBlockingChange(collectionMock, uri))
+                .thenReturn(Optional.of(blocker));
+        when(blocker.getDescription())
+                .thenReturn(collectionDescriptionMock);
+        when(collectionDescriptionMock.getName())
+                .thenReturn("Bob")
+                .thenReturn("Steve");
+        try {
+            collections.createContent(collectionMock, uri, sessionMock, null, null, null, false);
+        } catch (ConflictException e) {
+            verify(publishedContentMock, times(1)).exists(uri);
+            verify(zebedeeMock, times(1)).checkForCollectionBlockingChange(collectionMock, uri);
+            verify(collectionMock, times(1)).getDescription();
+            verify(blocker, times(1)).getDescription();
+            verify(collectionDescriptionMock, times(2)).getName();
+            verifyNoMoreInteractions(zebedeeMock);
+            verifyZeroInteractions(collectionReaderWriterFactoryMock, collectionWriterMock, collectionMock);
+            throw e;
         }
     }
 }

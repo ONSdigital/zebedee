@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.json.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
+import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;

@@ -92,14 +92,14 @@ public class Zebedee {
         this.applicationKeysPath = cgf.getApplicationKeysPath();
         this.redirectPath = cgf.getRedirectPath();
 
+        this.permissions = cgf.getPermissions(this);
         this.published = cgf.getPublished();
         this.dataIndex = cgf.getDataIndex();
-        this.collections = cgf.getCollections(this);
+        this.collections = cgf.getCollections(permissions, this.published);
         this.publishedCollections = cgf.getPublishCollections();
         this.keyringCache = cgf.getKeyringCache(this);
         this.applicationKeys = cgf.getApplicationKeys();
         this.sessions = cgf.getSessions();
-        this.permissions = cgf.getPermissions(this);
         this.teams = cgf.getTeams(this.permissions);
         this.usersService = cgf.getUsersService(collections, permissions, applicationKeys, keyringCache);
         this.verificationAgent = cgf.getVerificationAgent(isVerificationEnabled(), this);
@@ -145,14 +145,14 @@ public class Zebedee {
             this.published.redirect = new RedirectTablePartialMatch(this.published, redirectPath);
         }
 
-        this.collections = new Collections(collectionsPath, this);
+        this.permissions = new Permissions(permissionsPath, this);
+        this.collections = new Collections(collectionsPath, permissions, published);
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
-        //this.users = new Users(userPath, this);
 
         this.keyringCache = new KeyringCache(this);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.sessions = new Sessions(sessionsPath);
-        this.permissions = new Permissions(permissionsPath, this);
+
         this.teams = new Teams(teamsPath, this.permissions);
 
         this.usersService = UsersServiceImpl.getInstance(usersPath, getCollections(), getPermissions(),

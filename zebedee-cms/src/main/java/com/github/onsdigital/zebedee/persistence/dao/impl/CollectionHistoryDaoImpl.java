@@ -69,8 +69,8 @@ public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
     @Override
     public Future saveCollectionHistoryEvent(Collection collection, com.github.onsdigital.zebedee.json.Session session,
                                              CollectionEventType collectionEventType, CollectionEventMetaData... metaValues) {
-        return this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection.getDescription().id,
-                collection.getDescription().name, session, collectionEventType, metaValues));
+        return this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection.getDescription().getId(),
+                collection.getDescription().getName(), session, collectionEventType, metaValues));
     }
 
     @Override

@@ -252,7 +252,7 @@ public class Publisher {
 
         if (success) {
             Date publishedDate = new Date();
-            collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
+            collection.description.addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
             collection.description.publishComplete = true;
             publishComplete = true;
         }

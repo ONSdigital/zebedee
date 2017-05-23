@@ -137,8 +137,8 @@ public class ZebedeeConfiguration {
         return new DataIndex(new FileSystemContentReader(publishedContentPath));
     }
 
-    public Collections getCollections(Zebedee z) {
-        return new Collections(collectionsPath, z);
+    public Collections getCollections(Permissions permissions, Content published) {
+        return new Collections(collectionsPath, permissions, published);
     }
 
     public PublishedCollections getPublishCollections() {

@@ -183,7 +183,7 @@ public class ApproveTask implements Callable<Boolean> {
     public void approveCollection() throws IOException {
         // set the approved state on the collection
         collection.description.approvalStatus = ApprovalStatus.COMPLETE;
-        collection.description.AddEvent(new Event(new Date(), EventType.APPROVED, session.email));
+        collection.description.addEvent(new Event(new Date(), EventType.APPROVED, session.email));
         collection.save();
     }
 

@@ -3,8 +3,8 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
@@ -33,8 +33,7 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.service.UsersService;
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -82,14 +81,22 @@ public class Collection {
     public static final String IN_PROGRESS = "inprogress";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
+    private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
+
     public final CollectionDescription description;
     public final Path path;
     public final Content reviewed;
     public final Content complete;
     public final Content inProgress;
+
     public final Zebedee zebedee;
 
     private final Path collectionJsonPath;
+
+    @VisibleForTesting
+    public static void setKeyManagerUtil(KeyManangerUtil manager) {
+        keyManagerUtil = manager;
+    }
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -162,7 +169,7 @@ public class Collection {
 
         CreateCollectionFolders(filename, rootCollectionsPath);
 
-        collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, session.email));
+        collectionDescription.addEvent(new Event(new Date(), EventType.CREATED, session.email));
         // Create the description:
         Path collectionDescriptionPath = rootCollectionsPath.resolve(filename
                 + ".json");
@@ -183,10 +190,11 @@ public class Collection {
 
         // Encryption
         // assign a key for the collection to the session user
-        KeyManager.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.email),
+        keyManagerUtil.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.email),
                 collection.description.id, Keys.newSecretKey());
+
         // get the session user to distribute the key to all
-        KeyManager.distributeCollectionKey(zebedee, session, collection, true);
+        keyManagerUtil.distributeCollectionKey(zebedee, session, collection, true);
 
         if (release != null) {
             collection.associateWithRelease(session.email, release, new ZebedeeCollectionWriter(zebedee, collection, session));

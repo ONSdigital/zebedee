@@ -58,13 +58,15 @@ public class CollectionHistoryEvent {
 
     public CollectionHistoryEvent(Collection collection, Session session, CollectionEventType collectionEventType,
                                   String uri, CollectionEventMetaData... metaValues) {
-        this(collection.description.id, collection.description.name, session, collectionEventType, metaValues);
+        this(collection.getDescription().getId(), collection.getDescription().getName(), session, collectionEventType,
+                metaValues);
         this.uri = uri;
     }
 
     public CollectionHistoryEvent(Collection collection, Session session, CollectionEventType collectionEventType,
                                   CollectionEventMetaData... metaValues) {
-        this(collection.description.id, collection.description.name, session, collectionEventType, metaValues);
+        this(collection.getDescription().getId(), collection.getDescription().getName(), session, collectionEventType,
+                metaValues);
     }
 
     public CollectionHistoryEvent(String collectionId, String collectionName, Session session,
@@ -73,7 +75,7 @@ public class CollectionHistoryEvent {
         collectionId(collectionId);
         collectionName(collectionName);
         eventType(collectionEventType);
-        user(session.email);
+        user(session.getEmail());
 
         if (metaValues != null) {
             for (CollectionEventMetaData collectionEventMetaData : metaValues) {

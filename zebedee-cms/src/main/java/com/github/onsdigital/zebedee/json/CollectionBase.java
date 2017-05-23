@@ -32,4 +32,7 @@ public class CollectionBase {
         return this.id;
     }
 
+    public String getName() {
+        return name;
+    }
 }

@@ -47,6 +47,23 @@ public class Session {
         return lastAccess;
     }
 
+    public void setId(String id) {
+
+        this.id = id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setStart(Date start) {
+        this.start = start;
+    }
+
+    public void setLastAccess(Date lastAccess) {
+        this.lastAccess = lastAccess;
+    }
+
     @Override
     public String toString() {
         return email + " (" + StringUtils.abbreviate(id, 8) + ")";

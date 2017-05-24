@@ -64,7 +64,7 @@ public class ZebedeeConfiguration {
         this.permissionsPath = verifyDir(zebedeeRootPath, PERMISSIONS);
         this.teamsPath = verifyDir(zebedeeRootPath, TEAMS);
         this.applicationKeysPath = verifyDir(zebedeeRootPath, APPLICATION_KEYS);
-        this.redirectPath = verifyDir(publishedContentPath, Content.REDIRECT);
+        this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
     }
 
     public void enableVerificationAgent(boolean enabled) {

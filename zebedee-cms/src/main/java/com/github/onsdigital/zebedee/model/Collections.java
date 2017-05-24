@@ -23,6 +23,7 @@ import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -82,6 +83,7 @@ public class Collections {
     private Function<ApproveTask, Future<Boolean>> addTaskToQueue = (task) -> ApprovalQueue.add(task);
     private BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
     private Function<Path, ContentReader> contentReaderFactory = (p) -> new FileSystemContentReader(p);
+    private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier = () -> getCollectionHistoryDao();
 
     public Collections(Path path, Permissions permissions, Content published) {
         this.path = path;
@@ -202,9 +204,10 @@ public class Collections {
         if (collection.complete(session.getEmail(), uri, recursive)) {
             removeEmptyCollectionDirectories(path);
             collection.save();
-            getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_ITEM_COMPLETED));
+            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent.eventType
+                    (COLLECTION_ITEM_COMPLETED));
         } else {
-            getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_COMPLETED_ERROR));
+            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_COMPLETED_ERROR));
             throw new BadRequestException("URI was not completed.");
         }
     }
@@ -304,7 +307,7 @@ public class Collections {
                 new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
                         zebedeeSupplier.get().getDataIndex()));
 
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
         return future;
     }
 
@@ -340,7 +343,7 @@ public class Collections {
         // Go ahead
         collection.getDescription().setApprovalStatus(ApprovalStatus.NOT_STARTED);
         collection.getDescription().addEvent(new Event(new Date(), EventType.UNLOCKED, session.getEmail()));
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_UNLOCKED);
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_UNLOCKED);
 
         publishingNotificationConsumer.accept(collection, EventType.UNLOCKED);
         return collection.save();
@@ -491,7 +494,7 @@ public class Collections {
 
         // Go ahead
         collection.delete();
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
     }
 
     /**
@@ -611,7 +614,7 @@ public class Collections {
                 collectionWriter.getInProgress().write(requestBody, uri);
             }
             if (eventType != null) {
-                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent);
+                collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
             }
         }
     }
@@ -683,7 +686,7 @@ public class Collections {
         collection.save();
         if (deleted) {
             removeEmptyCollectionDirectories(path);
-            getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
+            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
                     eventType, uri));
         }
         return deleted;
@@ -711,7 +714,7 @@ public class Collections {
                 try (InputStream inputStream = item.getInputStream()) {
                     collectionWriter.getInProgress().write(inputStream, uri);
                 }
-                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent);
+                collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
             }
         } catch (Exception e) {
             throw new IOException("Error processing uploaded file", e);
@@ -790,7 +793,7 @@ public class Collections {
         }
 
         collection.moveContent(session, uri, newUri);
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_MOVED,
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_MOVED,
                 contentMoved(uri, newUri));
         collection.save();
     }
@@ -820,7 +823,7 @@ public class Collections {
         }
 
         collection.renameContent(session.email, uri, toUri);
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_RENAMED,
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_RENAMED,
                 contentRenamed(uri, toUri));
         collection.save();
     }

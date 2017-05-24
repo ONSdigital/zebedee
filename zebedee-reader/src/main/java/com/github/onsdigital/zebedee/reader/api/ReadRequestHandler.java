@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.file.NoSuchFileException;
 import java.util.Collection;
 import java.util.Collections;
@@ -118,7 +119,7 @@ public class ReadRequestHandler {
      * @throws IOException
      */
     public Resource findResource(HttpServletRequest request) throws ZebedeeException, IOException {
-        String uri = extractUri(request);
+        String uri = URLDecoder.decode(extractUri(request), "UTF-8");
         String collectionId = getCollectionId(request);
         if (collectionId != null) {
             try {

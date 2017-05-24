@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -120,7 +121,14 @@ public class ZebedeeReader {
      * @throws IOException
      */
     public Resource getPublishedResource(String path) throws ZebedeeException, IOException {
-        return publishedContentReader.getResource(path);
+        try {
+            return publishedContentReader.getResource(path);
+        } catch (BadRequestException e) {
+            if(path.startsWith("/visualisations/")) {
+                return publishedContentReader.getResource(path + "/index.html");
+            }
+            throw e;
+        }
     }
 
     /**

@@ -14,7 +14,7 @@ public class Configuration {
     private static final String DEFAULT_BRIAN_URL = "http://localhost:8083";
     private static final String DEFAULT_TRAIN_URL = "http://localhost:8084";
     private static final String DEFAULT_DYLAN_URL = "http://localhost:8085";
-    private static final String CONTENT_DIRECTORY = "zebedee-cms/target/content";
+    private static final String CONTENT_DIRECTORY = "content";
     private static final String INFLUXDB_URL = "http://influxdb:8086";
     private static final String AUDIT_DB_ENABLED_ENV_VAR = "audit_db_enabled";
     private static final String MATHJAX_SERVICE_URL = "http://localhost:8888";

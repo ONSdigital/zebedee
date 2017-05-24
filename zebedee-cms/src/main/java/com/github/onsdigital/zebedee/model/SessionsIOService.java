@@ -84,6 +84,7 @@ public class SessionsIOService {
 
     public Session find(String email) throws IOException {
         Session candidate = null;
+        Session result = null;
 
         iterate:
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessionsPath)) {
@@ -91,12 +92,14 @@ public class SessionsIOService {
                 if (!Files.isDirectory(entry) && !entry.endsWith(DS_STORE_FILE)) {
                     candidate = read(entry);
                     if (StringUtils.equalsIgnoreCase(candidate.getEmail(), PathUtils.standardise(email))) {
+                        result = candidate;
                         break iterate;
                     }
+                    candidate = null;
                 }
             }
         }
-        return candidate;
+        return result;
     }
 
     public List<Session> filterSessions(Predicate<Session> criteria) throws IOException {

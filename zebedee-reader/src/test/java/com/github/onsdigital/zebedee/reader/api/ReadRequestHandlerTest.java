@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.content.dynamic.browse.ContentNode;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.reader.FakeCollectionReaderFactory;
+import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.reader.data.filter.DataFilter;
@@ -97,7 +98,7 @@ public class ReadRequestHandlerTest {
 
     private void shouldResolveTaxonomyFirstLevel() throws Exception {
         Collection<ContentNode> children = readRequestHandler.getTaxonomy(request, 1);
-        assertTrue(children.size() == 4);
+        assertTrue(children.size() == 5);
         ContentNode child = children.iterator().next();
         assertNull(child.getChildren());
         assertEquals("Economy", child.getDescription().getTitle());
@@ -141,5 +142,19 @@ public class ReadRequestHandlerTest {
     @Test
     public void testSetAuthorisationHandler() throws Exception {
 
+    }
+
+    @Test
+    public void testIndexFile() throws Exception {
+        when(request.getParameter("uri")).thenReturn("/visualisations/test/content");
+        Resource resource = readRequestHandler.findResource(request);
+        assertEquals("/visualisations/test/content/index.html", resource.getUri().toString());
+    }
+
+    @Test
+    public void testURIWithSpaces() throws Exception {
+        when(request.getParameter("uri")).thenReturn("/visualisations/test/content/has spaces");
+        Resource resource = readRequestHandler.findResource(request);
+        assertEquals("/visualisations/test/content/has%20spaces/index.html", resource.getUri().toString());
     }
 }

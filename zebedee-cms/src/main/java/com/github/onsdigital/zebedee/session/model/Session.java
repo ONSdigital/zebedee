@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.json;
+package com.github.onsdigital.zebedee.session.model;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,22 +13,22 @@ public class Session {
     /**
      * The ID of this session.
      */
-    public String id;
+    private String id;
 
     /**
      * The user this session represents.
      */
-    public String email;
+    private String email;
 
     /**
      * The date-time at which the session started. This is useful for general information. Defaults to the current date.
      */
-    public Date start = new Date();
+    private Date start = new Date();
 
     /**
      * The date-time at which the session was last accessed. This is useful for timeouts. Defaults to the current date.
      */
-    public Date lastAccess = new Date();
+    private Date lastAccess = new Date();
 
 
     public String getId() {

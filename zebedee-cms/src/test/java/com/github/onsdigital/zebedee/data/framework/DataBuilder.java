@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
@@ -128,9 +128,9 @@ public class DataBuilder {
     }
 
     private void addReviewEventsToCollectionJson(String uri, Collection collection) throws IOException {
-        collection.addEvent(uri, new Event(new Date(), EventType.CREATED, this.publisher.email));
-        collection.addEvent(uri, new Event(new Date(), EventType.COMPLETED, this.publisher.email));
-        collection.addEvent(uri, new Event(new Date(), EventType.REVIEWED, this.reviewer.email));
+        collection.addEvent(uri, new Event(new Date(), EventType.CREATED, this.publisher.getEmail()));
+        collection.addEvent(uri, new Event(new Date(), EventType.COMPLETED, this.publisher.getEmail()));
+        collection.addEvent(uri, new Event(new Date(), EventType.REVIEWED, this.reviewer.getEmail()));
         collection.reviewedUris().add(uri);
         collection.save();
     }

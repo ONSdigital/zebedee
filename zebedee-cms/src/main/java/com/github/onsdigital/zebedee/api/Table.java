@@ -7,10 +7,8 @@ import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
-import com.github.onsdigital.zebedee.persistence.CollectionEventType;
-import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.util.XlsToHtmlConverter;
@@ -40,7 +38,7 @@ public class Table {
     public void createTable(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ParserConfigurationException, TransformerException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
@@ -89,7 +87,7 @@ public class Table {
                     .parameters()
                     .host(request)
                     .collection(collection)
-                    .user(session.email)
+                    .user(session.getEmail())
                     .log();
         }
     }

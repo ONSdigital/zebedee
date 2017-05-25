@@ -11,7 +11,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.approval.tasks.CollectionPdfGenerator;
@@ -183,7 +183,7 @@ public class ApproveTask implements Callable<Boolean> {
     public void approveCollection() throws IOException {
         // set the approved state on the collection
         collection.description.approvalStatus = ApprovalStatus.COMPLETE;
-        collection.description.addEvent(new Event(new Date(), EventType.APPROVED, session.email));
+        collection.description.addEvent(new Event(new Date(), EventType.APPROVED, session.getEmail()));
         collection.save();
     }
 

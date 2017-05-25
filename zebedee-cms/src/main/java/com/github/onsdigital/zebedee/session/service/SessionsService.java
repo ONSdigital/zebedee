@@ -1,7 +1,9 @@
-package com.github.onsdigital.zebedee.model;
+package com.github.onsdigital.zebedee.session.service;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,23 +24,22 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 /**
  * Created by david on 12/03/2015.
  */
-public class Sessions extends TimerTask {
+public class SessionsService extends TimerTask {
 
-    private static final String DS_STORE_FILE = ".DS_Store";
     private static final String DELETING_SESSION_MSG = "Deleting expired session";
     private static final String SESSION_ID_PARAM = "sessionId";
 
     private Supplier<String> randomIdGenerator = () -> Random.id();
-    private SessionsIOService sessionsIOService;
+    private SessionsStoreImpl sessionsStore;
 
     int expiryUnit = Calendar.MINUTE;
     int expiryAmount = 60;
     Timer timer;
     private Path sessionsPath;
 
-    public Sessions(Path sessionsPath) {
+    public SessionsService(Path sessionsPath) {
         this.sessionsPath = sessionsPath;
-        this.sessionsIOService = new SessionsIOService(sessionsPath);
+        this.sessionsStore = new SessionsStoreImpl(sessionsPath);
 
         // Run every minute after the first minute:
         timer = new Timer("Florence sessions timer", true);
@@ -87,7 +88,7 @@ public class Sessions extends TimerTask {
                 session = new Session();
                 session.setId(randomIdGenerator.get());
                 session.setEmail(user.getEmail());
-                sessionsIOService.write(session);
+                sessionsStore.write(session);
             }
         }
 
@@ -119,9 +120,9 @@ public class Sessions extends TimerTask {
         Session result = null;
 
         // Check the session record exists:
-        if (sessionsIOService.exists(id)) {
+        if (sessionsStore.exists(id)) {
             // Deserialise the json:
-            Session session = sessionsIOService.read(sessionPath(id));
+            Session session = sessionsStore.read(sessionPath(id));
             if (!expired(session)) {
                 updateLastAccess(session);
                 result = session;
@@ -138,7 +139,7 @@ public class Sessions extends TimerTask {
      * @throws IOException If a filesystem error occurs.
      */
     public Session find(String email) throws IOException {
-        Session session = sessionsIOService.find(email);
+        Session session = sessionsStore.find(email);
         if (!expired(session)) {
             updateLastAccess(session);
         }
@@ -153,7 +154,7 @@ public class Sessions extends TimerTask {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean exists(String id) throws IOException {
-        return sessionsIOService.exists(id);
+        return sessionsStore.exists(id);
     }
 
 
@@ -164,13 +165,13 @@ public class Sessions extends TimerTask {
      */
     public void deleteExpiredSessions() throws IOException {
         Predicate<Session> isExpired = (session) -> expired(session);
-        List<Session> expired = sessionsIOService.filterSessions(isExpired);
+        List<Session> expired = sessionsStore.filterSessions(isExpired);
 
         for (Session s : expired) {
             logDebug(DELETING_SESSION_MSG)
                     .addParameter(SESSION_ID_PARAM, s.getId())
                     .log();
-            sessionsIOService.delete(sessionPath(s.getId()));
+            sessionsStore.delete(sessionPath(s.getId()));
         }
     }
 
@@ -203,7 +204,7 @@ public class Sessions extends TimerTask {
     public void updateLastAccess(Session session) throws IOException {
         if (session != null) {
             session.setLastAccess(new Date());
-            sessionsIOService.write(session);
+            sessionsStore.write(session);
         }
     }
 
@@ -233,7 +234,7 @@ public class Sessions extends TimerTask {
      * @throws IOException
      */
     public Session read(String id) throws IOException {
-        return sessionsIOService.read(sessionPath(id));
+        return sessionsStore.read(sessionPath(id));
     }
 
     public Date getExpiryDate(Session session) {

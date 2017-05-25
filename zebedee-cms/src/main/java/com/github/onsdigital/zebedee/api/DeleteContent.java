@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.DeleteMarkerJson;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.response.DeleteContentResponse;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
@@ -47,7 +47,7 @@ public class DeleteContent {
                 deleteMarkerJson.getCollectionId());
         Session session = zebedeeCmsService.getSession(request);
 
-        if (!zebedeeCmsService.getPermissions().canView(session.email, collection.description)) {
+        if (!zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.description)) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
@@ -63,7 +63,7 @@ public class DeleteContent {
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
         Session session = zebedeeCmsService.getSession(request);
 
-        if (zebedeeCmsService.getPermissions().canView(session.email, collection.description)) {
+        if (zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.description)) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 
@@ -88,7 +88,7 @@ public class DeleteContent {
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
         Session session = zebedeeCmsService.getSession(request);
 
-        if (!zebedeeCmsService.getPermissions().canView(session.email, collection.description)) {
+        if (!zebedeeCmsService.getPermissions().canView(session.getEmail(), collection.description)) {
             return new DeleteContentResponse(HttpStatus.SC_UNAUTHORIZED);
         }
 

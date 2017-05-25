@@ -9,8 +9,9 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.common.collect.ImmutableList;
 import org.junit.After;
@@ -81,7 +82,7 @@ public class KeyManagerTest {
     private Users usersMock;
 
     @Mock
-    private Sessions sessionsMock;
+    private SessionsService sessionsServiceMock;
 
     @Before
     public void setUp() throws Exception {
@@ -150,7 +151,7 @@ public class KeyManagerTest {
 
         // Then
         // the user has a key for the collection
-        User user = zebedee.getUsers().get(session.email);
+        User user = zebedee.getUsers().get(session.getEmail());
         assertEquals(1, user.keyring.size());
 
         // and in the keyringCache
@@ -360,9 +361,9 @@ public class KeyManagerTest {
                 .thenReturn(keyringMock);
         when(zebedeeMock.getUsers())
                 .thenReturn(usersMock);
-        when(zebedeeMock.getSessions())
-                .thenReturn(sessionsMock);
-        when(sessionsMock.find(anyString()))
+        when(zebedeeMock.getSessionsService())
+                .thenReturn(sessionsServiceMock);
+        when(sessionsServiceMock.find(anyString()))
                 .thenReturn(mockSession);
 
         KeyManager.distributeCollectionKey(zebedeeMock, mockSession, collectionMock, true);
@@ -373,7 +374,7 @@ public class KeyManagerTest {
         verify(zebedeeMock, times(1)).getPermissions();
         verify(permissionsMock, times(1)).getCollectionAccessMapping(zebedeeMock, collectionMock);
         verify(usersMock, times(1)).updateKeyring(userOneMock);
-        verify(zebedeeMock, times(1)).getSessions();
+        verify(zebedeeMock, times(1)).getSessionsService();
         verify(keyringMock, times(2)).put("0001", secretKeyMock);
 
         verify(keyringMock, never()).remove("0001");

@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee;
 
 import com.github.davidcarboni.cryptolite.Keys;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyManager;

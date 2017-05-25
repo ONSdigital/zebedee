@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
@@ -221,7 +221,7 @@ public class DataVisualisationZip {
 
         } catch (IOException e) {
             logError(e, UPDATE_PAGE_JSON_ERROR_MSG)
-                    .user(session.email)
+                    .user(session.getEmail())
                     .path(zipPath.toString())
                     .logAndThrow(UnexpectedErrorException.class);
         }

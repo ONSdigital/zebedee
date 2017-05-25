@@ -1,7 +1,8 @@
-package com.github.onsdigital.zebedee.model;
+package com.github.onsdigital.zebedee.session.store;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -17,13 +18,13 @@ import java.util.function.Predicate;
 /**
  * Created by dave on 23/05/2017.
  */
-public class SessionsIOService {
+public class SessionsStoreImpl implements SessionsStore {
 
     private static final String DS_STORE_FILE = ".DS_Store";
     private static final String JSON_EXT = ".json";
     private Path sessionsPath;
 
-    public SessionsIOService(Path sessionsPath) {
+    public SessionsStoreImpl(Path sessionsPath) {
         this.sessionsPath = sessionsPath;
     }
 
@@ -50,24 +51,26 @@ public class SessionsIOService {
     /**
      * Writes a session object to disk.
      *
-     * @param session The {@link com.github.onsdigital.zebedee.json.Session} to be written.
+     * @param session The {@link Session} to be written.
      * @throws IOException If a filesystem error occurs.
      */
-    synchronized void write(Session session) throws IOException {
+    @Override
+    public synchronized void write(Session session) throws IOException {
         try (OutputStream output = Files.newOutputStream(getPath(session))) {
             Serialiser.serialise(output, session);
         }
     }
 
     /**
-     * Reads a {@link com.github.onsdigital.zebedee.json.Session} object
+     * Reads a {@link Session} object
      * from the given {@link java.nio.file.Path}
      *
      * @param path The path to read from.
      * @return The read session.
      * @throws IOException If a filesystem error occurs.
      */
-    synchronized Session read(Path path) throws IOException {
+    @Override
+    public synchronized Session read(Path path) throws IOException {
         Session session = null;
 
         if (Files.exists(path)) {
@@ -78,10 +81,12 @@ public class SessionsIOService {
         return session;
     }
 
+    @Override
     public boolean exists(String id) throws IOException {
         return StringUtils.isNotBlank(id) && Files.exists(getPath(id));
     }
 
+    @Override
     public Session find(String email) throws IOException {
         Session candidate = null;
         Session result = null;
@@ -92,8 +97,7 @@ public class SessionsIOService {
                 if (!Files.isDirectory(entry) && !entry.endsWith(DS_STORE_FILE)) {
                     candidate = read(entry);
                     if (StringUtils.equalsIgnoreCase(candidate.getEmail(), PathUtils.standardise(email))) {
-                        result = candidate;
-                        break iterate;
+                        return candidate;
                     }
                     candidate = null;
                 }
@@ -102,6 +106,7 @@ public class SessionsIOService {
         return result;
     }
 
+    @Override
     public List<Session> filterSessions(Predicate<Session> criteria) throws IOException {
         List<Session> results = new ArrayList<>();
 
@@ -118,6 +123,7 @@ public class SessionsIOService {
         return results;
     }
 
+    @Override
     public void delete(Path p) throws IOException {
         Files.delete(p);
     }

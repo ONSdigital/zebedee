@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
@@ -47,8 +47,8 @@ public class CollectionDetails {
             return null;
         }
 
-        Session session = Root.zebedee.getSessions().get(request);
-        if (Root.zebedee.getPermissions().canView(session.email, collection.description) == false) {
+        Session session = Root.zebedee.getSessionsService().get(request);
+        if (Root.zebedee.getPermissions().canView(session.getEmail(), collection.description) == false) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }

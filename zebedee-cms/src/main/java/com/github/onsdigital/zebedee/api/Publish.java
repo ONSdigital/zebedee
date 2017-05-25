@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -46,7 +46,7 @@ public class Publish {
             throws IOException, ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
 
         getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_MANUAL_PUBLISHED_TRIGGERED);
 
@@ -84,7 +84,7 @@ public class Publish {
             historyEvent.exceptionText(ex.getMessage());
         }
 
-        auditEvent.parameters().host(request).collection(collection).actionedBy(session.email).log();
+        auditEvent.parameters().host(request).collection(collection).actionedBy(session.getEmail()).log();
         getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent);
     }
 }

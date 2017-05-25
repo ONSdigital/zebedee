@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.model.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -153,8 +153,8 @@ public class ZebedeeConfiguration {
         return new ApplicationKeys(applicationKeysPath);
     }
 
-    public Sessions getSessions() {
-        return new Sessions(sessionsPath);
+    public SessionsService getSessionsService() {
+        return new SessionsService(sessionsPath);
     }
 
     public Permissions getPermissions(Zebedee z) {

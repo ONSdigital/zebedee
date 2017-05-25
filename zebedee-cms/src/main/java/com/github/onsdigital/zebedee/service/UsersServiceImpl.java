@@ -58,7 +58,7 @@ public class UsersServiceImpl implements UsersService {
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    private Path users;
+    private Path usersPath;
     private Permissions permissions;
     private ApplicationKeys applicationKeys;
     private KeyringCache keyringCache;
@@ -81,15 +81,15 @@ public class UsersServiceImpl implements UsersService {
 
     /**
      *
-     * @param users
+     * @param usersPath
      * @param collections
      * @param permissions
      * @param applicationKeys
      * @param keyringCache
      */
-    UsersServiceImpl(Path users, Collections collections, Permissions permissions, ApplicationKeys
+    UsersServiceImpl(Path usersPath, Collections collections, Permissions permissions, ApplicationKeys
             applicationKeys, KeyringCache keyringCache) {
-        this.users = users;
+        this.usersPath = usersPath;
         this.permissions = permissions;
         this.applicationKeys = applicationKeys;
         this.collections = collections;
@@ -239,7 +239,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public UserList list() throws IOException {
         UserList result = new UserList();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(users)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(usersPath)) {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) {
                     try (InputStream input = Files.newInputStream(path)) {
@@ -484,7 +484,7 @@ public class UsersServiceImpl implements UsersService {
         if (StringUtils.isNotBlank(email)) {
             String userFileName = PathUtils.toFilename(normalise(email));
             userFileName += JSON_EXT;
-            result = users.resolve(userFileName);
+            result = usersPath.resolve(userFileName);
         }
         return result;
     }

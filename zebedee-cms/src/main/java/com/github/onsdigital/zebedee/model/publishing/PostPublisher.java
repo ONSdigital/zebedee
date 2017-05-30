@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.publishing.PublishedCollection;
 import com.github.onsdigital.zebedee.json.publishing.request.FileCopy;
 import com.github.onsdigital.zebedee.json.publishing.request.Manifest;
@@ -118,7 +118,7 @@ public class PostPublisher {
     private static Session getPublisherClassSession() {
         if (zebdeePublisherSession == null) {
             zebdeePublisherSession = new Session();
-            zebdeePublisherSession.email = Publisher.class.getName();
+            zebdeePublisherSession.setEmail(Publisher.class.getName());
         }
         return zebdeePublisherSession;
     }

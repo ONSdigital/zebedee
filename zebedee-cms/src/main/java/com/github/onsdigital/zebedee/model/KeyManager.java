@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -182,7 +182,7 @@ public class KeyManager {
         zebedee.getUsersService().addKeyToKeyring(user.email, keyIdentifier, key);
 
         // If the user is logged in assign the key to their cached keyring
-        Session session = zebedee.getSessions().find(user.email);
+        Session session = zebedee.getSessionsService().find(user.email);
         if (session != null) {
             Keyring keyring = zebedee.getKeyringCache().get(session);
             try {
@@ -213,7 +213,7 @@ public class KeyManager {
         zebedee.getUsersService().removeKeyFromKeyring(user.email, keyIdentifier);
 
         // If the user is logged in remove the key from their cached keyring
-        Session session = zebedee.getSessions().find(user.email);
+        Session session = zebedee.getSessionsService().find(user.email);
         if (session != null) {
             Keyring keyring = zebedee.getKeyringCache().get(session);
             try {

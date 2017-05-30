@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -44,7 +45,7 @@ public class Login {
      *                    <li>If authentication fails:  {@link HttpStatus#UNAUTHORIZED_401}</li>
      *                    </ul>
      * @param credentials The user email and password.
-     * @return A session ID to be passed in the {@value com.github.onsdigital.zebedee.model.Sessions#TOKEN_HEADER} header.
+     * @return A session ID to be passed in the {@value SessionsService#TOKEN_HEADER} header.
      * @throws IOException
      */
     @POST
@@ -83,7 +84,7 @@ public class Login {
             response.setStatus(HttpStatus.OK_200);
         }
 
-        return Root.zebedee.openSession(credentials).id;
+        return Root.zebedee.openSession(credentials).getId();
     }
 
 }

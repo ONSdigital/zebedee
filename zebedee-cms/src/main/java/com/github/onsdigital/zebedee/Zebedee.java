@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
@@ -15,7 +15,7 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.model.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.Users;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
@@ -47,7 +47,7 @@ public class Zebedee {
     public static final String PUBLISHED_COLLECTIONS = "publish-log";
     public static final String ZEBEDEE = "zebedee";
     public static final String USERS = "users";
-    public static final String SESSIONS = "sessions";
+    public static final String SESSIONS = "sessionsService";
     public static final String PERMISSIONS = "permissions";
     public static final String TEAMS = "teams";
     public static final String LAUNCHPAD = "launchpad";
@@ -75,7 +75,7 @@ public class Zebedee {
 
     private final UsersService usersService;
     private final Teams teams;
-    private final Sessions sessions;
+    private final SessionsService sessionsService;
     private final DataIndex dataIndex;
     private Users users;
 
@@ -99,7 +99,7 @@ public class Zebedee {
         this.publishedCollections = cgf.getPublishCollections();
         this.keyringCache = cgf.getKeyringCache(this);
         this.applicationKeys = cgf.getApplicationKeys();
-        this.sessions = cgf.getSessions();
+        this.sessionsService = cgf.getSessionsService();
         this.teams = cgf.getTeams(this.permissions);
         this.usersService = cgf.getUsersService(collections, permissions, applicationKeys, keyringCache);
         this.verificationAgent = cgf.getVerificationAgent(isVerificationEnabled(), this);
@@ -151,7 +151,7 @@ public class Zebedee {
 
         this.keyringCache = new KeyringCache(this);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
-        this.sessions = new Sessions(sessionsPath);
+        this.sessionsService = new SessionsService(sessionsPath);
 
         this.teams = new Teams(teamsPath, this.permissions);
 
@@ -386,7 +386,7 @@ public class Zebedee {
         }
 
         // Create a session
-        Session session = sessions.create(user);
+        Session session = sessionsService.create(user);
 
         // Unlock and cache keyring
         user.keyring.unlock(credentials.password);
@@ -437,8 +437,8 @@ public class Zebedee {
         return this.applicationKeys;
     }
 
-    public Sessions getSessions() {
-        return this.sessions;
+    public SessionsService getSessionsService() {
+        return this.sessionsService;
     }
 
     public VerificationAgent getVerificationAgent() {

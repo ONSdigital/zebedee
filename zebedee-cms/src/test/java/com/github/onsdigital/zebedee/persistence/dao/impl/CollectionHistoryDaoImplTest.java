@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.persistence.dao.impl;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.exceptions.CollectionEventHistoryException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.HibernateServiceImpl;
@@ -77,7 +77,7 @@ public class CollectionHistoryDaoImplTest {
         MockitoAnnotations.initMocks(this);
 
         session = new Session();
-        session.email = "tyrionLannister@test.com";
+        session.setEmail("tyrionLannister@test.com");
 
         dao = new CollectionHistoryDaoImpl(hibernateServiceMock);
         eventType = randomEvent();

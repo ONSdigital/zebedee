@@ -11,7 +11,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
@@ -68,7 +68,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean isPublisher(Session session) throws IOException {
-        return session != null && isPublisher(session.email);
+        return session != null && isPublisher(session.getEmail());
     }
 
     /**
@@ -95,7 +95,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean isAdministrator(Session session) throws IOException {
-        return session != null && isAdministrator(session.email);
+        return session != null && isAdministrator(session.getEmail());
     }
 
     /**
@@ -164,7 +164,7 @@ public class Permissions {
     public void addAdministrator(String email, Session session) throws IOException, UnauthorizedException {
 
         // Allow the initial user to be set as an administrator:
-        if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
+        if (hasAdministrator() && (session == null || !isAdministrator(session.getEmail()))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -183,7 +183,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !isAdministrator(session.email)) {
+        if (session == null || !isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -203,7 +203,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canEdit(Session session) throws IOException {
-        return session != null && canEdit(session.email);
+        return session != null && canEdit(session.getEmail());
     }
 
     /**
@@ -230,9 +230,10 @@ public class Permissions {
      */
     public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(session.email) && zebedee.getKeyringCache().get(session).list().contains(collectionDescription.id);
+            return canEdit(session.getEmail()) && zebedee.getKeyringCache().get(session).list().contains
+                    (collectionDescription.getId());
         } else {
-            return canEdit(session.email);
+            return canEdit(session.getEmail());
         }
     }
 
@@ -246,9 +247,9 @@ public class Permissions {
      */
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(user.email) && user.keyring.list().contains(collectionDescription.id);
+            return canEdit(user.getEmail()) && user.keyring.list().contains(collectionDescription.getId());
         } else {
-            return canEdit(user.email);
+            return canEdit(user.getEmail());
         }
     }
 
@@ -277,7 +278,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
-        if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
+        if (hasAdministrator() && (session == null || !isAdministrator(session.getEmail()))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -300,7 +301,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !isAdministrator(session.email)) {
+        if (session == null || !isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -322,7 +323,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
-        return session != null && canView(session.email, collectionDescription);
+        return session != null && canView(session.getEmail(), collectionDescription);
     }
 
     /**
@@ -338,7 +339,7 @@ public class Permissions {
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
         AccessMapping accessMapping = readAccessMapping();
         return user != null && (
-                canEdit(user.email, accessMapping) || canView(user.email, collectionDescription, accessMapping));
+                canEdit(user.getEmail(), accessMapping) || canView(user.getEmail(), collectionDescription, accessMapping));
     }
 
     /**
@@ -368,7 +369,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
-        if (session == null || !canEdit(session.email)) {
+        if (session == null || !canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -419,7 +420,7 @@ public class Permissions {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
-        if (session == null || !canEdit(session.email)) {
+        if (session == null || !canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -555,8 +556,9 @@ public class Permissions {
     public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
         AccessMapping accessMapping = readAccessMapping();
 
-        if ((session == null) || (!isAdministrator(session.email, accessMapping) && !isPublisher(session.email, accessMapping)
-                && !session.email.equalsIgnoreCase(email))) {
+        if ((session == null) || (!isAdministrator(session.getEmail(), accessMapping) && !isPublisher(session.getEmail(),
+                accessMapping)
+                && !session.getEmail().equalsIgnoreCase(email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -578,7 +580,7 @@ public class Permissions {
     public void addDataVisualisationPublisher(String email, Session session) throws ZebedeeException {
         try {
             // Allow the initial user to be set as an administrator:
-            if (hasAdministrator() && (session == null || !isAdministrator(session.email))) {
+            if (hasAdministrator() && (session == null || !isAdministrator(session.getEmail()))) {
                 throw new UnauthorizedException(getUnauthorizedMessage(session));
             }
 
@@ -593,7 +595,7 @@ public class Permissions {
             updateKeyring(session, email, DATA_VISUALISATION);
         } catch (IOException e) {
             logError(e, "Error while attempting to add Data Vis publisher permission.")
-                    .user(session.email)
+                    .user(session.getEmail())
                     .addParameter("forUser", email)
                     .log();
             throw new UnexpectedErrorException("Error while attempting to add Data Vis publisher permission.",
@@ -602,7 +604,7 @@ public class Permissions {
     }
 
     public void removeDataVisualisationPublisher(String email, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !isAdministrator(session.email)) {
+        if (session == null || !isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -615,7 +617,7 @@ public class Permissions {
      * Determined the {@link CollectionOwner} for this collection (PUBLISHING_SUPPORT or Data Visualisation).
      */
     public CollectionOwner getUserCollectionGroup(Session session) throws IOException {
-        return getUserCollectionGroup(session.email, readAccessMapping());
+        return getUserCollectionGroup(session.getEmail(), readAccessMapping());
     }
 
     public CollectionOwner getUserCollectionGroup(String email) throws IOException {

@@ -67,7 +67,7 @@ public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
     }
 
     @Override
-    public Future saveCollectionHistoryEvent(Collection collection, com.github.onsdigital.zebedee.json.Session session,
+    public Future saveCollectionHistoryEvent(Collection collection, com.github.onsdigital.zebedee.session.model.Session session,
                                              CollectionEventType collectionEventType, CollectionEventMetaData... metaValues) {
         return this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collection.getDescription().getId(),
                 collection.getDescription().getName(), session, collectionEventType, metaValues));
@@ -75,7 +75,7 @@ public class CollectionHistoryDaoImpl implements CollectionHistoryDao {
 
     @Override
     public Future saveCollectionHistoryEvent(String collectionId, String collectionName,
-                                             com.github.onsdigital.zebedee.json.Session session,
+                                             com.github.onsdigital.zebedee.session.model.Session session,
                                              CollectionEventType collectionEventType, CollectionEventMetaData... metaValues) {
         return this.saveCollectionHistoryEvent(new CollectionHistoryEvent(collectionId, collectionName, session,
                 collectionEventType, metaValues));

@@ -13,6 +13,7 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -319,7 +320,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.email, uri);
+        boolean created = collection.create(publisherSession.getEmail(), uri);
 
         // Then
         assertFalse(created);
@@ -336,7 +337,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.email, uri);
+        boolean created = collection.create(publisherSession.getEmail(), uri);
 
         // Then
         assertFalse(created);
@@ -353,7 +354,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.email, uri);
+        boolean created = collection.create(publisherSession.getEmail(), uri);
 
         // Then
         assertFalse(created);
@@ -370,7 +371,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.email, uri);
+        boolean created = collection.create(publisherSession.getEmail(), uri);
 
         // Then
         assertFalse(created);
@@ -389,7 +390,7 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContentDirectory(publisherSession.email, jsonFile);
+        boolean result = collection.deleteContentDirectory(publisherSession.getEmail(), jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -412,7 +413,7 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContentDirectory(publisherSession.email, jsonFile);
+        boolean result = collection.deleteContentDirectory(publisherSession.getEmail(), jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);

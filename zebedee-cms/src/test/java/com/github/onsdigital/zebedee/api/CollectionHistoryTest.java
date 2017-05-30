@@ -60,7 +60,7 @@ public class CollectionHistoryTest extends ZebedeeAPIBaseTestCase {
      */
     @Test
     public void getCollectionHistorySuccess() throws Exception {
-        when(permissionsMock.canEdit(session.email))
+        when(permissionsMock.canEdit(session.getEmail()))
                 .thenReturn(true);
 
         com.github.onsdigital.zebedee.model.collection.audit.CollectionHistory result
@@ -73,8 +73,7 @@ public class CollectionHistoryTest extends ZebedeeAPIBaseTestCase {
 
         verify(zebedeeCmsServiceMock, times(1)).getSession(mockRequest);
         verify(zebedeeCmsServiceMock, times(1)).getPermissions();
-        verify(permissionsMock, times(1)).canEdit(session.email);
-        //verify(mockDao, times(1)).getCollectionEventHistory(COLLECTION_ID);
+        verify(permissionsMock, times(1)).canEdit(session.getEmail());
     }
 
     /**
@@ -92,7 +91,7 @@ public class CollectionHistoryTest extends ZebedeeAPIBaseTestCase {
         } catch (ZebedeeException zebEx) {
             verify(zebedeeCmsServiceMock, times(1)).getSession(mockRequest);
             verify(zebedeeCmsServiceMock, never()).getPermissions();
-            verify(permissionsMock, never()).canEdit(session.email);
+            verify(permissionsMock, never()).canEdit(session.getEmail());
             verify(mockDao, never()).getCollectionEventHistory(COLLECTION_ID);
             throw zebEx;
         }
@@ -106,14 +105,14 @@ public class CollectionHistoryTest extends ZebedeeAPIBaseTestCase {
      */
     @Test(expected = UnauthorizedException.class)
     public void testGetCollectionHistoryIncorrectPermissions() throws Exception {
-        when(permissionsMock.canEdit(session.email))
+        when(permissionsMock.canEdit(session.getEmail()))
                 .thenReturn(false);
         try {
             api.getCollectionEventHistory(mockRequest, mockResponse);
         } catch (ZebedeeException zebEx) {
             verify(zebedeeCmsServiceMock, times(1)).getSession(mockRequest);
             verify(zebedeeCmsServiceMock, times(1)).getPermissions();
-            verify(permissionsMock, times(1)).canEdit(session.email);
+            verify(permissionsMock, times(1)).canEdit(session.getEmail());
             verify(mockDao, never()).getCollectionEventHistory(COLLECTION_ID);
             throw zebEx;
         }

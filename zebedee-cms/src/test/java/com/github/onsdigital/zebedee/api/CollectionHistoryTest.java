@@ -74,7 +74,6 @@ public class CollectionHistoryTest extends ZebedeeAPIBaseTestCase {
         verify(zebedeeCmsServiceMock, times(1)).getSession(mockRequest);
         verify(zebedeeCmsServiceMock, times(1)).getPermissions();
         verify(permissionsMock, times(1)).canEdit(session.getEmail());
-        //verify(mockDao, times(1)).getCollectionEventHistory(COLLECTION_ID);
     }
 
     /**

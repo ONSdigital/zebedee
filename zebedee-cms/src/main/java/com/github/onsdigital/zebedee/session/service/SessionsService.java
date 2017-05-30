@@ -4,7 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.session.store.SessionsStoreImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import org.apache.commons.lang3.StringUtils;
 

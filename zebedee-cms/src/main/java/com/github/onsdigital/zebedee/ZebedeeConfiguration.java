@@ -11,8 +11,10 @@ import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.UsersService;
-import com.github.onsdigital.zebedee.service.UsersServiceImpl;
+import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
+import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
+import com.github.onsdigital.zebedee.user.store.UserStore;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -54,7 +56,7 @@ public class ZebedeeConfiguration {
         return dir;
     }
 
-    public void setZebedeeRootPath(Path zebedeeRootPath) {
+    public ZebedeeConfiguration setZebedeeRootPath(Path zebedeeRootPath) {
         this.zebedeeRootPath = zebedeeRootPath;
         this.publishedContentPath = verifyDir(zebedeeRootPath, PUBLISHED);
         this.collectionsPath = verifyDir(zebedeeRootPath, COLLECTIONS);
@@ -65,10 +67,12 @@ public class ZebedeeConfiguration {
         this.teamsPath = verifyDir(zebedeeRootPath, TEAMS);
         this.applicationKeysPath = verifyDir(zebedeeRootPath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
+        return this;
     }
 
-    public void enableVerificationAgent(boolean enabled) {
+    public ZebedeeConfiguration enableVerificationAgent(boolean enabled) {
         this.useVerificationAgent = enabled;
+        return this;
     }
 
     public boolean isUseVerificationAgent() {
@@ -167,7 +171,11 @@ public class ZebedeeConfiguration {
 
     public UsersService getUsersService(Collections collections, Permissions permissions, ApplicationKeys
             applicationKeys, KeyringCache keyringCache) {
-        return UsersServiceImpl.getInstance(usersPath, collections, permissions, applicationKeys, keyringCache);
+        return UsersServiceImpl.getInstance(collections, permissions, applicationKeys, keyringCache, getStore());
+    }
+
+    public UserStore getStore() {
+        return new UserStoreFileSystemImpl(this.usersPath);
     }
 
     public VerificationAgent getVerificationAgent(boolean verificationIsEnabled, Zebedee z) {

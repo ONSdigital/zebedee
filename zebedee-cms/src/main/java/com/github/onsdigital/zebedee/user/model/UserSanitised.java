@@ -1,5 +1,6 @@
-package com.github.onsdigital.zebedee.json;
+package com.github.onsdigital.zebedee.user.model;
 
+import com.github.onsdigital.zebedee.json.AdminOptions;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -102,21 +103,5 @@ public class UserSanitised {
                 .append(inactive)
                 .append(lastAdmin)
                 .toHashCode();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

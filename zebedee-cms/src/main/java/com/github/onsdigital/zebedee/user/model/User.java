@@ -1,6 +1,7 @@
-package com.github.onsdigital.zebedee.json;
+package com.github.onsdigital.zebedee.user.model;
 
 import com.github.davidcarboni.cryptolite.Password;
+import com.github.onsdigital.zebedee.json.Keyring;
 import org.apache.commons.lang3.BooleanUtils;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -77,6 +78,10 @@ public class User extends UserSanitised {
      */
     public Keyring keyring() {
         return keyring;
+    }
+
+    public void setKeyring(Keyring keyring) {
+        this.keyring = keyring;
     }
 
     @Override

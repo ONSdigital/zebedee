@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
 
 import javax.crypto.SecretKey;
@@ -57,7 +57,7 @@ public class KeyringCache {
         Keyring result = null;
 
         if (user != null) {
-            Session session = zebedee.getSessions().find(user.email);
+            Session session = zebedee.getSessionsService().find(user.email);
             if (session != null) {
                 result = keyringMap.get(session);
             }

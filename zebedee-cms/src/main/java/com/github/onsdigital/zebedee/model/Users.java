@@ -7,6 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -237,7 +238,7 @@ public class Users {
             throw new BadRequestException("Insufficient user details given (name, email)");
         }
 
-        return create(user, session.email);
+        return create(user, session.getEmail());
     }
 
     /**
@@ -281,7 +282,7 @@ public class Users {
     @Deprecated
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
-        if (zebedee.getPermissions().isAdministrator(session.email) == false) {
+        if (zebedee.getPermissions().isAdministrator(session.getEmail()) == false) {
             throw new UnauthorizedException("Administrator permissions required");
         }
 
@@ -294,7 +295,7 @@ public class Users {
 //        }
 
         // Update
-        User updated = update(user, updatedUser, session.email);
+        User updated = update(user, updatedUser, session.getEmail());
 
         // We'll allow changing the email at some point.
         // It entails renaming the json file and checking
@@ -375,7 +376,7 @@ public class Users {
     @Deprecated
     public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
 
-        if (zebedee.getPermissions().isAdministrator(session.email) == false) {
+        if (!zebedee.getPermissions().isAdministrator(session.getEmail())) {
             throw new UnauthorizedException("Administrator permissions required");
         }
 
@@ -431,17 +432,17 @@ public class Users {
             throw new UnauthorizedException("Authentication failed with old password.");
         }
 
-        if (credentials.email.equalsIgnoreCase(session.email) && StringUtils.isNotBlank(credentials.password)) {
+        if (credentials.email.equalsIgnoreCase(session.getEmail()) && StringUtils.isNotBlank(credentials.password)) {
             // User changing their own password
             result = changePassword(user, credentials.oldPassword, credentials.password);
-        } else if (zebedee.getPermissions().isAdministrator(session.email) || !zebedee.getPermissions().hasAdministrator()) {
+        } else if (zebedee.getPermissions().isAdministrator(session.getEmail()) || !zebedee.getPermissions().hasAdministrator()) {
             // Administrator reset, or system setup
 
             // Grab current keyring (null if this is system setup)
             Keyring originalKeyring = null;
             if (user.keyring != null) originalKeyring = user.keyring.clone();
 
-            resetPassword(user, credentials.password, session.email);
+            resetPassword(user, credentials.password, session.getEmail());
 
             // Restore the user keyring (or not if this is system setup)
             if (originalKeyring != null)

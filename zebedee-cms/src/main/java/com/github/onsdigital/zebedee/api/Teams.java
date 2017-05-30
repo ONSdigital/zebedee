@@ -8,7 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.json.TeamList;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -71,7 +71,7 @@ public class Teams {
 
     public boolean createTeam(HttpServletRequest request, HttpServletResponse response) throws IOException, ConflictException, UnauthorizedException, NotFoundException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         String teamName = getTeamName(request);
 
         Root.zebedee.getTeams().createTeam(teamName, session);
@@ -80,14 +80,14 @@ public class Teams {
                 .parameters()
                 .host(request)
                 .team(teamName)
-                .actionedBy(session.email)
+                .actionedBy(session.getEmail())
                 .log();
         return true;
     }
 
     public boolean addTeamMember(HttpServletRequest request, HttpServletResponse response) throws UnauthorizedException, IOException, NotFoundException, BadRequestException {
         Zebedee zebedee = Root.zebedee;
-        Session session = zebedee.getSessions().get(request);
+        Session session = zebedee.getSessionsService().get(request);
 
         String teamName = getTeamName(request);
 
@@ -102,7 +102,7 @@ public class Teams {
                 .host(request)
                 .team(teamName)
                 .teamMember(email)
-                .actionedBy(session.email)
+                .actionedBy(session.getEmail())
                 .log();
         return true;
     }
@@ -135,7 +135,7 @@ public class Teams {
         String teamName = getTeamName(request);
 
         Zebedee zebedee = Root.zebedee;
-        Session session = zebedee.getSessions().get(request);
+        Session session = zebedee.getSessionsService().get(request);
         Team team = zebedee.getTeams().findTeam(teamName);
         zebedee.getTeams().deleteTeam(team, session);
 
@@ -145,7 +145,7 @@ public class Teams {
                 .parameters()
                 .host(request)
                 .team(teamName)
-                .actionedBy(session.email)
+                .actionedBy(session.getEmail())
                 .log();
         return true;
     }
@@ -155,7 +155,7 @@ public class Teams {
         String teamName = getTeamName(request);
 
         Zebedee zebedee = Root.zebedee;
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         String email = request.getParameter("email");
         Team team = zebedee.getTeams().findTeam(teamName);
 
@@ -167,7 +167,7 @@ public class Teams {
                 .host(request)
                 .team(teamName)
                 .teamMember(email)
-                .actionedBy(session.email)
+                .actionedBy(session.getEmail())
                 .log();
         return true;
     }

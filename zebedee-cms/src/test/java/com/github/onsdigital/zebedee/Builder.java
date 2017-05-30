@@ -11,6 +11,7 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
@@ -403,12 +404,12 @@ public class Builder {
 
         // Build the session object
         Session session = new Session();
-        session.id = Random.id();
-        session.email = email;
+        session.setId(Random.id());
+        session.setEmail(email);
 
         // Determine the path in which to create the session Json
         Path sessionPath;
-        String sessionFileName = PathUtils.toFilename(session.id);
+        String sessionFileName = PathUtils.toFilename(session.getId());
         sessionFileName += ".json";
         sessionPath = zebedee.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
 
@@ -424,12 +425,12 @@ public class Builder {
 
         // Build the session object
         Session session = new Session();
-        session.id = Random.id();
-        session.email = user.email;
+        session.setId(Random.id());
+        session.setEmail(user.email);
 
         // Determine the path in which to create the session Json
         Path sessionPath;
-        String sessionFileName = PathUtils.toFilename(session.id);
+        String sessionFileName = PathUtils.toFilename(session.getId());
         sessionFileName += ".json";
         sessionPath = zebedee.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
 

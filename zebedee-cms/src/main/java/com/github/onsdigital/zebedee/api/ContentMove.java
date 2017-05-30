@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ public class ContentMove {
     @POST
     public boolean MoveContent(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         Collection collection = Collections.getCollection(request);
 
         String uri = request.getParameter("uri");
@@ -35,7 +35,7 @@ public class ContentMove {
                 .host(request)
                 .collection(collection)
                 .fromTo(uri, toUri)
-                .actionedBy(session.email)
+                .actionedBy(session.getEmail())
                 .log();
         return true;
     }

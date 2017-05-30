@@ -9,7 +9,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
@@ -245,7 +245,7 @@ public class ContentDeleteService {
     }
 
     private Event collectionEvent(Session session, EventType eventType) {
-        return new Event(DateTime.now().toDate(), eventType, session.email);
+        return new Event(DateTime.now().toDate(), eventType, session.getEmail());
     }
 
     private void logDeleteEvent(Collection collection, Session session, String contentUri,
@@ -253,7 +253,7 @@ public class ContentDeleteService {
         collectionHistoryDao.saveCollectionHistoryEvent(collection, session,
                 event.collectionEventType, collectionEventMetaData);
         collection.addEvent(contentUri, collectionEvent(session, event.eventType));
-        event.auditEvent.parameters().collection(collection).user(session.email).content(contentUri).log();
+        event.auditEvent.parameters().collection(collection).user(session.getEmail()).content(contentUri).log();
     }
 
     private static class DeleteEventType {

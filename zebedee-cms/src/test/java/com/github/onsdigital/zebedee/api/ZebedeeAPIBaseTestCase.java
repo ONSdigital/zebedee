@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.api;
 
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -33,7 +33,7 @@ public abstract class ZebedeeAPIBaseTestCase {
         MockitoAnnotations.initMocks(this);
 
         session = new Session();
-        session.email = TEST_EMAIL;
+        session.setEmail(TEST_EMAIL);
 
         customSetUp();
         REQUESTED_URI = MessageFormat.format(REQUESTED_URI, getAPIName());

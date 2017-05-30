@@ -21,7 +21,7 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
@@ -169,7 +169,7 @@ public class Collection {
 
         CreateCollectionFolders(filename, rootCollectionsPath);
 
-        collectionDescription.addEvent(new Event(new Date(), EventType.CREATED, session.email));
+        collectionDescription.addEvent(new Event(new Date(), EventType.CREATED, session.getEmail()));
         // Create the description:
         Path collectionDescriptionPath = rootCollectionsPath.resolve(filename
                 + ".json");
@@ -190,14 +190,15 @@ public class Collection {
 
         // Encryption
         // assign a key for the collection to the session user
-        keyManagerUtil.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.email),
+        keyManagerUtil.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.getEmail()),
                 collection.description.id, Keys.newSecretKey());
 
         // get the session user to distribute the key to all
         keyManagerUtil.distributeCollectionKey(zebedee, session, collection, true);
 
         if (release != null) {
-            collection.associateWithRelease(session.email, release, new ZebedeeCollectionWriter(zebedee, collection, session));
+            collection.associateWithRelease(session.getEmail(), release, new ZebedeeCollectionWriter(zebedee,
+                    collection, session));
             collection.save();
         }
 
@@ -710,7 +711,7 @@ public class Collection {
         }
 
 
-        boolean permission = zebedee.getPermissions().canEdit(session.email);
+        boolean permission = zebedee.getPermissions().canEdit(session.getEmail());
         if (!permission) {
             throw new UnauthorizedException("Insufficient permissions");
         }
@@ -724,7 +725,7 @@ public class Collection {
             throw new BadRequestException("Item has not been marked completed");
         }
 
-        boolean userCompletedContent = didUserCompleteContent(session.email, uri);
+        boolean userCompletedContent = didUserCompleteContent(session.getEmail(), uri);
         if (userCompletedContent) {
             throw new UnauthorizedException("Reviewer must be a second set of eyes");
         }
@@ -752,7 +753,7 @@ public class Collection {
                 zebedee.getCollections().removeEmptyCollectionDirectories(source);
             }
 
-            addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
+            addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
             getCollectionHistoryDao().saveCollectionHistoryEvent(
                     new CollectionHistoryEvent(this.description.id, this.description.name, session,
                             COLLECTION_CONTENT_REVIEWED, contentReviewed(source, destination)));
@@ -926,7 +927,7 @@ public class Collection {
         }
 
         if (hasDeleted) {
-            addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.email));
+            addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
             getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
                     DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri.toString()));
         }
@@ -1060,7 +1061,7 @@ public class Collection {
         // Fix up links within the content
         if (hasMoved) replaceLinksWithinCollection(session, fromUri, toUri);
 
-        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.email));
+        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.getEmail()));
 
         return hasMoved;
     }

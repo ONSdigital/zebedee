@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.content.page.statistics.document.figure.Ass
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
@@ -44,7 +44,7 @@ public class Equation {
             com.github.onsdigital.zebedee.content.page.statistics.document.figure.equation.Equation equation
     ) throws IOException, ZebedeeException, FileUploadException, TranscoderException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
@@ -95,7 +95,7 @@ public class Equation {
             HttpServletResponse response
     ) throws IOException, ZebedeeException, FileUploadException, TranscoderException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
 
@@ -126,7 +126,7 @@ public class Equation {
                     .host(request)
                     .collection(collection)
                     .content(uriToDelete)
-                    .user(session.email).log();
+                    .user(session.getEmail()).log();
         }
     }
 
@@ -191,7 +191,7 @@ public class Equation {
                     .host(request)
                     .collection(collection)
                     .content(uri)
-                    .user(session.email).log();
+                    .user(session.getEmail()).log();
         }
     }
 }

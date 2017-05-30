@@ -9,11 +9,10 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
-import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
@@ -54,7 +53,7 @@ public class ZebedeeCmsService {
 
     public Session getSession(HttpServletRequest request) throws ZebedeeException {
         try {
-            return Root.zebedee.getSessions().get(request);
+            return Root.zebedee.getSessionsService().get(request);
         } catch (IOException e) {
             logError(e, SESSION_NOT_FOUND_MSG).logAndThrow(UnauthorizedException.class);
         }
@@ -69,7 +68,8 @@ public class ZebedeeCmsService {
         try {
             return new ZebedeeCollectionWriter(Root.zebedee, collection, session);
         } catch (IOException e) {
-            logError(e, COLLECTION_WRI_ERROR_MSG).collectionId(collection).user(session.email).logAndThrow(BadRequestException.class);
+            logError(e, COLLECTION_WRI_ERROR_MSG).collectionId(collection).user(session.getEmail())
+                    .logAndThrow(BadRequestException.class);
         }
         return null;
     }
@@ -78,7 +78,8 @@ public class ZebedeeCmsService {
         try {
             return new ZebedeeCollectionReader(Root.zebedee, collection, session);
         } catch (IOException e) {
-            logError(e, COLLECTION_READ_ERROR_MSG).collectionId(collection).user(session.email).logAndThrow(BadRequestException.class);
+            logError(e, COLLECTION_READ_ERROR_MSG).collectionId(collection).user(session.getEmail())
+                    .logAndThrow(BadRequestException.class);
         }
         return null;
     }

@@ -13,13 +13,13 @@ import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.service.UsersService;
@@ -46,6 +46,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -128,6 +130,7 @@ public class CollectionsTest {
     private User testUser;
     private Supplier<Zebedee> zebedeeSupplier;
     private BiConsumer<Collection, EventType> publishingNotificationConsumer;
+    private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier;
 
     @Before
     public void setUp() throws IOException {
@@ -145,6 +148,7 @@ public class CollectionsTest {
 
         zebedeeSupplier = () -> zebedeeMock;
         publishingNotificationConsumer = (c, e) -> publishNotification.sendNotification(e);
+        collectionHistoryDaoSupplier = () -> collectionHistoryDaoMock;
 
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -155,6 +159,7 @@ public class CollectionsTest {
         ReflectionTestUtils.setField(collections, "zebedeeSupplier", zebedeeSupplier);
         ReflectionTestUtils.setField(collections, "collectionReaderWriterFactory", collectionReaderWriterFactoryMock);
         ReflectionTestUtils.setField(collections, "publishingNotificationConsumer", publishingNotificationConsumer);
+        ReflectionTestUtils.setField(collections, "collectionHistoryDaoSupplier", collectionHistoryDaoSupplier);
     }
 
     @Test
@@ -480,6 +485,7 @@ public class CollectionsTest {
         verify(inProg, times(1)).get(p.toString());
         verify(collectionMock, times(1)).complete(TEST_EMAIL, p.toString(), false);
         verify(collectionMock, times(1)).save();
+        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
     }
 
     @Test(expected = BadRequestException.class)
@@ -532,6 +538,7 @@ public class CollectionsTest {
             verify(collectionMock, times(1)).inProgressUris();
             verify(collectionReaderWriterFactoryMock, never()).getReader(any(), any(), any());
             verify(collectionReaderWriterFactoryMock, never()).getWriter(any(), any(), any());
+            verify(collectionHistoryDaoMock, never()).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
             throw e;
         }
     }
@@ -588,6 +595,7 @@ public class CollectionsTest {
         verify(collectionMock, times(1)).completeUris();
         verify(collectionReaderWriterFactoryMock, times(1)).getReader(zebedeeMock, collectionMock, sessionMock);
         verify(collectionReaderWriterFactoryMock, times(1)).getWriter(zebedeeMock, collectionMock, sessionMock);
+        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(), any(), any());
     }
 
     @Test
@@ -609,6 +617,8 @@ public class CollectionsTest {
         verify(collectionDescriptionMock, times(1)).addEvent(any(Event.class));
         verify(publishNotification, times(1)).sendNotification(EventType.UNLOCKED);
         verify(collectionMock, times(1)).save();
+        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(collectionMock, sessionMock,
+                COLLECTION_UNLOCKED);
     }
 
     @Test
@@ -779,6 +789,8 @@ public class CollectionsTest {
         verify(permissionsMock, times(1)).canEdit(sessionMock);
         verify(collectionMock, times(1)).isEmpty();
         verify(collectionMock, times(1)).delete();
+        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(eq(collectionMock), eq(sessionMock),
+                eq(COLLECTION_DELETED));
     }
 
     @Test(expected = BadRequestException.class)
@@ -899,6 +911,7 @@ public class CollectionsTest {
         verify(collectionMock, times(1)).getInProgressPath(uri.toString());
         verify(collectionWriterMock, times(1)).getInProgress();
         verify(contentWriterMock, times(1)).write(in, uri.toString());
+        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
     }
 
     @Test(expected = NotFoundException.class)
@@ -938,6 +951,7 @@ public class CollectionsTest {
 
 
         assertThat(collections.deleteContent(collectionMock, uri.toString(), sessionMock), is(true));
+
         verify(permissionsMock, times(1)).canEdit(TEST_EMAIL);
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
@@ -946,6 +960,7 @@ public class CollectionsTest {
         verify(collectionMock, never()).deleteContentDirectory(anyString(), anyString());
         verify(collectionMock, times(1)).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();
+        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
     }
 
     @Test
@@ -977,6 +992,7 @@ public class CollectionsTest {
         verify(collectionMock, times(1)).deleteContentDirectory(TEST_EMAIL, uri.toString());
         verify(collectionMock, never()).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();
+        verify(collectionHistoryDaoMock, times(1)).saveCollectionHistoryEvent(any(CollectionHistoryEvent.class));
     }
 
     @Test(expected = ConflictException.class)

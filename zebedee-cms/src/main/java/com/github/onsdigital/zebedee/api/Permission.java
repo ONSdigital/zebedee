@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.BooleanUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +43,7 @@ public class Permission {
     public String grantPermission(HttpServletRequest request, HttpServletResponse response, PermissionDefinition permissionDefinition)
             throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
 
         // Administrator
         if (BooleanUtils.isTrue(permissionDefinition.admin)) {
@@ -53,14 +53,14 @@ public class Permission {
             Audit.Event.ADMIN_PERMISSION_ADDED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.email, permissionDefinition.email)
+                    .actionedByEffecting(session.getEmail(), permissionDefinition.email)
                     .log();
         } else if (BooleanUtils.isFalse(permissionDefinition.admin)) {
             Root.zebedee.getPermissions().removeAdministrator(permissionDefinition.email, session);
             Audit.Event.ADMIN_PERMISSION_REMOVED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.email, permissionDefinition.email)
+                    .actionedByEffecting(session.getEmail(), permissionDefinition.email)
                     .log();
         }
 
@@ -68,12 +68,12 @@ public class Permission {
             Root.zebedee.getPermissions().addDataVisualisationPublisher(permissionDefinition.email, session);
             logInfo("Data Vis Publisher permission added to user.")
                     .user(permissionDefinition.email)
-                    .addParameter("by", session.email).log();
+                    .addParameter("by", session.getEmail()).log();
         } else if (BooleanUtils.isFalse(permissionDefinition.dataVisPublisher)) {
             Root.zebedee.getPermissions().removeDataVisualisationPublisher(permissionDefinition.email, session);
             logInfo("Data Vis Publisher permission removed from user.")
                     .user(permissionDefinition.email)
-                    .addParameter("by", session.email).log();
+                    .addParameter("by", session.getEmail()).log();
         }
 
         // Digital publishing
@@ -82,14 +82,14 @@ public class Permission {
             Audit.Event.PUBLISHER_PERMISSION_ADDED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.email, permissionDefinition.email)
+                    .actionedByEffecting(session.getEmail(), permissionDefinition.email)
                     .log();
         } else if (BooleanUtils.isFalse(permissionDefinition.editor)) {
             Root.zebedee.getPermissions().removeEditor(permissionDefinition.email, session);
             Audit.Event.PUBLISHER_PERMISSION_REMOVED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.email, permissionDefinition.email)
+                    .actionedByEffecting(session.getEmail(), permissionDefinition.email)
                     .log();
         }
 
@@ -109,7 +109,7 @@ public class Permission {
     @GET
     public PermissionDefinition getPermissions(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, UnauthorizedException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         String email = request.getParameter("email");
 
         PermissionDefinition permissionDefinition = Root.zebedee.getPermissions().userPermissions(email, session);

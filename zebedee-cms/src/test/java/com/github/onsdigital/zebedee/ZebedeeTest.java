@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -216,7 +216,7 @@ public class ZebedeeTest {
 		builder.createInProgressFile(contentPath);
 
 		Session session = new Session();
-		session.email = "makingData@greatagain.com";
+		session.setEmail("makingData@greatagain.com");
 		Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
 
 		assertThat(blockingCollection.isPresent(), is(true));
@@ -233,7 +233,7 @@ public class ZebedeeTest {
 		Collection collectionOne = zebedee.getCollections().getCollectionByName(COLLECTION_ONE_NAME);
 
 		Session session = new Session();
-		session.email = "makingData@greatagain.com";
+		session.setEmail("makingData@greatagain.com");
 		Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collectionOne, contentPath);
 		assertThat(blockingCollection.isPresent(), is(false));
 

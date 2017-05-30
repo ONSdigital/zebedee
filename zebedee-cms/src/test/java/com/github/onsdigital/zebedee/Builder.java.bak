@@ -209,8 +209,8 @@ public class Builder {
             Serialiser.serialise(outputStream, reviewer2);
         }
 
-        Path sessions = zebedee.resolve(Zebedee.SESSIONS);
-        Files.createDirectories(sessions);
+        Path sessionsService = zebedee.resolve(Zebedee.SESSIONS);
+        Files.createDirectories(sessionsService);
 
         // Set up some permissions:
         Path permissions = zebedee.resolve(Zebedee.PERMISSIONS);

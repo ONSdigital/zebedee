@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.util.ContentTree;
@@ -33,7 +33,7 @@ public class CollectionBrowseTree {
         com.github.onsdigital.zebedee.model.Collection collection = Collections
                 .getCollection(request);
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
         return ContentTree.getOverlayed(collection, collectionReader);

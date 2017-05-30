@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.model.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
@@ -64,7 +64,7 @@ public class ZebedeeConfiguration {
         this.permissionsPath = verifyDir(zebedeeRootPath, PERMISSIONS);
         this.teamsPath = verifyDir(zebedeeRootPath, TEAMS);
         this.applicationKeysPath = verifyDir(zebedeeRootPath, APPLICATION_KEYS);
-        this.redirectPath = verifyDir(publishedContentPath, Content.REDIRECT);
+        this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
     }
 
     public void enableVerificationAgent(boolean enabled) {
@@ -153,8 +153,8 @@ public class ZebedeeConfiguration {
         return new ApplicationKeys(applicationKeysPath);
     }
 
-    public Sessions getSessions() {
-        return new Sessions(sessionsPath);
+    public SessionsService getSessionsService() {
+        return new SessionsService(sessionsPath);
     }
 
     public Permissions getPermissions(Zebedee z) {

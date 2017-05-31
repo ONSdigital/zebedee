@@ -38,9 +38,9 @@ public class KeyringCache {
                 keyringMap.put(session, user.keyring());
 
                 // populate the scheduler keyring
-                for (String collectionId : user.keyring.list()) {
+                for (String collectionId : user.keyring().list()) {
                     if (!schedulerCache.containsKey(collectionId))
-                        schedulerCache.put(collectionId, user.keyring.get(collectionId));
+                        schedulerCache.put(collectionId, user.keyring().get(collectionId));
                 }
             }
         }
@@ -57,7 +57,7 @@ public class KeyringCache {
         Keyring result = null;
 
         if (user != null) {
-            Session session = zebedee.getSessionsService().find(user.email);
+            Session session = zebedee.getSessionsService().find(user.getEmail());
             if (session != null) {
                 result = keyringMap.get(session);
             }

@@ -71,9 +71,9 @@ public class Login {
         usersServiceSupplier.getService().migrateToEncryption(user, credentials.password);
         //com.github.onsdigital.zebedee.model.Users.migrateToEncryption(Root.zebedee, user, credentials.password);
         //com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
-        usersServiceSupplier.getService().removeStaleCollectionKeys(user.email);
+        usersServiceSupplier.getService().removeStaleCollectionKeys(user.getEmail());
 
-        if (BooleanUtils.isTrue(user.temporaryPassword)) {
+        if (BooleanUtils.isTrue(user.getTemporaryPassword())) {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
             Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.email).log();
             ZebedeeLogBuilder.logInfo(PASSWORD_CHANGE_REQUIRED_MSG).user(credentials.email).log();

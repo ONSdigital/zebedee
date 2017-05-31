@@ -222,8 +222,8 @@ public class Zebedee {
 
         // Create the initial user
         User user = new User();
-        user.email = "florence@magicroundabout.ons.gov.uk";
-        user.name = "Florence";
+        user.setEmail("florence@magicroundabout.ons.gov.uk");
+        user.setName("Florence");
         String password = "Doug4l";
         zebedee.getUsersService().createSystemUser(user, password);
         return zebedee;
@@ -394,8 +394,8 @@ public class Zebedee {
         Session session = sessionsService.create(user);
 
         // Unlock and cache keyring
-        user.keyring.unlock(credentials.password);
-        applicationKeys.populateCacheFromUserKeyring(user.keyring);
+        user.keyring().unlock(credentials.password);
+        applicationKeys.populateCacheFromUserKeyring(user.keyring());
         keyringCache.put(user, session);
 
         // Return a session

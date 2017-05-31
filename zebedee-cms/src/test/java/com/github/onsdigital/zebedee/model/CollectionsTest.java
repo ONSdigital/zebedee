@@ -139,7 +139,7 @@ public class CollectionsTest {
 
         System.setProperty("audit_db_enabled", "false");
         testUser = new User();
-        testUser.email = TEST_EMAIL;
+        testUser.setEmail(TEST_EMAIL);
         rootDir.create();
         collectionsPath = rootDir.newFolder("collections").toPath();
 

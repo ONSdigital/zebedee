@@ -176,7 +176,7 @@ public class UsersServiceImpl implements UsersService {
             throw new BadRequestException(USER_IS_NULL_MSG);
         }
         if (userStore.exists(user.getEmail())) {
-            throw new ConflictException(format(USER_ALREADY_EXISTS_MSG, user.email));
+            throw new ConflictException(format(USER_ALREADY_EXISTS_MSG, user.getEmail()));
         }
         if (!valid(user)) {
             throw new BadRequestException(USER_DETAILS_INVALID_MSG);

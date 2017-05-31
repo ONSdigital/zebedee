@@ -124,9 +124,9 @@ public class Permissions {
     private boolean isCollectionKeyRecipient(AccessMapping accessMapping, List<Team> teamsList, User user, Collection collection) {
         boolean result = false;
         try {
-            result = isAdministrator(user.email, accessMapping)
-                    || canEdit(user.email)
-                    || canView(user.email, collection.getDescription(), accessMapping, teamsList);
+            result = isAdministrator(user.getEmail(), accessMapping)
+                    || canEdit(user.getEmail())
+                    || canView(user.getEmail(), collection.getDescription(), accessMapping, teamsList);
         } catch (IOException e) {
             logError(e).throwUnchecked(e);
         }
@@ -247,7 +247,7 @@ public class Permissions {
      */
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(user.getEmail()) && user.keyring.list().contains(collectionDescription.getId());
+            return canEdit(user.getEmail()) && user.keyring().list().contains(collectionDescription.getId());
         } else {
             return canEdit(user.getEmail());
         }
@@ -642,8 +642,8 @@ public class Permissions {
     private void updateKeyring(Session session, String email, CollectionOwner collectionOwner)
             throws IOException, NotFoundException, BadRequestException {
         User user = usersServiceSupplier.getService().getUserByEmail(email);
-        if (session != null && user.keyring != null) {
-            KeyManager.transferKeyring(user.keyring, zebedee.getKeyringCache().get(session), collectionOwner);
+        if (session != null && user.keyring() != null) {
+            KeyManager.transferKeyring(user.keyring(), zebedee.getKeyringCache().get(session), collectionOwner);
             usersServiceSupplier.getService().updateKeyring(user);
         }
     }

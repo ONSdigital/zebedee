@@ -17,7 +17,7 @@ public class User extends UserSanitised {
     // to unlock the keyring, so we need to
     // manage these fields together.
     private String passwordHash;
-    public Keyring keyring;
+    private Keyring keyring;
 
     /**
      * Constructor for deserialisation.
@@ -45,7 +45,7 @@ public class User extends UserSanitised {
         boolean result = true;
 
         if (authenticate(oldPassword)) {
-            if (keyring.changePassword(oldPassword, newPassword)) {
+            if (keyring().changePassword(oldPassword, newPassword)) {
                 passwordHash = Password.hash(newPassword);
                 result = true;
             } else {

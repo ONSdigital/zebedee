@@ -12,19 +12,17 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class UserSanitised {
 
-    public String name;
-    public String email;
+    protected String name;
+    protected String email;
 
     /**
      * This field is {@link Boolean} rather than <code>boolean</code> so that it can be <code>null</code> in an update message.
      * This ensures the value won't change unless explicitly specified.
      */
-    public Boolean inactive;
-
-    public Boolean temporaryPassword;
-    public String lastAdmin;
-
-    public AdminOptions adminOptions;
+    protected Boolean inactive;
+    protected Boolean temporaryPassword;
+    protected String lastAdmin;
+    protected AdminOptions adminOptions;
 
     public String getName() {
         return name;

@@ -132,7 +132,7 @@ public class KeyringCacheTest {
 
     private User user() {
         User result = new User();
-        result.email = Random.id()+"@example.com";
+        result.setEmail(Random.id()+"@example.com");
         result.resetPassword(Random.password(8));
         return result;
     }

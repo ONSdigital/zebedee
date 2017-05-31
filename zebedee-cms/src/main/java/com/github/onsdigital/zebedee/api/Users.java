@@ -93,7 +93,7 @@ public class Users {
         Audit.Event.USER_CREATED
                 .parameters()
                 .host(request)
-                .actionedByEffecting(session.getEmail(), user.email)
+                .actionedByEffecting(session.getEmail(), user.getEmail())
                 .log();
         return sanitise(created);
     }
@@ -120,7 +120,7 @@ public class Users {
         Audit.Event.USER_UPDATED
                 .parameters()
                 .host(request)
-                .actionedByEffecting(session.getEmail(), user.email)
+                .actionedByEffecting(session.getEmail(), user.getEmail())
                 .log();
         return sanitise(updated);
     }
@@ -144,7 +144,7 @@ public class Users {
             Audit.Event.USER_DELETED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.getEmail(), user.email)
+                    .actionedByEffecting(session.getEmail(), user.getEmail())
                     .log();
         }
 

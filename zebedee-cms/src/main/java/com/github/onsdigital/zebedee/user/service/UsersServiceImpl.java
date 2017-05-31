@@ -10,9 +10,7 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -24,8 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
@@ -49,7 +45,7 @@ public class UsersServiceImpl implements UsersService {
 
     private static final Object MUTEX = new Object();
     private static final String JSON_EXT = ".json";
-    private static final String SYSTEM_USER = "system";
+    static final String SYSTEM_USER = "system";
 
     private static UsersService INSTANCE = null;
 
@@ -61,6 +57,7 @@ public class UsersServiceImpl implements UsersService {
     private KeyringCache keyringCache;
     private Collections collections;
     private UserStore userStore;
+    private UserFactory userFactory;
 
     /**
      * Get a singleton instance of {@link UsersServiceImpl}.
@@ -78,11 +75,14 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
-     * @param usersPath
-     * @param collections
-     * @param permissions
-     * @param applicationKeys
-     * @param keyringCache
+     * Create a new instance. Callers from outside of this package should use
+     * {@link UsersServiceImpl#getInstance(Collections, Permissions, ApplicationKeys, KeyringCache, UserStore)} to
+     * obatin a singleton instance of this service.
+     *
+     * @param collections     the {@link Collections} for accessing collections.
+     * @param permissions     the {@link Permissions} service for determining user permissions.
+     * @param applicationKeys {@link ApplicationKeys} to use.
+     * @param keyringCache    {@link KeyringCache} to add / remove user keys to/form.
      */
     UsersServiceImpl(Collections collections, Permissions permissions, ApplicationKeys applicationKeys,
                      KeyringCache keyringCache, UserStore userStore) {
@@ -91,6 +91,8 @@ public class UsersServiceImpl implements UsersService {
         this.collections = collections;
         this.keyringCache = keyringCache;
         this.userStore = userStore;
+        this.userFactory = new UserFactory();
+        this.keyManangerUtil = new KeyManangerUtil();
     }
 
     @Override
@@ -252,7 +254,7 @@ public class UsersServiceImpl implements UsersService {
         try {
             User user = getUserByEmail(userEmail);
 
-            if (user.keyring != null) {
+            if (user.keyring() != null) {
                 Map<String, Collection> collectionMap = collections.mapByID();
 
                 List<String> keysToRemove = user.keyring()
@@ -274,7 +276,7 @@ public class UsersServiceImpl implements UsersService {
                 });
 
                 if (!keysToRemove.isEmpty()) {
-                    update(user, user, user.lastAdmin);
+                    update(user, user, user.getLastAdmin());
                 }
             }
         } finally {
@@ -393,12 +395,7 @@ public class UsersServiceImpl implements UsersService {
         lock.lock();
         try {
             if (valid(user) && !userStore.exists(user.getEmail())) {
-                result = new User();
-                result.setEmail(user.getEmail());
-                result.setName(user.getName());
-                result.setInactive(true);
-                result.setTemporaryPassword(true);
-                result.setLastAdmin(lastAdmin);
+                result = userFactory.newUserWithDefaultSettings(user.getEmail(), user.getName(), lastAdmin);
                 userStore.save(result);
             }
             return result;
@@ -500,6 +497,38 @@ public class UsersServiceImpl implements UsersService {
             return user;
         } finally {
             lock.unlock();
+        }
+    }
+
+    /**
+     * Factory class encapsulating the creation of new {@link User}.
+     */
+    protected class UserFactory {
+
+        /**
+         * Encapsulate the creation of a new {@link User} with default settings.
+         * <ul>
+         * <li>{@link User#email} -> email provided</li>
+         * <li>{@link User#name} -> name provided</li>
+         * <li>{@link User#inactive} -> true</li>
+         * <li>{@link User#temporaryPassword} -> true</li>
+         * <li>{@link User#keyring} -> null</li>
+         * <li>{@link User#passwordHash} -> null</li>
+         * </ul>
+         *
+         * @param email     the email address to set for the new user.
+         * @param name      the name to set for the new user.
+         * @param lastAdmin email / name of the last admin user to change / update this user.
+         * @return a new {@link User} with the properties set as described above.
+         */
+        public User newUserWithDefaultSettings(String email, String name, String lastAdmin) {
+            User user = new User();
+            user.setEmail(email);
+            user.setName(name);
+            user.setInactive(true);
+            user.setTemporaryPassword(true);
+            user.setLastAdmin(lastAdmin);
+            return user;
         }
     }
 }

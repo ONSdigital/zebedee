@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AdminOptions;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.Permissions;
@@ -22,12 +23,20 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.github.onsdigital.zebedee.user.service.UsersServiceImpl.SYSTEM_USER;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -39,13 +48,14 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- *
+ * Test verifying the behaviour of the {@link UsersServiceImpl}.
  */
 public class UsersServiceTest {
 
     private static final String EMAIL = "test@ons.gov.uk";
     private static final String EMAIL_2 = "test2@ons.gov.uk";
     private static final String KEY_IDENTIFIER = "Valar morghulis";
+    private static final String MOCK_USER_NAME = "A girl is no one";
 
     @Mock
     private Collections collections;
@@ -74,6 +84,9 @@ public class UsersServiceTest {
     @Mock
     private User userMock;
 
+    @Mock
+    private UsersServiceImpl.UserFactory userFactory;
+
     private UsersService service;
     private User user;
 
@@ -93,7 +106,7 @@ public class UsersServiceTest {
         when(userMock.getEmail())
                 .thenReturn(EMAIL_2);
         when(userMock.getName())
-                .thenReturn("A girl is no one");
+                .thenReturn(MOCK_USER_NAME);
 
         ReflectionTestUtils.setField(service, "lock", lockMock);
     }
@@ -602,6 +615,96 @@ public class UsersServiceTest {
         verify(userStore, times(1)).get(EMAIL);
         verify(userStore, times(1)).save(user);
         verifyLockObtainedAndReleased();
+    }
+
+    @Test
+    public void createSystemUser_Success() throws Exception {
+        String password = "Valar morghulis";
+
+        User expected = new User();
+        expected.setEmail(EMAIL_2);
+        expected.setName(MOCK_USER_NAME);
+        expected.setInactive(true);
+        expected.setTemporaryPassword(true);
+        expected.setLastAdmin(SYSTEM_USER);
+
+        ReflectionTestUtils.setField(service, "userFactory", userFactory);
+
+        when(permissions.hasAdministrator())
+                .thenReturn(false);
+        when(userStore.exists(MOCK_USER_NAME))
+                .thenReturn(false);
+        when(userFactory.newUserWithDefaultSettings(EMAIL_2, MOCK_USER_NAME, SYSTEM_USER))
+                .thenReturn(userMock);
+
+        service.createSystemUser(userMock, password);
+
+        verify(permissions, times(1)).hasAdministrator();
+        verify(userStore, times(1)).exists(EMAIL_2);
+        verify(userStore, times(2)).save(userMock);
+        verify(userMock, times(1)).resetPassword(password);
+        verify(userMock, times(1)).setInactive(false);
+        verify(userMock, times(1)).setLastAdmin(SYSTEM_USER);
+        verify(userMock, times(1)).setTemporaryPassword(true);
+        verify(permissions, times(1)).addEditor(EMAIL_2, null);
+        verify(permissions, times(1)).addAdministrator(EMAIL_2, null);
+        verify(lockMock, times(3)).lock();
+        verify(lockMock, times(3)).unlock();
+    }
+
+    @Test
+    public void createSystemUser_ShouldNotCreateIfAlreadyExists() throws Exception {
+        when(permissions.hasAdministrator())
+                .thenReturn(true);
+
+        service.createSystemUser(userMock, null);
+
+        verify(permissions, times(1)).hasAdministrator();
+        verify(userStore, never()).exists(anyString());
+        verify(userStore, never()).save(any(User.class));
+        verify(userMock, never()).resetPassword(anyString());
+        verify(userMock, never()).setInactive(anyBoolean());
+        verify(userMock, never()).setLastAdmin(anyString());
+        verify(userMock, never()).setTemporaryPassword(anyBoolean());
+        verify(permissions, never()).addEditor(anyString(), any(Session.class));
+        verify(permissions, never()).addAdministrator(anyString(), any(Session.class));
+        verify(lockMock, never()).lock();
+        verify(lockMock, never()).unlock();
+    }
+
+    @Test
+    public void removeStaleCollectionKeys_Success() throws Exception {
+        Collection collectionMock = mock(Collection.class);
+        Map<String, Collection> mapping = new HashMap<>();
+        Set<String> keyringAsList = new HashSet<>();
+        keyringAsList.add("12345");
+
+        when(userStore.exists(EMAIL))
+                .thenReturn(true);
+        when(userStore.get(EMAIL))
+                .thenReturn(userMock);
+        when(userMock.keyring())
+                .thenReturn(keyring);
+        when(keyring.list())
+                .thenReturn(keyringAsList);
+        when(collections.mapByID())
+                .thenReturn(mapping);
+        when(applicationKeys.containsKey("12345"))
+                .thenReturn(false);
+        when(userMock.getAdminOptions())
+                .thenReturn(new AdminOptions());
+
+        service.removeStaleCollectionKeys(EMAIL);
+
+        verify(userStore, times(1)).exists(EMAIL);
+        verify(userStore, times(1)).get(EMAIL);
+        verify(userMock, times(3)).keyring();
+        verify(collections, times(1)).mapByID();
+        verify(applicationKeys, times(1)).containsKey("12345");
+        verify(keyring, times(1)).remove("12345");
+        verify(userStore, times(1)).save(userMock);
+        verify(lockMock, times(3)).lock();
+        verify(lockMock, times(3)).unlock();
     }
 
 }

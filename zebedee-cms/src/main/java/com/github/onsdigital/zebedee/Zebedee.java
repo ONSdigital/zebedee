@@ -48,7 +48,7 @@ public class Zebedee {
     public static final String PUBLISHED_COLLECTIONS = "publish-log";
     public static final String ZEBEDEE = "zebedee";
     public static final String USERS = "users";
-    public static final String SESSIONS = "sessionsService";
+    public static final String SESSIONS = "sessions";
     public static final String PERMISSIONS = "permissions";
     public static final String TEAMS = "teams";
     public static final String LAUNCHPAD = "launchpad";

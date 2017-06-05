@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.lang3.StringUtils;
@@ -133,7 +133,7 @@ public class KeyManager {
 
 
     private static boolean userShouldHaveApplicationKey(Zebedee zebedee, User user) throws IOException {
-        return zebedee.getPermissions().isAdministrator(user.email) || zebedee.getPermissions().canEdit(user.email);
+        return zebedee.getPermissions().isAdministrator(user.getEmail()) || zebedee.getPermissions().canEdit(user.getEmail());
     }
 
     /**
@@ -169,20 +169,16 @@ public class KeyManager {
         // Escape in case user keyring has not been generated
         if (user.keyring() == null) {
             logWarn("Skipping assigning collection key to user as their keyring has not been initialized.")
-                    .user(user.email)
+                    .user(user.getEmail())
                     .collectionId(keyIdentifier)
                     .log();
             return;
         }
 
-        // Add the key to the user keyring and save
-//        user.keyring().put(keyIdentifier, key);
-//        zebedee.getUsers().addKeyToKeyring(user);
-
-        zebedee.getUsersService().addKeyToKeyring(user.email, keyIdentifier, key);
+        zebedee.getUsersService().addKeyToKeyring(user.getEmail(), keyIdentifier, key);
 
         // If the user is logged in assign the key to their cached keyring
-        Session session = zebedee.getSessionsService().find(user.email);
+        Session session = zebedee.getSessionsService().find(user.getEmail());
         if (session != null) {
             Keyring keyring = zebedee.getKeyringCache().get(session);
             try {
@@ -206,14 +202,10 @@ public class KeyManager {
         // Escape in case user keyring has not been generated
         if (user.keyring() == null) return;
 
-        // Remove the key from the users keyring and save
-/*        user.keyring().remove(keyIdentifier);
-        zebedee.getUsers().updateKeyring(user);*/
-
-        zebedee.getUsersService().removeKeyFromKeyring(user.email, keyIdentifier);
+        zebedee.getUsersService().removeKeyFromKeyring(user.getEmail(), keyIdentifier);
 
         // If the user is logged in remove the key from their cached keyring
-        Session session = zebedee.getSessionsService().find(user.email);
+        Session session = zebedee.getSessionsService().find(user.getEmail());
         if (session != null) {
             Keyring keyring = zebedee.getKeyringCache().get(session);
             try {
@@ -275,7 +267,7 @@ public class KeyManager {
     }
 
     private static boolean userShouldHaveKey(Zebedee zebedee, User user, Collection collection) throws IOException {
-        if (zebedee.getPermissions().isAdministrator(user.email) || zebedee.getPermissions().canView(user, collection.description))
+        if (zebedee.getPermissions().isAdministrator(user.getEmail()) || zebedee.getPermissions().canView(user, collection.description))
             return true;
         return false;
     }

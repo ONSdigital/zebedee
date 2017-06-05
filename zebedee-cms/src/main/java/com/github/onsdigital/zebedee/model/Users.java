@@ -8,6 +8,8 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,10 +55,10 @@ public class Users {
     public static void createPublisher(Zebedee zebedee, User user, String password, Session session) throws IOException, UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
         zebedee.getUsers().create(session, user);
         Credentials credentials = new Credentials();
-        credentials.email = user.email;
+        credentials.email = user.getEmail();
         credentials.password = password;
         zebedee.getUsers().setPassword(session, credentials);
-        zebedee.getPermissions().addEditor(user.email, session);
+        zebedee.getPermissions().addEditor(user.getEmail(), session);
     }
 
     /**
@@ -78,8 +80,8 @@ public class Users {
         // Create the user at a lower level because we don't have a Session at this point:
         zebedee.getUsers().create(user, "system");
         zebedee.getUsers().resetPassword(user, password, "system");
-        zebedee.getPermissions().addEditor(user.email, null);
-        zebedee.getPermissions().addAdministrator(user.email, null);
+        zebedee.getPermissions().addEditor(user.getEmail(), null);
+        zebedee.getPermissions().addAdministrator(user.getEmail(), null);
     }
 
     /**
@@ -121,13 +123,13 @@ public class Users {
      */
     @Deprecated
     public static void cleanupCollectionKeys(Zebedee zebedee, User user) throws IOException {
-        if (user.keyring != null) {
+        if (user.keyring() != null) {
 
             List<String> keysToRemove = new ArrayList<>();
 
             Collections.CollectionList collections = zebedee.getCollections().list();
 
-            for (String key : user.keyring.list()) {
+            for (String key : user.keyring().list()) {
                 boolean keyIsValid = false;
 
                 if (zebedee.getApplicationKeys().containsKey(key)) {
@@ -147,11 +149,11 @@ public class Users {
 
             for (String key : keysToRemove) {
                 logDebug("Removing stale key").addParameter("key", key).log();
-                user.keyring.remove(key);
+                user.keyring().remove(key);
             }
 
             if (keysToRemove.size() > 0)
-                zebedee.getUsers().update(user, user, user.lastAdmin);
+                zebedee.getUsers().update(user, user, user.getLastAdmin());
         }
     }
 
@@ -171,7 +173,7 @@ public class Users {
             // The keyring has not been generated yet,
             // so reset the password to the current password
             // in order to generate a keyring and associated key pair:
-            logDebug("Generating keyring").addParameter("user", user.email).log();
+            logDebug("Generating keyring").addParameter("user", user.getEmail()).log();
             user.resetPassword(password);
 
             zebedee.getUsers().update(user, user, "Encryption migration");
@@ -231,7 +233,7 @@ public class Users {
         }
 
         if (zebedee.getUsers().exists(user)) {
-            throw new ConflictException("User " + user.email + " already exists");
+            throw new ConflictException("User " + user.getEmail() + " already exists");
         }
 
         if (!valid(user)) {
@@ -253,14 +255,14 @@ public class Users {
     User create(User user, String lastAdmin) throws IOException {
         User result = null;
 
-        if (valid(user) && !exists(user.email)) {
+        if (valid(user) && !exists(user.getEmail())) {
 
             result = new User();
-            result.email = user.email;
-            result.name = user.name;
-            result.inactive = true;
-            result.temporaryPassword = true;
-            result.lastAdmin = lastAdmin;
+            result.setEmail(user.getEmail());
+            result.setName(user.getName());
+            result.setInactive(true);
+            result.setTemporaryPassword(true);
+            result.setLastAdmin(lastAdmin);
             write(result);
         }
 
@@ -287,7 +289,7 @@ public class Users {
         }
 
         if (!zebedee.getUsers().exists(user)) {
-            throw new NotFoundException("User " + user.email + " could not be found");
+            throw new NotFoundException("User " + user.getEmail() + " could not be found");
         }
 
 //        if (!valid(user)) {
@@ -320,24 +322,24 @@ public class Users {
 
         if (user != null) {
 
-            if (updatedUser.name != null && updatedUser.name.length() > 0) {
-                user.name = updatedUser.name;
+            if (updatedUser.getName() != null && updatedUser.getName().length() > 0) {
+                user.setName(updatedUser.getName());
             }
 
             // Create adminOptions object if user doesn't already have it
-            if (user.adminOptions == null) {
-                user.adminOptions = new AdminOptions();
+            if (user.getAdminOptions() == null) {
+                user.setAdminOptions(new AdminOptions());
             }
 
             // Update adminOptions object if updatedUser options are different to stored user options
-            if (updatedUser.adminOptions != null) {
-                if (updatedUser.adminOptions.rawJson != user.adminOptions.rawJson) {
-                    user.adminOptions.rawJson = updatedUser.adminOptions.rawJson;
-                    System.out.println(user.adminOptions.rawJson);
+            if (updatedUser.getAdminOptions() != null) {
+                if (updatedUser.getAdminOptions().rawJson != user.getAdminOptions().rawJson) {
+                    user.getAdminOptions().rawJson = updatedUser.getAdminOptions().rawJson;
+                    System.out.println(user.getAdminOptions().rawJson);
                 }
             }
 
-            user.lastAdmin = lastAdmin;
+            user.setLastAdmin(lastAdmin);
 
             write(user);
         }
@@ -352,12 +354,12 @@ public class Users {
      * @throws IOException
      */
     public User updateKeyring(User user) throws IOException {
-        User updated = read(user.email);
+        User updated = read(user.getEmail());
         if (updated != null) {
-            updated.keyring = user.keyring.clone();
+            updated.setKeyring(user.keyring().clone());
 
             // Only set this to true if explicitly set:
-            updated.inactive = BooleanUtils.isTrue(user.inactive);
+            updated.setInactive(BooleanUtils.isTrue(user.getInactive()));
             write(updated);
         }
         return updated;
@@ -381,10 +383,10 @@ public class Users {
         }
 
         if (!zebedee.getUsers().exists(user)) {
-            throw new NotFoundException("User " + user.email + " does not exist");
+            throw new NotFoundException("User " + user.getEmail() + " does not exist");
         }
 
-        Path path = userPath(user.email);
+        Path path = userPath(user.getEmail());
         return Files.deleteIfExists(path);
     }
 
@@ -397,7 +399,7 @@ public class Users {
      */
     @Deprecated
     public boolean exists(User user) throws IOException {
-        return user != null && exists(user.email);
+        return user != null && exists(user.getEmail());
     }
 
     /**
@@ -440,13 +442,13 @@ public class Users {
 
             // Grab current keyring (null if this is system setup)
             Keyring originalKeyring = null;
-            if (user.keyring != null) originalKeyring = user.keyring.clone();
+            if (user.keyring() != null) originalKeyring = user.keyring().clone();
 
             resetPassword(user, credentials.password, session.getEmail());
 
             // Restore the user keyring (or not if this is system setup)
             if (originalKeyring != null)
-                KeyManager.transferKeyring(user.keyring, zebedee.getKeyringCache().get(session), originalKeyring.list());
+                KeyManager.transferKeyring(user.keyring(), zebedee.getKeyringCache().get(session), originalKeyring.list());
 
             // Save the user
             write(user);
@@ -472,9 +474,9 @@ public class Users {
 
         result = user.changePassword(oldPassword, newPassword);
         if (result) {
-            user.inactive = false;
-            user.lastAdmin = user.email;
-            user.temporaryPassword = false;
+            user.setInactive(false);
+            user.setLastAdmin(user.getEmail());
+            user.setTemporaryPassword(false);
             write(user);
             result = true;
         }
@@ -494,9 +496,9 @@ public class Users {
     @Deprecated
     private void resetPassword(User user, String password, String adminEmail) throws IOException {
         user.resetPassword(password);
-        user.inactive = false;
-        user.lastAdmin = adminEmail;
-        user.temporaryPassword = true;
+        user.setInactive(false);
+        user.setLastAdmin(adminEmail);
+        user.setTemporaryPassword(true);
         write(user);
     }
 
@@ -520,7 +522,7 @@ public class Users {
      */
     @Deprecated
     private boolean valid(User user) {
-        return user != null && StringUtils.isNoneBlank(user.email, user.name);
+        return user != null && StringUtils.isNoneBlank(user.getEmail(), user.getName());
     }
 
     /**
@@ -548,8 +550,8 @@ public class Users {
      */
     @Deprecated
     private void write(User user) throws IOException {
-        user.email = normalise(user.email);
-        Path userPath = userPath(user.email);
+        user.setEmail(normalise(user.getEmail()));
+        Path userPath = userPath(user.getEmail());
         Serialiser.serialise(userPath, user);
     }
 

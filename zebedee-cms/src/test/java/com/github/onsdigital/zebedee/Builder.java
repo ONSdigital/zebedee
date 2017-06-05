@@ -12,6 +12,7 @@ import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
@@ -116,32 +117,32 @@ public class Builder {
         Files.createDirectories(users);
 
         administrator = clone(administratorTemplate);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(administrator.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(administrator.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, administrator);
         }
 
         publisher1 = clone(publisher1Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher1.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher1.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, publisher1);
         }
 
         publisher2 = clone(publisher2Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher2.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher2.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, publisher2);
         }
 
         reviewer1 = clone(reviewer1Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer1.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer1.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, reviewer1);
         }
 
         reviewer2 = clone(reviewer2Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer2.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer2.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, reviewer2);
         }
 
         dataVis = clone(dataVisTemplate);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(dataVis.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(dataVis.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, dataVis);
         }
 
@@ -167,11 +168,11 @@ public class Builder {
         accessMapping.digitalPublishingTeam = new HashSet<>();
         accessMapping.dataVisualisationPublishers = new HashSet<>();
 
-        accessMapping.administrators.add(administrator.email);
-        accessMapping.digitalPublishingTeam.add(publisher1.email);
-        accessMapping.digitalPublishingTeam.add(publisher2.email);
+        accessMapping.administrators.add(administrator.getEmail());
+        accessMapping.digitalPublishingTeam.add(publisher1.getEmail());
+        accessMapping.digitalPublishingTeam.add(publisher2.getEmail());
 
-        accessMapping.dataVisualisationPublishers.add(dataVis.email);
+        accessMapping.dataVisualisationPublishers.add(dataVis.getEmail());
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.id = Random.id();
@@ -220,11 +221,11 @@ public class Builder {
     static User clone(User user) {
         User clone = new User();
 
-        clone.name = user.name;
-        clone.email = user.email;
-        clone.inactive = user.inactive;
-        clone.temporaryPassword = user.temporaryPassword;
-        clone.lastAdmin = user.lastAdmin;
+        clone.setName(user.getName());
+        clone.setEmail(user.getEmail());
+        clone.setInactive(user.getInactive());
+        clone.setTemporaryPassword(user.getTemporaryPassword());
+        clone.setLastAdmin(user.getLastAdmin());
         clone(clone, user, "passwordHash");
         clone(clone, user, "keyring");
         return clone;
@@ -251,48 +252,48 @@ public class Builder {
             logDebug("Generating test users and keys...").log();
 
             User jukesie = new User();
-            jukesie.name = "Matt Jukes";
-            jukesie.email = "jukesie@example.com";
-            jukesie.inactive = false;
+            jukesie.setName("Matt Jukes");
+            jukesie.setEmail("jukesie@example.com");
+            jukesie.setInactive(false);
             administratorTemplate = jukesie;
             jukesie.resetPassword("password");
 
             User patricia = clone(jukesie);
-            patricia.name = "Patricia Pumpkin";
-            patricia.email = "patricia@example.com";
-            patricia.inactive = false;
+            patricia.setName("Patricia Pumpkin");
+            patricia.setEmail("patricia@example.com");
+            patricia.setInactive(false);
             publisher1Template = patricia;
 
             User bernard = clone(jukesie);
-            bernard.name = "Bernard Black";
-            bernard.email = "bernard@example.com";
-            bernard.inactive = false;
+            bernard.setName("Bernard Black");
+            bernard.setEmail("bernard@example.com");
+            bernard.setInactive(false);
             publisher2Template = bernard;
 
             User freddy = clone(jukesie);
-            freddy.name = "freddy Pumpkin";
-            freddy.email = "freddy@example.com";
-            freddy.inactive = false;
+            freddy.setName("freddy Pumpkin");
+            freddy.setEmail("freddy@example.com");
+            freddy.setInactive(false);
             reviewer1Template = freddy;
 
             User ronny = clone(jukesie);
-            ronny.name = "Ronny Roller";
-            ronny.email = "ronny@example.com";
-            ronny.inactive = false;
+            ronny.setName("Ronny Roller");
+            ronny.setName("ronny@example.com");
+            ronny.setInactive(false);
             reviewer2Template = ronny;
 
             User dataVis = clone(jukesie);
-            dataVis.name = "dataVis";
-            dataVis.email = "datavis@example.com";
-            dataVis.inactive = false;
+            dataVis.setName("dataVis");
+            dataVis.setEmail("datavis@example.com");
+            dataVis.setInactive(false);
             dataVisTemplate = dataVis;
         }
     }
 
     private Credentials userCredentials(User user) {
         Credentials credentials = new Credentials();
-        credentials.email = user.email;
-        credentials.password = "password";
+        credentials.setEmail(user.getEmail());
+        credentials.setPassword("password");
         return credentials;
     }
 
@@ -307,7 +308,7 @@ public class Builder {
 
         team.setId(++teamId);
         team.setName(name);
-        team.addMember(user.email);
+        team.addMember(user.getEmail());
         Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.getName() + ".json"));
         try (OutputStream output = Files.newOutputStream(labourMarketTeamPath)) {
             Serialiser.serialise(output, team);
@@ -426,7 +427,7 @@ public class Builder {
         // Build the session object
         Session session = new Session();
         session.setId(Random.id());
-        session.setEmail(user.email);
+        session.setEmail(user.getEmail());
 
         // Determine the path in which to create the session Json
         Path sessionPath;

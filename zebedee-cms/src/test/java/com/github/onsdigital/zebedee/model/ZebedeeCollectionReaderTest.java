@@ -78,7 +78,7 @@ public class ZebedeeCollectionReaderTest {
         // A uri that defines a directory
         String uri = "/this/is/a/directory/";
         Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri + "file.json"));
+        assertTrue(collection.create(builder.publisher1.getEmail(), uri + "file.json"));
 
         // When
         // We attempt to read the file
@@ -96,7 +96,7 @@ public class ZebedeeCollectionReaderTest {
         // A nonexistent file
         String uri = "/file.json";
         Collection collection = new Collection(builder.collections.get(0), zebedee);
-        assertTrue(collection.create(builder.publisher1.email, uri));
+        assertTrue(collection.create(builder.publisher1.getEmail(), uri));
 
         // When
         // We attempt to read the file

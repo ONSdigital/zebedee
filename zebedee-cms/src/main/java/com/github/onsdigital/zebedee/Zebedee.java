@@ -7,23 +7,24 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.Users;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.UsersService;
-import com.github.onsdigital.zebedee.service.UsersServiceImpl;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
+import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -105,7 +106,7 @@ public class Zebedee {
         this.verificationAgent = cgf.getVerificationAgent(isVerificationEnabled(), this);
     }
 
-
+    @Deprecated
     public Zebedee(Path path, boolean useVerificationAgent) {
 
         // Validate the directory:
@@ -155,9 +156,8 @@ public class Zebedee {
 
         this.teams = new Teams(teamsPath, this.permissions);
 
-        this.usersService = UsersServiceImpl.getInstance(usersPath, getCollections(), getPermissions(),
-                getApplicationKeys(),
-                getKeyringCache());
+        this.usersService = UsersServiceImpl.getInstance(getCollections(), getPermissions(),
+                getApplicationKeys(), getKeyringCache(), new UserStoreFileSystemImpl(usersPath));
 
         if (useVerificationAgent && isVerificationEnabled()) {
             this.verificationAgent = new VerificationAgent(this);
@@ -166,6 +166,7 @@ public class Zebedee {
         }
     }
 
+    @Deprecated
     public Zebedee(Path path) {
         this(path, true);
     }
@@ -213,12 +214,16 @@ public class Zebedee {
             Files.createFile(redirectPath);
         }
 
-        Zebedee zebedee = new Zebedee(path);
+        ZebedeeConfiguration cfg = new ZebedeeConfiguration()
+                .setZebedeeRootPath(path)
+                .enableVerificationAgent(true);
+
+        Zebedee zebedee = new Zebedee(cfg);
 
         // Create the initial user
         User user = new User();
-        user.email = "florence@magicroundabout.ons.gov.uk";
-        user.name = "Florence";
+        user.setEmail("florence@magicroundabout.ons.gov.uk");
+        user.setName("Florence");
         String password = "Doug4l";
         zebedee.getUsersService().createSystemUser(user, password);
         return zebedee;
@@ -389,8 +394,8 @@ public class Zebedee {
         Session session = sessionsService.create(user);
 
         // Unlock and cache keyring
-        user.keyring.unlock(credentials.password);
-        applicationKeys.populateCacheFromUserKeyring(user.keyring);
+        user.keyring().unlock(credentials.password);
+        applicationKeys.populateCacheFromUserKeyring(user.keyring());
         keyringCache.put(user, session);
 
         // Return a session

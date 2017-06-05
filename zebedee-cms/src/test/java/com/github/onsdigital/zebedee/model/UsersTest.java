@@ -8,8 +8,8 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -52,8 +52,8 @@ public class UsersTest {
 
         boolean userFound = false;
         for (User user : users) {
-            if (user.name.equals(name)
-                    && user.email.equals(email)) {
+            if (user.getName().equals(name)
+                    && user.getEmail().equals(email)) {
                 userFound = true;
             }
         }
@@ -73,10 +73,10 @@ public class UsersTest {
 
         // Then
         assertNotNull(user);
-        assertEquals(user.name, name);
-        assertEquals(user.email, email);
+        assertEquals(user.getName(), name);
+        assertEquals(user.getEmail(), email);
         assertTrue(user.authenticate("password"));
-        assertFalse(user.inactive);
+        assertFalse(user.getInactive());
     }
 
     @Test
@@ -147,22 +147,22 @@ public class UsersTest {
         String email = "mr.rusty@magic.roundabout.com";
         String name = "Mr Rusty";
         User user = new User();
-        user.name = "Mr Rusty";
-        user.email = "mr.rusty@magic.roundabout.com";
+        user.setName("Mr Rusty");
+        user.setEmail("mr.rusty@magic.roundabout.com");
 
         // When
-        User created = zebedee.getUsers().create(user, builder.administrator.email);
+        User created = zebedee.getUsers().create(user, builder.administrator.getEmail());
         User read = zebedee.getUsers().get(email);
 
         // Then
 
         assertNotNull(user);
-        assertEquals(created.name, name);
-        assertEquals(created.email, email);
+        assertEquals(created.getName(), name);
+        assertEquals(created.getEmail(), email);
 
         assertNotNull(read);
-        assertEquals(read.name, name);
-        assertEquals(read.email, email);
+        assertEquals(read.getName(), name);
+        assertEquals(read.getEmail(), email);
     }
 
     @Test
@@ -172,13 +172,13 @@ public class UsersTest {
         // A user with a non-blank password:
         String password = "password";
         User user = new User();
-        user.name = "Mr Rusty";
-        user.email = "mr.rusty@magic.roundabout.com";
+        user.setName("Mr Rusty");
+        user.setEmail("mr.rusty@magic.roundabout.com");
         user.resetPassword(password);
 
         // When
         // We create the user
-        User created = zebedee.getUsers().create(user, builder.administrator.email);
+        User created = zebedee.getUsers().create(user, builder.administrator.getEmail());
 
         // Then
         // The password should not be set
@@ -191,15 +191,15 @@ public class UsersTest {
         // Given
         // A user set to inactive:
         User user = new User();
-        user.name = "mr.rusty@magic.roundabout.com";
-        user.email = "Mr Rusty";
-        user.inactive = false;
+        user.setName("mr.rusty@magic.roundabout.com");
+        user.setEmail("Mr Rusty");
+        user.setInactive(false);
 
         // When
-        User created = zebedee.getUsers().create(user, builder.administrator.email);
+        User created = zebedee.getUsers().create(user, builder.administrator.getEmail());
 
         // Then
-        assertTrue(created.inactive);
+        assertTrue(created.getInactive());
     }
 
     @Test
@@ -209,7 +209,7 @@ public class UsersTest {
         // No preconditions
 
         // When
-        User user = zebedee.getUsers().create(null, builder.administrator.email);
+        User user = zebedee.getUsers().create(null, builder.administrator.getEmail());
 
         // Then
         // We should not have an error
@@ -223,12 +223,12 @@ public class UsersTest {
         // A null email
         String email = null;
         User user = new User();
-        user.email = null;
+        user.setEmail(null);
 
         // When
         User created  = null;
         //try {
-            created = zebedee.getUsers().create(user, builder.administrator.email);
+            created = zebedee.getUsers().create(user, builder.administrator.getEmail());
         //} catch (BadRequestException e) {
             // Expected - for now
         //}
@@ -263,7 +263,7 @@ public class UsersTest {
 
         // Given
         // An existing user:
-        String email = builder.publisher1.email;
+        String email = builder.publisher1.getEmail();
         String name = "Sunnink ewse";
         String lastAdmin = "admin";
         boolean inactive = true;
@@ -271,8 +271,8 @@ public class UsersTest {
 
         // When
         // We update the user
-        existing.name = name;
-        existing.inactive = inactive;
+        existing.setName(name);
+        existing.setInactive(inactive);
         User updated = zebedee.getUsers().update(existing, existing, lastAdmin);
         User read = zebedee.getUsers().get(email);
 
@@ -280,14 +280,14 @@ public class UsersTest {
         // The expected fields should be set:
 
         assertNotNull(updated);
-        assertEquals(name, updated.name);
-        assertEquals(inactive, updated.inactive);
-        assertEquals(lastAdmin, updated.lastAdmin);
+        assertEquals(name, updated.getName());
+        assertEquals(inactive, updated.getInactive());
+        assertEquals(lastAdmin, updated.getLastAdmin());
 
         assertNotNull(read);
-        assertEquals(name, read.name);
-        assertEquals(inactive, read.inactive);
-        assertEquals(lastAdmin, read.lastAdmin);
+        assertEquals(name, read.getName());
+        assertEquals(inactive, read.getInactive());
+        assertEquals(lastAdmin, read.getLastAdmin());
     }
 
     @Test
@@ -295,9 +295,9 @@ public class UsersTest {
 
         // Given
         // An existing user:
-        String email = builder.publisher1.email;
+        String email = builder.publisher1.getEmail();
         String password = "new password";
-        String lastAdmin = builder.administrator.email;
+        String lastAdmin = builder.administrator.getEmail();
         User existingUser = zebedee.getUsers().get(email);
         User updatedUser = zebedee.getUsers().get(email);
 
@@ -313,8 +313,8 @@ public class UsersTest {
         assertNotNull(read);
         assertFalse(updated.authenticate(password));
         assertFalse(read.authenticate(password));
-        assertEquals(builder.administrator.email, updated.lastAdmin);
-        assertEquals(builder.administrator.email, read.lastAdmin);
+        assertEquals(builder.administrator.getEmail(), updated.getLastAdmin());
+        assertEquals(builder.administrator.getEmail(), read.getLastAdmin());
     }
 
     @Test
@@ -322,14 +322,14 @@ public class UsersTest {
 
         // Given
         // An existing user:
-        String email = builder.publisher1.email;
+        String email = builder.publisher1.getEmail();
         String newEmail = "new@email.com";
-        String lastAdmin = builder.administrator.email;;
+        String lastAdmin = builder.administrator.getEmail();;
         User existingUser = zebedee.getUsers().get(email);
         User updatedUser = zebedee.getUsers().get(email);
 
         // When
-        updatedUser.email = newEmail;
+        updatedUser.setEmail(newEmail);
         User updated = zebedee.getUsers().update(existingUser, updatedUser, lastAdmin);
         User read = zebedee.getUsers().get(email);
         User readNew = null;
@@ -343,7 +343,7 @@ public class UsersTest {
 
         // It will not have been possible to update
         // because no user exists with this email:
-        assertNotEquals(newEmail, updated.email);
+        assertNotEquals(newEmail, updated.getEmail());
 
         // The old user should still exist
         assertNotNull(read);
@@ -357,14 +357,14 @@ public class UsersTest {
 
         // Given
         // An existing user and an administrator session
-        String email = builder.publisher1.email;
+        String email = builder.publisher1.getEmail();
         String newPassword = "newPassword";
         Session adminSession = builder.createSession(builder.administrator);
 
         // When
         // We set the password
         Credentials credentials = new Credentials();
-        credentials.email = email;
+        credentials.setEmail(email);
         credentials.password = newPassword;
         boolean result = zebedee.getUsers().setPassword(adminSession, credentials);
 
@@ -373,7 +373,7 @@ public class UsersTest {
         assertTrue(result);
         User user = zebedee.getUsers().get(email);
         assertTrue(user.authenticate(newPassword));
-        assertTrue(user.temporaryPassword);
+        assertTrue(user.getTemporaryPassword());
     }
 
     @Test
@@ -381,7 +381,7 @@ public class UsersTest {
 
         // Given
         // An existing user and an administrator session
-        String email = builder.publisher1.email;
+        String email = builder.publisher1.getEmail();
         String newPassword = "newPassword";
         Session selfSession = builder.createSession(builder.publisher1);
         Credentials credentials = new Credentials();
@@ -398,7 +398,7 @@ public class UsersTest {
         assertTrue(result);
         User user = zebedee.getUsers().get(email);
         assertTrue(user.authenticate(newPassword));
-        assertFalse(user.temporaryPassword);
+        assertFalse(user.getTemporaryPassword());
     }
 
     @Test
@@ -406,7 +406,7 @@ public class UsersTest {
 
         // Given
         // An existing user and an administrator session
-        String email = builder.administrator.email;
+        String email = builder.administrator.getEmail();
         String newPassword = "newPassword";
         Session selfSession = builder.createSession(builder.administrator);
         Credentials credentials = new Credentials();
@@ -423,7 +423,7 @@ public class UsersTest {
         assertTrue(result);
         User user = zebedee.getUsers().get(email);
         assertTrue(user.authenticate(newPassword));
-        assertFalse(user.temporaryPassword);
+        assertFalse(user.getTemporaryPassword());
     }
 
     @Test
@@ -431,7 +431,7 @@ public class UsersTest {
 
         // Given
         // An existing user and an administrator session
-        String email = builder.publisher1.email;
+        String email = builder.publisher1.getEmail();
         String newPassword = "newPassword";
         Session adminSession = builder.createSession(builder.administrator);
         Credentials credentials = new Credentials();
@@ -447,7 +447,7 @@ public class UsersTest {
         assertTrue(result);
         User user = zebedee.getUsers().get(email);
         assertTrue(user.authenticate(newPassword));
-        assertTrue(user.temporaryPassword);
+        assertTrue(user.getTemporaryPassword());
     }
 
     @Test
@@ -455,9 +455,9 @@ public class UsersTest {
 
         // Given
         // An existing user and session
-        String email = builder.publisher1.email;
+        String email = builder.publisher1.getEmail();
         String newPassword = "newPassword";
-        Session selfSession = builder.createSession(builder.publisher1.email);
+        Session selfSession = builder.createSession(builder.publisher1.getEmail());
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = newPassword;
@@ -470,7 +470,7 @@ public class UsersTest {
         // Then
         // The temponary flag should not be set
         User user = zebedee.getUsers().get(email);
-        assertFalse(user.temporaryPassword);
+        assertFalse(user.getTemporaryPassword());
     }
 
     @Test(expected = UnauthorizedException.class)
@@ -528,7 +528,7 @@ public class UsersTest {
 
         boolean userFound = false;
         for (User user : users) {
-            if (user.email.equals(email)) {
+            if (user.getEmail().equals(email)) {
                 userFound = true;
             }
         }

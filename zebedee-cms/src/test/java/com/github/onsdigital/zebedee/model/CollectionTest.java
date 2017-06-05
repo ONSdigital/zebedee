@@ -4,6 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
@@ -13,6 +14,7 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
+import com.github.onsdigital.zebedee.service.UsersService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
@@ -22,6 +24,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,36 +39,28 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
-@Ignore("IGNORE: user keys concurrency defect")
-public class CollectionTest {
+public class CollectionTest extends ZebedeeTestBaseFixture {
 
     private static final boolean recursive = false;
-    Zebedee zebedee;
     Collection collection;
-    Builder builder;
     Session publisherSession;
     String publisher1Email;
     FakeCollectionWriter collectionWriter;
 
-    @Before
     public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
+
         collection = new Collection(builder.collections.get(1), zebedee);
 
         publisherSession = zebedee.openSession(builder.publisher1Credentials);
         publisher1Email = builder.publisher1.email;
         collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
     }
 
     @Test

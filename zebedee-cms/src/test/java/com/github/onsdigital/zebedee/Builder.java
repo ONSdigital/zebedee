@@ -30,6 +30,14 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
  *
  * @author david
  */
+
+
+/**
+ * {@link Deprecated} THIS NEEDS TO GO. You should not have to build a zebedee and all of its services, files and
+ * directories etc just to test a single compment. all tests that use this are horrendus and near impossible to
+ * maintain. I will be a happy happy man the day this is removed from the code base.
+ */
+@Deprecated
 public class Builder {
 
     public static final String COLLECTION_ONE_NAME = "inflationq22015";
@@ -163,15 +171,15 @@ public class Builder {
 
         AccessMapping accessMapping = new AccessMapping();
 
-        accessMapping.administrators = new HashSet<>();
-        accessMapping.digitalPublishingTeam = new HashSet<>();
-        accessMapping.dataVisualisationPublishers = new HashSet<>();
+        accessMapping.setAdministrators(new HashSet<>());
+        accessMapping.setDigitalPublishingTeam(new HashSet<>());
+        accessMapping.setDataVisualisationPublishers(new HashSet<>());
 
-        accessMapping.administrators.add(administrator.email);
-        accessMapping.digitalPublishingTeam.add(publisher1.email);
-        accessMapping.digitalPublishingTeam.add(publisher2.email);
+        accessMapping.getAdministrators().add(administrator.email);
+        accessMapping.getDigitalPublishingTeam().add(publisher1.getEmail());
+        accessMapping.getDigitalPublishingTeam().add(publisher2.getEmail());
 
-        accessMapping.dataVisualisationPublishers.add(dataVis.email);
+        accessMapping.getDataVisualisationPublishers().add(dataVis.email);
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.id = Random.id();
@@ -217,7 +225,7 @@ public class Builder {
         }
     }
 
-    static User clone(User user) {
+    public static User clone(User user) {
         User clone = new User();
 
         clone.name = user.name;

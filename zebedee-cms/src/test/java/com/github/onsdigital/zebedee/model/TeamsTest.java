@@ -4,6 +4,9 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import com.google.gson.Gson;
@@ -43,7 +46,7 @@ public class TeamsTest {
     private Session sessionMock;
 
     @Mock
-    private Permissions permissionsMock;
+    private PermissionsServiceImpl permissionsServiceImplMock;
 
     @Rule
     public TemporaryFolder zebedeeRoot;
@@ -52,6 +55,7 @@ public class TeamsTest {
     private Path teamsPath;
     private Team teamA;
     private Team teamB;
+    private ServiceSupplier<PermissionsService> permissionsServiceSupplier;
 
     /**
      * Set up the test.
@@ -64,8 +68,10 @@ public class TeamsTest {
         zebedeeRoot.create();
         zebedeeRoot.newFolder("teams");
 
+        permissionsServiceSupplier = () -> permissionsServiceImplMock;
+
         teamsPath = zebedeeRoot.getRoot().toPath().resolve(TEAMS);
-        teamsService = new Teams(teamsPath, permissionsMock);
+        teamsService = new Teams(teamsPath, permissionsServiceSupplier);
 
         teamA = new Team()
                 .setId(123)
@@ -107,7 +113,7 @@ public class TeamsTest {
     @Test
     public void shouldCreateTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException,
             NotFoundException {
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(true);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -118,14 +124,14 @@ public class TeamsTest {
         Team target = teamsService.findTeam("TeamONS");
         assertThat(result, equalTo(target));
 
-        verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+        verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
         verify(sessionMock, times(1)).getEmail();
     }
 
     @Test
     public void shouldCreateTeamWithUniqueId() throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(true);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -141,7 +147,7 @@ public class TeamsTest {
         // If there are 20 unique IDS the set will have the same number of entries as teams created.
         assertThat(ids.size(), equalTo(20));
 
-        verify(permissionsMock, times(20)).isAdministrator(TEST_EMAIL);
+        verify(permissionsServiceImplMock, times(20)).isAdministrator(TEST_EMAIL);
         verify(sessionMock, times(20)).getEmail();
     }
 
@@ -149,7 +155,7 @@ public class TeamsTest {
     public void shouldNotCreateTeamWithDuplicateName() throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
         createTeams();
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(true);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -158,7 +164,7 @@ public class TeamsTest {
             teamsService.createTeam("Team-A", sessionMock);
         } catch (ConflictException e) {
             assertThat(teamsService.listTeams().size(), equalTo(2));
-            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
             throw e;
         }
@@ -167,7 +173,7 @@ public class TeamsTest {
     @Test(expected = UnauthorizedException.class)
     public void shouldNotCreateTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(false);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -176,7 +182,7 @@ public class TeamsTest {
             teamsService.createTeam("Non Admin team", sessionMock);
         } catch (UnauthorizedException e) {
             assertThat(teamsService.listTeams().isEmpty(), is(true));
-            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
             throw e;
         }
@@ -186,7 +192,7 @@ public class TeamsTest {
     public void shouldDeleteTeam() throws IOException, UnauthorizedException, BadRequestException, ConflictException,
             NotFoundException {
         createTeams();
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(true);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -202,7 +208,7 @@ public class TeamsTest {
                         .isPresent(),
                 equalTo(false));
 
-        verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+        verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
         verify(sessionMock, times(1)).getEmail();
     }
 
@@ -210,7 +216,7 @@ public class TeamsTest {
     public void shouldThrowExceptionIfTeamToDeleteDoesNotExist() throws IOException, UnauthorizedException,
             BadRequestException, ConflictException, NotFoundException {
         List<Team> initialTeams = createTeams();
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(true);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -219,7 +225,7 @@ public class TeamsTest {
             teamsService.deleteTeam(new Team().setId(999).setName("AGirlIsNoOne"), sessionMock);
         } catch (NotFoundException e) {
             assertThat(initialTeams, equalTo(teamsService.listTeams()));
-            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
             throw e;
         }
@@ -228,7 +234,7 @@ public class TeamsTest {
     @Test(expected = BadRequestException.class)
     public void shouldNotDeleteNullTeam() throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(true);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -236,7 +242,7 @@ public class TeamsTest {
         try {
             teamsService.deleteTeam(null, sessionMock);
         } catch (BadRequestException e) {
-            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
             throw e;
         }
@@ -246,7 +252,7 @@ public class TeamsTest {
     public void shouldNotDeleteTeamIfNotAdministrator() throws IOException, UnauthorizedException, BadRequestException,
             ConflictException, NotFoundException {
         List<Team> initialTeams = createTeams();
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(false);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -257,7 +263,7 @@ public class TeamsTest {
             List<Team> afterDelete = teamsService.listTeams();
             assertThat(afterDelete, equalTo(initialTeams));
             assertThat(afterDelete.contains(teamA), is(true));
-            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
             throw e;
         }
@@ -269,7 +275,7 @@ public class TeamsTest {
         List<Team> initial = createTeams();
         int teamAMembers = teamA.getMembers().size();
 
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(true);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -279,7 +285,7 @@ public class TeamsTest {
         assertThat(teamAUpdated.getMembers().contains(TEST_EMAIL), equalTo(true));
         assertThat(teamAUpdated.getMembers().size(), equalTo(++teamAMembers));
 
-        verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+        verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
         verify(sessionMock, times(1)).getEmail();
     }
 
@@ -289,7 +295,7 @@ public class TeamsTest {
         createTeams();
         Team initial = teamA;
 
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(false);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -299,7 +305,7 @@ public class TeamsTest {
         } catch (UnauthorizedException e) {
             Team updated = teamsService.findTeam(teamA.getName());
             assertThat(updated.getMembers(), equalTo(initial.getMembers()));
-            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
             throw e;
         }
@@ -311,7 +317,7 @@ public class TeamsTest {
         createTeams();
         Team inital = teamA;
 
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(true);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -321,7 +327,7 @@ public class TeamsTest {
         Team updated = teamsService.findTeam(teamA.getName());
         assertThat(!updated.getMembers().contains("Dave"), is(false));
 
-        verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+        verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
         verify(sessionMock, times(1)).getEmail();
     }
 
@@ -331,7 +337,7 @@ public class TeamsTest {
         createTeams();
         Team inital = teamA;
 
-        when(permissionsMock.isAdministrator(TEST_EMAIL))
+        when(permissionsServiceImplMock.isAdministrator(TEST_EMAIL))
                 .thenReturn(false);
         when(sessionMock.getEmail())
                 .thenReturn(TEST_EMAIL);
@@ -342,7 +348,7 @@ public class TeamsTest {
             Team updated = teamsService.findTeam(teamA.getName());
             assertThat(updated.getMembers().contains("Dave"), is(true));
 
-            verify(permissionsMock, times(1)).isAdministrator(TEST_EMAIL);
+            verify(permissionsServiceImplMock, times(1)).isAdministrator(TEST_EMAIL);
             verify(sessionMock, times(1)).getEmail();
             throw e;
         }

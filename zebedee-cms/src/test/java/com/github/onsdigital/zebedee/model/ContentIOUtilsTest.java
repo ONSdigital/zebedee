@@ -1,13 +1,19 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
+import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.service.UsersService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -17,19 +23,39 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by thomasridd on 1/24/16.
  */
-@Ignore("IGNORE: user keys concurrency defect")
 public class ContentIOUtilsTest {
+
+    @Mock
+    private UsersService usersService;
+
+    @Mock
+    private KeyManangerUtil keyManangerUtil;
+
+    @Mock
+    private CollectionHistoryDao collectionHistoryDao;
+
     Zebedee zebedee;
     Builder bob;
     Session publisher;
@@ -54,9 +80,40 @@ public class ContentIOUtilsTest {
      */
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
+        ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
+        Collection.setCollectionHistoryDaoServiceSupplier(collectionHistoryDaoServiceSupplier);
+        Collection.setKeyManagerUtil(keyManangerUtil);
 
         bob = new Builder();
         zebedee = new Zebedee(bob.zebedee, false);
+
+        ReflectionTestUtils.setField(zebedee, "usersService", usersService);
+
+        when(usersService.getUserByEmail(bob.publisher1Credentials.email))
+                .thenReturn(bob.publisher1);
+        when(usersService.getUserByEmail(bob.reviewer1.getEmail()))
+                .thenReturn(bob.reviewer1);
+
+        Map<String, String> emailToCreds = new HashMap<>();
+        emailToCreds.put(bob.publisher1.getEmail(), bob.publisher1Credentials.password);
+
+        // UsersService is now mocked so needs to add this mannually.
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                User u = invocationOnMock.getArgumentAt(1, User.class);
+                String id = invocationOnMock.getArgumentAt(2, String.class);
+                SecretKey key = invocationOnMock.getArgumentAt(3, SecretKey.class);
+
+                if (emailToCreds.containsKey(u.getEmail())) {
+                    u.keyring().unlock(emailToCreds.get(u.getEmail()));
+                    u.keyring().put(id, key);
+                }
+                return null;
+            }
+        }).when(keyManangerUtil).assignKeyToUser(any(), any(), any(), any());
 
         publisher = zebedee.openSession(bob.publisher1Credentials);
         reviewer = zebedee.openSession(bob.reviewer1Credentials);

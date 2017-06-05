@@ -63,7 +63,6 @@ public class DataIndexTest {
         bob.delete();
     }
 
-    @Ignore("IGNORE: user keys concurrency defect")
     @Test
     public void dataIndex_givenContent_buildsIndex() throws IOException, InterruptedException, BadRequestException {
         // Given

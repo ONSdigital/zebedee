@@ -6,24 +6,27 @@ import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedExcept
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.Users;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.service.UsersService;
 import com.github.onsdigital.zebedee.service.UsersServiceImpl;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -53,6 +56,8 @@ public class Zebedee {
     public static final String LAUNCHPAD = "launchpad";
     public static final String APPLICATION_KEYS = "application-keys";
 
+    private static final String[] ZEBEDEE_DIRS = new String[]{PUBLISHED, COLLECTIONS, USERS, SESSIONS, PERMISSIONS,
+            TEAMS, LAUNCHPAD, PUBLISHED_COLLECTIONS, APPLICATION_KEYS};
 
     private final Path publishedCollectionsPath;
     private final Path collectionsPath;
@@ -71,14 +76,13 @@ public class Zebedee {
     private final KeyringCache keyringCache;
     private final Path publishedContentPath;
     private final Path path;
-    private final Permissions permissions;
+    private final PermissionsServiceImpl permissionsServiceImpl;
 
     private final UsersService usersService;
     private final Teams teams;
     private final SessionsService sessionsService;
     private final DataIndex dataIndex;
     private Users users;
-
 
     public Zebedee(ZebedeeConfiguration cgf) {
         this.path = cgf.getZebedeeRootPath();
@@ -92,16 +96,16 @@ public class Zebedee {
         this.applicationKeysPath = cgf.getApplicationKeysPath();
         this.redirectPath = cgf.getRedirectPath();
 
-        this.permissions = cgf.getPermissions(this);
+        this.sessionsService = cgf.getSessionsService();
+        this.keyringCache = cgf.getKeyringCache();
+        this.permissionsServiceImpl = cgf.getPermissionsServiceImpl();
         this.published = cgf.getPublished();
         this.dataIndex = cgf.getDataIndex();
-        this.collections = cgf.getCollections(permissions, this.published);
+        this.collections = cgf.getCollections();
         this.publishedCollections = cgf.getPublishCollections();
-        this.keyringCache = cgf.getKeyringCache(this);
         this.applicationKeys = cgf.getApplicationKeys();
-        this.sessionsService = cgf.getSessionsService();
-        this.teams = cgf.getTeams(this.permissions);
-        this.usersService = cgf.getUsersService(collections, permissions, applicationKeys, keyringCache);
+        this.teams = cgf.getTeams();
+        this.usersService = cgf.getUsersService();
         this.verificationAgent = cgf.getVerificationAgent(isVerificationEnabled(), this);
     }
 
@@ -145,17 +149,16 @@ public class Zebedee {
             this.published.redirect = new RedirectTablePartialMatch(this.published, redirectPath);
         }
 
-        this.permissions = new Permissions(permissionsPath, this);
-        this.collections = new Collections(collectionsPath, permissions, published);
+        this.permissionsServiceImpl = new PermissionsServiceImpl(new PermissionsStoreFileSystemImpl(permissionsPath), () -> getUsersService(), () -> getTeams(), getKeyringCache());
+        this.collections = new Collections(collectionsPath, permissionsServiceImpl, published);
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
 
-        this.keyringCache = new KeyringCache(this);
-        this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.sessionsService = new SessionsService(sessionsPath);
+        this.keyringCache = new KeyringCache(sessionsService);
+        this.applicationKeys = new ApplicationKeys(applicationKeysPath);
+        this.teams = new Teams(teamsPath, () -> this.permissionsServiceImpl);
 
-        this.teams = new Teams(teamsPath, this.permissions);
-
-        this.usersService = UsersServiceImpl.getInstance(usersPath, getCollections(), getPermissions(),
+        this.usersService = UsersServiceImpl.getInstance(usersPath, getCollections(), getPermissionsService(),
                 getApplicationKeys(),
                 getKeyringCache());
 
@@ -186,6 +189,26 @@ public class Zebedee {
         } else {
             path = parent.resolve(ZEBEDEE);
         }
+
+        for (String target : ZEBEDEE_DIRS) {
+            Path targetPath = path.resolve(target);
+            if (!Files.exists(targetPath)) {
+                Files.createDirectory(targetPath);
+            }
+        }
+
+        Path redirectPath = path.resolve(PUBLISHED).resolve(Content.REDIRECT);
+        if (!Files.exists(redirectPath)) {
+            Files.createFile(redirectPath);
+        }
+
+        PermissionsStoreFileSystemImpl.init(path.resolve(PERMISSIONS));
+
+/*        Path accessMappingPath = path.resolve(PERMISSIONS).resolve("accessMapping.json");
+        if (!Files.exists(accessMappingPath)) {
+            Files.createFile(accessMappingPath);
+        }*/
+/*
         if (!Files.exists(path.resolve(PUBLISHED))) {
             Files.createDirectory(path.resolve(PUBLISHED));
         }
@@ -206,14 +229,9 @@ public class Zebedee {
         }
         if (!Files.exists(path.resolve(LAUNCHPAD))) {
             Files.createDirectory(path.resolve(LAUNCHPAD));
-        }
+        }*/
 
-        Path redirectPath = path.resolve(PUBLISHED).resolve(Content.REDIRECT);
-        if (!Files.exists(redirectPath)) {
-            Files.createFile(redirectPath);
-        }
-
-        Zebedee zebedee = new Zebedee(path);
+        Zebedee zebedee = new Zebedee(new ZebedeeConfiguration(path, true));
 
         // Create the initial user
         User user = new User();
@@ -409,8 +427,8 @@ public class Zebedee {
         return this.path;
     }
 
-    public Permissions getPermissions() {
-        return this.permissions;
+    public PermissionsService getPermissionsService() {
+        return this.permissionsServiceImpl;
     }
 
     public Path getPublishedContentPath() {

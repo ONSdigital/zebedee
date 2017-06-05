@@ -48,7 +48,7 @@ public class CollectionDetails {
         }
 
         Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissions().canView(session.getEmail(), collection.description)) {
+        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.description)) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
@@ -77,7 +77,7 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, result, collection);
         addEventsForDetails(result.reviewed, result, collection);
 
-        Set<Integer> teamIds = Root.zebedee.getPermissions().listViewerTeams(collection.description, session);
+        Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
         List<Team> teams = Root.zebedee.getTeams().resolveTeams(teamIds);
         teams.forEach(team -> {
             collection.description.teams.add(team.getName());

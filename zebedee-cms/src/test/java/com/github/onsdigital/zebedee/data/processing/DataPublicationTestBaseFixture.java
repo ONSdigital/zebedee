@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
@@ -14,9 +13,6 @@ import com.github.onsdigital.zebedee.model.*;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -36,12 +32,9 @@ import static org.junit.Assert.assertNotNull;
  *
  * Tests for the data publication object
  */
-@Ignore("IGNORE: user keys concurrency defect")
-public class DataPublicationTest {
+public class DataPublicationTestBaseFixture extends ZebedeeTestBaseFixture {
 
     final List<TimeseriesUpdateCommand> updateCommands = new ArrayList<>();
-    Zebedee zebedee;
-    Builder bob;
     Session publisher;
     Session reviewer;
     Collection collection;
@@ -59,14 +52,9 @@ public class DataPublicationTest {
      *
      * @throws Exception
      */
-    @Before
     public void setUp() throws Exception {
-
-        bob = new Builder();
-        zebedee = new Zebedee(bob.zebedee, false);
-
-        publisher = zebedee.openSession(bob.publisher1Credentials);
-        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+        publisher = zebedee.openSession(builder.publisher1Credentials);
+        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
@@ -93,11 +81,6 @@ public class DataPublicationTest {
         // generate a set of data that will replace the data in published
         republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
 
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        bob.delete();
     }
 
     @Test

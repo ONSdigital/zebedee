@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -19,25 +20,15 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-@Ignore("IGNORE: user keys concurrency defect")
-public class PublishSchedulerTest {
+public class PublishSchedulerTest extends ZebedeeTestBaseFixture {
 
-    private Builder builder;
-    private Zebedee zebedee;
     private Session session;
     private PublishScheduler scheduler;
 
-    @Before
+
     public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee);
         session = zebedee.openSession(builder.publisher1Credentials);
         scheduler = new PublishScheduler();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
     }
 
     @Test

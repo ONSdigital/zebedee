@@ -4,8 +4,10 @@ import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.Permissions;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
+import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
+import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
@@ -46,6 +48,21 @@ public class ZebedeeConfiguration {
     private Path redirectPath;
     private boolean useVerificationAgent;
 
+    private VerificationAgent verificationAgent;
+    private ApplicationKeys applicationKeys;
+    private PublishedCollections publishedCollections;
+    private Collections collections;
+    private Content published;
+    private KeyringCache keyringCache;
+    private Path path;
+    private PermissionsServiceImpl permissionsServiceImpl;
+
+    private UsersService usersService;
+    private Teams teams;
+    private SessionsService sessionsService;
+    private DataIndex dataIndex;
+    private PermissionsStore permissionsStore;
+
     private static Path verifyDir(Path root, String dirName) {
         Path dir = root.resolve(dirName);
         if (!Files.exists(dir)) {
@@ -54,7 +71,7 @@ public class ZebedeeConfiguration {
         return dir;
     }
 
-    public void setZebedeeRootPath(Path zebedeeRootPath) {
+    public ZebedeeConfiguration(Path zebedeeRootPath, boolean enableVerificationAgent) {
         this.zebedeeRootPath = zebedeeRootPath;
         this.publishedContentPath = verifyDir(zebedeeRootPath, PUBLISHED);
         this.collectionsPath = verifyDir(zebedeeRootPath, COLLECTIONS);
@@ -65,7 +82,25 @@ public class ZebedeeConfiguration {
         this.teamsPath = verifyDir(zebedeeRootPath, TEAMS);
         this.applicationKeysPath = verifyDir(zebedeeRootPath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
+        this.useVerificationAgent = enableVerificationAgent;
+
+        this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
+        this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
+        this.keyringCache = new KeyringCache(sessionsService);
+        this.applicationKeys = new ApplicationKeys(applicationKeysPath);
+        this.sessionsService = new SessionsService(sessionsPath);
+        this.teams = new Teams(teamsPath, () -> getPermissionsServiceImpl());
+
+        this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
+        this.permissionsServiceImpl = new PermissionsServiceImpl(permissionsStore, () -> this.getUsersService(),
+                () -> this.getTeams(), keyringCache);
+
+        this.collections = new Collections(collectionsPath, permissionsServiceImpl, published);
+        this.usersService = UsersServiceImpl.getInstance(usersPath, collections, permissionsServiceImpl,
+                applicationKeys, keyringCache);
+
     }
+
 
     public void enableVerificationAgent(boolean enabled) {
         this.useVerificationAgent = enabled;
@@ -133,44 +168,55 @@ public class ZebedeeConfiguration {
         return content;
     }
 
+
+
+
+
+
+
+
+
     public DataIndex getDataIndex() {
-        return new DataIndex(new FileSystemContentReader(publishedContentPath));
+        return this.dataIndex;
     }
 
-    public Collections getCollections(Permissions permissions, Content published) {
-        return new Collections(collectionsPath, permissions, published);
+    public Collections getCollections() {
+        return this.collections;
     }
 
     public PublishedCollections getPublishCollections() {
-        return new PublishedCollections(publishedCollectionsPath);
+        return this.publishedCollections;
     }
 
-    public KeyringCache getKeyringCache(Zebedee z) {
-        return new KeyringCache(z);
+    public KeyringCache getKeyringCache() {
+        return this.keyringCache;
     }
 
     public ApplicationKeys getApplicationKeys() {
-        return new ApplicationKeys(applicationKeysPath);
+        return this.applicationKeys;
     }
 
     public SessionsService getSessionsService() {
-        return new SessionsService(sessionsPath);
+        return this.sessionsService;
     }
 
-    public Permissions getPermissions(Zebedee z) {
-        return new Permissions(permissionsPath, z);
+    public PermissionsServiceImpl getPermissionsServiceImpl() {
+        return this.permissionsServiceImpl;
     }
 
-    public Teams getTeams(Permissions permissions) {
-        return new Teams(teamsPath, permissions);
+    public Teams getTeams() {
+        return this.teams;
     }
 
-    public UsersService getUsersService(Collections collections, Permissions permissions, ApplicationKeys
-            applicationKeys, KeyringCache keyringCache) {
-        return UsersServiceImpl.getInstance(usersPath, collections, permissions, applicationKeys, keyringCache);
+    public UsersService getUsersService() {
+        return this.usersService;
     }
 
     public VerificationAgent getVerificationAgent(boolean verificationIsEnabled, Zebedee z) {
         return isUseVerificationAgent() && verificationIsEnabled ? new VerificationAgent(z) : null;
+    }
+
+    public PermissionsStore getPermissionsStore(Path accessMappingPath) {
+        return new PermissionsStoreFileSystemImpl(accessMappingPath);
     }
 }

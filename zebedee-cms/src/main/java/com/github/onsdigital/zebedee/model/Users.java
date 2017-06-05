@@ -56,7 +56,7 @@ public class Users {
         credentials.email = user.email;
         credentials.password = password;
         zebedee.getUsers().setPassword(session, credentials);
-        zebedee.getPermissions().addEditor(user.email, session);
+        zebedee.getPermissionsService().addEditor(user.email, session);
     }
 
     /**
@@ -70,7 +70,7 @@ public class Users {
     @Deprecated
     public static void createSystemUser(Zebedee zebedee, User user, String password) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
-        if (zebedee.getPermissions().hasAdministrator()) {
+        if (zebedee.getPermissionsService().hasAdministrator()) {
             // An initial system user already exists
             return;
         }
@@ -78,8 +78,8 @@ public class Users {
         // Create the user at a lower level because we don't have a Session at this point:
         zebedee.getUsers().create(user, "system");
         zebedee.getUsers().resetPassword(user, password, "system");
-        zebedee.getPermissions().addEditor(user.email, null);
-        zebedee.getPermissions().addAdministrator(user.email, null);
+        zebedee.getPermissionsService().addEditor(user.email, null);
+        zebedee.getPermissionsService().addAdministrator(user.email, null);
     }
 
     /**
@@ -226,7 +226,7 @@ public class Users {
     public User create(Session session, User user) throws UnauthorizedException, IOException, ConflictException, BadRequestException {
 
         // Check the user has create permissions
-        if (!zebedee.getPermissions().isAdministrator(session)) {
+        if (!zebedee.getPermissionsService().isAdministrator(session)) {
             throw new UnauthorizedException("This account is not permitted to create users.");
         }
 
@@ -282,7 +282,7 @@ public class Users {
     @Deprecated
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
-        if (zebedee.getPermissions().isAdministrator(session.getEmail()) == false) {
+        if (zebedee.getPermissionsService().isAdministrator(session.getEmail()) == false) {
             throw new UnauthorizedException("Administrator permissions required");
         }
 
@@ -376,7 +376,7 @@ public class Users {
     @Deprecated
     public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
 
-        if (!zebedee.getPermissions().isAdministrator(session.getEmail())) {
+        if (!zebedee.getPermissionsService().isAdministrator(session.getEmail())) {
             throw new UnauthorizedException("Administrator permissions required");
         }
 
@@ -428,14 +428,14 @@ public class Users {
         User user = read(credentials.email);
 
         // If own user updating, ensure the old password is correct
-        if (!zebedee.getPermissions().isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
+        if (!zebedee.getPermissionsService().isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
             throw new UnauthorizedException("Authentication failed with old password.");
         }
 
         if (credentials.email.equalsIgnoreCase(session.getEmail()) && StringUtils.isNotBlank(credentials.password)) {
             // User changing their own password
             result = changePassword(user, credentials.oldPassword, credentials.password);
-        } else if (zebedee.getPermissions().isAdministrator(session.getEmail()) || !zebedee.getPermissions().hasAdministrator()) {
+        } else if (zebedee.getPermissionsService().isAdministrator(session.getEmail()) || !zebedee.getPermissionsService().hasAdministrator()) {
             // Administrator reset, or system setup
 
             // Grab current keyring (null if this is system setup)

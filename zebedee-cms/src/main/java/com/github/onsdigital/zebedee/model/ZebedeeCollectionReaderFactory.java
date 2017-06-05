@@ -35,7 +35,7 @@ public class ZebedeeCollectionReaderFactory implements CollectionReaderFactory {
      */
     @Override
     public CollectionReader createCollectionReader(String collectionId, String sessionId) throws NotFoundException, IOException, BadRequestException, UnauthorizedException {
-        Session session = Root.zebedee.getSessionsService().get(sessionId);
+        Session session = zebedee.getSessionsService().get(sessionId);
         Collection collection = zebedee.getCollections().getCollection(collectionId);
         return getCollectionReader(collection, session);
     }

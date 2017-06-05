@@ -36,9 +36,7 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
         }
 
         // Authorisation
-        if (session == null
-                || !zebedee.getPermissions().canEdit(session.getEmail(),
-                collection.getDescription())) {
+        if (session == null || !zebedee.getPermissionsService().canEdit(session.getEmail(), collection.getDescription())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

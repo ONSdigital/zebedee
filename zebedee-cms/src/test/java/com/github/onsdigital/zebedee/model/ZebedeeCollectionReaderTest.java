@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
@@ -17,25 +18,14 @@ import java.io.IOException;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@Ignore("IGNORE: user keys concurrency defect")
-public class ZebedeeCollectionReaderTest {
+public class ZebedeeCollectionReaderTest extends ZebedeeTestBaseFixture {
 
-    Zebedee zebedee;
-    Builder builder;
     ZebedeeCollectionReader reader;
 
-    @Before
     public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
         Session session = zebedee.openSession(builder.publisher1Credentials);
         Collection collection = new Collection(builder.collections.get(0), zebedee);
         reader = new ZebedeeCollectionReader(zebedee, collection, session);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
     }
 
     @Test(expected = NullPointerException.class)

@@ -125,7 +125,7 @@ public class CollectionEventMetaData {
     private static String viewerTeamsAsStr(CollectionDescription collectionDescription, Session session)
             throws
             IOException, ZebedeeException {
-        Set<Integer> teams = Root.zebedee.getPermissions().listViewerTeams(collectionDescription, session);
+        Set<Integer> teams = Root.zebedee.getPermissionsService().listViewerTeams(collectionDescription, session);
         Iterator<Team> iterator = Root.zebedee.getTeams().resolveTeams(teams).iterator();
         StringBuilder teamsListStr = new StringBuilder();
 

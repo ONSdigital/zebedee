@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -13,22 +14,12 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class ZebedeeCollectionReaderFactoryTest {
+public class ZebedeeCollectionReaderFactoryTest extends ZebedeeTestBaseFixture {
 
-    Zebedee zebedee;
-    Builder builder;
     ZebedeeCollectionReaderFactory factory;
 
-    @Before
     public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
         factory = new ZebedeeCollectionReaderFactory(zebedee);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
     }
 
     @Test(expected = NotFoundException.class)

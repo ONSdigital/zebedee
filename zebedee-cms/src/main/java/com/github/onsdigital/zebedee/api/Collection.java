@@ -47,7 +47,7 @@ public class Collection {
         }
         // Check whether we have access
         Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissions().canView(session.getEmail(), collection.description)) {
+        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.description)) {
             throw new UnauthorizedException("You are not authorised to delete collections.");
         }
 
@@ -95,7 +95,7 @@ public class Collection {
         }
 
         Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissions().canEdit(session.getEmail())) {
+        if (!Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
             throw new UnauthorizedException("You are not authorised to create collections.");
         }
 
@@ -135,7 +135,7 @@ public class Collection {
     ) throws IOException, ZebedeeException {
 
         Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissions().canEdit(session.getEmail())) {
+        if (!Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
             throw new UnauthorizedException("You are not authorised to update collections.");
         }
 

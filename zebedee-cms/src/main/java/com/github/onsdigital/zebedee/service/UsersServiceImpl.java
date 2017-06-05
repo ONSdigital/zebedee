@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AdminOptions;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.UserList;
@@ -16,7 +17,6 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang3.BooleanUtils;
@@ -59,7 +59,7 @@ public class UsersServiceImpl implements UsersService {
     private final ReentrantLock lock = new ReentrantLock();
 
     private Path users;
-    private Permissions permissions;
+    private PermissionsService permissionsService;
     private ApplicationKeys applicationKeys;
     private KeyringCache keyringCache;
     private Collections collections;
@@ -67,12 +67,12 @@ public class UsersServiceImpl implements UsersService {
     /**
      * Get a singleton instance of {@link UsersServiceImpl}.
      */
-    public static UsersService getInstance(Path users, Collections collections, Permissions permissions,
+    public static UsersService getInstance(Path users, Collections collections, PermissionsService permissionsService,
                                            ApplicationKeys applicationKeys, KeyringCache keyringCache) {
         if (INSTANCE == null) {
             synchronized (MUTEX) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UsersServiceImpl(users, collections, permissions, applicationKeys, keyringCache);
+                    INSTANCE = new UsersServiceImpl(users, collections, permissionsService, applicationKeys, keyringCache);
                 }
             }
         }
@@ -83,14 +83,14 @@ public class UsersServiceImpl implements UsersService {
      *
      * @param users
      * @param collections
-     * @param permissions
+     * @param permissionsServiceImpl
      * @param applicationKeys
      * @param keyringCache
      */
-    UsersServiceImpl(Path users, Collections collections, Permissions permissions, ApplicationKeys
+    UsersServiceImpl(Path users, Collections collections, PermissionsService permissionsService, ApplicationKeys
             applicationKeys, KeyringCache keyringCache) {
         this.users = users;
-        this.permissions = permissions;
+        this.permissionsService = permissionsService;
         this.applicationKeys = applicationKeys;
         this.collections = collections;
         this.keyringCache = keyringCache;
@@ -139,7 +139,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public void createSystemUser(User user, String password) throws IOException, UnauthorizedException,
             NotFoundException, BadRequestException {
-        if (permissions.hasAdministrator()) {
+        if (permissionsService.hasAdministrator()) {
             logDebug(SYSTEM_USER_ALREADY_EXISTS_MSG).log();
             return;
         }
@@ -147,8 +147,8 @@ public class UsersServiceImpl implements UsersService {
         // Create the user at a lower level because we don't have a Session at this point:
         user = create(user, SYSTEM_USER);
         write(resetPassword(user, password, SYSTEM_USER));
-        permissions.addEditor(user.email, null);
-        permissions.addAdministrator(user.email, null);
+        permissionsService.addEditor(user.email, null);
+        permissionsService.addAdministrator(user.email, null);
     }
 
     @Override
@@ -159,13 +159,13 @@ public class UsersServiceImpl implements UsersService {
         credentials.email = user.email;
         credentials.password = password;
         setPassword(session, credentials);
-        permissions.addEditor(user.email, session);
+        permissionsService.addEditor(user.email, session);
     }
 
     @Override
     public User create(Session session, User user) throws UnauthorizedException, IOException, ConflictException,
             BadRequestException {
-        if (!permissions.isAdministrator(session)) {
+        if (!permissionsService.isAdministrator(session)) {
             throw new UnauthorizedException(CREATE_USER_AUTH_ERROR_MSG);
         }
         if (exists(user)) {
@@ -196,7 +196,7 @@ public class UsersServiceImpl implements UsersService {
         try {
             User user = read(credentials.email);
 
-            if (!permissions.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
+            if (!permissionsService.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
                 throw new UnauthorizedException("Authentication failed with old password.");
             }
 
@@ -207,7 +207,7 @@ public class UsersServiceImpl implements UsersService {
                 isSuccess = changePassword(user, credentials.oldPassword, credentials.password);
             } else {
                 // Only an admin can update another users password.
-                if (permissions.isAdministrator(session.getEmail()) || !permissions.hasAdministrator()) {
+                if (permissionsService.isAdministrator(session.getEmail()) || !permissionsService.hasAdministrator()) {
 
                     // Administrator reset, or system setup Grab current keyring (null if this is system setup)
                     Keyring originalKeyring = null;
@@ -308,8 +308,8 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public User update(Session session, User user, User updatedUser) throws IOException, UnauthorizedException,
             NotFoundException, BadRequestException {
-        if (!permissions.isAdministrator(session.getEmail())) {
-            throw new UnauthorizedException("Administrator permissions required");
+        if (!permissionsService.isAdministrator(session.getEmail())) {
+            throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 
         if (!exists(user.email)) {
@@ -320,8 +320,8 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
-        if (permissions.isAdministrator(session.getEmail()) == false) {
-            throw new UnauthorizedException("Administrator permissions required");
+        if (permissionsService.isAdministrator(session.getEmail()) == false) {
+            throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 
         if (!exists(user.email)) {

@@ -5,6 +5,8 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.Team;
 import org.apache.commons.lang3.StringUtils;
@@ -31,12 +33,13 @@ import static com.github.onsdigital.zebedee.configuration.Configuration.getUnaut
 public class Teams {
 
     private Path teamsPath;
-    private Permissions permissions;
+    //private PermissionsServiceImpl permissions;
     private ReadWriteLock teamLock = new ReentrantReadWriteLock();
+    private ServiceSupplier<PermissionsService> permissionsServiceSupplier;
 
-    public Teams(Path teams, Permissions permissions) {
+    public Teams(Path teams, ServiceSupplier<PermissionsService> permissionsServiceSupplier) {
         this.teamsPath = teams;
-        this.permissions = permissions;
+        this.permissionsServiceSupplier = permissionsServiceSupplier;
     }
 
     public List<Team> listTeams() throws IOException {
@@ -83,7 +86,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public Team createTeam(String teamName, Session session) throws IOException, UnauthorizedException, ConflictException, NotFoundException {
-        if (session == null || !permissions.isAdministrator(session.getEmail())) {
+        if (session == null || !permissionsServiceSupplier.getService().isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -116,7 +119,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void deleteTeam(Team delete, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
-        if (session == null || !permissions.isAdministrator(session.getEmail()))
+        if (session == null || !permissionsServiceSupplier.getService().isAdministrator(session.getEmail()))
             throw new UnauthorizedException(getUnauthorizedMessage(session));
 
         if (delete != null) {
@@ -149,7 +152,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void addTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
-        if (session == null || !permissions.isAdministrator(session.getEmail())) {
+        if (session == null || !permissionsServiceSupplier.getService().isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -168,7 +171,7 @@ public class Teams {
      * @throws IOException If a filesystem error occurs.
      */
     public void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException {
-        if (session == null || !permissions.isAdministrator(session.getEmail())) {
+        if (session == null || !permissionsServiceSupplier.getService().isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

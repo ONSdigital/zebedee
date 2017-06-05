@@ -185,7 +185,7 @@ public class Teams {
      */
     private void evaluateCollectionKeys(Zebedee zebedee, Session session, Team team, String... emails) throws IOException, NotFoundException, BadRequestException, UnauthorizedException {
         for (Collection collection : zebedee.getCollections().list()) {
-            Set<Integer> teamIds = Root.zebedee.getPermissions().listViewerTeams(collection.description, session);
+            Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
             if (teamIds != null && teamIds.contains(team.getId())) {
                 for (String memberEmail : emails) {
                     KeyManager.distributeKeyToUser(zebedee, collection, session,

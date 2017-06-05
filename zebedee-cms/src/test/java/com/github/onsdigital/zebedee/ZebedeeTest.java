@@ -9,6 +9,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,29 +32,24 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class ZebedeeTest {
+
+public class ZebedeeTest extends ZebedeeTestBaseFixture {
 
 	Path expectedPath;
-	Builder builder;
 	Map<String, String> env;
 
-	@Before
 	public void setUp() throws Exception {
 		env = Root.env;
 		Root.env = new HashMap<>(); // Run tests with known environment variables
-
-		builder = new Builder();
 		expectedPath = builder.parent.resolve(Zebedee.ZEBEDEE);
 	}
 
-	@After
+	@Override
 	public void tearDown() throws Exception {
-		builder.delete();
-		Root.env = env;
+		// do nothing.
 	}
 
-	@Ignore("IGNORE: user keys concurrency defect")
-	@Test
+/*	@Test
 	public void shouldCreate() throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
 
 		// Given
@@ -68,7 +64,7 @@ public class ZebedeeTest {
 		assertTrue(Files.exists(expectedPath.resolve(Zebedee.PUBLISHED)));
         assertTrue(Files.exists(expectedPath.resolve(Zebedee.COLLECTIONS)));
         assertTrue(Files.exists(expectedPath.resolve(Zebedee.USERS)));
-	}
+	}*/
 
 	@Test
 	public void shouldInstantiate() throws IOException {

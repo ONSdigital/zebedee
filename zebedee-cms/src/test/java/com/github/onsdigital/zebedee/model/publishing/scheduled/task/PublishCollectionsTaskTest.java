@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model.publishing.scheduled.task;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
@@ -20,23 +21,13 @@ import java.util.Date;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
-@Ignore("IGNORE: user keys concurrency defect")
-public class PublishCollectionsTaskTest {
+public class PublishCollectionsTaskTest extends ZebedeeTestBaseFixture {
 
-    Zebedee zebedee;
-    Builder builder;
     Session session;
 
-    @Before
+    @Override
     public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
         session = zebedee.openSession(builder.administratorCredentials);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
     }
 
     @Test

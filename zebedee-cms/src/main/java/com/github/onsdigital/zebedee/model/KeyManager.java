@@ -175,10 +175,6 @@ public class KeyManager {
             return;
         }
 
-        // Add the key to the user keyring and save
-//        user.keyring().put(keyIdentifier, key);
-//        zebedee.getUsers().addKeyToKeyring(user);
-
         zebedee.getUsersService().addKeyToKeyring(user.getEmail(), keyIdentifier, key);
 
         // If the user is logged in assign the key to their cached keyring
@@ -205,10 +201,6 @@ public class KeyManager {
     private static void removeKeyFromUser(Zebedee zebedee, User user, String keyIdentifier) throws IOException {
         // Escape in case user keyring has not been generated
         if (user.keyring() == null) return;
-
-        // Remove the key from the users keyring and save
-/*        user.keyring().remove(keyIdentifier);
-        zebedee.getUsers().updateKeyring(user);*/
 
         zebedee.getUsersService().removeKeyFromKeyring(user.getEmail(), keyIdentifier);
 

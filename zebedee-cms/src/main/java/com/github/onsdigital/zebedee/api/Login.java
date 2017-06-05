@@ -69,8 +69,6 @@ public class Login {
         // Temponary whilst encryption is being put in place.
         // This can be removed once all users have keyrings.
         usersServiceSupplier.getService().migrateToEncryption(user, credentials.password);
-        //com.github.onsdigital.zebedee.model.Users.migrateToEncryption(Root.zebedee, user, credentials.password);
-        //com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
         usersServiceSupplier.getService().removeStaleCollectionKeys(user.getEmail());
 
         if (BooleanUtils.isTrue(user.getTemporaryPassword())) {

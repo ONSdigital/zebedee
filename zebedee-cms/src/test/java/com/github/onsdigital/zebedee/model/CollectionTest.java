@@ -14,7 +14,7 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
-import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
@@ -59,7 +59,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         collection = new Collection(builder.collections.get(1), zebedee);
 
         publisherSession = zebedee.openSession(builder.publisher1Credentials);
-        publisher1Email = builder.publisher1.email;
+        publisher1Email = builder.publisher1.getEmail();
         collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
     }
 
@@ -1105,7 +1105,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         String releaseJsonUri = uri + "/data.json";
 
-        collection.complete(builder.publisher1.email, releaseJsonUri, recursive);
+        collection.complete(builder.publisher1.getEmail(), releaseJsonUri, recursive);
         collection.review(builder.createSession(builder.publisher2), releaseJsonUri, recursive);
 
         ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());

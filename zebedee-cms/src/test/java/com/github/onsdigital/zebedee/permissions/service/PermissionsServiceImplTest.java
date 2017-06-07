@@ -4,15 +4,15 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.service.UsersService;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -358,9 +358,6 @@ public class PermissionsServiceImplTest {
     }
 
 
-
-
-
     @Test(expected = UnauthorizedException.class)
     public void removeAdministrator_ShouldThrowExceptionIfSessionNull() throws Exception {
         try {
@@ -413,9 +410,6 @@ public class PermissionsServiceImplTest {
         verify(permissionsStore, times(1)).saveAccessMapping(accessMapping);
         verifyZeroInteractions(usersService, teams, keyringCache);
     }
-
-
-
 
 
     @Test(expected = UnauthorizedException.class)
@@ -526,7 +520,7 @@ public class PermissionsServiceImplTest {
         verify(accessMapping, times(2)).getAdministrators();
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void addAdministrator_ShouldThrowErrorSessionNull() throws Exception {
         admins.add(EMAIL);
 
@@ -545,7 +539,7 @@ public class PermissionsServiceImplTest {
         }
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void addAdministrator_ShouldThrowErrorSessionEmailNull() throws Exception {
         admins.add(EMAIL);
         session.setEmail(null);
@@ -565,7 +559,7 @@ public class PermissionsServiceImplTest {
         }
     }
 
-    @Test (expected = UnauthorizedException.class)
+    @Test(expected = UnauthorizedException.class)
     public void addAdministrator_ShouldThrowErrorIfUserNotAdmin() throws Exception {
         admins.add(EMAIL);
         session.setEmail("test2@ons.gov.uk");

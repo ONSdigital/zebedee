@@ -8,7 +8,8 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -213,6 +214,9 @@ public class KeyManager {
      */
     private static void removeKeyFromUser(Zebedee zebedee, User user, String keyIdentifier) throws IOException {
         // Escape in case user keyring has not been generated
+        if (user.keyring() == null) {
+            return;
+        }
         zebedee.getUsersService().removeKeyFromKeyring(user.getEmail(), keyIdentifier);
 
         // If the user is logged in remove the key from their cached keyring

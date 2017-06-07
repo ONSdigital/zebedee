@@ -1,5 +1,6 @@
-package com.github.onsdigital.zebedee.json;
+package com.github.onsdigital.zebedee.user.model;
 
+import com.github.onsdigital.zebedee.json.AdminOptions;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -11,19 +12,65 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class UserSanitised {
 
-    public String name;
-    public String email;
+    protected String name;
+    protected String email;
 
     /**
      * This field is {@link Boolean} rather than <code>boolean</code> so that it can be <code>null</code> in an update message.
      * This ensures the value won't change unless explicitly specified.
      */
-    public Boolean inactive;
+    protected Boolean inactive;
+    protected Boolean temporaryPassword;
+    protected String lastAdmin;
+    protected AdminOptions adminOptions;
 
-    public Boolean temporaryPassword;
-    public String lastAdmin;
+    public String getName() {
+        return name;
+    }
 
-    public AdminOptions adminOptions;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Boolean getInactive() {
+        return inactive;
+    }
+
+    public void setInactive(Boolean inactive) {
+        this.inactive = inactive;
+    }
+
+    public Boolean getTemporaryPassword() {
+        return temporaryPassword;
+    }
+
+    public void setTemporaryPassword(Boolean temporaryPassword) {
+        this.temporaryPassword = temporaryPassword;
+    }
+
+    public String getLastAdmin() {
+        return lastAdmin;
+    }
+
+    public void setLastAdmin(String lastAdmin) {
+        this.lastAdmin = lastAdmin;
+    }
+
+    public AdminOptions getAdminOptions() {
+        return adminOptions;
+    }
+
+    public void setAdminOptions(AdminOptions adminOptions) {
+        this.adminOptions = adminOptions;
+    }
 
     @Override
     public String toString() {
@@ -54,21 +101,5 @@ public class UserSanitised {
                 .append(inactive)
                 .append(lastAdmin)
                 .toHashCode();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

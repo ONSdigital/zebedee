@@ -6,6 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
+import com.github.onsdigital.zebedee.user.model.User;
 
 import java.io.IOException;
 

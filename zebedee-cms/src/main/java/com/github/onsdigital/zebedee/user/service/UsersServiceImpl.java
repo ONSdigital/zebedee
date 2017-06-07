@@ -1,6 +1,6 @@
-package com.github.onsdigital.zebedee.service;
+package com.github.onsdigital.zebedee.user.service;
 
-import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -8,33 +8,26 @@ import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.AdminOptions;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
-import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
-import com.google.gson.JsonSyntaxException;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
+import com.github.onsdigital.zebedee.user.store.UserStore;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static java.text.MessageFormat.format;
 
@@ -52,27 +45,33 @@ public class UsersServiceImpl implements UsersService {
 
     private static final Object MUTEX = new Object();
     private static final String JSON_EXT = ".json";
-    private static final String SYSTEM_USER = "system";
+    static final String SYSTEM_USER = "system";
 
     private static UsersService INSTANCE = null;
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    private Path users;
+    // private Path users;
     private PermissionsService permissionsService;
+    private KeyManangerUtil keyManangerUtil;
+    private PermissionsService permissions;
     private ApplicationKeys applicationKeys;
     private KeyringCache keyringCache;
     private Collections collections;
+    private UserStore userStore;
+    private UserFactory userFactory;
 
     /**
      * Get a singleton instance of {@link UsersServiceImpl}.
      */
-    public static UsersService getInstance(Path users, Collections collections, PermissionsService permissionsService,
-                                           ApplicationKeys applicationKeys, KeyringCache keyringCache) {
+    public static UsersService getInstance(UserStore userStore, Collections collections,
+                                           PermissionsService permissionsService, ApplicationKeys applicationKeys,
+                                           KeyringCache keyringCache) {
         if (INSTANCE == null) {
             synchronized (MUTEX) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UsersServiceImpl(users, collections, permissionsService, applicationKeys, keyringCache);
+                    INSTANCE = new UsersServiceImpl(userStore, collections, permissionsService, applicationKeys,
+                            keyringCache);
                 }
             }
         }
@@ -80,6 +79,9 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
+     * Create a new instance. Callers from outside of this package should use
+     * {@link UsersServiceImpl#getInstance(Collections, Permissions, ApplicationKeys, KeyringCache, UserStore)} to
+     * obatin a singleton instance of this service.
      *
      * @param users
      * @param collections
@@ -87,22 +89,24 @@ public class UsersServiceImpl implements UsersService {
      * @param applicationKeys
      * @param keyringCache
      */
-    UsersServiceImpl(Path users, Collections collections, PermissionsService permissionsService, ApplicationKeys
-            applicationKeys, KeyringCache keyringCache) {
-        this.users = users;
+    UsersServiceImpl(UserStore userStore, Collections collections, PermissionsService permissionsService,
+                     ApplicationKeys applicationKeys, KeyringCache keyringCache) {
         this.permissionsService = permissionsService;
         this.applicationKeys = applicationKeys;
         this.collections = collections;
         this.keyringCache = keyringCache;
+        this.userStore = userStore;
+        this.userFactory = new UserFactory();
+        this.keyManangerUtil = new KeyManangerUtil();
     }
 
     @Override
     public User addKeyToKeyring(String email, String keyIdentifier, SecretKey key) throws IOException {
         lock.lock();
         try {
-            User user = read(email);
+            User user = userStore.get(email);
             user.keyring().put(keyIdentifier, key);
-            write(user);
+            userStore.save(user);
             return user;
         } finally {
             lock.unlock();
@@ -117,10 +121,10 @@ public class UsersServiceImpl implements UsersService {
                 throw new BadRequestException(BLACK_EMAIL_MSG);
             }
 
-            if (!exists(email)) {
+            if (!userStore.exists(email)) {
                 throw new NotFoundException(format(UNKNOWN_USER_MSG, email));
             }
-            return read(email);
+            return userStore.get(email);
         } finally {
             lock.unlock();
         }
@@ -128,12 +132,12 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public boolean exists(String email) throws IOException {
-        return StringUtils.isNotBlank(email) && Files.exists(userPath(email));
+        return userStore.exists(email);
     }
 
     @Override
     public boolean exists(User user) throws IOException {
-        return user != null && exists(user.email);
+        return user != null && userStore.exists(user.getEmail());
     }
 
     @Override
@@ -145,10 +149,15 @@ public class UsersServiceImpl implements UsersService {
         }
 
         // Create the user at a lower level because we don't have a Session at this point:
-        user = create(user, SYSTEM_USER);
-        write(resetPassword(user, password, SYSTEM_USER));
-        permissionsService.addEditor(user.email, null);
-        permissionsService.addAdministrator(user.email, null);
+        lock.lock();
+        try {
+            user = create(user, SYSTEM_USER);
+            userStore.save(resetPassword(user, password, SYSTEM_USER));
+            permissionsService.addEditor(user.getEmail(), null);
+            permissionsService.addAdministrator(user.getEmail(), null);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -156,10 +165,10 @@ public class UsersServiceImpl implements UsersService {
             UnauthorizedException, ConflictException, BadRequestException, NotFoundException {
         create(session, user);
         Credentials credentials = new Credentials();
-        credentials.email = user.email;
-        credentials.password = password;
+        credentials.setEmail(user.getEmail());
+        credentials.setPassword(password);
         setPassword(session, credentials);
-        permissionsService.addEditor(user.email, session);
+        permissionsService.addEditor(user.getEmail(), session);
     }
 
     @Override
@@ -168,8 +177,11 @@ public class UsersServiceImpl implements UsersService {
         if (!permissionsService.isAdministrator(session)) {
             throw new UnauthorizedException(CREATE_USER_AUTH_ERROR_MSG);
         }
-        if (exists(user)) {
-            throw new ConflictException(format(USER_ALREADY_EXISTS_MSG, user.email));
+        if (user == null) {
+            throw new BadRequestException(USER_IS_NULL_MSG);
+        }
+        if (userStore.exists(user.getEmail())) {
+            throw new ConflictException(format(USER_ALREADY_EXISTS_MSG, user.getEmail()));
         }
         if (!valid(user)) {
             throw new BadRequestException(USER_DETAILS_INVALID_MSG);
@@ -188,39 +200,39 @@ public class UsersServiceImpl implements UsersService {
         if (credentials == null) {
             throw new BadRequestException("Cannot set password for user as credentials is null.");
         }
-        if (!exists(credentials.email)) {
+        if (!userStore.exists(credentials.getEmail())) {
             throw new BadRequestException("Cannot set password as user does not exist");
         }
 
         lock.lock();
         try {
-            User user = read(credentials.email);
+            User user = userStore.get(credentials.getEmail());
 
-            if (!permissionsService.isAdministrator(session) && !user.authenticate(credentials.oldPassword)) {
+            if (!permissionsService.isAdministrator(session) && !user.authenticate(credentials.getOldPassword())) {
                 throw new UnauthorizedException("Authentication failed with old password.");
             }
 
-            boolean settingOwnPwd = credentials.email.equalsIgnoreCase(session.getEmail())
+            boolean settingOwnPwd = credentials.getEmail().equalsIgnoreCase(session.getEmail())
                     && StringUtils.isNotBlank(credentials.password);
 
             if (settingOwnPwd) {
-                isSuccess = changePassword(user, credentials.oldPassword, credentials.password);
+                isSuccess = changePassword(user, credentials.getOldPassword(), credentials.getPassword());
             } else {
                 // Only an admin can update another users password.
                 if (permissionsService.isAdministrator(session.getEmail()) || !permissionsService.hasAdministrator()) {
 
                     // Administrator reset, or system setup Grab current keyring (null if this is system setup)
                     Keyring originalKeyring = null;
-                    if (user.keyring != null) {
-                        originalKeyring = user.keyring.clone();
+                    if (user.keyring() != null) {
+                        originalKeyring = user.keyring().clone();
                     }
 
-                    user = resetPassword(user, credentials.password, session.getEmail());
+                    user = resetPassword(user, credentials.getPassword(), session.getEmail());
                     // Restore the user keyring (or not if this is system setup)
                     if (originalKeyring != null) {
-                        KeyManager.transferKeyring(user.keyring, keyringCache.get(session), originalKeyring.list());
+                        keyManangerUtil.transferKeyring(user.keyring(), keyringCache.get(session), originalKeyring.list());
                     }
-                    write(user);
+                    userStore.save(user);
                     isSuccess = true;
                 } else {
                     // Set password unsuccessful.
@@ -238,29 +250,17 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public UserList list() throws IOException {
-        UserList result = new UserList();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(users)) {
-            for (Path path : stream) {
-                if (!Files.isDirectory(path)) {
-                    try (InputStream input = Files.newInputStream(path)) {
-                        User user = Serialiser.deserialise(input, User.class);
-                        result.add(user);
-                    } catch (JsonSyntaxException e) {
-                        logError(e, "Error deserialising user").addParameter("path", path.toString()).log();
-                    }
-                }
-            }
-        }
-        return result;
+        return userStore.list();
     }
 
     @Override
-    public void removeStaleCollectionKeys(String userEmail) throws IOException, NotFoundException, BadRequestException {
+    public void removeStaleCollectionKeys(String userEmail) throws
+            IOException, NotFoundException, BadRequestException {
         lock.lock();
         try {
             User user = getUserByEmail(userEmail);
 
-            if (user.keyring != null) {
+            if (user.keyring() != null) {
                 Map<String, Collection> collectionMap = collections.mapByID();
 
                 List<String> keysToRemove = user.keyring()
@@ -282,7 +282,7 @@ public class UsersServiceImpl implements UsersService {
                 });
 
                 if (!keysToRemove.isEmpty()) {
-                    update(user, user, user.lastAdmin);
+                    update(user, user, user.getLastAdmin());
                 }
             }
         } finally {
@@ -293,11 +293,12 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public User removeKeyFromKeyring(String email, String keyIdentifier) throws IOException {
+        // TODO MIGHT WANT TO CONSIDER HOW WE MIGHT ROLLBACK IS THE SAVE CALL FAILS.
         lock.lock();
         try {
-            User user = read(email);
+            User user = userStore.get(email);
             user.keyring().remove(keyIdentifier);
-            write(user);
+            userStore.save(user);
             return user;
         } finally {
             lock.unlock();
@@ -312,26 +313,28 @@ public class UsersServiceImpl implements UsersService {
             throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 
-        if (!exists(user.email)) {
-            throw new NotFoundException("User " + user.email + " could not be found");
+        if (!userStore.exists(user.getEmail())) {
+            throw new NotFoundException("User " + user.getEmail() + " could not be found");
         }
         return update(user, updatedUser, session.getEmail());
     }
 
     @Override
-    public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException {
+    public boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
+        if (session == null) {
+            throw new BadRequestException("A session is required to delete a user.");
+        }
         if (permissionsService.isAdministrator(session.getEmail()) == false) {
             throw new UnauthorizedException("Administrator permissionsServiceImpl required");
         }
 
-        if (!exists(user.email)) {
-            throw new NotFoundException(format(UNKNOWN_USER_MSG, user.email));
+        if (!userStore.exists(user.getEmail())) {
+            throw new NotFoundException(format(UNKNOWN_USER_MSG, user.getEmail()));
         }
 
-        Path path = userPath(user.email);
         lock.lock();
         try {
-            return Files.deleteIfExists(path);
+            return userStore.delete(user);
         } finally {
             lock.unlock();
         }
@@ -370,13 +373,21 @@ public class UsersServiceImpl implements UsersService {
     public User updateKeyring(User user) throws IOException {
         lock.lock();
         try {
-            User updated = read(user.email);
+            User updated = userStore.get(user.getEmail());
             if (updated != null) {
-                updated.keyring = user.keyring.clone();
+
+                if (updated.keyring() == null) {
+                    logDebug("User keyring not updated as it is currently null.")
+                            .user(updated.getEmail())
+                            .log();
+                    return updated;
+                }
+
+                updated.setKeyring(user.keyring().clone());
 
                 // Only set this to true if explicitly set:
-                updated.inactive = BooleanUtils.isTrue(user.inactive);
-                write(updated);
+                updated.setInactive(BooleanUtils.isTrue(user.getInactive()));
+                userStore.save(updated);
             }
             return updated;
         } finally {
@@ -388,14 +399,9 @@ public class UsersServiceImpl implements UsersService {
         User result = null;
         lock.lock();
         try {
-            if (valid(user) && !exists(user.email)) {
-                result = new User();
-                result.email = user.email;
-                result.name = user.name;
-                result.inactive = true;
-                result.temporaryPassword = true;
-                result.lastAdmin = lastAdmin;
-                write(result);
+            if (valid(user) && !userStore.exists(user.getEmail())) {
+                result = userFactory.newUserWithDefaultSettings(user.getEmail(), user.getName(), lastAdmin);
+                userStore.save(result);
             }
             return result;
         } finally {
@@ -411,11 +417,11 @@ public class UsersServiceImpl implements UsersService {
 
                 System.out.println("\nUSER KEYRING IS NULL GENERATING NEW KEYRING\n");
 
-                user = read(user.email);
+                user = userStore.get(user.getEmail());
                 // The keyring has not been generated yet,
                 // so reset the password to the current password
                 // in order to generate a keyring and associated key pair:
-                logDebug("Generating keyring").user(user.email).log();
+                logDebug("Generating keyring").user(user.getEmail()).log();
                 user.resetPassword(password);
                 update(user, user, "Encryption migration");
             }
@@ -429,23 +435,23 @@ public class UsersServiceImpl implements UsersService {
         lock.lock();
         try {
             if (user != null) {
-                if (updatedUser.name != null && updatedUser.name.length() > 0) {
-                    user.name = updatedUser.name;
+                if (updatedUser.getName() != null && updatedUser.getName().length() > 0) {
+                    user.setName(updatedUser.getName());
                 }
                 // Create adminOptions object if user doesn't already have it
-                if (user.adminOptions == null) {
-                    user.adminOptions = new AdminOptions();
+                if (user.getAdminOptions() == null) {
+                    user.setAdminOptions(new AdminOptions());
                 }
                 // Update adminOptions object if updatedUser options are different to stored user options
-                if (updatedUser.adminOptions != null) {
-                    if (updatedUser.adminOptions.rawJson != user.adminOptions.rawJson) {
-                        user.adminOptions.rawJson = updatedUser.adminOptions.rawJson;
-                        System.out.println(user.adminOptions.rawJson);
+                if (updatedUser.getAdminOptions() != null) {
+                    if (updatedUser.getAdminOptions().rawJson != user.getAdminOptions().rawJson) {
+                        user.getAdminOptions().rawJson = updatedUser.getAdminOptions().rawJson;
+                        logDebug("Update").addParameter("User.adminoptions.rawJson", user.getAdminOptions().rawJson);
                     }
                 }
 
-                user.lastAdmin = lastAdmin;
-                write(user);
+                user.setLastAdmin(lastAdmin);
+                userStore.save(user);
             }
             return user;
         } finally {
@@ -453,60 +459,22 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
-    private void write(User user) throws IOException {
-        lock.lock();
-        try {
-            user.email = normalise(user.email);
-            Path userPath = userPath(user.email);
-            Serialiser.serialise(userPath, user);
-        } catch (Exception ex) {
-            logError(ex).log();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private User read(String email) throws IOException {
-        lock.lock();
-        try {
-            User result = null;
-            if (exists(email)) {
-                result = Serialiser.deserialise(userPath(email), User.class);
-            }
-            return result;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private Path userPath(String email) {
-        Path result = null;
-        if (StringUtils.isNotBlank(email)) {
-            String userFileName = PathUtils.toFilename(normalise(email));
-            userFileName += JSON_EXT;
-            result = users.resolve(userFileName);
-        }
-        return result;
-    }
-
     private String normalise(String email) {
         return StringUtils.lowerCase(StringUtils.trim(email));
     }
 
     private boolean valid(User user) {
-        return user != null && StringUtils.isNoneBlank(user.email, user.name);
+        return user != null && StringUtils.isNoneBlank(user.getEmail(), user.getName());
     }
 
     private boolean changePassword(User user, String oldPassword, String newPassword) throws IOException {
         lock.lock();
         try {
             if (user.changePassword(oldPassword, newPassword)) {
-/*                // Make sure we have the latest before we save.
-                user = read(user.email);*/
-                user.inactive = false;
-                user.lastAdmin = user.email;
-                user.temporaryPassword = false;
-                write(user);
+                user.setInactive(false);
+                user.setLastAdmin(user.getEmail());
+                user.setTemporaryPassword(false);
+                userStore.save(user);
                 return true;
             }
             return false;
@@ -528,12 +496,44 @@ public class UsersServiceImpl implements UsersService {
         lock.lock();
         try {
             user.resetPassword(password);
-            user.inactive = false;
-            user.lastAdmin = adminEmail;
-            user.temporaryPassword = true;
+            user.setInactive(false);
+            user.setLastAdmin(adminEmail);
+            user.setTemporaryPassword(true);
             return user;
         } finally {
             lock.unlock();
+        }
+    }
+
+    /**
+     * Factory class encapsulating the creation of new {@link User}.
+     */
+    protected class UserFactory {
+
+        /**
+         * Encapsulate the creation of a new {@link User} with default settings.
+         * <ul>
+         * <li>{@link User#email} -> email provided</li>
+         * <li>{@link User#name} -> name provided</li>
+         * <li>{@link User#inactive} -> true</li>
+         * <li>{@link User#temporaryPassword} -> true</li>
+         * <li>{@link User#keyring} -> null</li>
+         * <li>{@link User#passwordHash} -> null</li>
+         * </ul>
+         *
+         * @param email     the email address to set for the new user.
+         * @param name      the name to set for the new user.
+         * @param lastAdmin email / name of the last admin user to change / update this user.
+         * @return a new {@link User} with the properties set as described above.
+         */
+        public User newUserWithDefaultSettings(String email, String name, String lastAdmin) {
+            User user = new User();
+            user.setEmail(email);
+            user.setName(name);
+            user.setInactive(true);
+            user.setTemporaryPassword(true);
+            user.setLastAdmin(lastAdmin);
+            return user;
         }
     }
 }

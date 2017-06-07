@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.service;
+package com.github.onsdigital.zebedee.user.service;
 
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
@@ -6,8 +6,8 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -24,6 +24,7 @@ public interface UsersService {
     String SYSTEM_USER_ALREADY_EXISTS_MSG = "A system user already exists, no futher action required.";
     String CREATE_USER_AUTH_ERROR_MSG = "This account is not permitted to create users.";
     String USER_DETAILS_INVALID_MSG = "Name & email are required fields for User.";
+    String USER_IS_NULL_MSG = "User was null";
 
     /**
      * Get a {@link User} by their email address.
@@ -172,7 +173,8 @@ public interface UsersService {
      * @throws UnauthorizedException unexpected problem deleting the user.
      * @throws NotFoundException     unexpected problem deleting the user.
      */
-    boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException;
+    boolean delete(Session session, User user) throws IOException, UnauthorizedException, NotFoundException,
+            BadRequestException;
 
     /**
      * Migrate the {@link User} to use collection key encryption. WE THINK THIS IS NO LONGER REQUIRED.

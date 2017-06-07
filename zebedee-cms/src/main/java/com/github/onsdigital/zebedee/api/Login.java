@@ -5,10 +5,10 @@ import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,11 +69,9 @@ public class Login {
         // Temponary whilst encryption is being put in place.
         // This can be removed once all users have keyrings.
         usersServiceSupplier.getService().migrateToEncryption(user, credentials.password);
-        //com.github.onsdigital.zebedee.model.Users.migrateToEncryption(Root.zebedee, user, credentials.password);
-        //com.github.onsdigital.zebedee.model.Users.cleanupCollectionKeys(Root.zebedee, user);
-        usersServiceSupplier.getService().removeStaleCollectionKeys(user.email);
+        usersServiceSupplier.getService().removeStaleCollectionKeys(user.getEmail());
 
-        if (BooleanUtils.isTrue(user.temporaryPassword)) {
+        if (BooleanUtils.isTrue(user.getTemporaryPassword())) {
             response.setStatus(HttpStatus.EXPECTATION_FAILED_417);
             Audit.Event.LOGIN_PASSWORD_CHANGE_REQUIRED.parameters().host(request).user(credentials.email).log();
             ZebedeeLogBuilder.logInfo(PASSWORD_CHANGE_REQUIRED_MSG).user(credentials.email).log();

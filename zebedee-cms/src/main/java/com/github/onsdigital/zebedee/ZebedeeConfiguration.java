@@ -4,17 +4,18 @@ import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
-import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
-import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
+import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import com.github.onsdigital.zebedee.service.UsersService;
-import com.github.onsdigital.zebedee.service.UsersServiceImpl;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
+import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.verification.VerificationAgent;
 
 import java.io.IOException;
@@ -91,19 +92,23 @@ public class ZebedeeConfiguration {
         this.sessionsService = new SessionsService(sessionsPath);
         this.teams = new Teams(teamsPath, () -> getPermissionsServiceImpl());
 
+        this.published = createPublished();
+
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
+
         this.permissionsServiceImpl = new PermissionsServiceImpl(permissionsStore, () -> this.getUsersService(),
                 () -> this.getTeams(), keyringCache);
 
         this.collections = new Collections(collectionsPath, permissionsServiceImpl, published);
-        this.usersService = UsersServiceImpl.getInstance(usersPath, collections, permissionsServiceImpl,
-                applicationKeys, keyringCache);
 
+        this.usersService = UsersServiceImpl.getInstance(new UserStoreFileSystemImpl(this.usersPath), collections,
+                permissionsServiceImpl, applicationKeys, keyringCache);
     }
 
 
-    public void enableVerificationAgent(boolean enabled) {
+    public ZebedeeConfiguration enableVerificationAgent(boolean enabled) {
         this.useVerificationAgent = enabled;
+        return this;
     }
 
     public boolean isUseVerificationAgent() {
@@ -151,6 +156,10 @@ public class ZebedeeConfiguration {
     }
 
     public Content getPublished() {
+        return this.published;
+    }
+
+    private Content createPublished() {
         Content content = new Content(publishedContentPath);
         Path redirectPath = publishedContentPath.resolve(Content.REDIRECT);
         if (!Files.exists(redirectPath)) {
@@ -167,13 +176,6 @@ public class ZebedeeConfiguration {
         }
         return content;
     }
-
-
-
-
-
-
-
 
 
     public DataIndex getDataIndex() {

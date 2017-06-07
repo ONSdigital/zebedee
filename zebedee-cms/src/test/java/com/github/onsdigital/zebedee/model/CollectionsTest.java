@@ -15,7 +15,7 @@ import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
@@ -23,7 +23,7 @@ import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
-import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.fileupload.FileUploadException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -140,7 +140,7 @@ public class CollectionsTest {
 
         System.setProperty("audit_db_enabled", "false");
         testUser = new User();
-        testUser.email = TEST_EMAIL;
+        testUser.setEmail(TEST_EMAIL);
         rootDir.create();
         collectionsPath = rootDir.newFolder("collections").toPath();
 

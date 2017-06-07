@@ -14,7 +14,7 @@ import com.github.onsdigital.zebedee.json.TeamList;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

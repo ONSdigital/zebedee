@@ -1,6 +1,5 @@
 package com.github.onsdigital.zebedee.permissions.service;
 
-import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
@@ -9,6 +8,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
+import com.github.onsdigital.zebedee.json.Team;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.KeyManager;
@@ -16,12 +16,11 @@ import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.Response;
@@ -54,7 +53,6 @@ public class PermissionsServiceImpl implements PermissionsService {
     private ServiceSupplier<Teams> teamsServiceSupplier;
 
     /**
-     *
      * @param permissionsStore
      * @param usersServiceSupplier
      * @param teamsServiceSupplier
@@ -281,7 +279,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     @Override
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(user.getEmail()) && user.keyring.list().contains(collectionDescription.getId());
+            return canEdit(user.getEmail()) && user.keyring().list().contains(collectionDescription.getId());
         } else {
             return canEdit(user.getEmail());
         }
@@ -637,8 +635,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     private void updateKeyring(Session session, String email, CollectionOwner collectionOwner)
             throws IOException, NotFoundException, BadRequestException {
         User user = usersServiceSupplier.getService().getUserByEmail(email);
-        if (session != null && user.keyring != null) {
-            KeyManager.transferKeyring(user.keyring, keyringCache.get(session), collectionOwner);
+        if (session != null && user.keyring() != null) {
+            KeyManager.transferKeyring(user.keyring(), keyringCache.get(session), collectionOwner);
             usersServiceSupplier.getService().updateKeyring(user);
         }
     }

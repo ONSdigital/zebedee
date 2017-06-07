@@ -9,7 +9,7 @@ import com.github.onsdigital.zebedee.json.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.session.model.Session;

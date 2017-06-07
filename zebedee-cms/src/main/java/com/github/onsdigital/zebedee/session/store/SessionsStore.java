@@ -1,6 +1,7 @@
 package com.github.onsdigital.zebedee.session.store;
 
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
 
 import java.io.IOException;
 import java.nio.file.Path;

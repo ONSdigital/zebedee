@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
 /**
  * Created by dave on 31/05/2017.
@@ -30,10 +30,9 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
         Path jsonPath = accessMappingPath.resolve(PERMISSIONS_FILE);
 
         if (!Files.exists(jsonPath)) {
-            System.out.println("AccessMapping file does not yet exist. Empty one will be created.");
+            logDebug("AccessMapping file does not yet exist. Empty one will be created.").log();
 
             jsonPath.toFile().createNewFile();
-
             try (OutputStream output = Files.newOutputStream(jsonPath)) {
                 Serialiser.serialise(output, new AccessMapping());
             }
@@ -43,19 +42,6 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
     public PermissionsStoreFileSystemImpl(Path accessMappingPath) {
         this.accessMappingPath = accessMappingPath;
         this.accessMappingFilePath = this.accessMappingPath.resolve(PERMISSIONS_FILE);
-
-        if (!Files.exists(this.accessMappingFilePath)) {
-            System.out.println("AccessMapping file does not yet exist. Empty one will be created.");
-
-            accessMappingLock.writeLock().lock();
-            try (OutputStream output = Files.newOutputStream(accessMappingFilePath)) {
-                Serialiser.serialise(output, new AccessMapping());
-            } catch (IOException e) {
-                logError(e, "Unexpected error while attempting to create accessMapping file.").throwUnchecked(e);
-            } finally {
-                accessMappingLock.writeLock().unlock();
-            }
-        }
     }
 
     @Override

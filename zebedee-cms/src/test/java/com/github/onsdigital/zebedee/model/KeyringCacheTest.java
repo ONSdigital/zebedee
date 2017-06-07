@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -132,7 +132,7 @@ public class KeyringCacheTest {
 
     private User user() {
         User result = new User();
-        result.email = Random.id()+"@example.com";
+        result.setEmail(Random.id()+"@example.com");
         result.resetPassword(Random.password(8));
         return result;
     }

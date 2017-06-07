@@ -1,9 +1,9 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.user.model.User;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -37,9 +37,9 @@ public class KeyringCache {
                 keyringMap.put(session, user.keyring());
 
                 // populate the scheduler keyring
-                for (String collectionId : user.keyring.list()) {
+                for (String collectionId : user.keyring().list()) {
                     if (!schedulerCache.containsKey(collectionId))
-                        schedulerCache.put(collectionId, user.keyring.get(collectionId));
+                        schedulerCache.put(collectionId, user.keyring().get(collectionId));
                 }
             }
         }
@@ -56,7 +56,7 @@ public class KeyringCache {
         Keyring result = null;
 
         if (user != null) {
-            Session session = sessionsService.find(user.email);
+            Session session = sessionsService.find(user.getEmail());
             if (session != null) {
                 result = keyringMap.get(session);
             }

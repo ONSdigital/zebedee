@@ -3,11 +3,11 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.service.UsersService;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import org.junit.Before;
@@ -173,6 +173,8 @@ public class KeyManagerTest {
         UserList ul = new UserList();
         ul.add(user);
 
+        when(user.keyring())
+                .thenReturn(keyring);
         when(usersService.list())
                 .thenReturn(ul);
         when(permissionsServiceImpl.isAdministrator(EMAIL))
@@ -198,6 +200,7 @@ public class KeyManagerTest {
         verify(usersService, times(1)).removeKeyFromKeyring(EMAIL, COLLECTION_ID);
         verify(sessionsService, times(1)).find(EMAIL);
         verify(user, times(5)).getEmail();
+        verify(user, times(1)).keyring();
         verifyNoMoreInteractions(zebedee, permissionsServiceImpl, usersService, sessionsService, keyringCache, user, keyring, session);
     }
 
@@ -293,6 +296,8 @@ public class KeyManagerTest {
                 .thenReturn(false);
         when(sessionsService.find(EMAIL))
                 .thenReturn(session);
+        when(user.keyring())
+                .thenReturn(keyring);
 
         KeyManager.distributeKeyToUser(zebedee, collection, session, user);
 

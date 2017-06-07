@@ -1,6 +1,7 @@
-package com.github.onsdigital.zebedee.json;
+package com.github.onsdigital.zebedee.user.model;
 
 import com.github.davidcarboni.cryptolite.Password;
+import com.github.onsdigital.zebedee.json.Keyring;
 import org.apache.commons.lang3.BooleanUtils;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -16,7 +17,7 @@ public class User extends UserSanitised {
     // to unlock the keyring, so we need to
     // manage these fields together.
     private String passwordHash;
-    public Keyring keyring;
+    private Keyring keyring;
 
     /**
      * Constructor for deserialisation.
@@ -44,7 +45,7 @@ public class User extends UserSanitised {
         boolean result = true;
 
         if (authenticate(oldPassword)) {
-            if (keyring.changePassword(oldPassword, newPassword)) {
+            if (keyring().changePassword(oldPassword, newPassword)) {
                 passwordHash = Password.hash(newPassword);
                 result = true;
             } else {
@@ -77,6 +78,10 @@ public class User extends UserSanitised {
      */
     public Keyring keyring() {
         return keyring;
+    }
+
+    public void setKeyring(Keyring keyring) {
+        this.keyring = keyring;
     }
 
     @Override

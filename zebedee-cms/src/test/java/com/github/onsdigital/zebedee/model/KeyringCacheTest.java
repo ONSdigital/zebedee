@@ -1,38 +1,26 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for {@link KeyringCache}.
  */
-public class KeyringCacheTest {
+public class KeyringCacheTest extends ZebedeeTestBaseFixture {
 
-    static Builder builder;
-    private Zebedee zebedee;
     private KeyringCache keyringCache;
 
-    @BeforeClass
-    public static void beforeClass() throws IOException, CollectionNotFoundException {
-        builder = new Builder();
-    }
-
-    @Before
-    public  void before() throws IOException, CollectionNotFoundException {
-        zebedee = new Zebedee(builder.zebedee, false);
-         keyringCache = zebedee.getKeyringCache();
+    @Override
+    public void setUp() throws Exception {
+        keyringCache = zebedee.getKeyringCache();
     }
 
     @Test
@@ -132,7 +120,7 @@ public class KeyringCacheTest {
 
     private User user() {
         User result = new User();
-        result.setEmail(Random.id()+"@example.com");
+        result.setEmail(Random.id() + "@example.com");
         result.resetPassword(Random.password(8));
         return result;
     }

@@ -76,6 +76,7 @@ public class RedirectTableChained {
     public void setChild(RedirectTableChained child) {
         this.child = child;
     }
+
     public RedirectTableChained getChild() {
         return child;
     }
@@ -88,6 +89,7 @@ public class RedirectTableChained {
     public void addRedirect(String redirectFrom, String redirectTo) {
         table.put(redirectFrom, redirectTo);
     }
+
     public void removeRedirect(String redirectFrom) {
         table.remove(redirectFrom);
     }

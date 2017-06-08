@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
@@ -43,7 +44,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by thomasridd on 1/24/16.
  */
-public class ContentIOUtilsTest {
+public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
 
     @Mock
     private UsersService usersService;
@@ -54,8 +55,6 @@ public class ContentIOUtilsTest {
     @Mock
     private CollectionHistoryDao collectionHistoryDao;
 
-    Zebedee zebedee;
-    Builder bob;
     Session publisher;
     Session reviewer;
 
@@ -76,45 +75,10 @@ public class ContentIOUtilsTest {
      *
      * @throws Exception
      */
-    @Before
+    @Override
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
-        ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
-        Collection.setCollectionHistoryDaoServiceSupplier(collectionHistoryDaoServiceSupplier);
-        Collection.setKeyManagerUtil(keyManangerUtil);
-
-        bob = new Builder();
-        zebedee = new Zebedee(bob.zebedee, false);
-
-        ReflectionTestUtils.setField(zebedee, "usersService", usersService);
-
-        when(usersService.getUserByEmail(bob.publisher1Credentials.email))
-                .thenReturn(bob.publisher1);
-        when(usersService.getUserByEmail(bob.reviewer1.getEmail()))
-                .thenReturn(bob.reviewer1);
-
-        Map<String, String> emailToCreds = new HashMap<>();
-        emailToCreds.put(bob.publisher1.getEmail(), bob.publisher1Credentials.password);
-
-        // UsersService is now mocked so needs to add this mannually.
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                User u = invocationOnMock.getArgumentAt(1, User.class);
-                String id = invocationOnMock.getArgumentAt(2, String.class);
-                SecretKey key = invocationOnMock.getArgumentAt(3, SecretKey.class);
-
-                if (emailToCreds.containsKey(u.getEmail())) {
-                    u.keyring().unlock(emailToCreds.get(u.getEmail()));
-                    u.keyring().put(id, key);
-                }
-                return null;
-            }
-        }).when(keyManangerUtil).assignKeyToUser(any(), any(), any(), any());
-
-        publisher = zebedee.openSession(bob.publisher1Credentials);
-        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+        publisher = zebedee.openSession(builder.publisher1Credentials);
+        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
         // create a copy destination
         copy = Files.createTempDirectory("ContentIOUtils");
@@ -144,9 +108,8 @@ public class ContentIOUtilsTest {
 
     }
 
-    @After
+    @Override
     public void tearDown() throws IOException {
-        bob.delete();
         FileUtils.deleteDirectory(copy.toFile());
 
     }

@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
 import com.github.onsdigital.zebedee.model.Teams;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
@@ -30,14 +31,20 @@ import static com.github.onsdigital.zebedee.Zebedee.PUBLISHED_COLLECTIONS;
 import static com.github.onsdigital.zebedee.Zebedee.SESSIONS;
 import static com.github.onsdigital.zebedee.Zebedee.TEAMS;
 import static com.github.onsdigital.zebedee.Zebedee.USERS;
+import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 
 /**
- * Created by dave on 19/05/2017.
+ * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
+ * directories required by zebedee, create the service instances it requires etc.
  */
 public class ZebedeeConfiguration {
 
-    private Path zebedeeRootPath;
+    private static final String LOG_PREFIX = "[ZebedeeConfiguration]: ";
+
+    private Path rootPath;
+    private Path zebedeePath;
     private Path publishedContentPath;
     private Path publishedCollectionsPath;
     private Path collectionsPath;
@@ -48,61 +55,101 @@ public class ZebedeeConfiguration {
     private Path applicationKeysPath;
     private Path redirectPath;
     private boolean useVerificationAgent;
-
     private VerificationAgent verificationAgent;
     private ApplicationKeys applicationKeys;
     private PublishedCollections publishedCollections;
     private Collections collections;
     private Content published;
     private KeyringCache keyringCache;
-    private Path path;
-    private PermissionsServiceImpl permissionsServiceImpl;
-
+    private PermissionsService permissionsService;
     private UsersService usersService;
     private Teams teams;
     private SessionsService sessionsService;
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
 
-    private static Path verifyDir(Path root, String dirName) {
+    private static Path createDir(Path root, String dirName) throws IOException {
         Path dir = root.resolve(dirName);
         if (!Files.exists(dir)) {
-            throw new IllegalArgumentException("This folder doesn't look like a zebedee folder: " + dir.toAbsolutePath());
+            logDebug(LOG_PREFIX + "Creating required Zebedee directory as it does not exist.")
+                    .path(dirName.toString()).log();
+            Files.createDirectory(dir);
+        } else {
+            logDebug(LOG_PREFIX + "Zebedee directory already exists no action required.")
+                    .path(dir.toString()).log();
         }
         return dir;
     }
 
-    public ZebedeeConfiguration(Path zebedeeRootPath, boolean enableVerificationAgent) {
-        this.zebedeeRootPath = zebedeeRootPath;
-        this.publishedContentPath = verifyDir(zebedeeRootPath, PUBLISHED);
-        this.collectionsPath = verifyDir(zebedeeRootPath, COLLECTIONS);
-        this.publishedCollectionsPath = verifyDir(zebedeeRootPath, PUBLISHED_COLLECTIONS);
-        this.usersPath = verifyDir(zebedeeRootPath, USERS);
-        this.sessionsPath = verifyDir(zebedeeRootPath, SESSIONS);
-        this.permissionsPath = verifyDir(zebedeeRootPath, PERMISSIONS);
-        this.teamsPath = verifyDir(zebedeeRootPath, TEAMS);
-        this.applicationKeysPath = verifyDir(zebedeeRootPath, APPLICATION_KEYS);
+    /**
+     * Create a new configuration object.
+     *
+     * @param rootPath
+     * @param enableVerificationAgent
+     * @throws IOException
+     */
+    public ZebedeeConfiguration(Path rootPath, boolean enableVerificationAgent) throws IOException {
+        logDebug(LOG_PREFIX + "Creating ZebedeeConfiguration").log();
+
+        if (Files.exists(rootPath)) {
+            logDebug(LOG_PREFIX + "Setting Zebedee root directory").path(rootPath.toString()).log();
+        } else {
+            throw new IllegalArgumentException(LOG_PREFIX + "Zebedee root directory doesn't not exist." + rootPath.toAbsolutePath());
+        }
+
+        // Create the zebedee file system structure
+        this.rootPath = rootPath;
+        this.zebedeePath = createDir(rootPath, ZEBEDEE);
+        this.publishedContentPath = createDir(zebedeePath, PUBLISHED);
+        this.collectionsPath = createDir(zebedeePath, COLLECTIONS);
+        this.publishedCollectionsPath = createDir(zebedeePath, PUBLISHED_COLLECTIONS);
+        this.usersPath = createDir(zebedeePath, USERS);
+        this.sessionsPath = createDir(zebedeePath, SESSIONS);
+        this.permissionsPath = createDir(zebedeePath, PERMISSIONS);
+        this.teamsPath = createDir(zebedeePath, TEAMS);
+        this.applicationKeysPath = createDir(zebedeePath, APPLICATION_KEYS);
         this.redirectPath = this.publishedContentPath.resolve(Content.REDIRECT);
+
+        if (!Files.exists(redirectPath)) {
+            Files.createFile(redirectPath);
+        }
+
         this.useVerificationAgent = enableVerificationAgent;
 
+        // Create the services and objects...
         this.dataIndex = new DataIndex(new FileSystemContentReader(publishedContentPath));
         this.publishedCollections = new PublishedCollections(publishedCollectionsPath);
-        this.keyringCache = new KeyringCache(sessionsService);
         this.applicationKeys = new ApplicationKeys(applicationKeysPath);
         this.sessionsService = new SessionsService(sessionsPath);
-        this.teams = new Teams(teamsPath, () -> getPermissionsServiceImpl());
+        this.keyringCache = new KeyringCache(sessionsService);
+
+        this.teams = new Teams(
+                teamsPath,
+                () -> getPermissionsService());
 
         this.published = createPublished();
 
+        //
+        PermissionsStoreFileSystemImpl.init(permissionsPath);
+
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
-        this.permissionsServiceImpl = new PermissionsServiceImpl(permissionsStore, () -> this.getUsersService(),
-                () -> this.getTeams(), keyringCache);
+        this.permissionsService = new PermissionsServiceImpl(permissionsStore,
+                () -> this.getUsersService(),
+                () -> this.getTeams(),
+                keyringCache);
 
-        this.collections = new Collections(collectionsPath, permissionsServiceImpl, published);
+        this.collections = new Collections(collectionsPath, permissionsService, published);
 
-        this.usersService = UsersServiceImpl.getInstance(new UserStoreFileSystemImpl(this.usersPath), collections,
-                permissionsServiceImpl, applicationKeys, keyringCache);
+        this.usersService = UsersServiceImpl.getInstance(
+                new UserStoreFileSystemImpl(this.usersPath),
+                collections,
+                permissionsService,
+                applicationKeys,
+                keyringCache)
+        ;
+
+        logDebug(LOG_PREFIX + "ZebedeeConfiguration creation complete.").log();
     }
 
 
@@ -115,8 +162,8 @@ public class ZebedeeConfiguration {
         return useVerificationAgent;
     }
 
-    public Path getZebedeeRootPath() {
-        return zebedeeRootPath;
+    public Path getZebedeePath() {
+        return zebedeePath;
     }
 
     public Path getPublishedContentPath() {
@@ -167,7 +214,7 @@ public class ZebedeeConfiguration {
             try {
                 Files.createFile(redirectPath);
             } catch (IOException e) {
-                logError(e, "Could not save redirect to requested path")
+                logError(e, LOG_PREFIX + "Could not save redirect to requested path")
                         .addParameter("requestedPath", redirectPath.toString())
                         .log();
             }
@@ -202,8 +249,8 @@ public class ZebedeeConfiguration {
         return this.sessionsService;
     }
 
-    public PermissionsServiceImpl getPermissionsServiceImpl() {
-        return this.permissionsServiceImpl;
+    public PermissionsService getPermissionsService() {
+        return this.permissionsService;
     }
 
     public Teams getTeams() {
@@ -220,5 +267,9 @@ public class ZebedeeConfiguration {
 
     public PermissionsStore getPermissionsStore(Path accessMappingPath) {
         return new PermissionsStoreFileSystemImpl(accessMappingPath);
+    }
+
+    public void setUsersService(UsersService usersService) {
+        this.usersService = usersService;
     }
 }

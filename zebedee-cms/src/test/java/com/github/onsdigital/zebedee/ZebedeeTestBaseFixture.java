@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee;
 
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
 import com.github.onsdigital.zebedee.model.Collection;
@@ -15,7 +16,6 @@ import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by dave on 02/06/2017.
+ * Common set up required by tests using {@link Builder} (Hide some of the nastiness).
  */
 public abstract class ZebedeeTestBaseFixture {
 
@@ -37,27 +37,34 @@ public abstract class ZebedeeTestBaseFixture {
     @Mock
     private CollectionHistoryDao collectionHistoryDao;
 
+    @Mock
+    private PermissionsService permissionsService;
+
     protected Zebedee zebedee;
     protected Builder builder;
+    protected Map<String, User> usersMap;
 
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
+        zebedee = builder.getZebedee();
 
         UserList usersList = new UserList();
         usersList.add(builder.publisher1);
 
+        ServiceSupplier<UsersService> usersServiceServiceSupplier = () -> usersService;
+
         ReflectionTestUtils.setField(zebedee, "usersService", usersService);
+        ReflectionTestUtils.setField(zebedee.getPermissionsService(), "usersServiceSupplier", usersServiceServiceSupplier);
 
         ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> collectionHistoryDao;
 
         Collection.setCollectionHistoryDaoServiceSupplier(collectionHistoryDaoServiceSupplier);
         Collection.setKeyManagerUtil(keyManangerUtil);
 
-        Map<String, User> usersMap = new HashMap<>();
+        usersMap = new HashMap<>();
         usersMap.put(builder.publisher1.getEmail(), builder.publisher1);
 
         when(usersService.getUserByEmail(builder.publisher1.getEmail()))

@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.json.publishing.request;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.model.Collection;
 import org.junit.After;
 import org.junit.Before;
@@ -13,22 +14,12 @@ import java.nio.file.Path;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
-public class ManifestTest {
+public class ManifestTest extends ZebedeeTestBaseFixture {
 
-    Zebedee zebedee;
     Collection collection;
-    Builder builder;
 
-    @Before
     public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
         collection = new Collection(builder.collections.get(1), zebedee);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
     }
 
     @Test

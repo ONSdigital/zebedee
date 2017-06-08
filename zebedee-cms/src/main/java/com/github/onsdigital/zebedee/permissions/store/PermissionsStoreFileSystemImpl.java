@@ -16,7 +16,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
 /**
- * Created by dave on 31/05/2017.
+ * A File system implementation of {@link PermissionsStore}. Provides functionality for reading / writing
+ * {@link AccessMapping} objects to/from json files on disk.
  */
 public class PermissionsStoreFileSystemImpl implements PermissionsStore {
 
@@ -26,6 +27,13 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
     private Path accessMappingFilePath;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
 
+    /**
+     * Check if an {@link AccessMapping} json file exists in the permissions directory. If not a new empty instance
+     * will be serialized to json and written to the permissions directory.
+     *
+     * @param accessMappingPath the path of the accessMapping json file.
+     * @throws IOException error while initializing.
+     */
     public static void init(Path accessMappingPath) throws IOException {
         Path jsonPath = accessMappingPath.resolve(PERMISSIONS_FILE);
 
@@ -39,6 +47,11 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
         }
     }
 
+    /**
+     * Create a new instance of the File system permissions store.
+     *
+     * @param accessMappingPath the path of the permissions directory to use.
+     */
     public PermissionsStoreFileSystemImpl(Path accessMappingPath) {
         this.accessMappingPath = accessMappingPath;
         this.accessMappingFilePath = this.accessMappingPath.resolve(PERMISSIONS_FILE);

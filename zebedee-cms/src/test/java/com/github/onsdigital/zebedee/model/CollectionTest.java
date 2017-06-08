@@ -2,7 +2,6 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
@@ -14,19 +13,12 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
-import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +31,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 public class CollectionTest extends ZebedeeTestBaseFixture {
 
@@ -80,7 +70,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
 
         // Then
-        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
         Path releasePath = rootPath.resolve(filename);
         Path jsonPath = rootPath.resolve(filename + ".json");
 
@@ -121,7 +111,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Collection.rename(collectionDescription, newName, zebedee);
 
         // Then the collection is renamed.
-        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
         Path releasePath = rootPath.resolve(filename);
         Path jsonPath = rootPath.resolve(filename + ".json");
 
@@ -167,7 +157,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
-        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
         Path collectionFolderPath = rootPath.resolve(filename);
         Path collectionJsonPath = rootPath.resolve(filename + ".json");
 
@@ -209,7 +199,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
-        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
         Path collectionFolderPath = rootPath.resolve(filename);
         Path collectionJsonPath = rootPath.resolve(filename + ".json");
 
@@ -278,7 +268,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 
-        Path releasePath = builder.zebedee.resolve(Zebedee.COLLECTIONS).resolve(
+        Path releasePath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).resolve(
                 PathUtils.toFilename(name));
         FileUtils.cleanDirectory(releasePath.toFile());
 
@@ -520,7 +510,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
-        Path published = builder.zebedee.resolve(Zebedee.PUBLISHED);
+        Path published = builder.zebedeeRootPath.resolve(Zebedee.PUBLISHED);
         Path content = published.resolve(uri.substring(1));
         assertTrue(Files.exists(content));
 

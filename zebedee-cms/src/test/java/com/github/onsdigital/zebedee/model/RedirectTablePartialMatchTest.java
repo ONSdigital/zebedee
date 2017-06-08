@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -15,23 +16,12 @@ import static org.junit.Assert.*;
 /**
  * Created by thomasridd on 17/08/15.
  */
-public class RedirectTablePartialMatchTest {
-    Zebedee zebedee = null;
-    Path root = null;
+public class RedirectTablePartialMatchTest extends ZebedeeTestBaseFixture {
 
-    @Before
+    @Override
     public void setUp() throws Exception {
-        // Create a
-        Builder bob = new Builder(ResourceUtils.getPath("/bootstraps/basic"));
-        root = bob.zebedee;
-        zebedee = new Zebedee(root, false);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        // Garbage collection
-        zebedee = null;
-        FileUtils.deleteDirectory(root.toFile());
+        builder = new Builder(ResourceUtils.getPath("/bootstraps/basic"));
+        zebedee = builder.getZebedee();
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeConfiguration;
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
@@ -19,6 +20,7 @@ import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 import com.github.onsdigital.zebedee.util.SlackNotification;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -38,6 +40,11 @@ import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 
 public class Root {
+
+    private static final String DEFAULT_SYS_USER_EMAIL = "florence@magicroundabout.ons.gov.uk";
+    private static final String DEFAULT_SYS_USER_NAME = "Florence";
+    private static final String DEFAULT_SYS_USER_PASSWORD = "Doug4l";
+
     static final String ZEBEDEE_ROOT = "zebedee_root";
     // Environment variables are stored as a static variable so if necessary we can hijack them for testing
     public static Map<String, String> env = System.getenv();
@@ -78,21 +85,21 @@ public class Root {
         // If we have an environment variable and it is
         String rootDir = env.get(ZEBEDEE_ROOT);
         boolean zebedeeCreated = false;
-        if (rootDir != null && rootDir != "" && Files.exists(Paths.get(rootDir))) {
+
+        if (StringUtils.isNotEmpty(rootDir) && Files.exists(Paths.get(rootDir))) {
             root = Paths.get(rootDir);
             try {
-                zebedee = Zebedee.create(root);
+                zebedee = initialiseZebedee(root);
                 zebedeeCreated = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
         if (!zebedeeCreated) {
             try {
                 // Create a Zebedee folder:
-                root = Files.createTempDirectory("zebedee");
-                zebedee = Zebedee.create(root);
+                root = Files.createTempDirectory("generated");
+                zebedee = initialiseZebedee(root);
                 logDebug("zebedee root created").addParameter("uri", root.toString()).log();
                 ReaderConfiguration.init(root.toString());
 
@@ -220,6 +227,20 @@ public class Root {
 
     public static Scheduler getScheduler() {
         return scheduler;
+    }
+
+    private static Zebedee initialiseZebedee(Path root) throws IOException, NotFoundException, BadRequestException,
+            UnauthorizedException {
+        zebedee = new Zebedee(new ZebedeeConfiguration(root, true));
+        createSystemUser();
+        return zebedee;
+    }
+
+    private static void createSystemUser() throws NotFoundException, BadRequestException, UnauthorizedException, IOException {
+        User user = new User();
+        user.setEmail(DEFAULT_SYS_USER_EMAIL);
+        user.setName(DEFAULT_SYS_USER_NAME);
+        zebedee.getUsersService().createSystemUser(user, DEFAULT_SYS_USER_PASSWORD);
     }
 
     /**

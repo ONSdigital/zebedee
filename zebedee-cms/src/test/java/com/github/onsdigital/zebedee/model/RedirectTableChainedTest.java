@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.ResourceUtils;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -20,30 +21,8 @@ import java.util.Scanner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class RedirectTableChainedTest {
-    Zebedee zebedee;
-    Builder bob;
+public class RedirectTableChainedTest extends ZebedeeTestBaseFixture {
 
-    @Before
-    public void setupTests() throws IOException, CollectionNotFoundException {
-        // Create a setup from
-        bob = new Builder(ResourceUtils.getPath("/bootstraps/basic"));
-        zebedee = new Zebedee(bob.zebedee, false);
-    }
-    @After
-    public void ripdownTests() throws IOException {
-        bob = null;
-        FileUtils.deleteDirectory(zebedee.getPath().toFile());
-        zebedee = null;
-    }
-
-    //------------------------------------------------------
-    //
-    // Trivial tests (4 tests)
-    //
-    // Given - an empty redirect
-    // When - we redirect
-    // Then - we expect a uri for existing files, null otherwise
     @Test
     public void get_emptyRedirectWithExistingFileURI_shouldReturnURI() throws Exception {
         // Given
@@ -597,4 +576,9 @@ public class RedirectTableChainedTest {
         return lineList;
     }
 
+    @Override
+    public void setUp() throws Exception {
+        builder = new Builder(ResourceUtils.getPath("/bootstraps/basic"));
+        zebedee = builder.getZebedee();
+    }
 }

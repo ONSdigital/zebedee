@@ -5,7 +5,8 @@ import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.RedirectTablePartialMatch;
-import com.github.onsdigital.zebedee.model.Teams;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
@@ -14,6 +15,7 @@ import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
+import com.github.onsdigital.zebedee.teams.store.TeamsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import com.github.onsdigital.zebedee.user.service.UsersServiceImpl;
 import com.github.onsdigital.zebedee.user.store.UserStoreFileSystemImpl;
@@ -34,6 +36,7 @@ import static com.github.onsdigital.zebedee.Zebedee.USERS;
 import static com.github.onsdigital.zebedee.Zebedee.ZEBEDEE;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
+import static com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl.initialisePermissions;
 
 /**
  * Object encapsulating the set up configuration required by {@link Zebedee}. Set paths to & create relevant
@@ -63,7 +66,7 @@ public class ZebedeeConfiguration {
     private KeyringCache keyringCache;
     private PermissionsService permissionsService;
     private UsersService usersService;
-    private Teams teams;
+    private TeamsService teamsService;
     private SessionsService sessionsService;
     private DataIndex dataIndex;
     private PermissionsStore permissionsStore;
@@ -123,21 +126,16 @@ public class ZebedeeConfiguration {
         this.sessionsService = new SessionsService(sessionsPath);
         this.keyringCache = new KeyringCache(sessionsService);
 
-        this.teams = new Teams(
-                teamsPath,
-                () -> getPermissionsService());
+        this.teamsService = new TeamsServiceImpl(
+                new TeamsStoreFileSystemImpl(teamsPath), this::getPermissionsService);
 
         this.published = createPublished();
 
-        //
-        PermissionsStoreFileSystemImpl.init(permissionsPath);
-
+        initialisePermissions(permissionsPath);
         this.permissionsStore = new PermissionsStoreFileSystemImpl(permissionsPath);
 
         this.permissionsService = new PermissionsServiceImpl(permissionsStore,
-                () -> this.getUsersService(),
-                () -> this.getTeams(),
-                keyringCache);
+                this::getUsersService, this::getTeamsService, keyringCache);
 
         this.collections = new Collections(collectionsPath, permissionsService, published);
 
@@ -253,8 +251,8 @@ public class ZebedeeConfiguration {
         return this.permissionsService;
     }
 
-    public Teams getTeams() {
-        return this.teams;
+    public TeamsService getTeamsService() {
+        return this.teamsService;
     }
 
     public UsersService getUsersService() {

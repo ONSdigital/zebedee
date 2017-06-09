@@ -4,19 +4,17 @@ import com.github.onsdigital.zebedee.data.processing.DataIndex;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.Content;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.Teams;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
 import com.github.onsdigital.zebedee.model.publishing.PublishedCollections;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.permissions.store.PermissionsStoreFileSystemImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.user.model.User;
@@ -73,7 +71,7 @@ public class Zebedee {
     private final PermissionsService permissionsService;
 
     private final UsersService usersService;
-    private final Teams teams;
+    private final TeamsService teamsService;
     private final SessionsService sessionsService;
     private final DataIndex dataIndex;
 
@@ -101,7 +99,7 @@ public class Zebedee {
         this.collections = configuration.getCollections();
         this.publishedCollections = configuration.getPublishCollections();
         this.applicationKeys = configuration.getApplicationKeys();
-        this.teams = configuration.getTeams();
+        this.teamsService = configuration.getTeamsService();
         this.usersService = configuration.getUsersService();
         this.verificationAgent = configuration.getVerificationAgent(isVerificationEnabled(), this);
     }
@@ -272,8 +270,8 @@ public class Zebedee {
         return session;
     }
 
-    public Teams getTeams() {
-        return this.teams;
+    public TeamsService getTeamsService() {
+        return this.teamsService;
     }
 
     public Path getPath() {

@@ -5,16 +5,16 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.AccessMapping;
+import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.model.Teams;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
@@ -50,7 +50,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     private KeyringCache keyringCache;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
     private ServiceSupplier<UsersService> usersServiceSupplier;
-    private ServiceSupplier<Teams> teamsServiceSupplier;
+    private ServiceSupplier<TeamsService> teamsServiceSupplier;
 
     /**
      * @param permissionsStore
@@ -59,7 +59,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @param keyringCache
      */
     public PermissionsServiceImpl(PermissionsStore permissionsStore, ServiceSupplier<UsersService> usersServiceSupplier,
-                                  ServiceSupplier<Teams> teamsServiceSupplier, KeyringCache keyringCache) {
+                                  ServiceSupplier<TeamsService> teamsServiceSupplier, KeyringCache keyringCache) {
         this.permissionsStore = permissionsStore;
         this.usersServiceSupplier = usersServiceSupplier;
         this.teamsServiceSupplier = teamsServiceSupplier;

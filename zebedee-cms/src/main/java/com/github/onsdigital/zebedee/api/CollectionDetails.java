@@ -6,7 +6,7 @@ import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Events;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
@@ -78,7 +78,7 @@ public class CollectionDetails {
         addEventsForDetails(result.reviewed, result, collection);
 
         Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
-        List<Team> teams = Root.zebedee.getTeams().resolveTeams(teamIds);
+        List<Team> teams = Root.zebedee.getTeamsService().resolveTeams(teamIds);
         teams.forEach(team -> {
             collection.description.teams.add(team.getName());
         });

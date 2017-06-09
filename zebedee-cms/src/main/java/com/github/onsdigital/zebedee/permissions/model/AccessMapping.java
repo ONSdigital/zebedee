@@ -1,4 +1,4 @@
-package com.github.onsdigital.zebedee.json;
+package com.github.onsdigital.zebedee.permissions.model;
 
 import java.util.HashSet;
 import java.util.Map;

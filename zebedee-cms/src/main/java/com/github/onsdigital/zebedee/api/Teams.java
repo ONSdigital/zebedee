@@ -9,8 +9,8 @@ import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.json.TeamList;
+import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.teams.model.TeamList;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
@@ -74,7 +74,7 @@ public class Teams {
         Session session = Root.zebedee.getSessionsService().get(request);
         String teamName = getTeamName(request);
 
-        Root.zebedee.getTeams().createTeam(teamName, session);
+        Root.zebedee.getTeamsService().createTeam(teamName, session);
 
         Audit.Event.TEAM_CREATED
                 .parameters()
@@ -92,9 +92,9 @@ public class Teams {
         String teamName = getTeamName(request);
 
         String email = request.getParameter("email");
-        Team team = zebedee.getTeams().findTeam(teamName);
+        Team team = zebedee.getTeamsService().findTeam(teamName);
 
-        Root.zebedee.getTeams().addTeamMember(email, team, session);
+        Root.zebedee.getTeamsService().addTeamMember(email, team, session);
         evaluateCollectionKeys(zebedee, session, team, email);
 
         Audit.Event.TEAM_MEMBER_ADDED
@@ -136,8 +136,8 @@ public class Teams {
 
         Zebedee zebedee = Root.zebedee;
         Session session = zebedee.getSessionsService().get(request);
-        Team team = zebedee.getTeams().findTeam(teamName);
-        zebedee.getTeams().deleteTeam(team, session);
+        Team team = zebedee.getTeamsService().findTeam(teamName);
+        zebedee.getTeamsService().deleteTeam(team, session);
 
         evaluateCollectionKeys(zebedee, session, team, team.getMembers().toArray(new String[team.getMembers().size()]));
 
@@ -157,9 +157,9 @@ public class Teams {
         Zebedee zebedee = Root.zebedee;
         Session session = Root.zebedee.getSessionsService().get(request);
         String email = request.getParameter("email");
-        Team team = zebedee.getTeams().findTeam(teamName);
+        Team team = zebedee.getTeamsService().findTeam(teamName);
 
-        zebedee.getTeams().removeTeamMember(email, team, session);
+        zebedee.getTeamsService().removeTeamMember(email, team, session);
         evaluateCollectionKeys(zebedee, session, team, email);
 
         Audit.Event.TEAM_MEMBER_REMOVED
@@ -209,9 +209,9 @@ public class Teams {
     public Object get(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException {
         Object result = null;
         if (getTeamName(request) != null) {
-            result = Root.zebedee.getTeams().findTeam(getTeamName(request));
+            result = Root.zebedee.getTeamsService().findTeam(getTeamName(request));
         } else {
-            List<Team> teams = Root.zebedee.getTeams().listTeams();
+            List<Team> teams = Root.zebedee.getTeamsService().listTeams();
             teams.sort((t1, t2) -> t1.getName().toUpperCase().compareTo(t2.getName().toUpperCase()));
             result = new TeamList(teams);
         }

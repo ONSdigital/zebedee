@@ -8,7 +8,9 @@ import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.teams.service.TeamsServiceImpl;
 import com.google.gson.Gson;
 import org.junit.After;
 import org.junit.Before;
@@ -36,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests verifing the behaviour of the {@link Teams} in both success and failure scenarios.
+ * Tests verifing the behaviour of the {@link TeamsServiceImpl} in both success and failure scenarios.
  */
 public class TeamsTest {
 
@@ -51,7 +53,7 @@ public class TeamsTest {
     @Rule
     public TemporaryFolder zebedeeRoot;
 
-    private Teams teamsService;
+    private TeamsService teamsService;
     private Path teamsPath;
     private Team teamA;
     private Team teamB;
@@ -71,7 +73,7 @@ public class TeamsTest {
         permissionsServiceSupplier = () -> permissionsServiceImplMock;
 
         teamsPath = zebedeeRoot.getRoot().toPath().resolve(TEAMS);
-        teamsService = new Teams(teamsPath, permissionsServiceSupplier);
+        teamsService = new TeamsServiceImpl(null, permissionsServiceSupplier);
 
         teamA = new Team()
                 .setId(123)

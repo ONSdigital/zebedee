@@ -1,7 +1,7 @@
 package com.github.onsdigital.zebedee.permissions.store;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.json.AccessMapping;
+import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
      * @param accessMappingPath the path of the accessMapping json file.
      * @throws IOException error while initializing.
      */
-    public static void init(Path accessMappingPath) throws IOException {
+    public static void initialisePermissions(Path accessMappingPath) throws IOException {
         Path jsonPath = accessMappingPath.resolve(PERMISSIONS_FILE);
 
         if (!Files.exists(jsonPath)) {

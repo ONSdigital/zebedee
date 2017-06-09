@@ -19,7 +19,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
@@ -130,14 +129,6 @@ public class TeamsServiceImpl implements TeamsService {
                 (t) -> t.removeMember(email));
     }
 
-    /**
-     *
-     * @param target
-     * @param validator
-     * @param updateTask
-     * @throws IOException
-     * @throws NotFoundException
-     */
     private void updateTeam(Team target, Predicate<Team> validator, Function<Team, Team> updateTask) throws IOException, NotFoundException {
         if (validator.test(target)) {
             teamLock.writeLock().lock();
@@ -149,6 +140,15 @@ public class TeamsServiceImpl implements TeamsService {
         }
     }
 
+    /**
+     * Check the {@link Session} is not null & the email address is not empty and that the user have the required
+     * admin permission.
+     *
+     * @param session the {@link Session} to validate.
+     * @throws UnauthorizedException if the session is null, the session email is empty or the user does not have the
+     *                               admin permission.
+     * @throws IOException           problem checking the permission.
+     */
     private void validateSessionAndPermissions(Session session) throws UnauthorizedException, IOException {
         if (session == null || StringUtils.isEmpty(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));

@@ -17,14 +17,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-/**
- * Created by dave on 08/06/2017.
- */
+import static org.apache.commons.io.FilenameUtils.isExtension;
+
+
 public class TeamsStoreFileSystemImpl implements TeamsStore {
+
+    private static final String JSON_EXT = ".json";
 
     private Path teamsPath;
     private ReadWriteLock teamLock = new ReentrantReadWriteLock();
+
+    /**
+     * Return true if the {@link Path} is not null and ends with '.json'.
+     */
+    private Predicate<Path> jsonEXTFilter = (p) -> p != null && isExtension(p.getFileName().toString(), "json");
 
     /**
      * @param teamsPath
@@ -76,18 +86,21 @@ public class TeamsStoreFileSystemImpl implements TeamsStore {
     @Override
     public List<Team> listTeams() throws IOException {
         List<Team> result = new ArrayList<>();
+
+        teamLock.readLock().lock();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(teamsPath)) {
-            for (Path path : stream) {
-                if (path.getFileName().toString().equalsIgnoreCase(".DS_Store")) {
-                    continue;
-                }
-                teamLock.readLock().lock();
+            List<Path> teams = StreamSupport
+                    .stream(stream.spliterator(), true)
+                    .filter(p -> jsonEXTFilter.test(p))
+                    .collect(Collectors.toList());
+
+            for (Path path : teams) {
                 try (InputStream input = Files.newInputStream(path)) {
                     result.add(Serialiser.deserialise(input, Team.class));
-                } finally {
-                    teamLock.readLock().unlock();
                 }
             }
+        } finally {
+            teamLock.readLock().unlock();
         }
         return result;
     }
@@ -118,7 +131,7 @@ public class TeamsStoreFileSystemImpl implements TeamsStore {
     private Path teamPath(String teamName) {
         Path result = null;
         if (StringUtils.isNotBlank(teamName)) {
-            result = teamsPath.resolve(PathUtils.toFilename(teamName) + ".json");
+            result = teamsPath.resolve(PathUtils.toFilename(teamName) + JSON_EXT);
         }
         return result;
     }

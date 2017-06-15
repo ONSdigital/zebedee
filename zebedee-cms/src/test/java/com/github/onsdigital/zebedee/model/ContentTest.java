@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.github.onsdigital.zebedee.model.Content.isVisibleForCollectionOwner;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 public class ContentTest {
@@ -226,5 +228,45 @@ public class ContentTest {
         // The result has the expected values
         assertEquals(1, results.size());
         assertTrue(results.contains("/somedirectory/" + jsonFile));
+    }
+
+    @Test
+    public void isVisibleForCollectionOwner_ShouldReturnFalseIfPathEndsWithTimeseriesDir() throws Exception {
+        Path p = Files.createTempDirectory("master");
+        p = p.resolve("timeseries");
+        p.toFile().mkdir();
+
+        assertThat(isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, p), is(false));
+    }
+
+    @Test
+    public void isVisibleForCollectionOwner_ShouldReturnFalseIfPathContainsTimeseriesDir() throws Exception {
+        Path zebedeeURI = Files.createTempDirectory("master");
+        zebedeeURI = zebedeeURI.resolve("timeseries");
+        zebedeeURI.toFile().mkdir();
+        zebedeeURI = zebedeeURI.resolve("nested");
+        zebedeeURI.toFile().mkdir();
+
+        assertThat(isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, zebedeeURI), is(false));
+    }
+
+    @Test
+    public void isVisibleForCollectionOwner_ShouldReturnTrueIfPathDoesNotConatinTimeseriesDir() throws Exception {
+        Path p = Files.createTempDirectory("master");
+        p = p.resolve("datasets");
+        p.toFile().mkdir();
+
+        assertThat(isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, p), is(true));
+    }
+
+
+    @Test
+    public void isVisibleForCollectionOwner_ShouldReturnTrueIfPathContainsDirWhereTimeseriesIsASubStringOfTheDirName() throws Exception {
+        Path p = Files.createTempDirectory("master");
+        p = p.resolve("thisisnotatimeseriesdir");
+        p.toFile().mkdir();
+
+        boolean result = isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, p);
+        assertThat(result, is(true));
     }
 }

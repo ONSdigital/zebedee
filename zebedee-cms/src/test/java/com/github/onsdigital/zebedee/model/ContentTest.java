@@ -244,6 +244,8 @@ public class ContentTest {
         Path zebedeeURI = Files.createTempDirectory("master");
         zebedeeURI = zebedeeURI.resolve("timeseries");
         zebedeeURI.toFile().mkdir();
+        zebedeeURI = zebedeeURI.resolve("nested");
+        zebedeeURI.toFile().mkdir();
 
         assertThat(isVisibleForCollectionOwner(CollectionOwner.PUBLISHING_SUPPORT, zebedeeURI), is(false));
     }

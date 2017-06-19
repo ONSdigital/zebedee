@@ -13,7 +13,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 /**
- * Created by dave on 30/05/2017.
+ * Abstract custom {@link Collector} - If you want to use {@link java.util.stream.Stream} to iterate over the custom
+ * collection types in the code base i.e. {@link UserList}.
  */
 public abstract class CustomListCollector<T, R> implements Collector<T, ImmutableList.Builder<T>, R> {
 
@@ -24,7 +25,7 @@ public abstract class CustomListCollector<T, R> implements Collector<T, Immutabl
 
     @Override
     public BiConsumer<ImmutableList.Builder<T>, T> accumulator() {
-        return (builder, user) -> builder.add(user);
+        return (builder, item) -> builder.add(item);
     }
 
     @Override

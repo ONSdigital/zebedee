@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.statistics.document.article.Article;
@@ -29,22 +30,15 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by thomasridd on 16/11/15.
  */
+public class CollectionMoveTest extends ZebedeeTestBaseFixture {
 
-@Ignore("IGNORE: user keys concurrency defect")
-public class CollectionMoveTest {
-
-    Zebedee zebedee;
-    Builder builder;
     Collection collection;
     Article martin;
     Article bedford;
     Article bedfordshire;
     Session session;
 
-    @Before
     public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee);
         session = zebedee.openSession(builder.publisher1Credentials);
 
         collection = new Collection(builder.collections.get(1), zebedee);
@@ -54,12 +48,6 @@ public class CollectionMoveTest {
 
         savePages();
     }
-
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
-    }
-
 
     @Test
     public void shouldChangeReferencesInFileOnMoveContent() throws URISyntaxException, IOException, ZebedeeException {

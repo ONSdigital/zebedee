@@ -4,6 +4,7 @@ import com.github.davidcarboni.ResourceUtils;
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Dataset;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.session.model.Session;
@@ -27,10 +28,8 @@ import java.security.KeyPair;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class CsdbImporterTest {
+public class CsdbImporterTest extends ZebedeeTestBaseFixture {
 
-    Zebedee zebedee;
-    Builder bob;
     Session publisher;
     Collection collection;
     CollectionReader collectionReader;
@@ -55,9 +54,9 @@ public class CsdbImporterTest {
     public void setUp() throws Exception {
         // Loads a zebedee with two collections, each of which contain a dataset
         //
-        bob = new Builder(ResourceUtils.getPath("/bootstraps/data_publisher"));
-        zebedee = new Zebedee(bob.zebedee, false);
-        publisher = bob.createSession(bob.publisher1);
+        builder = new Builder(ResourceUtils.getPath("/bootstraps/data_publisher"));
+        zebedee = builder.getZebedee();
+        publisher = builder.createSession(builder.publisher1);
 
         collection = zebedee.getCollections().list().getCollection("collection");
 

@@ -67,7 +67,7 @@ public class Collections {
             CollectionOwner collectionOwner = zebedeeCmsService.getPublisherType(session.getEmail());
 
             for (Collection collection : collections) {
-                if (Root.zebedee.getPermissions().canView(session, collection.description)
+                if (Root.zebedee.getPermissionsService().canView(session, collection.description)
                         && (collection.description.collectionOwner.equals(collectionOwner))) {
 
                     CollectionDescription description = new CollectionDescription();

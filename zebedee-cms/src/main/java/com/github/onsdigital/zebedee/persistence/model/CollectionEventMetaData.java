@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
 import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -125,8 +125,8 @@ public class CollectionEventMetaData {
     private static String viewerTeamsAsStr(CollectionDescription collectionDescription, Session session)
             throws
             IOException, ZebedeeException {
-        Set<Integer> teams = Root.zebedee.getPermissions().listViewerTeams(collectionDescription, session);
-        Iterator<Team> iterator = Root.zebedee.getTeams().resolveTeams(teams).iterator();
+        Set<Integer> teams = Root.zebedee.getPermissionsService().listViewerTeams(collectionDescription, session);
+        Iterator<Team> iterator = Root.zebedee.getTeamsService().resolveTeams(teams).iterator();
         StringBuilder teamsListStr = new StringBuilder();
 
         while (iterator.hasNext()) {

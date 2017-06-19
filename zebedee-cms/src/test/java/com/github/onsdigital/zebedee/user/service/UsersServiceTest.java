@@ -9,8 +9,8 @@ import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.Collections;
 import com.github.onsdigital.zebedee.model.KeyringCache;
-import com.github.onsdigital.zebedee.model.Permissions;
 import com.github.onsdigital.zebedee.model.encryption.ApplicationKeys;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.model.UserList;
@@ -23,10 +23,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -61,7 +59,7 @@ public class UsersServiceTest {
     private Collections collections;
 
     @Mock
-    private Permissions permissions;
+    private PermissionsService permissions;
 
     @Mock
     private ApplicationKeys applicationKeys;
@@ -101,7 +99,7 @@ public class UsersServiceTest {
         user.setTemporaryPassword(false);
         user.setAdminOptions(new AdminOptions());
 
-        service = new UsersServiceImpl(collections, permissions, applicationKeys, keyringCache, userStore);
+        service = new UsersServiceImpl(userStore, collections, permissions, applicationKeys, keyringCache);
 
         when(userMock.getEmail())
                 .thenReturn(EMAIL_2);
@@ -565,7 +563,7 @@ public class UsersServiceTest {
         verify(userStore, times(1)).delete(user);
     }
 
-    @Test (expected = IOException.class)
+    @Test(expected = IOException.class)
     public void updateKeyring_ShouldNotUpdateIfUserStoreThrowsException() throws Exception {
         when(userStore.get(EMAIL))
                 .thenThrow(new IOException());

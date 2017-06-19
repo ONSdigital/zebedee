@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.model.content;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
@@ -9,7 +8,6 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
@@ -17,9 +15,7 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -31,10 +27,8 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by thomasridd on 1/26/16.
  */
-@Ignore("IGNORE: user keys concurrency defect")
-public class CompoundContentReaderTest {
-    Zebedee zebedee;
-    Builder bob;
+public class CompoundContentReaderTestBaseFixture extends ZebedeeTestBaseFixture {
+
     Session publisher;
     Session reviewer;
 
@@ -52,19 +46,14 @@ public class CompoundContentReaderTest {
 
     /**
      * Setup generates an instance of zebedee plus a collection
-     *
+     * <p>
      * It
      *
      * @throws Exception
      */
-    @Before
     public void setUp() throws Exception {
-
-        bob = new Builder();
-        zebedee = new Zebedee(bob.zebedee, false);
-
-        publisher = zebedee.openSession(bob.publisher1Credentials);
-        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+        publisher = zebedee.openSession(builder.publisher1Credentials);
+        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
@@ -90,11 +79,6 @@ public class CompoundContentReaderTest {
         dataBuilder.addInProgressPage("/timeseries/complete", completePage, collection, collectionWriter);
         dataBuilder.addInProgressPage("/timeseries/reviewed", reviewedPage, collection, collectionWriter);
         dataBuilder.publishPage(publishedPage, "/timeseries/published");
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        bob.delete();
     }
 
     @Test

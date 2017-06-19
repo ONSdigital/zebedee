@@ -2,6 +2,7 @@ package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
@@ -11,7 +12,6 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -21,10 +21,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by thomasridd on 1/25/16.
  */
-public class DataIndexTest {
+public class DataIndexTest extends ZebedeeTestBaseFixture {
 
-    Zebedee zebedee;
-    Builder bob;
     Session publisher;
     Session reviewer;
 
@@ -39,14 +37,10 @@ public class DataIndexTest {
      *
      * @throws Exception
      */
-    @Before
     public void setUp() throws Exception {
 
-        bob = new Builder();
-        zebedee = new Zebedee(bob.zebedee, false);
-
-        publisher = zebedee.openSession(bob.publisher1Credentials);
-        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+        publisher = zebedee.openSession(builder.publisher1Credentials);
+        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
@@ -58,12 +52,6 @@ public class DataIndexTest {
         dataBuilder.publishDataPagesSet(published);
     }
 
-    @After
-    public void tearDown() throws IOException {
-        bob.delete();
-    }
-
-    @Ignore("IGNORE: user keys concurrency defect")
     @Test
     public void dataIndex_givenContent_buildsIndex() throws IOException, InterruptedException, BadRequestException {
         // Given

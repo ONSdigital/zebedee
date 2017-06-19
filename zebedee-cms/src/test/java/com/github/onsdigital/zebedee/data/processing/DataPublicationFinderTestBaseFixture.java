@@ -1,7 +1,6 @@
 package com.github.onsdigital.zebedee.data.processing;
 
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
@@ -16,9 +15,6 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -32,11 +28,8 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by thomasridd on 1/19/16.
  */
-@Ignore("IGNORE: user keys concurrency defect")
-public class DataPublicationFinderTest {
+public class DataPublicationFinderTestBaseFixture extends ZebedeeTestBaseFixture {
 
-    Zebedee zebedee;
-    Builder bob;
     Session publisher;
     Session reviewer;
 
@@ -47,14 +40,9 @@ public class DataPublicationFinderTest {
     DataBuilder dataBuilder;
     DataPagesGenerator generator;
 
-    @Before
     public void setUp() throws Exception {
-
-        bob = new Builder();
-        zebedee = new Zebedee(bob.zebedee, false);
-
-        publisher = zebedee.openSession(bob.publisher1Credentials);
-        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+        publisher = zebedee.openSession(builder.publisher1Credentials);
+        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
@@ -68,11 +56,6 @@ public class DataPublicationFinderTest {
         publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
         collectionReader = new ZebedeeCollectionReader(zebedee, collection, publisher);
         collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, publisher);
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        bob.delete();
     }
 
     @Test

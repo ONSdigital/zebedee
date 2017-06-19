@@ -1,390 +1,341 @@
 package com.github.onsdigital.zebedee.model;
 
-import com.github.davidcarboni.cryptolite.Random;
-import com.github.davidcarboni.httpino.Serialiser;
-import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.user.service.UsersService;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.session.service.SessionsService;
-import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
-import com.google.common.collect.ImmutableList;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.SecretKey;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import javax.crypto.SecretKey;
-import java.io.IOException;
-import java.security.PublicKey;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by thomasridd on 18/11/15.
+ * Created by dave on 01/06/2017.
  */
-@Ignore("IGNORE: user keys concurrency defect")
 public class KeyManagerTest {
-    Zebedee zebedee;
-    Builder builder;
+
+    private static final String COLLECTION_ID = "123";
+    private static final String EMAIL = "test@ons.gov.uk";
 
     @Mock
-    private ZebedeeCmsService zebedeeHelperMock;
+    private Zebedee zebedee;
 
     @Mock
-    private Session mockSession;
+    private User user;
 
     @Mock
-    private Zebedee zebedeeMock;
+    private SecretKey secretKey;
 
     @Mock
-    private Collection collectionMock;
+    private UsersService usersService;
 
     @Mock
-    private KeyringCache keyringCacheMock;
+    private Keyring keyring;
 
     @Mock
-    private Keyring keyringMock;
+    private SessionsService sessionsService;
 
     @Mock
-    private SecretKey secretKeyMock;
+    private Session session;
 
     @Mock
-    private Permissions permissionsMock;
+    private KeyringCache keyringCache;
 
     @Mock
-    private User userOneMock;
+    private PermissionsServiceImpl permissionsServiceImpl;
 
     @Mock
-    private User userTwoMock;
+    private Collection collection;
 
     @Mock
-    private Users usersMock;
+    private Collections collections;
 
     @Mock
-    private SessionsService sessionsServiceMock;
+    private CollectionDescription collectionDescription;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
-        KeyManager.setZebedeeCmsService(zebedeeHelperMock);
-    }
 
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
-    }
-
-    @Test
-    public void isEncrypted_whenCollectionGenerated_isSetToTrue() throws ZebedeeException, IOException {
-        // Given
-        // a collection is created
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        CollectionDescription collectionDescription = collectionDescription();
-        Collection.create(collectionDescription, zebedee, session);
-
-        // When
-        // we reload it
-        Collection reloaded = zebedee.getCollections().list().getCollection(collectionDescription.id);
-
-        // Then
-        // isEncrypted is false
-        assertTrue(reloaded.description.isEncrypted);
-    }
-
-    @Test
-    public void isEncrypted_whenSetToTrue_persists() throws IOException, ZebedeeException {
-        // Given
-        // a collection is created, isEncrypted is set, and is set to true
-        CollectionDescription collectionDescription = createCollection(true);
-
-
-        // When
-        // we reload the collection
-        Collection reloaded = zebedee.getCollections().list().getCollection(collectionDescription.id);
-
-        // Then
-        // isEncrypted is true
-        assertEquals(true, reloaded.description.isEncrypted);
-    }
-
-    private CollectionDescription createCollection(boolean isEncrypted) throws IOException, ZebedeeException {
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        CollectionDescription collectionDescription = collectionDescription();
-        collectionDescription.isEncrypted = isEncrypted;
-        Collection.create(collectionDescription, zebedee, session);
-        return collectionDescription;
-    }
-
-    @Test
-    public void userKeyring_whenCollectionGenerated_hasKeyForCollection() throws ZebedeeException, IOException {
-        // Given
-        // a user session
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        assertEquals(0, builder.publisher1.keyring().size());
-
-        // When
-        // we generate the collection
-        Collection.create(collectionDescription(), zebedee, session);
-
-        // Then
-        // the user has a key for the collection
-        User user = zebedee.getUsers().get(session.getEmail());
-        assertEquals(1, user.keyring().size());
-
-        // and in the keyringCache
-        assertEquals(1, zebedee.getKeyringCache().get(session).keys.size());
-    }
-
-    @Test
-    public void otherPublisherKeyring_whenCollectionGenerated_hasKeyForCollection() throws ZebedeeException, IOException {
-        // Given
-        // publisher A
-        Session session = zebedee.openSession(builder.publisher1Credentials);
-        assertEquals(0, builder.publisher2.keyring().size());
-
-        // When
-        // a collection is generated by publisher A
-        Collection.create(collectionDescription(), zebedee, session);
-
-        // Then
-        // publisher B gets a key for the collection
-        User user = zebedee.getUsers().get(builder.publisher2.getEmail());
-        assertEquals(1, user.keyring().size());
-    }
-
-    private CollectionDescription publishCollection(Session session) throws IOException, ZebedeeException {
-        CollectionDescription collectionDescription = collectionDescription();
-        Collection.create(collectionDescription, zebedee, session);
-        return collectionDescription;
-    }
-
-    @Test
-    public void publisherKeyring_whenPasswordReset_receivesAllCollections() throws ZebedeeException, IOException {
-        // Given
-        // publisher A and details for publisher B
-        Session sessionA = zebedee.openSession(builder.administratorCredentials);
-        CollectionDescription collection = publishCollection(sessionA);
-
-        assertEquals(1, zebedee.getUsers().get(builder.administrator.getEmail()).keyring().size());
-        assertEquals(1, zebedee.getUsers().get(builder.publisher1.getEmail()).keyring().size());
-
-
-        // When
-        // publisher A resets password
-
-        Credentials credentials = builder.publisher1Credentials;
-        credentials.password = "Adam Bob Charlie Danny";
-        zebedee.getUsers().setPassword(sessionA, credentials);
-
-        // Then
-        // publisher A retains keys
-        User user = zebedee.getUsers().get(builder.publisher1.getEmail());
-        assertTrue(user.keyring().unlock(credentials.password));
-        assertEquals(1, user.keyring().size());
-
-    }
-
-    @Test
-    public void publisherKeyring_whenPasswordResetByAdmin_receivesNewPublicKey() throws ZebedeeException, IOException {
-        // Given
-        // admin A and details for publisher B
-        Session sessionA = zebedee.openSession(builder.administratorCredentials);
-        PublicKey initialPublicKey = builder.publisher2.keyring().getPublicKey();
-
-        // When
-        // admin A resets password
-        Credentials credentials = builder.publisher2Credentials;
-        credentials.password = "Adam Bob Charlie Danny";
-        zebedee.getUsers().setPassword(sessionA, credentials);
-
-        // Then
-        // publisher B gets a new public key
-        PublicKey secondPublicKey = zebedee.getUsers().get(builder.publisher2.getEmail()).keyring().getPublicKey();
-        assertNotEquals(initialPublicKey.toString(), secondPublicKey.toString());
-    }
-
-    @Test
-    public void publisherKeyring_whenPasswordResetBySelf_reencryptsKey() throws ZebedeeException, IOException {
-        // Given
-        // publisher A
-        Session sessionA = zebedee.openSession(builder.publisher1Credentials);
-        String oldPassword = builder.publisher1Credentials.password;
-        assertTrue(builder.publisher1.keyring().unlock(oldPassword));
-
-        // When
-        // A resets own password
-        Credentials credentials = builder.publisher1Credentials;
-        credentials.oldPassword = credentials.password;
-        credentials.password = "Adam Bob Charlie Danny";
-        zebedee.getUsers().setPassword(sessionA, credentials);
-
-        // Then
-        // A can unlock their keyring with the new password and not the old
-        User reloaded = zebedee.getUsers().get(builder.publisher1.getEmail());
-        assertTrue(reloaded.keyring().unlock(credentials.password));
-        assertFalse(reloaded.keyring().unlock(oldPassword));
-    }
-
-    @Test
-    public void assignKeyToUser_givenUserWithoutKeyring_doesNothing() throws IOException, ZebedeeException {
-        // Given
-        // a publisher user without a key
-        Session session = zebedee.openSession(builder.administratorCredentials);
-        User user = Serialiser.deserialise("{\"name\":\"Alison Davies\",\"email\":\"a.davies@ons.gov.uk\",\"passwordHash\":\"VewEkE+p3X4zuLQP6fMBkhrPgY99y2ajXwWfTAYifH71CfROf3I8XU/K0Ps0dakJ\"}", User.class);
-        zebedee.getUsers().create(user, builder.administrator.getEmail());
-        zebedee.getPermissions().addEditor(user.getEmail(), session);
-
-        // When
-        // we publish a collection
-        Collection.create(collectionDescription(), zebedee, session);
-
-        // Then
-        // they dont get a key
-        user = zebedee.getUsers().get(user.getEmail());
-        assertNull(user.keyring());
-    }
-
-    @Test
-    public void publisherKeyring_onCreation_receivesAllCollections() throws ZebedeeException, IOException {
-        // Given
-        // An administrator and a collection
-        Session sessionA = zebedee.openSession(builder.administratorCredentials);
-        Collection collection = Collection.create(collectionDescription(), zebedee, sessionA);
-        assertEquals(1, zebedee.getUsers().get(builder.administrator.getEmail()).keyring().size());
-
-        // When
-        // a new user is created and assigned Publisher permissions
-        User test = new User();
-        test.setName("Test User");
-        test.setEmail(Random.id() + "@example.com");
-        test.setInactive(false);
-        zebedee.getUsers().create(sessionA, test);
-
-        Credentials credentials = new Credentials();
-        credentials.setEmail(test.getEmail());
-        credentials.setPassword("password");
-        zebedee.getUsers().setPassword(sessionA, credentials);
-        when(zebedeeHelperMock.getCollection(anyString()))
-                .thenReturn(collection);
-
-        zebedee.getPermissions().addEditor(test.getEmail(), sessionA);
-
-        // Then
-        // publisher A retains keys
-        User user = zebedee.getUsers().get(test.getEmail());
-        assertTrue(user.keyring().unlock("password"));
-        assertEquals(1, user.keyring().size());
-
-    }
-
-    @Test
-    public void schedulerKeyring_whenUserLogsIn_populates() throws IOException, ZebedeeException {
-        // Given
-        // an instance of zebedee with two collections but an empty scheduler key cache
-        // (this simulates when zebedee restarts)
-        Session sessionA = zebedee.openSession(builder.administratorCredentials);
-        publishCollection(sessionA);
-        publishCollection(sessionA);
-        zebedee.getKeyringCache().schedulerCache = new ConcurrentHashMap<>();
-        assertEquals(0, zebedee.getKeyringCache().schedulerCache.size());
-
-        // When
-        // a publisher signs in
-        Session sessionB = zebedee.openSession(builder.publisher1Credentials);
-
-        // Then
-        // the key cache recovers the secret keys
-        assertEquals(2, zebedee.getKeyringCache().schedulerCache.size());
-
-    }
-
-    @Test
-    public void schedulerKeyring_whenCollectionCreated_getsSecretKey() throws IOException, ZebedeeException {
-        // Given
-        // a user that can create publications
-        Session sessionA = zebedee.openSession(builder.administratorCredentials);
-        assertEquals(0, zebedee.getKeyringCache().schedulerCache.size());
-
-        // When
-        // they create a couple of collections
-        publishCollection(sessionA);
-        publishCollection(sessionA);
-
-        // Then
-        // keys are added to the schedulerCache keyring
-        assertEquals(2, zebedee.getKeyringCache().schedulerCache.size());
-
-    }
-
-    @Test
-    public void shouldDistributeNewKeyToExpectedUsers() throws Exception {
-        CollectionDescription collectionDescription = collectionDescription();
-        collectionDescription.id = "0001";
-        List<User> keyRecipients = new ImmutableList.Builder<User>().add(userOneMock).build();
-
-        when(collectionMock.getDescription())
+        when(zebedee.getUsersService())
+                .thenReturn(usersService);
+        when(zebedee.getSessionsService())
+                .thenReturn(sessionsService);
+        when(zebedee.getKeyringCache())
+                .thenReturn(keyringCache);
+        when(zebedee.getPermissionsService())
+                .thenReturn(permissionsServiceImpl);
+        when(user.getEmail())
+                .thenReturn(EMAIL);
+        when(collection.getDescription())
                 .thenReturn(collectionDescription);
-        when(zebedeeMock.getKeyringCache())
-                .thenReturn(keyringCacheMock);
-        when(keyringCacheMock.get(mockSession))
-                .thenReturn(keyringMock);
-        when(keyringMock.get(collectionDescription.id))
-                .thenReturn(secretKeyMock);
-        when(zebedeeMock.getPermissions())
-                .thenReturn(permissionsMock);
-        when(permissionsMock.getCollectionAccessMapping(zebedeeMock, collectionMock))
-                .thenReturn(keyRecipients);
-        when(userOneMock.keyring())
-                .thenReturn(keyringMock);
-        when(zebedeeMock.getUsers())
-                .thenReturn(usersMock);
-        when(zebedeeMock.getSessionsService())
-                .thenReturn(sessionsServiceMock);
-        when(sessionsServiceMock.find(anyString()))
-                .thenReturn(mockSession);
+        when(collectionDescription.getId())
+                .thenReturn(COLLECTION_ID);
 
-        KeyManager.distributeCollectionKey(zebedeeMock, mockSession, collectionMock, true);
-
-        verify(zebedeeMock, times(3)).getKeyringCache();
-        verify(keyringCacheMock, times(2)).get(mockSession);
-        verify(keyringMock, times(1)).get(collectionDescription.id);
-        verify(zebedeeMock, times(1)).getPermissions();
-        verify(permissionsMock, times(1)).getCollectionAccessMapping(zebedeeMock, collectionMock);
-        verify(usersMock, times(1)).updateKeyring(userOneMock);
-        verify(zebedeeMock, times(1)).getSessionsService();
-        verify(keyringMock, times(2)).put("0001", secretKeyMock);
-
-        verify(keyringMock, never()).remove("0001");
+        ServiceSupplier<Collections> collectionsServiceSupplier = () -> collections;
+        KeyManager.setCollectionsServiceSupplier(collectionsServiceSupplier);
     }
 
-    private CollectionDescription collectionDescription() {
-        CollectionDescription collectionDescription = new CollectionDescription(this.getClass().getSimpleName() + "-"
-                + Random.id());
-        collectionDescription.publishDate = new Date();
-        collectionDescription.type = CollectionType.scheduled;
-        return collectionDescription;
+    @Test
+    public void assignKeyToUser_ShouldDoNothingIfUserKeyringNull() throws Exception {
+        when(user.keyring())
+                .thenReturn(null);
+
+        KeyManager.assignKeyToUser(zebedee, user, COLLECTION_ID, secretKey);
+
+        verifyZeroInteractions(zebedee, usersService, secretKey, keyring);
+        verify(user, times(1)).keyring();
+        verify(user, times(1)).getEmail();
+        verifyNoMoreInteractions(user);
+    }
+
+    @Test
+    public void assignKeyToUser_Success() throws Exception {
+        when(user.keyring())
+                .thenReturn(keyring);
+        when(sessionsService.find(EMAIL))
+                .thenReturn(session);
+
+        when(keyringCache.get(session))
+                .thenReturn(keyring);
+
+        KeyManager.assignKeyToUser(zebedee, user, COLLECTION_ID, secretKey);
+
+        verify(user, times(1)).keyring();
+        verify(user, times(2)).getEmail();
+        verify(zebedee, times(1)).getUsersService();
+        verify(usersService, times(1)).addKeyToKeyring(EMAIL, COLLECTION_ID, secretKey);
+        verify(zebedee, times(1)).getSessionsService();
+        verify(zebedee, times(1)).getKeyringCache();
+        verify(keyringCache, times(1)).get(session);
+        verify(keyring, times(1)).put(COLLECTION_ID, secretKey);
+    }
+
+    @Test
+    public void distributeApplicationKeyToUser_ShouldDoNothingIfUserNull() throws Exception {
+        UserList ul = new UserList();
+        User nullUser = null;
+        ul.add(nullUser);
+
+        when(zebedee.getUsersService())
+                .thenReturn(usersService);
+        when(usersService.list())
+                .thenReturn(ul);
+
+        KeyManager.distributeApplicationKey(zebedee, COLLECTION_ID, secretKey);
+
+        verify(zebedee, times(1)).getUsersService();
+        verify(usersService, times(1)).list();
+        verifyNoMoreInteractions(zebedee, usersService);
+        verifyZeroInteractions(permissionsServiceImpl, keyringCache, keyring, sessionsService, secretKey);
+    }
+
+    @Test
+    public void distributeApplicationKeyToUser_ShouldDoNothingIfUserEmailBlack() throws Exception {
+        UserList ul = new UserList();
+        User u = new User();
+        ul.add(u);
+
+        when(zebedee.getUsersService())
+                .thenReturn(usersService);
+        when(usersService.list())
+                .thenReturn(ul);
+
+        KeyManager.distributeApplicationKey(zebedee, COLLECTION_ID, secretKey);
+
+        verify(zebedee, times(1)).getUsersService();
+        verify(usersService, times(1)).list();
+        verifyNoMoreInteractions(zebedee, usersService);
+        verifyZeroInteractions(permissionsServiceImpl, keyringCache, keyring, sessionsService, secretKey);
+    }
+
+    @Test
+    public void distributeApplicationKeyToUser_ShouldRemoveKeyFromUserIfDoesNotHavePermission() throws Exception {
+        UserList ul = new UserList();
+        ul.add(user);
+
+        when(user.keyring())
+                .thenReturn(keyring);
+        when(usersService.list())
+                .thenReturn(ul);
+        when(permissionsServiceImpl.isAdministrator(EMAIL))
+                .thenReturn(false);
+        when(permissionsServiceImpl.canEdit(EMAIL))
+                .thenReturn(false);
+        when(sessionsService.find(EMAIL))
+                .thenReturn(session);
+        when(keyringCache.get(session))
+                .thenReturn(keyring);
+
+        KeyManager.distributeApplicationKey(zebedee, COLLECTION_ID, secretKey);
+
+        verify(zebedee, times(2)).getUsersService();
+        verify(zebedee, times(2)).getPermissionsService();
+        verify(zebedee, times(1)).getSessionsService();
+        verify(zebedee, times(1)).getKeyringCache();
+        verify(permissionsServiceImpl, times(1)).isAdministrator(EMAIL);
+        verify(permissionsServiceImpl, times(1)).canEdit(EMAIL);
+        verify(keyringCache, times(1)).get(session);
+        verify(keyring, times(1)).remove(COLLECTION_ID);
+        verify(usersService, times(1)).list();
+        verify(usersService, times(1)).removeKeyFromKeyring(EMAIL, COLLECTION_ID);
+        verify(sessionsService, times(1)).find(EMAIL);
+        verify(user, times(5)).getEmail();
+        verify(user, times(1)).keyring();
+        verifyNoMoreInteractions(zebedee, permissionsServiceImpl, usersService, sessionsService, keyringCache, user, keyring, session);
+    }
+
+    @Test
+    public void distributeApplicationKeyToUser_ShouldAssignKeyToUserIfHasPermission() throws Exception {
+        UserList ul = new UserList();
+        ul.add(user);
+
+        when(usersService.list())
+                .thenReturn(ul);
+        when(permissionsServiceImpl.isAdministrator(EMAIL))
+                .thenReturn(true);
+        when(permissionsServiceImpl.canEdit(EMAIL))
+                .thenReturn(false);
+        when(sessionsService.find(EMAIL))
+                .thenReturn(session);
+        when(keyringCache.get(session))
+                .thenReturn(keyring);
+        when(user.keyring())
+                .thenReturn(keyring);
+
+        KeyManager.distributeApplicationKey(zebedee, COLLECTION_ID, secretKey);
+
+        verify(zebedee, times(2)).getUsersService();
+        verify(zebedee, times(1)).getPermissionsService();
+        verify(zebedee, times(1)).getSessionsService();
+        verify(zebedee, times(1)).getKeyringCache();
+        verify(permissionsServiceImpl, times(1)).isAdministrator(EMAIL);
+        verify(permissionsServiceImpl, never()).canEdit(EMAIL);
+        verify(keyringCache, times(1)).get(session);
+        verify(keyring, times(1)).put(COLLECTION_ID, secretKey);
+        verify(usersService, times(1)).list();
+        verify(usersService, times(1)).addKeyToKeyring(EMAIL, COLLECTION_ID, secretKey);
+        verify(sessionsService, times(1)).find(EMAIL);
+        verify(user, times(4)).getEmail();
+        verify(user, times(1)).keyring();
+        verifyNoMoreInteractions(zebedee, permissionsServiceImpl, usersService, sessionsService, keyringCache, user, keyring, session);
+    }
+
+    @Test
+    public void transferKeyring_Success() throws Exception {
+        Set<String> collectionIds = new HashSet<>();
+        collectionIds.add(COLLECTION_ID);
+
+        Keyring source = mock(Keyring.class);
+        Keyring target = mock(Keyring.class);
+
+        when(source.get(COLLECTION_ID))
+                .thenReturn(secretKey);
+
+        KeyManager.transferKeyring(target, source, collectionIds);
+
+        verify(source, times(1)).get(COLLECTION_ID);
+        verify(target, times(1)).put(COLLECTION_ID, secretKey);
+    }
+
+    @Test
+    public void transferKeyringByCollectionOwner_Success() throws Exception {
+        Keyring source = mock(Keyring.class);
+        Keyring target = mock(Keyring.class);
+
+        Set<String> srcIDS = new HashSet<>();
+        srcIDS.add(COLLECTION_ID);
+
+        when(source.list())
+                .thenReturn(srcIDS);
+        when(collections.getCollection(COLLECTION_ID))
+                .thenReturn(collection);
+        when(collectionDescription.getCollectionOwner())
+                .thenReturn(CollectionOwner.PUBLISHING_SUPPORT);
+        when(source.get(COLLECTION_ID))
+                .thenReturn(secretKey);
+
+        KeyManager.transferKeyring(target, source, CollectionOwner.PUBLISHING_SUPPORT);
+
+        verify(source, times(1)).list();
+        verify(collections, times(1)).getCollection(COLLECTION_ID);
+        verify(collection, times(2)).getDescription();
+        verify(collectionDescription, times(2)).getCollectionOwner();
+        verify(source,times(1)).get(COLLECTION_ID);
+        verify(target,times(1)).put(COLLECTION_ID, secretKey);
+    }
+
+    @Test
+    public void distributeKeyToUser_ShouldRemoveKeyIfDoesNotHavePermissions() throws Exception {
+        when(keyringCache.get(session))
+                .thenReturn(keyring);
+        when(keyring.get(COLLECTION_ID))
+                .thenReturn(secretKey);
+        when(permissionsServiceImpl.isAdministrator(EMAIL))
+                .thenReturn(false);
+        when(permissionsServiceImpl.canView(user, collectionDescription))
+                .thenReturn(false);
+        when(sessionsService.find(EMAIL))
+                .thenReturn(session);
+        when(user.keyring())
+                .thenReturn(keyring);
+
+        KeyManager.distributeKeyToUser(zebedee, collection, session, user);
+
+        verify(zebedee, times(2)).getKeyringCache();
+        verify(keyringCache, times(2)).get(session);
+        verify(keyring, times(1)).get(COLLECTION_ID);
+        verify(zebedee, times(2)).getPermissionsService();
+        verify(permissionsServiceImpl, times(1)).isAdministrator(EMAIL);
+        verify(permissionsServiceImpl, times(1)).canView(user, collectionDescription);
+        verify(zebedee, times(1)).getUsersService();
+        verify(usersService, times(1)).removeKeyFromKeyring(EMAIL, COLLECTION_ID);
+        verify(zebedee, times(1)).getSessionsService();
+        verify(sessionsService, times(1)).find(EMAIL);
+        verify(keyring, times(1)).remove(COLLECTION_ID);
+    }
+
+    @Test
+    public void distributeKeyToUser_ShouldAssignKeyIfHasPermissions() throws Exception {
+        when(keyringCache.get(session))
+                .thenReturn(keyring);
+        when(keyring.get(COLLECTION_ID))
+                .thenReturn(secretKey);
+        when(permissionsServiceImpl.isAdministrator(EMAIL))
+                .thenReturn(true);
+        when(sessionsService.find(EMAIL))
+                .thenReturn(session);
+        when(user.keyring())
+                .thenReturn(keyring);
+
+        KeyManager.distributeKeyToUser(zebedee, collection, session, user);
+
+        verify(zebedee, times(2)).getKeyringCache();
+        verify(keyringCache, times(2)).get(session);
+        verify(keyring, times(1)).get(COLLECTION_ID);
+        verify(user, times(1)).keyring();
+        verify(zebedee, times(1)).getSessionsService();
+        verify(usersService, times(1)).addKeyToKeyring(EMAIL, COLLECTION_ID, secretKey);
+        verify(sessionsService, times(1)).find(EMAIL);
+        verify(keyring, times(1)).put(COLLECTION_ID, secretKey);
     }
 }

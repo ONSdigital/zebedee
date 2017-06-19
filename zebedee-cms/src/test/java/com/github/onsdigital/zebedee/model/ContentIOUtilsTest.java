@@ -1,37 +1,60 @@
 package com.github.onsdigital.zebedee.model;
 
 import com.github.onsdigital.zebedee.Builder;
+import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
 import com.github.onsdigital.zebedee.data.framework.DataPagesGenerator;
 import com.github.onsdigital.zebedee.data.framework.DataPagesSet;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by thomasridd on 1/24/16.
  */
-@Ignore("IGNORE: user keys concurrency defect")
-public class ContentIOUtilsTest {
-    Zebedee zebedee;
-    Builder bob;
+public class ContentIOUtilsTest extends ZebedeeTestBaseFixture {
+
+    @Mock
+    private UsersService usersService;
+
+    @Mock
+    private KeyManangerUtil keyManangerUtil;
+
+    @Mock
+    private CollectionHistoryDao collectionHistoryDao;
+
     Session publisher;
     Session reviewer;
 
@@ -52,14 +75,10 @@ public class ContentIOUtilsTest {
      *
      * @throws Exception
      */
-    @Before
+    @Override
     public void setUp() throws Exception {
-
-        bob = new Builder();
-        zebedee = new Zebedee(bob.zebedee, false);
-
-        publisher = zebedee.openSession(bob.publisher1Credentials);
-        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+        publisher = zebedee.openSession(builder.publisher1Credentials);
+        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
         // create a copy destination
         copy = Files.createTempDirectory("ContentIOUtils");
@@ -89,9 +108,8 @@ public class ContentIOUtilsTest {
 
     }
 
-    @After
+    @Override
     public void tearDown() throws IOException {
-        bob.delete();
         FileUtils.deleteDirectory(copy.toFile());
 
     }

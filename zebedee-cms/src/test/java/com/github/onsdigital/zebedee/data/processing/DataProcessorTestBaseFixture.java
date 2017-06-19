@@ -1,8 +1,7 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.Page;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
@@ -22,10 +21,7 @@ import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -51,10 +47,8 @@ import static org.junit.Assert.assertNotEquals;
  *
  *
  */
-@Ignore("IGNORE: user keys concurrency defect")
-public class DataProcessorTest {
-    Zebedee zebedee;
-    Builder bob;
+public class DataProcessorTestBaseFixture extends ZebedeeTestBaseFixture {
+
     Session publisher;
     Session reviewer;
 
@@ -69,6 +63,9 @@ public class DataProcessorTest {
     DataPagesSet inReview;
 
     Date date;
+
+    private DataProcessor processor;
+
     /**
      * Setup generates an instance of zebedee plus a collection
      *
@@ -76,14 +73,10 @@ public class DataProcessorTest {
      *
      * @throws Exception
      */
-    @Before
     public void setUp() throws Exception {
-
-        bob = new Builder();
-        zebedee = new Zebedee(bob.zebedee, false);
-
-        publisher = zebedee.openSession(bob.publisher1Credentials);
-        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+        processor = new DataProcessor();
+        publisher = zebedee.openSession(builder.publisher1Credentials);
+        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
@@ -110,12 +103,6 @@ public class DataProcessorTest {
 
         date = new SimpleDateFormat("dd MMM yyyy").parse("01 JAN 1978");
     }
-
-    @After
-    public void tearDown() throws IOException {
-        bob.delete();
-    }
-
 
     @Test
     public void getDatasetBasedUriForTimeseries_givenUnindexed_returnsExpectedUrl() throws ParseException, URISyntaxException, IOException, ZebedeeException {

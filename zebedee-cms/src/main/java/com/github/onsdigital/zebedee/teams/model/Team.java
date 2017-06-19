@@ -1,8 +1,11 @@
-package com.github.onsdigital.zebedee.json;
+package com.github.onsdigital.zebedee.teams.model;
 
+import com.github.onsdigital.zebedee.model.PathUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,6 +13,11 @@ import java.util.Set;
  * Created by david on 21/04/2015.
  */
 public class Team {
+
+    /**
+     * {@link Comparator} ordering {@link Team} by {@link Team#id}.
+     */
+    public static Comparator<Team> teamIDComparator = (t1, t2) -> Integer.compare(t1.getId(), t2.getId());
 
     private int id;
     private String name;
@@ -48,6 +56,13 @@ public class Team {
 
     public Team addMember(String name) {
         this.members.add(name);
+        return this;
+    }
+
+    public Team removeMember(String email) {
+        if (!StringUtils.isEmpty(email)) {
+            this.getMembers().remove(PathUtils.standardise(email));
+        }
         return this;
     }
 

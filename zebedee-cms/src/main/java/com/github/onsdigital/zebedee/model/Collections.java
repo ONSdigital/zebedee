@@ -16,6 +16,8 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
@@ -75,7 +77,7 @@ import static java.util.Objects.requireNonNull;
 public class Collections {
 
     public final Path path;
-    private Permissions permissions;
+    private PermissionsService permissionsService;
     private Content published;
     private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
     private CollectionReaderWriterFactory collectionReaderWriterFactory;
@@ -84,9 +86,9 @@ public class Collections {
     private Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
     private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier = CollectionHistoryDaoFactory::getCollectionHistoryDao;
 
-    public Collections(Path path, Permissions permissions, Content published) {
+    public Collections(Path path, PermissionsService permissionsService, Content published) {
         this.path = path;
-        this.permissions = permissions;
+        this.permissionsService = permissionsService;
         this.published = published;
         this.collectionReaderWriterFactory = new CollectionReaderWriterFactory();
     }
@@ -183,7 +185,7 @@ public class Collections {
         }
 
         // Check authorisation
-        if (!permissions.canEdit(session)) {
+        if (!permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -284,7 +286,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissions.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -330,7 +332,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissions.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -370,7 +372,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !permissions.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -423,8 +425,8 @@ public class Collections {
             throw new BadRequestException("Please specify a valid collection.");
         }
 
-        // Check view permissions
-        if (!permissions.canView(session,
+        // Check view permissionsServiceImpl
+        if (!permissionsService.canView(session,
                 collection.getDescription())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -449,7 +451,7 @@ public class Collections {
      *
      * @param collection the collection to overlay on master content
      * @param uri        the uri of the directory
-     * @param session    the session (used to determine user permissions)
+     * @param session    the session (used to determine user permissionsServiceImpl)
      * @return a DirectoryListing object with system content overlaying master content
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -482,7 +484,7 @@ public class Collections {
         }
 
         // User has permission
-        if (!permissions.canEdit(session)) {
+        if (!permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -649,7 +651,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissions.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -775,7 +777,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissions.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -805,7 +807,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !permissions.canEdit(session.getEmail())) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 

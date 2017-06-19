@@ -47,7 +47,7 @@ public class Permission {
 
         // Administrator
         if (BooleanUtils.isTrue(permissionDefinition.admin)) {
-            Root.zebedee.getPermissions().addAdministrator(permissionDefinition.email, session);
+            Root.zebedee.getPermissionsService().addAdministrator(permissionDefinition.email, session);
             // Admins must be publishers so update the permissions accordingly
             permissionDefinition.editor = true;
             Audit.Event.ADMIN_PERMISSION_ADDED
@@ -56,7 +56,7 @@ public class Permission {
                     .actionedByEffecting(session.getEmail(), permissionDefinition.email)
                     .log();
         } else if (BooleanUtils.isFalse(permissionDefinition.admin)) {
-            Root.zebedee.getPermissions().removeAdministrator(permissionDefinition.email, session);
+            Root.zebedee.getPermissionsService().removeAdministrator(permissionDefinition.email, session);
             Audit.Event.ADMIN_PERMISSION_REMOVED
                     .parameters()
                     .host(request)
@@ -65,12 +65,12 @@ public class Permission {
         }
 
         if (BooleanUtils.isTrue(permissionDefinition.dataVisPublisher)) {
-            Root.zebedee.getPermissions().addDataVisualisationPublisher(permissionDefinition.email, session);
+            Root.zebedee.getPermissionsService().addDataVisualisationPublisher(permissionDefinition.email, session);
             logInfo("Data Vis Publisher permission added to user.")
                     .user(permissionDefinition.email)
                     .addParameter("by", session.getEmail()).log();
         } else if (BooleanUtils.isFalse(permissionDefinition.dataVisPublisher)) {
-            Root.zebedee.getPermissions().removeDataVisualisationPublisher(permissionDefinition.email, session);
+            Root.zebedee.getPermissionsService().removeDataVisualisationPublisher(permissionDefinition.email, session);
             logInfo("Data Vis Publisher permission removed from user.")
                     .user(permissionDefinition.email)
                     .addParameter("by", session.getEmail()).log();
@@ -78,14 +78,14 @@ public class Permission {
 
         // Digital publishing
         if (BooleanUtils.isTrue(permissionDefinition.editor)) {
-            Root.zebedee.getPermissions().addEditor(permissionDefinition.email, session);
+            Root.zebedee.getPermissionsService().addEditor(permissionDefinition.email, session);
             Audit.Event.PUBLISHER_PERMISSION_ADDED
                     .parameters()
                     .host(request)
                     .actionedByEffecting(session.getEmail(), permissionDefinition.email)
                     .log();
         } else if (BooleanUtils.isFalse(permissionDefinition.editor)) {
-            Root.zebedee.getPermissions().removeEditor(permissionDefinition.email, session);
+            Root.zebedee.getPermissionsService().removeEditor(permissionDefinition.email, session);
             Audit.Event.PUBLISHER_PERMISSION_REMOVED
                     .parameters()
                     .host(request)
@@ -112,7 +112,7 @@ public class Permission {
         Session session = Root.zebedee.getSessionsService().get(request);
         String email = request.getParameter("email");
 
-        PermissionDefinition permissionDefinition = Root.zebedee.getPermissions().userPermissions(email, session);
+        PermissionDefinition permissionDefinition = Root.zebedee.getPermissionsService().userPermissions(email, session);
 
         return permissionDefinition;
     }

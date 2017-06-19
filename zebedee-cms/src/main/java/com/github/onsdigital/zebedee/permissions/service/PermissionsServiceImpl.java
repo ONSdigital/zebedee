@@ -1,30 +1,30 @@
-package com.github.onsdigital.zebedee.model;
+package com.github.onsdigital.zebedee.permissions.service;
 
-import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Zebedee;
-import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.AccessMapping;
+import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.model.Collection;
+import com.github.onsdigital.zebedee.model.CollectionOwner;
+import com.github.onsdigital.zebedee.model.KeyManager;
+import com.github.onsdigital.zebedee.model.KeyringCache;
+import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,20 +44,26 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
  * Handles permissions mapping between users and {@link com.github.onsdigital.zebedee.Zebedee} functions.
  * Created by david on 12/03/2015.
  */
-public class Permissions {
+public class PermissionsServiceImpl implements PermissionsService {
 
-    private Zebedee zebedee;
-    private Path accessMappingPath;
+    private PermissionsStore permissionsStore;
+    private KeyringCache keyringCache;
     private ReadWriteLock accessMappingLock = new ReentrantReadWriteLock();
-    /**
-     * Wrap static method calls to obtain service in function makes testing easier - class member can be
-     * replaced with a mocked giving control of desired behaviour.
-     */
-    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
+    private ServiceSupplier<UsersService> usersServiceSupplier;
+    private ServiceSupplier<TeamsService> teamsServiceSupplier;
 
-    public Permissions(Path permissions, Zebedee zebedee) {
-        this.zebedee = zebedee;
-        accessMappingPath = permissions.resolve("accessMapping.json");
+    /**
+     * @param permissionsStore
+     * @param usersServiceSupplier
+     * @param teamsServiceSupplier
+     * @param keyringCache
+     */
+    public PermissionsServiceImpl(PermissionsStore permissionsStore, ServiceSupplier<UsersService> usersServiceSupplier,
+                                  ServiceSupplier<TeamsService> teamsServiceSupplier, KeyringCache keyringCache) {
+        this.permissionsStore = permissionsStore;
+        this.usersServiceSupplier = usersServiceSupplier;
+        this.teamsServiceSupplier = teamsServiceSupplier;
+        this.keyringCache = keyringCache;
     }
 
     /**
@@ -67,8 +73,12 @@ public class Permissions {
      * @return If the user is a publisher, true.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean isPublisher(Session session) throws IOException {
-        return session != null && isPublisher(session.getEmail());
+        if (session == null || StringUtils.isEmpty(session.getEmail())) {
+            return false;
+        }
+        return isPublisher(session.getEmail());
     }
 
     /**
@@ -78,13 +88,18 @@ public class Permissions {
      * @return If the user is an publisher, true.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean isPublisher(String email) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
+        if (StringUtils.isEmpty(email)) {
+            return false;
+        }
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
         return isPublisher(email, accessMapping);
     }
 
     private boolean isPublisher(String email, AccessMapping accessMapping) {
-        return accessMapping.digitalPublishingTeam != null && accessMapping.digitalPublishingTeam.contains(standardise(email));
+        return accessMapping.getDigitalPublishingTeam() != null && accessMapping.getDigitalPublishingTeam()
+                .contains(standardise(email));
     }
 
     /**
@@ -94,8 +109,11 @@ public class Permissions {
      * @return If the user is an administrator, true.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean isAdministrator(Session session) throws IOException {
-        return session != null && isAdministrator(session.getEmail());
+        if (session == null || StringUtils.isEmpty(session.getEmail()))
+            return false;
+        return isAdministrator(session.getEmail());
     }
 
     /**
@@ -105,13 +123,18 @@ public class Permissions {
      * @return If the user is an administrator, true.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean isAdministrator(String email) throws IOException {
-        return isAdministrator(email, readAccessMapping());
+        if (StringUtils.isEmpty(email)) {
+            return false;
+        }
+        return isAdministrator(email, permissionsStore.getAccessMapping());
     }
 
-    public List<User> getCollectionAccessMapping(Zebedee zebedee, Collection collection) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
-        List<Team> teamsList = zebedee.getTeams().listTeams();
+    @Override
+    public List<User> getCollectionAccessMapping(Collection collection) throws IOException {
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        List<Team> teamsList = teamsServiceSupplier.getService().listTeams();
         List<User> keyUsers = usersServiceSupplier
                 .getService()
                 .list()
@@ -133,13 +156,14 @@ public class Permissions {
         return result;
     }
 
+    @Override
     public boolean isDataVisPublisher(String email, AccessMapping accessMapping) throws IOException {
-        return accessMapping.dataVisualisationPublishers != null
-                && accessMapping.dataVisualisationPublishers.contains(standardise(email));
+        return accessMapping.getDataVisualisationPublishers() != null
+                && accessMapping.getDataVisualisationPublishers().contains(standardise(email));
     }
 
     private boolean isAdministrator(String email, AccessMapping accessMapping) {
-        return accessMapping.administrators != null && accessMapping.administrators.contains(standardise(email));
+        return accessMapping.getAdministrators() != null && accessMapping.getAdministrators().contains(standardise(email));
     }
 
     /**
@@ -148,9 +172,10 @@ public class Permissions {
      * @return True if at least one administrator exists.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean hasAdministrator() throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
-        return accessMapping.administrators != null && (accessMapping.administrators.size() > 0);
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        return accessMapping.getAdministrators() != null && !accessMapping.getAdministrators().isEmpty();
     }
 
     /**
@@ -161,19 +186,21 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public void addAdministrator(String email, Session session) throws IOException, UnauthorizedException {
-
         // Allow the initial user to be set as an administrator:
-        if (hasAdministrator() && (session == null || !isAdministrator(session.getEmail()))) {
+        if (hasAdministrator() && (session == null || StringUtils.isEmpty(session.getEmail())
+                || !isAdministrator(session.getEmail()))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.administrators == null) {
-            accessMapping.administrators = new HashSet<>();
+
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        if (accessMapping.getAdministrators() == null) {
+            accessMapping.setAdministrators(new HashSet<>());
         }
-        accessMapping.administrators.add(standardise(email));
-        writeAccessMapping(accessMapping);
+        accessMapping.getAdministrators().add(standardise(email));
+        permissionsStore.saveAccessMapping(accessMapping);
     }
 
     /**
@@ -182,17 +209,18 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public void removeAdministrator(String email, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !isAdministrator(session.getEmail())) {
+        if (session == null || StringUtils.isEmpty(email) || StringUtils.isEmpty(session.getEmail()) || !isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = readAccessMapping();
-        if (accessMapping.administrators == null) {
-            accessMapping.administrators = new HashSet<>();
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        if (accessMapping.getAdministrators() == null) {
+            accessMapping.setAdministrators(new HashSet<>());
         }
-        accessMapping.administrators.remove(standardise(email));
-        writeAccessMapping(accessMapping);
+        accessMapping.getAdministrators().remove(standardise(email));
+        permissionsStore.saveAccessMapping(accessMapping);
     }
 
     /**
@@ -202,6 +230,7 @@ public class Permissions {
      * @return If the user is a member of the Digital Publishing team, true.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean canEdit(Session session) throws IOException {
         return session != null && canEdit(session.getEmail());
     }
@@ -213,8 +242,9 @@ public class Permissions {
      * @return If the user is a member of the Digital Publishing team, true.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean canEdit(String email) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
         return canEdit(email, accessMapping);
     }
 
@@ -228,9 +258,10 @@ public class Permissions {
      * @return
      * @throws IOException
      */
+    @Override
     public boolean canEdit(Session session, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
-            return canEdit(session.getEmail()) && zebedee.getKeyringCache().get(session).list().contains
+            return canEdit(session.getEmail()) && keyringCache.get(session).list().contains
                     (collectionDescription.getId());
         } else {
             return canEdit(session.getEmail());
@@ -245,6 +276,7 @@ public class Permissions {
      * @return
      * @throws IOException
      */
+    @Override
     public boolean canEdit(User user, CollectionDescription collectionDescription) throws IOException {
         if (collectionDescription.isEncrypted) {
             return canEdit(user.getEmail()) && user.keyring().list().contains(collectionDescription.getId());
@@ -262,6 +294,7 @@ public class Permissions {
      * @return
      * @throws IOException
      */
+    @Override
     public boolean canEdit(String email, CollectionDescription collectionDescription) throws IOException {
         try {
             return canEdit(usersServiceSupplier.getService().getUserByEmail(email), collectionDescription);
@@ -277,17 +310,15 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public void addEditor(String email, Session session) throws IOException, UnauthorizedException, NotFoundException, BadRequestException {
         if (hasAdministrator() && (session == null || !isAdministrator(session.getEmail()))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = readAccessMapping();
-        //if (accessMapping.digitalPublishingTeam == null) {
-        //    accessMapping.digitalPublishingTeam = new HashSet<>();
-        //}
-        accessMapping.digitalPublishingTeam.add(PathUtils.standardise(email));
-        writeAccessMapping(accessMapping);
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        accessMapping.getDigitalPublishingTeam().add(PathUtils.standardise(email));
+        permissionsStore.saveAccessMapping(accessMapping);
 
         // Update keyring (assuming this is not the system initialisation)
         updateKeyring(session, email, PUBLISHING_SUPPORT);
@@ -300,17 +331,19 @@ public class Permissions {
      * @param email The user's email.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public void removeEditor(String email, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !isAdministrator(session.getEmail())) {
+        if (session == null || StringUtils.isEmpty(email) || StringUtils.isEmpty(session.getEmail())
+                || !isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = readAccessMapping();
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
         //if (accessMapping.digitalPublishingTeam == null) {
         //    accessMapping.digitalPublishingTeam = new HashSet<>();
         //}
-        accessMapping.digitalPublishingTeam.remove(PathUtils.standardise(email));
-        writeAccessMapping(accessMapping);
+        accessMapping.getDigitalPublishingTeam().remove(PathUtils.standardise(email));
+        permissionsStore.saveAccessMapping(accessMapping);
     }
 
     /**
@@ -322,6 +355,7 @@ public class Permissions {
      * the user is a content owner with access to the given path or any parent path.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean canView(Session session, CollectionDescription collectionDescription) throws IOException {
         return session != null && canView(session.getEmail(), collectionDescription);
     }
@@ -336,8 +370,9 @@ public class Permissions {
      * the user is a content owner with access to the given path or any parent path.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean canView(User user, CollectionDescription collectionDescription) throws IOException {
-        AccessMapping accessMapping = readAccessMapping();
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
         return user != null && (
                 canEdit(user.getEmail(), accessMapping) || canView(user.getEmail(), collectionDescription, accessMapping));
     }
@@ -351,6 +386,7 @@ public class Permissions {
      * the user is a content owner with access to the given path or any parent path.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public boolean canView(String email, CollectionDescription collectionDescription) throws IOException {
 
         try {
@@ -368,12 +404,13 @@ public class Permissions {
      * @param session               Only editors can grant a team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public void addViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
         if (session == null || !canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = readAccessMapping();
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
         Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.id);
         if (collectionTeams == null) {
             collectionTeams = new HashSet<>();
@@ -382,7 +419,7 @@ public class Permissions {
 
         Team teamAdded = !collectionTeams.contains(team.getId()) ? team : null;
         collectionTeams.add(team.getId());
-        writeAccessMapping(accessMapping);
+        permissionsStore.saveAccessMapping(accessMapping);
 
         if (teamAdded != null) {
             getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name, session,
@@ -399,12 +436,13 @@ public class Permissions {
      * @throws IOException
      * @throws UnauthorizedException
      */
+    @Override
     public Set<Integer> listViewerTeams(CollectionDescription collectionDescription, Session session) throws IOException, UnauthorizedException {
         if (session == null || !canView(session, collectionDescription)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = readAccessMapping();
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
         Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.id);
         if (teamIds == null) teamIds = new HashSet<>();
 
@@ -419,12 +457,13 @@ public class Permissions {
      * @param session               Only editors can revoke team access to a collection.
      * @throws IOException If a filesystem error occurs.
      */
+    @Override
     public void removeViewerTeam(CollectionDescription collectionDescription, Team team, Session session) throws IOException, ZebedeeException {
         if (session == null || !canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = readAccessMapping();
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
         Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.id);
         if (collectionTeams == null) {
             collectionTeams = new HashSet<>();
@@ -434,7 +473,7 @@ public class Permissions {
 
         Team teamRemoved = collectionTeams.contains(team.getId()) ? team : null;
         collectionTeams.remove(team.getId());
-        writeAccessMapping(accessMapping);
+        permissionsStore.saveAccessMapping(accessMapping);
 
         if (teamRemoved != null) {
             getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name,
@@ -444,8 +483,8 @@ public class Permissions {
     }
 
     private boolean canEdit(String email, AccessMapping accessMapping) {
-        Set<String> digitalPublishingTeam = accessMapping.digitalPublishingTeam;
-        Set<String> dataVisualisationPublishers = accessMapping.dataVisualisationPublishers;
+        Set<String> digitalPublishingTeam = accessMapping.getDigitalPublishingTeam();
+        Set<String> dataVisualisationPublishers = accessMapping.getDataVisualisationPublishers();
 
         return (digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email)))
                 || (dataVisualisationPublishers != null && dataVisualisationPublishers.contains(standardise(email)));
@@ -459,7 +498,7 @@ public class Permissions {
         // Check to see if the email is a member of a team associated with the given collection:
         Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
         if (teams != null) {
-            for (Team team : zebedee.getTeams().listTeams()) {
+            for (Team team : teamsServiceSupplier.getService().listTeams()) {
                 boolean isTeamMember = teams.contains(team.getId()) && team.getMembers().contains(standardise(email));
                 boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping).equals(collectionDescription.collectionOwner);
                 if (isTeamMember && inCollectionGroup) {
@@ -474,7 +513,7 @@ public class Permissions {
                             AccessMapping accessMapping, List<Team> teamsList) throws IOException {
         boolean result = false;
         // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teamsOnCollection = accessMapping.collections.get(collectionDescription.id);
+        Set<Integer> teamsOnCollection = accessMapping.getCollections().get(collectionDescription.getCollectionOwner());
         if (teamsOnCollection != null) {
             for (Team team : teamsList) {
                 boolean isTeamMember = teamsOnCollection.contains(team.getId()) && team.getMembers()
@@ -487,58 +526,6 @@ public class Permissions {
         }
         return result;
     }
-
-    private AccessMapping readAccessMapping() throws IOException {
-        AccessMapping result = null;
-
-        if (Files.exists(accessMappingPath)) {
-
-            // Read the configuration
-            accessMappingLock.readLock().lock();
-            try (InputStream input = Files.newInputStream(accessMappingPath)) {
-                result = Serialiser.deserialise(input, AccessMapping.class);
-            } finally {
-                accessMappingLock.readLock().unlock();
-            }
-
-            // Initialise any missing objects:
-            if (result.administrators == null) {
-                result.administrators = new HashSet<>();
-            }
-            if (result.digitalPublishingTeam == null) {
-                result.digitalPublishingTeam = new HashSet<>();
-            }
-            if (result.collections == null) {
-                result.collections = new HashMap<>();
-            }
-            if (result.dataVisualisationPublishers == null) {
-                result.dataVisualisationPublishers = new HashSet<>();
-            }
-
-        } else {
-
-            // Or generate a new one:
-            result = new AccessMapping();
-            result.administrators = new HashSet<>();
-            result.digitalPublishingTeam = new HashSet<>();
-            result.collections = new HashMap<>();
-            result.dataVisualisationPublishers = new HashSet<>();
-            writeAccessMapping(result);
-        }
-
-        return result;
-    }
-
-    private void writeAccessMapping(AccessMapping accessMapping) throws IOException {
-
-        accessMappingLock.writeLock().lock();
-        try (OutputStream output = Files.newOutputStream(accessMappingPath)) {
-            Serialiser.serialise(output, accessMapping);
-        } finally {
-            accessMappingLock.writeLock().unlock();
-        }
-    }
-
 
     private String standardise(String email) {
         return PathUtils.standardise(email);
@@ -553,11 +540,12 @@ public class Permissions {
      * @throws NotFoundException     If the user cannot be found
      * @throws UnauthorizedException If the request is not from an admin or publisher
      */
-    public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException, UnauthorizedException {
-        AccessMapping accessMapping = readAccessMapping();
+    @Override
+    public PermissionDefinition userPermissions(String email, Session session) throws IOException, NotFoundException,
+            UnauthorizedException {
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
 
-        if ((session == null) || (!isAdministrator(session.getEmail(), accessMapping) && !isPublisher(session.getEmail(),
-                accessMapping)
+        if ((session == null) || (!isAdministrator(session.getEmail(), accessMapping) && !isPublisher(session.getEmail(), accessMapping)
                 && !session.getEmail().equalsIgnoreCase(email))) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
@@ -577,6 +565,7 @@ public class Permissions {
      * @param session
      * @throws ZebedeeException
      */
+    @Override
     public void addDataVisualisationPublisher(String email, Session session) throws ZebedeeException {
         try {
             // Allow the initial user to be set as an administrator:
@@ -584,12 +573,12 @@ public class Permissions {
                 throw new UnauthorizedException(getUnauthorizedMessage(session));
             }
 
-            AccessMapping accessMapping = readAccessMapping();
-            if (accessMapping.dataVisualisationPublishers == null) {
-                accessMapping.dataVisualisationPublishers = new HashSet<>();
+            AccessMapping accessMapping = permissionsStore.getAccessMapping();
+            if (accessMapping.getDataVisualisationPublishers() == null) {
+                accessMapping.setDataVisualisationPublishers(new HashSet<>());
             }
-            accessMapping.dataVisualisationPublishers.add(standardise(email));
-            writeAccessMapping(accessMapping);
+            accessMapping.getDataVisualisationPublishers().add(standardise(email));
+            permissionsStore.saveAccessMapping(accessMapping);
 
             // Update keyring (assuming this is not the system initialisation)
             updateKeyring(session, email, DATA_VISUALISATION);
@@ -603,27 +592,31 @@ public class Permissions {
         }
     }
 
+    @Override
     public void removeDataVisualisationPublisher(String email, Session session) throws IOException, UnauthorizedException {
         if (session == null || !isAdministrator(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        AccessMapping accessMapping = readAccessMapping();
-        accessMapping.dataVisualisationPublishers.remove(PathUtils.standardise(email));
-        writeAccessMapping(accessMapping);
+        AccessMapping accessMapping = permissionsStore.getAccessMapping();
+        accessMapping.getDataVisualisationPublishers().remove(PathUtils.standardise(email));
+        permissionsStore.saveAccessMapping(accessMapping);
     }
 
     /**
      * Determined the {@link CollectionOwner} for this collection (PUBLISHING_SUPPORT or Data Visualisation).
      */
+    @Override
     public CollectionOwner getUserCollectionGroup(Session session) throws IOException {
-        return getUserCollectionGroup(session.getEmail(), readAccessMapping());
+        return getUserCollectionGroup(session.getEmail(), permissionsStore.getAccessMapping());
     }
 
+    @Override
     public CollectionOwner getUserCollectionGroup(String email) throws IOException {
-        return getUserCollectionGroup(email, readAccessMapping());
+        return getUserCollectionGroup(email, permissionsStore.getAccessMapping());
     }
 
+    @Override
     public CollectionOwner getUserCollectionGroup(String email, AccessMapping accessMapping) throws IOException {
         return isDataVisPublisher(email, accessMapping) ? DATA_VISUALISATION : PUBLISHING_SUPPORT;
     }
@@ -643,7 +636,7 @@ public class Permissions {
             throws IOException, NotFoundException, BadRequestException {
         User user = usersServiceSupplier.getService().getUserByEmail(email);
         if (session != null && user.keyring() != null) {
-            KeyManager.transferKeyring(user.keyring(), zebedee.getKeyringCache().get(session), collectionOwner);
+            KeyManager.transferKeyring(user.keyring(), keyringCache.get(session), collectionOwner);
             usersServiceSupplier.getService().updateKeyring(user);
         }
     }

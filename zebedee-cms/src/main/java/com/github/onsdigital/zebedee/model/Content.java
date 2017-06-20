@@ -303,12 +303,12 @@ public class Content {
                     result.uri = PathUtils.toUri(this.path.relativize(path.getParent()));
                 } else {
                     logInfo("Failed to deserialise content details")
-                            .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())).toString())
+                            .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())))
                             .log();
                 }
             } catch (JsonSyntaxException exception) {
                 logInfo("Failed to deserialise content details")
-                        .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())).toString())
+                        .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())))
                         .log();
             }
         }

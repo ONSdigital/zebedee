@@ -1263,7 +1263,7 @@ public class CollectionTest extends ZebedeeTestBaseFixture {
         assertTrue(Files.exists(collection.reviewed.get(version.getUri()).resolve("data.json")));
 
         // When the delete version function is called for the version URI
-        collection.deleteVersion(version.getUri().toString());
+        collection.deleteVersion(version.getUri());
 
         // Then the versions directory is deleted.
         assertNull(collection.reviewed.get(version.getUri()));

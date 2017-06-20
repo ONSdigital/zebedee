@@ -245,9 +245,9 @@ public class PostPublisher {
                     contentWriter.write(inputStream, fileCopy.target);
                 } catch (ZebedeeException | IOException e) {
                     logError(e, "An error occurred trying to copy file from "
-                            + fileCopy.source.toString()
+                            + fileCopy.source
                             + " to "
-                            + fileCopy.target.toString())
+                            + fileCopy.target)
                             .collectionName(collection).collectionId(collection).log();
                 }
             }

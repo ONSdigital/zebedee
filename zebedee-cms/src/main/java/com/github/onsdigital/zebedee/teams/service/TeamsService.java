@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Set;
 
@@ -75,4 +76,12 @@ public interface TeamsService {
      * @throws IOException If a filesystem error occurs.
      */
     void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException;
+
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
+    List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) throws IOException,
+            UnauthorizedException;
 }

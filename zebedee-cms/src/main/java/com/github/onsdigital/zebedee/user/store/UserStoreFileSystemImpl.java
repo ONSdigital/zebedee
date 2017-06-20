@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
@@ -21,6 +22,7 @@ import java.util.stream.StreamSupport;
 public class UserStoreFileSystemImpl implements UserStore {
 
     private static final String JSON_EXT = ".json";
+    private static final Path DS_STORE = Paths.get(".DS_Store");
 
     private Path usersPath;
 
@@ -61,7 +63,7 @@ public class UserStoreFileSystemImpl implements UserStore {
     @Override
     public UserList list() throws IOException {
         return StreamSupport.stream(Files.newDirectoryStream(usersPath).spliterator(), false)
-                .filter(path -> !Files.isDirectory(path))
+                .filter(path -> !Files.isDirectory(path) && !path.getFileName().equals(DS_STORE))
                 .map(userPath -> {
                     return userDeserializer.apply(userPath);
                 }).collect(new UserListCollector());

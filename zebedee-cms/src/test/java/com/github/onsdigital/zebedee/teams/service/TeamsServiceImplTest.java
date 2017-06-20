@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -522,5 +523,67 @@ public class TeamsServiceImplTest {
         verify(readWriteLock, times(2)).writeLock();
         verify(lock, times(1)).lock();
         verify(lock, times(1)).unlock();
+    }
+
+    @Test (expected = UnauthorizedException.class)
+    public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfSessionNull() throws Exception {
+        try {
+            service.getTeamMembersSummary(null);
+        } catch (UnauthorizedException e) {
+            verifyZeroInteractions(teamsStore, permissionsService);
+            throw e;
+        }
+    }
+
+    @Test (expected = UnauthorizedException.class)
+    public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfSessionEmailNull() throws Exception {
+        session.setEmail(null);
+        try {
+            service.getTeamMembersSummary(session);
+        } catch (UnauthorizedException e) {
+            verifyZeroInteractions(teamsStore, permissionsService);
+            throw e;
+        }
+    }
+
+    @Test (expected = UnauthorizedException.class)
+    public void getTeamMembersSummary_ShouldThrowUnauthorizedExceptionIfUserNotAdmin() throws Exception {
+        session.setEmail(EMAIL);
+
+        when(permissionsService.isAdministrator(session))
+                .thenReturn(false);
+
+        try {
+            service.getTeamMembersSummary(session);
+        } catch (UnauthorizedException e) {
+            verify(permissionsService, times(1)).isAdministrator(EMAIL);
+            verifyZeroInteractions(teamsStore);
+            throw e;
+        }
+    }
+
+    @Test
+    public void getTeamMembersSummary_Success() throws Exception {
+        session.setEmail(EMAIL);
+
+        teamsList.add(teamA.addMember("userA").addMember("userB"));
+        teamsList.add(teamC.addMember("userC"));
+
+        when(permissionsService.isAdministrator(EMAIL))
+                .thenReturn(true);
+        when(teamsStore.listTeams())
+                .thenReturn(teamsList);
+
+        List<AbstractMap.SimpleEntry<String, String>> expected = new ArrayList<>();
+        expected.add(new AbstractMap.SimpleEntry<String, String>(teamA.getName(), "userA"));
+        expected.add(new AbstractMap.SimpleEntry<String, String>(teamA.getName(), "userB"));
+        expected.add(new AbstractMap.SimpleEntry<String, String>(teamC.getName(), "userC"));
+
+        List<AbstractMap.SimpleEntry<String, String>> result = service.getTeamMembersSummary(session);
+
+        assertThat(result, equalTo(expected));
+        verify(permissionsService, times(1)).isAdministrator(EMAIL);
+        verify(teamsStore, times(1)).listTeams();
+        verifyNoMoreInteractions(permissionsService, teamsStore);
     }
 }

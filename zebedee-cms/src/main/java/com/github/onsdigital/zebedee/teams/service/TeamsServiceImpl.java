@@ -12,7 +12,10 @@ import com.github.onsdigital.zebedee.teams.store.TeamsStore;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -40,6 +43,17 @@ public class TeamsServiceImpl implements TeamsService {
     private ReadWriteLock teamLock = new ReentrantReadWriteLock();
     private ServiceSupplier<PermissionsService> permissionsServiceSupplier;
     private TeamsStore teamsStore;
+
+    private Comparator<Team> sortTeamsbyName = (t1, t2) -> t1.getName().compareTo(t2.getName());
+
+    private Comparator<AbstractMap.SimpleEntry<String, String>> sortByTeamName =
+            (o1, o2) -> o1.getKey().compareTo(o2.getKey());
+
+    private Comparator<AbstractMap.SimpleEntry<String, String>> sortTeamByMemberName =
+            (o1, o2) -> o1.getValue().compareTo(o2.getValue());
+
+    private Comparator<AbstractMap.SimpleEntry<String, String>> sortTeamsReportList =
+            sortByTeamName.thenComparing(sortTeamByMemberName);
 
     /**
      * @param teamsStore
@@ -127,6 +141,27 @@ public class TeamsServiceImpl implements TeamsService {
                 team,
                 (t) -> !StringUtils.isBlank(email) && team != null,
                 (t) -> t.removeMember(email));
+    }
+
+    @Override
+    public List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) throws IOException, UnauthorizedException {
+        validateSessionAndPermissions(session);
+        List<AbstractMap.SimpleEntry<String, String>> membersReport = new ArrayList<>();
+
+        for (Team team : listTeams()) {
+            if (team.getMembers() == null || team.getMembers().isEmpty()) {
+                membersReport.add(new AbstractMap.SimpleEntry<String, String>(team.getName(), ""));
+                continue;
+            }
+
+            membersReport.addAll(team.getMembers()
+                    .stream()
+                    .map(user -> new AbstractMap.SimpleEntry<String, String>(team.getName(), user))
+                    .collect(Collectors.toSet()));
+        }
+
+        Collections.sort(membersReport, sortTeamsReportList);
+        return membersReport;
     }
 
     private void updateTeam(Team target, Predicate<Team> validator, Function<Team, Team> updateTask) throws IOException, NotFoundException {

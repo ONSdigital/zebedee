@@ -62,14 +62,14 @@ public class TeamsReport {
     public void getReport(HttpServletRequest request, HttpServletResponse response) throws IOException,
             BadRequestException, UnauthorizedException {
         Session session = serviceServiceSupplier.getService().get(request);
-        HSSFWorkbook workbook = createWorkbook(session);
         response.setContentType(APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader(CONTENT_DISPOSITION_HEADER, format(CONTENT_DISPOSITION_VALUE, getDateString()));
         response.setStatus(HttpStatus.OK.value());
-        workbook.write(response.getOutputStream());
+        createWorkbook(session, response);
     }
 
-    private HSSFWorkbook createWorkbook(Session session) throws IOException, UnauthorizedException {
+    private void createWorkbook(Session session, HttpServletResponse response) throws IOException,
+            UnauthorizedException {
         List<AbstractMap.SimpleEntry<String, String>> teamMembersMapping = teamsServiceSupplier
                 .getService()
                 .getTeamMembersSummary(session);
@@ -77,15 +77,16 @@ public class TeamsReport {
         final AtomicInteger rowIndex = new AtomicInteger(0);
         String sheetName = format(SHEET_TITLE, getDateString());
 
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet(sheetName);
+        try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+            HSSFSheet sheet = workbook.createSheet(sheetName);
 
-        // Create the title row.
-        createTeamUserCells(sheet, rowIndex, TEAM_COL, USER_COL);
+            // Create the title row.
+            createTeamUserCells(sheet, rowIndex, TEAM_COL, USER_COL);
 
-        teamMembersMapping.stream()
-                .forEach(entry -> createTeamUserCells(sheet, rowIndex, entry.getKey(), entry.getValue()));
-        return formatWorkbook(workbook, sheetName);
+            teamMembersMapping.stream()
+                    .forEach(entry -> createTeamUserCells(sheet, rowIndex, entry.getKey(), entry.getValue()));
+            formatWorkbook(workbook, sheetName).write(response.getOutputStream());
+        }
     }
 
     private HSSFWorkbook formatWorkbook(HSSFWorkbook workbook, String sheetName) {

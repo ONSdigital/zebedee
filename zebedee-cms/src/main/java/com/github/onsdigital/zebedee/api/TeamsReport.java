@@ -54,9 +54,9 @@ public class TeamsReport {
      *
      * @param request  the client {@link HttpServletRequest}
      * @param response the {@link HttpServletResponse} to the client.
-     * @throws IOException
-     * @throws BadRequestException
-     * @throws UnauthorizedException
+     * @throws IOException           error while generating teams report.
+     * @throws BadRequestException   error while generating teams report.
+     * @throws UnauthorizedException user not authorised to request teams report.
      */
     @GET
     public void getReport(HttpServletRequest request, HttpServletResponse response) throws IOException,

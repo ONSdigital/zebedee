@@ -118,7 +118,7 @@ public class VersionedContentItem extends ContentItem {
     public ContentItemVersion createVersion(Path contentRoot, ContentReader contentReader, ContentWriter contentWriter) throws IOException, ZebedeeException {
 
         // create a new directory for the version. e.g. edition/previous/v1
-        Path absolutePath = contentRoot.resolve(URIUtils.removeLeadingSlash(getUri().toString()));
+        Path absolutePath = contentRoot.resolve(URIUtils.removeLeadingSlash(getUri()));
         String versionIdentifier = createVersionIdentifier(absolutePath);
         String versionUri = String.format("%s/%s/%s", getUri(), getVersionDirectoryName(), versionIdentifier);
 
@@ -151,7 +151,7 @@ public class VersionedContentItem extends ContentItem {
     private void copyFilesIntoVersionDirectory(Path contentRoot, String versionUri, ContentReader contentReader,
                                                ContentWriter contentWriter) throws IOException, ZebedeeException {
         // Iterate the files in the source directory.
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri().toString())))) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentRoot.resolve(removeLeadingSlash(getUri())))) {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) { // ignore directories
                     String uri = contentRoot.relativize(path).toString();
@@ -184,7 +184,7 @@ public class VersionedContentItem extends ContentItem {
 
     public boolean versionExists(Content content) {
 
-        Path path = content.get(getUri().toString());
+        Path path = content.get(getUri());
         if (path != null) {
             Path destinationPath = path.resolve(VersionedContentItem.getVersionDirectoryName());
 
@@ -197,7 +197,7 @@ public class VersionedContentItem extends ContentItem {
 
     public boolean versionExists(ContentReader reader) {
 
-        Path pathToVersionsFolder = reader.getRootFolder().resolve(getUri().toString()).resolve(VersionedContentItem.getVersionDirectoryName());
+        Path pathToVersionsFolder = reader.getRootFolder().resolve(getUri()).resolve(VersionedContentItem.getVersionDirectoryName());
 
         if (pathToVersionsFolder != null && Files.exists(pathToVersionsFolder) && pathToVersionsFolder.toFile().listFiles().length > 0) {
             return true;

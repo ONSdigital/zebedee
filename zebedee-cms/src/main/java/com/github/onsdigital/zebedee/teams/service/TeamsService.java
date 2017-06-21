@@ -8,6 +8,7 @@ import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Set;
 
@@ -18,12 +19,12 @@ public interface TeamsService {
 
     /**
      * Return a list of the current teams.
+     *
      * @throws IOException unexpected error listing the current teams.
      */
     List<Team> listTeams() throws IOException;
 
     /**
-     *
      * @param teamIds
      * @return
      * @throws IOException
@@ -32,6 +33,7 @@ public interface TeamsService {
 
     /**
      * Find a team by name.
+     *
      * @param teamName the name of the team to search for.
      * @return
      * @throws IOException
@@ -75,4 +77,11 @@ public interface TeamsService {
      * @throws IOException If a filesystem error occurs.
      */
     void removeTeamMember(String email, Team team, Session session) throws IOException, UnauthorizedException, NotFoundException;
+
+    /**
+     * @return on the fly mapping of which teams currently contain which users. Format is teamName -> userEmail.
+     * @throws IOException
+     */
+    List<AbstractMap.SimpleEntry<String, String>> getTeamMembersSummary(Session session) throws IOException,
+            UnauthorizedException;
 }

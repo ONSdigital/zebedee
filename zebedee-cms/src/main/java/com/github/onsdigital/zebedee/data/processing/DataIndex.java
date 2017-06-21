@@ -124,7 +124,7 @@ public class DataIndex {
             String uri = "/" + this.contentReader.getRootFolder().relativize(file).toString();
 
             // Check json files in timeseries directories (excluding versions)
-            if (uri.endsWith("data.json") && uri.contains("/timeseries/") && !uri.toString().contains("/" + VersionedContentItem.getVersionDirectoryName() + "/")) {
+            if (uri.endsWith("data.json") && uri.contains("/timeseries/") && !uri.contains("/" + VersionedContentItem.getVersionDirectoryName() + "/")) {
                 uri = uri.substring(0, uri.length() - "/data.json".length());
 
                 TimeSeries timeSeries;

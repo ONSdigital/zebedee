@@ -75,7 +75,7 @@ public class ZebedeeConfiguration {
         Path dir = root.resolve(dirName);
         if (!Files.exists(dir)) {
             logDebug(LOG_PREFIX + "Creating required Zebedee directory as it does not exist.")
-                    .path(dirName.toString()).log();
+                    .path(dirName).log();
             Files.createDirectory(dir);
         } else {
             logDebug(LOG_PREFIX + "Zebedee directory already exists no action required.")

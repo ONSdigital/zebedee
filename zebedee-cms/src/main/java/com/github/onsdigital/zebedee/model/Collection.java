@@ -940,7 +940,7 @@ public class Collection {
         if (hasDeleted) {
             addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
-                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri.toString()));
+                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri));
         }
         save();
         return hasDeleted;

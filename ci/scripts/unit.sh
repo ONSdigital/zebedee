@@ -1,5 +1,5 @@
 #!/bin/bash -eux
 
 pushd zebedee
-  mvn clean package dependency:copy-dependencies
+  mvn test
 popd

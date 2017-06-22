@@ -1,8 +1,9 @@
 #!/bin/bash -eux
 
 pushd zebedee
-  mvn clean package dependency:copy-dependencies -DskipTests=true
-popd
+  mvn -DskipTests=true clean package dependency:copy-dependencies
+  cp -r Dockerfile.concourse zebedee-cms/target/* ../build
 
-cp -r zebedee/zebedee-cms/target zebedee-cms/
-cp -r zebedee/zebedee-reader/target zebedee-reader/
+  mkdir ../build/zebedee-reader
+  cp -r zebedee-reader/Dockerfile.concourse zebedee-reader/target/* ../build/zebedee-reader
+popd

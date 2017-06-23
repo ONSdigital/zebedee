@@ -1,0 +1,11 @@
+FROM onsdigital/java-component
+
+WORKDIR /usr/src
+
+ADD classes target/classes
+ADD dependency target/dependency
+
+CMD java -Xmx2048m -cp "target/dependency/*:target/classes/"    \
+    -Drestolino.packageprefix=com.github.onsdigital.zebedee.api \
+    -Drestolino.classes=target/classes                          \
+    com.github.davidcarboni.restolino.Main

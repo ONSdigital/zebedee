@@ -110,7 +110,7 @@ public class CollectionDescription extends CollectionBase {
      *
      * @param event
      */
-    public void AddEvent(Event event) {
+    public void addEvent(Event event) {
 
         if (events == null)
             events = new Events();
@@ -153,5 +153,13 @@ public class CollectionDescription extends CollectionBase {
 
     public void setPendingDeletes(List<PendingDelete> pendingDeletes) {
         this.pendingDeletes = pendingDeletes;
+    }
+
+    public ApprovalStatus getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(ApprovalStatus approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 }

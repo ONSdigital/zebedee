@@ -4,7 +4,7 @@ import com.github.davidcarboni.restolino.framework.Filter;
 import com.github.davidcarboni.restolino.helpers.Path;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.api.*;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.search.api.endpoint.ReIndex;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ public class AuthenticationFilter implements Filter {
 	 * @param response
 	 * @return <ul>
 	 * <li>If the first path segment is login, true.</li>
-	 * <li>Otherwise, if a {@link com.github.onsdigital.zebedee.json.Session} can be found for the login token, true.</li>
+	 * <li>Otherwise, if a {@link Session} can be found for the login token, true.</li>
 	 * <li>Otherwise false.</li>
 	 * </ul>
 	 */
@@ -58,7 +58,7 @@ public class AuthenticationFilter implements Filter {
 		// Check all other requests:
 		boolean result = false;
 		try {
-			Session session = Root.zebedee.getSessions().get(request);
+			Session session = Root.zebedee.getSessionsService().get(request);
 			if (session == null) {
 				forbidden(response);
 			} else {

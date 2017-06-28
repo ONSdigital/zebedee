@@ -5,8 +5,8 @@ import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDetail;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
@@ -47,8 +47,8 @@ public class CollectionDetails {
             return null;
         }
 
-        Session session = Root.zebedee.getSessions().get(request);
-        if (Root.zebedee.getPermissions().canView(session.email, collection.description) == false) {
+        Session session = Root.zebedee.getSessionsService().get(request);
+        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.description)) {
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return null;
         }
@@ -77,10 +77,10 @@ public class CollectionDetails {
         addEventsForDetails(result.complete, result, collection);
         addEventsForDetails(result.reviewed, result, collection);
 
-        Set<Integer> teamIds = Root.zebedee.getPermissions().listViewerTeams(collection.description, session);
-        List<Team> teams = Root.zebedee.getTeams().resolveTeams(teamIds);
+        Set<Integer> teamIds = Root.zebedee.getPermissionsService().listViewerTeams(collection.description, session);
+        List<Team> teams = Root.zebedee.getTeamsService().resolveTeams(teamIds);
         teams.forEach(team -> {
-            collection.description.teams.add(team.name);
+            collection.description.teams.add(team.getName());
         });
 
         return result;

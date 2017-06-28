@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.service;
 
 import com.github.onsdigital.zebedee.configuration.Configuration;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.util.URIUtils;
@@ -12,7 +12,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.IOException;
-import java.util.function.Supplier;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -53,7 +52,7 @@ public class BabbagePdfService implements PdfService {
 
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpGet httpGet = new HttpGet(src);
-            httpGet.addHeader("Cookie", "access_token=" + session.id);
+            httpGet.addHeader("Cookie", "access_token=" + session.getId());
             httpGet.addHeader("Cookie", "collection=" + collection.description.id);
 
             try (CloseableHttpResponse response = client.execute(httpGet)) {

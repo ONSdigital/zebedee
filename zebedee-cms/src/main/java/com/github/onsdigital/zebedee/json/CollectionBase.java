@@ -28,4 +28,11 @@ public class CollectionBase {
 
     public List<String> teams; // list of team Id's
 
+    public String getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

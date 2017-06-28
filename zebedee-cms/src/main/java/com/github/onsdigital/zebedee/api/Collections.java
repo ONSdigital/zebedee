@@ -7,7 +7,7 @@ import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 
@@ -61,13 +61,13 @@ public class Collections {
     public CollectionDescriptions get(HttpServletRequest request, HttpServletResponse response)
             throws ZebedeeException {
         try {
-            Session session = Root.zebedee.getSessions().get(request);
+            Session session = Root.zebedee.getSessionsService().get(request);
             CollectionDescriptions result = new CollectionDescriptions();
             List<Collection> collections = Root.zebedee.getCollections().list();
-            CollectionOwner collectionOwner = zebedeeCmsService.getPublisherType(session.email);
+            CollectionOwner collectionOwner = zebedeeCmsService.getPublisherType(session.getEmail());
 
             for (Collection collection : collections) {
-                if (Root.zebedee.getPermissions().canView(session, collection.description)
+                if (Root.zebedee.getPermissionsService().canView(session, collection.description)
                         && (collection.description.collectionOwner.equals(collectionOwner))) {
 
                     CollectionDescription description = new CollectionDescription();

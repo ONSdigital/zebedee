@@ -3,9 +3,9 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.json.PingRequest;
 import com.github.onsdigital.zebedee.json.PingResponse;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.logging.ZebedeeReaderLogBuilder;
-import com.github.onsdigital.zebedee.model.Sessions;
+import com.github.onsdigital.zebedee.session.service.SessionsService;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.util.mertics.service.MetricsService;
 
@@ -42,13 +42,13 @@ public class Ping {
 
     private void setSessionDetails(HttpServletRequest request, PingResponse pingResponse) {
         try {
-            Sessions sessions = Root.zebedee.getSessions();
+            SessionsService sessionsService = Root.zebedee.getSessionsService();
             String token = RequestUtils.getSessionId(request);
-            if (sessions.exists(token)) {
-                Session session = sessions.read(token);
-                if (session != null && !sessions.expired(session)) {
+            if (sessionsService.exists(token)) {
+                Session session = sessionsService.read(token);
+                if (session != null && !sessionsService.expired(session)) {
                     pingResponse.hasSession = true;
-                    pingResponse.sessionExpiryDate = sessions.getExpiryDate(session);
+                    pingResponse.sessionExpiryDate = sessionsService.getExpiryDate(session);
                 }
             }
         } catch (IOException e) {

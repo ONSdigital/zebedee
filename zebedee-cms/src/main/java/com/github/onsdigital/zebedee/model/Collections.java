@@ -5,15 +5,28 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
 import com.github.onsdigital.zebedee.data.json.DirectoryListing;
-import com.github.onsdigital.zebedee.data.processing.DataIndex;
-import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.zebedee.exceptions.BadRequestException;
+import com.github.onsdigital.zebedee.exceptions.CollectionNotFoundException;
+import com.github.onsdigital.zebedee.exceptions.ConflictException;
+import com.github.onsdigital.zebedee.exceptions.DeleteContentRequestDeniedException;
+import com.github.onsdigital.zebedee.exceptions.NotFoundException;
+import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
+import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
+import com.github.onsdigital.zebedee.json.ApprovalStatus;
+import com.github.onsdigital.zebedee.json.Event;
+import com.github.onsdigital.zebedee.json.EventType;
+import com.github.onsdigital.zebedee.json.Keyring;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
@@ -37,24 +50,47 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.*;
-import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_MOVED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_RENAMED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
+import static java.util.Objects.requireNonNull;
 
 public class Collections {
-    public final Path path;
-    Zebedee zebedee;
 
-    public Collections(Path path, Zebedee zebedee) {
+    public final Path path;
+    private PermissionsService permissionsService;
+    private Content published;
+    private Supplier<Zebedee> zebedeeSupplier = () -> Root.zebedee;
+    private CollectionReaderWriterFactory collectionReaderWriterFactory;
+    private Function<ApproveTask, Future<Boolean>> addTaskToQueue = ApprovalQueue::add;
+    private BiConsumer<Collection, EventType> publishingNotificationConsumer = (c, e) -> new PublishNotification(c).sendNotification(e);
+    private Function<Path, ContentReader> contentReaderFactory = FileSystemContentReader::new;
+    private Supplier<CollectionHistoryDao> collectionHistoryDaoSupplier = CollectionHistoryDaoFactory::getCollectionHistoryDao;
+
+    public Collections(Path path, PermissionsService permissionsService, Content published) {
         this.path = path;
-        this.zebedee = zebedee;
+        this.permissionsService = permissionsService;
+        this.published = published;
+        this.collectionReaderWriterFactory = new CollectionReaderWriterFactory();
     }
 
     /**
@@ -70,10 +106,10 @@ public class Collections {
                 .newDirectoryStream(path)) {
             for (Path directory : stream) {
                 if (Files.isDirectory(directory)) {
-                    listing.folders.put(directory.getFileName().toString(),
+                    listing.getFolders().put(directory.getFileName().toString(),
                             directory.toString());
                 } else {
-                    listing.files.put(directory.getFileName().toString(),
+                    listing.getFiles().put(directory.getFileName().toString(),
                             directory.toString());
                 }
             }
@@ -149,12 +185,12 @@ public class Collections {
         }
 
         // Check authorisation
-        if (!zebedee.getPermissions().canEdit(session)) {
+        if (!permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // Locate the path:
-        Path path = collection.inProgress.get(uri);
+        Path path = collection.getInProgress().get(uri);
         if (path == null) {
             throw new NotFoundException("URI not in progress.");
         }
@@ -166,12 +202,13 @@ public class Collections {
 
         CollectionHistoryEvent historyEvent = new CollectionHistoryEvent(collection, session, null, uri);
         // Attempt to complete:
-        if (collection.complete(session.email, uri, recursive)) {
+        if (collection.complete(session.getEmail(), uri, recursive)) {
             removeEmptyCollectionDirectories(path);
             collection.save();
-            getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_ITEM_COMPLETED));
+            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent.eventType
+                    (COLLECTION_ITEM_COMPLETED));
         } else {
-            getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_COMPLETED_ERROR));
+            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent.eventType(COLLECTION_COMPLETED_ERROR));
             throw new BadRequestException("URI was not completed.");
         }
     }
@@ -187,7 +224,7 @@ public class Collections {
             for (Path path : stream) {
                 if (Files.isDirectory(path)) {
                     try {
-                        result.add(new Collection(path, zebedee));
+                        result.add(new Collection(path, zebedeeSupplier.get()));
                     } catch (CollectionNotFoundException e) {
                         logError(e, "Failed to deserialise collection")
                                 .addParameter("collectionPath", path.toString())
@@ -198,6 +235,11 @@ public class Collections {
         }
 
         return result;
+    }
+
+    public Map<String, Collection> mapByID() throws IOException {
+        return list().stream().collect(Collectors.toMap(
+                collection -> collection.getDescription().getId(), collection -> collection));
     }
 
     /**
@@ -214,12 +256,12 @@ public class Collections {
             Collection collection = getCollectionByName(collectionName);
             return collection;
         } catch (IOException | CollectionNotFoundException e) {
-            return Root.zebedee.getCollections().list().getCollection(collectionId);
+            return list().getCollection(collectionId);
         }
     }
 
     public Collection getCollectionByName(String collectionName) throws IOException, CollectionNotFoundException {
-        return new Collection(this.path.resolve(collectionName), this.zebedee);
+        return new Collection(this.path.resolve(collectionName), zebedeeSupplier.get());
     }
 
     /**
@@ -244,7 +286,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -255,19 +297,18 @@ public class Collections {
                     "This collection can't be approved because it's not empty");
         }
 
-        CollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
-        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
+        CollectionReader collectionReader = collectionReaderWriterFactory.getReader(zebedeeSupplier.get(), collection, session);
+        CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
+        ContentReader publishedReader = contentReaderFactory.apply(this.published.path);
 
-        ContentReader publishedReader = new FileSystemContentReader(zebedee.getPublished().path);
-        DataIndex dataIndex = zebedee.getDataIndex();
-
-        collection.description.approvalStatus = ApprovalStatus.IN_PROGRESS;
+        collection.getDescription().setApprovalStatus(ApprovalStatus.IN_PROGRESS);
         collection.save();
 
-        Future<Boolean> future = ApprovalQueue.add(
-                new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader, dataIndex));
+        Future<Boolean> future = addTaskToQueue.apply(
+                new ApproveTask(collection, session, collectionReader, collectionWriter, publishedReader,
+                        zebedeeSupplier.get().getDataIndex()));
 
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_APPROVED);
         return future;
     }
 
@@ -291,23 +332,22 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         // don't do anything if the approval status is not complete.
-        if (collection.description.approvalStatus != ApprovalStatus.COMPLETE) {
+        if (collection.getDescription().getApprovalStatus() != ApprovalStatus.COMPLETE) {
             return true;
         }
 
         // Go ahead
-        collection.description.approvalStatus = ApprovalStatus.NOT_STARTED;
-        collection.description.AddEvent(new Event(new Date(), EventType.UNLOCKED, session.email));
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_UNLOCKED);
+        collection.getDescription().setApprovalStatus(ApprovalStatus.NOT_STARTED);
+        collection.getDescription().addEvent(new Event(new Date(), EventType.UNLOCKED, session.getEmail()));
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_UNLOCKED);
 
-        boolean result = collection.save();
-        new PublishNotification(collection).sendNotification(EventType.UNLOCKED);
-        return result;
+        publishingNotificationConsumer.accept(collection, EventType.UNLOCKED);
+        return collection.save();
     }
 
     /**
@@ -332,7 +372,7 @@ public class Collections {
         }
 
         // User has permission
-        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -348,19 +388,19 @@ public class Collections {
         }
         logInfo("Going ahead with publish").log();
 
-        Keyring keyring = zebedee.getKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
+        Keyring keyring = zebedeeSupplier.get().getKeyringCache().get(session);
+        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
 
-        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedee, collection, session);
+        ZebedeeCollectionReader collectionReader = new ZebedeeCollectionReader(zebedeeSupplier.get(), collection, session);
         long publishStart = System.currentTimeMillis();
-        boolean publishComplete = Publisher.Publish(collection, session.email, collectionReader);
+        boolean publishComplete = Publisher.Publish(collection, session.getEmail(), collectionReader);
 
         if (publishComplete) {
             long onPublishCompleteStart = System.currentTimeMillis();
 
             new PublishNotification(collection).sendNotification(EventType.PUBLISHED);
 
-            PostPublisher.postPublish(zebedee, collection, skipVerification, collectionReader);
+            PostPublisher.postPublish(zebedeeSupplier.get(), collection, skipVerification, collectionReader);
 
             logInfo("Collection postPublish process finished")
                     .collectionName(collection)
@@ -385,9 +425,9 @@ public class Collections {
             throw new BadRequestException("Please specify a valid collection.");
         }
 
-        // Check view permissions
-        if (!zebedee.getPermissions().canView(session,
-                collection.description)) {
+        // Check view permissionsServiceImpl
+        if (!permissionsService.canView(session,
+                collection.getDescription())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -411,7 +451,7 @@ public class Collections {
      *
      * @param collection the collection to overlay on master content
      * @param uri        the uri of the directory
-     * @param session    the session (used to determine user permissions)
+     * @param session    the session (used to determine user permissionsServiceImpl)
      * @return a DirectoryListing object with system content overlaying master content
      * @throws NotFoundException
      * @throws UnauthorizedException
@@ -426,11 +466,11 @@ public class Collections {
 
         DirectoryListing listing = listDirectory(collection, uri, session);
 
-        Path publishedPath = zebedee.getPublished().get(uri);
+        Path publishedPath = this.published.get(uri);
         DirectoryListing publishedListing = listDirectory(publishedPath);
 
-        listing.files.putAll(publishedListing.files);
-        listing.folders.putAll(publishedListing.folders);
+        listing.getFiles().putAll(publishedListing.getFiles());
+        listing.getFolders().putAll(publishedListing.getFolders());
 
         return listing;
     }
@@ -444,7 +484,7 @@ public class Collections {
         }
 
         // User has permission
-        if (!zebedee.getPermissions().canEdit(session)) {
+        if (!permissionsService.canEdit(session)) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -455,7 +495,7 @@ public class Collections {
 
         // Go ahead
         collection.delete();
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_DELETED);
     }
 
     /**
@@ -478,22 +518,22 @@ public class Collections {
     ) throws ZebedeeException, IOException,
             FileUploadException {
 
-        if (zebedee.getPublished().exists(uri)) {
+        if (this.published.exists(uri)) {
             throw new ConflictException("This URI already exists");
         }
 
-        Optional<Collection> blockingCollection = zebedee.checkForCollectionBlockingChange(collection, uri);
+        Optional<Collection> blockingCollection = zebedeeSupplier.get().checkForCollectionBlockingChange(collection, uri);
         if (blockingCollection.isPresent()) {
             Collection blocker = blockingCollection.get();
             logInfo("Cannot create content as it existings in another collection.")
                     .saveOrEditConflict(collection, blocker, uri)
-                    .user(session.email)
+                    .user(session.getEmail())
                     .log();
             throw new ConflictException("This URI exists in another collection.");
         }
 
         try {
-            zebedee.checkAllCollectionsForDeleteMarker(uri);
+            zebedeeSupplier.get().checkAllCollectionsForDeleteMarker(uri);
         } catch (DeleteContentRequestDeniedException ex) {
             throw new ConflictException("This URI already exists");
         }
@@ -508,14 +548,15 @@ public class Collections {
             boolean validateJson
     ) throws IOException, ZebedeeException, FileUploadException {
 
-        CollectionWriter collectionWriter = new ZebedeeCollectionWriter(zebedee, collection, session);
+        CollectionWriter collectionWriter = collectionReaderWriterFactory.getWriter(zebedeeSupplier.get(), collection, session);
+
         logInfo("Attempting to write content.")
                 .collectionName(collection)
                 .path(uri)
-                .user(session.email)
+                .user(session.getEmail())
                 .log();
 
-        if (collection.description.approvalStatus == ApprovalStatus.COMPLETE) {
+        if (collection.getDescription().getApprovalStatus() == ApprovalStatus.COMPLETE) {
             throw new BadRequestException("This collection has been approved and cannot be saved to.");
         }
 
@@ -535,14 +576,14 @@ public class Collections {
         // Create / edit
         if (path == null) {
             // create the file
-            if (!collection.create(session.email, uri)) {
+            if (!collection.create(session.getEmail(), uri)) {
                 // file may be being edited in a different collection
                 throw new ConflictException(
                         "It could be this URI is being edited in another collection");
             }
         } else {
             // edit the file
-            boolean result = collection.edit(session.email, uri, collectionWriter, recursive);
+            boolean result = collection.edit(session.getEmail(), uri, collectionWriter, recursive);
             if (!result) {
                 // file may be being edited in a different collection
                 throw new ConflictException(
@@ -551,7 +592,7 @@ public class Collections {
         }
 
         collection.save();
-        logInfo("content save successful.").collectionName(collection).path(uri).user(session.email).log();
+        logInfo("content save successful.").collectionName(collection).path(uri).user(session.getEmail()).log();
 
         path = collection.getInProgressPath(uri);
         if (!Files.exists(path)) {
@@ -574,7 +615,7 @@ public class Collections {
                 collectionWriter.getInProgress().write(requestBody, uri);
             }
             if (eventType != null) {
-                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent);
+                collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
             }
         }
     }
@@ -610,7 +651,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -632,12 +673,12 @@ public class Collections {
         boolean deleted;
         CollectionEventType eventType;
 
-        if (collection.description.collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
+        if (collection.getDescription().getCollectionOwner().equals(CollectionOwner.DATA_VISUALISATION)) {
             deleted = collection.deleteDataVisContent(session, Paths.get(uri));
             eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
         } else {
             if (Files.isDirectory(path)) {
-                deleted = collection.deleteContentDirectory(session.email, uri);
+                deleted = collection.deleteContentDirectory(session.getEmail(), uri);
             } else {
                 deleted = collection.deleteFile(uri);
             }
@@ -646,7 +687,7 @@ public class Collections {
         collection.save();
         if (deleted) {
             removeEmptyCollectionDirectories(path);
-            getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
+            collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(new CollectionHistoryEvent(collection, session,
                     eventType, uri));
         }
         return deleted;
@@ -674,7 +715,7 @@ public class Collections {
                 try (InputStream inputStream = item.getInputStream()) {
                     collectionWriter.getInProgress().write(inputStream, uri);
                 }
-                getCollectionHistoryDao().saveCollectionHistoryEvent(historyEvent);
+                collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(historyEvent);
             }
         } catch (Exception e) {
             throw new IOException("Error processing uploaded file", e);
@@ -736,7 +777,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -748,12 +789,12 @@ public class Collections {
             throw new BadRequestException("Please provide a new URI");
         }
 
-        if (zebedee.getPublished().exists(uri)) {
+        if (this.published.exists(uri)) {
             throw new BadRequestException("You cannot move or rename a file that is already published.");
         }
 
         collection.moveContent(session, uri, newUri);
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_MOVED,
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_MOVED,
                 contentMoved(uri, newUri));
         collection.save();
     }
@@ -766,7 +807,7 @@ public class Collections {
         }
 
         // Authorisation
-        if (session == null || !zebedee.getPermissions().canEdit(session.email)) {
+        if (session == null || !permissionsService.canEdit(session.getEmail())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
@@ -778,12 +819,12 @@ public class Collections {
             throw new BadRequestException("Please provide a new URI");
         }
 
-        if (zebedee.getPublished().exists(uri)) {
+        if (this.published.exists(uri)) {
             throw new BadRequestException("You cannot move or rename a file that is already published.");
         }
 
-        collection.renameContent(session.email, uri, toUri);
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_RENAMED,
+        collection.renameContent(session.getEmail(), uri, toUri);
+        collectionHistoryDaoSupplier.get().saveCollectionHistoryEvent(collection, session, COLLECTION_CONTENT_RENAMED,
                 contentRenamed(uri, toUri));
         collection.save();
     }

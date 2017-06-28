@@ -6,8 +6,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
@@ -36,8 +35,8 @@ public class Version {
     @POST
     public String create(HttpServletRequest request, HttpServletResponse response) throws IOException, ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
-        if (session == null || !Root.zebedee.getPermissions().canEdit(session.email)) {
+        Session session = Root.zebedee.getSessionsService().get(request);
+        if (session == null || !Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
             throw new UnauthorizedException("You are not authorised to edit content.");
         }
 
@@ -45,14 +44,14 @@ public class Version {
         String uri = request.getParameter("uri");
 
         CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);
-        ContentItemVersion version = collection.version(session.email, uri, collectionWriter);
+        ContentItemVersion version = collection.version(session.getEmail(), uri, collectionWriter);
 
         Audit.Event.COLLECTION_VERSION_CREATED
                 .parameters()
                 .host(request)
                 .collection(collection)
                 .version(version.getIdentifier())
-                .user(session.email)
+                .user(session.getEmail())
                 .log();
         return version.getUri();
     }
@@ -70,8 +69,8 @@ public class Version {
     @DELETE
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException, BadRequestException, NotFoundException, UnauthorizedException {
 
-        Session session = Root.zebedee.getSessions().get(request);
-        if (session == null || !Root.zebedee.getPermissions().canEdit(session.email)) {
+        Session session = Root.zebedee.getSessionsService().get(request);
+        if (session == null || !Root.zebedee.getPermissionsService().canEdit(session.getEmail())) {
             throw new UnauthorizedException("You are not authorised to edit content.");
         }
 
@@ -85,7 +84,7 @@ public class Version {
                 .host(request)
                 .collection(collection)
                 .version(uri)
-                .user(session.email)
+                .user(session.getEmail())
                 .log();
         return true;
     }

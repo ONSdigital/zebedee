@@ -4,7 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.IOUtils;
@@ -28,7 +28,7 @@ public class UserPublisherType {
     public void getCollectionUserType(HttpServletRequest request, HttpServletResponse response) throws ZebedeeException {
         Session session = zebedeeCmsService.getSession(request);
         try {
-            writeToResponse(zebedeeCmsService.getPublisherType(session.email), response);
+            writeToResponse(zebedeeCmsService.getPublisherType(session.getEmail()), response);
         } catch (IOException e) {
             logError(e, "Unexpected Error while writing json to httpServletResponse")
                     .logAndThrow(UnexpectedErrorException.class);

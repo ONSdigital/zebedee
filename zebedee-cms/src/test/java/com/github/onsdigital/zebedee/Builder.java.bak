@@ -38,7 +38,7 @@ public class Builder {
     public Path parent;
     public Path zebedee;
     public List<Path> collections;
-    public List<String> teams;
+    public List<String> teamsService;
     public List<String> contentUris;
     public User administrator;
     public User publisher1;
@@ -157,8 +157,8 @@ public class Builder {
             collections.add(collection);
         }
 
-        // Create the teams
-        teams = new ArrayList<>();
+        // Create the teamsService
+        teamsService = new ArrayList<>();
 
         // Create some published content:
         Path folder = zebedee.resolve(Zebedee.PUBLISHED);
@@ -209,14 +209,14 @@ public class Builder {
             Serialiser.serialise(outputStream, reviewer2);
         }
 
-        Path sessions = zebedee.resolve(Zebedee.SESSIONS);
-        Files.createDirectories(sessions);
+        Path sessionsService = zebedee.resolve(Zebedee.SESSIONS);
+        Files.createDirectories(sessionsService);
 
         // Set up some permissions:
         Path permissions = zebedee.resolve(Zebedee.PERMISSIONS);
         Files.createDirectories(permissions);
-        Path teams = zebedee.resolve(Zebedee.TEAMS);
-        Files.createDirectories(teams);
+        Path teamsService = zebedee.resolve(Zebedee.TEAMS);
+        Files.createDirectories(teamsService);
 
         AccessMapping accessMapping = new AccessMapping();
 
@@ -232,8 +232,8 @@ public class Builder {
         accessMapping.collections = new HashMap<>();
 
         Zebedee z = new Zebedee(zebedee);
-        inflationTeam = createTeam(reviewer1, teamNames[0], teams);
-        labourMarketTeam = createTeam(reviewer2, teamNames[1], teams);
+        inflationTeam = createTeam(reviewer1, teamNames[0], teamsService);
+        labourMarketTeam = createTeam(reviewer2, teamNames[1], teamsService);
         accessMapping.collections.put(new Collection(collections.get(0), z).description.id, set(inflationTeam));
         accessMapping.collections.put(new Collection(collections.get(1), z).description.id, set(labourMarketTeam));
 
@@ -279,14 +279,14 @@ public class Builder {
         return ids;
     }
 
-    private Team createTeam(User user, String name, Path teams) throws IOException {
+    private Team createTeam(User user, String name, Path teamsService) throws IOException {
         Team team = new Team();
 
         team.id = ++teamId;
         team.name = name;
         team.members = new HashSet<>();
         team.members.add(user.email);
-        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.name + ".json"));
+        Path labourMarketTeamPath = teamsService.resolve(PathUtils.toFilename(team.name + ".json"));
         try (OutputStream output = Files.newOutputStream(labourMarketTeamPath)) {
             Serialiser.serialise(output, team);
         }

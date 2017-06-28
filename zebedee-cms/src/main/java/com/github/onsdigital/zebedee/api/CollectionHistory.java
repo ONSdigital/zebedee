@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.reader.util.RequestUtils;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
@@ -56,12 +56,12 @@ public class CollectionHistory {
 
     private void checkPermission(Session session) throws ZebedeeException {
         try {
-            if (session == null || zebedeeCmsService.getPermissions().canEdit(session.email) == false) {
+            if (session == null || !zebedeeCmsService.getPermissions().canEdit(session.getEmail())) {
                 throw new UnauthorizedException("You are not authorised to create collections.");
             }
         } catch (IOException io) {
             logError(io, "Unexpected error while trying to access permissions")
-                    .user(session.email)
+                    .user(session.getEmail())
                     .logAndThrow(UnexpectedErrorException.class);
         }
     }

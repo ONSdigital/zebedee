@@ -1,8 +1,7 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.zebedee.Builder;
-import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.statistics.data.timeseries.TimeSeries;
 import com.github.onsdigital.zebedee.content.page.statistics.dataset.Version;
 import com.github.onsdigital.zebedee.data.framework.DataBuilder;
@@ -12,7 +11,7 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
@@ -21,8 +20,6 @@ import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -33,10 +30,8 @@ import java.util.Date;
 
 import static org.junit.Assert.*;
 
-public class DataWriterTest {
+public class DataWriterTest extends ZebedeeTestBaseFixture {
 
-    Zebedee zebedee;
-    Builder bob;
     Session publisher;
     Session reviewer;
 
@@ -56,14 +51,9 @@ public class DataWriterTest {
      *
      * @throws Exception
      */
-    @Before
     public void setUp() throws Exception {
-
-        bob = new Builder();
-        zebedee = new Zebedee(bob.zebedee, false);
-
-        publisher = zebedee.openSession(bob.publisher1Credentials);
-        reviewer = zebedee.openSession(bob.reviewer1Credentials);
+        publisher = zebedee.openSession(builder.publisher1Credentials);
+        reviewer = zebedee.openSession(builder.reviewer1Credentials);
 
         dataBuilder = new DataBuilder(zebedee, publisher, reviewer);
         generator = new DataPagesGenerator();
@@ -90,11 +80,6 @@ public class DataWriterTest {
         // add a set of data to published over the existing set
         republish = generator.generateDataPagesSet("dataprocessor", "published", 2016, 2, "");
         dataBuilder.addReviewedDataPagesSet(republish, collection, collectionWriter);
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        bob.delete();
     }
 
     @Test

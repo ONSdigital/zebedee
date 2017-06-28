@@ -11,6 +11,10 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
+import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.user.model.User;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
@@ -24,11 +28,9 @@ import java.util.*;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 
 /**
- * This is a utility class to build a known {@link Zebedee} structure for
- * testing.
- *
- * @author david
+ * {@link Deprecated} Please do not use this any more.
  */
+@Deprecated
 public class Builder {
 
     public static final String COLLECTION_ONE_NAME = "inflationq22015";
@@ -46,7 +48,7 @@ public class Builder {
     public String[] collectionNames = {"Inflation Q2 2015", "Labour Market Q2 2015"};
     public String[] teamNames = {"Economy Team", "Labour Market Team"};
     public Path parent;
-    public Path zebedee;
+    public Path zebedeeRootPath;
     public List<Path> collections;
     public List<String> teams;
     public List<String> contentUris;
@@ -65,6 +67,8 @@ public class Builder {
     public Team labourMarketTeam;
     public Team inflationTeam;
 
+    private Zebedee zebedee;
+
     /**
      * Constructor to build a known {@link Zebedee} structure with minimal structure for testing.
      *
@@ -78,12 +82,12 @@ public class Builder {
 
         // Create the structure:
         parent = Files.createTempDirectory(Random.id());
-        zebedee = createZebedee(parent);
+        zebedeeRootPath = createZebedee(parent);
 
         // Create the collections:
         collections = new ArrayList<>();
         for (String collectionName : collectionNames) {
-            Path collection = createCollection(collectionName, zebedee);
+            Path collection = createCollection(collectionName, zebedeeRootPath);
             collections.add(collection);
         }
 
@@ -91,7 +95,7 @@ public class Builder {
         teams = new ArrayList<>();
 
         // Create some published content:
-        Path folder = zebedee.resolve(Zebedee.PUBLISHED);
+        Path folder = zebedeeRootPath.resolve(Zebedee.PUBLISHED);
         contentUris = new ArrayList<>();
         String contentUri;
         Path contentPath;
@@ -111,36 +115,36 @@ public class Builder {
         contentUris.add(contentUri);
 
         // A couple of users:
-        Path users = zebedee.resolve(Zebedee.USERS);
+        Path users = zebedeeRootPath.resolve(Zebedee.USERS);
         Files.createDirectories(users);
 
         administrator = clone(administratorTemplate);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(administrator.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(administrator.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, administrator);
         }
 
         publisher1 = clone(publisher1Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher1.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher1.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, publisher1);
         }
 
         publisher2 = clone(publisher2Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher2.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(publisher2.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, publisher2);
         }
 
         reviewer1 = clone(reviewer1Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer1.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer1.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, reviewer1);
         }
 
         reviewer2 = clone(reviewer2Template);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer2.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(reviewer2.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, reviewer2);
         }
 
         dataVis = clone(dataVisTemplate);
-        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(dataVis.email) + ".json"))) {
+        try (OutputStream outputStream = Files.newOutputStream(users.resolve(PathUtils.toFilename(dataVis.getEmail()) + ".json"))) {
             Serialiser.serialise(outputStream, dataVis);
         }
 
@@ -151,36 +155,39 @@ public class Builder {
         reviewer2Credentials = userCredentials(reviewer2);
         dataVisCredentials = userCredentials(dataVis);
 
-        Path sessions = zebedee.resolve(Zebedee.SESSIONS);
+        Path sessions = zebedeeRootPath.resolve(Zebedee.SESSIONS);
         Files.createDirectories(sessions);
 
         // Set up some permissions:
-        Path permissions = zebedee.resolve(Zebedee.PERMISSIONS);
+        Path permissions = zebedeeRootPath.resolve(Zebedee.PERMISSIONS);
         Files.createDirectories(permissions);
-        Path teams = zebedee.resolve(Zebedee.TEAMS);
+        Path teams = zebedeeRootPath.resolve(Zebedee.TEAMS);
         Files.createDirectories(teams);
 
         AccessMapping accessMapping = new AccessMapping();
 
-        accessMapping.administrators = new HashSet<>();
-        accessMapping.digitalPublishingTeam = new HashSet<>();
-        accessMapping.dataVisualisationPublishers = new HashSet<>();
+        accessMapping.setAdministrators(new HashSet<>());
+        accessMapping.setDigitalPublishingTeam(new HashSet<>());
+        accessMapping.setDataVisualisationPublishers(new HashSet<>());
 
-        accessMapping.administrators.add(administrator.email);
-        accessMapping.digitalPublishingTeam.add(publisher1.email);
-        accessMapping.digitalPublishingTeam.add(publisher2.email);
+        accessMapping.getAdministrators().add(administrator.getEmail());
+        accessMapping.getDigitalPublishingTeam().add(publisher1.getEmail());
+        accessMapping.getDigitalPublishingTeam().add(publisher2.getEmail());
 
-        accessMapping.dataVisualisationPublishers.add(dataVis.email);
+        accessMapping.getDataVisualisationPublishers().add(dataVis.getEmail());
 
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.id = Random.id();
         accessMapping.collections = new HashMap<>();
 
-        Zebedee z = new Zebedee(zebedee, false);
+
+        ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
+        this.zebedee = new Zebedee(configuration);
+
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);
         labourMarketTeam = createTeam(reviewer2, teamNames[1], teams);
-        accessMapping.collections.put(new Collection(collections.get(0), z).description.id, set(inflationTeam));
-        accessMapping.collections.put(new Collection(collections.get(1), z).description.id, set(labourMarketTeam));
+        accessMapping.collections.put(new Collection(collections.get(0), zebedee).description.id, set(inflationTeam));
+        accessMapping.collections.put(new Collection(collections.get(1), zebedee).description.id, set(labourMarketTeam));
 
         Path path = permissions.resolve("accessMapping.json");
         try (OutputStream output = Files.newOutputStream(path)) {
@@ -197,33 +204,33 @@ public class Builder {
     public Builder(Path bootStrap) throws IOException, CollectionNotFoundException {
         this();
 
-        FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
-        FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
-        FileUtils.deleteDirectory(this.zebedee.resolve(Zebedee.COLLECTIONS).toFile());
-        Files.createDirectory(this.zebedee.resolve(Zebedee.PUBLISHED));
-        Files.createDirectory(this.zebedee.resolve(Zebedee.LAUNCHPAD));
-        Files.createDirectory(this.zebedee.resolve(Zebedee.COLLECTIONS));
+        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.PUBLISHED).toFile());
+        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile());
+        FileUtils.deleteDirectory(this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).toFile());
+        Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.PUBLISHED));
+        Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD));
+        Files.createDirectory(this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS));
 
-        FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedee.resolve(Zebedee.PUBLISHED).toFile());
+        FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedeeRootPath.resolve(Zebedee.PUBLISHED).toFile());
         if (Files.exists(bootStrap.resolve(Zebedee.LAUNCHPAD))) {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.LAUNCHPAD).toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile());
+            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.LAUNCHPAD).toFile(), this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile());
         } else {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedee.resolve(Zebedee.LAUNCHPAD).toFile()); // Not bothering with distinct launchpad
+            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.PUBLISHED).toFile(), this.zebedeeRootPath.resolve(Zebedee.LAUNCHPAD).toFile()); // Not bothering with distinct launchpad
         }
 
         if (Files.exists(bootStrap.resolve(Zebedee.COLLECTIONS))) {
-            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.COLLECTIONS).toFile(), this.zebedee.resolve(Zebedee.COLLECTIONS).toFile());
+            FileUtils.copyDirectory(bootStrap.resolve(Zebedee.COLLECTIONS).toFile(), this.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).toFile());
         }
     }
 
-    static User clone(User user) {
+    public static User clone(User user) {
         User clone = new User();
 
-        clone.name = user.name;
-        clone.email = user.email;
-        clone.inactive = user.inactive;
-        clone.temporaryPassword = user.temporaryPassword;
-        clone.lastAdmin = user.lastAdmin;
+        clone.setName(user.getName());
+        clone.setEmail(user.getEmail());
+        clone.setInactive(user.getInactive());
+        clone.setTemporaryPassword(user.getTemporaryPassword());
+        clone.setLastAdmin(user.getLastAdmin());
         clone(clone, user, "passwordHash");
         clone(clone, user, "keyring");
         return clone;
@@ -250,65 +257,64 @@ public class Builder {
             logDebug("Generating test users and keys...").log();
 
             User jukesie = new User();
-            jukesie.name = "Matt Jukes";
-            jukesie.email = "jukesie@example.com";
-            jukesie.inactive = false;
+            jukesie.setName("Matt Jukes");
+            jukesie.setEmail("jukesie@example.com");
+            jukesie.setInactive(false);
             administratorTemplate = jukesie;
             jukesie.resetPassword("password");
 
             User patricia = clone(jukesie);
-            patricia.name = "Patricia Pumpkin";
-            patricia.email = "patricia@example.com";
-            patricia.inactive = false;
+            patricia.setName("Patricia Pumpkin");
+            patricia.setEmail("patricia@example.com");
+            patricia.setInactive(false);
             publisher1Template = patricia;
 
             User bernard = clone(jukesie);
-            bernard.name = "Bernard Black";
-            bernard.email = "bernard@example.com";
-            bernard.inactive = false;
+            bernard.setName("Bernard Black");
+            bernard.setEmail("bernard@example.com");
+            bernard.setInactive(false);
             publisher2Template = bernard;
 
             User freddy = clone(jukesie);
-            freddy.name = "freddy Pumpkin";
-            freddy.email = "freddy@example.com";
-            freddy.inactive = false;
+            freddy.setName("freddy Pumpkin");
+            freddy.setEmail("freddy@example.com");
+            freddy.setInactive(false);
             reviewer1Template = freddy;
 
             User ronny = clone(jukesie);
-            ronny.name = "Ronny Roller";
-            ronny.email = "ronny@example.com";
-            ronny.inactive = false;
+            ronny.setName("Ronny Roller");
+            ronny.setName("ronny@example.com");
+            ronny.setInactive(false);
             reviewer2Template = ronny;
 
             User dataVis = clone(jukesie);
-            dataVis.name = "dataVis";
-            dataVis.email = "datavis@example.com";
-            dataVis.inactive = false;
+            dataVis.setName("dataVis");
+            dataVis.setEmail("datavis@example.com");
+            dataVis.setInactive(false);
             dataVisTemplate = dataVis;
         }
     }
 
     private Credentials userCredentials(User user) {
         Credentials credentials = new Credentials();
-        credentials.email = user.email;
-        credentials.password = "password";
+        credentials.setEmail(user.getEmail());
+        credentials.setPassword("password");
         return credentials;
     }
 
     private Set<Integer> set(Team team) {
         Set<Integer> ids = new HashSet<>();
-        ids.add(team.id);
+        ids.add(team.getId());
         return ids;
     }
 
     private Team createTeam(User user, String name, Path teams) throws IOException {
         Team team = new Team();
 
-        team.id = ++teamId;
-        team.name = name;
-        team.members = new HashSet<>();
-        team.members.add(user.email);
-        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.name + ".json"));
+        team.setId(++teamId);
+        team.setName(name);
+        team.addMember(user.getEmail());
+        Path labourMarketTeamPath = teams.resolve(PathUtils.toFilename(team.getName() + ".json"));
         try (OutputStream output = Files.newOutputStream(labourMarketTeamPath)) {
             Serialiser.serialise(output, team);
         }
@@ -328,7 +334,7 @@ public class Builder {
      */
     public Path createPublishedFile(String uri) throws IOException {
 
-        Path published = zebedee.resolve(Zebedee.PUBLISHED);
+        Path published = zebedeeRootPath.resolve(Zebedee.PUBLISHED);
         Path content = published.resolve(uri.substring(1));
         Files.createDirectories(content.getParent());
         Files.createFile(content);
@@ -404,14 +410,14 @@ public class Builder {
 
         // Build the session object
         Session session = new Session();
-        session.id = Random.id();
-        session.email = email;
+        session.setId(Random.id());
+        session.setEmail(email);
 
         // Determine the path in which to create the session Json
         Path sessionPath;
-        String sessionFileName = PathUtils.toFilename(session.id);
+        String sessionFileName = PathUtils.toFilename(session.getId());
         sessionFileName += ".json";
-        sessionPath = zebedee.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
+        sessionPath = zebedeeRootPath.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
 
         // Serialise
         try (OutputStream output = Files.newOutputStream(sessionPath)) {
@@ -425,14 +431,14 @@ public class Builder {
 
         // Build the session object
         Session session = new Session();
-        session.id = Random.id();
-        session.email = user.email;
+        session.setId(Random.id());
+        session.setEmail(user.getEmail());
 
         // Determine the path in which to create the session Json
         Path sessionPath;
-        String sessionFileName = PathUtils.toFilename(session.id);
+        String sessionFileName = PathUtils.toFilename(session.getId());
         sessionFileName += ".json";
-        sessionPath = zebedee.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
+        sessionPath = zebedeeRootPath.resolve(Zebedee.SESSIONS).resolve(sessionFileName);
 
         // Serialise
         try (OutputStream output = Files.newOutputStream(sessionPath)) {
@@ -461,6 +467,8 @@ public class Builder {
         Files.createDirectory(path.resolve(Zebedee.PERMISSIONS));
         Files.createDirectory(path.resolve(Zebedee.TEAMS));
         Files.createDirectory(path.resolve(Zebedee.LAUNCHPAD));
+        Files.createDirectory(path.resolve(Zebedee.PUBLISHED_COLLECTIONS));
+        Files.createDirectory(path.resolve(Zebedee.APPLICATION_KEYS));
         return path;
     }
 
@@ -649,5 +657,9 @@ public class Builder {
             e.printStackTrace();
         }
         return path;
+    }
+
+    public Zebedee getZebedee() {
+        return zebedee;
     }
 }

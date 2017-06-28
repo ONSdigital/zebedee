@@ -149,7 +149,7 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
     }
 
     public ZebedeeLogBuilder collectionName(Collection collection) {
-        addParameter(COLLECTION_NAME, collection.getDescription().name);
+        addParameter(COLLECTION_NAME, collection.getDescription().getName());
         return this;
     }
 
@@ -194,12 +194,12 @@ public class ZebedeeLogBuilder extends LogMessageBuilder {
 
     public ZebedeeLogBuilder saveOrEditConflict(Collection targetCollection, Collection blockingCollection, String targetURI) throws IOException {
         if (targetCollection != null) {
-            String name = targetCollection.getDescription().name;
+            String name = targetCollection.getDescription().getName();
             addParameter(TARGET_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
             addParameter(TARGET_COLLECTION, name);
         }
         if (blockingCollection != null) {
-            String name = blockingCollection.getDescription().name;
+            String name = blockingCollection.getDescription().getName();
 
             addParameter(BLOCKING_PATH, COLLECTION_CONTENT_PATH.apply(name, targetURI));
             addParameter(BLOCKING_COLLECTION, name);

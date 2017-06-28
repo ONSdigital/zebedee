@@ -167,7 +167,7 @@ public class Publisher {
         // We do not want to send versioned files. They have already been taken care of via the manifest.
         // Pass the function to filter files into the publish method.
         Function<String, Boolean> versionedUriFilter = uri -> VersionedContentItem.isVersionedUri(uri);
-        Function<String, Boolean> timeseriesUriFilter = uri -> uri.toString().contains("/timeseries/");
+        Function<String, Boolean> timeseriesUriFilter = uri -> uri.contains("/timeseries/");
         Publisher.PublishCollectionFiles(collection, collectionReader, encryptionPassword, versionedUriFilter, timeseriesUriFilter);
     }
 
@@ -252,7 +252,7 @@ public class Publisher {
 
         if (success) {
             Date publishedDate = new Date();
-            collection.description.AddEvent(new Event(publishedDate, EventType.PUBLISHED, email));
+            collection.description.addEvent(new Event(publishedDate, EventType.PUBLISHED, email));
             collection.description.publishComplete = true;
             publishComplete = true;
         }

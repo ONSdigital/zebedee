@@ -1,5 +1,6 @@
 package com.github.onsdigital.zebedee.json;
 
+import com.github.onsdigital.zebedee.user.model.User;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

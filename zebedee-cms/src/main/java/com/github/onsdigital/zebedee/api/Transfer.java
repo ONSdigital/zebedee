@@ -2,7 +2,7 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.json.TransferRequest;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.PathUtils;
@@ -40,8 +40,8 @@ public class Transfer {
 
 
         // user has permission
-        Session session = Root.zebedee.getSessions().get(request);
-        if (!Root.zebedee.getPermissions().canEdit(session.email)){
+        Session session = Root.zebedee.getSessionsService().get(request);
+        if (!Root.zebedee.getPermissionsService().canEdit(session.getEmail())){
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             return false;
         }
@@ -78,7 +78,7 @@ public class Transfer {
         Audit.Event.COLLECTION_TRANSFERRED.parameters()
                 .host(request)
                 .fromTo(params.uri, params.destination)
-                .user(session.email)
+                .user(session.getEmail())
                 .log();
         return true;
     }

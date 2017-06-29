@@ -11,7 +11,6 @@ import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;

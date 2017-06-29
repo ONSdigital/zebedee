@@ -10,7 +10,6 @@ import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.session.model.Session;
 
 import java.io.IOException;
@@ -71,10 +70,4 @@ public interface PermissionsService {
     void addDataVisualisationPublisher(String email, Session session) throws ZebedeeException;
 
     void removeDataVisualisationPublisher(String email, Session session) throws IOException, UnauthorizedException;
-
-    CollectionOwner getUserCollectionGroup(Session session) throws IOException;
-
-    CollectionOwner getUserCollectionGroup(String email) throws IOException;
-
-    CollectionOwner getUserCollectionGroup(String email, AccessMapping accessMapping) throws IOException;
 }

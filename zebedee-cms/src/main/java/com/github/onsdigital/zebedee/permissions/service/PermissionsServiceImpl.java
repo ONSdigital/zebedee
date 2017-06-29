@@ -5,20 +5,19 @@ import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.model.KeyManager;
 import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
-import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +26,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.model.CollectionOwner.DATA_VISUALISATION;
 import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamAdded;
@@ -321,7 +320,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         permissionsStore.saveAccessMapping(accessMapping);
 
         // Update keyring (assuming this is not the system initialisation)
-        updateKeyring(session, email, PUBLISHING_SUPPORT);
+        updateKeyring(session, email);
     }
 
 
@@ -493,20 +492,14 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private boolean canView(String email, CollectionDescription collectionDescription, AccessMapping accessMapping)
             throws IOException {
-        boolean result = false;
-
         // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
-        if (teams != null) {
-            for (Team team : teamsServiceSupplier.getService().listTeams()) {
-                boolean isTeamMember = teams.contains(team.getId()) && team.getMembers().contains(standardise(email));
-                boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping).equals(collectionDescription.collectionOwner);
-                if (isTeamMember && inCollectionGroup) {
-                    return true;
-                }
-            }
-        }
-        return result;
+        Set<Integer> teams = accessMapping.collections.get(collectionDescription.getId());
+        return teamsServiceSupplier.getService()
+                .listTeams()
+                .stream()
+                .filter(team -> teams.contains(team.getId()) && team.getMembers().contains(standardise(email)))
+                .findFirst()
+                .isPresent();
     }
 
     private boolean canView(String email, CollectionDescription collectionDescription,
@@ -581,7 +574,7 @@ public class PermissionsServiceImpl implements PermissionsService {
             permissionsStore.saveAccessMapping(accessMapping);
 
             // Update keyring (assuming this is not the system initialisation)
-            updateKeyring(session, email, DATA_VISUALISATION);
+            updateKeyring(session, email);
         } catch (IOException e) {
             logError(e, "Error while attempting to add Data Vis publisher permission.")
                     .user(session.getEmail())
@@ -604,24 +597,6 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * Determined the {@link CollectionOwner} for this collection (PUBLISHING_SUPPORT or Data Visualisation).
-     */
-    @Override
-    public CollectionOwner getUserCollectionGroup(Session session) throws IOException {
-        return getUserCollectionGroup(session.getEmail(), permissionsStore.getAccessMapping());
-    }
-
-    @Override
-    public CollectionOwner getUserCollectionGroup(String email) throws IOException {
-        return getUserCollectionGroup(email, permissionsStore.getAccessMapping());
-    }
-
-    @Override
-    public CollectionOwner getUserCollectionGroup(String email, AccessMapping accessMapping) throws IOException {
-        return isDataVisPublisher(email, accessMapping) ? DATA_VISUALISATION : PUBLISHING_SUPPORT;
-    }
-
-    /**
      * Add the necessary keyrings to the user.
      *
      * @param session         The session of the user who is adding the new user.
@@ -632,7 +607,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      * @throws NotFoundException
      * @throws BadRequestException
      */
-    private void updateKeyring(Session session, String email, CollectionOwner collectionOwner)
+    private void updateKeyring(Session session, String email)
             throws IOException, NotFoundException, BadRequestException {
         User user = usersServiceSupplier.getService().getUserByEmail(email);
         if (session != null && user.keyring() != null) {

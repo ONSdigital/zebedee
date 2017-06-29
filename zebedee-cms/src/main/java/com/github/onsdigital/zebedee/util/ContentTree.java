@@ -4,7 +4,6 @@ import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.model.Collection;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.service.ContentDeleteService;
 
@@ -36,7 +35,7 @@ public class ContentTree {
         if (contentTree == null) {
             synchronized (ContentTree.class) {
                 if (contentTree == null) {
-                    contentTree = Root.zebedee.getPublished().nestedDetails(collectionOwner);
+                    contentTree = Root.zebedee.getPublished().nestedDetails();
                     if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
                         publishedDataVisualisationsTree = contentTree;
                     } else {

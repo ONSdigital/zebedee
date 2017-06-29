@@ -1,15 +1,12 @@
 package com.github.onsdigital.zebedee.json;
 
 import com.github.onsdigital.zebedee.json.publishing.Result;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
 
 /**
  * This cd ..
@@ -28,9 +25,6 @@ public class CollectionDescription extends CollectionBase {
     public Date publishEndDate; // The date the publish process ended.
     public boolean isEncrypted;
     private List<PendingDelete> pendingDeletes;
-
-    // Default to PUBLISHING_SUPPORT_TEAM
-    public CollectionOwner collectionOwner = PUBLISHING_SUPPORT;
 
     public List<String> timeseriesImportFiles = new ArrayList<>();
 
@@ -66,13 +60,6 @@ public class CollectionDescription extends CollectionBase {
         this.name = name;
     }
 
-    /**
-     *
-     */
-    public CollectionDescription(String name, CollectionOwner collectionOwner) {
-        this.name = name;
-        this.collectionOwner = collectionOwner != null ? collectionOwner : PUBLISHING_SUPPORT;
-    }
 
     /**
      * Convenience constructor for instantiating with a name
@@ -85,25 +72,6 @@ public class CollectionDescription extends CollectionBase {
         this.publishDate = publishDate;
         this.name = name;
     }
-
-    /**
-     * Convenience constructor for instantiating with a name
-     * and publish date.
-     *
-     * @param name
-     * @param publishDate
-     */
-    public CollectionDescription(String name, Date publishDate, CollectionOwner collectionOwner) {
-        this.publishDate = publishDate;
-        this.name = name;
-        this.collectionOwner = collectionOwner != null ? collectionOwner : PUBLISHING_SUPPORT;
-    }
-
-
-    public void setCollectionOwner(CollectionOwner audience) {
-        this.collectionOwner = audience != null ? audience : PUBLISHING_SUPPORT;
-    }
-
 
     /**
      * Add an event to this collection description.
@@ -130,10 +98,6 @@ public class CollectionDescription extends CollectionBase {
         }
 
         publishResults.add(result);
-    }
-
-    public CollectionOwner getCollectionOwner() {
-        return collectionOwner == null ? PUBLISHING_SUPPORT : collectionOwner;
     }
 
     public List<PendingDelete> getPendingDeletes() {

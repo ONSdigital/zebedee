@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.persistence.model;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionType;
-import com.github.onsdigital.zebedee.model.CollectionOwner;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;

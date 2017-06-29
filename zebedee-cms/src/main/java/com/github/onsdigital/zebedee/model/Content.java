@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -89,7 +90,6 @@ public class Content {
                         result.add(entry);
                         return result;
                     }
-
                     result.addAll(listTimeSeriesDirectories(entry));
                 }
             }
@@ -235,11 +235,11 @@ public class Content {
      * @return
      * @throws IOException
      */
-    public ContentDetail nestedDetails(CollectionOwner collectionOwner) throws IOException {
-        return nestedDetails(path, collectionOwner);
+    public ContentDetail nestedDetails() throws IOException {
+        return nestedDetails(path);
     }
 
-    private ContentDetail nestedDetails(Path contentPath, CollectionOwner collectionOwner) throws IOException {
+    private ContentDetail nestedDetails(Path contentPath) throws IOException {
         ContentDetail detail = details(contentPath.resolve("data.json"));
 
         // if the folder is empty put in an empty node with just a name.
@@ -255,8 +255,8 @@ public class Content {
         // todo: remove timeseries filter once we are caching the browse tree.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentPath)) {
             for (Path entry : stream) {
-                if (isVisibleForCollectionOwner(collectionOwner, entry)) {
-                    ContentDetail child = nestedDetails(entry, collectionOwner);
+                if (isVisibleForCollectionOwner(entry)) {
+                    ContentDetail child = nestedDetails(entry);
                     if (child != null) {
                         detail.children.add(child);
                     }
@@ -417,19 +417,11 @@ public class Content {
         return false;
     }
 
-    static boolean isVisibleForCollectionOwner(CollectionOwner collectionOwner, Path entry) {
-        if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
-            return Files.isDirectory(entry)
-                    && isDataVisualisation(entry)
-                    && !isTimeseries(entry)
-                    && isNotPreviousVersions(entry);
-        } else {
-            // PUBLISHING SUPPORT
+    static boolean isVisibleForCollectionOwner(Path entry) {
             return Files.isDirectory(entry)
                     && !isTimeseries(entry)
                     && isNotPreviousVersions(entry)
                     && !isDataVisualisation(entry);
-        }
     }
 
     public Path getPublishedContentPath() {

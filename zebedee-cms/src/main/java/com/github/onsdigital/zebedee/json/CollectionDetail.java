@@ -1,7 +1,5 @@
 package com.github.onsdigital.zebedee.json;
 
-import com.github.onsdigital.zebedee.model.CollectionOwner;
-
 import java.util.List;
 
 public class CollectionDetail extends CollectionBase {

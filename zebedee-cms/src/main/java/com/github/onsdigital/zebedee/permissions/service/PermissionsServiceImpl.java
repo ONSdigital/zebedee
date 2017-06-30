@@ -13,7 +13,6 @@ import com.github.onsdigital.zebedee.model.KeyringCache;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.permissions.model.AccessMapping;
 import com.github.onsdigital.zebedee.permissions.store.PermissionsStore;
-import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.teams.model.Team;
@@ -26,7 +25,6 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -34,7 +32,8 @@ import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
-import static com.github.onsdigital.zebedee.model.CollectionOwner.PUBLISHING_SUPPORT;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_VIEWER_TEAM_ADDED;
+import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_VIEWER_TEAM_REMOVED;
 import static com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory.getCollectionHistoryDao;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamAdded;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.teamRemoved;
@@ -410,10 +409,10 @@ public class PermissionsServiceImpl implements PermissionsService {
         }
 
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.id);
+        Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.getId());
         if (collectionTeams == null) {
             collectionTeams = new HashSet<>();
-            accessMapping.collections.put(collectionDescription.id, collectionTeams);
+            accessMapping.collections.put(collectionDescription.getId(), collectionTeams);
         }
 
         Team teamAdded = !collectionTeams.contains(team.getId()) ? team : null;
@@ -421,8 +420,8 @@ public class PermissionsServiceImpl implements PermissionsService {
         permissionsStore.saveAccessMapping(accessMapping);
 
         if (teamAdded != null) {
-            getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name, session,
-                    CollectionEventType.COLLECTION_VIEWER_TEAM_ADDED, teamAdded(collectionDescription, session, team));
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.getId(), collectionDescription
+                    .getName(), session, COLLECTION_VIEWER_TEAM_ADDED, teamAdded(collectionDescription, session, team));
         }
     }
 
@@ -442,7 +441,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         }
 
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.id);
+        Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.getId());
         if (teamIds == null) teamIds = new HashSet<>();
 
         return java.util.Collections.unmodifiableSet(teamIds);
@@ -463,10 +462,10 @@ public class PermissionsServiceImpl implements PermissionsService {
         }
 
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.id);
+        Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.getId());
         if (collectionTeams == null) {
             collectionTeams = new HashSet<>();
-            accessMapping.collections.put(collectionDescription.id, collectionTeams);
+            accessMapping.collections.put(collectionDescription.getId(), collectionTeams);
         }
 
 
@@ -475,9 +474,8 @@ public class PermissionsServiceImpl implements PermissionsService {
         permissionsStore.saveAccessMapping(accessMapping);
 
         if (teamRemoved != null) {
-            getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.id, collectionDescription.name,
-                    session, CollectionEventType.COLLECTION_VIEWER_TEAM_REMOVED,
-                    teamRemoved(collectionDescription, session, team));
+            getCollectionHistoryDao().saveCollectionHistoryEvent(collectionDescription.getId(), collectionDescription.getName(),
+                    session, COLLECTION_VIEWER_TEAM_REMOVED, teamRemoved(collectionDescription, session, team));
         }
     }
 
@@ -504,20 +502,14 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private boolean canView(String email, CollectionDescription collectionDescription,
                             AccessMapping accessMapping, List<Team> teamsList) throws IOException {
-        boolean result = false;
-        // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teamsOnCollection = accessMapping.getCollections().get(collectionDescription.getCollectionOwner());
-        if (teamsOnCollection != null) {
-            for (Team team : teamsList) {
-                boolean isTeamMember = teamsOnCollection.contains(team.getId()) && team.getMembers()
-                        .contains(standardise(email));
-                boolean inCollectionGroup = getUserCollectionGroup(email, accessMapping).equals(collectionDescription.collectionOwner);
-                if (isTeamMember && inCollectionGroup) {
-                    return true;
-                }
-            }
+        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
+        if (collectionTeams == null || collectionTeams.isEmpty()) {
+            return false;
         }
-        return result;
+        return teamsList.stream()
+                .filter(t -> collectionTeams.contains(t.getId()) && t.getMembers().contains(standardise(email)))
+                .findFirst()
+                .isPresent();
     }
 
     private String standardise(String email) {
@@ -543,12 +535,10 @@ public class PermissionsServiceImpl implements PermissionsService {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
-        PermissionDefinition definition = new PermissionDefinition();
-        definition.email = email;
-        definition.admin = isAdministrator(email);
-        definition.editor = canEdit(email);
-        definition.dataVisPublisher = isDataVisPublisher(email, accessMapping);
-        return definition;
+        return new PermissionDefinition()
+                .setEmail(email)
+                .isAdmin(isAdministrator(email))
+                .isEditor(canEdit(email));
     }
 
     /**
@@ -611,7 +601,7 @@ public class PermissionsServiceImpl implements PermissionsService {
             throws IOException, NotFoundException, BadRequestException {
         User user = usersServiceSupplier.getService().getUserByEmail(email);
         if (session != null && user.keyring() != null) {
-            KeyManager.transferKeyring(user.keyring(), keyringCache.get(session), collectionOwner);
+            KeyManager.transferKeyring(user.keyring(), keyringCache.get(session));
             usersServiceSupplier.getService().updateKeyring(user);
         }
     }

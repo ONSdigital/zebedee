@@ -9,7 +9,6 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.PendingDelete;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.DeleteMarker;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
@@ -17,6 +16,7 @@ import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
 import com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData;
 import com.github.onsdigital.zebedee.service.content.navigation.ContentTreeNavigator;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentTree;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import com.google.common.collect.ImmutableList;
@@ -208,7 +208,7 @@ public class ContentDeleteService {
 
     public ContentDetail getAllDeletesForNode(DeleteMarker nodeToDelete)
             throws IOException {
-        ContentDetail wholeTree = ContentTree.get(CollectionOwner.PUBLISHING_SUPPORT);
+        ContentDetail wholeTree = ContentTree.get();
         Optional<ContentDetail> branch = contentTreeNavigator.findContentDetail(wholeTree, nodeToDelete.getPath());
         if (branch.isPresent()) {
             return branch.get();

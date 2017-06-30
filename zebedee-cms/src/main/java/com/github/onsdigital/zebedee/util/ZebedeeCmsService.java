@@ -101,15 +101,6 @@ public class ZebedeeCmsService {
         return null;
     }
 
-    public CollectionOwner getPublisherType(String email) throws ZebedeeException {
-        try {
-            return Root.zebedee.getPermissionsService().getUserCollectionGroup(email);
-        } catch (IOException e) {
-            logError(e, "Error while trying to determined user collectionOwner.").user(email).logAndThrow(UnexpectedErrorException.class);
-        }
-        return null;
-    }
-
     public PermissionsService getPermissions() {
         return Root.zebedee.getPermissionsService();
     }

@@ -126,4 +126,7 @@ public class CollectionDescription extends CollectionBase {
     public void setApprovalStatus(ApprovalStatus approvalStatus) {
         this.approvalStatus = approvalStatus;
     }
+
+
+
 }

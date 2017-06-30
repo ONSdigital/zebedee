@@ -177,7 +177,7 @@ public class Builder {
         accessMapping.getDataVisualisationPublishers().add(dataVis.getEmail());
 
         CollectionDescription collectionDescription = new CollectionDescription();
-        collectionDescription.id = Random.id();
+        collectionDescription.setId(Random.id());
         accessMapping.collections = new HashMap<>();
 
 
@@ -186,8 +186,9 @@ public class Builder {
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);
         labourMarketTeam = createTeam(reviewer2, teamNames[1], teams);
-        accessMapping.collections.put(new Collection(collections.get(0), zebedee).description.id, set(inflationTeam));
-        accessMapping.collections.put(new Collection(collections.get(1), zebedee).description.id, set(labourMarketTeam));
+        accessMapping.collections.put(new Collection(collections.get(0), zebedee).description.getId(), set(inflationTeam));
+        accessMapping.collections.put(new Collection(collections.get(1), zebedee).description.getId(),
+                set(labourMarketTeam));
 
         Path path = permissions.resolve("accessMapping.json");
         try (OutputStream output = Files.newOutputStream(path)) {
@@ -499,8 +500,8 @@ public class Builder {
         // Create the description:
         Path collectionDescription = collections.resolve(filename + ".json");
         CollectionDescription description = new CollectionDescription();
-        description.id = Random.id();
-        description.name = name;
+        description.setId(Random.id());
+        description.setName(name);
         try (OutputStream output = Files.newOutputStream(collectionDescription)) {
             Serialiser.serialise(output, description);
         }

@@ -47,25 +47,24 @@ public class Collection {
         }
         // Check whether we have access
         Session session = Root.zebedee.getSessionsService().get(request);
-        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.description)) {
+        if (!Root.zebedee.getPermissionsService().canView(session.getEmail(), collection.getDescription())) {
             throw new UnauthorizedException("You are not authorised to delete collections.");
         }
 
         // Collate the result:
         CollectionDescription result = new CollectionDescription();
-        result.id = collection.description.id;
-        result.name = collection.description.name;
-        result.publishDate = collection.description.publishDate;
+        result.setId(collection.getDescription().getId());
+        result.setName(collection.getDescription().getName());
+        result.setPublishDate(collection.getDescription().getPublishDate());
         result.inProgressUris = collection.inProgressUris();
         result.completeUris = collection.completeUris();
         result.reviewedUris = collection.reviewedUris();
-        result.eventsByUri = collection.description.eventsByUri;
-        result.approvalStatus = collection.description.approvalStatus;
-        result.type = collection.description.type;
-        result.teams = collection.description.teams;
-        result.isEncrypted = collection.description.isEncrypted;
-        result.releaseUri = collection.description.releaseUri;
-        result.collectionOwner = collection.description.collectionOwner;
+        result.eventsByUri = collection.getDescription().eventsByUri;
+        result.setApprovalStatus(collection.getDescription().approvalStatus);
+        result.setType(collection.getDescription().getType());
+        result.setTeams(collection.getDescription().getTeams());
+        result.isEncrypted = collection.getDescription().isEncrypted;
+        result.setReleaseUri(collection.getDescription().getReleaseUri());
         return result;
     }
 
@@ -89,7 +88,7 @@ public class Collection {
                                         HttpServletResponse response,
                                         CollectionDescription collectionDescription) throws IOException, ZebedeeException {
 
-        if (StringUtils.isBlank(collectionDescription.name)) {
+        if (StringUtils.isBlank(collectionDescription.getName())) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             return null;
         }
@@ -104,16 +103,16 @@ public class Collection {
             throw new UnauthorizedException("Keyring is not initialised.");
         }
 
-        collectionDescription.name = StringUtils.trim(collectionDescription.name);
+        collectionDescription.setName(StringUtils.trim(collectionDescription.getName()));
         if (Root.zebedee.getCollections().list().hasCollection(
-                collectionDescription.name)) {
+                collectionDescription.getName())) {
             throw new ConflictException("Could not create collection. A collection with this name already exists.");
         }
 
         com.github.onsdigital.zebedee.model.Collection collection = com.github.onsdigital.zebedee.model.Collection.create(
                 collectionDescription, Root.zebedee, session);
 
-        if (collection.description.type.equals(CollectionType.scheduled)) {
+        if (collection.getDescription().getType().equals(CollectionType.scheduled)) {
             Root.schedulePublish(collection);
         }
 
@@ -124,7 +123,7 @@ public class Collection {
                 .actionedBy(session.getEmail())
                 .log();
 
-        return collection.description;
+        return collection.getDescription();
     }
 
     @PUT
@@ -154,7 +153,7 @@ public class Collection {
                 .actionedBy(session.getEmail())
                 .log();
 
-        return updatedCollection.description;
+        return updatedCollection.getDescription();
     }
 
 

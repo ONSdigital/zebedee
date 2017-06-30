@@ -41,31 +41,27 @@ public class CollectionEventMetaDataTest {
         date = new Date();
 
         collectionDescription = new CollectionDescription();
-        collectionDescription.name = "test";
-        collectionDescription.id = collectionDescription.name + "-" + Random.id();
-        collectionDescription.type = CollectionType.scheduled;
-        collectionDescription.publishDate = date;
-        collectionDescription.collectionOwner = CollectionOwner.PUBLISHING_SUPPORT;
+        collectionDescription.setName("test");
+        collectionDescription.setId(collectionDescription.getName() + "-" + Random.id());
+        collectionDescription.setType(CollectionType.scheduled);
+        collectionDescription.setPublishDate(date);
 
         publishTypeScheduledMD = CollectionEventMetaData.create(PUBLISH_TYPE, CollectionType.scheduled.toString());
         publishTypeManualdMD = CollectionEventMetaData.create(PUBLISH_TYPE, CollectionType.manual.toString());
         publishDateMD = CollectionEventMetaData.create(PUBLISH_DATE, date.toString());
-        collectionOwnerMD = CollectionEventMetaData.create(COLLECTION_OWNER, CollectionOwner.PUBLISHING_SUPPORT.getDisplayText());
     }
 
     @Test
     public void shouldReturnCollectionCreatedEvent() throws Exception {
         CollectionEventMetaData[] results = CollectionEventMetaData.collectionCreated(collectionDescription);
 
-        assertThat(results.length, equalTo(3));
+        assertThat(results.length, equalTo(2));
         assertThat(results[0], equalTo(publishTypeScheduledMD));
         assertThat(results[1], equalTo(publishDateMD));
-        assertThat(results[2], equalTo(collectionOwnerMD));
     }
 
     @Test
     public void testCollectionCreatedEventOwnerNull() throws Exception {
-        collectionDescription.collectionOwner = null;
 
         CollectionEventMetaData[] results = CollectionEventMetaData.collectionCreated(collectionDescription);
 
@@ -76,13 +72,12 @@ public class CollectionEventMetaDataTest {
 
     @Test
     public void testCollectionCreatedEventTypeManual() throws Exception {
-        collectionDescription.type = CollectionType.manual;
+        collectionDescription.setType(CollectionType.manual);
 
         CollectionEventMetaData[] results = CollectionEventMetaData.collectionCreated(collectionDescription);
 
-        assertThat(results.length, equalTo(2));
+        assertThat(results.length, equalTo(1));
         assertThat(results[0], equalTo(publishTypeManualdMD));
-        assertThat(results[1], equalTo(collectionOwnerMD));
     }
 
     @Test

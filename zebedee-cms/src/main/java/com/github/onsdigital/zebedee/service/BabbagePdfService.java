@@ -53,7 +53,7 @@ public class BabbagePdfService implements PdfService {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpGet httpGet = new HttpGet(src);
             httpGet.addHeader("Cookie", "access_token=" + session.getId());
-            httpGet.addHeader("Cookie", "collection=" + collection.description.id);
+            httpGet.addHeader("Cookie", "collection=" + collection.getDescription().getId());
 
             try (CloseableHttpResponse response = client.execute(httpGet)) {
 

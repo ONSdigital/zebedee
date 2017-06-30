@@ -166,8 +166,8 @@ public class CollectionsTest {
     @Test
     public void shouldFindCollection() throws Exception {
         CollectionDescription desc = new CollectionDescription();
-        desc.name = "test";
-        desc.type = CollectionType.manual;
+        desc.setName("test");
+        desc.setType(CollectionType.manual);
 
         when(zebedeeMock.getCollections())
                 .thenReturn(collections);
@@ -179,11 +179,11 @@ public class CollectionsTest {
                 .thenReturn(collectionWriterMock);
 
         Collection created = Collection.create(desc, zebedeeMock, sessionMock);
-        Collection found = collections.getCollection(created.getDescription().id);
+        Collection found = collections.getCollection(created.getDescription().getId());
 
-        assertThat(created.getDescription().id, equalTo(found.getDescription().id));
-        assertThat(created.getDescription().name, equalTo(found.getDescription().name));
-        assertThat(created.getDescription().type, equalTo(found.getDescription().type));
+        assertThat(created.getDescription().getId(), equalTo(found.getDescription().getId()));
+        assertThat(created.getDescription().getName(), equalTo(found.getDescription().getName()));
+        assertThat(created.getDescription().getType(), equalTo(found.getDescription().getType()));
     }
 
     @Test
@@ -927,7 +927,7 @@ public class CollectionsTest {
             verify(collectionMock, times(1)).find(uri);
             verify(collectionMock, never()).isInCollection(anyString());
             verify(collectionMock, never()).getDescription();
-            verify(collectionMock, never()).deleteDataVisContent(any(), any());
+            /*verify(collectionMock, never()).deleteDataVisContent(any(), any());*/
             verify(collectionMock, never()).deleteContentDirectory(anyString(), anyString());
             verify(collectionMock, never()).deleteFile(anyString());
             verify(collectionMock, never()).save();
@@ -945,8 +945,6 @@ public class CollectionsTest {
                 .thenReturn(uri);
         when(collectionMock.isInCollection(uri.toString()))
                 .thenReturn(true);
-        when(collectionDescriptionMock.getCollectionOwner())
-                .thenReturn(CollectionOwner.PUBLISHING_SUPPORT);
         when(collectionMock.deleteFile(uri.toString()))
                 .thenReturn(true);
 
@@ -956,8 +954,8 @@ public class CollectionsTest {
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
-        verify(collectionMock, times(3)).getDescription();
-        verify(collectionMock, never()).deleteDataVisContent(any(), any());
+        verify(collectionMock, times(2)).getDescription();
+        verify(collectionMock, never()).deleteContentDirectory(any(), any());
         verify(collectionMock, never()).deleteContentDirectory(anyString(), anyString());
         verify(collectionMock, times(1)).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();
@@ -977,8 +975,6 @@ public class CollectionsTest {
                 .thenReturn(uri);
         when(collectionMock.isInCollection(uri.toString()))
                 .thenReturn(true);
-        when(collectionDescriptionMock.getCollectionOwner())
-                .thenReturn(CollectionOwner.PUBLISHING_SUPPORT);
         when(collectionMock.deleteContentDirectory(TEST_EMAIL, uri.toString()))
                 .thenReturn(true);
 
@@ -988,8 +984,8 @@ public class CollectionsTest {
         verify(permissionsServiceMock, times(1)).canEdit(TEST_EMAIL);
         verify(collectionMock, times(1)).find(uri.toString());
         verify(collectionMock, times(1)).isInCollection(uri.toString());
-        verify(collectionMock, times(3)).getDescription();
-        verify(collectionMock, never()).deleteDataVisContent(any(), any());
+        verify(collectionMock, times(2)).getDescription();
+        /*verify(collectionMock, never()).deleteContentDirectory(any(), any());*/
         verify(collectionMock, times(1)).deleteContentDirectory(TEST_EMAIL, uri.toString());
         verify(collectionMock, never()).deleteFile(uri.toString());
         verify(collectionMock, times(1)).save();

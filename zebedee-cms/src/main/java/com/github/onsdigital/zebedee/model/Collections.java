@@ -16,14 +16,12 @@ import com.github.onsdigital.zebedee.json.ApprovalStatus;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
-import com.github.onsdigital.zebedee.permissions.service.PermissionsServiceImpl;
-import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.approval.ApprovalQueue;
 import com.github.onsdigital.zebedee.model.approval.ApproveTask;
 import com.github.onsdigital.zebedee.model.publishing.PostPublisher;
 import com.github.onsdigital.zebedee.model.publishing.PublishNotification;
 import com.github.onsdigital.zebedee.model.publishing.Publisher;
+import com.github.onsdigital.zebedee.permissions.service.PermissionsService;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDaoFactory;
@@ -31,6 +29,7 @@ import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -46,7 +45,6 @@ import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -69,10 +67,8 @@ import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLL
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_DELETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_ITEM_COMPLETED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_UNLOCKED;
-import static com.github.onsdigital.zebedee.persistence.CollectionEventType.DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentMoved;
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.contentRenamed;
-import static java.util.Objects.requireNonNull;
 
 public class Collections {
 
@@ -673,17 +669,13 @@ public class Collections {
         boolean deleted;
         CollectionEventType eventType;
 
-        if (collection.getDescription().getCollectionOwner().equals(CollectionOwner.DATA_VISUALISATION)) {
-            deleted = collection.deleteDataVisContent(session, Paths.get(uri));
-            eventType = DATA_VISUALISATION_COLLECTION_CONTENT_DELETED;
+        if (Files.isDirectory(path)) {
+            deleted = collection.deleteContentDirectory(session.getEmail(), uri);
         } else {
-            if (Files.isDirectory(path)) {
-                deleted = collection.deleteContentDirectory(session.getEmail(), uri);
-            } else {
-                deleted = collection.deleteFile(uri);
-            }
-            eventType = COLLECTION_CONTENT_DELETED;
+            deleted = collection.deleteFile(uri);
         }
+        eventType = COLLECTION_CONTENT_DELETED;
+
         collection.save();
         if (deleted) {
             removeEmptyCollectionDirectories(path);
@@ -848,8 +840,7 @@ public class Collections {
 
             if (StringUtils.isNotBlank(id)) {
                 for (Collection collection : this) {
-                    if (StringUtils.equalsIgnoreCase(collection.description.id,
-                            id)) {
+                    if (StringUtils.equalsIgnoreCase(collection.getDescription().getId(), id)) {
                         result = collection;
                         break;
                     }

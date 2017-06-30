@@ -88,7 +88,8 @@ public class TimeSeriesCompressionTask {
         for (TimeseriesCompressionResult failedZipFile : failedZipFiles) {
             String message = "Failed verification of time series zip file: " + failedZipFile.zipPath;
             logInfo(message).collectionName(collection).addParameter("attempt", attempt).log();
-            SlackNotification.send(message + " in collection " + collection.getDescription().name + " on attempt number " + attempt);
+            SlackNotification.send(message + " in collection " + collection.getDescription().getName()
+                    + " on attempt number " + attempt);
         }
         return failedZipFiles;
     }

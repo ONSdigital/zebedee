@@ -9,20 +9,14 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -69,11 +63,6 @@ public class Content {
         return findByCriteria(path, p -> {
             return p.toFile().isDirectory() && TIME_SERIES_KEYWORD.equals(p.getFileName().toString());
         });
-    }
-
-    private static boolean isDataVisualisation(Path p) {
-        // should be under visualisations but stop at the content directory.
-        return p.getFileName().toString().equals(DATA_VIS_DIR) || p.getParent().getFileName().toString().equals(DATA_VIS_DIR);
     }
 
     private static boolean isNotPreviousVersions(Path p) {
@@ -255,7 +244,7 @@ public class Content {
         // todo: remove timeseries filter once we are caching the browse tree.
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(contentPath)) {
             for (Path entry : stream) {
-                if (isVisibleForCollectionOwner(entry)) {
+                if (isVisible(entry)) {
                     ContentDetail child = nestedDetails(entry);
                     if (child != null) {
                         detail.children.add(child);
@@ -417,11 +406,19 @@ public class Content {
         return false;
     }
 
-    static boolean isVisibleForCollectionOwner(Path entry) {
-            return Files.isDirectory(entry)
-                    && !isTimeseries(entry)
-                    && isNotPreviousVersions(entry)
-                    && !isDataVisualisation(entry);
+    static boolean isVisible(Path entry) {
+        return Files.isDirectory(entry)
+                && !isTimeseries(entry)
+                && isNotPreviousVersions(entry)
+                && !isDataVisSubDir(entry);
+    }
+
+    private static boolean isDataVisSubDir(Path path) {
+        if (!path.toString().contains(DATA_VIS_DIR)) {
+            return false;
+        }
+        return !DATA_VIS_DIR.equals(path.getFileName().toString().toLowerCase())
+                && !DATA_VIS_DIR.equals(path.getParent().getFileName().toString().toLowerCase());
     }
 
     public Path getPublishedContentPath() {

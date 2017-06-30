@@ -4,19 +4,16 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -25,7 +22,6 @@ import java.util.concurrent.Executors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
-import static com.github.onsdigital.zebedee.model.csdb.CsdbImporter.APPLICATION_KEY_ID;
 
 /**
  * Created by thomasridd on 18/11/15.
@@ -73,14 +69,14 @@ public class KeyManager {
         });
 
         for (User removedUser : removals) {
-            removeKeyFromUser(zebedee, removedUser, collection.getDescription().id);
+            removeKeyFromUser(zebedee, removedUser, collection.getDescription().getId());
         }
 
         for (User addedUser : additions) {
-            assignKeyToUser(zebedee, addedUser, collection.getDescription().id, key);
+            assignKeyToUser(zebedee, addedUser, collection.getDescription().getId(), key);
         }
 
-        zebedee.getKeyringCache().getSchedulerCache().put(collection.description.id, key);
+        zebedee.getKeyringCache().getSchedulerCache().put(collection.getDescription().getId(), key);
     }
 
     /**
@@ -263,27 +259,9 @@ public class KeyManager {
      * @throws BadRequestException
      * @throws IOException
      */
-    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring, CollectionOwner collectionOwner)
+    public static void transferKeyring(Keyring targetKeyring, Keyring sourceKeyring)
             throws NotFoundException, BadRequestException, IOException {
-        Set<String> collectionIds = new HashSet<>();
-
-        sourceKeyring.list().stream().forEach(collectionId -> {
-            if (StringUtils.equals(collectionId, APPLICATION_KEY_ID)) {
-                // csdb-import is a special case always add this.
-                collectionIds.add(collectionId);
-            } else {
-                Collection collection = getCollection(collectionId);
-                if (collection != null && collection.getDescription().getCollectionOwner() != null
-                        && collection.getDescription().getCollectionOwner().equals(collectionOwner)) {
-                    collectionIds.add(collectionId);
-                } else {
-                    if (CollectionOwner.PUBLISHING_SUPPORT.equals(collectionOwner)) {
-                        collectionIds.add(collectionId);
-                    }
-                }
-            }
-        });
-        transferKeyring(targetKeyring, sourceKeyring, collectionIds);
+        transferKeyring(targetKeyring, sourceKeyring, sourceKeyring.list());
     }
 
     private static boolean userShouldHaveKey(Zebedee z, User user, Collection collection) throws IOException {

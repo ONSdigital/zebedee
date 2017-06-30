@@ -21,20 +21,20 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
-import com.github.onsdigital.zebedee.service.ServiceSupplier;
-import com.github.onsdigital.zebedee.session.model.Session;
-import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.Scheduler;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
 import com.github.onsdigital.zebedee.reader.CollectionReader;
 import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.teams.service.TeamsService;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
@@ -79,6 +79,7 @@ import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMet
 import static com.github.onsdigital.zebedee.persistence.model.CollectionEventMetaData.typeChanged;
 
 public class Collection {
+
     public static final String REVIEWED = "reviewed";
     public static final String COMPLETE = "complete";
     public static final String IN_PROGRESS = "inprogress";
@@ -171,8 +172,8 @@ public class Collection {
 
         Release release = checkForRelease(collectionDescription, zebedee);
 
-        String filename = PathUtils.toFilename(collectionDescription.name);
-        collectionDescription.id = filename + "-" + Random.id();
+        String filename = PathUtils.toFilename(collectionDescription.getName());
+        collectionDescription.setId(filename + "-" + Random.id());
 
         // Create the folders:
         Path rootCollectionsPath = zebedee.getCollections().path;
@@ -191,8 +192,8 @@ public class Collection {
         collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED,
                 collectionCreated(collectionDescription));
 
-        if (collectionDescription.teams != null) {
-            for (String teamName : collectionDescription.teams) {
+        if (collectionDescription.getTeams() != null) {
+            for (String teamName : collectionDescription.getTeams()) {
                 Team team = zebedee.getTeamsService().findTeam(teamName);
                 zebedee.getPermissionsService().addViewerTeam(collectionDescription, team, session);
             }
@@ -201,7 +202,7 @@ public class Collection {
         // Encryption
         // assign a key for the collection to the session user
         keyManagerUtil.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.getEmail()),
-                collection.description.id, Keys.newSecretKey());
+                collection.getDescription().getId(), Keys.newSecretKey());
 
         // get the session user to distribute the key to all
         keyManagerUtil.distributeCollectionKey(zebedee, session, collection, true);
@@ -225,8 +226,8 @@ public class Collection {
 
     private static Release checkForRelease(CollectionDescription collectionDescription, Zebedee zebedee) throws IOException, ZebedeeException {
         Release release = null;
-        if (StringUtils.isNotEmpty(collectionDescription.releaseUri)) {
-            release = getPublishedRelease(collectionDescription.releaseUri, zebedee);
+        if (StringUtils.isNotEmpty(collectionDescription.getReleaseUri())) {
+            release = getPublishedRelease(collectionDescription.getReleaseUri(), zebedee);
 
             if (zebedee.isBeingEdited(release.getUri().toString() + "/data.json") > 0) {
                 throw new ConflictException(
@@ -245,7 +246,7 @@ public class Collection {
                 throw new BadRequestException("Could not use this release, the release has no release date.");
             }
 
-            collectionDescription.publishDate = release.getDescription().getReleaseDate();
+            collectionDescription.setPublishDate(release.getDescription().getReleaseDate());
         }
         return release;
     }
@@ -262,7 +263,7 @@ public class Collection {
     public static Collection rename(CollectionDescription collectionDescription, String newName, Zebedee zebedee)
             throws IOException, CollectionNotFoundException {
 
-        String filename = PathUtils.toFilename(collectionDescription.name);
+        String filename = PathUtils.toFilename(collectionDescription.getName());
         String newFilename = PathUtils.toFilename(newName);
 
         Path collection = zebedee.getCollections().path.resolve(filename);
@@ -274,7 +275,7 @@ public class Collection {
         Path newPath = zebedee.getCollections().path.resolve(newFilename
                 + ".json");
 
-        collectionDescription.name = newName;
+        collectionDescription.setName(newName);
 
         try (OutputStream output = Files.newOutputStream(newPath)) {
             Serialiser.serialise(output, collectionDescription);
@@ -313,14 +314,15 @@ public class Collection {
         Collection updatedCollection = collection;
 
         // only update the collection name if its given and its changed.
-        if (collectionDescription.name != null && !collectionDescription.name.equals(collection.description.name)) {
-            String nameBeforeUpdate = collection.description.name;
+        if (collectionDescription.getName() != null
+                && !collectionDescription.getName().equals(collection.getDescription().getName())) {
+            String nameBeforeUpdate = collection.getDescription().getName();
 
             // check if only the casing of the name has changed. If so only the json is updated, not the filename.
-            if (!collectionDescription.name.equalsIgnoreCase(collection.description.name)) {
-                updatedCollection = collection.rename(collection.description, collectionDescription.name, zebedee);
+            if (!collectionDescription.getName().equalsIgnoreCase(collection.getDescription().getName())) {
+                updatedCollection = collection.rename(collection.getDescription(), collectionDescription.getName(), zebedee);
             } else {
-                updatedCollection.description.name = collectionDescription.name;
+                updatedCollection.getDescription().setName(collectionDescription.getName());
             }
 
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_NAME_CHANGED, renamed
@@ -328,35 +330,35 @@ public class Collection {
         }
 
         // if the type has changed
-        if (collectionDescription.type != null
-                && updatedCollection.description.type != collectionDescription.type) {
-            updatedCollection.description.type = collectionDescription.type;
+        if (collectionDescription.getType() != null
+                && updatedCollection.getDescription().getType() != collectionDescription.getType()) {
+            updatedCollection.getDescription().setType(collectionDescription.getType());
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_TYPE_CHANGED, typeChanged
                     (updatedCollection.description));
         }
 
-        if (updatedCollection.description.type == CollectionType.scheduled) {
-            if (collectionDescription.publishDate != null) {
-                if (!collectionDescription.publishDate.equals(collection.description.publishDate)) {
+        if (updatedCollection.getDescription().getType() == CollectionType.scheduled) {
+            if (collectionDescription.getPublishDate() != null) {
+                if (!collectionDescription.getPublishDate().equals(collection.getDescription().getPublishDate())) {
                     collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_PUBLISH_RESCHEDULED,
-                            reschedule(collection.description.publishDate, collectionDescription.publishDate));
+                            reschedule(collection.getDescription().getPublishDate(), collectionDescription.getPublishDate()));
                 }
-                updatedCollection.description.publishDate = collectionDescription.publishDate;
+                updatedCollection.getDescription().setPublishDate(collectionDescription.getPublishDate());
                 scheduler.schedulePublish(updatedCollection, zebedee);
             }
         } else { // the type is now manual so cancel it
-            updatedCollection.description.publishDate = null;
+            updatedCollection.getDescription().setPublishDate(null);
             scheduler.cancel(collection);
         }
 
         Set<String> updatesTeams = updateViewerTeams(collectionDescription, zebedee, session);
 
-        if (updatedCollection.description.teams != null) {
-            updatedCollection.description.teams.clear();
+        if (updatedCollection.getDescription().getTeams() != null) {
+            updatedCollection.getDescription().getTeams().clear();
         } else {
-            updatedCollection.description.teams = new ArrayList<>();
+            updatedCollection.getDescription().setTeams(new ArrayList<>());
         }
-        updatedCollection.description.teams.addAll(updatesTeams);
+        updatedCollection.getDescription().getTeams().addAll(updatesTeams);
 
         updatedCollection.save();
 
@@ -369,15 +371,15 @@ public class Collection {
 
         Set<String> updatedTeams = new HashSet<>();
 
-        if (collectionDescription.teams != null) {
+        if (collectionDescription.getTeams() != null) {
             // work out which teams need to be removed from the existing teams.
             Set<Integer> currentTeamIds = zebedee.getPermissionsService().listViewerTeams(collectionDescription, session);
             TeamsService teamsService = zebedee.getTeamsService();
             for (Integer currentTeamId : currentTeamIds) { // for each current team ID
                 for (Team team : teamsService.listTeams()) { // iterate the teamsService list to find the team object
                     if (currentTeamId.equals(team.getId())) { // if the ID's match
-                        if (!collectionDescription.teams.contains(team.getName())) { // if the team is not listed in the
-                            // updated list
+                        if (!collectionDescription.getTeams().contains(team.getName())) { // if the team is not
+                            // listed in the updated list
                             zebedee.getPermissionsService().removeViewerTeam(collectionDescription, team, session);
                         }
                     }
@@ -385,7 +387,7 @@ public class Collection {
             }
 
             // Add all the new teams. The add is idempotent so we don't need to check if it already exists.
-            for (String teamName : collectionDescription.teams) {
+            for (String teamName : collectionDescription.getTeams()) {
                 // We have already deserialised the teams list to its more efficient to iterate it again rather than
                 // deserialise by team name.
                 for (Team team : teamsService.listTeams()) {
@@ -412,18 +414,18 @@ public class Collection {
 
     public Release populateRelease(CollectionReader reader, CollectionWriter collectionWriter, List<ContentDetail> collectionContent) throws IOException, ZebedeeException {
 
-        if (StringUtils.isEmpty(this.description.releaseUri)) {
+        if (StringUtils.isEmpty(this.getDescription().getReleaseUri())) {
             throw new BadRequestException("This collection is not associated with a release.");
         }
 
-        String uri = this.description.releaseUri + "/data.json";
+        String uri = this.getDescription().getReleaseUri() + "/data.json";
         try (
                 Resource resource = reader.getResource(uri);
                 InputStream dataStream = resource.getData()
         ) {
             Release release = (Release) ContentUtil.deserialiseContent(dataStream);
             logInfo("Release identified for collection")
-                    .collectionName(this.description.name)
+                    .collectionName(this.getDescription().getName())
                     .addParameter("title", release.getDescription().getTitle())
                     .log();
 
@@ -766,7 +768,7 @@ public class Collection {
 
             addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
             collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(
-                    new CollectionHistoryEvent(this.description.id, this.description.name, session,
+                    new CollectionHistoryEvent(this.description.getId(), this.description.getName(), session,
                             COLLECTION_CONTENT_REVIEWED, contentReviewed(source, destination)));
             result = true;
         }
@@ -922,7 +924,7 @@ public class Collection {
         return hasDeleted;
     }
 
-    public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException {
+/*    public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException {
         if (contentPath == null || StringUtils.isEmpty(contentPath.toString())) {
             return false;
         }
@@ -944,7 +946,7 @@ public class Collection {
         }
         save();
         return hasDeleted;
-    }
+    }*/
 
     /**
      * When we delete content, we don't want to just delete the whole directory it lives in as it may have nested content.
@@ -993,7 +995,7 @@ public class Collection {
      * @return
      */
     public boolean isRelease() {
-        return StringUtils.isNotEmpty(this.description.releaseUri);
+        return StringUtils.isNotEmpty(this.description.getReleaseUri());
     }
 
     /**

@@ -14,6 +14,7 @@ import com.github.onsdigital.zebedee.reader.data.language.ContentLanguage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -123,9 +124,12 @@ public class ZebedeeReader {
     public Resource getPublishedResource(String path) throws ZebedeeException, IOException {
         try {
             return publishedContentReader.getResource(path);
-        } catch (BadRequestException e) {
+        } catch (BadRequestException | NotFoundException e) {
             if(path.startsWith("/visualisations/")) {
-                return publishedContentReader.getResource(path + "/index.html");
+                if (path.endsWith("/data")) {
+                    path = Paths.get(path).getParent().toString();
+                }
+                return publishedContentReader.getResource(path);
             }
             throw e;
         }

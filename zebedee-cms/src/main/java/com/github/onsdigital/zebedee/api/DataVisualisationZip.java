@@ -128,7 +128,7 @@ public class DataVisualisationZip {
         com.github.onsdigital.zebedee.model.Collection collection = zebedeeCmsService.getCollection(request);
 
         try {
-            collection.deleteContentDirectory(session.getEmail(), zipPath);
+            collection.deleteDataVisContent(session, Paths.get(zipPath));
         } catch (IOException e) {
             logError(e, DELETING_ZIP_ERROR_DEBUG).path(zipPath).logAndThrow(UnexpectedErrorException.class);
         }

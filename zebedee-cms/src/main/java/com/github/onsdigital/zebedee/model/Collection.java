@@ -924,7 +924,7 @@ public class Collection {
         return hasDeleted;
     }
 
-/*    public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException {
+    public boolean deleteDataVisContent(Session session, Path contentPath) throws IOException {
         if (contentPath == null || StringUtils.isEmpty(contentPath.toString())) {
             return false;
         }
@@ -946,7 +946,7 @@ public class Collection {
         }
         save();
         return hasDeleted;
-    }*/
+    }
 
     /**
      * When we delete content, we don't want to just delete the whole directory it lives in as it may have nested content.

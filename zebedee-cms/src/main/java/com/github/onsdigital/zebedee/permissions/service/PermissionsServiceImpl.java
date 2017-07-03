@@ -3,7 +3,6 @@ package com.github.onsdigital.zebedee.permissions.service;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
@@ -21,7 +20,6 @@ import com.github.onsdigital.zebedee.user.model.User;
 import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -152,12 +150,6 @@ public class PermissionsServiceImpl implements PermissionsService {
             logError(e).throwUnchecked(e);
         }
         return result;
-    }
-
-    @Override
-    public boolean isDataVisPublisher(String email, AccessMapping accessMapping) throws IOException {
-        return accessMapping.getDataVisualisationPublishers() != null
-                && accessMapping.getDataVisualisationPublishers().contains(standardise(email));
     }
 
     private boolean isAdministrator(String email, AccessMapping accessMapping) {
@@ -409,10 +401,10 @@ public class PermissionsServiceImpl implements PermissionsService {
         }
 
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.getId());
+        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
         if (collectionTeams == null) {
             collectionTeams = new HashSet<>();
-            accessMapping.collections.put(collectionDescription.getId(), collectionTeams);
+            accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
         }
 
         Team teamAdded = !collectionTeams.contains(team.getId()) ? team : null;
@@ -441,7 +433,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         }
 
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> teamIds = accessMapping.collections.get(collectionDescription.getId());
+        Set<Integer> teamIds = accessMapping.getCollections().get(collectionDescription.getId());
         if (teamIds == null) teamIds = new HashSet<>();
 
         return java.util.Collections.unmodifiableSet(teamIds);
@@ -462,10 +454,10 @@ public class PermissionsServiceImpl implements PermissionsService {
         }
 
         AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        Set<Integer> collectionTeams = accessMapping.collections.get(collectionDescription.getId());
+        Set<Integer> collectionTeams = accessMapping.getCollections().get(collectionDescription.getId());
         if (collectionTeams == null) {
             collectionTeams = new HashSet<>();
-            accessMapping.collections.put(collectionDescription.getId(), collectionTeams);
+            accessMapping.getCollections().put(collectionDescription.getId(), collectionTeams);
         }
 
 
@@ -481,17 +473,16 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private boolean canEdit(String email, AccessMapping accessMapping) {
         Set<String> digitalPublishingTeam = accessMapping.getDigitalPublishingTeam();
-        Set<String> dataVisualisationPublishers = accessMapping.getDataVisualisationPublishers();
-
-        return (digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email)))
-                || (dataVisualisationPublishers != null && dataVisualisationPublishers.contains(standardise(email)));
+        return (digitalPublishingTeam != null && digitalPublishingTeam.contains(standardise(email)));
     }
 
 
     private boolean canView(String email, CollectionDescription collectionDescription, AccessMapping accessMapping)
             throws IOException {
-        // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teams = accessMapping.collections.get(collectionDescription.getId());
+        Set<Integer> teams = accessMapping.getCollections().get(collectionDescription.getId());
+        if (teams == null || teams.isEmpty()) {
+            return false;
+        }
         return teamsServiceSupplier.getService()
                 .listTeams()
                 .stream()
@@ -542,57 +533,10 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     /**
-     * Add a Data Visualisation Publisher.
-     *
-     * @param email
-     * @param session
-     * @throws ZebedeeException
-     */
-    @Override
-    public void addDataVisualisationPublisher(String email, Session session) throws ZebedeeException {
-        try {
-            // Allow the initial user to be set as an administrator:
-            if (hasAdministrator() && (session == null || !isAdministrator(session.getEmail()))) {
-                throw new UnauthorizedException(getUnauthorizedMessage(session));
-            }
-
-            AccessMapping accessMapping = permissionsStore.getAccessMapping();
-            if (accessMapping.getDataVisualisationPublishers() == null) {
-                accessMapping.setDataVisualisationPublishers(new HashSet<>());
-            }
-            accessMapping.getDataVisualisationPublishers().add(standardise(email));
-            permissionsStore.saveAccessMapping(accessMapping);
-
-            // Update keyring (assuming this is not the system initialisation)
-            updateKeyring(session, email);
-        } catch (IOException e) {
-            logError(e, "Error while attempting to add Data Vis publisher permission.")
-                    .user(session.getEmail())
-                    .addParameter("forUser", email)
-                    .log();
-            throw new UnexpectedErrorException("Error while attempting to add Data Vis publisher permission.",
-                    Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
-        }
-    }
-
-    @Override
-    public void removeDataVisualisationPublisher(String email, Session session) throws IOException, UnauthorizedException {
-        if (session == null || !isAdministrator(session.getEmail())) {
-            throw new UnauthorizedException(getUnauthorizedMessage(session));
-        }
-
-        AccessMapping accessMapping = permissionsStore.getAccessMapping();
-        accessMapping.getDataVisualisationPublishers().remove(PathUtils.standardise(email));
-        permissionsStore.saveAccessMapping(accessMapping);
-    }
-
-    /**
      * Add the necessary keyrings to the user.
      *
-     * @param session         The session of the user who is adding the new user.
-     * @param email           the email of the new user.
-     * @param collectionOwner {@link CollectionOwner#PUBLISHING_SUPPORT} for PST users
-     *                        or {@link CollectionOwner#DATA_VISUALISATION} for data vis users.
+     * @param session The session of the user who is adding the new user.
+     * @param email   the email of the new user.
      * @throws IOException
      * @throws NotFoundException
      * @throws BadRequestException

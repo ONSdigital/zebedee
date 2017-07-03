@@ -168,17 +168,14 @@ public class Builder {
 
         accessMapping.setAdministrators(new HashSet<>());
         accessMapping.setDigitalPublishingTeam(new HashSet<>());
-        accessMapping.setDataVisualisationPublishers(new HashSet<>());
 
         accessMapping.getAdministrators().add(administrator.getEmail());
         accessMapping.getDigitalPublishingTeam().add(publisher1.getEmail());
         accessMapping.getDigitalPublishingTeam().add(publisher2.getEmail());
 
-        accessMapping.getDataVisualisationPublishers().add(dataVis.getEmail());
-
         CollectionDescription collectionDescription = new CollectionDescription();
         collectionDescription.setId(Random.id());
-        accessMapping.collections = new HashMap<>();
+        accessMapping.setCollections(new HashMap<>());
 
 
         ZebedeeConfiguration configuration = new ZebedeeConfiguration(parent, false);
@@ -186,8 +183,8 @@ public class Builder {
 
         inflationTeam = createTeam(reviewer1, teamNames[0], teams);
         labourMarketTeam = createTeam(reviewer2, teamNames[1], teams);
-        accessMapping.collections.put(new Collection(collections.get(0), zebedee).description.getId(), set(inflationTeam));
-        accessMapping.collections.put(new Collection(collections.get(1), zebedee).description.getId(),
+        accessMapping.getCollections().put(new Collection(collections.get(0), zebedee).description.getId(), set(inflationTeam));
+        accessMapping.getCollections().put(new Collection(collections.get(1), zebedee).description.getId(),
                 set(labourMarketTeam));
 
         Path path = permissions.resolve("accessMapping.json");

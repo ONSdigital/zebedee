@@ -1,5 +1,9 @@
 package com.github.onsdigital.zebedee.permissions.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -19,14 +23,20 @@ public class AccessMapping {
      */
     private Set<String> digitalPublishingTeam;
 
-
-    private Set<String> dataVisualisationPublishers;
-
     /**
      * Content owners can be assigned access to collections via one or more teams.
      * <p>NB: This is a map of collection ID to the set of team IDs that have access to the collection.</p>
      */
-    public Map<String, Set<Integer>> collections;
+    private Map<String, Set<Integer>> collections;
+
+    /**
+     *
+     */
+    public AccessMapping() {
+        this.administrators = new HashSet<>();
+        this.digitalPublishingTeam = new HashSet<>();
+        this.collections = new HashMap<>();
+    }
 
     public Set<String> getAdministrators() {
         return administrators;
@@ -34,10 +44,6 @@ public class AccessMapping {
 
     public Set<String> getDigitalPublishingTeam() {
         return digitalPublishingTeam;
-    }
-
-    public Set<String> getDataVisualisationPublishers() {
-        return dataVisualisationPublishers;
     }
 
     public Map<String, Set<Integer>> getCollections() {
@@ -52,11 +58,33 @@ public class AccessMapping {
         this.digitalPublishingTeam = digitalPublishingTeam;
     }
 
-    public void setDataVisualisationPublishers(Set<String> dataVisualisationPublishers) {
-        this.dataVisualisationPublishers = dataVisualisationPublishers;
-    }
-
     public void setCollections(Map<String, Set<Integer>> collections) {
         this.collections = collections;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        AccessMapping that = (AccessMapping) obj;
+        return new EqualsBuilder()
+                .append(getAdministrators(), that.getAdministrators())
+                .append(getDigitalPublishingTeam(), that.getDigitalPublishingTeam())
+                .append(getCollections(), that.getCollections())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getAdministrators())
+                .append(getDigitalPublishingTeam())
+                .append(getCollections())
+                .toHashCode();
     }
 }

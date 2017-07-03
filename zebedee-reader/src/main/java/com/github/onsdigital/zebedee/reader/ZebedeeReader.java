@@ -124,11 +124,8 @@ public class ZebedeeReader {
     public Resource getPublishedResource(String path) throws ZebedeeException, IOException {
         try {
             return publishedContentReader.getResource(path);
-        } catch (BadRequestException | NotFoundException e) {
+        } catch (BadRequestException e) {
             if(path.startsWith("/visualisations/")) {
-                if (path.endsWith("/data")) {
-                    path = Paths.get(path).getParent().toString();
-                }
                 return publishedContentReader.getResource(path);
             }
             throw e;

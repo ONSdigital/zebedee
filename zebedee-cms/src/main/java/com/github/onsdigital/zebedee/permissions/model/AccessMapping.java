@@ -30,7 +30,7 @@ public class AccessMapping {
     private Map<String, Set<Integer>> collections;
 
     /**
-     *
+     * Create a new AccessMapping.
      */
     public AccessMapping() {
         this.administrators = new HashSet<>();

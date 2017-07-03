@@ -57,7 +57,7 @@ public class PermissionsStoreFileSystemImpl implements PermissionsStore {
     }
 
     /**
-     * Tempory legacy migration. Transfer deprecated Data Visualisation Publisher users to Digital Publishing team.
+     * Temporary legacy migration. Transfer deprecated Data Visualisation Publisher users to Digital Publishing team.
      * Can be reomved once all users have been safely migrated.
      */
     private static void migrateDataVisUsers(Path p) throws IOException {

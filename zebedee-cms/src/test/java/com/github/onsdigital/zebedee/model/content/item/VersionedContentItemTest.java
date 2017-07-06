@@ -19,7 +19,7 @@ public class VersionedContentItemTest {
         // Given an instance of VersionedContentItem with a path to some content.
         Path rootPath = Files.createTempDirectory("VersionedContentItemTest");
         VersionedContentItem versionedContentItem = new VersionedContentItem("economy");
-        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
+        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri());
         FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
         ContentReader contentReader = new FileSystemContentReader(rootPath);
@@ -43,7 +43,7 @@ public class VersionedContentItemTest {
         Files.createDirectories(rootPath.resolve(path).resolve(VersionedContentItem.VERSION_DIRECTORY).resolve("v3"));
 
         VersionedContentItem versionedContentItem = new VersionedContentItem(path);
-        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
+        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri());
         FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
         ContentReader contentReader = new FileSystemContentReader(rootPath);
@@ -64,7 +64,7 @@ public class VersionedContentItemTest {
         // Given an existing version of some content.
         Path rootPath = Files.createTempDirectory("VersionedContentItemTest");
         VersionedContentItem versionedContentItem = new VersionedContentItem("economy");
-        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri().toString());
+        Path contentItemPath = rootPath.resolve(versionedContentItem.getUri());
         FileUtils.touch(contentItemPath.resolve("data.json").toFile()); // create the data.json file in the content item directory
 
         ContentReader contentReader = new FileSystemContentReader(rootPath);

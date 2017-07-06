@@ -4,7 +4,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.json.ApprovalStatus;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionWriter;
 import org.apache.commons.fileupload.FileItem;
@@ -28,7 +28,7 @@ public class TimeseriesImport {
         // otherwise the call to get a request parameter will actually consume the body:
         try (InputStream requestBody = request.getInputStream()) {
 
-            Session session = Root.zebedee.getSessions().get(request);
+            Session session = Root.zebedee.getSessionsService().get(request);
             com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
             CollectionWriter collectionWriter = new ZebedeeCollectionWriter(Root.zebedee, collection, session);

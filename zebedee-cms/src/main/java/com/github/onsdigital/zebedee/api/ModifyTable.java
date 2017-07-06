@@ -9,7 +9,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.TableBuilderException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.model.ZebedeeCollectionReader;
 import com.github.onsdigital.zebedee.persistence.model.CollectionHistoryEvent;
@@ -65,7 +65,7 @@ public class ModifyTable {
     public void modifyTable(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ZebedeeException, ParserConfigurationException, TransformerException, FileUploadException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);
         String currentUri = request.getParameter(CURRENT_URI);
@@ -87,7 +87,7 @@ public class ModifyTable {
                 .parameters()
                 .host(request)
                 .collection(collection)
-                .user(session.email)
+                .user(session.getEmail())
                 .log();
     }
 
@@ -97,7 +97,7 @@ public class ModifyTable {
     @GET
     public void getTableMetadata(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
 
         CollectionReader collectionReader = new ZebedeeCollectionReader(Root.zebedee, collection, session);

@@ -3,7 +3,7 @@ package com.github.onsdigital.zebedee.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
 import com.github.onsdigital.zebedee.exceptions.*;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.Collection;
 import com.github.onsdigital.zebedee.persistence.CollectionEventType;
 import com.github.onsdigital.zebedee.reader.Resource;
@@ -76,7 +76,7 @@ public class Content {
         // otherwise the call to get a request parameter will actually consume the body:
         InputStream requestBody = request.getInputStream();
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
 
         Collection collection = Collections.getCollection(request);
 
@@ -93,7 +93,8 @@ public class Content {
                     .host(request)
                     .collection(collection)
                     .content(uri)
-                    .user(session.email).log();
+                    .user(session.getEmail())
+                    .log();
         } else {
             Root.zebedee.getCollections().createContent(collection, uri, session, request, requestBody, eventType, validateJson);
             Audit.Event.CONTENT_SAVED
@@ -101,7 +102,8 @@ public class Content {
                     .host(request)
                     .collection(collection)
                     .content(uri)
-                    .user(session.email).log();
+                    .user(session.getEmail())
+                    .log();
         }
 
         return true;
@@ -123,7 +125,7 @@ public class Content {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws IOException,
             ZebedeeException {
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
 
         Collection collection = Collections.getCollection(request);
         String uri = request.getParameter("uri");
@@ -135,7 +137,8 @@ public class Content {
                     .host(request)
                     .collection(collection)
                     .content(uri)
-                    .user(session.email).log();
+                    .user(session.getEmail())
+                    .log();
         }
 
         return result;

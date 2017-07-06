@@ -7,10 +7,12 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.UserList;
-import com.github.onsdigital.zebedee.json.UserSanitised;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.user.model.User;
+import com.github.onsdigital.zebedee.user.model.UserList;
+import com.github.onsdigital.zebedee.user.model.UserSanitised;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.user.service.UsersService;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +31,14 @@ import java.util.List;
 @Api
 public class Users {
 
+    private static final String EMAIL_PARAM = "email";
+
+    /**
+     * Wrap static method calls to obtain service in function makes testing easier - class member can be
+     * replaced with a mocked giving control of desired behaviour.
+     */
+    private ServiceSupplier<UsersService> usersServiceSupplier = () -> Root.zebedee.getUsersService();
+
     /**
      * Get a user or list of users
      *
@@ -45,18 +55,17 @@ public class Users {
     public Object read(HttpServletRequest request, HttpServletResponse response) throws IOException, NotFoundException, BadRequestException {
         Object result = null;
 
-        String email = request.getParameter("email");
-        Session session = Root.zebedee.getSessions().get(request);
+        String email = request.getParameter(EMAIL_PARAM);
+        Session session = Root.zebedee.getSessionsService().get(request);
 
         if (session != null) {
             // If email is empty
             if (StringUtils.isBlank(email)) {
-                result = sanitise(Root.zebedee.getUsers().list());
+                result = sanitise(usersServiceSupplier.getService().list());
             } else {
-                result = sanitise(Root.zebedee.getUsers().get(email));
+                result = sanitise(usersServiceSupplier.getService().getUserByEmail(email));
             }
         }
-
         return result;
     }
 
@@ -78,13 +87,13 @@ public class Users {
     @POST
     public UserSanitised create(HttpServletRequest request, HttpServletResponse response, User user) throws
             IOException, ConflictException, BadRequestException, UnauthorizedException {
-        Session session = Root.zebedee.getSessions().get(request);
-        User created = Root.zebedee.getUsers().create(session, user);
+        Session session = Root.zebedee.getSessionsService().get(request);
+        User created = usersServiceSupplier.getService().create(session, user);
 
         Audit.Event.USER_CREATED
                 .parameters()
                 .host(request)
-                .actionedByEffecting(session.email, user.email)
+                .actionedByEffecting(session.getEmail(), user.getEmail())
                 .log();
         return sanitise(created);
     }
@@ -102,17 +111,16 @@ public class Users {
     @PUT
     public UserSanitised update(HttpServletRequest request, HttpServletResponse response, User updatedUser) throws
             IOException, NotFoundException, BadRequestException, UnauthorizedException {
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
 
-        String email = request.getParameter("email");
-        User user = Root.zebedee.getUsers().get(email);
-
-        User updated = Root.zebedee.getUsers().update(session, user, updatedUser);
+        String email = request.getParameter(EMAIL_PARAM);
+        User user = usersServiceSupplier.getService().getUserByEmail(email);
+        User updated = usersServiceSupplier.getService().update(session, user, updatedUser);
 
         Audit.Event.USER_UPDATED
                 .parameters()
                 .host(request)
-                .actionedByEffecting(session.email, user.email)
+                .actionedByEffecting(session.getEmail(), user.getEmail())
                 .log();
         return sanitise(updated);
     }
@@ -128,15 +136,15 @@ public class Users {
     public boolean delete(HttpServletRequest request, HttpServletResponse response) throws
             UnauthorizedException, IOException, NotFoundException, BadRequestException {
 
-        Session session = Root.zebedee.getSessions().get(request);
-        String email = request.getParameter("email");
-        User user = Root.zebedee.getUsers().get(email);
-        boolean result = Root.zebedee.getUsers().delete(session, user);
+        Session session = Root.zebedee.getSessionsService().get(request);
+        String email = request.getParameter(EMAIL_PARAM);
+        User user = usersServiceSupplier.getService().getUserByEmail(email);
+        boolean result = usersServiceSupplier.getService().delete(session, user);
         if(result) {
             Audit.Event.USER_DELETED
                     .parameters()
                     .host(request)
-                    .actionedByEffecting(session.email, user.email)
+                    .actionedByEffecting(session.getEmail(), user.getEmail())
                     .log();
         }
 

@@ -1,6 +1,6 @@
 package com.github.onsdigital.zebedee.configuration;
 
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 

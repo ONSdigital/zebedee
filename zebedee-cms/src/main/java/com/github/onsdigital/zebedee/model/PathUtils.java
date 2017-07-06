@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Predicate;
 
 public class PathUtils {
     static final int MAX_LENGTH = 255;
@@ -181,5 +182,29 @@ public class PathUtils {
             uri = "/" + uri;
         }
         return uri;
+    }
+
+    /**
+     * Starting with the child directory/file applies the test criteria acsending the path until the criteria is
+     * satisfied. Will return true at the first level to meet the criteria. If no match is found or if there are no
+     * levels to ascend to then returns false.
+     *
+     * @param path     the {@link Path} to apply the test criteria to.
+     * @param criteria {@link Predicate} defining the criteria to apply.
+     * @return returns true at the the first directory to meet the criteria, false otherwise.
+     */
+    public static boolean findByCriteria(Path path, Predicate<Path> criteria) {
+        if (path == null) {
+            return false;
+        }
+
+        Path dir = path;
+        while (dir != null && dir.getParent() != null) {
+            if (criteria.test(dir)) {
+                return true;
+            }
+            dir = dir.getParent();
+        }
+        return false;
     }
 }

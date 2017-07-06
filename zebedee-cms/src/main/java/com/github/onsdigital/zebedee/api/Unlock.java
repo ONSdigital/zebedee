@@ -2,11 +2,10 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.ConflictException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,14 +31,14 @@ public class Unlock {
             ZebedeeException {
 
         com.github.onsdigital.zebedee.model.Collection collection = Collections.getCollection(request);
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         boolean result = Root.zebedee.getCollections().unlock(collection, session);
         if (result) {
             Audit.Event.COLLECTION_UNLOCKED
                     .parameters()
                     .host(request)
                     .collection(collection)
-                    .actionedBy(session.email)
+                    .actionedBy(session.getEmail())
                     .log();
         }
 

@@ -2,8 +2,8 @@ package com.github.onsdigital.zebedee.model;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.zebedee.Builder;
 import com.github.onsdigital.zebedee.Zebedee;
+import com.github.onsdigital.zebedee.ZebedeeTestBaseFixture;
 import com.github.onsdigital.zebedee.content.page.base.PageDescription;
 import com.github.onsdigital.zebedee.content.page.base.PageType;
 import com.github.onsdigital.zebedee.content.page.release.Release;
@@ -13,12 +13,11 @@ import com.github.onsdigital.zebedee.json.*;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
 import com.github.onsdigital.zebedee.model.publishing.scheduled.DummyScheduler;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.util.ContentDetailUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -37,30 +36,21 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
-public class CollectionTest {
+public class CollectionTest extends ZebedeeTestBaseFixture {
 
     private static final boolean recursive = false;
-    Zebedee zebedee;
     Collection collection;
-    Builder builder;
     Session publisherSession;
     String publisher1Email;
     FakeCollectionWriter collectionWriter;
 
-    @Before
     public void setUp() throws Exception {
-        builder = new Builder();
-        zebedee = new Zebedee(builder.zebedee, false);
+
         collection = new Collection(builder.collections.get(1), zebedee);
 
         publisherSession = zebedee.openSession(builder.publisher1Credentials);
-        publisher1Email = builder.publisher1.email;
+        publisher1Email = builder.publisher1.getEmail();
         collectionWriter = new FakeCollectionWriter(zebedee.getCollections().path.toString(), collection.description.id);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        builder.delete();
     }
 
     @Test
@@ -80,7 +70,7 @@ public class CollectionTest {
 
 
         // Then
-        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
         Path releasePath = rootPath.resolve(filename);
         Path jsonPath = rootPath.resolve(filename + ".json");
 
@@ -121,7 +111,7 @@ public class CollectionTest {
         Collection.rename(collectionDescription, newName, zebedee);
 
         // Then the collection is renamed.
-        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
         Path releasePath = rootPath.resolve(filename);
         Path jsonPath = rootPath.resolve(filename + ".json");
 
@@ -167,7 +157,7 @@ public class CollectionTest {
         Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
-        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
         Path collectionFolderPath = rootPath.resolve(filename);
         Path collectionJsonPath = rootPath.resolve(filename + ".json");
 
@@ -209,7 +199,7 @@ public class CollectionTest {
         Collection.update(collection, updatedDescription, zebedee, new DummyScheduler(), publisherSession);
 
         // Then the properties of the description passed to update have been updated.
-        Path rootPath = builder.zebedee.resolve(Zebedee.COLLECTIONS);
+        Path rootPath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS);
         Path collectionFolderPath = rootPath.resolve(filename);
         Path collectionJsonPath = rootPath.resolve(filename + ".json");
 
@@ -278,7 +268,7 @@ public class CollectionTest {
 
         Collection.create(collectionDescription, zebedee, publisherSession);
 
-        Path releasePath = builder.zebedee.resolve(Zebedee.COLLECTIONS).resolve(
+        Path releasePath = builder.zebedeeRootPath.resolve(Zebedee.COLLECTIONS).resolve(
                 PathUtils.toFilename(name));
         FileUtils.cleanDirectory(releasePath.toFile());
 
@@ -317,7 +307,7 @@ public class CollectionTest {
         builder.createPublishedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.email, uri);
+        boolean created = collection.create(publisherSession.getEmail(), uri);
 
         // Then
         assertFalse(created);
@@ -334,7 +324,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.email, uri);
+        boolean created = collection.create(publisherSession.getEmail(), uri);
 
         // Then
         assertFalse(created);
@@ -351,7 +341,7 @@ public class CollectionTest {
         builder.createReviewedFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.email, uri);
+        boolean created = collection.create(publisherSession.getEmail(), uri);
 
         // Then
         assertFalse(created);
@@ -368,7 +358,7 @@ public class CollectionTest {
         builder.createInProgressFile(uri);
 
         // When
-        boolean created = collection.create(publisherSession.email, uri);
+        boolean created = collection.create(publisherSession.getEmail(), uri);
 
         // Then
         assertFalse(created);
@@ -387,7 +377,7 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContentDirectory(publisherSession.email, jsonFile);
+        boolean result = collection.deleteContentDirectory(publisherSession.getEmail(), jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -410,7 +400,7 @@ public class CollectionTest {
         Path root = builder.collections.get(1).resolve(Collection.COMPLETE);
 
         // When the delete method is called on the json file
-        boolean result = collection.deleteContentDirectory(publisherSession.email, jsonFile);
+        boolean result = collection.deleteContentDirectory(publisherSession.getEmail(), jsonFile);
 
         // Then both the json file and csv file are deleted.
         assertTrue(result);
@@ -520,7 +510,7 @@ public class CollectionTest {
         Path inProgress = builder.collections.get(1).resolve(Collection.IN_PROGRESS);
         assertTrue(Files.exists(inProgress.resolve(uri.substring(1))));
 
-        Path published = builder.zebedee.resolve(Zebedee.PUBLISHED);
+        Path published = builder.zebedeeRootPath.resolve(Zebedee.PUBLISHED);
         Path content = published.resolve(uri.substring(1));
         assertTrue(Files.exists(content));
 
@@ -1105,7 +1095,7 @@ public class CollectionTest {
 
         String releaseJsonUri = uri + "/data.json";
 
-        collection.complete(builder.publisher1.email, releaseJsonUri, recursive);
+        collection.complete(builder.publisher1.getEmail(), releaseJsonUri, recursive);
         collection.review(builder.createSession(builder.publisher2), releaseJsonUri, recursive);
 
         ContentDetail articleDetail = new ContentDetail("My article", "/some/uri", PageType.article.toString());
@@ -1273,7 +1263,7 @@ public class CollectionTest {
         assertTrue(Files.exists(collection.reviewed.get(version.getUri()).resolve("data.json")));
 
         // When the delete version function is called for the version URI
-        collection.deleteVersion(version.getUri().toString());
+        collection.deleteVersion(version.getUri());
 
         // Then the versions directory is deleted.
         assertNull(collection.reviewed.get(version.getUri()));

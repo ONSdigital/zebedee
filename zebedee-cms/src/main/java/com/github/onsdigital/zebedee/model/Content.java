@@ -9,17 +9,23 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.model.PathUtils.findByCriteria;
 
 public class Content {
 
@@ -49,6 +55,7 @@ public class Content {
 
     /**
      * Create a new instance using an injected publishedContentPath.
+     *
      * @param path
      * @param publishedContentPath
      */
@@ -57,8 +64,10 @@ public class Content {
         this.publishedContentPath = publishedContentPath;
     }
 
-    private static boolean isNotTimeseries(Path p) {
-        return !p.getFileName().toString().contains(TIME_SERIES_KEYWORD);
+    private static boolean isTimeseries(Path path) {
+        return findByCriteria(path, p -> {
+            return p.toFile().isDirectory() && TIME_SERIES_KEYWORD.equals(p.getFileName().toString());
+        });
     }
 
     private static boolean isDataVisualisation(Path p) {
@@ -294,12 +303,12 @@ public class Content {
                     result.uri = PathUtils.toUri(this.path.relativize(path.getParent()));
                 } else {
                     logInfo("Failed to deserialise content details")
-                            .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())).toString())
+                            .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())))
                             .log();
                 }
             } catch (JsonSyntaxException exception) {
                 logInfo("Failed to deserialise content details")
-                        .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())).toString())
+                        .addParameter("path", PathUtils.toUri(this.path.relativize(path.getParent())))
                         .log();
             }
         }
@@ -408,16 +417,16 @@ public class Content {
         return false;
     }
 
-    private boolean isVisibleForCollectionOwner(CollectionOwner collectionOwner, Path entry) {
+    static boolean isVisibleForCollectionOwner(CollectionOwner collectionOwner, Path entry) {
         if (collectionOwner.equals(CollectionOwner.DATA_VISUALISATION)) {
             return Files.isDirectory(entry)
                     && isDataVisualisation(entry)
-                    && isNotTimeseries(entry)
+                    && !isTimeseries(entry)
                     && isNotPreviousVersions(entry);
         } else {
             // PUBLISHING SUPPORT
             return Files.isDirectory(entry)
-                    && isNotTimeseries(entry)
+                    && !isTimeseries(entry)
                     && isNotPreviousVersions(entry)
                     && !isDataVisualisation(entry);
         }

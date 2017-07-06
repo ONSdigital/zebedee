@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.model;
 import com.github.davidcarboni.cryptolite.Keys;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.zebedee.KeyManangerUtil;
 import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.content.page.release.Release;
 import com.github.onsdigital.zebedee.content.util.ContentUtil;
@@ -20,8 +21,10 @@ import com.github.onsdigital.zebedee.json.ContentDetail;
 import com.github.onsdigital.zebedee.json.Event;
 import com.github.onsdigital.zebedee.json.EventType;
 import com.github.onsdigital.zebedee.json.Events;
-import com.github.onsdigital.zebedee.json.Session;
-import com.github.onsdigital.zebedee.json.Team;
+import com.github.onsdigital.zebedee.persistence.dao.CollectionHistoryDao;
+import com.github.onsdigital.zebedee.service.ServiceSupplier;
+import com.github.onsdigital.zebedee.session.model.Session;
+import com.github.onsdigital.zebedee.teams.model.Team;
 import com.github.onsdigital.zebedee.model.approval.tasks.ReleasePopulator;
 import com.github.onsdigital.zebedee.model.content.item.ContentItemVersion;
 import com.github.onsdigital.zebedee.model.content.item.VersionedContentItem;
@@ -32,6 +35,8 @@ import com.github.onsdigital.zebedee.reader.ContentReader;
 import com.github.onsdigital.zebedee.reader.FileSystemContentReader;
 import com.github.onsdigital.zebedee.reader.Resource;
 import com.github.onsdigital.zebedee.reader.ZebedeeReader;
+import com.github.onsdigital.zebedee.teams.service.TeamsService;
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -79,14 +84,29 @@ public class Collection {
     public static final String IN_PROGRESS = "inprogress";
 
     private static ConcurrentMap<Path, ReadWriteLock> collectionLocks = new ConcurrentHashMap<>();
+    private static KeyManangerUtil keyManagerUtil = new KeyManangerUtil();
+
     public final CollectionDescription description;
     public final Path path;
     public final Content reviewed;
     public final Content complete;
     public final Content inProgress;
+
     public final Zebedee zebedee;
 
     private final Path collectionJsonPath;
+
+    private static ServiceSupplier<CollectionHistoryDao> collectionHistoryDaoServiceSupplier = () -> getCollectionHistoryDao();
+
+    @VisibleForTesting
+    public static void setKeyManagerUtil(KeyManangerUtil manager) {
+        keyManagerUtil = manager;
+    }
+
+    @VisibleForTesting
+    public static void setCollectionHistoryDaoServiceSupplier(ServiceSupplier<CollectionHistoryDao> supplier) {
+        collectionHistoryDaoServiceSupplier = supplier;
+    }
 
     /**
      * Instantiates an existing {@link Collection}. This validates that the
@@ -159,7 +179,7 @@ public class Collection {
 
         CreateCollectionFolders(filename, rootCollectionsPath);
 
-        collectionDescription.AddEvent(new Event(new Date(), EventType.CREATED, session.email));
+        collectionDescription.addEvent(new Event(new Date(), EventType.CREATED, session.getEmail()));
         // Create the description:
         Path collectionDescriptionPath = rootCollectionsPath.resolve(filename
                 + ".json");
@@ -168,24 +188,27 @@ public class Collection {
         }
 
         Collection collection = new Collection(rootCollectionsPath.resolve(filename), zebedee);
-        getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED, collectionCreated
-                (collectionDescription));
+        collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_CREATED,
+                collectionCreated(collectionDescription));
 
         if (collectionDescription.teams != null) {
             for (String teamName : collectionDescription.teams) {
-                Team team = zebedee.getTeams().findTeam(teamName);
-                zebedee.getPermissions().addViewerTeam(collectionDescription, team, session);
+                Team team = zebedee.getTeamsService().findTeam(teamName);
+                zebedee.getPermissionsService().addViewerTeam(collectionDescription, team, session);
             }
         }
 
         // Encryption
         // assign a key for the collection to the session user
-        KeyManager.assignKeyToUser(zebedee, zebedee.getUsers().get(session.email), collection.description.id, Keys.newSecretKey());
+        keyManagerUtil.assignKeyToUser(zebedee, zebedee.getUsersService().getUserByEmail(session.getEmail()),
+                collection.description.id, Keys.newSecretKey());
+
         // get the session user to distribute the key to all
-        KeyManager.distributeCollectionKey(zebedee, session, collection, true);
+        keyManagerUtil.distributeCollectionKey(zebedee, session, collection, true);
 
         if (release != null) {
-            collection.associateWithRelease(session.email, release, new ZebedeeCollectionWriter(zebedee, collection, session));
+            collection.associateWithRelease(session.getEmail(), release, new ZebedeeCollectionWriter(zebedee,
+                    collection, session));
             collection.save();
         }
 
@@ -300,7 +323,7 @@ public class Collection {
                 updatedCollection.description.name = collectionDescription.name;
             }
 
-            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_NAME_CHANGED, renamed
+            collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_NAME_CHANGED, renamed
                     (nameBeforeUpdate));
         }
 
@@ -308,14 +331,14 @@ public class Collection {
         if (collectionDescription.type != null
                 && updatedCollection.description.type != collectionDescription.type) {
             updatedCollection.description.type = collectionDescription.type;
-            getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_TYPE_CHANGED, typeChanged
+            collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_TYPE_CHANGED, typeChanged
                     (updatedCollection.description));
         }
 
         if (updatedCollection.description.type == CollectionType.scheduled) {
             if (collectionDescription.publishDate != null) {
                 if (!collectionDescription.publishDate.equals(collection.description.publishDate)) {
-                    getCollectionHistoryDao().saveCollectionHistoryEvent(collection, session, COLLECTION_PUBLISH_RESCHEDULED,
+                    collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(collection, session, COLLECTION_PUBLISH_RESCHEDULED,
                             reschedule(collection.description.publishDate, collectionDescription.publishDate));
                 }
                 updatedCollection.description.publishDate = collectionDescription.publishDate;
@@ -348,13 +371,14 @@ public class Collection {
 
         if (collectionDescription.teams != null) {
             // work out which teams need to be removed from the existing teams.
-            Set<Integer> currentTeamIds = zebedee.getPermissions().listViewerTeams(collectionDescription, session);
-            Teams teams = zebedee.getTeams();
+            Set<Integer> currentTeamIds = zebedee.getPermissionsService().listViewerTeams(collectionDescription, session);
+            TeamsService teamsService = zebedee.getTeamsService();
             for (Integer currentTeamId : currentTeamIds) { // for each current team ID
-                for (Team team : teams.listTeams()) { // iterate the teams list to find the team object
-                    if (currentTeamId.equals(team.id)) { // if the ID's match
-                        if (!collectionDescription.teams.contains(team.name)) { // if the team is not listed in the updated list
-                            zebedee.getPermissions().removeViewerTeam(collectionDescription, team, session);
+                for (Team team : teamsService.listTeams()) { // iterate the teamsService list to find the team object
+                    if (currentTeamId.equals(team.getId())) { // if the ID's match
+                        if (!collectionDescription.teams.contains(team.getName())) { // if the team is not listed in the
+                            // updated list
+                            zebedee.getPermissionsService().removeViewerTeam(collectionDescription, team, session);
                         }
                     }
                 }
@@ -362,10 +386,11 @@ public class Collection {
 
             // Add all the new teams. The add is idempotent so we don't need to check if it already exists.
             for (String teamName : collectionDescription.teams) {
-                // We have already deserialised the teams list to its more efficient to iterate it again rather than deserialise by team name.
-                for (Team team : teams.listTeams()) { // iterate the teams list to find the team object
-                    if (teamName.equals(team.name)) {
-                        zebedee.getPermissions().addViewerTeam(collectionDescription, team, session);
+                // We have already deserialised the teams list to its more efficient to iterate it again rather than
+                // deserialise by team name.
+                for (Team team : teamsService.listTeams()) {
+                    if (teamName.equals(team.getName())) {
+                        zebedee.getPermissionsService().addViewerTeam(collectionDescription, team, session);
                         updatedTeams.add(teamName);
                     }
                 }
@@ -549,7 +574,7 @@ public class Collection {
         }
 
         // Does the current user have permission to edit?
-        boolean permission = zebedee.getPermissions().canEdit(email);
+        boolean permission = zebedee.getPermissionsService().canEdit(email);
 
         if (!isBeingEdited && !hasDeleteMarker && !exists && permission) {
             // Copy from Published to in progress:
@@ -603,7 +628,7 @@ public class Collection {
 
 
         // Does the user have permission to edit?
-        boolean permission = zebedee.getPermissions().canEdit(email, description);
+        boolean permission = zebedee.getPermissionsService().canEdit(email, description);
         if (!permission) {
             logInfo("Content was not saved as user does not have EDIT permission")
                     .path(uri)
@@ -652,7 +677,7 @@ public class Collection {
 
     public boolean complete(String email, String uri, boolean recursive) throws IOException {
         boolean result = false;
-        boolean permission = zebedee.getPermissions().canEdit(email);
+        boolean permission = zebedee.getPermissionsService().canEdit(email);
 
         if (isInProgress(uri) && permission) {
             // Move the in-progress copy to completed:
@@ -697,7 +722,7 @@ public class Collection {
         }
 
 
-        boolean permission = zebedee.getPermissions().canEdit(session.email);
+        boolean permission = zebedee.getPermissionsService().canEdit(session.getEmail());
         if (!permission) {
             throw new UnauthorizedException("Insufficient permissions");
         }
@@ -711,7 +736,7 @@ public class Collection {
             throw new BadRequestException("Item has not been marked completed");
         }
 
-        boolean userCompletedContent = didUserCompleteContent(session.email, uri);
+        boolean userCompletedContent = didUserCompleteContent(session.getEmail(), uri);
         if (userCompletedContent) {
             throw new UnauthorizedException("Reviewer must be a second set of eyes");
         }
@@ -739,8 +764,8 @@ public class Collection {
                 zebedee.getCollections().removeEmptyCollectionDirectories(source);
             }
 
-            addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.email));
-            getCollectionHistoryDao().saveCollectionHistoryEvent(
+            addEvent(uri, new Event(new Date(), EventType.REVIEWED, session.getEmail()));
+            collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(
                     new CollectionHistoryEvent(this.description.id, this.description.name, session,
                             COLLECTION_CONTENT_REVIEWED, contentReviewed(source, destination)));
             result = true;
@@ -913,9 +938,9 @@ public class Collection {
         }
 
         if (hasDeleted) {
-            addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.email));
-            getCollectionHistoryDao().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
-                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri.toString()));
+            addEvent(contentUri, new Event(new Date(), EventType.DELETED, session.getEmail()));
+            collectionHistoryDaoServiceSupplier.getService().saveCollectionHistoryEvent(new CollectionHistoryEvent(this, session,
+                    DATA_VISUALISATION_COLLECTION_CONTENT_DELETED, contentUri));
         }
         save();
         return hasDeleted;
@@ -1047,7 +1072,7 @@ public class Collection {
         // Fix up links within the content
         if (hasMoved) replaceLinksWithinCollection(session, fromUri, toUri);
 
-        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.email));
+        if (hasMoved) addEvent(fromUri, new Event(new Date(), EventType.MOVED, session.getEmail()));
 
         return hasMoved;
     }

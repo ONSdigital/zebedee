@@ -4,7 +4,7 @@ import com.github.onsdigital.zebedee.content.page.visualisation.Visualisation;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.UnexpectedErrorException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.model.CollectionWriter;
 import com.github.onsdigital.zebedee.model.ContentWriter;
 import com.github.onsdigital.zebedee.model.SimpleZebedeeResponse;
@@ -163,7 +163,7 @@ public class DataVisualisationZipTest {
     @Test
     public void shouldDeleteZipAndContent() throws Exception {
         Session session = new Session();
-        session.email = TEST_EMAIL;
+        session.setEmail(TEST_EMAIL);
 
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);
@@ -207,7 +207,7 @@ public class DataVisualisationZipTest {
     @Test(expected = UnexpectedErrorException.class)
     public void shouldThrowNotFoundExceptionForGetCollectionError() throws Exception {
         Session session = new Session();
-        session.email = TEST_EMAIL;
+        session.setEmail(TEST_EMAIL);
 
         try {
             when(mockRequest.getParameter(ZIP_PATH_KEY))
@@ -235,7 +235,7 @@ public class DataVisualisationZipTest {
     @Test(expected = UnexpectedErrorException.class)
     public void shouldThrowUnexpectedErrorForErrorWhileDeletingContent() throws Exception {
         Session session = new Session();
-        session.email = TEST_EMAIL;
+        session.setEmail(TEST_EMAIL);
 
         when(mockRequest.getParameter(ZIP_PATH_KEY))
                 .thenReturn(ZIP_PATH);

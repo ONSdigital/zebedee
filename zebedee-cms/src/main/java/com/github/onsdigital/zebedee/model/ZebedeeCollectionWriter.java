@@ -5,7 +5,7 @@ import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
 import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.json.Keyring;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.reader.configuration.ReaderConfiguration;
 
 import javax.crypto.SecretKey;
@@ -36,16 +36,14 @@ public class ZebedeeCollectionWriter extends CollectionWriter {
         }
 
         // Authorisation
-        if (session == null
-                || !zebedee.getPermissions().canEdit(session.email,
-                collection.description)) {
+        if (session == null || !zebedee.getPermissionsService().canEdit(session.getEmail(), collection.getDescription())) {
             throw new UnauthorizedException(getUnauthorizedMessage(session));
         }
 
         Keyring keyring = zebedee.getKeyringCache().get(session);
-        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.email);
+        if (keyring == null) throw new UnauthorizedException("No keyring is available for " + session.getEmail());
 
-        SecretKey key = keyring.get(collection.description.id);
+        SecretKey key = keyring.get(collection.getDescription().getId());
         init(collection, key);
     }
 

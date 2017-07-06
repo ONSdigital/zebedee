@@ -2,12 +2,10 @@ package com.github.onsdigital.zebedee.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.zebedee.audit.Audit;
-import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.UnauthorizedException;
 import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.ResultMessage;
-import com.github.onsdigital.zebedee.json.Session;
+import com.github.onsdigital.zebedee.session.model.Session;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -43,7 +41,7 @@ public class Review {
             throw new NotFoundException("Collection not found");
         }
 
-        Session session = Root.zebedee.getSessions().get(request);
+        Session session = Root.zebedee.getSessionsService().get(request);
         String uri = request.getParameter("uri");
 
         Boolean recursive = BooleanUtils.toBoolean(StringUtils.defaultIfBlank(request.getParameter("recursive"), "false"));
@@ -56,7 +54,7 @@ public class Review {
                 .parameters()
                 .host(request)
                 .collection(collection)
-                .user(session.email)
+                .user(session.getEmail())
                 .log();
         return new ResultMessage("URI reviewed.");
     }

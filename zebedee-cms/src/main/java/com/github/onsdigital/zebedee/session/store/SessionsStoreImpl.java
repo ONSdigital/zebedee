@@ -3,6 +3,7 @@ package com.github.onsdigital.zebedee.session.store;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.zebedee.model.PathUtils;
 import com.github.onsdigital.zebedee.session.model.Session;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static org.apache.commons.io.FilenameUtils.getExtension;
+
 /**
  * Created by dave on 23/05/2017.
  */
@@ -22,10 +25,11 @@ public class SessionsStoreImpl implements SessionsStore {
 
     private static final String DS_STORE_FILE = ".DS_Store";
     private static final String JSON_EXT = ".json";
+
     private Path sessionsPath;
 
-    private static final Predicate<Path> isSessionFile = (p) -> !Files.isDirectory(p)
-            && !DS_STORE_FILE.equals(p.getFileName().toString());
+    private static final Predicate<Path> isSessionFile = (p) -> p != null && !Files.isDirectory(p)
+            && p.getFileName().toString().endsWith(JSON_EXT);
 
     public SessionsStoreImpl(Path sessionsPath) {
         this.sessionsPath = sessionsPath;
@@ -99,7 +103,8 @@ public class SessionsStoreImpl implements SessionsStore {
             for (Path entry : stream) {
                 if (isSessionFile.test(entry)) {
                     candidate = read(entry);
-                    if (StringUtils.equalsIgnoreCase(candidate.getEmail(), PathUtils.standardise(email))) {
+                    if (candidate != null && StringUtils.equalsIgnoreCase(candidate.getEmail(),
+                            PathUtils.standardise(email))) {
                         return candidate;
                     }
                     candidate = null;

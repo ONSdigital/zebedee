@@ -24,6 +24,9 @@ public class SessionsStoreImpl implements SessionsStore {
     private static final String JSON_EXT = ".json";
     private Path sessionsPath;
 
+    private static final Predicate<Path> isSessionFile = (p) -> !Files.isDirectory(p)
+            && !DS_STORE_FILE.equals(p.getFileName().toString());
+
     public SessionsStoreImpl(Path sessionsPath) {
         this.sessionsPath = sessionsPath;
     }
@@ -94,7 +97,7 @@ public class SessionsStoreImpl implements SessionsStore {
         iterate:
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessionsPath)) {
             for (Path entry : stream) {
-                if (!Files.isDirectory(entry) && !entry.endsWith(DS_STORE_FILE)) {
+                if (isSessionFile.test(entry)) {
                     candidate = read(entry);
                     if (StringUtils.equalsIgnoreCase(candidate.getEmail(), PathUtils.standardise(email))) {
                         return candidate;
@@ -112,7 +115,7 @@ public class SessionsStoreImpl implements SessionsStore {
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(sessionsPath)) {
             for (Path entry : stream) {
-                if (!Files.isDirectory(entry)) {
+                if (isSessionFile.test(entry)) {
                     Session s = read(entry);
                     if (criteria.test(s)) {
                         results.add(s);

@@ -64,6 +64,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logDebug;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_REVIEWED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CREATED;
@@ -934,7 +935,7 @@ public class Collection {
 
         for (Content collectionDir : new Content[]{inProgress, complete, reviewed}) {
             if (collectionDir.exists(contentUri)) {
-                FileUtils.deleteDirectory(Paths.get(collectionDir.path.toString() + contentUri).toFile());
+                FileUtils.deleteDirectory(Paths.get(collectionDir.getPath().toString() + contentUri).toFile());
                 hasDeleted = true;
             }
         }

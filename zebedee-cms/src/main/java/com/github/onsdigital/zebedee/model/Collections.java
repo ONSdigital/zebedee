@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -59,6 +60,7 @@ import java.util.stream.Collectors;
 import static com.github.onsdigital.zebedee.configuration.Configuration.getUnauthorizedMessage;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
+import static com.github.onsdigital.zebedee.model.Content.isDataVisualisationFile;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_APPROVED;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_COMPLETED_ERROR;
 import static com.github.onsdigital.zebedee.persistence.CollectionEventType.COLLECTION_CONTENT_DELETED;
@@ -669,11 +671,14 @@ public class Collections {
         boolean deleted;
         CollectionEventType eventType;
 
-        if (Files.isDirectory(path)) {
+        if (isDataVisualisationFile(path)) {
+            deleted = collection.deleteDataVisContent(session, Paths.get(uri));
+        } else if (Files.isDirectory(path)) {
             deleted = collection.deleteContentDirectory(session.getEmail(), uri);
         } else {
             deleted = collection.deleteFile(uri);
         }
+
         eventType = COLLECTION_CONTENT_DELETED;
 
         collection.save();

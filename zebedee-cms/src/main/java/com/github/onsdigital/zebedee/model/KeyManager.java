@@ -52,7 +52,6 @@ public class KeyManager {
 
         List<User> keyRecipients = zebedee.getPermissionsService().getCollectionAccessMapping(collection);
         List<User> removals = new ArrayList<>();
-        List<User> additions = new ArrayList<>();
 
         if (!isNewCollection) {
             zebedee.getUsersService().list().stream().forEach(user -> {
@@ -62,21 +61,18 @@ public class KeyManager {
             });
         }
 
-        zebedee.getUsersService().list().stream().forEach(user -> {
-            if (!removals.contains(user)) {
-                additions.add(user);
+        for (User u : zebedee.getUsersService().list()) {
+            if (removals.contains(u)) {
+                removeKeyFromUser(zebedee, u, collection.getDescription().getId());
+                continue;
             }
-        });
 
-        for (User removedUser : removals) {
-            removeKeyFromUser(zebedee, removedUser, collection.getDescription().getId());
+            if (keyRecipients.contains(u) && !removals.contains(u)) {
+                assignKeyToUser(zebedee, u, collection.getDescription().getId(), key);
+            }
         }
 
-        for (User addedUser : additions) {
-            assignKeyToUser(zebedee, addedUser, collection.getDescription().getId(), key);
-        }
-
-        zebedee.getKeyringCache().getSchedulerCache().put(collection.getDescription().getId(), key);
+        zebedee.getKeyringCache().getSchedulerCache().put(collection.description.getId(), key);
     }
 
     /**

@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logInfo;
@@ -24,9 +25,13 @@ import static com.github.onsdigital.zebedee.model.PathUtils.findByCriteria;
 
 public class Content {
 
+
     public static final String REDIRECT = "redirect.txt";
     public static final String DATA_VIS_DIR = "visualisations";
     public static final String TIME_SERIES_KEYWORD = "timeseries";
+
+    private static final Predicate<Path> IS_DATA_VIZ_FILE = (p) -> p != null && p.toFile().isDirectory() &&
+            DATA_VIS_DIR.equals(p.getFileName().toString());
 
     public final Path path;
     public final Path dataVisualisationsPath;
@@ -37,8 +42,7 @@ public class Content {
     public Content(Path path) {
         this.path = path;
         if (!Files.exists(path)) {
-            throw new IllegalArgumentException("Path does not exist: "
-                    + path.toAbsolutePath());
+            throw new IllegalArgumentException("Path does not exist: " + path.toAbsolutePath());
         }
 
         this.dataVisualisationsPath = this.path.resolve(DATA_VIS_DIR);
@@ -427,5 +431,9 @@ public class Content {
             publishedContentPath = ZebedeeCmsService.getInstance().getZebedee().getPublishedContentPath();
 
         return publishedContentPath;
+    }
+
+    public static boolean isDataVisualisationFile(Path path) {
+        return findByCriteria(path, IS_DATA_VIZ_FILE);
     }
 }

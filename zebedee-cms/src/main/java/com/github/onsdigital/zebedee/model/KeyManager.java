@@ -4,12 +4,10 @@ import com.github.onsdigital.zebedee.Zebedee;
 import com.github.onsdigital.zebedee.api.Root;
 import com.github.onsdigital.zebedee.exceptions.BadRequestException;
 import com.github.onsdigital.zebedee.exceptions.NotFoundException;
-import com.github.onsdigital.zebedee.exceptions.ZebedeeException;
 import com.github.onsdigital.zebedee.json.Keyring;
 import com.github.onsdigital.zebedee.service.ServiceSupplier;
 import com.github.onsdigital.zebedee.session.model.Session;
 import com.github.onsdigital.zebedee.user.model.User;
-import com.github.onsdigital.zebedee.model.csdb.CsdbImporter;
 import com.github.onsdigital.zebedee.util.ZebedeeCmsService;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logError;
 import static com.github.onsdigital.zebedee.logging.ZebedeeLogBuilder.logWarn;
@@ -55,32 +54,25 @@ public class KeyManager {
         SecretKey key = zebedee.getKeyringCache().get(session).get(collection.getDescription().getId());
 
         List<User> keyRecipients = zebedee.getPermissionsService().getCollectionAccessMapping(collection);
-        List<User> removals = new ArrayList<>();
-        List<User> additions = new ArrayList<>();
+        List<User> keyRevoked = new ArrayList<>();
 
         if (!isNewCollection) {
-            zebedee.getUsersService().list().stream().forEach(user -> {
-                if (!keyRecipients.contains(user)) {
-                    removals.add(user);
-                }
-            });
+            keyRevoked = zebedee.getUsersService()
+                    .list()
+                    .stream()
+                    .filter((user -> !keyRecipients.contains(user)))
+                    .collect(Collectors.toList());
         }
 
-        zebedee.getUsersService().list().stream().forEach(user -> {
-            if (!removals.contains(user)) {
-                additions.add(user);
-            }
-        });
-
-        for (User removedUser : removals) {
-            removeKeyFromUser(zebedee, removedUser, collection.getDescription().id);
+        for (User removedUser : keyRevoked) {
+            removeKeyFromUser(zebedee, removedUser, collection.getDescription().getId());
         }
 
-        for (User addedUser : additions) {
-            assignKeyToUser(zebedee, addedUser, collection.getDescription().id, key);
+        for (User recipient : keyRecipients) {
+            assignKeyToUser(zebedee, recipient, collection.getDescription().getId(), key);
         }
 
-        zebedee.getKeyringCache().getSchedulerCache().put(collection.description.id, key);
+        zebedee.getKeyringCache().getSchedulerCache().put(collection.getDescription().getId(), key);
     }
 
     /**

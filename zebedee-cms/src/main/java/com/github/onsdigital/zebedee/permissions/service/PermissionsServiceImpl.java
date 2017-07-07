@@ -496,7 +496,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         boolean result = false;
 
         // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teams = accessMapping.collections.get(collectionDescription.id);
+        Set<Integer> teams = accessMapping.collections.get(collectionDescription.getId());
         if (teams != null) {
             for (Team team : teamsServiceSupplier.getService().listTeams()) {
                 boolean isTeamMember = teams.contains(team.getId()) && team.getMembers().contains(standardise(email));
@@ -513,7 +513,7 @@ public class PermissionsServiceImpl implements PermissionsService {
                             AccessMapping accessMapping, List<Team> teamsList) throws IOException {
         boolean result = false;
         // Check to see if the email is a member of a team associated with the given collection:
-        Set<Integer> teamsOnCollection = accessMapping.getCollections().get(collectionDescription.getCollectionOwner());
+        Set<Integer> teamsOnCollection = accessMapping.getCollections().get(collectionDescription.getId());
         if (teamsOnCollection != null) {
             for (Team team : teamsList) {
                 boolean isTeamMember = teamsOnCollection.contains(team.getId()) && team.getMembers()
